@@ -11,7 +11,7 @@
 | `ml` | AI 모델 | PyTorch · LSTM(공실 예측) · GNN(업종 추천) · MLflow |
 | `data` | ETL·크롤링 | Airflow · Playwright · Bronze/Silver/Gold |
 | `infra` | 배포 | Docker · k8s · GitHub Actions |
-| `docs` · `memory` | 문서·전략 메모리 | — |
+| `docs` · `memory` | 문서·전략 메모리 | — | 
 
 ## 빠른 시작
 

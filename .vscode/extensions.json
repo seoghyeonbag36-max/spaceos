@@ -1,0 +1,13 @@
+{
+  "// SpaceOS 팀 권장 확장": "VS Code가 이 폴더를 열면 설치를 안내합니다 (@recommended)",
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    "charliermarsh.ruff",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-azuretools.vscode-docker",
+    "redhat.vscode-yaml"
+  ]
+}

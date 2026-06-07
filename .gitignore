@@ -28,7 +28,12 @@ data/gold/*
 # IDE / OS
 .DS_Store
 .idea/
-.vscode/
+# .vscode: 팀 공유 설정만 추적, 개인/머신별 설정은 제외
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
 
 # Secrets
 *.pem
