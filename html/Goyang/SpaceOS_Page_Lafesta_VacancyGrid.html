@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS · Page · 라페스타·웨스턴돔 공실 밀도 히트맵</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<style>
+:root{
+ --bg:#eef1f4;--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#3a5a98;--green:#3f7d3f;
+ --nv-land:#f7f6f2;--nv-park:#d9ead0;--nv-arter:#fbe7a6;--nv-arter-case:#e9cf73;--nv-bldg:#ece9e2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);padding:22px;line-height:1.4}
+.wrap{max-width:1180px;margin:0 auto}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.hd .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+.hd h1{font-size:30px;font-weight:800;margin:6px 0 5px;letter-spacing:-.5px}
+.hd .sub{font-size:13px;color:var(--sub)}
+.hd .rt{display:flex;gap:8px;align-items:center}
+.chip{font-size:12px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:7px 13px;color:var(--sub)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+.kpi .l{font-size:12px;color:var(--sub);margin-bottom:9px}
+.kpi .v{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.kpi .v small{font-size:13px;font-weight:700;margin-left:4px}
+.kpi .d{font-size:11px;color:var(--sub);margin-top:6px}
+.cols{display:grid;grid-template-columns:1.55fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px 18px;margin-bottom:14px}
+.card .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.card .ch h2{font-size:16px;font-weight:800}
+.card .ch .hint{font-size:11px;color:#9aa3af}
+.maphost{position:relative}
+#map{height:560px;border-radius:12px;border:1px solid var(--line);background:var(--nv-land)}
+.leaflet-container{background:var(--nv-land)}
+.glab{font-size:9px;font-weight:800;color:#3a2f2f;text-shadow:0 0 2px #fff,0 0 2px #fff;pointer-events:none;white-space:nowrap}
+.poi{font-size:10.5px;font-weight:700;color:#7b8794;text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.poi.sta{color:#c0504a}.poi.park{color:#4f7a31}
+.legb{display:flex;gap:6px;justify-content:center;margin-top:13px;flex-wrap:wrap;align-items:center}
+.legb .lt{font-size:11px;color:var(--sub);margin-right:4px}
+.legb i{width:30px;height:11px;display:inline-block}
+.legb .lv{font-size:10px;color:var(--sub)}
+.detail .top{display:flex;justify-content:space-between;align-items:flex-start}
+.detail .znm{font-size:17px;font-weight:800}
+.detail .zlab{font-size:11px;color:var(--sub)}
+.detail .zsc{font-size:30px;font-weight:800;text-align:right;line-height:1}
+.detail .zsuf{font-size:11px;text-align:right;margin-top:3px;font-weight:600;color:var(--sub)}
+.mrow{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-top:1px solid var(--line)}
+.mrow b{font-weight:700}
+.sec{margin-top:14px}.sec .st{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:8px}
+.mix{display:flex;height:11px;border-radius:6px;overflow:hidden;margin-bottom:7px}
+.mix i{height:100%}
+.mixleg{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:11px;color:var(--sub)}
+.mixleg span{display:flex;align-items:center;gap:5px}.mixleg .dt{width:8px;height:8px;border-radius:2px}
+.vac{font-size:12px;color:#7a3b39;background:#fbeceb;border:1px solid #f0d4d2;border-radius:8px;padding:9px 11px;margin-top:10px;line-height:1.6}
+.vac b{color:#5e2c2a}
+.btn{width:100%;margin-top:13px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;padding:11px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{background:#3a5a98;color:#fff;border-color:#3a5a98}
+.rk{display:flex;flex-direction:column;gap:9px}
+.rkr{display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px 8px;border-radius:8px;transition:.12s}
+.rkr:hover{background:#f4f6f9}
+.rkr .rn{width:18px;font-size:12px;font-weight:800;color:#9aa3af}
+.rkr .rc{font-size:12px;font-weight:700;flex:0 0 58px}
+.rkr .rbar{flex:1;height:8px;border-radius:5px;background:#eceff2;overflow:hidden}
+.rkr .rbar i{display:block;height:100%}
+.rkr .rv{font-size:12px;font-weight:800;flex:0 0 44px;text-align:right}
+.foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:18px;line-height:1.6}
+.nvbadge{position:absolute;right:10px;bottom:8px;z-index:500;background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:10px;color:#9aa3af}
+@media(max-width:920px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}#map{height:440px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <div class="ey">SPACEOS · PAGE · 공실 밀도 히트맵 (전 공실)</div>
+      <h1>일산 라페스타 · 웨스턴돔</h1>
+      <div class="sub">고양시 일산동구 장항동 · 네이버 지도 정합 · 전 공실 밀도 히트맵 · 클릭 → 구역 상세 · 건축물대장+크롤링 정합</div>
+    </div>
+    <div class="rt">
+      <div class="chip">공실구역 <b id="cellcnt">0</b>개</div>
+      <div class="chip">기준일 2026-06-01</div>
+    </div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="cols">
+    <div class="left">
+      <div class="card">
+        <div class="ch"><h2>공실 밀도 히트맵 · 전 공실</h2><div class="hint">색 진할수록 공실 밀집 · 지도 클릭 → 구역 상세</div></div>
+        <div class="maphost"><div id="map"></div><div class="nvbadge">베이스: 네이버 지도 스타일 정합 · 100m 격자 EPSG 근사</div></div>
+        <div class="legb" id="legb"></div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="card detail" id="detail"></div>
+      <div class="card">
+        <div class="ch"><h2>공실률 상위 셀 TOP 6</h2><div class="hint">클릭 시 지도 이동</div></div>
+        <div class="rk" id="rk"></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">SpaceOS Digital Twin Platform · Page 레이어 · 100m×100m 격자는 위경도 등간격(위도 0.0009°≈100m, 경도 0.001135°≈100m@37.66°N) 근사. 공실률·업종구성은 라페스타 공실 13.6%(실측)·웨스턴돔 상층부 고공실 패턴을 반영한 시뮬레이션이며, 건축물대장(공공데이터)+네이버플레이스 영업상태 크롤링 정합 시 셀별 실측치로 자동 갱신됩니다.</div>
+</div>
+<script>
+// ===== 공실률 색상 스케일 (네이버 스타일 위 가독성 높은 OrRd 계열) =====
+function vacColor(v){return v<5?'#cfe3cf':v<10?'#fbe7a6':v<18?'#f6b96b':v<28?'#e8743b':'#c0392b';}
+var legSteps=[[0,'#cfe3cf'],[5,'#fbe7a6'],[10,'#f6b96b'],[18,'#e8743b'],[28,'#c0392b']];
+document.getElementById('legb').innerHTML='<span class="lt">공실률</span>'+legSteps.map(function(s,i){
+ var nx=legSteps[i+1];return '<i style="background:'+s[1]+'"></i><span class="lv">'+s[0]+(nx?'~'+nx[0]:'%+')+'</span>';
+}).join('');
+
+// ===== 100m 그리드 정의 =====
+// 라페스타~웨스턴돔 바운딩박스
+var BB={s:37.6565,n:37.6620,w:126.7685,e:126.7745};
+var DLAT=0.0009, DLNG=0.001135; // ≈100m
+
+// 공실 핫스팟(실측 패턴): [lat,lng,영향반경m,피크공실률]
+var hot=[
+ {lat:37.65775,lng:126.77150,r:90,pk:34}, // 라페스타 후면주차장(고공실)
+ {lat:37.66085,lng:126.77245,r:80,pk:31}, // 웨스턴돔 2F
+ {lat:37.66110,lng:126.77285,r:85,pk:42}, // 웨스턴돔 3F(최고)
+ {lat:37.65880,lng:126.77010,r:70,pk:16}, // 중앙상가(중간)
+ {lat:37.65945,lng:126.76935,r:60,pk:6},  // 정문광장(저공실)
+ {lat:37.65820,lng:126.77085,r:60,pk:5},  // 레스토랑거리(저공실)
+];
+// 상권 중심에서 멀면 데이터 희소 → 비상업 셀로 처리
+var coreCenter={lat:37.6594,lng:126.7711};
+function distM(aLat,aLng,bLat,bLng){var dy=(aLat-bLat)*111000;var dx=(aLng-bLng)*88800;return Math.sqrt(dx*dx+dy*dy);}
+function seed(i,j){var x=Math.sin(i*12.9898+j*78.233)*43758.5453;return x-Math.floor(x);}
+
+// 업종 구성 템플릿(공실률대별)
+var mixHi=[['요식',24,'#e8743b'],['공실',38,'#c0392b'],['생활편의',14,'#9aa3af'],['뷰티',8,'#c98bbf'],['기타',16,'#cbd2d9']];
+var mixMid=[['요식',34,'#e8743b'],['공실',16,'#c0392b'],['패션',14,'#7a9ad6'],['뷰티',12,'#c98bbf'],['생활편의',12,'#9aa3af'],['기타',12,'#cbd2d9']];
+var mixLo=[['요식',42,'#e8743b'],['카페',18,'#b07a4a'],['패션',14,'#7a9ad6'],['뷰티',10,'#c98bbf'],['공실',5,'#c0392b'],['기타',11,'#cbd2d9']];
+var vacStores={hi:['웨스턴돔 3F 304호 (구 노래연습장)','2F 211호 (구 의류)','1F 105호 (구 분식)'],
+ mid:['중앙상가 B동 1F (구 휴대폰)','후면동 2F (구 학원)'],lo:['A동 1F (구 액세서리)']};
+
+var map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,minZoom:15,maxZoom:18}).setView([37.6592,126.7712],16);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',opacity:.5}).addTo(map);
+
+// 네이버 스타일 참조 벡터(공원·간선·보행로)
+function fill(c,col,op){L.polygon(c,{color:col,weight:0,fillColor:col,fillOpacity:op}).addTo(map);}
+function road(c,col,w,cs,cw){L.polyline(c,{color:cs,weight:cw,opacity:.9,lineCap:'round'}).addTo(map);L.polyline(c,{color:col,weight:w,opacity:1,lineCap:'round'}).addTo(map);}
+fill([[37.6618,126.7738],[37.6628,126.7762],[37.6612,126.7780],[37.6600,126.7748]],'#d9ead0',.7);
+road([[37.6606,126.7660],[37.6612,126.7710],[37.6616,126.7762]],'#fbe7a6',6,'#e9cf73',9);
+road([[37.65960,126.76920],[37.65820,126.77090],[37.65775,126.77150]],'#ffffff',5,'#d7d2c6',8);
+L.circleMarker([37.65950,126.77415],{radius:6,color:'#fff',weight:2,fillColor:'#c0504a',fillOpacity:1}).addTo(map)
+ .bindTooltip('<div class="poi sta">◉ 정발산역</div>',{permanent:true,direction:'right',offset:[6,0],opacity:1});
+L.marker([37.66205,126.77580],{icon:L.divIcon({html:'<div class="poi park">정발산 근린공원</div>',iconSize:[0,0]})}).addTo(map);
+
+// ===== 그리드 생성 =====
+var cells=[],ci=0,sumStores=0,sumVac=0,nCom=0;
+for(var lat=BB.s, i=0; lat<BB.n-1e-9; lat+=DLAT, i++){
+ for(var lng=BB.w, j=0; lng<BB.e-1e-9; lng+=DLNG, j++){
+  var cLat=lat+DLAT/2, cLng=lng+DLNG/2;
+  // 핫스팟 합성 공실률
+  var v=2.5, infl=0;
+  hot.forEach(function(h){var d=distM(cLat,cLng,h.lat,h.lng);var w=Math.exp(-(d*d)/(2*h.r*h.r));v+=h.pk*w;infl+=w;});
+  v+=(seed(i,j)-0.5)*4; // 미세 노이즈
+  var dc=distM(cLat,cLng,coreCenter.lat,coreCenter.lng);
+  var commercial=infl>0.12 && dc<340; // 상권 코어만 점포 존재
+  if(!commercial){continue;}
+  v=Math.max(2,Math.min(46,v));
+  var stores=Math.round(8+22*Math.min(1,infl)+seed(j,i)*10); // 셀 점포수
+  var vacN=Math.round(stores*v/100);
+  cells.push({i:i,j:j,lat:lat,lng:lng,cLat:cLat,cLng:cLng,v:v,stores:stores,vacN:vacN});
+  sumStores+=stores;sumVac+=vacN;nCom++;
+ }
+}
+document.getElementById('cellcnt').textContent=nCom;
+
+// 공실 밀도 히트맵 렌더 (모든 공실 점포 분산)
+var rects={};
+var heatPts=[];
+cells.forEach(function(c){
+ rects[c.i+'_'+c.j]=c;
+ for(var k=0;k<c.vacN;k++){
+  var jl=c.cLat+(Math.random()-0.5)*DLAT*0.9;
+  var jg=c.cLng+(Math.random()-0.5)*DLNG*0.9;
+  heatPts.push([jl,jg,Math.max(0.32,Math.min(1,c.v/42))]);
+ }
+});
+if(window.L&&L.heatLayer){
+ L.heatLayer(heatPts,{radius:22,blur:28,minOpacity:0.28,max:1.0,
+  gradient:{0.15:'#cfe3cf',0.35:'#fbe7a6',0.55:'#f6b96b',0.78:'#e8743b',1.0:'#c0392b'}}).addTo(map);
+}else{
+ heatPts.forEach(function(p){L.circleMarker([p[0],p[1]],{radius:4,weight:0,fillColor:vacColor(p[2]*42),fillOpacity:.5}).addTo(map);});
+}
+// 히트맵 클릭 → 가장 가까운 공실 구역 상세
+map.on('click',function(ev){
+ if(!cells.length)return;
+ var best=null,bd=1e9;
+ cells.forEach(function(c){var dy=(ev.latlng.lat-c.cLat)*111000,dx=(ev.latlng.lng-c.cLng)*88800,dd=Math.sqrt(dx*dx+dy*dy);if(dd<bd){bd=dd;best=c;}});
+ if(best&&bd<180)selCell(best.i+'_'+best.j);
+});
+
+// ===== KPI =====
+var avgV=(sumVac/sumStores*100);
+var hiCells=cells.filter(function(c){return c.v>=28;}).length;
+var kpis=[
+ {l:'🏢 평균 공실률',v:avgV.toFixed(1),suf:'%',c:'#c0392b',d:'전체 '+sumStores+'개 점포 기준'},
+ {l:'🟥 고공실 셀(28%+)',v:hiCells,suf:'칸',c:'#c0392b',d:'집중 관리 대상'},
+ {l:'🏬 상업 활성 셀',v:nCom,suf:'칸',d:'점포 존재 100m 격자'},
+ {l:'🪧 총 공실 점포',v:sumVac,suf:'곳',c:'#e8743b',d:'Posting 입점 후보'},
+ {l:'📐 격자 해상도',v:'100',suf:'m',d:'위경도 등간격 근사',blue:true},
+];
+document.getElementById('kpis').innerHTML=kpis.map(function(k){
+ return '<div class="kpi"><div class="l">'+k.l+'</div><div class="v"'+(k.blue?' style="color:var(--blue)"':k.c?' style="color:'+k.c+'"':'')+'>'+k.v+(k.suf?'<small style="color:var(--sub);font-weight:700">'+k.suf+'</small>':'')+'</div>'+(k.d?'<div class="d">'+k.d+'</div>':'')+'</div>';
+}).join('');
+
+// ===== 상세 패널 =====
+function mixFor(v){return v>=24?{m:mixHi,k:'hi'}:v>=10?{m:mixMid,k:'mid'}:{m:mixLo,k:'lo'};}
+function selCell(id){
+ var c=rects[id];if(!c)return;
+ var lvl=c.v<5?['양호','#3f7d3f']:c.v<10?['주의','#9a7b1e']:c.v<18?['경계','#d2691e']:c.v<28?['위험','#e8743b']:['심각','#c0392b'];
+ var mm=mixFor(c.v);
+ var mixBar=mm.m.map(function(x){return '<i style="width:'+x[1]+'%;background:'+x[2]+'"></i>';}).join('');
+ var mixLeg=mm.m.map(function(x){return '<span><span class="dt" style="background:'+x[2]+'"></span>'+x[0]+' '+x[1]+'%</span>';}).join('');
+ var stores=vacStores[mm.k];
+ var vacList='<b>대표 공실</b> · '+(stores.slice(0,c.v>=18?3:c.v>=10?2:1).join(' / '));
+ document.getElementById('detail').innerHTML=
+  '<div class="ch" style="margin-bottom:6px"><div class="zlab">선택 공실 구역 · ('+c.i+','+c.j+')</div></div>'
+  +'<div class="top"><div><div class="znm">N'+c.cLat.toFixed(4)+' · E'+c.cLng.toFixed(4)+'</div><div class="zlab" style="margin-top:4px">'+lvl[0]+' 공실 구간</div></div>'
+  +'<div><div class="zsc" style="color:'+lvl[1]+'">'+c.v.toFixed(1)+'<small style="font-size:14px">%</small></div><div class="zsuf">공실 '+c.vacN+' / 총 '+c.stores+'점포</div></div></div>'
+  +'<div class="sec"><div class="mrow"><span>총 점포 수</span><b>'+c.stores+'개</b></div>'
+  +'<div class="mrow"><span>공실 점포</span><b style="color:'+lvl[1]+'">'+c.vacN+'개</b></div>'
+  +'<div class="mrow"><span>입주율</span><b>'+(100-c.v).toFixed(1)+'%</b></div></div>'
+  +'<div class="sec"><div class="st">업종 구성</div><div class="mix">'+mixBar+'</div><div class="mixleg">'+mixLeg+'</div></div>'
+  +'<div class="vac">'+vacList+'</div>'
+  +'<button class="btn" onclick="alert(\'Posting 입점 솔루션 연계 (프로토타입)\\n\\n셀 ('+c.i+','+c.j+') 공실 '+c.vacN+'곳 → 3-Tier 매칭\\n· 고급화 / 가성비 / 공장제 비용-효용 분석\')">이 셀 Posting 입점 솔루션 ↗</button>';
+ map.setView([c.cLat,c.cLng],17,{animate:true});
+}
+
+// ===== TOP 6 랭킹 =====
+var top=cells.slice().sort(function(a,b){return b.v-a.v;}).slice(0,6);
+document.getElementById('rk').innerHTML=top.map(function(c,k){
+ return '<div class="rkr" onclick="selCell(\''+c.i+'_'+c.j+'\')"><span class="rn">'+(k+1)+'</span>'
+  +'<span class="rc">('+c.i+','+c.j+')</span>'
+  +'<span class="rbar"><i style="width:'+(c.v/46*100)+'%;background:'+vacColor(c.v)+'"></i></span>'
+  +'<span class="rv" style="color:'+vacColor(c.v)+'">'+c.v.toFixed(1)+'%</span></div>';
+}).join('');
+
+selCell(top[0].i+'_'+top[0].j);
+</script>
+</body>
+</html>

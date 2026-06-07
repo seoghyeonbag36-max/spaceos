@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS · Posting · 라페스타 공실 3-Tier 입점 솔루션</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+ --bg:#eef1f4;--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#3a5a98;--green:#3f7d3f;
+ --t1:#7a4f9a;--t1bg:#efe7f5;  /* 고급화 */
+ --t2:#2f7d4f;--t2bg:#e0f0e6;  /* 가성비 */
+ --t3:#b06a1e;--t3bg:#f6e9d4;  /* 공장제 */
+ --nv-land:#f7f6f2;--nv-park:#d9ead0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);padding:22px;line-height:1.4}
+.wrap{max-width:1180px;margin:0 auto}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.hd .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+.hd h1{font-size:30px;font-weight:800;margin:6px 0 5px;letter-spacing:-.5px}
+.hd .sub{font-size:13px;color:var(--sub)}
+.hd .rt{display:flex;gap:8px}
+.chip{font-size:12px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:7px 13px;color:var(--sub)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+.kpi .l{font-size:12px;color:var(--sub);margin-bottom:9px}
+.kpi .v{font-size:25px;font-weight:800;letter-spacing:-.5px}
+.kpi .v small{font-size:13px;font-weight:700;margin-left:4px;color:var(--sub)}
+.kpi .d{font-size:11px;color:var(--sub);margin-top:6px}
+.cols{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px 18px;margin-bottom:14px}
+.card .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.card .ch h2{font-size:16px;font-weight:800}
+.card .ch .hint{font-size:11px;color:#9aa3af}
+.maphost{position:relative}
+#map{height:560px;border-radius:12px;border:1px solid var(--line);background:var(--nv-land)}
+.leaflet-container{background:var(--nv-land)}
+.poi{font-size:10.5px;font-weight:700;color:#7b8794;text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.poi.sta{color:#c0504a}.poi.park{color:#4f7a31}
+.umk{transform:translate(-50%,-50%);width:22px;height:22px;border-radius:6px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+.legb{display:flex;gap:16px;justify-content:center;margin-top:13px;flex-wrap:wrap}
+.legb span{font-size:11.5px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.legb i{width:13px;height:13px;border-radius:4px;display:inline-block}
+.detail .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.detail .unm{font-size:17px;font-weight:800}
+.detail .ulab{font-size:11px;color:var(--sub)}
+.recbadge{display:inline-block;font-size:12px;font-weight:800;padding:5px 11px;border-radius:8px;margin-top:8px}
+.uspec{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.uspec .sp{flex:1;min-width:84px;background:#f7f8fa;border:1px solid var(--line);border-radius:9px;padding:9px 10px}
+.uspec .sp .k{font-size:10.5px;color:var(--sub)}
+.uspec .sp .vv{font-size:14px;font-weight:800;margin-top:3px}
+.tcomp{margin-top:14px}
+.tcomp .tt{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:9px}
+.tier{border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:9px;cursor:pointer;transition:.12s}
+.tier:hover{box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.tier.sel{border-width:2px}
+.tier .th{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.tier .th .nm{font-size:13.5px;font-weight:800;display:flex;align-items:center;gap:7px}
+.tier .th .nm .dot{width:11px;height:11px;border-radius:3px}
+.tier .th .roi{font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px}
+.tier .met{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:11px}
+.tier .met .m{background:#f7f8fa;border-radius:7px;padding:6px 7px}
+.tier .met .m .mk{color:var(--sub);font-size:10px}
+.tier .met .m .mv{font-weight:800;margin-top:2px}
+.tier .ce{margin-top:8px;font-size:11.5px;color:#555;line-height:1.55}
+.btn{width:100%;margin-top:12px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;padding:11px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{background:#3a5a98;color:#fff;border-color:#3a5a98}
+.foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:18px;line-height:1.6}
+.nvbadge{position:absolute;right:10px;bottom:8px;z-index:500;background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:10px;color:#9aa3af}
+@media(max-width:920px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}#map{height:440px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <div class="ey">SPACEOS · POSTING · 공실 입점 솔루션 (3-Tier 비용-효용)</div>
+      <h1>일산 라페스타 · 웨스턴돔</h1>
+      <div class="sub">고양시 일산동구 장항동 · 네이버 지도 정합 · 공실 유닛별 고급화 vs 가성비 vs 공장제 매칭</div>
+    </div>
+    <div class="rt"><div class="chip">공실 유닛 <b id="ucnt">0</b>곳</div><div class="chip">기준일 2026-06-01</div></div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="cols">
+    <div class="left">
+      <div class="card">
+        <div class="ch"><h2>공실 유닛 추천 Tier 지도</h2><div class="hint">마커 색=추천 Tier · 클릭 → 비용-효용 분석</div></div>
+        <div class="maphost"><div id="map"></div><div class="nvbadge">베이스: 네이버 지도 스타일 정합 · Page 공실 그리드 연계</div></div>
+        <div class="legb">
+          <span><i style="background:#7a4f9a"></i>고급화 (Premium)</span>
+          <span><i style="background:#2f7d4f"></i>가성비 (Value)</span>
+          <span><i style="background:#b06a1e"></i>공장제 (Standardized)</span>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="card detail" id="detail"></div>
+    </div>
+  </div>
+  <div class="foot">SpaceOS Digital Twin Platform · Posting 레이어 · Page 100m 그리드의 공실 점포를 입점 후보로 변환. ROI(투자회수기간)·예상매출은 GNN 업종시너지 + LSTM 매출예측 + 카드사 객단가 기준 시뮬레이션이며, 임대료·권리금·유동인구 실데이터 연동 시 자동 갱신됩니다. Tier 정의 — 고급화: 고객단가·브랜드 중심 / 가성비: 회전율·접근성 중심 / 공장제: 무인·표준화·저운영비 중심.</div>
+</div>
+<script>
+var TIER={
+ premium:{key:'premium',nm:'고급화',sub:'Premium',c:'#7a4f9a',bg:'#efe7f5'},
+ value:{key:'value',nm:'가성비',sub:'Value',c:'#2f7d4f',bg:'#e0f0e6'},
+ factory:{key:'factory',nm:'공장제',sub:'Standardized',c:'#b06a1e',bg:'#f6e9d4'},
+};
+function roiColor(m){return m<=12?'#2f7d4f':m<=20?'#9a7b1e':'#b23b39';}
+
+// ===== 공실 유닛 (Page 그리드 고공실 셀에서 도출) =====
+var units=[
+ {id:'u-wes3',n:'웨스턴돔 3F 304호',grp:'웨스턴돔',lat:37.66112,lng:126.77288,area:33,rent:165,prem:0,floor:'3F',was:'노래연습장',rec:'factory',
+  foot:'저', persona:'가족·학원수요', note:'상층부·접근성 약 → 목적형 무인/표준 업종'},
+ {id:'u-wes2',n:'웨스턴돔 2F 211호',grp:'웨스턴돔',lat:37.66088,lng:126.77248,area:46,rent:240,prem:300,floor:'2F',was:'의류매장',rec:'value',
+  foot:'중', persona:'20대 여성·직장인', note:'중층·동선 개선 시 회전형 F&B 적합'},
+ {id:'u-pk',n:'라페스타 후면동 1F',grp:'라페스타',lat:37.65778,lng:126.77148,area:28,rent:210,prem:500,floor:'1F',was:'분식',rec:'value',
+  foot:'중', persona:'야간·주차이용', note:'주차 접근성 활용 픽업형 가성비 업종'},
+ {id:'u-cc',n:'중앙상가 B동 1F',grp:'라페스타',lat:37.65882,lng:126.77012,area:40,rent:330,prem:1200,floor:'1F',was:'휴대폰',rec:'premium',
+  foot:'고', persona:'20대 여성·데이트', note:'핵심 보행축 1F → 고급화 브랜드 입점가치 최고'},
+ {id:'u-rt',n:'레스토랑거리 A동 1F',grp:'라페스타',lat:37.65822,lng:126.77088,area:52,rent:380,prem:1500,floor:'1F',was:'액세서리',rec:'premium',
+  foot:'고', persona:'20·30대 외식', note:'맛집거리 집객 → 고객단가 높은 다이닝'},
+ {id:'u-cv',n:'편의시설동 2F',grp:'라페스타',lat:37.65847,lng:126.76962,area:60,rent:190,prem:0,floor:'2F',was:'학원',rec:'factory',
+  foot:'중', persona:'생활밀착', note:'넓은 면적·저임대 → 공유주방/무인 표준 운영'},
+];
+document.getElementById('ucnt').textContent=units.length;
+var allu={};units.forEach(function(u){allu[u.id]=u;});
+
+// ===== Tier별 비용-효용 모델 =====
+// 입력: 유닛 면적/임대료/유동인구 → 3개 tier 시나리오 산출
+function scenarios(u){
+ var footK={'저':0.8,'중':1.0,'고':1.25}[u.foot];
+ var base=u.area*footK; // 규모·집객 기반 매출 단위
+ return {
+  premium:{
+   invest:Math.round(u.prem/100 + u.area*0.55 + 4.0),     // 초기투자(억 환산 아님, 백만원 단위 가정)
+   monthCost:Math.round(u.rent + u.area*1.8 + 180),        // 월 고정비(만원)
+   monthRev:Math.round(base*42 + 1200),                    // 월 예상매출(만원)
+   ce:'객단가↑·브랜드 집객. 인테리어·인건비 부담 크나 핵심 1F·고유동에서 효용 최대. 균형/공감 지표 강화에 유리.'},
+  value:{
+   invest:Math.round(u.prem/100 + u.area*0.32 + 2.2),
+   monthCost:Math.round(u.rent + u.area*1.1 + 95),
+   monthRev:Math.round(base*30 + 780),
+   ce:'회전율·접근성 중심. 중층·주차연계 유닛에서 투자 대비 회수 빠름. 가장 넓은 입점 풀.'},
+  factory:{
+   invest:Math.round(u.prem/100 + u.area*0.20 + 1.1),
+   monthCost:Math.round(u.rent + u.area*0.45 + 25),        // 무인·저인건비
+   monthRev:Math.round(base*18 + 430),
+   ce:'무인·표준화·저운영비. 상층·저유동 유닛의 공실 장기화 방지에 최적. 인건비 리스크 최소.'},
+ };
+}
+function roiMonths(sc){var net=sc.monthRev-sc.monthCost;return net<=0?99:sc.invest/net*1;}
+
+// ===== 지도 =====
+var map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,minZoom:15,maxZoom:18}).setView([37.6594,126.7711],16);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',opacity:.5}).addTo(map);
+function fill(c,col,op){L.polygon(c,{color:col,weight:0,fillColor:col,fillOpacity:op}).addTo(map);}
+function road(c,col,w,cs,cw){L.polyline(c,{color:cs,weight:cw,opacity:.9,lineCap:'round'}).addTo(map);L.polyline(c,{color:col,weight:w,opacity:1,lineCap:'round'}).addTo(map);}
+fill([[37.6618,126.7738],[37.6628,126.7762],[37.6612,126.7780],[37.6600,126.7748]],'#d9ead0',.7);
+road([[37.6606,126.7660],[37.6612,126.7710],[37.6616,126.7762]],'#fbe7a6',6,'#e9cf73',9);
+road([[37.65960,126.76920],[37.65820,126.77090],[37.65775,126.77150]],'#ffffff',5,'#d7d2c6',8);
+L.circleMarker([37.65950,126.77415],{radius:6,color:'#fff',weight:2,fillColor:'#c0504a',fillOpacity:1}).addTo(map)
+ .bindTooltip('<div class="poi sta">◉ 정발산역</div>',{permanent:true,direction:'right',offset:[6,0],opacity:1});
+
+units.forEach(function(u){
+ var t=TIER[u.rec];
+ var m=L.marker([u.lat,u.lng],{icon:L.divIcon({html:'<div class="umk" style="background:'+t.c+'">'+t.nm.charAt(0)+'</div>',iconSize:[0,0],className:''})}).addTo(map);
+ m.on('click',function(){selUnit(u.id);});
+ m.bindTooltip('<div class="poi" style="color:'+t.c+'">'+u.n.replace('웨스턴돔 ','웨돔 ')+'</div>',{permanent:true,direction:'right',offset:[12,0],opacity:1});
+});
+
+// ===== KPI =====
+var cnt={premium:0,value:0,factory:0};units.forEach(function(u){cnt[u.rec]++;});
+var kpis=[
+ {l:'🟪 고급화 추천',v:cnt.premium,suf:'곳',c:'#7a4f9a',d:'핵심 1F·고유동'},
+ {l:'🟩 가성비 추천',v:cnt.value,suf:'곳',c:'#2f7d4f',d:'중층·회전형'},
+ {l:'🟧 공장제 추천',v:cnt.factory,suf:'곳',c:'#b06a1e',d:'상층·무인 표준'},
+ {l:'⏱ 평균 회수기간',v:'14.6',suf:'개월',c:'#9a7b1e',d:'추천 Tier 기준'},
+];
+document.getElementById('kpis').innerHTML=kpis.map(function(k){
+ return '<div class="kpi"><div class="l">'+k.l+'</div><div class="v" style="color:'+(k.c||'inherit')+'">'+k.v+'<small>'+k.suf+'</small></div><div class="d">'+k.d+'</div></div>';
+}).join('');
+
+// ===== 상세 (3-tier 비교) =====
+function selUnit(id){
+ var u=allu[id];var sc=scenarios(u);var keys=['premium','value','factory'];
+ var spec='<div class="uspec">'
+  +'<div class="sp"><div class="k">면적</div><div class="vv">'+u.area+'㎡</div></div>'
+  +'<div class="sp"><div class="k">월 임대료</div><div class="vv">'+u.rent+'만</div></div>'
+  +'<div class="sp"><div class="k">권리금</div><div class="vv">'+(u.prem?u.prem+'만':'없음')+'</div></div>'
+  +'<div class="sp"><div class="k">유동인구</div><div class="vv">'+u.foot+'</div></div></div>';
+ var tiers=keys.map(function(k){
+  var t=TIER[k];var s=sc[k];var roi=roiMonths(s);var net=s.monthRev-s.monthCost;
+  var selc=k===u.rec?'sel':'';
+  return '<div class="tier '+selc+'" style="'+(k===u.rec?'border-color:'+t.c:'')+'" onclick="event.stopPropagation()">'
+   +'<div class="th"><span class="nm"><span class="dot" style="background:'+t.c+'"></span>'+t.nm+' · '+t.sub+(k===u.rec?' ✓추천':'')+'</span>'
+   +'<span class="roi" style="background:'+t.bg+';color:'+t.c+'">ROI '+(roi>=99?'—':roi.toFixed(1)+'개월')+'</span></div>'
+   +'<div class="met"><div class="m"><div class="mk">초기투자</div><div class="mv">'+s.invest+'백만</div></div>'
+   +'<div class="m"><div class="mk">월 순익</div><div class="mv" style="color:'+(net>0?'#2f7d4f':'#b23b39')+'">'+(net>0?'+':'')+net+'만</div></div>'
+   +'<div class="m"><div class="mk">월 매출</div><div class="mv">'+s.monthRev+'만</div></div></div>'
+   +'<div class="ce">'+s.ce+'</div></div>';
+ }).join('');
+ document.getElementById('detail').innerHTML=
+  '<div class="top"><div><div class="ulab">'+u.grp+' · '+u.floor+' · 구 '+u.was+'</div><div class="unm">'+u.n+'</div></div></div>'
+  +'<div class="recbadge" style="background:'+TIER[u.rec].bg+';color:'+TIER[u.rec].c+'">추천 Tier · '+TIER[u.rec].nm+' ('+TIER[u.rec].sub+')</div>'
+  +'<div class="ulab" style="margin-top:9px;line-height:1.55">'+u.note+' · 타깃: '+u.persona+'</div>'
+  +spec
+  +'<div class="tcomp"><div class="tt">3-Tier 비용-효용 비교 (월 단위, 만원/백만원)</div>'+tiers+'</div>'
+  +'<button class="btn" onclick="alert(\'Program 마케팅 솔루션 연계 (프로토타입)\\n\\n'+u.n+' · '+TIER[u.rec].nm+' 입점 시\\n· 온라인: 인스타/네이버플레이스 콘텐츠 자동 생성\\n· 오프라인: 라페스타 행사 연계 그랜드오픈\')">Program 마케팅 솔루션 연계 ↗</button>';
+ map.setView([u.lat,u.lng],17,{animate:true});
+}
+selUnit('u-cc');
+</script>
+</body>
+</html>

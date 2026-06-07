@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.env
+.mlruns/
+mlruns/
+
+# Node
+node_modules/
+dist/
+.vite/
+*.local
+
+# Data lake (로컬 레이어 — 원본/대용량 제외)
+data/bronze/*
+data/silver/*
+data/gold/*
+!data/bronze/.gitkeep
+!data/silver/.gitkeep
+!data/gold/.gitkeep
+*.parquet
+*.glb
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Secrets
+*.pem
+secrets/
+
+# Claude Code 개인(리드) 설정 — 커밋 금지
+.claude/settings.local.json
+
+# ── 추가: 빌드/임시 산출물 (커밋 제외) ──
+_build/
+_charts_tmp/
+sedJOtKwK
+
+# ── 추가: env 변형 방어 (.env.local/.env.production 등 제외, .env.example은 추적) ──
+.env.*
+!.env.example

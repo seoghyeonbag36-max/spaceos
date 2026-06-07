@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS · 고양시 멀티거점 PPPP 통합 플랫폼</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<style>
+:root{--bg:#eef1f4;--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#3a5a98;--green:#3f7d3f;
+ --P1:#3a5a98;--P2:#c0392b;--P3:#7a4f9a;--P4:#2563b0;--off:#b06a1e;--offbg:#f6e9d4;--nv-land:#f7f6f2;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);padding:20px;line-height:1.4}
+.wrap{max-width:1200px;margin:0 auto}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+h1{font-size:26px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
+.sub{font-size:13px;color:var(--sub)}
+.rt{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:12px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:7px 13px;color:var(--sub)}
+.chip.live{color:var(--green);border-color:#cfe3cf;background:#f1f8f1;font-weight:600}
+.dsel{font-family:inherit;font-size:13px;font-weight:700;color:var(--ink);border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 13px;cursor:pointer}
+.backbtn{font-family:inherit;font-size:13px;font-weight:700;color:#fff;background:#3a5a98;border:1px solid #3a5a98;border-radius:10px;padding:9px 13px;cursor:pointer;display:none}
+.ovmk{transform:translate(-50%,-50%);border-radius:50%;border:2px solid #fff;box-shadow:0 2px 7px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;cursor:pointer}
+.ovlbl{transform:translate(0,-50%);font-size:11px;font-weight:800;color:#1f2937;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none;margin-left:4px}
+.ovrk{display:flex;flex-direction:column;gap:7px}
+.ovrkr{display:flex;align-items:center;gap:9px;cursor:pointer;padding:6px 8px;border-radius:8px;transition:.12s;border:1px solid transparent}
+.ovrkr:hover{background:#f2f5fb;border-color:#d6e0f0}
+.ovrkr .rn{width:18px;font-size:12px;font-weight:800;color:#9aa3af;text-align:center}
+.ovrkr .ri{flex:1;min-width:0}
+.ovrkr .rnm{font-size:12.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ovrkr .rgu{font-size:10px;color:var(--sub)}
+.ovrkr .rbar{height:8px;border-radius:5px;background:#eceff2;overflow:hidden;margin-top:3px}.ovrkr .rbar i{display:block;height:100%;border-radius:5px}
+.ovrkr .rv{font-size:14px;font-weight:800;flex:0 0 46px;text-align:right}
+.ptabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.ptab{border:1px solid var(--line);background:var(--card);border-radius:13px;padding:13px 15px;cursor:pointer;transition:.15s;border-left-width:4px}
+.ptab .pk{font-size:11px;font-weight:800;letter-spacing:.5px;color:#9aa3af}
+.ptab .pn{font-size:15px;font-weight:800;margin-top:3px}.ptab .pd{font-size:11px;color:var(--sub);margin-top:3px}
+.ptab.on{box-shadow:0 3px 10px rgba(0,0,0,.08);transform:translateY(-1px)}
+.ptab[data-p="P1"]{border-left-color:var(--P1)}.ptab[data-p="P1"].on{background:#f2f5fb}
+.ptab[data-p="P2"]{border-left-color:var(--P2)}.ptab[data-p="P2"].on{background:#fbf2f1}
+.ptab[data-p="P3"]{border-left-color:var(--P3)}.ptab[data-p="P3"].on{background:#f7f2fb}
+.ptab[data-p="P4"]{border-left-color:var(--P4)}.ptab[data-p="P4"].on{background:#f1f6fc}
+.kpis{display:grid;gap:11px;margin-bottom:13px;grid-template-columns:repeat(5,1fr)}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 15px}
+.kpi .l{font-size:11.5px;color:var(--sub);margin-bottom:7px}
+.kpi .v{font-size:22px;font-weight:800;letter-spacing:-.5px}.kpi .v small{font-size:12px;font-weight:700;margin-left:3px;color:var(--sub)}
+.kpi .d{font-size:10.5px;color:var(--sub);margin-top:5px}
+.cols{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 17px;margin-bottom:14px}
+.card .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.card .ch h2{font-size:15px;font-weight:800}.card .ch .hint{font-size:11px;color:#9aa3af}
+.maphost{position:relative}
+#map{height:540px;border-radius:12px;border:1px solid var(--line);background:var(--nv-land)}
+.leaflet-container{background:var(--nv-land)}
+.poi{font-size:10.5px;font-weight:700;color:#7b8794;text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.poi.sta{color:#c0504a}.poi.park{color:#4f7a31}
+.mlbl{font-size:11px;font-weight:800;color:#1f2937;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.glab{font-size:9px;font-weight:800;color:#3a2f2f;text-shadow:0 0 2px #fff,0 0 2px #fff;pointer-events:none}
+.zmk{transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer}
+.umk{transform:translate(-50%,-50%);width:22px;height:22px;border-radius:6px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+.emk{transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50% 50% 50% 4px;border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
+.legb{display:flex;gap:13px;justify-content:center;margin-top:12px;flex-wrap:wrap;align-items:center}
+.legb .lt{font-size:11px;color:var(--sub)}.legb span{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:5px}
+.legb i{width:12px;height:12px;border-radius:4px;display:inline-block}.legb i.r{border-radius:50%}.legb i.bar{width:28px;height:10px;border-radius:0}
+.flow{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--sub);margin-top:10px;flex-wrap:wrap}.flow b{color:var(--ink)}.flow .ar{color:#c3c9d2}
+.rp .top{display:flex;justify-content:space-between;align-items:flex-start}
+.rp .nm{font-size:17px;font-weight:800}.rp .lab{font-size:11px;color:var(--sub)}
+.rp .sc{font-size:28px;font-weight:800;text-align:right;line-height:1}.rp .suf{font-size:11px;text-align:right;margin-top:3px;font-weight:600;color:var(--sub)}
+.fr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+.fr b{font-weight:700}.fr .up{color:#b23b39}.fr .dn{color:var(--blue)}
+.sec{margin-top:13px}.sec .st{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:8px}
+.mix{display:flex;height:11px;border-radius:6px;overflow:hidden;margin-bottom:7px}.mix i{height:100%}
+.mixleg{display:flex;flex-wrap:wrap;gap:7px 11px;font-size:11px;color:var(--sub)}.mixleg span{display:flex;align-items:center;gap:5px}.mixleg .dt{width:8px;height:8px;border-radius:2px}
+.recbadge{display:inline-block;font-size:12px;font-weight:800;padding:5px 11px;border-radius:8px;margin-top:8px}
+.uspec{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}.uspec .sp{flex:1;min-width:80px;background:#f7f8fa;border:1px solid var(--line);border-radius:9px;padding:8px 9px}
+.uspec .sp .k{font-size:10px;color:var(--sub)}.uspec .sp .vv{font-size:13px;font-weight:800;margin-top:3px}
+.tier{border:1px solid var(--line);border-radius:11px;padding:10px 11px;margin-bottom:8px}.tier.sel{border-width:2px}
+.tier .th{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.tier .th .tn{font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px}.tier .th .tn .dot{width:10px;height:10px;border-radius:3px}
+.tier .roi{font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px}
+.tier .met{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;font-size:11px}.tier .met .m{background:#f7f8fa;border-radius:7px;padding:5px 6px}.tier .met .m .mk{color:var(--sub);font-size:9.5px}.tier .met .m .mv{font-weight:800;margin-top:2px}
+.subtabs{display:flex;gap:6px;margin-bottom:12px}.subtab{flex:1;text-align:center;font-size:12.5px;font-weight:700;padding:9px;border:1px solid var(--line);border-radius:9px;background:#fafbfc;color:var(--sub);cursor:pointer}.subtab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.gen{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:10px;background:#fbfcfd}.gen .gh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.gen .pf{font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px}.gen .pf .ic{width:17px;height:17px;border-radius:5px}.gen .body{font-size:12px;line-height:1.6;white-space:pre-wrap;color:#28303a}.gen .tags{margin-top:6px;font-size:11px;color:var(--blue);font-weight:600}.gen .meta{margin-top:7px;font-size:10.5px;color:var(--sub)}.gen .meta b{color:var(--green)}
+.ev{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:10px;cursor:pointer}.ev.sel{border-width:2px;border-color:var(--off)}.ev .eh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}.ev .en{font-size:13.5px;font-weight:800}.ev .edt{font-size:11px;color:var(--sub);margin-top:2px}.ev .k2{font-size:11px;font-weight:800;color:var(--off);background:var(--offbg);border-radius:6px;padding:3px 8px;white-space:nowrap}.ev .desc{font-size:11.5px;color:#444;line-height:1.5;margin-top:5px}.ev .roles{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}.ev .roles span{font-size:10px;border:1px solid var(--line);border-radius:20px;padding:3px 8px;color:var(--sub)}
+.ha{margin-top:6px;background:#f4f8f4;border:1px solid #d8e8d8;border-radius:9px;padding:9px 11px;font-size:11px;color:#3f6b3f;line-height:1.55}.ha b{color:#2f5a2f}
+.btn{width:100%;margin-top:12px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{background:#3a5a98;color:#fff;border-color:#3a5a98}
+.foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:16px;line-height:1.6}
+.nvbadge{position:absolute;right:10px;bottom:8px;z-index:500;background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:10px;color:#9aa3af}
+@media(max-width:920px){.ptabs{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}#map{height:440px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <div class="ey">SPACEOS · DIGITAL TWIN · 고양시 멀티거점 PPPP</div>
+      <h1 id="dname">—</h1>
+      <div class="sub" id="dsub">—</div>
+    </div>
+    <div class="rt">
+      <button class="backbtn" id="backbtn" onclick="showOverview()">← 고양시 전체</button>
+      <select class="dsel" id="dsel" onchange="onSel(this.value)"></select>
+      <div class="chip live"><span id="liverate">42</span>건/s</div>
+    </div>
+  </div>
+  <div class="ptabs" id="ptabs">
+    <div class="ptab on" data-p="P1" onclick="setP('P1')"><div class="pk">PLATFORM</div><div class="pn">상권 감성 지도</div><div class="pd">Place→Platform</div></div>
+    <div class="ptab" data-p="P2" onclick="setP('P2')"><div class="pk">PAGE</div><div class="pn">공실률 그리드</div><div class="pd">Product→Page · 100m</div></div>
+    <div class="ptab" data-p="P3" onclick="setP('P3')"><div class="pk">POSTING</div><div class="pn">입점 솔루션</div><div class="pd">Promo→Posting · 3-Tier</div></div>
+    <div class="ptab" data-p="P4" onclick="setP('P4')"><div class="pk">PROGRAM</div><div class="pn">마케팅 솔루션</div><div class="pd">Promo→Program</div></div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="cols">
+    <div class="left"><div class="card">
+      <div class="ch"><h2 id="maptitle">상권 감성 히트맵</h2><div class="hint" id="maphint"></div></div>
+      <div class="maphost"><div id="map"></div><div class="nvbadge">네이버 지도 스타일 정합 · 39거점 · 키 발급 시 실타일</div></div>
+      <div class="legb" id="legb"></div><div class="flow" id="flow"></div>
+    </div></div>
+    <div class="right"><div class="card rp" id="panel"></div></div>
+  </div>
+  <div class="foot">SpaceOS Digital Twin Platform · 고양시 39개 주요 상권 멀티 PPPP(3구 전수). 좌표는 네이버 지도 기준 역·랜드마크 정합. 감성·공실·ROI 수치는 거점 특성(신상권/대형몰배후/성숙상권/택지/구도심)을 반영한 시뮬레이션이며 건축물대장·SNS·카드사 실데이터 연동 시 자동 갱신. Humanistic Authority(균형·공생·공감) 설계 기준 적용.</div>
+</div>
+
+<script>
+/* ===== 유틸 ===== */
+function fgHex(s){return s<40?'#d9716a':s<60?'#e3b95e':s<80?'#7faa55':'#3a5a98';}
+function fgV(s){return s<40?'#b23b39':s<60?'#9a7b1e':s<80?'#4f7a31':'#3a5a98';}
+function vacColor(v){return v<5?'#cfe3cf':v<10?'#fbe7a6':v<18?'#f6b96b':v<28?'#e8743b':'#c0392b';}
+function arrow(d){return d>0?'↑'+d.toFixed(1):d<0?'↓'+Math.abs(d).toFixed(1):'→'+d.toFixed(1);}
+function rev(n){return n>=1000?(n/1000).toFixed(1)+'K':n;}
+function distM(a,b,c,d){var dy=(a-c)*111000,dx=(b-d)*88300;return Math.sqrt(dx*dx+dy*dy);}
+function seed(i,j){var x=Math.sin(i*12.9898+j*78.233)*43758.5453;return x-Math.floor(x);}
+function rad(r){return 12+Math.sqrt(r)/3;}
+var TIER={premium:{nm:'고급화',sub:'Premium',c:'#7a4f9a',bg:'#efe7f5'},value:{nm:'가성비',sub:'Value',c:'#2f7d4f',bg:'#e0f0e6'},factory:{nm:'공장제',sub:'Standardized',c:'#b06a1e',bg:'#f6e9d4'}};
+var mixHi=[['요식',24,'#e8743b'],['공실',38,'#c0392b'],['생활편의',14,'#9aa3af'],['뷰티',8,'#c98bbf'],['기타',16,'#cbd2d9']];
+var mixMid=[['요식',32,'#e8743b'],['공실',17,'#c0392b'],['생활편의',16,'#9aa3af'],['카페',13,'#b07a4a'],['뷰티',10,'#c98bbf'],['기타',12,'#cbd2d9']];
+var mixLo=[['요식',40,'#e8743b'],['카페',20,'#b07a4a'],['패션',14,'#7a9ad6'],['뷰티',10,'#c98bbf'],['공실',6,'#c0392b'],['기타',10,'#cbd2d9']];
+function mixFor(v){return v>=24?mixHi:v>=10?mixMid:mixLo;}
+function scenarios(u){var fK={'저':0.8,'중':1.0,'고':1.25}[u.foot],base=u.area*fK;return{
+ premium:{invest:Math.round(u.prem/100+u.area*0.55+4),monthCost:Math.round(u.rent+u.area*1.8+180),monthRev:Math.round(base*41+1150)},
+ value:{invest:Math.round(u.prem/100+u.area*0.32+2.2),monthCost:Math.round(u.rent+u.area*1.1+95),monthRev:Math.round(base*30+760)},
+ factory:{invest:Math.round(u.prem/100+u.area*0.2+1.1),monthCost:Math.round(u.rent+u.area*0.45+25),monthRev:Math.round(base*18+430)}};}
+function roiM(s){var net=s.monthRev-s.monthCost;return net<=0?99:s.invest/net;}
+
+/* ===== 거점 데이터 (네이버 좌표 정합) =====
+   z:[id,이름,그룹,lat,lng,감성,Δ,리뷰,[[요인,값,up/dn]x3]]
+   u:[id,이름,그룹,lat,lng,면적,임대료,권리금,층,구업종,추천tier,유동,페르소나,노트]
+   e:[id,이름,lat,lng,아이콘,시기,KPI,설명,[역할],HA]  */
+function Z(a){return{id:a[0],n:a[1],grp:a[2],lat:a[3],lng:a[4],s:a[5],d:a[6],r:a[7],f:a[8]};}
+function U(a){return{id:a[0],n:a[1],grp:a[2],lat:a[3],lng:a[4],area:a[5],rent:a[6],prem:a[7],floor:a[8],was:a[9],rec:a[10],foot:a[11],persona:a[12],note:a[13]};}
+function E(a){return{id:a[0],n:a[1],lat:a[2],lng:a[3],ic:a[4],when:a[5],k2:a[6],desc:a[7],roles:a[8],ha:a[9]};}
+
+var DISTRICTS=[
+{id:'lafesta',name:'일산 라페스타·웨스턴돔',sub:'일산동구 장항동 · 정발산역(3호선) · 신상권',center:[37.6593,126.7711],zoom:16,
+ poi:[[37.6595,126.77415,'◉ 정발산역','sta'],[37.66205,126.77580,'정발산 근린공원','park']],
+ zones:[Z(['z1','라페스타 정문광장','라페스타',37.65945,126.76935,74.2,1.8,856,[['인스타 노출','+58%','up'],['주말 유입','+33%','up'],['이벤트 언급','+21%','up']]]),
+  Z(['z2','라페스타 중앙상가','라페스타',37.65880,126.77010,68.4,-0.6,1900,[['공실 언급','+44%','up'],['가격 만족','-12%','dn'],['브랜드 다양성','+8%','up']]]),
+  Z(['z3','레스토랑거리','라페스타',37.65820,126.77085,76.8,2.4,1100,[['맛집 재방문','+61%','up'],['웨이팅 불만','+19%','up'],['SNS 인증샷','+47%','up']]]),
+  Z(['z4','후면주차장','라페스타',37.65775,126.77150,38.9,-4.2,287,[['주차 불편','+276%','up'],['야간 안전','+148%','up'],['접근성','-39%','dn']]]),
+  Z(['z5','웨스턴돔 2F','웨스턴돔',37.66085,126.77245,43.7,-2.1,412,[['공실 확대','+187%','up'],['동선 혼란','+92%','up'],['체류시간','-28%','dn']]]),
+  Z(['z6','웨스턴돔 3F','웨스턴돔',37.66110,126.77285,31.5,-5.8,168,[['관리필요','+312%','up'],['접근불편','+184%','up'],['노출','-47%','dn']]])],
+ grid:{bb:{s:37.6565,n:37.6620,w:126.7685,e:126.7745},dlat:0.0009,dlng:0.001135,core:[37.6594,126.7711],maxd:340,
+  hot:[[37.65775,126.77150,90,34],[37.66085,126.77245,80,31],[37.66110,126.77285,85,42],[37.65880,126.77010,70,16],[37.65945,126.76935,60,6],[37.65820,126.77085,60,5]]},
+ units:[U(['u1','중앙상가 B동 1F','라페스타',37.65882,126.77012,40,330,1200,'1F','휴대폰','premium','고','20대 여성·데이트','핵심 보행축 1F → 고급화 브랜드']),
+  U(['u2','레스토랑거리 A동 1F','라페스타',37.65822,126.77088,52,380,1500,'1F','액세서리','premium','고','20·30대 외식','맛집거리 집객 → 고객단가 높은 다이닝']),
+  U(['u3','웨스턴돔 2F 211호','웨스턴돔',37.66088,126.77248,46,240,300,'2F','의류','value','중','20대 여성·직장인','중층 → 회전형 F&B']),
+  U(['u4','후면동 1F','라페스타',37.65778,126.77148,28,210,500,'1F','분식','value','중','야간·주차','픽업형 가성비 업종']),
+  U(['u5','웨스턴돔 3F 304호','웨스턴돔',37.66112,126.77288,33,165,0,'3F','노래방','factory','저','가족·학원','목적형 무인/표준'])],
+ events:[E(['e1','라페스타 골목 페스타',37.65900,126.76980,'🎪','2026.09 · 주말 3일','유입 +38%','정문광장~중앙상가 200개 점포 거리축제. 스탬프로 공실 인접 구역 동선 유도.',['상인회: 부스','건물주: 공실 개방','소비자: 스탬프'],'<b>공생</b> — 공실을 팝업 부스로 개방, 임대인-임차인 접점.']),
+  E(['e2','웨스턴돔 빈공간 팝업위크',37.66095,126.77260,'🛍','2026.07 · 2주','전환 12%','고공실 2·3F 2주 단기 팝업. 입점 테스트+반응 데이터.',['건물주: 단기임대','브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 로컬·신생 브랜드 공정 노출.']),
+  E(['e3','정발산 나이트마켓',37.65800,126.77120,'🌙','매월 마지막 금요일','야간 +22%','후면주차장 야간 이슈 구역을 플리마켓·푸드트럭으로 전환.',['상인회: 야시장','지자체: 안전','소비자: 야간'],'<b>공감</b> — 라페스타 야간 상권 분위기 활용.'])],
+ insta:["📍라페스타 레스토랑거리, 줄 서는 이유\n\n정발산역 도보 5분. 주말 웨이팅 핫플. 인증샷 디저트 1+1 🍰\n\n#일산맛집 #라페스타","🌿웨스턴돔 3F가 달라졌어요\n\n비어있던 공간이 무인 디저트존으로! 24시간 ☕\n\n#웨스턴돔 #무인카페"]},
+
+{id:'starfield',name:'스타필드 고양·삼송·원흥',sub:'덕양구 동산동·삼송동 · 삼송역(3호선) · 대형몰 배후',center:[37.6502,126.8966],zoom:15,
+ poi:[[37.65275,126.89540,'◉ 삼송역','sta'],[37.64900,126.89720,'★ 스타필드 고양','park']],
+ zones:[Z(['z1','스타필드 별마당광장','스타필드',37.64900,126.89720,81.4,2.6,2400,[['포토존 인증','+72%','up'],['주말 집객','+41%','up'],['체류시간','+33%','up']]]),
+  Z(['z2','스타필드 잇토피아','스타필드',37.64925,126.89680,75.6,1.9,1850,[['맛집 재방문','+53%','up'],['웨이팅','+22%','up'],['SNS 언급','+38%','up']]]),
+  Z(['z3','트레이더스·이마트','스타필드',37.64790,126.89830,66.1,0.3,1240,[['대량구매','+31%','up'],['주차 대기','+19%','up'],['접근','+7%','up']]]),
+  Z(['z4','삼송 스타클래스 스트리트몰','삼송',37.65140,126.89600,40.6,-3.8,392,[['상층 공실','+214%','up'],['동선 단절','+96%','up'],['야간 공동화','-41%','dn']]]),
+  Z(['z5','원흥 도래울 근린상가','원흥',37.65040,126.89960,35.9,-5.1,248,[['신축 공실','+287%','up'],['임대료 부담','+162%','up'],['집객 부족','-44%','dn']]]),
+  Z(['z6','삼송 아이파크 단지상가','삼송',37.65180,126.89380,48.7,-2.3,430,[['생활밀착','+26%','up'],['주말 공동화','+58%','up'],['업종 중복','+33%','up']]])],
+ grid:{bb:{s:37.6452,n:37.6552,w:126.8920,e:126.9012},dlat:0.0009,dlng:0.001146,core:[37.6502,126.8966],maxd:560,
+  hot:[[37.64900,126.89720,120,5],[37.64790,126.89830,90,7],[37.65140,126.89600,95,40],[37.65040,126.89960,90,34],[37.65275,126.89470,80,15],[37.65180,126.89380,80,27]]},
+ units:[U(['u1','스타필드 인근 가로상가 1F','스타필드',37.64960,126.89880,48,420,800,'1F','카페','premium','고','몰 방문객','집객 낙수 → 고급화 플래그십']),
+  U(['u2','삼송역 1번출구 상가 1F','삼송',37.65278,126.89465,30,280,500,'1F','편의점','value','고','역세권 통근','회전형 테이크아웃']),
+  U(['u3','삼송 아이파크 단지상가 1F','삼송',37.65182,126.89385,33,210,300,'1F','분식','value','중','단지 주민','가성비 베이커리/반찬']),
+  U(['u4','삼송 스트리트몰 2F','삼송',37.65145,126.89610,50,175,0,'2F','의류','factory','저','택지 거주민','무인·표준으로 공동화 차단']),
+  U(['u5','원흥 도래울 상가 2F','원흥',37.65030,126.89945,44,165,0,'2F','학원','factory','저','학원·교습','무인스터디·공유오피스'])],
+ events:[E(['e1','스타필드 연계 지역상생 마켓',37.64960,126.89870,'🤝','2026.09 · 주말 4일','유입 +29%','스타필드 방문객을 인근 가로상가로 유도하는 상생 스탬프 마켓.',['스타필드: 공동홍보','상인회: 부스','소비자: 스탬프'],'<b>공생</b> — 대형몰 집객을 배후 택지상가와 공유.']),
+  E(['e2','삼송·원흥 빈상가 팝업위크',37.65095,126.89780,'🛍','2026.08 · 2주','전환 14%','신축 공실을 2주 단기 팝업으로. 택지 배후수요 반응 데이터.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신생·로컬 브랜드 공정 진입.']),
+  E(['e3','원흥 도래울 나이트마켓',37.65040,126.89960,'🌙','매월 둘째·넷째 금','야간 +24%','주말 공동화 단지상가를 야간 플리마켓·푸드트럭으로.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 신도시 정주 리듬에 맞춘 야간 콘텐츠.'])],
+ insta:["🛒스타필드 갈 때 여기도 들러요\n\n삼송역 옆 숨은 골목. 스탬프 찍고 디저트 받는 상생마켓 🍩\n\n#스타필드고양 #삼송맛집","🌙원흥 도래울 나이트마켓\n\n조용했던 단지상가가 금요일 밤 푸드트럭존으로! ☕\n\n#원흥 #삼송 #고양나이트마켓"]},
+
+{id:'hwajeong',name:'화정 로데오',sub:'덕양구 화정동 · 화정역(3호선·서해선) · 성숙상권',center:[37.6352,126.8328],zoom:16,
+ poi:[[37.63470,126.83260,'◉ 화정역','sta'],[37.63420,126.83010,'✚ 명지병원','park']],
+ zones:[Z(['z1','로데오 먹자골목','로데오',37.63600,126.83300,72.5,1.4,1680,[['저녁 회전율','+48%','up'],['배달 주문','+36%','up'],['노포 재방문','+27%','up']]]),
+  Z(['z2','화정 카페거리','로데오',37.63520,126.83205,69.8,1.1,1180,[['디저트 인증','+44%','up'],['주말 체류','+29%','up'],['신규 카페','+18%','up']]]),
+  Z(['z3','화정 패션거리','로데오',37.63620,126.83260,58.4,-1.9,742,[['온라인 이탈','+62%','up'],['공실 언급','+41%','up'],['업종 전환','+23%','up']]]),
+  Z(['z4','화정역 1번출구 상가','화정역',37.63470,126.83245,64.2,0.4,910,[['역세권 유입','+22%','up'],['프랜차이즈 편중','+34%','up'],['임대료','+16%','up']]]),
+  Z(['z5','화정 중앙 지하상가','로데오',37.63480,126.83320,33.7,-4.6,268,[['지하 공실','+243%','up'],['노후 시설','+128%','up'],['유동 단절','-39%','dn']]]),
+  Z(['z6','노후 상가 2~3F','로데오',37.63560,126.83400,38.9,-3.4,312,[['상층 공실','+196%','up'],['엘베 노후','+84%','up'],['임차 기피','-33%','dn']]])],
+ grid:{bb:{s:37.6312,n:37.6392,w:126.8290,e:126.8362},dlat:0.0009,dlng:0.001150,core:[37.6352,126.8328],maxd:470,
+  hot:[[37.63480,126.83320,85,38],[37.63560,126.83400,90,32],[37.63620,126.83260,80,20],[37.63340,126.83120,85,24],[37.63600,126.83300,70,6],[37.63520,126.83205,65,7]]},
+ units:[U(['u1','로데오 먹자골목 1F','로데오',37.63602,126.83302,40,340,1000,'1F','호프','premium','고','20·30대 외식','먹자 핵심 1F → 다이닝/바']),
+  U(['u2','화정역 1번출구 1F','화정역',37.63472,126.83248,28,300,600,'1F','편의점','value','고','역세권 통근','회전형 테이크아웃']),
+  U(['u3','패션거리 2F','로데오',37.63622,126.83265,46,200,200,'2F','의류','value','중','10·20대','체험·F&B 전환']),
+  U(['u4','화정 지하상가 B1','로데오',37.63482,126.83325,42,120,0,'B1','의류','factory','저','역 환승객','무인 셀프·창고형']),
+  U(['u5','노후 상가 3F','로데오',37.63562,126.83405,55,135,0,'3F','학원','factory','저','교습·스터디','무인스터디·공유오피스'])],
+ events:[E(['e1','화정 로데오 레트로 페스타',37.63580,126.83330,'🎶','2026.10 · 주말 3일','유입 +35%','먹자~패션거리 노포·노후상가를 레트로로 재조명. 정체성 콘텐츠 자산화.',['상인회: 노포투어','건물주: 상층 개방','소비자: 레트로'],'<b>공감</b> — 오래된 상권을 향수 콘텐츠로 재해석.']),
+  E(['e2','지하상가 리뉴얼 팝업',37.63480,126.83320,'🛍','2026.08 · 3주','전환 13%','공동화 지하상가를 무인·창작자 팝업존으로. 리뉴얼 전 수요 검증.',['건물주: 단기임대','창작자: 입점','SpaceOS: 데이터'],'<b>균형</b> — 저장벽 지하공간을 청년·창작자에 배분.']),
+  E(['e3','명지병원 연계 건강마켓',37.63420,126.83010,'🩺','매월 셋째 토','배후 +19%','병원 배후상가 건강·웰니스 마켓. 의료 편중에 생활 콘텐츠 보강.',['병원: 건강부스','상인회: 웰니스','주민: 체험'],'<b>공생</b> — 병원-상권-주민 건강 테마 결합.'])],
+ insta:["🍻화정 로데오 먹자골목, 노포의 반격\n\n화정역 도보 3분. 20년 노포부터 신상 포차까지. 레트로 스탬프 굿즈 🎟\n\n#화정맛집 #화정로데오","🎨비어있던 화정 지하상가가 팝업존으로\n\n청년 창작자 셀렉트숍·무인 굿즈샵! 🛍\n\n#화정 #지하상가 #팝업"]},
+
+{id:'bamridan',name:'정발산·밤리단길',sub:'일산동구 장항동 · 정발산역(3호선) · 골목 트렌드상권',center:[37.6580,126.7755],zoom:16,
+ poi:[[37.6595,126.77410,'◉ 정발산역','sta'],[37.66260,126.77600,'정발산','park']],
+ zones:[Z(['z1','밤리단길 메인골목','밤리단길',37.65720,126.77620,79.3,3.1,1420,[['인스타 핫플','+88%','up'],['20대 유입','+52%','up'],['신규 카페','+34%','up']]]),
+  Z(['z2','밤리단길 안쪽 공방거리','밤리단길',37.65660,126.77700,71.6,2.2,640,[['공방·체험','+47%','up'],['주말 체류','+31%','up'],['리뷰 증가','+26%','up']]]),
+  Z(['z3','정발산역 광장 상가','정발산',37.65905,126.77380,63.4,0.5,880,[['역세권 유입','+19%','up'],['프랜차이즈 편중','+28%','up'],['임대료','+14%','up']]]),
+  Z(['z4','일산문화광장 배후','정발산',37.66050,126.77520,57.2,-1.1,520,[['행사 의존','+33%','up'],['평일 한산','+41%','up'],['공실 언급','+22%','up']]]),
+  Z(['z5','밤리단길 노후 주택개조','밤리단길',37.65780,126.77760,45.1,-2.6,288,[['임대료 급등','+118%','up'],['젠트리 우려','+76%','up'],['원주민 이탈','-29%','dn']]]),
+  Z(['z6','장항동 안쪽 이면','장항동',37.65620,126.77520,41.8,-3.2,196,[['접근성 약','+64%','up'],['공실 장기화','+97%','up'],['야간 공동화','-31%','dn']]])],
+ grid:{bb:{s:37.6548,n:37.6628,w:126.7728,e:126.7800},dlat:0.0009,dlng:0.001135,core:[37.6580,126.7758],maxd:430,
+  hot:[[37.65720,126.77620,75,8],[37.65660,126.77700,70,12],[37.65780,126.77760,80,28],[37.65620,126.77520,80,33],[37.66050,126.77520,75,22],[37.65905,126.77380,65,10]]},
+ units:[U(['u1','밤리단길 메인 1F','밤리단길',37.65722,126.77622,36,300,700,'1F','카페','premium','고','20대 트렌드','핫플 1F → 시그니처 디저트/플래그십']),
+  U(['u2','공방거리 1F','밤리단길',37.65662,126.77702,44,220,300,'2F','사무실','value','중','체험·공방','원데이클래스 가성비 공방']),
+  U(['u3','정발산역 광장 1F','정발산',37.65907,126.77382,30,280,500,'1F','휴대폰','value','고','역세권','회전형 테이크아웃']),
+  U(['u4','노후 주택개조 2F','밤리단길',37.65782,126.77762,40,180,0,'2F','주거','factory','저','임차 기피','무인·표준 운영 임대 안정화']),
+  U(['u5','장항동 이면 1F','장항동',37.65622,126.77522,33,160,0,'1F','창고','factory','저','저유동','무인 스토어/물류 픽업'])],
+ events:[E(['e1','밤리단길 골목 아트마켓',37.65700,126.77650,'🎨','2026.09 · 매주 토','유입 +44%','메인골목~공방거리 핸드메이드 플리마켓. 젠트리 없는 로컬 창작자 중심.',['상인회: 골목','창작자: 부스','소비자: 아트'],'<b>균형</b> — 임대료 급등 속 원주민·창작자 우선 배분.']),
+  E(['e2','정발산 빈집 팝업 레지던시',37.65782,126.77760,'🏠','2026.08 · 1개월','전환 16%','노후 주택개조 공실을 단기 창작 레지던시로. 입주 전 수요 검증.',['건물주: 단기임대','작가: 입주','SpaceOS: 데이터'],'<b>공감</b> — 동네 정체성을 살린 점진적 활성화.']),
+  E(['e3','장항동 야간 골목등 축제',37.65620,126.77520,'🌙','매월 넷째 금','야간 +25%','공동화 이면도로에 골목등·푸드트럭으로 야간 동선 형성.',['상인회: 야시장','지자체: 조명·안전','주민: 야간'],'<b>공생</b> — 메인골목 집객을 이면까지 확산.'])],
+ insta:["✨일산 밤리단길, 요즘 여기\n\n정발산역 도보 5분 골목 핫플. 공방·카페·플리마켓 한 골목에 🎨\n\n#밤리단길 #일산핫플 #정발산","🏠빈집이 작가 작업실로\n\n밤리단길 레지던시 오픈스튜디오. 동네 산책 겸 들러요 🖼\n\n#밤리단길 #로컬 #일산"]},
+
+{id:'baekseok',name:'백석·요진 와이시티',sub:'일산동구 백석동 · 백석역(3호선) · 주상복합 배후상권',center:[37.6428,126.7900],zoom:16,
+ poi:[[37.64140,126.78960,'◉ 백석역','sta'],[37.64430,126.79080,'요진 와이시티','park']],
+ zones:[Z(['z1','요진 와이시티 스트리트몰','요진',37.64430,126.79080,70.4,1.6,1560,[['주상복합 배후','+38%','up'],['주말 집객','+26%','up'],['F&B 다양성','+19%','up']]]),
+  Z(['z2','백석역 1번출구 상가','백석역',37.64180,126.78930,66.2,0.6,1040,[['역세권 유입','+24%','up'],['직장 수요','+31%','up'],['점심 회전','+22%','up']]]),
+  Z(['z3','백석 먹자골목','백석동',37.64080,126.79020,68.9,1.0,920,[['저녁 회전','+34%','up'],['배달','+28%','up'],['노포 유지','+12%','up']]]),
+  Z(['z4','일산비즈니스타운 배후','백석동',37.64320,126.78820,54.7,-1.4,612,[['오피스 의존','+44%','up'],['주말 한산','+52%','up'],['공실 언급','+27%','up']]]),
+  Z(['z5','와이시티 단지내 상가','요진',37.64520,126.79160,43.6,-2.8,348,[['단지내 공실','+162%','up'],['업종 중복','+88%','up'],['외부 유입 부족','-34%','dn']]]),
+  Z(['z6','백석 노후 근린상가','백석동',37.63980,126.78880,39.2,-3.6,254,[['노후 공실','+187%','up'],['리뉴얼 필요','+96%','up'],['집객 약화','-31%','dn']]])],
+ grid:{bb:{s:37.6388,n:37.6468,w:126.7858,e:126.7942},dlat:0.0009,dlng:0.001135,core:[37.6428,126.7900],maxd:470,
+  hot:[[37.64430,126.79080,80,8],[37.64180,126.78930,70,9],[37.64080,126.79020,70,11],[37.64320,126.78820,80,22],[37.64520,126.79160,80,30],[37.63980,126.78880,80,34]]},
+ units:[U(['u1','요진 스트리트몰 1F','요진',37.64432,126.79082,50,360,700,'1F','카페','premium','고','주상복합 주민','배후수요 → 고급화 브런치/베이커리']),
+  U(['u2','백석역 1번출구 1F','백석역',37.64182,126.78932,32,300,500,'1F','분식','value','고','직장·통근','점심 회전형 가성비']),
+  U(['u3','와이시티 단지상가 1F','요진',37.64522,126.79162,38,210,200,'1F','공인중개','value','중','단지 생활','생활밀착 가성비 반찬/세탁']),
+  U(['u4','일산비즈니스 배후 2F','백석동',37.64322,126.78822,48,180,0,'2F','사무실','factory','저','주말 한산','무인·공유오피스 표준화']),
+  U(['u5','백석 노후 근린상가 1F','백석동',37.63982,126.78882,40,150,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 거점'])],
+ events:[E(['e1','요진 와이시티 패밀리 마켓',37.64430,126.79080,'👨‍👩‍👧','2026.09 · 주말 2일','유입 +27%','주상복합 광장에서 가족 단위 플리마켓·키즈 콘텐츠. 단지-스트리트몰 연결.',['요진: 광장','상인회: 부스','주민: 참여'],'<b>공생</b> — 단지 내수를 외부 상권과 연결.']),
+  E(['e2','백석 오피스 런치 페스타',37.64320,126.78820,'🍱','2026.08 · 평일 2주','전환 11%','비즈니스타운 직장인 대상 점심 할인·푸드트럭. 주말 한산 보완.',['상인회: 런치','직장: 참여','SpaceOS: 데이터'],'<b>균형</b> — 평일 오피스 수요를 골목으로 배분.']),
+  E(['e3','백석 노후상가 리뉴얼 팝업',37.63980,126.78880,'🛍','2026.10 · 3주','전환 12%','노후 근린상가 공실 단기 팝업. 무인·로컬 브랜드 수요 검증.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>공감</b> — 구상권 점진적 갱신.'])],
+ insta:["🏙요진 와이시티 스트리트몰\n\n백석역 도보 5분, 주말 패밀리 마켓 오픈. 키즈존+브런치 🥐\n\n#백석 #요진와이시티 #일산","🍱백석 직장인 런치 페스타\n\n점심마다 푸드트럭+할인! 비즈니스타운 직장인 모여라 🚚\n\n#백석역 #일산맛집 #런치"]},
+
+{id:'haengsin',name:'행신',sub:'덕양구 행신동 · 행신역(경의중앙) · 주거밀집 생활상권',center:[37.6125,126.8345],zoom:16,
+ poi:[[37.61220,126.83450,'◉ 행신역','sta'],[37.61560,126.83260,'행신근린공원','park']],
+ zones:[Z(['z1','행신역 중앙로 먹자','행신역',37.61320,126.83480,67.1,0.9,1180,[['저녁 회전','+33%','up'],['배달 주문','+29%','up'],['역세권','+18%','up']]]),
+  Z(['z2','행신 카페거리','행신동',37.61420,126.83400,64.8,0.7,860,[['주말 체류','+27%','up'],['디저트','+22%','up'],['신규 유입','+15%','up']]]),
+  Z(['z3','소만마을 단지상가','행신동',37.61180,126.83120,55.3,-1.2,540,[['생활밀착','+24%','up'],['주말 공동화','+44%','up'],['업종 중복','+28%','up']]]),
+  Z(['z4','햇빛마을 근린상가','행신동',37.61560,126.83560,52.9,-1.6,468,[['단지 배후','+21%','up'],['평일 한산','+38%','up'],['공실 언급','+24%','up']]]),
+  Z(['z5','무원마을 노후상가','행신동',37.60980,126.83260,40.4,-3.1,286,[['노후 공실','+174%','up'],['리뉴얼 필요','+92%','up'],['집객 약화','-28%','dn']]]),
+  Z(['z6','행신 이면 골목','행신동',37.61280,126.83660,44.7,-2.4,212,[['접근성 약','+58%','up'],['공실 장기화','+86%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.6085,n:37.6165,w:126.8302,e:126.8386},dlat:0.0009,dlng:0.001135,core:[37.6125,126.8345],maxd:470,
+  hot:[[37.61320,126.83480,75,10],[37.61420,126.83400,68,11],[37.61180,126.83120,82,24],[37.61560,126.83560,78,23],[37.60980,126.83260,80,32],[37.61280,126.83660,78,28]]},
+ units:[U(['u1','행신역 중앙로 1F','행신역',37.61322,126.83482,34,260,400,'1F','분식','value','고','역세권 통근','회전형 가성비 분식/김밥']),
+  U(['u2','행신 카페거리 1F','행신동',37.61422,126.83402,38,240,300,'1F','의류','premium','중','20·30대','동네 핫플 → 로스터리/베이커리']),
+  U(['u3','소만마을 단지상가 1F','행신동',37.61182,126.83122,33,200,200,'1F','문구','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u4','무원마을 노후상가 1F','행신동',37.60982,126.83262,40,140,0,'1F','세탁','factory','저','노후·저유동','무인 세탁·편의 표준화']),
+  U(['u5','행신 이면 골목 2F','행신동',37.61282,126.83662,44,150,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','행신 동네 한바퀴 마켓',37.61350,126.83440,'🛒','2026.09 · 매주 토','유입 +31%','중앙로~카페거리 동네 플리마켓. 단지 생활수요를 가로상권으로 유도.',['상인회: 부스','주민: 참여','소비자: 마켓'],'<b>공생</b> — 단지 내수를 가로상권과 연결.']),
+  E(['e2','무원마을 빈상가 리빙 팝업',37.60980,126.83260,'🛋','2026.08 · 3주','전환 12%','노후 근린상가 공실을 리빙·무인 팝업으로. 갱신 수요 검증.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 구단지 상가 점진 갱신.']),
+  E(['e3','행신 골목 야시장',37.61280,126.83660,'🌙','매월 둘째 금','야간 +21%','이면 골목 야간 푸드트럭·조명으로 체류 확대.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 주거밀집 생활 리듬에 맞춘 야간 콘텐츠.'])],
+ insta:["🍜행신역 중앙로 먹자\n\n행신역 1번출구, 동네 노포부터 신상까지. 동네 한바퀴 마켓 매주 토요일 🛒\n\n#행신동 #행신역맛집 #고양","🛋무원마을 빈상가가 리빙 팝업으로\n\n동네 산책 겸 구경 어때요? 🪑\n\n#행신 #리빙 #팝업"]},
+
+{id:'juyeop',name:'주엽·대화',sub:'일산서구 주엽·대화동 · 주엽/대화역(3호선) · 학원·킨텍스 배후',center:[37.6720,126.7560],zoom:14,
+ poi:[[37.67050,126.76150,'◉ 주엽역','sta'],[37.67660,126.74700,'◉ 대화역','sta'],[37.66800,126.74550,'킨텍스','park']],
+ zones:[Z(['z1','주엽역 문화의거리','주엽',37.67050,126.76060,69.2,1.2,1480,[['저녁 회전','+34%','up'],['학원 배후','+27%','up'],['카페 유입','+19%','up']]]),
+  Z(['z2','문촌마을 단지상가','주엽',37.67220,126.76260,57.4,-1.1,720,[['생활밀착','+23%','up'],['주말 공동화','+41%','up'],['업종 중복','+26%','up']]]),
+  Z(['z3','강선마을 학원가','주엽',37.66980,126.76360,62.8,0.4,840,[['학원 수요','+31%','up'],['저녁 픽업','+22%','up'],['임대료','+15%','up']]]),
+  Z(['z4','대화역 상가','대화',37.67620,126.74780,55.1,-1.4,560,[['역세권','+18%','up'],['평일 한산','+39%','up'],['공실 언급','+25%','up']]]),
+  Z(['z5','킨텍스 배후상가','대화',37.66880,126.74620,48.3,-2.3,402,[['행사 의존','+58%','up'],['비행사일 공동화','+74%','up'],['외부 유입','-29%','dn']]]),
+  Z(['z6','대화 노후 근린상가','대화',37.67780,126.74960,40.9,-3.3,268,[['노후 공실','+168%','up'],['리뉴얼 필요','+89%','up'],['집객 약화','-30%','dn']]])],
+ grid:{bb:{s:37.6668,n:37.6748,w:126.7568,e:126.7652},dlat:0.0009,dlng:0.001135,core:[37.6708,126.7610],maxd:480,
+  hot:[[37.67050,126.76060,78,9],[37.66980,126.76360,72,11],[37.67220,126.76260,82,24],[37.67120,126.75980,75,15],[37.67280,126.76420,80,29],[37.66900,126.76200,78,21]]},
+ units:[U(['u1','주엽 문화의거리 1F','주엽',37.67052,126.76062,42,320,700,'1F','호프','premium','고','20·30대 외식','문화거리 1F → 다이닝/바']),
+  U(['u2','강선마을 학원가 1F','주엽',37.66982,126.76362,34,260,400,'1F','분식','value','고','학생·학부모','학원 픽업 회전형 분식/카페']),
+  U(['u3','문촌마을 단지상가 1F','주엽',37.67222,126.76262,33,210,200,'1F','문구','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u4','대화역 상가 2F','대화',37.67622,126.74782,46,180,0,'2F','사무실','factory','저','평일 한산','무인·공유오피스 표준화']),
+  U(['u5','킨텍스 배후 1F','대화',37.66882,126.74622,50,200,0,'1F','카페','factory','저','행사 의존','무인·플렉시블 운영으로 변동성 흡수'])],
+ events:[E(['e1','주엽 문화의거리 버스킹 마켓',37.67050,126.76060,'🎤','2026.09 · 주말 3일','유입 +30%','학원가·단지 가족 수요를 문화의거리로 모으는 버스킹+플리마켓.',['상인회: 무대','학원: 연계','주민: 참여'],'<b>공생</b> — 학원·단지 내수를 가로상권과 연결.']),
+  E(['e2','킨텍스 연계 비수기 마켓',37.66880,126.74620,'🏟','킨텍스 비행사 주말','전환 12%','전시 비수기 주말 배후상가 자체 마켓으로 공동화 보완.',['상인회: 마켓','지자체: 홍보','소비자: 참여'],'<b>균형</b> — 행사 의존 상권의 변동성 완충.']),
+  E(['e3','대화 노후상가 리뉴얼 팝업',37.67780,126.74960,'🛍','2026.10 · 3주','전환 11%','대화 노후 근린상가 공실 단기 팝업으로 갱신 수요 검증.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>공감</b> — 구상권 점진 갱신.'])],
+ insta:["🎤주엽 문화의거리\n\n주엽역 도보 3분. 학원 끝나고 버스킹+플리마켓 즐겨요 🎶\n\n#주엽역 #일산학원가 #문화의거리","🏟킨텍스 비수기에도 핫한 대화\n\n전시 없는 주말, 배후상가 자체 마켓 오픈 🛍\n\n#대화역 #킨텍스 #일산"]},
+
+{id:'deokyang',name:'덕양구 (주교·원당·성사)',sub:'덕양구 주교동·성사동 · 원당역(3호선) · 행정중심 구도심',center:[37.6560,126.8360],zoom:15,
+ poi:[[37.65350,126.84200,'◉ 원당역','sta'],[37.65840,126.83200,'고양시청','park']],
+ zones:[Z(['z1','원당 로데오거리','원당',37.65420,126.84080,65.3,0.8,1240,[['저녁 회전','+31%','up'],['청년 유입','+24%','up'],['배달','+20%','up']]]),
+  Z(['z2','고양시청 일대 상가','주교',37.65840,126.83200,61.7,0.5,980,[['관공서 수요','+27%','up'],['점심 회전','+22%','up'],['저녁 한산','+33%','up']]]),
+  Z(['z3','주교동 재래시장','주교',37.65760,126.83440,58.9,-0.9,860,[['전통시장','+19%','up'],['고령 고객','+28%','up'],['청년 이탈','-21%','dn']]]),
+  Z(['z4','성사동 먹자골목','성사',37.65180,126.83760,56.4,-1.3,640,[['노포 유지','+18%','up'],['주차 불편','+47%','up'],['공실 언급','+26%','up']]]),
+  Z(['z5','원당 노후 근린상가','원당',37.65280,126.84320,41.2,-3.2,318,[['노후 공실','+178%','up'],['리뉴얼 필요','+94%','up'],['집객 약화','-29%','dn']]]),
+  Z(['z6','주교 이면 상가','주교',37.65920,126.83480,44.6,-2.5,242,[['접근성 약','+61%','up'],['공실 장기화','+88%','up'],['야간 공동화','-27%','dn']]])],
+ grid:{bb:{s:37.6500,n:37.6610,w:126.8300,e:126.8456},dlat:0.0009,dlng:0.001135,core:[37.6556,126.8378],maxd:640,
+  hot:[[37.65420,126.84080,80,12],[37.65840,126.83200,78,14],[37.65760,126.83440,75,15],[37.65180,126.83760,80,22],[37.65280,126.84320,80,33],[37.65920,126.83480,78,27]]},
+ units:[U(['u1','원당 로데오 1F','원당',37.65422,126.84082,38,260,500,'1F','호프','premium','고','청년·외식','원당 로데오 1F → 다이닝/바']),
+  U(['u2','고양시청 앞 1F','주교',37.65842,126.83202,32,280,400,'1F','편의점','value','고','관공서·통근','점심 회전형 가성비']),
+  U(['u3','주교동 시장 점포','주교',37.65762,126.83442,28,180,300,'1F','잡화','value','중','전통시장','청년몰형 가성비 먹거리']),
+  U(['u4','원당 노후 근린상가 1F','원당',37.65282,126.84322,40,150,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','주교 이면 상가 2F','주교',37.65922,126.83482,44,140,0,'2F','사무실','factory','저','저유동','무인스터디·공유오피스'])],
+ events:[E(['e1','원당 로데오 청년 페스타',37.65420,126.84080,'🎪','2026.09 · 주말 3일','유입 +29%','원당 로데오에 청년 창업·푸드트럭 마켓. 구도심 청년 유입.',['상인회: 부스','청년: 창업','소비자: 참여'],'<b>공감</b> — 구도심에 청년 콘텐츠 결합.']),
+  E(['e2','주교동 시장 청년몰 팝업',37.65760,126.83440,'🛍','2026.08 · 1개월','전환 13%','재래시장 빈점포를 청년몰 팝업으로. 시장 활성·세대 결합.',['상인회: 점포','청년: 입점','지자체: 지원'],'<b>공생</b> — 전통시장과 청년 상인 세대 결합.']),
+  E(['e3','고양시청 앞 플리·문화마켓',37.65840,126.83200,'🎨','매월 셋째 토','배후 +18%','관공서 저녁 한산 시간대 광장 문화마켓으로 체류 확대.',['시청: 광장','상인회: 부스','시민: 참여'],'<b>균형</b> — 행정 공간을 시민 생활공간으로 개방.'])],
+ insta:["🎪원당 로데오 청년 페스타\n\n원당역 도보 5분. 청년 창업 부스+푸드트럭 주말마다 🚚\n\n#원당역 #덕양구 #고양","🛍주교동 시장에 청년몰이 떴다\n\n전통시장 빈점포가 청년 먹거리존으로! 🍢\n\n#주교동시장 #청년몰 #고양"]},
+
+{id:'madu',name:'마두역·일산역 방면',sub:'일산동구 마두·일산동 · 마두역(3호선)·일산역(경의) · 학원가+구도심',center:[37.6520,126.7800],zoom:15,
+ poi:[[37.65150,126.78010,'◉ 마두역','sta'],[37.68200,126.77450,'◉ 일산역','sta'],[37.65500,126.78400,'백마근린공원','park']],
+ zones:[Z(['z1','마두역 학원가','마두',37.65150,126.78120,66.7,0.7,1320,[['학원 수요','+34%','up'],['저녁 픽업','+24%','up'],['카페 유입','+18%','up']]]),
+  Z(['z2','백마마을 단지상가','마두',37.65360,126.78280,56.8,-1.0,680,[['생활밀착','+22%','up'],['주말 공동화','+42%','up'],['업종 중복','+27%','up']]]),
+  Z(['z3','마두 먹자골목','마두',37.65040,126.78240,63.1,0.3,760,[['저녁 회전','+29%','up'],['배달','+25%','up'],['노포 유지','+13%','up']]]),
+  Z(['z4','일산역 구도심 상가','일산동',37.68180,126.77520,52.4,-1.6,590,[['구도심 노후','+38%','up'],['청년 이탈','+44%','up'],['공실 언급','+28%','up']]]),
+  Z(['z5','일산시장 일대','일산동',37.68320,126.77380,47.9,-2.4,448,[['전통시장','+17%','up'],['고령 고객','+31%','up'],['집객 약화','-26%','dn']]]),
+  Z(['z6','일산역 이면 노후상가','일산동',37.68060,126.77680,39.7,-3.4,262,[['노후 공실','+182%','up'],['리뉴얼 필요','+97%','up'],['야간 공동화','-32%','dn']]])],
+ grid:{bb:{s:37.6480,n:37.6560,w:126.7758,e:126.7842},dlat:0.0009,dlng:0.001135,core:[37.6520,126.7800],maxd:480,
+  hot:[[37.65150,126.78120,78,10],[37.65040,126.78240,72,11],[37.65360,126.78280,82,24],[37.65240,126.77980,76,16],[37.65420,126.78420,80,28],[37.64960,126.78060,78,22]]},
+ units:[U(['u1','마두역 학원가 1F','마두',37.65152,126.78122,36,280,500,'1F','분식','value','고','학생·학부모','학원 픽업 회전형 분식/카페']),
+  U(['u2','마두 먹자골목 1F','마두',37.65042,126.78242,40,300,800,'1F','호프','premium','고','20·30대 외식','먹자 1F → 다이닝/바']),
+  U(['u3','백마마을 단지상가 1F','마두',37.65362,126.78282,33,210,200,'1F','문구','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u4','일산역 구도심 1F','일산동',37.68182,126.77522,38,160,0,'1F','의류','factory','저','구도심·저유동','무인 편의·픽업 표준화']),
+  U(['u5','일산역 이면 노후 2F','일산동',37.68062,126.77682,44,135,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','마두 학원가 페어런츠 마켓',37.65150,126.78120,'📚','2026.09 · 매주 토','유입 +28%','학원가 학부모 대기수요 대상 카페·체험 마켓. 픽업 시간대 활성.',['상인회: 부스','학원: 연계','학부모: 참여'],'<b>공생</b> — 학원 대기수요를 가로상권으로 연결.']),
+  E(['e2','일산역 구도심 레트로 마켓',37.68180,126.77520,'🎶','2026.10 · 주말 3일','유입 +33%','일산역 구도심·시장을 레트로 콘텐츠로 재조명. 청년 유입 유도.',['상인회: 노포','청년: 부스','소비자: 레트로'],'<b>공감</b> — 일산 원도심 역사를 향수 콘텐츠로.']),
+  E(['e3','일산시장 빈점포 청년몰 팝업',37.68320,126.77380,'🛍','2026.08 · 1개월','전환 12%','전통시장 빈점포를 청년몰 팝업으로. 세대 결합·시장 활성.',['상인회: 점포','청년: 입점','지자체: 지원'],'<b>균형</b> — 전통시장과 청년 상인 세대 결합.'])],
+ insta:["📚마두역 학원가, 학부모 픽업 핫플\n\n마두역 도보 3분. 대기시간 즐기는 카페+체험 마켓 ☕\n\n#마두역 #일산학원가 #백마마을","🎶일산역 구도심 레트로 마켓\n\n원도심 노포 골목이 레트로 핫플로! 청년 부스도 🎟\n\n#일산역 #일산시장 #레트로"]},
+
+{id:'tanhyeon',name:'탄현',sub:'일산서구 탄현동 · 탄현역(경의중앙) · 역세권 주거상권',center:[37.6905,126.7480],zoom:16,
+ poi:[[37.69050,126.74800,'◉ 탄현역','sta'],[37.69300,126.74400,'탄현근린공원','park']],
+ zones:[Z(['z1','탄현역 큰마을 상가','탄현',37.69010,126.74880,63.8,0.6,1020,[['역세권 유입','+21%','up'],['저녁 회전','+19%','up'],['배달','+16%','up']]]),
+  Z(['z2','일산두산위브 단지상가','탄현',37.69180,126.74700,58.2,-0.8,640,[['주상복합 배후','+22%','up'],['주말 공동화','+34%','up'],['업종 중복','+24%','up']]]),
+  Z(['z3','탄현 카페거리','탄현',37.68920,126.74960,61.4,0.4,560,[['주말 체류','+24%','up'],['디저트','+18%','up'],['신규 유입','+13%','up']]]),
+  Z(['z4','탄현 먹자골목','탄현',37.69080,126.74720,57.6,-0.9,520,[['노포 유지','+15%','up'],['주차 불편','+38%','up'],['공실 언급','+22%','up']]]),
+  Z(['z5','탄현 노후 근린상가','탄현',37.68820,126.74640,42.3,-2.8,288,[['노후 공실','+162%','up'],['리뉴얼 필요','+84%','up'],['집객 약화','-27%','dn']]]),
+  Z(['z6','탄현 이면 상가','탄현',37.69240,126.74940,45.7,-2.1,214,[['접근성 약','+54%','up'],['공실 장기화','+78%','up'],['야간 공동화','-24%','dn']]])],
+ grid:{bb:{s:37.6865,n:37.6945,w:126.7438,e:126.7522},dlat:0.0009,dlng:0.001135,core:[37.6905,126.7480],maxd:470,
+  hot:[[37.69010,126.74880,75,11],[37.68920,126.74960,68,12],[37.69180,126.74700,80,22],[37.69080,126.74720,72,16],[37.68820,126.74640,80,30],[37.69240,126.74940,78,26]]},
+ units:[U(['u1','탄현역 큰마을 1F','탄현',37.69012,126.74882,34,250,400,'1F','분식','value','고','역세권 통근','회전형 가성비 분식/카페']),
+  U(['u2','탄현 카페거리 1F','탄현',37.68922,126.74962,38,230,300,'1F','의류','premium','중','20·30대','동네 핫플 → 로스터리/베이커리']),
+  U(['u3','일산두산위브 단지상가 1F','탄현',37.69182,126.74702,33,210,200,'1F','문구','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u4','탄현 노후 근린상가 1F','탄현',37.68822,126.74642,40,140,0,'1F','세탁','factory','저','노후·저유동','무인 세탁·편의 표준화']),
+  U(['u5','탄현 이면 상가 2F','탄현',37.69242,126.74942,44,150,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','탄현 동네 마켓',37.69020,126.74840,'🛒','2026.09 · 매주 토','유입 +27%','큰마을~카페거리 동네 플리마켓. 단지 생활수요를 가로상권으로 유도.',['상인회: 부스','주민: 참여','소비자: 마켓'],'<b>공생</b> — 단지 내수를 가로상권과 연결.']),
+  E(['e2','탄현 노후상가 리뉴얼 팝업',37.68820,126.74640,'🛍','2026.08 · 3주','전환 12%','노후 근린상가 공실 단기 팝업으로 갱신 수요 검증.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 구상권 점진 갱신.']),
+  E(['e3','탄현 골목 야시장',37.69240,126.74940,'🌙','매월 둘째 금','야간 +20%','이면 골목 야간 푸드트럭·조명으로 체류 확대.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 주거밀집 생활 리듬에 맞춘 야간 콘텐츠.'])],
+ insta:["🚉탄현역 큰마을, 동네 마켓 #탄현 #일산서구","탄현 카페거리 신상 로스터리 #탄현역 #일산카페"]},
+
+{id:'gajwa',name:'가좌·송포마을',sub:'일산서구 대화동 · 가좌마을 · 외곽 주거 생활상권',center:[37.6850,126.7400],zoom:16,
+ poi:[[37.68500,126.74000,'가좌마을','park']],
+ zones:[Z(['z1','가좌마을 중심상가','가좌',37.68520,126.74080,56.4,-0.5,720,[['생활밀착','+22%','up'],['주말 한산','+36%','up'],['배달','+15%','up']]]),
+  Z(['z2','가좌 카페·먹자','가좌',37.68440,126.74010,59.1,0.2,540,[['저녁 회전','+19%','up'],['단지 배후','+17%','up'],['신규 유입','+11%','up']]]),
+  Z(['z3','송포 근린상가','송포',37.68640,126.73900,52.8,-1.1,468,[['단지 배후','+18%','up'],['평일 한산','+34%','up'],['공실 언급','+23%','up']]]),
+  Z(['z4','가좌 학원가','가좌',37.68380,126.74160,57.3,-0.4,512,[['학원 수요','+24%','up'],['저녁 픽업','+18%','up'],['임대료','+12%','up']]]),
+  Z(['z5','가좌 노후 근린상가','가좌',37.68700,126.74060,40.9,-3.0,278,[['노후 공실','+168%','up'],['리뉴얼 필요','+86%','up'],['집객 약화','-28%','dn']]]),
+  Z(['z6','송포 이면 상가','송포',37.68560,126.73820,43.6,-2.3,196,[['접근성 약','+58%','up'],['공실 장기화','+82%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.6810,n:37.6890,w:126.7358,e:126.7442},dlat:0.0009,dlng:0.001135,core:[37.6850,126.7400],maxd:470,
+  hot:[[37.68520,126.74080,78,14],[37.68440,126.74010,68,12],[37.68640,126.73900,80,23],[37.68380,126.74160,72,15],[37.68700,126.74060,80,32],[37.68560,126.73820,78,27]]},
+ units:[U(['u1','가좌마을 중심상가 1F','가좌',37.68522,126.74082,34,220,300,'1F','분식','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u2','가좌 카페·먹자 1F','가좌',37.68442,126.74012,38,240,400,'1F','호프','premium','중','20·30대','동네 다이닝/바']),
+  U(['u3','송포 근린상가 1F','송포',37.68642,126.73902,33,190,200,'1F','문구','value','중','단지 생활','가성비 세탁/반찬']),
+  U(['u4','가좌 노후 근린상가 1F','가좌',37.68702,126.74062,40,130,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','송포 이면 상가 2F','송포',37.68562,126.73822,44,140,0,'2F','사무실','factory','저','저유동','무인스터디·공유오피스'])],
+ events:[E(['e1','가좌마을 한바퀴 마켓',37.68520,126.74040,'🛒','2026.09 · 매주 토','유입 +25%','중심상가~카페거리 동네 마켓.',['상인회: 부스','주민: 참여','소비자: 마켓'],'<b>공생</b> — 단지 내수를 가로상권과 연결.']),
+  E(['e2','가좌 빈상가 리빙 팝업',37.68700,126.74060,'🛋','2026.08 · 3주','전환 11%','노후 근린상가 공실을 리빙·무인 팝업으로.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 외곽 구단지 상가 점진 갱신.']),
+  E(['e3','송포 골목 야시장',37.68560,126.73820,'🌙','매월 둘째 금','야간 +18%','이면 골목 야간 푸드트럭·조명.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 주거 생활 리듬에 맞춘 야간 콘텐츠.'])],
+ insta:["🏘가좌마을 동네 한바퀴 마켓 #가좌마을 #일산서구","송포 빈상가가 리빙 팝업으로 #송포 #팝업"]},
+
+{id:'kintexone',name:'킨텍스원시티·일산테크노',sub:'일산서구 대화동 · 킨텍스 주상복합 · 신축 프리미엄 배후',center:[37.6680,126.7530],zoom:16,
+ poi:[[37.66800,126.74550,'킨텍스','park'],[37.66900,126.75400,'원시티','park']],
+ zones:[Z(['z1','킨텍스원시티 스트리트몰','원시티',37.66900,126.75400,72.6,1.8,1480,[['신축 프리미엄','+44%','up'],['주말 집객','+28%','up'],['F&B 다양성','+21%','up']]]),
+  Z(['z2','원시티 단지내 상가','원시티',37.67020,126.75520,46.2,-2.6,386,[['단지내 공실','+154%','up'],['업종 중복','+82%','up'],['외부 유입 부족','-31%','dn']]]),
+  Z(['z3','일산테크노밸리 배후','대화',37.66640,126.75180,53.4,-1.3,512,[['오피스 의존','+42%','up'],['주말 한산','+48%','up'],['공실 언급','+26%','up']]]),
+  Z(['z4','킨텍스 광장 상가','대화',37.66760,126.74780,64.8,0.6,720,[['전시 연계','+33%','up'],['비행사 공동화','+58%','up'],['임대료','+18%','up']]]),
+  Z(['z5','원시티 가로 카페','원시티',37.66980,126.75300,68.3,1.1,640,[['디저트 인증','+38%','up'],['주말 체류','+27%','up'],['신규 카페','+16%','up']]]),
+  Z(['z6','대화 신축 근린상가','대화',37.66520,126.75440,41.7,-3.4,268,[['신축 공실','+196%','up'],['임대료 부담','+138%','up'],['집객 부족','-33%','dn']]])],
+ grid:{bb:{s:37.6640,n:37.6720,w:126.7488,e:126.7572},dlat:0.0009,dlng:0.001135,core:[37.6680,126.7530],maxd:480,
+  hot:[[37.66900,126.75400,80,8],[37.67020,126.75520,80,30],[37.66640,126.75180,80,22],[37.66760,126.74780,75,16],[37.66980,126.75300,68,9],[37.66520,126.75440,80,33]]},
+ units:[U(['u1','킨텍스원시티 스트리트몰 1F','원시티',37.66902,126.75402,52,440,900,'1F','카페','premium','고','주상복합 주민','신축 배후 → 고급화 브런치/플래그십']),
+  U(['u2','원시티 가로 카페 1F','원시티',37.66982,126.75302,40,360,500,'1F','카페','premium','중','20·30대','시그니처 로스터리']),
+  U(['u3','킨텍스 광장 상가 1F','대화',37.66762,126.74782,46,300,300,'1F','분식','value','중','전시 방문객','회전형 가성비 F&B']),
+  U(['u4','원시티 단지내 상가 1F','원시티',37.67022,126.75522,38,220,0,'1F','공인중개','factory','저','단지 생활','무인·생활밀착 표준화']),
+  U(['u5','대화 신축 근린상가 2F','대화',37.66522,126.75442,50,180,0,'2F','사무실','factory','저','신축 저유동','무인·공유오피스 공동화 차단'])],
+ events:[E(['e1','킨텍스원시티 프리미엄 마켓',37.66900,126.75400,'🛍','2026.09 · 주말 3일','유입 +31%','신축 주상복합 광장 프리미엄 플리마켓. 단지-스트리트몰 연결.',['원시티: 광장','상인회: 부스','주민: 참여'],'<b>공생</b> — 신축 단지 내수를 외부와 연결.']),
+  E(['e2','대화 신축상가 팝업위크',37.66520,126.75440,'🤝','2026.08 · 2주','전환 13%','신축 공실을 2주 단기 팝업으로. 배후수요 반응 데이터.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신생·로컬 브랜드 공정 진입.']),
+  E(['e3','킨텍스 연계 비수기 마켓',37.66760,126.74780,'🏟','킨텍스 비행사 주말','야간 +19%','전시 비수기 주말 배후상가 자체 마켓으로 공동화 보완.',['상인회: 마켓','지자체: 홍보','소비자: 참여'],'<b>공감</b> — 전시 의존 상권의 변동성 완충.'])],
+ insta:["🏙킨텍스원시티 프리미엄 마켓 #킨텍스원시티 #일산","대화 신축상가 팝업위크 #대화동 #킨텍스"]},
+
+{id:'pungdong',name:'풍동·식사 위시티',sub:'일산동구 식사·풍동 · 일산자이·위시티 · 신도시+애니골 카페거리',center:[37.6770,126.8010],zoom:16,
+ poi:[[37.67700,126.80100,'위시티','park'],[37.67400,126.79600,'애니골 카페거리','park']],
+ zones:[Z(['z1','애니골 카페거리','풍동',37.67400,126.79620,74.1,1.6,1380,[['카페 핫플','+52%','up'],['주말 집객','+33%','up'],['SNS 인증','+41%','up']]]),
+  Z(['z2','위시티 중심상가','식사',37.67720,126.80120,63.7,0.4,1020,[['신도시 배후','+26%','up'],['저녁 회전','+19%','up'],['F&B 다양성','+15%','up']]]),
+  Z(['z3','일산자이 단지상가','식사',37.67900,126.80260,55.2,-1.2,680,[['생활밀착','+23%','up'],['주말 공동화','+41%','up'],['업종 중복','+27%','up']]]),
+  Z(['z4','풍동 먹자골목','풍동',37.67560,126.79780,61.8,0.2,720,[['저녁 회전','+28%','up'],['배달','+24%','up'],['노포 유지','+12%','up']]]),
+  Z(['z5','식사 신축 상층 상가','식사',37.67840,126.80060,40.3,-3.6,312,[['상층 공실','+208%','up'],['동선 단절','+92%','up'],['야간 공동화','-38%','dn']]]),
+  Z(['z6','위시티 외곽 근린상가','식사',37.67620,126.80320,44.9,-2.4,248,[['외곽 공실','+174%','up'],['집객 부족','+88%','up'],['임대료 부담','-29%','dn']]])],
+ grid:{bb:{s:37.6730,n:37.6810,w:126.7958,e:126.8062},dlat:0.0009,dlng:0.001135,core:[37.6760,126.8000],maxd:520,
+  hot:[[37.67400,126.79620,75,7],[37.67720,126.80120,72,14],[37.67900,126.80260,82,24],[37.67560,126.79780,70,12],[37.67840,126.80060,90,40],[37.67620,126.80320,80,30]]},
+ units:[U(['u1','애니골 카페거리 1F','풍동',37.67402,126.79622,44,340,700,'1F','카페','premium','고','20·30대 트렌드','카페 핫플 → 시그니처 로스터리/베이커리']),
+  U(['u2','풍동 먹자골목 1F','풍동',37.67562,126.79782,40,300,500,'1F','호프','premium','고','20·30대 외식','먹자 1F → 다이닝/바']),
+  U(['u3','일산자이 단지상가 1F','식사',37.67902,126.80262,33,230,200,'1F','문구','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u4','식사 신축 상층 상가 2F','식사',37.67842,126.80062,50,190,0,'2F','의류','factory','저','신도시 거주민','무인·표준으로 공동화 차단']),
+  U(['u5','위시티 외곽 근린상가 1F','식사',37.67622,126.80322,42,170,0,'1F','학원','factory','저','외곽 저유동','무인스터디·공유오피스'])],
+ events:[E(['e1','애니골 카페 페스타',37.67400,126.79620,'☕','2026.09 · 주말 3일','유입 +36%','애니골 카페거리 디저트·로스팅 체험 마켓. SNS 집객.',['상인회: 카페','로스터: 체험','소비자: 인증'],'<b>공감</b> — 동네 카페 정체성을 콘텐츠 자산화.']),
+  E(['e2','식사 신축 상층 팝업위크',37.67840,126.80060,'🛍','2026.08 · 2주','전환 13%','고공실 상층을 2주 단기 팝업으로. 신도시 배후수요 검증.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신도시 신생 브랜드 공정 진입.']),
+  E(['e3','위시티 패밀리 나이트마켓',37.67720,126.80120,'🌙','매월 마지막 금','야간 +23%','신도시 가족 단위 야간 플리마켓·푸드트럭.',['상인회: 야시장','주민: 참여','지자체: 안전'],'<b>공생</b> — 신도시 정주 가족 야간 콘텐츠.'])],
+ insta:["☕일산 애니골 카페거리 #애니골 #식사동 #일산카페","위시티 패밀리 나이트마켓 #위시티 #일산자이"]},
+
+{id:'jungsan',name:'중산지구',sub:'일산동구 중산동 · 중산마을 · 1기신도시 외곽 생활상권',center:[37.6860,126.7860],zoom:16,
+ poi:[[37.68600,126.78600,'중산마을','park']],
+ zones:[Z(['z1','중산마을 중심상가','중산',37.68620,126.78680,58.9,-0.4,860,[['생활밀착','+23%','up'],['저녁 회전','+17%','up'],['배달','+15%','up']]]),
+  Z(['z2','중산 학원가','중산',37.68460,126.78720,60.4,0.3,640,[['학원 수요','+26%','up'],['저녁 픽업','+19%','up'],['카페 유입','+13%','up']]]),
+  Z(['z3','중산 먹자골목','중산',37.68740,126.78540,57.1,-0.7,580,[['노포 유지','+15%','up'],['주차 불편','+36%','up'],['공실 언급','+21%','up']]]),
+  Z(['z4','하늘마을 단지상가','중산',37.68860,126.78760,53.6,-1.3,512,[['단지 배후','+19%','up'],['주말 공동화','+38%','up'],['업종 중복','+25%','up']]]),
+  Z(['z5','중산 노후 근린상가','중산',37.68380,126.78600,41.8,-2.9,286,[['노후 공실','+166%','up'],['리뉴얼 필요','+88%','up'],['집객 약화','-27%','dn']]]),
+  Z(['z6','중산 이면 상가','중산',37.68920,126.78920,44.3,-2.2,212,[['접근성 약','+56%','up'],['공실 장기화','+80%','up'],['야간 공동화','-25%','dn']]])],
+ grid:{bb:{s:37.6820,n:37.6900,w:126.7818,e:126.7902},dlat:0.0009,dlng:0.001135,core:[37.6860,126.7860],maxd:470,
+  hot:[[37.68620,126.78680,78,13],[37.68460,126.78720,72,12],[37.68740,126.78540,72,16],[37.68860,126.78760,80,23],[37.68380,126.78600,80,31],[37.68920,126.78920,78,26]]},
+ units:[U(['u1','중산마을 중심상가 1F','중산',37.68622,126.78682,34,240,300,'1F','분식','value','고','생활밀착','가성비 분식/반찬']),
+  U(['u2','중산 학원가 1F','중산',37.68462,126.78722,36,260,400,'1F','카페','premium','중','학생·학부모','학원가 디저트/카페']),
+  U(['u3','하늘마을 단지상가 1F','중산',37.68862,126.78762,33,210,200,'1F','문구','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u4','중산 노후 근린상가 1F','중산',37.68382,126.78602,40,140,0,'1F','세탁','factory','저','노후·저유동','무인 세탁·편의 표준화']),
+  U(['u5','중산 이면 상가 2F','중산',37.68922,126.78922,44,150,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','중산 동네 마켓',37.68600,126.78640,'🛒','2026.09 · 매주 토','유입 +26%','중심상가~학원가 동네 플리마켓.',['상인회: 부스','주민: 참여','소비자: 마켓'],'<b>공생</b> — 단지 내수를 가로상권과 연결.']),
+  E(['e2','중산 빈상가 리뉴얼 팝업',37.68380,126.78600,'🛍','2026.08 · 3주','전환 11%','노후 근린상가 공실 단기 팝업.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 1기신도시 외곽 상가 점진 갱신.']),
+  E(['e3','중산 골목 야시장',37.68920,126.78920,'🌙','매월 둘째 금','야간 +20%','이면 골목 야간 푸드트럭·조명.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 주거 생활 리듬에 맞춘 야간 콘텐츠.'])],
+ insta:["🏘중산마을 동네 마켓 #중산동 #일산","중산 학원가 신상 카페 #중산 #일산카페"]},
+
+{id:'hyangdong',name:'향동지구',sub:'덕양구 향동동 · DMC 배후 신도시 · 초기입주 신축상권',center:[37.6090,126.8830],zoom:16,
+ poi:[[37.60900,126.88300,'향동호수공원','park']],
+ zones:[Z(['z1','향동 스타街 상가','향동',37.60920,126.88380,60.4,0.8,920,[['신도시 입주','+38%','up'],['주말 집객','+22%','up'],['F&B 유입','+17%','up']]]),
+  Z(['z2','향동 중심 스트리트','향동',37.60840,126.88240,52.7,-1.4,640,[['상층 공실','+142%','up'],['동선 단절','+76%','up'],['야간 공동화','-29%','dn']]]),
+  Z(['z3','향동 카페거리','향동',37.61020,126.88460,64.1,1.0,560,[['신상 카페','+44%','up'],['주말 체류','+26%','up'],['SNS 인증','+31%','up']]]),
+  Z(['z4','향동 단지상가','향동',37.60760,126.88500,49.3,-2.2,480,[['생활밀착','+21%','up'],['입주 미완','+58%','up'],['업종 부족','+33%','up']]]),
+  Z(['z5','향동 신축 공실 클러스터','향동',37.60680,126.88340,36.8,-4.4,288,[['신축 공실','+264%','up'],['임대료 부담','+158%','up'],['집객 부족','-41%','dn']]]),
+  Z(['z6','향동 외곽 근린','향동',37.61080,126.88620,43.2,-2.8,224,[['외곽 공실','+182%','up'],['접근성 약','+92%','up'],['야간 공동화','-30%','dn']]])],
+ grid:{bb:{s:37.6050,n:37.6130,w:126.8788,e:126.8872},dlat:0.0009,dlng:0.001135,core:[37.6090,126.8830],maxd:500,
+  hot:[[37.60920,126.88380,75,16],[37.60840,126.88240,80,28],[37.61020,126.88460,68,9],[37.60760,126.88500,80,30],[37.60680,126.88340,90,40],[37.61080,126.88620,80,33]]},
+ units:[U(['u1','향동 스타街 1F','향동',37.60922,126.88382,46,300,400,'1F','카페','premium','중','신도시 입주민','신도시 배후 → 브런치/베이커리']),
+  U(['u2','향동 카페거리 1F','향동',37.61022,126.88462,40,260,300,'1F','의류','premium','중','20·30대','신상 로스터리']),
+  U(['u3','향동 단지상가 1F','향동',37.60762,126.88502,36,210,200,'1F','분식','value','중','입주 가족','가성비 반찬/분식']),
+  U(['u4','향동 신축 공실 클러스터 1F','향동',37.60682,126.88342,48,170,0,'1F','공실','factory','저','입주 미완','무인·표준으로 공동화 차단']),
+  U(['u5','향동 외곽 근린 2F','향동',37.61082,126.88622,44,160,0,'2F','학원','factory','저','외곽 저유동','무인스터디·공유오피스'])],
+ events:[E(['e1','향동 신도시 입주 페스타',37.60900,126.88380,'🎪','2026.09 · 주말 3일','유입 +34%','신도시 입주민 환영 마켓. 신축 공실 팝업 동선 유도.',['상인회: 부스','건물주: 공실 개방','입주민: 참여'],'<b>공생</b> — 입주 초기 공실을 팝업으로 채워 정착 유도.']),
+  E(['e2','향동 빈상가 팝업위크',37.60680,126.88340,'🛍','2026.08 · 2주','전환 14%','고공실 클러스터를 2주 단기 팝업으로. 신도시 배후수요 검증.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신도시 신생 브랜드 공정 진입.']),
+  E(['e3','향동 호수공원 나이트마켓',37.60900,126.88300,'🌙','매월 마지막 금','야간 +25%','호수공원 연계 야간 플리마켓·푸드트럭.',['상인회: 야시장','주민: 참여','지자체: 안전'],'<b>공감</b> — 신도시 정주 가족 야간 콘텐츠.'])],
+ insta:["🌆향동 신도시 입주 페스타 #향동지구 #DMC #고양","향동 호수공원 나이트마켓 #향동 #나이트마켓"]},
+
+{id:'jichuk',name:'지축지구',sub:'덕양구 지축동 · 지축역(3호선) · 역세권 신축 택지상권',center:[37.6480,126.9130],zoom:16,
+ poi:[[37.64800,126.91300,'◉ 지축역','sta']],
+ zones:[Z(['z1','지축역 스트리트몰','지축',37.64820,126.91380,61.2,0.9,980,[['역세권 신축','+36%','up'],['주말 집객','+21%','up'],['F&B 유입','+16%','up']]]),
+  Z(['z2','지축 중심상가','지축',37.64740,126.91240,53.4,-1.5,640,[['상층 공실','+148%','up'],['동선 단절','+78%','up'],['야간 공동화','-30%','dn']]]),
+  Z(['z3','지축 카페거리','지축',37.64920,126.91460,63.8,1.0,560,[['신상 카페','+42%','up'],['주말 체류','+25%','up'],['SNS 인증','+29%','up']]]),
+  Z(['z4','지축 단지상가','지축',37.64660,126.91500,48.7,-2.3,480,[['생활밀착','+20%','up'],['입주 미완','+54%','up'],['업종 부족','+31%','up']]]),
+  Z(['z5','지축 신축 공실 클러스터','지축',37.64580,126.91340,37.4,-4.2,292,[['신축 공실','+248%','up'],['임대료 부담','+152%','up'],['집객 부족','-39%','dn']]]),
+  Z(['z6','지축 외곽 근린','지축',37.64980,126.91620,43.9,-2.7,228,[['외곽 공실','+176%','up'],['접근성 약','+88%','up'],['야간 공동화','-28%','dn']]])],
+ grid:{bb:{s:37.6440,n:37.6520,w:126.9088,e:126.9172},dlat:0.0009,dlng:0.001135,core:[37.6480,126.9130],maxd:500,
+  hot:[[37.64820,126.91380,75,15],[37.64740,126.91240,80,28],[37.64920,126.91460,68,9],[37.64660,126.91500,80,29],[37.64580,126.91340,90,39],[37.64980,126.91620,80,32]]},
+ units:[U(['u1','지축역 스트리트몰 1F','지축',37.64822,126.91382,46,310,400,'1F','카페','premium','고','역세권 입주민','역세권 신축 → 브런치/플래그십']),
+  U(['u2','지축 카페거리 1F','지축',37.64922,126.91462,40,260,300,'1F','의류','premium','중','20·30대','신상 로스터리']),
+  U(['u3','지축 단지상가 1F','지축',37.64662,126.91502,36,210,200,'1F','분식','value','중','입주 가족','가성비 반찬/분식']),
+  U(['u4','지축 신축 공실 클러스터 1F','지축',37.64582,126.91342,48,180,0,'1F','공실','factory','저','입주 미완','무인·표준으로 공동화 차단']),
+  U(['u5','지축 외곽 근린 2F','지축',37.64982,126.91622,44,160,0,'2F','학원','factory','저','외곽 저유동','무인스터디·공유오피스'])],
+ events:[E(['e1','지축 신도시 입주 페스타',37.64800,126.91300,'🎪','2026.09 · 주말 3일','유입 +33%','역세권 신도시 입주 환영 마켓. 신축 공실 팝업 동선 유도.',['상인회: 부스','건물주: 공실 개방','입주민: 참여'],'<b>공생</b> — 입주 초기 공실을 팝업으로 채워 정착 유도.']),
+  E(['e2','지축 빈상가 팝업위크',37.64580,126.91340,'🛍','2026.08 · 2주','전환 14%','고공실 클러스터를 2주 단기 팝업으로.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신도시 신생 브랜드 공정 진입.']),
+  E(['e3','지축역 나이트마켓',37.64820,126.91380,'🌙','매월 마지막 금','야간 +24%','역세권 야간 플리마켓·푸드트럭.',['상인회: 야시장','주민: 참여','지자체: 안전'],'<b>공감</b> — 신도시 정주 가족 야간 콘텐츠.'])],
+ insta:["🚉지축역 신도시 입주 페스타 #지축지구 #지축역 #고양","지축 카페거리 신상 로스터리 #지축 #신도시카페"]},
+
+{id:'neunggok',name:'능곡',sub:'덕양구 토당동 · 능곡역(경의·서해선) · 재래시장 구도심',center:[37.6020,126.8150],zoom:16,
+ poi:[[37.60200,126.81500,'◉ 능곡역','sta'],[37.60400,126.81300,'능곡전통시장','park']],
+ zones:[Z(['z1','능곡 전통시장','능곡',37.60420,126.81320,57.6,-0.6,1080,[['전통시장','+18%','up'],['고령 고객','+27%','up'],['청년 이탈','-22%','dn']]]),
+  Z(['z2','능곡역 상가','능곡',37.60220,126.81460,61.3,0.4,860,[['역세권 유입','+22%','up'],['저녁 회전','+18%','up'],['배달','+15%','up']]]),
+  Z(['z3','능곡 먹자골목','능곡',37.60100,126.81560,58.9,-0.5,640,[['노포 유지','+16%','up'],['주차 불편','+42%','up'],['공실 언급','+24%','up']]]),
+  Z(['z4','토당 단지상가','토당',37.60340,126.81680,52.4,-1.4,512,[['생활밀착','+19%','up'],['주말 공동화','+38%','up'],['업종 중복','+26%','up']]]),
+  Z(['z5','능곡 노후 근린상가','능곡',37.59940,126.81400,40.2,-3.3,288,[['노후 공실','+182%','up'],['리뉴얼 필요','+94%','up'],['집객 약화','-30%','dn']]]),
+  Z(['z6','토당 이면 상가','토당',37.60480,126.81620,44.1,-2.4,214,[['접근성 약','+58%','up'],['공실 장기화','+86%','up'],['야간 공동화','-27%','dn']]])],
+ grid:{bb:{s:37.5980,n:37.6060,w:126.8108,e:126.8192},dlat:0.0009,dlng:0.001135,core:[37.6020,126.8150],maxd:480,
+  hot:[[37.60420,126.81320,82,14],[37.60220,126.81460,75,11],[37.60100,126.81560,72,16],[37.60340,126.81680,80,23],[37.59940,126.81400,80,33],[37.60480,126.81620,78,27]]},
+ units:[U(['u1','능곡 전통시장 점포','능곡',37.60422,126.81322,28,180,300,'1F','잡화','value','중','전통시장','청년몰형 가성비 먹거리']),
+  U(['u2','능곡역 상가 1F','능곡',37.60222,126.81462,34,260,400,'1F','분식','value','고','역세권 통근','회전형 테이크아웃']),
+  U(['u3','능곡 먹자골목 1F','능곡',37.60102,126.81562,40,280,500,'1F','호프','premium','고','20·30대 외식','노포거리 1F → 다이닝/바']),
+  U(['u4','능곡 노후 근린상가 1F','능곡',37.59942,126.81402,40,140,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','토당 이면 상가 2F','토당',37.60482,126.81622,44,150,0,'2F','사무실','factory','저','저유동','무인스터디·공유오피스'])],
+ events:[E(['e1','능곡 전통시장 청년몰 팝업',37.60420,126.81320,'🛍','2026.08 · 1개월','전환 13%','재래시장 빈점포를 청년몰 팝업으로. 시장 활성·세대 결합.',['상인회: 점포','청년: 입점','지자체: 지원'],'<b>공생</b> — 전통시장과 청년 상인 세대 결합.']),
+  E(['e2','능곡 레트로 골목 페스타',37.60100,126.81560,'🎶','2026.10 · 주말 3일','유입 +30%','노포 먹자골목을 레트로로 재조명.',['상인회: 노포','청년: 부스','소비자: 레트로'],'<b>공감</b> — 구도심 역사를 향수 콘텐츠로.']),
+  E(['e3','능곡 빈상가 리뉴얼 팝업',37.59940,126.81400,'🛋','2026.09 · 3주','전환 11%','노후 근린상가 공실 단기 팝업.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 구상권 점진 갱신.'])],
+ insta:["🛍능곡 전통시장 청년몰 #능곡 #전통시장 #덕양구","능곡 레트로 골목 페스타 #능곡역 #레트로"]},
+
+{id:'deokeun',name:'덕은지구',sub:'덕양구 덕은동 · DMC 배후 · 한강조망 신축 프리미엄',center:[37.5870,126.8650],zoom:16,
+ poi:[[37.58700,126.86500,'덕은 한강공원','park']],
+ zones:[Z(['z1','덕은 스트리트몰','덕은',37.58720,126.86580,67.2,1.2,1080,[['DMC 배후','+38%','up'],['한강조망','+29%','up'],['F&B 다양성','+19%','up']]]),
+  Z(['z2','덕은 단지내 상가','덕은',37.58840,126.86700,45.1,-2.7,386,[['단지내 공실','+158%','up'],['업종 중복','+84%','up'],['외부 유입 부족','-32%','dn']]]),
+  Z(['z3','덕은 카페거리','덕은',37.58620,126.86460,69.4,1.4,620,[['한강뷰 카페','+48%','up'],['주말 체류','+31%','up'],['SNS 인증','+38%','up']]]),
+  Z(['z4','덕은 오피스 배후','덕은',37.58920,126.86420,52.8,-1.4,512,[['오피스 의존','+42%','up'],['주말 한산','+48%','up'],['공실 언급','+26%','up']]]),
+  Z(['z5','덕은 신축 상층 공실','덕은',37.58780,126.86340,38.6,-4.0,298,[['상층 공실','+216%','up'],['임대료 부담','+142%','up'],['집객 부족','-35%','dn']]]),
+  Z(['z6','덕은 외곽 근린','덕은',37.58560,126.86680,43.7,-2.6,232,[['외곽 공실','+178%','up'],['접근성 약','+86%','up'],['야간 공동화','-29%','dn']]])],
+ grid:{bb:{s:37.5830,n:37.5910,w:126.8608,e:126.8692},dlat:0.0009,dlng:0.001135,core:[37.5870,126.8650],maxd:490,
+  hot:[[37.58720,126.86580,80,9],[37.58840,126.86700,80,30],[37.58620,126.86460,68,8],[37.58920,126.86420,80,22],[37.58780,126.86340,90,40],[37.58560,126.86680,80,32]]},
+ units:[U(['u1','덕은 스트리트몰 1F','덕은',37.58722,126.86582,50,420,800,'1F','카페','premium','고','DMC·신축 주민','한강조망 → 고급화 브런치/플래그십']),
+  U(['u2','덕은 카페거리 1F','덕은',37.58622,126.86462,42,380,500,'1F','카페','premium','중','20·30대','한강뷰 시그니처 로스터리']),
+  U(['u3','덕은 오피스 배후 1F','덕은',37.58922,126.86422,40,300,300,'1F','분식','value','중','오피스 통근','점심 회전형 가성비']),
+  U(['u4','덕은 단지내 상가 1F','덕은',37.58842,126.86702,38,230,0,'1F','공인중개','factory','저','단지 생활','무인·생활밀착 표준화']),
+  U(['u5','덕은 신축 상층 공실 2F','덕은',37.58782,126.86342,50,190,0,'2F','사무실','factory','저','신축 저유동','무인·공유오피스 공동화 차단'])],
+ events:[E(['e1','덕은 한강 프리미엄 마켓',37.58700,126.86500,'🛍','2026.09 · 주말 3일','유입 +32%','한강공원 연계 프리미엄 플리마켓. DMC-단지 연결.',['상인회: 부스','건물주: 공실 개방','주민: 참여'],'<b>공생</b> — 신축 단지 내수를 외부와 연결.']),
+  E(['e2','덕은 신축상가 팝업위크',37.58780,126.86340,'🤝','2026.08 · 2주','전환 13%','고공실 상층을 2주 단기 팝업으로.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신생·로컬 브랜드 공정 진입.']),
+  E(['e3','덕은 한강 나이트마켓',37.58700,126.86500,'🌙','매월 마지막 금','야간 +25%','한강조망 야간 플리마켓·푸드트럭.',['상인회: 야시장','주민: 참여','지자체: 안전'],'<b>공감</b> — 한강 신축 단지 야간 콘텐츠.'])],
+ insta:["🌉덕은 한강 프리미엄 마켓 #덕은지구 #DMC #한강뷰","덕은 카페거리 한강뷰 로스터리 #덕은 #일산카페"]},
+
+{id:'haengju',name:'행주·행주산성',sub:'덕양구 행주외동 · 행주산성 · 관광·음식 상권',center:[37.5990,126.8230],zoom:16,
+ poi:[[37.59800,126.82200,'행주산성','park'],[37.60000,126.82500,'행주나루','park']],
+ zones:[Z(['z1','행주산성 입구 음식거리','행주',37.59880,126.82280,70.3,1.4,1240,[['장어구이 명소','+44%','up'],['주말 관광','+38%','up'],['SNS 인증','+33%','up']]]),
+  Z(['z2','행주나루 카페·뷰','행주',37.60020,126.82480,67.8,1.1,720,[['한강뷰 카페','+41%','up'],['주말 체류','+28%','up'],['신규 유입','+18%','up']]]),
+  Z(['z3','행주 토속 음식점','행주',37.59760,126.82160,63.4,0.4,640,[['노포 명성','+22%','up'],['평일 한산','+44%','up'],['고령 고객','+19%','up']]]),
+  Z(['z4','행주외동 근린상가','행주',37.60120,126.82340,51.2,-1.6,440,[['생활밀착','+18%','up'],['관광 의존','+52%','up'],['평일 공실','+28%','up']]]),
+  Z(['z5','행주 비수기 공실','행주',37.59680,126.82380,42.6,-3.2,268,[['비수기 공실','+186%','up'],['계절 변동','+118%','up'],['집객 약화','-33%','dn']]]),
+  Z(['z6','행주 외곽 상가','행주',37.60200,126.82120,45.8,-2.3,196,[['접근성 약','+54%','up'],['공실 장기화','+78%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.5950,n:37.6030,w:126.8188,e:126.8272},dlat:0.0009,dlng:0.001135,core:[37.5990,126.8230],maxd:480,
+  hot:[[37.59880,126.82280,82,9],[37.60020,126.82480,72,11],[37.59760,126.82160,68,14],[37.60120,126.82340,80,24],[37.59680,126.82380,80,33],[37.60200,126.82120,78,27]]},
+ units:[U(['u1','행주산성 입구 음식거리 1F','행주',37.59882,126.82282,55,320,700,'1F','음식점','premium','고','주말 관광객','관광 명소 → 프리미엄 다이닝']),
+  U(['u2','행주나루 카페 1F','행주',37.60022,126.82482,42,300,400,'1F','카페','premium','중','20·30대','한강뷰 시그니처 카페']),
+  U(['u3','행주 토속 음식점 1F','행주',37.59762,126.82162,46,220,300,'1F','음식점','value','중','가족·노포','가성비 토속 한정식']),
+  U(['u4','행주외동 근린상가 1F','행주',37.60122,126.82342,38,170,0,'1F','잡화','factory','저','관광 의존','무인·플렉시블 운영 변동성 흡수']),
+  U(['u5','행주 외곽 상가 2F','행주',37.60202,126.82122,44,150,0,'2F','창고','factory','저','저유동','무인 스토어/픽업'])],
+ events:[E(['e1','행주산성 가을 음식 축제',37.59880,126.82280,'🍂','2026.10 · 주말 3일','유입 +40%','행주산성 관광 연계 토속음식·장어 축제. 관광 집객 극대화.',['상인회: 음식부스','지자체: 관광','소비자: 미식'],'<b>공감</b> — 행주산성 역사·미식 정체성을 콘텐츠 자산화.']),
+  E(['e2','행주 비수기 평일 마켓',37.59680,126.82380,'🛍','2026.08 · 평일 2주','전환 12%','비수기 평일 공실을 단기 마켓으로. 계절 변동성 보완.',['상인회: 마켓','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 관광 의존 상권의 변동성 완충.']),
+  E(['e3','행주나루 한강 나이트마켓',37.60020,126.82480,'🌙','매월 마지막 금','야간 +22%','한강나루 야간 플리마켓·푸드트럭.',['상인회: 야시장','지자체: 안전','소비자: 야간'],'<b>공생</b> — 관광 집객을 야간·배후로 확산.'])],
+ insta:["🏯행주산성 가을 음식 축제 #행주산성 #장어구이 #덕양구","행주나루 한강뷰 카페 #행주 #한강카페"]},
+
+{id:'hwajeon',name:'화전·항공대',sub:'덕양구 화전동 · 화전역(경의) · 항공대 대학가 소상권',center:[37.6100,126.8430],zoom:16,
+ poi:[[37.61000,126.84300,'◉ 화전역','sta'],[37.60000,126.86500,'한국항공대','park']],
+ zones:[Z(['z1','화전역 대학가 상가','화전',37.61020,126.84380,62.7,0.6,940,[['대학 수요','+32%','up'],['저녁 회전','+21%','up'],['배달','+18%','up']]]),
+  Z(['z2','항공대 앞 먹자','화전',37.60900,126.84240,64.3,0.8,820,[['대학생 외식','+34%','up'],['가성비 수요','+26%','up'],['저녁 픽업','+19%','up']]]),
+  Z(['z3','화전 카페거리','화전',37.61120,126.84460,58.4,-0.4,520,[['주말 체류','+22%','up'],['디저트','+17%','up'],['신규 유입','+12%','up']]]),
+  Z(['z4','화전 근린상가','화전',37.60820,126.84500,51.6,-1.5,468,[['생활밀착','+18%','up'],['방학 공동화','+62%','up'],['업종 중복','+27%','up']]]),
+  Z(['z5','화전 노후 상가','화전',37.61180,126.84300,41.4,-3.1,278,[['노후 공실','+172%','up'],['방학 변동','+98%','up'],['집객 약화','-29%','dn']]]),
+  Z(['z6','화전 이면 상가','화전',37.60760,126.84380,44.7,-2.3,202,[['접근성 약','+56%','up'],['공실 장기화','+82%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.6060,n:37.6140,w:126.8388,e:126.8472},dlat:0.0009,dlng:0.001135,core:[37.6100,126.8430],maxd:480,
+  hot:[[37.61020,126.84380,78,13],[37.60900,126.84240,75,11],[37.61120,126.84460,68,16],[37.60820,126.84500,80,24],[37.61180,126.84300,80,32],[37.60760,126.84380,78,27]]},
+ units:[U(['u1','화전역 대학가 1F','화전',37.61022,126.84382,34,240,300,'1F','분식','value','고','대학생','가성비 분식/김밥/카페']),
+  U(['u2','항공대 앞 먹자 1F','화전',37.60902,126.84242,40,260,400,'1F','호프','value','고','대학생 외식','가성비 회전형 주점/포차']),
+  U(['u3','화전 카페거리 1F','화전',37.61122,126.84462,36,250,300,'1F','카페','premium','중','20대','대학가 디저트/로스터리']),
+  U(['u4','화전 노후 상가 1F','화전',37.61182,126.84302,40,150,0,'1F','의류','factory','저','노후·방학변동','무인 편의·픽업 표준화']),
+  U(['u5','화전 이면 상가 2F','화전',37.60762,126.84382,44,150,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','화전 항공대 대학가 페스타',37.61000,126.84300,'🎓','2026.09 · 주말 3일','유입 +29%','대학 연계 청년 마켓·버스킹. 학기중 집객 극대화.',['상인회: 부스','대학: 연계','학생: 참여'],'<b>공생</b> — 대학 수요를 가로상권과 연결.']),
+  E(['e2','화전 방학 비수기 마켓',37.61180,126.84300,'🛍','2026.08 · 방학 2주','전환 11%','방학 공동화 시기 단기 마켓으로 변동성 보완.',['상인회: 마켓','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 대학가 계절 변동성 완충.']),
+  E(['e3','화전 골목 야시장',37.60760,126.84380,'🌙','매월 둘째 금','야간 +21%','이면 골목 야간 푸드트럭·조명.',['상인회: 야시장','지자체: 안전','학생: 야간'],'<b>공감</b> — 대학가 야간 생활 콘텐츠.'])],
+ insta:["🎓화전 항공대 대학가 페스타 #화전역 #항공대 #덕양구","화전 카페거리 대학가 디저트 #화전 #대학가카페"]},
+
+
+{id:'hugok',name:'후곡마을 학원가',sub:'일산서구 일산3동 · 후곡마을 · 학원가 생활상권',center:[37.679,126.766],zoom:16,
+ poi:[[37.679,126.766,'후곡마을','park']],
+ zones:[Z(['z1','후곡 학원가','후곡마을',37.6802,126.767,64.6,0.6,1180,[['학원 수요','+30%','up'],['저녁 픽업','+22%','up'],['카페 유입','+15%','up']]]),
+  Z(['z2','후곡 중심상가','후곡마을',37.6794,126.765,60.2,0.2,820,[['생활밀착','+22%','up'],['저녁 회전','+16%','up'],['배달','+14%','up']]]),
+  Z(['z3','후곡 카페거리','후곡마을',37.6784,126.767,62.8,0.5,640,[['주말 체류','+24%','up'],['디저트','+18%','up'],['신규 유입','+12%','up']]]),
+  Z(['z4','후곡 단지상가','후곡마을',37.6776,126.765,53.4,-1.2,560,[['단지 배후','+19%','up'],['주말 공동화','+38%','up'],['업종 중복','+25%','up']]]),
+  Z(['z5','후곡 노후 근린','후곡마을',37.6782,126.766,41.2,-2.9,288,[['노후 공실','+168%','up'],['리뉴얼 필요','+86%','up'],['집객 약화','-28%','dn']]]),
+  Z(['z6','후곡 이면 상가','후곡마을',37.68,126.765,44.6,-2.2,210,[['접근성 약','+56%','up'],['공실 장기화','+80%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.675,n:37.683,w:126.761,e:126.771},dlat:0.0009,dlng:0.001135,core:[37.679,126.766],maxd:470,
+  hot:[[37.6802,126.767,80,12],[37.6794,126.765,80,12],[37.6784,126.767,80,12],[37.6776,126.765,80,20],[37.6782,126.766,80,30],[37.68,126.765,80,30]]},
+ units:[U(['u1','후곡 학원가 1F','후곡마을',37.6802,126.767,36,260,400,'1F','분식','value','고','학생·학부모','학원 픽업 회전형 분식/카페']),
+  U(['u2','후곡 카페거리 1F','후곡마을',37.6794,126.765,38,250,300,'1F','의류','premium','중','20대','학원가 디저트/로스터리']),
+  U(['u3','후곡 단지상가 1F','후곡마을',37.6784,126.767,33,210,200,'1F','문구','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u4','후곡 노후 근린 1F','후곡마을',37.6776,126.765,40,140,0,'1F','세탁','factory','저','노후·저유동','무인 세탁·편의 표준화']),
+  U(['u5','후곡 이면 상가 2F','후곡마을',37.6782,126.766,44,150,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','후곡 학원가 페어런츠 마켓',37.6802,126.767,'📚','2026.09 · 매주 토','유입 +27%','학부모 대기수요 대상 카페·체험 마켓.',['상인회: 부스','학원: 연계','학부모: 참여'],'<b>공생</b> — 학원 대기수요를 가로상권과 연결.']),
+  E(['e2','후곡 빈상가 리뉴얼 팝업',37.6794,126.765,'🛍','2026.08 · 3주','전환 11%','노후 근린상가 공실 단기 팝업.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 1기신도시 학원가 상가 점진 갱신.']),
+  E(['e3','후곡 골목 야시장',37.6784,126.767,'🌙','매월 둘째 금','야간 +20%','이면 골목 야간 푸드트럭·조명.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 학원가 야간 생활 콘텐츠.'])],
+ insta:["후곡마을 학원가, 학부모 픽업 핫플 #후곡마을 #일산학원가","후곡 카페거리 신상 로스터리 #후곡 #일산카페"]},
+
+{id:'deokyi',name:'덕이·하이파크시티',sub:'일산서구 덕이동 · 하이파크시티 · 신축 주상복합 배후',center:[37.696,126.76],zoom:16,
+ poi:[[37.696,126.76,'하이파크시티','park']],
+ zones:[Z(['z1','하이파크 스트리트몰','덕이',37.6972,126.761,71.8,1.6,1420,[['신축 프리미엄','+42%','up'],['주말 집객','+26%','up'],['F&B 다양성','+20%','up']]]),
+  Z(['z2','하이파크 단지내 상가','덕이',37.6964,126.759,45.8,-2.7,372,[['단지내 공실','+156%','up'],['업종 중복','+84%','up'],['외부 유입 부족','-32%','dn']]]),
+  Z(['z3','덕이 가로 카페','덕이',37.6954,126.761,67.4,1,620,[['신상 카페','+40%','up'],['주말 체류','+27%','up'],['SNS 인증','+34%','up']]]),
+  Z(['z4','덕이 근린상가','덕이',37.6946,126.759,53.6,-1.3,520,[['생활밀착','+20%','up'],['주말 한산','+44%','up'],['공실 언급','+26%','up']]]),
+  Z(['z5','덕이 신축 상층 공실','덕이',37.6952,126.76,39.4,-3.8,296,[['상층 공실','+208%','up'],['임대료 부담','+144%','up'],['집객 부족','-35%','dn']]]),
+  Z(['z6','덕이 외곽 근린','덕이',37.697,126.759,43.8,-2.6,224,[['외곽 공실','+176%','up'],['접근성 약','+86%','up'],['야간 공동화','-28%','dn']]])],
+ grid:{bb:{s:37.692,n:37.7,w:126.755,e:126.765},dlat:0.0009,dlng:0.001135,core:[37.696,126.76],maxd:480,
+  hot:[[37.6972,126.761,68,7],[37.6964,126.759,80,30],[37.6954,126.761,80,12],[37.6946,126.759,80,20],[37.6952,126.76,80,40],[37.697,126.759,80,30]]},
+ units:[U(['u1','하이파크 스트리트몰 1F','덕이',37.6972,126.761,50,420,800,'1F','카페','premium','고','주상복합 주민','신축 배후 → 고급화 브런치/플래그십']),
+  U(['u2','덕이 가로 카페 1F','덕이',37.6964,126.759,40,360,500,'1F','카페','premium','중','20·30대','시그니처 로스터리']),
+  U(['u3','덕이 근린상가 1F','덕이',37.6954,126.761,36,230,200,'1F','분식','value','중','단지 생활','가성비 반찬/분식']),
+  U(['u4','하이파크 단지내 상가 1F','덕이',37.6946,126.759,38,220,0,'1F','공인중개','factory','저','단지 생활','무인·생활밀착 표준화']),
+  U(['u5','덕이 신축 상층 공실 2F','덕이',37.6952,126.76,50,190,0,'2F','사무실','factory','저','신축 저유동','무인·공유오피스 공동화 차단'])],
+ events:[E(['e1','하이파크 프리미엄 마켓',37.6972,126.761,'🛍','2026.09 · 주말 3일','유입 +30%','신축 주상복합 광장 프리미엄 플리마켓.',['하이파크: 광장','상인회: 부스','주민: 참여'],'<b>공생</b> — 신축 단지 내수를 외부와 연결.']),
+  E(['e2','덕이 신축상가 팝업위크',37.6964,126.759,'🤝','2026.08 · 2주','전환 13%','신축 공실을 2주 단기 팝업으로.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신생·로컬 브랜드 공정 진입.']),
+  E(['e3','덕이 나이트마켓',37.6954,126.761,'🌙','매월 마지막 금','야간 +23%','단지 광장 야간 플리마켓.',['상인회: 야시장','주민: 참여','지자체: 안전'],'<b>공감</b> — 신축 단지 야간 콘텐츠.'])],
+ insta:["덕이 하이파크시티 프리미엄 마켓 #덕이동 #하이파크시티","덕이 가로 카페 신상 로스터리 #덕이 #일산카페"]},
+
+{id:'pungsan',name:'풍산·고봉',sub:'일산동구 풍산동 · 풍산역(서해선) · 역세권 주거상권',center:[37.672,126.8],zoom:16,
+ poi:[[37.672,126.8,'◉ 풍산역','sta']],
+ zones:[Z(['z1','풍산역 상가','풍산',37.6732,126.801,62.4,0.5,1020,[['역세권 유입','+24%','up'],['저녁 회전','+18%','up'],['배달','+15%','up']]]),
+  Z(['z2','풍산 단지상가','풍산',37.6724,126.799,54.7,-1.1,680,[['생활밀착','+21%','up'],['주말 공동화','+40%','up'],['업종 중복','+26%','up']]]),
+  Z(['z3','풍산 먹자골목','풍산',37.6714,126.801,60.8,0.2,640,[['저녁 회전','+26%','up'],['노포 유지','+13%','up'],['배달','+22%','up']]]),
+  Z(['z4','고봉 근린상가','풍산',37.6706,126.799,52.1,-1.4,512,[['단지 배후','+18%','up'],['평일 한산','+38%','up'],['공실 언급','+24%','up']]]),
+  Z(['z5','풍산 노후 상가','풍산',37.6712,126.8,41.6,-3,288,[['노후 공실','+172%','up'],['리뉴얼 필요','+90%','up'],['집객 약화','-29%','dn']]]),
+  Z(['z6','풍산 이면 상가','풍산',37.673,126.799,44.3,-2.3,206,[['접근성 약','+56%','up'],['공실 장기화','+82%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.668,n:37.676,w:126.795,e:126.805},dlat:0.0009,dlng:0.001135,core:[37.672,126.8],maxd:470,
+  hot:[[37.6732,126.801,80,12],[37.6724,126.799,80,20],[37.6714,126.801,80,12],[37.6706,126.799,80,20],[37.6712,126.8,80,30],[37.673,126.799,80,30]]},
+ units:[U(['u1','풍산역 상가 1F','풍산',37.6732,126.801,34,260,400,'1F','분식','value','고','역세권 통근','회전형 테이크아웃']),
+  U(['u2','풍산 먹자골목 1F','풍산',37.6724,126.799,40,280,500,'1F','호프','premium','고','20·30대 외식','먹자 1F → 다이닝/바']),
+  U(['u3','풍산 단지상가 1F','풍산',37.6714,126.801,33,210,200,'1F','문구','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u4','풍산 노후 상가 1F','풍산',37.6706,126.799,40,140,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','풍산 이면 상가 2F','풍산',37.6712,126.8,44,150,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','풍산역 동네 마켓',37.6732,126.801,'🛒','2026.09 · 매주 토','유입 +26%','역세권~단지 동네 플리마켓.',['상인회: 부스','주민: 참여','소비자: 마켓'],'<b>공생</b> — 단지 내수를 가로상권과 연결.']),
+  E(['e2','풍산 빈상가 리뉴얼 팝업',37.6724,126.799,'🛍','2026.08 · 3주','전환 11%','노후 근린상가 공실 단기 팝업.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 구상권 점진 갱신.']),
+  E(['e3','풍산 골목 야시장',37.6714,126.801,'🌙','매월 둘째 금','야간 +20%','이면 골목 야간 푸드트럭.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 주거 생활 리듬 야간 콘텐츠.'])],
+ insta:["풍산역 동네 마켓 #풍산동 #풍산역","풍산 먹자골목 노포 #풍산 #일산맛집"]},
+
+{id:'gwansan',name:'관산지구',sub:'덕양구 관산동 · 관산지구 · 외곽 주거 생활상권',center:[37.672,126.865],zoom:16,
+ poi:[[37.672,126.865,'관산근린공원','park']],
+ zones:[Z(['z1','관산 중심상가','관산지구',37.6732,126.866,57.2,-0.4,760,[['생활밀착','+21%','up'],['저녁 회전','+15%','up'],['배달','+14%','up']]]),
+  Z(['z2','관산 먹자골목','관산지구',37.6724,126.864,59.6,0.2,560,[['저녁 회전','+22%','up'],['노포 유지','+12%','up'],['배달','+18%','up']]]),
+  Z(['z3','관산 단지상가','관산지구',37.6714,126.866,52.8,-1.2,512,[['단지 배후','+18%','up'],['주말 공동화','+38%','up'],['업종 중복','+25%','up']]]),
+  Z(['z4','관산 카페거리','관산지구',37.6706,126.864,55.4,-0.6,440,[['주말 체류','+20%','up'],['디저트','+15%','up'],['신규 유입','+10%','up']]]),
+  Z(['z5','관산 노후 근린','관산지구',37.6712,126.865,40.8,-3.1,278,[['노후 공실','+170%','up'],['리뉴얼 필요','+88%','up'],['집객 약화','-29%','dn']]]),
+  Z(['z6','관산 외곽 상가','관산지구',37.673,126.864,43.4,-2.4,196,[['접근성 약','+58%','up'],['공실 장기화','+84%','up'],['야간 공동화','-27%','dn']]])],
+ grid:{bb:{s:37.668,n:37.676,w:126.86,e:126.87},dlat:0.0009,dlng:0.001135,core:[37.672,126.865],maxd:470,
+  hot:[[37.6732,126.866,80,20],[37.6724,126.864,80,20],[37.6714,126.866,80,20],[37.6706,126.864,80,20],[37.6712,126.865,80,30],[37.673,126.864,80,30]]},
+ units:[U(['u1','관산 중심상가 1F','관산지구',37.6732,126.866,34,210,300,'1F','분식','value','중','단지 가족','가성비 반찬/분식']),
+  U(['u2','관산 먹자골목 1F','관산지구',37.6724,126.864,40,230,300,'1F','호프','premium','중','20·30대','동네 다이닝/바']),
+  U(['u3','관산 단지상가 1F','관산지구',37.6714,126.866,33,190,200,'1F','문구','value','중','단지 생활','가성비 세탁/반찬']),
+  U(['u4','관산 노후 근린 1F','관산지구',37.6706,126.864,40,130,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','관산 외곽 상가 2F','관산지구',37.6712,126.865,44,140,0,'2F','사무실','factory','저','저유동','무인스터디·공유오피스'])],
+ events:[E(['e1','관산 동네 한바퀴 마켓',37.6732,126.866,'🛒','2026.09 · 매주 토','유입 +24%','중심상가~먹자 동네 마켓.',['상인회: 부스','주민: 참여','소비자: 마켓'],'<b>공생</b> — 단지 내수를 가로상권과 연결.']),
+  E(['e2','관산 빈상가 리빙 팝업',37.6724,126.864,'🛋','2026.08 · 3주','전환 11%','노후 근린상가 공실을 리빙·무인 팝업으로.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 외곽 구단지 상가 점진 갱신.']),
+  E(['e3','관산 골목 야시장',37.6714,126.866,'🌙','매월 둘째 금','야간 +18%','이면 골목 야간 푸드트럭.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 외곽 주거 야간 콘텐츠.'])],
+ insta:["관산지구 동네 한바퀴 마켓 #관산동 #덕양구","관산 먹자골목 #관산 #고양맛집"]},
+
+{id:'goyangdong',name:'고양동',sub:'덕양구 고양동 · 고양 발원 구도심 · 외곽 생활상권',center:[37.676,126.882],zoom:16,
+ poi:[[37.676,126.882,'고양향교','park']],
+ zones:[Z(['z1','고양동 중심상가','고양동',37.6772,126.883,56.8,-0.5,820,[['생활밀착','+20%','up'],['고령 고객','+24%','up'],['배달','+13%','up']]]),
+  Z(['z2','고양동 재래상가','고양동',37.6764,126.881,54.2,-0.9,640,[['전통상권','+16%','up'],['고령 고객','+26%','up'],['청년 이탈','-20%','dn']]]),
+  Z(['z3','고양동 먹자골목','고양동',37.6754,126.883,58.4,0.1,560,[['저녁 회전','+20%','up'],['노포 유지','+12%','up'],['배달','+16%','up']]]),
+  Z(['z4','고양동 단지상가','고양동',37.6746,126.881,51.6,-1.3,468,[['단지 배후','+17%','up'],['주말 공동화','+38%','up'],['업종 중복','+24%','up']]]),
+  Z(['z5','고양동 노후 근린','고양동',37.6752,126.882,40.4,-3.2,278,[['노후 공실','+176%','up'],['리뉴얼 필요','+92%','up'],['집객 약화','-30%','dn']]]),
+  Z(['z6','고양동 외곽 상가','고양동',37.677,126.881,43.6,-2.3,192,[['접근성 약','+56%','up'],['공실 장기화','+84%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.672,n:37.68,w:126.877,e:126.887},dlat:0.0009,dlng:0.001135,core:[37.676,126.882],maxd:470,
+  hot:[[37.6772,126.883,80,20],[37.6764,126.881,80,20],[37.6754,126.883,80,20],[37.6746,126.881,80,20],[37.6752,126.882,80,30],[37.677,126.881,80,30]]},
+ units:[U(['u1','고양동 중심상가 1F','고양동',37.6772,126.883,32,200,300,'1F','분식','value','중','생활밀착','가성비 분식/반찬']),
+  U(['u2','고양동 먹자골목 1F','고양동',37.6764,126.881,40,220,300,'1F','호프','premium','중','20·30대','동네 다이닝/바']),
+  U(['u3','고양동 재래상가 점포','고양동',37.6754,126.883,28,160,200,'1F','잡화','value','중','전통상권','청년몰형 가성비 먹거리']),
+  U(['u4','고양동 노후 근린 1F','고양동',37.6746,126.881,40,130,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','고양동 외곽 상가 2F','고양동',37.6752,126.882,44,140,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','고양동 레트로 골목 페스타',37.6772,126.883,'🎶','2026.10 · 주말 3일','유입 +28%','구도심 노포를 레트로로 재조명.',['상인회: 노포','청년: 부스','소비자: 레트로'],'<b>공감</b> — 고양 발원 구도심 역사를 향수 콘텐츠로.']),
+  E(['e2','고양동 재래상가 청년몰 팝업',37.6764,126.881,'🛍','2026.08 · 1개월','전환 12%','재래상가 빈점포를 청년몰 팝업으로.',['상인회: 점포','청년: 입점','지자체: 지원'],'<b>공생</b> — 전통상권과 청년 상인 세대 결합.']),
+  E(['e3','고양동 빈상가 리뉴얼 팝업',37.6754,126.883,'🛋','2026.09 · 3주','전환 10%','노후 근린상가 공실 단기 팝업.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 구상권 점진 갱신.'])],
+ insta:["고양동 레트로 골목 페스타 #고양동 #덕양구","고양동 재래상가 청년몰 #고양동 #청년몰"]},
+
+{id:'daeja',name:'대자·벽제',sub:'덕양구 대자동 · 벽제 · 외곽 화훼·외식 상권',center:[37.692,126.895],zoom:16,
+ poi:[[37.692,126.895,'벽제관지','park']],
+ zones:[Z(['z1','벽제 외식거리','대자',37.6932,126.896,64.2,0.6,940,[['가든형 외식','+30%','up'],['주말 가족','+26%','up'],['SNS 인증','+22%','up']]]),
+  Z(['z2','대자 화훼단지 상가','대자',37.6924,126.894,60.4,0.3,620,[['화훼 특화','+24%','up'],['주말 방문','+20%','up'],['평일 한산','+34%','up']]]),
+  Z(['z3','대자 중심상가','대자',37.6914,126.896,55.6,-0.6,560,[['생활밀착','+18%','up'],['저녁 회전','+14%','up'],['배달','+12%','up']]]),
+  Z(['z4','대자 근린상가','대자',37.6906,126.894,51.8,-1.4,468,[['단지 배후','+16%','up'],['평일 한산','+40%','up'],['공실 언급','+24%','up']]]),
+  Z(['z5','대자 비수기 공실','대자',37.6912,126.895,41.2,-3.1,278,[['비수기 공실','+178%','up'],['계절 변동','+108%','up'],['집객 약화','-31%','dn']]]),
+  Z(['z6','대자 외곽 상가','대자',37.693,126.894,44.1,-2.4,196,[['접근성 약','+56%','up'],['공실 장기화','+82%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.688,n:37.696,w:126.89,e:126.9},dlat:0.0009,dlng:0.001135,core:[37.692,126.895],maxd:480,
+  hot:[[37.6932,126.896,80,12],[37.6924,126.894,80,12],[37.6914,126.896,80,20],[37.6906,126.894,80,20],[37.6912,126.895,80,30],[37.693,126.894,80,30]]},
+ units:[U(['u1','벽제 외식거리 1F','대자',37.6932,126.896,55,300,500,'1F','음식점','premium','고','주말 가족','가든형 → 프리미엄 다이닝']),
+  U(['u2','대자 화훼단지 상가 1F','대자',37.6924,126.894,42,240,300,'1F','화원','value','중','주말 방문객','가성비 플라워카페']),
+  U(['u3','대자 중심상가 1F','대자',37.6914,126.896,34,200,200,'1F','분식','value','중','생활밀착','가성비 분식/반찬']),
+  U(['u4','대자 비수기 공실 1F','대자',37.6906,126.894,40,150,0,'1F','잡화','factory','저','관광 의존','무인·플렉시블 운영 변동성 흡수']),
+  U(['u5','대자 외곽 상가 2F','대자',37.6912,126.895,44,140,0,'2F','창고','factory','저','저유동','무인 스토어/픽업'])],
+ events:[E(['e1','벽제 가을 외식 축제',37.6932,126.896,'🍂','2026.10 · 주말 3일','유입 +34%','벽제 가든형 외식·화훼 연계 미식 축제.',['상인회: 음식부스','지자체: 관광','소비자: 미식'],'<b>공감</b> — 벽제 외식·화훼 정체성을 콘텐츠 자산화.']),
+  E(['e2','대자 비수기 평일 마켓',37.6924,126.894,'🛍','2026.08 · 평일 2주','전환 11%','비수기 평일 공실을 단기 마켓으로.',['상인회: 마켓','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 계절 의존 상권의 변동성 완충.']),
+  E(['e3','대자 화훼 나이트마켓',37.6914,126.896,'🌙','매월 마지막 금','야간 +20%','화훼단지 야간 플리마켓.',['상인회: 야시장','지자체: 안전','소비자: 야간'],'<b>공생</b> — 관광 집객을 야간·배후로 확산.'])],
+ insta:["벽제 가을 외식 축제 #벽제 #대자동 #덕양구","대자 화훼단지 플라워카페 #대자 #화훼"]},
+
+{id:'sinwon',name:'신원·삼송2',sub:'덕양구 신원동 · 삼송 인근 택지 · 신축 주거상권',center:[37.66,126.898],zoom:16,
+ poi:[[37.66,126.898,'신원마을','park']],
+ zones:[Z(['z1','신원 중심상가','신원',37.6612,126.899,60.8,0.4,860,[['신축 입주','+30%','up'],['주말 집객','+20%','up'],['F&B 유입','+16%','up']]]),
+  Z(['z2','신원 스트리트','신원',37.6604,126.897,52.4,-1.5,560,[['상층 공실','+144%','up'],['동선 단절','+76%','up'],['야간 공동화','-29%','dn']]]),
+  Z(['z3','신원 카페거리','신원',37.6594,126.899,63.2,0.8,520,[['신상 카페','+38%','up'],['주말 체류','+24%','up'],['SNS 인증','+28%','up']]]),
+  Z(['z4','신원 단지상가','신원',37.6586,126.897,49.6,-2.1,468,[['생활밀착','+19%','up'],['입주 미완','+52%','up'],['업종 부족','+30%','up']]]),
+  Z(['z5','신원 신축 공실 클러스터','신원',37.6592,126.898,38.4,-3.9,288,[['신축 공실','+238%','up'],['임대료 부담','+148%','up'],['집객 부족','-37%','dn']]]),
+  Z(['z6','신원 외곽 근린','신원',37.661,126.897,43.6,-2.6,212,[['외곽 공실','+176%','up'],['접근성 약','+86%','up'],['야간 공동화','-28%','dn']]])],
+ grid:{bb:{s:37.656,n:37.664,w:126.893,e:126.903},dlat:0.0009,dlng:0.001135,core:[37.66,126.898],maxd:500,
+  hot:[[37.6612,126.899,80,12],[37.6604,126.897,80,20],[37.6594,126.899,80,12],[37.6586,126.897,80,30],[37.6592,126.898,80,40],[37.661,126.897,80,30]]},
+ units:[U(['u1','신원 중심상가 1F','신원',37.6612,126.899,44,290,400,'1F','카페','premium','중','신축 입주민','신도시 배후 → 브런치/베이커리']),
+  U(['u2','신원 카페거리 1F','신원',37.6604,126.897,40,260,300,'1F','의류','premium','중','20·30대','신상 로스터리']),
+  U(['u3','신원 단지상가 1F','신원',37.6594,126.899,36,210,200,'1F','분식','value','중','입주 가족','가성비 반찬/분식']),
+  U(['u4','신원 신축 공실 클러스터 1F','신원',37.6586,126.897,48,170,0,'1F','공실','factory','저','입주 미완','무인·표준으로 공동화 차단']),
+  U(['u5','신원 외곽 근린 2F','신원',37.6592,126.898,44,160,0,'2F','학원','factory','저','외곽 저유동','무인스터디·공유오피스'])],
+ events:[E(['e1','신원 신도시 입주 페스타',37.6612,126.899,'🎪','2026.09 · 주말 3일','유입 +32%','신축 입주민 환영 마켓. 신축 공실 팝업 동선 유도.',['상인회: 부스','건물주: 공실 개방','입주민: 참여'],'<b>공생</b> — 입주 초기 공실을 팝업으로 채워 정착 유도.']),
+  E(['e2','신원 빈상가 팝업위크',37.6604,126.897,'🛍','2026.08 · 2주','전환 13%','고공실 클러스터를 2주 단기 팝업으로.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신도시 신생 브랜드 공정 진입.']),
+  E(['e3','신원 나이트마켓',37.6594,126.899,'🌙','매월 마지막 금','야간 +23%','단지 광장 야간 플리마켓.',['상인회: 야시장','주민: 참여','지자체: 안전'],'<b>공감</b> — 신도시 정주 가족 야간 콘텐츠.'])],
+ insta:["신원 신도시 입주 페스타 #신원동 #삼송 #고양","신원 카페거리 신상 로스터리 #신원 #신도시카페"]},
+
+{id:'donae',name:'도내·원흥2',sub:'덕양구 도내동 · 원흥 인근 택지 · 오피스 배후상권',center:[37.642,126.882],zoom:16,
+ poi:[[37.642,126.882,'도내근린공원','park']],
+ zones:[Z(['z1','도내 중심상가','도내',37.6432,126.883,61.4,0.4,920,[['택지 배후','+28%','up'],['저녁 회전','+18%','up'],['F&B 유입','+15%','up']]]),
+  Z(['z2','도내 오피스 배후','도내',37.6424,126.881,53.2,-1.4,560,[['오피스 의존','+40%','up'],['주말 한산','+48%','up'],['공실 언급','+26%','up']]]),
+  Z(['z3','도내 카페거리','도내',37.6414,126.883,64.6,0.8,520,[['신상 카페','+40%','up'],['주말 체류','+26%','up'],['SNS 인증','+30%','up']]]),
+  Z(['z4','도내 단지상가','도내',37.6406,126.881,50.8,-1.8,468,[['생활밀착','+19%','up'],['주말 공동화','+44%','up'],['업종 중복','+27%','up']]]),
+  Z(['z5','도내 신축 상층 공실','도내',37.6412,126.882,39.2,-3.7,288,[['상층 공실','+204%','up'],['임대료 부담','+140%','up'],['집객 부족','-34%','dn']]]),
+  Z(['z6','도내 외곽 근린','도내',37.643,126.881,43.8,-2.5,206,[['외곽 공실','+174%','up'],['접근성 약','+84%','up'],['야간 공동화','-27%','dn']]])],
+ grid:{bb:{s:37.638,n:37.646,w:126.877,e:126.887},dlat:0.0009,dlng:0.001135,core:[37.642,126.882],maxd:480,
+  hot:[[37.6432,126.883,80,12],[37.6424,126.881,80,20],[37.6414,126.883,80,12],[37.6406,126.881,80,20],[37.6412,126.882,80,40],[37.643,126.881,80,30]]},
+ units:[U(['u1','도내 중심상가 1F','도내',37.6432,126.883,46,320,500,'1F','카페','premium','고','택지·오피스','배후 → 고급화 브런치/플래그십']),
+  U(['u2','도내 카페거리 1F','도내',37.6424,126.881,40,280,400,'1F','카페','premium','중','20·30대','시그니처 로스터리']),
+  U(['u3','도내 단지상가 1F','도내',37.6414,126.883,36,220,200,'1F','분식','value','중','단지 생활','가성비 반찬/분식']),
+  U(['u4','도내 오피스 배후 2F','도내',37.6406,126.881,48,190,0,'2F','사무실','factory','저','주말 한산','무인·공유오피스 표준화']),
+  U(['u5','도내 신축 상층 공실 1F','도내',37.6412,126.882,50,180,0,'1F','공실','factory','저','신축 저유동','무인·표준으로 공동화 차단'])],
+ events:[E(['e1','도내 택지 패밀리 마켓',37.6432,126.883,'🤝','2026.09 · 주말 3일','유입 +29%','택지 단지 광장 가족 단위 마켓.',['상인회: 부스','주민: 참여','건물주: 공실 개방'],'<b>공생</b> — 택지 내수를 가로상권과 연결.']),
+  E(['e2','도내 오피스 런치 페스타',37.6424,126.881,'🍱','2026.08 · 평일 2주','전환 12%','오피스 직장인 점심 할인·푸드트럭.',['상인회: 런치','직장: 참여','SpaceOS: 데이터'],'<b>균형</b> — 평일 오피스 수요를 골목으로 배분.']),
+  E(['e3','도내 나이트마켓',37.6414,126.883,'🌙','매월 마지막 금','야간 +22%','단지 광장 야간 플리마켓.',['상인회: 야시장','주민: 참여','지자체: 안전'],'<b>공감</b> — 택지 정주 가족 야간 콘텐츠.'])],
+ insta:["도내 택지 패밀리 마켓 #도내동 #원흥 #고양","도내 오피스 런치 페스타 #도내 #런치"]},
+
+
+{id:'gangmae',name:'강매·도래',sub:'덕양구 강매동 · 강매역(경의중앙) · 역세권 외곽상권',center:[37.608,126.828],zoom:16,
+ poi:[[37.608,126.828,'◉ 강매역','sta']],
+ zones:[Z(['z1','강매역 상가','강매',37.6092,126.829,60.4,0.3,820,[['역세권 유입','+22%','up'],['저녁 회전','+16%','up'],['배달','+14%','up']]]),
+  Z(['z2','강매 단지상가','강매',37.6084,126.827,53.2,-1.2,560,[['생활밀착','+19%','up'],['주말 공동화','+38%','up'],['업종 중복','+24%','up']]]),
+  Z(['z3','강매 먹자골목','강매',37.6074,126.829,57.8,0.1,520,[['저녁 회전','+20%','up'],['노포 유지','+12%','up'],['배달','+16%','up']]]),
+  Z(['z4','도래 근린상가','강매',37.6066,126.827,51.4,-1.4,440,[['단지 배후','+16%','up'],['평일 한산','+38%','up'],['공실 언급','+24%','up']]]),
+  Z(['z5','강매 노후 상가','강매',37.6072,126.828,40.6,-3,272,[['노후 공실','+170%','up'],['리뉴얼 필요','+88%','up'],['집객 약화','-29%','dn']]]),
+  Z(['z6','강매 이면 상가','강매',37.609,126.827,43.8,-2.3,192,[['접근성 약','+56%','up'],['공실 장기화','+82%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.604,n:37.612,w:126.823,e:126.833},dlat:0.0009,dlng:0.001135,core:[37.608,126.828],maxd:470,
+  hot:[[37.6092,126.829,80,12],[37.6084,126.827,80,20],[37.6074,126.829,80,20],[37.6066,126.827,80,20],[37.6072,126.828,80,30],[37.609,126.827,80,30]]},
+ units:[U(['u1','강매역 상가 1F','강매',37.6092,126.829,34,240,300,'1F','분식','value','고','역세권 통근','회전형 테이크아웃']),
+  U(['u2','강매 먹자골목 1F','강매',37.6084,126.827,40,230,300,'1F','호프','premium','중','20·30대','동네 다이닝/바']),
+  U(['u3','강매 단지상가 1F','강매',37.6074,126.829,33,200,200,'1F','문구','value','중','단지 생활','가성비 반찬/세탁']),
+  U(['u4','강매 노후 상가 1F','강매',37.6066,126.827,40,130,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','강매 이면 상가 2F','강매',37.6072,126.828,44,140,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','강매 동네 마켓',37.6092,126.829,'🛒','2026.09 · 매주 토','유입 +24%','역세권~단지 동네 마켓.',['상인회: 부스','주민: 참여','소비자: 마켓'],'<b>공생</b> — 단지 내수를 가로상권과 연결.']),
+  E(['e2','강매 빈상가 리뉴얼 팝업',37.6084,126.827,'🛍','2026.08 · 3주','전환 10%','노후 근린상가 공실 단기 팝업.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 외곽 구상권 점진 갱신.']),
+  E(['e3','강매 골목 야시장',37.6074,126.829,'🌙','매월 둘째 금','야간 +18%','이면 골목 야간 푸드트럭.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 외곽 주거 야간 콘텐츠.'])],
+ insta:["강매역 동네 마켓 #강매동 #강매역","강매 먹자골목 #강매 #고양맛집"]},
+
+{id:'hyoja',name:'효자·북한산',sub:'덕양구 효자동 · 북한산성 입구 · 관광·외식 상권',center:[37.668,126.955],zoom:16,
+ poi:[[37.668,126.955,'북한산성 입구','park']],
+ zones:[Z(['z1','북한산 입구 음식거리','효자',37.6692,126.956,66.4,0.7,940,[['등산 수요','+34%','up'],['주말 관광','+30%','up'],['SNS 인증','+22%','up']]]),
+  Z(['z2','효자 가든 외식','효자',37.6684,126.954,62.8,0.4,640,[['가든형 외식','+26%','up'],['주말 가족','+22%','up'],['평일 한산','+36%','up']]]),
+  Z(['z3','효자 카페·뷰','효자',37.6674,126.956,64.2,0.6,560,[['산뷰 카페','+32%','up'],['주말 체류','+24%','up'],['신규 유입','+16%','up']]]),
+  Z(['z4','효자 근린상가','효자',37.6666,126.954,50.8,-1.6,420,[['생활밀착','+16%','up'],['관광 의존','+50%','up'],['평일 공실','+28%','up']]]),
+  Z(['z5','효자 비수기 공실','효자',37.6672,126.955,41.4,-3.1,268,[['비수기 공실','+182%','up'],['계절 변동','+112%','up'],['집객 약화','-32%','dn']]]),
+  Z(['z6','효자 외곽 상가','효자',37.669,126.954,44.6,-2.3,188,[['접근성 약','+54%','up'],['공실 장기화','+78%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.664,n:37.672,w:126.95,e:126.96},dlat:0.0009,dlng:0.001135,core:[37.668,126.955],maxd:480,
+  hot:[[37.6692,126.956,80,12],[37.6684,126.954,80,12],[37.6674,126.956,80,12],[37.6666,126.954,80,20],[37.6672,126.955,80,30],[37.669,126.954,80,30]]},
+ units:[U(['u1','북한산 입구 음식거리 1F','효자',37.6692,126.956,52,300,500,'1F','음식점','premium','고','주말 등산객','관광 명소 → 프리미엄 다이닝']),
+  U(['u2','효자 카페·뷰 1F','효자',37.6684,126.954,40,280,400,'1F','카페','premium','중','20·30대','산뷰 시그니처 카페']),
+  U(['u3','효자 가든 외식 1F','효자',37.6674,126.956,46,220,300,'1F','음식점','value','중','가족·관광','가성비 가든 한정식']),
+  U(['u4','효자 비수기 공실 1F','효자',37.6666,126.954,40,150,0,'1F','잡화','factory','저','관광 의존','무인·플렉시블 운영 변동성 흡수']),
+  U(['u5','효자 외곽 상가 2F','효자',37.6672,126.955,44,140,0,'2F','창고','factory','저','저유동','무인 스토어/픽업'])],
+ events:[E(['e1','북한산 가을 단풍 음식 축제',37.6692,126.956,'🍂','2026.10 · 주말 3일','유입 +38%','북한산 등산 연계 토속음식 축제.',['상인회: 음식부스','지자체: 관광','소비자: 미식'],'<b>공감</b> — 북한산 관광·미식 정체성을 콘텐츠 자산화.']),
+  E(['e2','효자 비수기 평일 마켓',37.6684,126.954,'🛍','2026.08 · 평일 2주','전환 11%','비수기 평일 공실을 단기 마켓으로.',['상인회: 마켓','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 관광 의존 상권의 변동성 완충.']),
+  E(['e3','효자 산뷰 나이트마켓',37.6674,126.956,'🌙','매월 마지막 금','야간 +20%','산뷰 야간 플리마켓.',['상인회: 야시장','지자체: 안전','소비자: 야간'],'<b>공생</b> — 관광 집객을 야간·배후로 확산.'])],
+ insta:["북한산 가을 단풍 음식 축제 #북한산 #효자동 #덕양구","효자 산뷰 카페 #효자동 #북한산카페"]},
+
+{id:'sarihyeon',name:'사리현·식사2',sub:'일산동구 사리현동 · 식사2 외곽 · 주거·물류 배후',center:[37.685,126.805],zoom:16,
+ poi:[[37.685,126.805,'사리현근린공원','park']],
+ zones:[Z(['z1','사리현 중심상가','사리현',37.6862,126.806,57.6,-0.3,720,[['생활밀착','+20%','up'],['저녁 회전','+15%','up'],['배달','+14%','up']]]),
+  Z(['z2','사리현 단지상가','사리현',37.6854,126.804,52.4,-1.3,520,[['단지 배후','+18%','up'],['주말 공동화','+40%','up'],['업종 중복','+25%','up']]]),
+  Z(['z3','사리현 먹자골목','사리현',37.6844,126.806,59.2,0.2,480,[['저녁 회전','+20%','up'],['노포 유지','+12%','up'],['배달','+16%','up']]]),
+  Z(['z4','식사2 근린상가','사리현',37.6836,126.804,50.6,-1.6,440,[['단지 배후','+16%','up'],['평일 한산','+42%','up'],['공실 언급','+25%','up']]]),
+  Z(['z5','사리현 노후 상가','사리현',37.6842,126.805,40.2,-3.1,262,[['노후 공실','+172%','up'],['리뉴얼 필요','+90%','up'],['집객 약화','-30%','dn']]]),
+  Z(['z6','사리현 외곽 상가','사리현',37.686,126.804,43.4,-2.4,186,[['접근성 약','+58%','up'],['공실 장기화','+84%','up'],['야간 공동화','-27%','dn']]])],
+ grid:{bb:{s:37.681,n:37.689,w:126.8,e:126.81},dlat:0.0009,dlng:0.001135,core:[37.685,126.805],maxd:470,
+  hot:[[37.6862,126.806,80,20],[37.6854,126.804,80,20],[37.6844,126.806,80,20],[37.6836,126.804,80,20],[37.6842,126.805,80,30],[37.686,126.804,80,30]]},
+ units:[U(['u1','사리현 중심상가 1F','사리현',37.6862,126.806,34,220,300,'1F','분식','value','중','단지 가족','가성비 반찬/분식']),
+  U(['u2','사리현 먹자골목 1F','사리현',37.6854,126.804,40,230,300,'1F','호프','premium','중','20·30대','동네 다이닝/바']),
+  U(['u3','사리현 단지상가 1F','사리현',37.6844,126.806,33,200,200,'1F','문구','value','중','단지 생활','가성비 세탁/반찬']),
+  U(['u4','사리현 노후 상가 1F','사리현',37.6836,126.804,40,130,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','사리현 외곽 상가 2F','사리현',37.6842,126.805,44,140,0,'2F','창고','factory','저','물류·저유동','무인 스토어/물류 픽업'])],
+ events:[E(['e1','사리현 동네 마켓',37.6862,126.806,'🛒','2026.09 · 매주 토','유입 +23%','중심상가~먹자 동네 마켓.',['상인회: 부스','주민: 참여','소비자: 마켓'],'<b>공생</b> — 단지 내수를 가로상권과 연결.']),
+  E(['e2','사리현 빈상가 리뉴얼 팝업',37.6854,126.804,'🛍','2026.08 · 3주','전환 10%','노후 근린상가 공실 단기 팝업.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 외곽 구상권 점진 갱신.']),
+  E(['e3','사리현 골목 야시장',37.6844,126.806,'🌙','매월 둘째 금','야간 +17%','이면 골목 야간 푸드트럭.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 외곽 주거 야간 콘텐츠.'])],
+ insta:["사리현 동네 마켓 #사리현동 #일산","사리현 먹자골목 #사리현 #일산맛집"]},
+
+{id:'seongseok',name:'성석·고봉',sub:'일산동구 성석동 · 고봉산 · 농촌형 외곽상권',center:[37.7,126.82],zoom:15,
+ poi:[[37.7,126.82,'고봉산','park']],
+ zones:[Z(['z1','성석 중심상가','성석',37.7012,126.821,55.2,-0.4,560,[['생활밀착','+18%','up'],['저녁 회전','+13%','up'],['배달','+12%','up']]]),
+  Z(['z2','성석 가든 외식','성석',37.7004,126.819,60.4,0.3,520,[['가든형 외식','+24%','up'],['주말 가족','+20%','up'],['평일 한산','+36%','up']]]),
+  Z(['z3','성석 농촌상가','성석',37.6994,126.821,52.6,-0.8,440,[['농촌형','+15%','up'],['고령 고객','+24%','up'],['청년 이탈','-20%','dn']]]),
+  Z(['z4','성석 근린상가','성석',37.6986,126.819,49.8,-1.7,386,[['단지 배후','+15%','up'],['평일 한산','+44%','up'],['공실 언급','+26%','up']]]),
+  Z(['z5','성석 노후 상가','성석',37.6992,126.82,40.4,-3,248,[['노후 공실','+168%','up'],['리뉴얼 필요','+86%','up'],['집객 약화','-29%','dn']]]),
+  Z(['z6','성석 외곽 상가','성석',37.701,126.819,43.2,-2.4,176,[['접근성 약','+60%','up'],['공실 장기화','+84%','up'],['야간 공동화','-27%','dn']]])],
+ grid:{bb:{s:37.696,n:37.704,w:126.815,e:126.825},dlat:0.0009,dlng:0.001135,core:[37.7,126.82],maxd:500,
+  hot:[[37.7012,126.821,80,20],[37.7004,126.819,80,12],[37.6994,126.821,80,20],[37.6986,126.819,80,30],[37.6992,126.82,80,30],[37.701,126.819,80,30]]},
+ units:[U(['u1','성석 가든 외식 1F','성석',37.7012,126.821,50,260,400,'1F','음식점','premium','중','주말 가족','가든형 → 가성비 한정식']),
+  U(['u2','성석 중심상가 1F','성석',37.7004,126.819,32,190,200,'1F','분식','value','중','생활밀착','가성비 분식/반찬']),
+  U(['u3','성석 농촌상가 점포','성석',37.6994,126.821,30,150,150,'1F','농산물','value','중','농촌형','로컬 농산물 직판']),
+  U(['u4','성석 노후 상가 1F','성석',37.6986,126.819,40,120,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','성석 외곽 상가 2F','성석',37.6992,126.82,44,130,0,'2F','창고','factory','저','저유동','무인 스토어/픽업'])],
+ events:[E(['e1','성석 고봉산 로컬 마켓',37.7012,126.821,'🌾','2026.10 · 주말 3일','유입 +26%','고봉산 연계 로컬 농산물·외식 마켓.',['상인회: 부스','농가: 직판','소비자: 로컬'],'<b>공생</b> — 농촌 로컬 자원을 상권과 결합.']),
+  E(['e2','성석 빈상가 리뉴얼 팝업',37.7004,126.819,'🛍','2026.08 · 3주','전환 9%','노후 근린상가 공실 단기 팝업.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 농촌형 외곽 상가 점진 갱신.']),
+  E(['e3','성석 가든 나이트마켓',37.6994,126.821,'🌙','매월 마지막 금','야간 +16%','가든 외식거리 야간 마켓.',['상인회: 야시장','지자체: 안전','소비자: 야간'],'<b>공감</b> — 농촌 외곽 야간 콘텐츠.'])],
+ insta:["성석 고봉산 로컬 마켓 #성석동 #고봉산","성석 가든 외식 #성석 #고양맛집"]},
+
+{id:'beopgot',name:'법곳·구산',sub:'일산서구 법곳동 · 킨텍스 서측 한강변 외곽',center:[37.668,126.735],zoom:15,
+ poi:[[37.668,126.735,'한강 장항습지','park']],
+ zones:[Z(['z1','법곳 중심상가','법곳',37.6692,126.736,56.4,-0.3,620,[['생활밀착','+19%','up'],['저녁 회전','+14%','up'],['배달','+13%','up']]]),
+  Z(['z2','법곳 카페·한강뷰','법곳',37.6684,126.734,63.8,0.6,520,[['한강뷰 카페','+34%','up'],['주말 체류','+24%','up'],['SNS 인증','+26%','up']]]),
+  Z(['z3','법곳 단지상가','법곳',37.6674,126.736,51.8,-1.4,440,[['단지 배후','+16%','up'],['주말 공동화','+40%','up'],['업종 중복','+24%','up']]]),
+  Z(['z4','법곳 근린상가','법곳',37.6666,126.734,49.6,-1.8,386,[['생활밀착','+15%','up'],['평일 한산','+44%','up'],['공실 언급','+26%','up']]]),
+  Z(['z5','법곳 비수기 공실','법곳',37.6672,126.735,40.8,-3,248,[['비수기 공실','+176%','up'],['계절 변동','+96%','up'],['집객 약화','-31%','dn']]]),
+  Z(['z6','법곳 외곽 상가','법곳',37.669,126.734,43.6,-2.3,182,[['접근성 약','+58%','up'],['공실 장기화','+82%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.664,n:37.672,w:126.73,e:126.74},dlat:0.0009,dlng:0.001135,core:[37.668,126.735],maxd:480,
+  hot:[[37.6692,126.736,80,20],[37.6684,126.734,80,12],[37.6674,126.736,80,20],[37.6666,126.734,80,30],[37.6672,126.735,80,30],[37.669,126.734,80,30]]},
+ units:[U(['u1','법곳 카페·한강뷰 1F','법곳',37.6692,126.736,42,280,400,'1F','카페','premium','중','20·30대','한강뷰 시그니처 카페']),
+  U(['u2','법곳 중심상가 1F','법곳',37.6684,126.734,34,200,200,'1F','분식','value','중','단지 생활','가성비 반찬/분식']),
+  U(['u3','법곳 단지상가 1F','법곳',37.6674,126.736,33,190,200,'1F','문구','value','중','단지 가족','가성비 세탁/반찬']),
+  U(['u4','법곳 비수기 공실 1F','법곳',37.6666,126.734,40,140,0,'1F','잡화','factory','저','관광 의존','무인·플렉시블 운영 변동성 흡수']),
+  U(['u5','법곳 외곽 상가 2F','법곳',37.6672,126.735,44,130,0,'2F','창고','factory','저','저유동','무인 스토어/픽업'])],
+ events:[E(['e1','법곳 한강 습지 마켓',37.6692,126.736,'🛶','2026.09 · 주말 3일','유입 +27%','장항습지 연계 한강 플리마켓.',['상인회: 부스','지자체: 관광','소비자: 참여'],'<b>공감</b> — 한강·습지 자연자원을 상권과 결합.']),
+  E(['e2','법곳 비수기 평일 마켓',37.6684,126.734,'🛍','2026.08 · 평일 2주','전환 10%','비수기 평일 공실을 단기 마켓으로.',['상인회: 마켓','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 계절 의존 상권의 변동성 완충.']),
+  E(['e3','법곳 한강 나이트마켓',37.6674,126.736,'🌙','매월 마지막 금','야간 +18%','한강뷰 야간 플리마켓.',['상인회: 야시장','지자체: 안전','소비자: 야간'],'<b>공생</b> — 관광 집객을 야간·배후로 확산.'])],
+ insta:["법곳 한강 습지 마켓 #법곳동 #한강 #일산","법곳 한강뷰 카페 #법곳 #한강카페"]},
+
+{id:'yongdu',name:'용두·삼송3',sub:'덕양구 용두동 · 삼송 동측 · 택지 인근 상권',center:[37.645,126.905],zoom:16,
+ poi:[[37.645,126.905,'용두근린공원','park']],
+ zones:[Z(['z1','용두 중심상가','용두',37.6462,126.906,59.2,0.2,820,[['택지 배후','+24%','up'],['저녁 회전','+16%','up'],['배달','+14%','up']]]),
+  Z(['z2','용두 카페거리','용두',37.6454,126.904,62.4,0.5,560,[['신상 카페','+34%','up'],['주말 체류','+22%','up'],['SNS 인증','+24%','up']]]),
+  Z(['z3','용두 단지상가','용두',37.6444,126.906,52.6,-1.3,512,[['생활밀착','+18%','up'],['주말 공동화','+38%','up'],['업종 중복','+25%','up']]]),
+  Z(['z4','용두 근린상가','용두',37.6436,126.904,50.4,-1.7,440,[['단지 배후','+16%','up'],['평일 한산','+40%','up'],['공실 언급','+24%','up']]]),
+  Z(['z5','용두 신축 공실','용두',37.6442,126.905,40.6,-3.2,272,[['신축 공실','+196%','up'],['임대료 부담','+128%','up'],['집객 부족','-32%','dn']]]),
+  Z(['z6','용두 외곽 상가','용두',37.646,126.904,43.8,-2.3,188,[['접근성 약','+56%','up'],['공실 장기화','+82%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.641,n:37.649,w:126.9,e:126.91},dlat:0.0009,dlng:0.001135,core:[37.645,126.905],maxd:470,
+  hot:[[37.6462,126.906,80,20],[37.6454,126.904,80,12],[37.6444,126.906,80,20],[37.6436,126.904,80,20],[37.6442,126.905,80,30],[37.646,126.904,80,30]]},
+ units:[U(['u1','용두 카페거리 1F','용두',37.6462,126.906,40,260,300,'1F','카페','premium','중','20·30대','신상 로스터리']),
+  U(['u2','용두 중심상가 1F','용두',37.6454,126.904,34,230,300,'1F','분식','value','고','택지 거주민','회전형 가성비']),
+  U(['u3','용두 단지상가 1F','용두',37.6444,126.906,33,200,200,'1F','문구','value','중','단지 가족','가성비 반찬/베이커리']),
+  U(['u4','용두 신축 공실 1F','용두',37.6436,126.904,46,170,0,'1F','공실','factory','저','신축 저유동','무인·표준으로 공동화 차단']),
+  U(['u5','용두 외곽 상가 2F','용두',37.6442,126.905,44,140,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','용두 택지 동네 마켓',37.6462,126.906,'🛒','2026.09 · 매주 토','유입 +25%','중심상가~카페거리 동네 마켓.',['상인회: 부스','주민: 참여','소비자: 마켓'],'<b>공생</b> — 택지 내수를 가로상권과 연결.']),
+  E(['e2','용두 신축상가 팝업위크',37.6454,126.904,'🛍','2026.08 · 2주','전환 12%','신축 공실을 2주 단기 팝업으로.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신생·로컬 브랜드 공정 진입.']),
+  E(['e3','용두 골목 야시장',37.6444,126.906,'🌙','매월 둘째 금','야간 +19%','이면 골목 야간 푸드트럭.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 택지 정주 야간 콘텐츠.'])],
+ insta:["용두 택지 동네 마켓 #용두동 #삼송 #고양","용두 카페거리 신상 로스터리 #용두 #일산카페"]},
+
+{id:'dongsan',name:'동산·원흥오피스',sub:'덕양구 동산동 · 스타필드 인근 · 오피스 배후상권',center:[37.64,126.91],zoom:16,
+ poi:[[37.64,126.91,'동산근린공원','park']],
+ zones:[Z(['z1','동산 오피스 가로상가','동산',37.6412,126.911,60.8,0.3,860,[['오피스 배후','+26%','up'],['점심 회전','+20%','up'],['저녁 한산','+30%','up']]]),
+  Z(['z2','동산 카페거리','동산',37.6404,126.909,63.4,0.6,560,[['신상 카페','+34%','up'],['주말 체류','+22%','up'],['SNS 인증','+24%','up']]]),
+  Z(['z3','동산 중심상가','동산',37.6394,126.911,54.6,-0.8,520,[['생활밀착','+18%','up'],['저녁 회전','+14%','up'],['배달','+12%','up']]]),
+  Z(['z4','동산 오피스 배후','동산',37.6386,126.909,52.2,-1.5,468,[['오피스 의존','+40%','up'],['주말 한산','+46%','up'],['공실 언급','+26%','up']]]),
+  Z(['z5','동산 신축 상층 공실','동산',37.6392,126.91,39.6,-3.6,278,[['상층 공실','+200%','up'],['임대료 부담','+136%','up'],['집객 부족','-34%','dn']]]),
+  Z(['z6','동산 외곽 근린','동산',37.641,126.909,43.6,-2.4,196,[['외곽 공실','+172%','up'],['접근성 약','+84%','up'],['야간 공동화','-27%','dn']]])],
+ grid:{bb:{s:37.636,n:37.644,w:126.905,e:126.915},dlat:0.0009,dlng:0.001135,core:[37.64,126.91],maxd:480,
+  hot:[[37.6412,126.911,80,12],[37.6404,126.909,80,12],[37.6394,126.911,80,20],[37.6386,126.909,80,20],[37.6392,126.91,80,40],[37.641,126.909,80,30]]},
+ units:[U(['u1','동산 카페거리 1F','동산',37.6412,126.911,40,280,400,'1F','카페','premium','중','오피스·20·30대','시그니처 로스터리']),
+  U(['u2','동산 오피스 가로상가 1F','동산',37.6404,126.909,36,300,400,'1F','분식','value','고','오피스 통근','점심 회전형 가성비']),
+  U(['u3','동산 중심상가 1F','동산',37.6394,126.911,33,210,200,'1F','문구','value','중','단지 생활','가성비 반찬/분식']),
+  U(['u4','동산 오피스 배후 2F','동산',37.6386,126.909,48,190,0,'2F','사무실','factory','저','주말 한산','무인·공유오피스 표준화']),
+  U(['u5','동산 신축 상층 공실 1F','동산',37.6392,126.91,50,180,0,'1F','공실','factory','저','신축 저유동','무인·표준으로 공동화 차단'])],
+ events:[E(['e1','동산 오피스 런치 페스타',37.6412,126.911,'🍱','2026.08 · 평일 2주','전환 12%','오피스 직장인 점심 할인·푸드트럭.',['상인회: 런치','직장: 참여','SpaceOS: 데이터'],'<b>균형</b> — 평일 오피스 수요를 골목으로 배분.']),
+  E(['e2','동산 신축상가 팝업위크',37.6404,126.909,'🤝','2026.08 · 2주','전환 13%','고공실 상층을 2주 단기 팝업으로.',['건물주: 단기임대','로컬브랜드: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 신생·로컬 브랜드 공정 진입.']),
+  E(['e3','동산 카페거리 나이트마켓',37.6394,126.911,'🌙','매월 마지막 금','야간 +20%','카페거리 야간 플리마켓.',['상인회: 야시장','주민: 참여','지자체: 안전'],'<b>공생</b> — 오피스 집객을 야간·배후로 확산.'])],
+ insta:["동산 오피스 런치 페스타 #동산동 #원흥 #런치","동산 카페거리 신상 로스터리 #동산 #일산카페"]},
+
+{id:'naeyu',name:'내유·오금',sub:'덕양구 내유동 · 북부 외곽 · 농촌형 생활상권',center:[37.705,126.9],zoom:15,
+ poi:[[37.705,126.9,'내유근린공원','park']],
+ zones:[Z(['z1','내유 중심상가','내유',37.7062,126.901,54.4,-0.4,520,[['생활밀착','+17%','up'],['저녁 회전','+12%','up'],['배달','+11%','up']]]),
+  Z(['z2','내유 가든 외식','내유',37.7054,126.899,59.6,0.2,480,[['가든형 외식','+22%','up'],['주말 가족','+18%','up'],['평일 한산','+38%','up']]]),
+  Z(['z3','오금 농촌상가','내유',37.7044,126.901,52.2,-0.8,420,[['농촌형','+14%','up'],['고령 고객','+24%','up'],['청년 이탈','-20%','dn']]]),
+  Z(['z4','내유 근린상가','내유',37.7036,126.899,49.4,-1.7,372,[['단지 배후','+14%','up'],['평일 한산','+46%','up'],['공실 언급','+26%','up']]]),
+  Z(['z5','내유 노후 상가','내유',37.7042,126.9,40.2,-3,238,[['노후 공실','+166%','up'],['리뉴얼 필요','+84%','up'],['집객 약화','-29%','dn']]]),
+  Z(['z6','내유 외곽 상가','내유',37.706,126.899,43.2,-2.4,170,[['접근성 약','+60%','up'],['공실 장기화','+84%','up'],['야간 공동화','-27%','dn']]])],
+ grid:{bb:{s:37.701,n:37.709,w:126.895,e:126.905},dlat:0.0009,dlng:0.001135,core:[37.705,126.9],maxd:500,
+  hot:[[37.7062,126.901,80,20],[37.7054,126.899,80,20],[37.7044,126.901,80,20],[37.7036,126.899,80,30],[37.7042,126.9,80,30],[37.706,126.899,80,30]]},
+ units:[U(['u1','내유 가든 외식 1F','내유',37.7062,126.901,50,250,400,'1F','음식점','premium','중','주말 가족','가든형 → 가성비 한정식']),
+  U(['u2','내유 중심상가 1F','내유',37.7054,126.899,32,180,200,'1F','분식','value','중','생활밀착','가성비 분식/반찬']),
+  U(['u3','오금 농촌상가 점포','내유',37.7044,126.901,30,140,150,'1F','농산물','value','중','농촌형','로컬 농산물 직판']),
+  U(['u4','내유 노후 상가 1F','내유',37.7036,126.899,40,120,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','내유 외곽 상가 2F','내유',37.7042,126.9,44,130,0,'2F','창고','factory','저','저유동','무인 스토어/픽업'])],
+ events:[E(['e1','내유 로컬 농촌 마켓',37.7062,126.901,'🌾','2026.10 · 주말 3일','유입 +24%','북부 농촌 로컬 농산물·외식 마켓.',['상인회: 부스','농가: 직판','소비자: 로컬'],'<b>공생</b> — 농촌 로컬 자원을 상권과 결합.']),
+  E(['e2','내유 빈상가 리뉴얼 팝업',37.7054,126.899,'🛍','2026.08 · 3주','전환 9%','노후 근린상가 공실 단기 팝업.',['건물주: 단기임대','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 농촌형 외곽 상가 점진 갱신.']),
+  E(['e3','내유 가든 나이트마켓',37.7044,126.901,'🌙','매월 마지막 금','야간 +15%','가든 외식거리 야간 마켓.',['상인회: 야시장','지자체: 안전','소비자: 야간'],'<b>공감</b> — 농촌 외곽 야간 콘텐츠.'])],
+ insta:["내유 로컬 농촌 마켓 #내유동 #덕양구","내유 가든 외식 #내유 #고양맛집"]},
+
+{id:'seonyu',name:'선유·운동장',sub:'덕양구 선유동 · 고양종합운동장 · 행사 배후상권',center:[37.66,126.925],zoom:16,
+ poi:[[37.66,126.925,'고양종합운동장','park']],
+ zones:[Z(['z1','운동장 앞 외식거리','선유',37.6612,126.926,62.6,0.5,860,[['경기 연계','+30%','up'],['주말 집객','+24%','up'],['SNS 인증','+18%','up']]]),
+  Z(['z2','선유 카페거리','선유',37.6604,126.924,61.8,0.4,560,[['신상 카페','+30%','up'],['주말 체류','+22%','up'],['신규 유입','+15%','up']]]),
+  Z(['z3','선유 중심상가','선유',37.6594,126.926,54.2,-0.8,520,[['생활밀착','+18%','up'],['저녁 회전','+14%','up'],['배달','+12%','up']]]),
+  Z(['z4','선유 운동장 배후','선유',37.6586,126.924,51.4,-1.6,468,[['행사 의존','+52%','up'],['비경기 공동화','+64%','up'],['외부 유입','-28%','dn']]]),
+  Z(['z5','선유 비수기 공실','선유',37.6592,126.925,40.8,-3.1,268,[['비수기 공실','+184%','up'],['행사 변동','+108%','up'],['집객 약화','-32%','dn']]]),
+  Z(['z6','선유 외곽 상가','선유',37.661,126.924,43.6,-2.3,186,[['접근성 약','+56%','up'],['공실 장기화','+80%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.656,n:37.664,w:126.92,e:126.93},dlat:0.0009,dlng:0.001135,core:[37.66,126.925],maxd:480,
+  hot:[[37.6612,126.926,80,12],[37.6604,126.924,80,12],[37.6594,126.926,80,20],[37.6586,126.924,80,20],[37.6592,126.925,80,30],[37.661,126.924,80,30]]},
+ units:[U(['u1','운동장 앞 외식거리 1F','선유',37.6612,126.926,46,300,500,'1F','호프','premium','고','경기 관람객','경기 연계 → 다이닝/바']),
+  U(['u2','선유 카페거리 1F','선유',37.6604,126.924,40,260,300,'1F','카페','premium','중','20·30대','신상 로스터리']),
+  U(['u3','선유 중심상가 1F','선유',37.6594,126.926,34,210,200,'1F','분식','value','중','생활밀착','가성비 분식/반찬']),
+  U(['u4','선유 운동장 배후 1F','선유',37.6586,126.924,46,190,0,'1F','잡화','factory','저','행사 의존','무인·플렉시블 운영 변동성 흡수']),
+  U(['u5','선유 외곽 상가 2F','선유',37.6592,126.925,44,150,0,'2F','창고','factory','저','저유동','무인 스토어/픽업'])],
+ events:[E(['e1','선유 운동장 경기 연계 마켓',37.6612,126.926,'🏟','경기 개최 주말','유입 +32%','고양종합운동장 경기 연계 푸드·굿즈 마켓.',['상인회: 부스','구단: 공동홍보','소비자: 참여'],'<b>공생</b> — 경기 집객을 배후 상권과 공유.']),
+  E(['e2','선유 비경기 자체 마켓',37.6604,126.924,'🛍','2026.08 · 평일 2주','전환 11%','비경기 시기 배후상가 자체 마켓으로 공동화 보완.',['상인회: 마켓','지자체: 홍보','소비자: 참여'],'<b>균형</b> — 행사 의존 상권의 변동성 완충.']),
+  E(['e3','선유 나이트마켓',37.6594,126.926,'🌙','매월 마지막 금','야간 +19%','카페거리 야간 플리마켓.',['상인회: 야시장','주민: 참여','지자체: 안전'],'<b>공감</b> — 행사 배후 야간 콘텐츠.'])],
+ insta:["선유 운동장 경기 연계 마켓 #선유동 #고양종합운동장","선유 카페거리 #선유 #일산카페"]},
+
+{id:'ilsan1',name:'일산1동 구시가',sub:'일산서구 일산1동 · 일산 원도심 · 구시가 생활상권',center:[37.685,126.768],zoom:16,
+ poi:[[37.685,126.768,'일산문화공원','park']],
+ zones:[Z(['z1','일산 원도심 상가','일산1동',37.6862,126.769,58.4,-0.3,920,[['구도심 노후','+28%','up'],['고령 고객','+24%','up'],['청년 이탈','-18%','dn']]]),
+  Z(['z2','일산1동 먹자골목','일산1동',37.6854,126.767,61.2,0.2,720,[['저녁 회전','+24%','up'],['노포 유지','+13%','up'],['배달','+18%','up']]]),
+  Z(['z3','일산1동 카페거리','일산1동',37.6844,126.769,60.6,0.3,560,[['주말 체류','+22%','up'],['디저트','+16%','up'],['신규 유입','+12%','up']]]),
+  Z(['z4','일산1동 단지상가','일산1동',37.6836,126.767,52.4,-1.3,512,[['단지 배후','+18%','up'],['주말 공동화','+38%','up'],['업종 중복','+25%','up']]]),
+  Z(['z5','일산1동 노후 상가','일산1동',37.6842,126.768,40.6,-3.2,288,[['노후 공실','+178%','up'],['리뉴얼 필요','+92%','up'],['집객 약화','-30%','dn']]]),
+  Z(['z6','일산1동 이면 상가','일산1동',37.686,126.767,43.8,-2.4,206,[['접근성 약','+56%','up'],['공실 장기화','+84%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.681,n:37.689,w:126.763,e:126.773},dlat:0.0009,dlng:0.001135,core:[37.685,126.768],maxd:470,
+  hot:[[37.6862,126.769,80,20],[37.6854,126.767,80,12],[37.6844,126.769,80,12],[37.6836,126.767,80,20],[37.6842,126.768,80,30],[37.686,126.767,80,30]]},
+ units:[U(['u1','일산1동 먹자골목 1F','일산1동',37.6862,126.769,40,260,400,'1F','호프','premium','고','20·30대 외식','노포거리 1F → 다이닝/바']),
+  U(['u2','일산1동 카페거리 1F','일산1동',37.6854,126.767,38,240,300,'1F','의류','premium','중','20·30대','구도심 디저트/로스터리']),
+  U(['u3','일산 원도심 상가 점포','일산1동',37.6844,126.769,30,180,200,'1F','잡화','value','중','구도심','청년몰형 가성비 먹거리']),
+  U(['u4','일산1동 노후 상가 1F','일산1동',37.6836,126.767,40,140,0,'1F','의류','factory','저','노후·저유동','무인 편의·픽업 표준화']),
+  U(['u5','일산1동 이면 상가 2F','일산1동',37.6842,126.768,44,150,0,'2F','학원','factory','저','저유동','무인스터디·공유공방'])],
+ events:[E(['e1','일산1동 원도심 레트로 페스타',37.6862,126.769,'🎶','2026.10 · 주말 3일','유입 +30%','일산 원도심 노포를 레트로로 재조명.',['상인회: 노포','청년: 부스','소비자: 레트로'],'<b>공감</b> — 일산 원도심 역사를 향수 콘텐츠로.']),
+  E(['e2','일산1동 구상가 청년몰 팝업',37.6854,126.767,'🛍','2026.08 · 1개월','전환 12%','구도심 빈점포를 청년몰 팝업으로.',['상인회: 점포','청년: 입점','지자체: 지원'],'<b>공생</b> — 구도심과 청년 상인 세대 결합.']),
+  E(['e3','일산1동 골목 야시장',37.6844,126.769,'🌙','매월 둘째 금','야간 +20%','이면 골목 야간 푸드트럭.',['상인회: 야시장','지자체: 안전','주민: 야간'],'<b>공감</b> — 구도심 야간 생활 콘텐츠.'])],
+ insta:["일산1동 원도심 레트로 페스타 #일산1동 #원도심","일산1동 카페거리 #일산구도심 #일산카페"]},
+
+{id:'gusan',name:'구산·송포',sub:'일산서구 구산동 · 한강변 서북 외곽',center:[37.695,126.725],zoom:15,
+ poi:[[37.695,126.725,'한강 송포','park']],
+ zones:[Z(['z1','구산 중심상가','구산',37.6962,126.726,55.4,-0.4,560,[['생활밀착','+17%','up'],['저녁 회전','+13%','up'],['배달','+12%','up']]]),
+  Z(['z2','송포 한강뷰 카페','구산',37.6954,126.724,62.6,0.5,480,[['한강뷰 카페','+30%','up'],['주말 체류','+22%','up'],['신규 유입','+15%','up']]]),
+  Z(['z3','구산 농촌상가','구산',37.6944,126.726,52,-0.8,420,[['농촌형','+14%','up'],['고령 고객','+22%','up'],['청년 이탈','-19%','dn']]]),
+  Z(['z4','구산 근린상가','구산',37.6936,126.724,49.2,-1.7,372,[['단지 배후','+14%','up'],['평일 한산','+44%','up'],['공실 언급','+25%','up']]]),
+  Z(['z5','구산 비수기 공실','구산',37.6942,126.725,40.4,-3,238,[['비수기 공실','+172%','up'],['계절 변동','+94%','up'],['집객 약화','-30%','dn']]]),
+  Z(['z6','구산 외곽 상가','구산',37.696,126.724,43.2,-2.3,168,[['접근성 약','+60%','up'],['공실 장기화','+82%','up'],['야간 공동화','-26%','dn']]])],
+ grid:{bb:{s:37.691,n:37.699,w:126.72,e:126.73},dlat:0.0009,dlng:0.001135,core:[37.695,126.725],maxd:500,
+  hot:[[37.6962,126.726,80,20],[37.6954,126.724,80,12],[37.6944,126.726,80,20],[37.6936,126.724,80,30],[37.6942,126.725,80,30],[37.696,126.724,80,30]]},
+ units:[U(['u1','송포 한강뷰 카페 1F','구산',37.6962,126.726,42,260,400,'1F','카페','premium','중','20·30대','한강뷰 시그니처 카페']),
+  U(['u2','구산 중심상가 1F','구산',37.6954,126.724,32,180,200,'1F','분식','value','중','생활밀착','가성비 분식/반찬']),
+  U(['u3','구산 농촌상가 점포','구산',37.6944,126.726,30,140,150,'1F','농산물','value','중','농촌형','로컬 농산물 직판']),
+  U(['u4','구산 비수기 공실 1F','구산',37.6936,126.724,40,130,0,'1F','잡화','factory','저','관광 의존','무인·플렉시블 운영 변동성 흡수']),
+  U(['u5','구산 외곽 상가 2F','구산',37.6942,126.725,44,130,0,'2F','창고','factory','저','저유동','무인 스토어/픽업'])],
+ events:[E(['e1','구산 한강 송포 마켓',37.6962,126.726,'🛶','2026.09 · 주말 3일','유입 +24%','한강 송포 연계 로컬·플리마켓.',['상인회: 부스','지자체: 관광','소비자: 참여'],'<b>공감</b> — 한강 자연자원을 상권과 결합.']),
+  E(['e2','구산 비수기 평일 마켓',37.6954,126.724,'🛍','2026.08 · 평일 2주','전환 9%','비수기 평일 공실을 단기 마켓으로.',['상인회: 마켓','로컬: 팝업','SpaceOS: 데이터'],'<b>균형</b> — 계절 의존 상권의 변동성 완충.']),
+  E(['e3','구산 한강 나이트마켓',37.6944,126.726,'🌙','매월 마지막 금','야간 +16%','한강뷰 야간 플리마켓.',['상인회: 야시장','지자체: 안전','소비자: 야간'],'<b>공생</b> — 관광 집객을 야간·배후로 확산.'])],
+ insta:["구산 한강 송포 마켓 #구산동 #한강 #일산","송포 한강뷰 카페 #송포 #한강카페"]},
+];
+
+/* ===== 엔진 ===== */
+var map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,minZoom:11,maxZoom:18}).setView([37.6520,126.8080],12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',opacity:.5}).addTo(map);
+var baseLayer=L.layerGroup().addTo(map);
+var G={P1:L.layerGroup(),P2:L.layerGroup(),P3:L.layerGroup(),P4:L.layerGroup()};
+var OV=L.layerGroup();
+var CUR=null,curP='P1',curEvent='e1',cellsCur=[],rects={},mode='overview';
+// P2 히트맵: 지도 클릭 시 가장 가까운 공실 구역 상세 표시
+map.on('click',function(ev){
+ if(curP!=='P2'||mode!=='district'||!cellsCur.length)return;
+ var best=null,bd=1e9;
+ cellsCur.forEach(function(c){var dd=distM(ev.latlng.lat,ev.latlng.lng,c.cLat,c.cLng);if(dd<bd){bd=dd;best=c;}});
+ if(best&&bd<180)selCell(best.i+'_'+best.j);
+});
+
+// 거점 선택기 채우기 (맨 앞에 '고양시 전체')
+document.getElementById('dsel').innerHTML='<option value="">🗺 고양시 전체 상권</option>'+DISTRICTS.map(function(d,i){return '<option value="'+d.id+'">'+(i+1)+'. '+d.name+'</option>';}).join('');
+function onSel(v){ if(v) selectDistrict(v); else showOverview(); }
+
+function buildCells(d){
+ var g=d.grid,out=[],ss=0,sv=0;
+ for(var lat=g.bb.s,i=0;lat<g.bb.n-1e-9;lat+=g.dlat,i++){for(var lng=g.bb.w,j=0;lng<g.bb.e-1e-9;lng+=g.dlng,j++){
+  var cLat=lat+g.dlat/2,cLng=lng+g.dlng/2,v=2.5,infl=0;
+  g.hot.forEach(function(h){var dd=distM(cLat,cLng,h[0],h[1]),w=Math.exp(-(dd*dd)/(2*h[2]*h[2]));v+=h[3]*w;infl+=w;});
+  v+=(seed(i,j)-0.5)*4;var dc=distM(cLat,cLng,g.core[0],g.core[1]);
+  if(!(infl>0.12&&dc<g.maxd))continue;
+  v=Math.max(2,Math.min(48,v));var st=Math.round(8+22*Math.min(1,infl)+seed(j,i)*10),vn=Math.round(st*v/100);
+  out.push({i:i,j:j,lat:lat,lng:lng,cLat:cLat,cLng:cLng,v:v,stores:st,vacN:vn,dlat:g.dlat,dlng:g.dlng});ss+=st;sv+=vn;
+ }}
+ return {cells:out,sumStores:ss,sumVac:sv};
+}
+
+// ===== 거점 요약(오버뷰용) =====
+function districtSummary(d){
+ if(d._sum)return d._sum;
+ var sumR=d.zones.reduce(function(a,z){return a+z.r;},0);
+ var sent=d.zones.reduce(function(a,z){return a+z.s*z.r;},0)/sumR;
+ var risk=d.zones.filter(function(z){return z.s<40;}).length;
+ var ci=buildCells(d);var vac=ci.sumStores?ci.sumVac/ci.sumStores*100:0;
+ d._sum={sent:sent,reviews:sumR,risk:risk,vac:vac,vacN:ci.sumVac};
+ return d._sum;
+}
+function buildOverview(){
+ OV.clearLayers();
+ DISTRICTS.forEach(function(d){
+  var s=districtSummary(d),col=fgHex(s.sent),sz=Math.max(22,Math.min(46,22+s.reviews/130));
+  var m=L.marker(d.center,{icon:L.divIcon({className:'',html:'<div class="ovmk" style="width:'+sz+'px;height:'+sz+'px;background:'+col+'">'+s.sent.toFixed(0)+'</div>',iconSize:[0,0]})}).addTo(OV);
+  m.on('click',function(){selectDistrict(d.id);});
+  L.marker(d.center,{icon:L.divIcon({className:'',html:'<div class="ovlbl">'+d.name.replace('일산 ','')+'</div>',iconSize:[0,0]})}).addTo(OV);
+ });
+}
+function showOverview(){
+ mode='overview';
+ ['P1','P2','P3','P4'].forEach(function(k){if(map.hasLayer(G[k]))map.removeLayer(G[k]);G[k].clearLayers();});
+ baseLayer.clearLayers();
+ if(!map.hasLayer(OV))OV.addTo(map);
+ buildOverview();
+ document.getElementById('ptabs').style.display='none';
+ document.getElementById('flow').style.display='none';
+ document.getElementById('backbtn').style.display='none';
+ document.getElementById('dsel').value='';
+ document.getElementById('dname').textContent='고양시 전체 상권';
+ document.getElementById('dsub').textContent='덕양구·일산동구·일산서구 · 39개 주요 상권 · 거점을 클릭하면 디지털 4P(PPPP)가 열립니다';
+ document.getElementById('maptitle').textContent='고양시 전체 상권 지도';
+ document.getElementById('maphint').textContent='원=리뷰량 · 색=감성지수 · 마커 클릭 → 해당 상권 PPPP';
+ document.getElementById('legb').innerHTML='<span class="lt">감성</span><span><i class="r" style="background:#d9716a"></i>위험</span><span><i class="r" style="background:#e3b95e"></i>주의</span><span><i class="r" style="background:#7faa55"></i>양호</span><span><i class="r" style="background:#3a5a98"></i>우수</span>';
+ var n=DISTRICTS.length,sums=DISTRICTS.map(districtSummary);
+ var sAvg=sums.reduce(function(a,s){return a+s.sent;},0)/n;
+ var vAvg=sums.reduce(function(a,s){return a+s.vac;},0)/n;
+ var totRev=sums.reduce(function(a,s){return a+s.reviews;},0);
+ var totVac=sums.reduce(function(a,s){return a+s.vacN;},0);
+ var riskD=sums.filter(function(s){return s.sent<50;}).length;
+ document.getElementById('kpis').innerHTML=kpiHTML([
+  {l:'🏙 주요 상권',v:n,suf:'개',d:'3구 전수'},
+  {l:'😊 평균 감성',v:sAvg.toFixed(1),c:fgV(sAvg),d:'리뷰가중 평균'},
+  {l:'🏢 평균 공실률',v:vAvg.toFixed(1),suf:'%',c:'#c0392b',d:'100m 그리드'},
+  {l:'🗂 누적 리뷰',v:(totRev/1000).toFixed(1),suf:'K',d:'39거점 합산'},
+  {l:'⚠ 침체 거점',v:riskD,suf:'개',c:riskD?'#b23b39':'#4f7a31',d:'감성 50 미만'}
+ ]);
+ var rk=DISTRICTS.slice().sort(function(a,b){return districtSummary(b).sent-districtSummary(a).sent;}).map(function(d,i){
+  var s=districtSummary(d),col=fgHex(s.sent);
+  return '<div class="ovrkr" onclick="selectDistrict(\''+d.id+'\')"><div class="rn">'+(i+1)+'</div><div class="ri"><div class="rnm">'+d.name+'</div><div class="rgu">'+(d.sub.split(' · ')[0])+'</div><div class="rbar"><i style="width:'+s.sent+'%;background:'+col+'"></i></div></div><div class="rv" style="color:'+col+'">'+s.sent.toFixed(0)+'</div></div>';
+ }).join('');
+ document.getElementById('panel').innerHTML='<div class="lab" style="margin-bottom:8px">감성지수 랭킹 · 거점 클릭 → 디지털 4P(PPPP)</div><div class="ovrk">'+rk+'</div>';
+ map.setView([37.6520,126.8080],12);
+}
+
+function selectDistrict(id){
+ var d=DISTRICTS.filter(function(x){return x.id===id;})[0];if(!d)return;
+ mode='district';
+ if(map.hasLayer(OV))map.removeLayer(OV);
+ document.getElementById('ptabs').style.display='';
+ document.getElementById('flow').style.display='';
+ document.getElementById('backbtn').style.display='';
+ CUR=d;document.getElementById('dsel').value=id;
+ document.getElementById('dname').textContent=d.name;
+ document.getElementById('dsub').textContent=d.sub;
+ baseLayer.clearLayers();G.P1.clearLayers();G.P2.clearLayers();G.P3.clearLayers();G.P4.clearLayers();
+ // base poi
+ d.poi.forEach(function(p){
+  if(p[3]==='sta')L.circleMarker([p[0],p[1]],{radius:6,color:'#fff',weight:2,fillColor:'#c0504a',fillOpacity:1}).addTo(baseLayer);
+  L.marker([p[0],p[1]],{icon:L.divIcon({html:'<div class="poi '+(p[3]||'')+'">'+p[2]+'</div>',iconSize:[0,0]})}).addTo(baseLayer);
+ });
+ // P1
+ d.zones.forEach(function(z){var c=fgHex(z.s);
+  L.circle([z.lat,z.lng],{radius:rad(z.r),color:c,weight:1.4,opacity:.55,fillColor:c,fillOpacity:.18}).addTo(G.P1);
+  var m=L.circleMarker([z.lat,z.lng],{radius:9,fillColor:c,color:'#fff',weight:2,fillOpacity:.95}).addTo(G.P1);
+  m.on('click',function(){selZone(z.id);});
+  m.bindTooltip('<div class="mlbl">'+z.n+' · '+z.s.toFixed(0)+'</div>',{permanent:true,direction:'right',offset:[8,0],opacity:1});
+ });
+ // P2 — 모든 공실 점포를 연속 히트맵으로 표현 (그리드 미사용)
+ var built=buildCells(d);cellsCur=built.cells;rects={};
+ var heatPts=[];
+ cellsCur.forEach(function(c){
+  rects[c.i+'_'+c.j]=c;
+  for(var k=0;k<c.vacN;k++){
+   var jl=c.cLat+(seed(c.i*7+k,c.j*3+1)-0.5)*c.dlat*0.9;
+   var jg=c.cLng+(seed(c.j*5+k,c.i*9+1)-0.5)*c.dlng*0.9;
+   heatPts.push([jl,jg,Math.max(0.32,Math.min(1,c.v/42))]);
+  }
+ });
+ if(window.L&&L.heatLayer){
+  G.P2.addLayer(L.heatLayer(heatPts,{radius:22,blur:28,minOpacity:0.28,max:1.0,
+   gradient:{0.15:'#cfe3cf',0.35:'#fbe7a6',0.55:'#f6b96b',0.78:'#e8743b',1.0:'#c0392b'}}));
+ }else{ // 폴백: 플러그인 미로드 시 점 마커
+  heatPts.forEach(function(p){L.circleMarker([p[0],p[1]],{radius:4,color:vacColor(p[2]*42),weight:0,fillColor:vacColor(p[2]*42),fillOpacity:.5}).addTo(G.P2);});
+ }
+ CUR._cellsInfo=built;
+ // P3
+ d.units.forEach(function(u){var t=TIER[u.rec];
+  var m=L.marker([u.lat,u.lng],{icon:L.divIcon({html:'<div class="umk" style="background:'+t.c+'">'+t.nm.charAt(0)+'</div>',iconSize:[0,0]})}).addTo(G.P3);
+  m.on('click',function(){selUnit(u.id);});
+  m.bindTooltip('<div class="poi" style="color:'+t.c+'">'+u.n+'</div>',{permanent:true,direction:'right',offset:[12,0],opacity:1});
+ });
+ // P4
+ var fz=d.zones[0];L.circle([fz.lat,fz.lng],{radius:90,color:'#2563b0',weight:1.4,opacity:.5,fillColor:'#2563b0',fillOpacity:.12}).addTo(G.P4);
+ d.events.forEach(function(e){
+  var m=L.marker([e.lat,e.lng],{icon:L.divIcon({html:'<div class="emk" style="background:#b06a1e">'+e.ic+'</div>',iconSize:[0,0]})}).addTo(G.P4);
+  m.on('click',function(){selEvent(e.id);});
+  m.bindTooltip('<div class="poi" style="color:#b06a1e">'+e.n+'</div>',{permanent:true,direction:'right',offset:[14,0],opacity:1});
+ });
+ curEvent=d.events[0].id;
+ map.setView(d.center,d.zoom);
+ setP(curP);
+}
+
+function allz(id){return CUR.zones.filter(function(z){return z.id===id;})[0];}
+function allu(id){return CUR.units.filter(function(u){return u.id===id;})[0];}
+function alle(id){return CUR.events.filter(function(e){return e.id===id;})[0];}
+function kpiHTML(arr){return arr.map(function(k){return '<div class="kpi"><div class="l">'+k.l+'</div><div class="v" style="color:'+(k.c||'inherit')+'">'+k.v+(k.suf?'<small>'+k.suf+'</small>':'')+'</div>'+(k.d?'<div class="d">'+k.d+'</div>':'')+'</div>';}).join('');}
+
+function selZone(id){var z=allz(id);var risk=z.s<40?'위험':z.s<60?'주의':z.s<80?'양호':'우수';
+ var frows=z.f.map(function(f){return '<div class="fr"><span>'+f[0]+'</span><b class="'+(f[2]==='dn'?'dn':'up')+'">'+f[1]+'</b></div>';}).join('');
+ document.getElementById('panel').innerHTML='<div class="lab">선택 구역 · '+z.grp+'</div><div class="top"><div class="nm">'+z.n+'</div><div><div class="sc" style="color:'+fgV(z.s)+'">'+z.s.toFixed(1)+'</div><div class="suf" style="color:'+fgV(z.s)+'">'+risk+' · '+arrow(z.d)+' · '+rev(z.r)+'건</div></div></div><div class="sec"><div class="st">'+(z.d<0?'점수 하락 핵심 요인':'점수 변동 핵심 요인')+'</div>'+frows+'</div><button class="btn" onclick="setP(\'P2\')">이 구역 공실 그리드 ↗</button>';
+ map.setView([z.lat,z.lng],17,{animate:true});}
+function selCell(id){var c=rects[id];if(!c)return;var lv=c.v<5?['양호','#3f7d3f']:c.v<10?['주의','#9a7b1e']:c.v<18?['경계','#d2691e']:c.v<28?['위험','#e8743b']:['심각','#c0392b'];
+ var mm=mixFor(c.v),mixBar=mm.map(function(x){return '<i style="width:'+x[1]+'%;background:'+x[2]+'"></i>';}).join(''),mixLeg=mm.map(function(x){return '<span><span class="dt" style="background:'+x[2]+'"></span>'+x[0]+' '+x[1]+'%</span>';}).join('');
+ document.getElementById('panel').innerHTML='<div class="lab">선택 공실 구역 · '+c.cLat.toFixed(4)+','+c.cLng.toFixed(4)+'</div><div class="top"><div><div class="nm">N'+c.cLat.toFixed(4)+' E'+c.cLng.toFixed(4)+'</div><div class="lab" style="margin-top:4px">'+lv[0]+' 공실 구간</div></div><div><div class="sc" style="color:'+lv[1]+'">'+c.v.toFixed(1)+'<small style="font-size:14px">%</small></div><div class="suf">공실 '+c.vacN+' / 총 '+c.stores+'</div></div></div><div class="sec"><div class="fr"><span>총 점포</span><b>'+c.stores+'개</b></div><div class="fr"><span>공실 점포</span><b style="color:'+lv[1]+'">'+c.vacN+'개</b></div><div class="fr"><span>입주율</span><b>'+(100-c.v).toFixed(1)+'%</b></div></div><div class="sec"><div class="st">업종 구성</div><div class="mix">'+mixBar+'</div><div class="mixleg">'+mixLeg+'</div></div><button class="btn" onclick="setP(\'P3\')">이 셀 입점 솔루션(3-Tier) ↗</button>';
+ map.setView([c.cLat,c.cLng],17,{animate:true});}
+function selUnit(id){var u=allu(id),sc=scenarios(u),keys=['premium','value','factory'];
+ var spec='<div class="uspec"><div class="sp"><div class="k">면적</div><div class="vv">'+u.area+'㎡</div></div><div class="sp"><div class="k">월 임대료</div><div class="vv">'+u.rent+'만</div></div><div class="sp"><div class="k">권리금</div><div class="vv">'+(u.prem?u.prem+'만':'없음')+'</div></div><div class="sp"><div class="k">유동인구</div><div class="vv">'+u.foot+'</div></div></div>';
+ var tiers=keys.map(function(k){var t=TIER[k],s=sc[k],roi=roiM(s),net=s.monthRev-s.monthCost,sel=k===u.rec?'sel':'';
+  return '<div class="tier '+sel+'" style="'+(k===u.rec?'border-color:'+t.c:'')+'"><div class="th"><span class="tn"><span class="dot" style="background:'+t.c+'"></span>'+t.nm+' · '+t.sub+(k===u.rec?' ✓':'')+'</span><span class="roi" style="background:'+t.bg+';color:'+t.c+'">ROI '+(roi>=99?'—':roi.toFixed(1)+'개월')+'</span></div><div class="met"><div class="m"><div class="mk">초기투자</div><div class="mv">'+s.invest+'백만</div></div><div class="m"><div class="mk">월 순익</div><div class="mv" style="color:'+(net>0?'#2f7d4f':'#b23b39')+'">'+(net>0?'+':'')+net+'만</div></div><div class="m"><div class="mk">월 매출</div><div class="mv">'+s.monthRev+'만</div></div></div></div>';}).join('');
+ document.getElementById('panel').innerHTML='<div class="lab">'+u.grp+' · '+u.floor+' · 구 '+u.was+'</div><div class="top"><div class="nm">'+u.n+'</div></div><div class="recbadge" style="background:'+TIER[u.rec].bg+';color:'+TIER[u.rec].c+'">추천 · '+TIER[u.rec].nm+' ('+TIER[u.rec].sub+')</div><div class="lab" style="margin-top:8px;line-height:1.5">'+u.note+' · 타깃: '+u.persona+'</div>'+spec+'<div class="sec"><div class="st">3-Tier 비용-효용 (월, 만원/백만원)</div>'+tiers+'</div><button class="btn" onclick="setP(\'P4\')">입점 후 마케팅(Program) ↗</button>';
+ map.setView([u.lat,u.lng],17,{animate:true});}
+function selEvent(id){curEvent=id;renderP4();var e=alle(id);map.setView([e.lat,e.lng],17,{animate:true});}
+function renderP4(){
+ var ig=CUR.insta.map(function(t,i){var first=t.split('\n\n');return '<div class="gen"><div class="gh"><span class="pf"><span class="ic" style="background:linear-gradient(135deg,#f58529,#dd2a7b)"></span>인스타 피드 #'+(i+1)+'</span></div><div class="body">'+first.slice(0,-1).join('\n\n')+'</div><div class="tags">'+first.slice(-1)[0]+'</div><div class="meta">예상 도달 <b>'+(8+i*3)+'K</b> · 감성 매칭 <b>9'+(1+i)+'</b></div></div>';}).join('');
+ var evs=CUR.events.map(function(e){var sel=e.id===curEvent?'sel':'';return '<div class="ev '+sel+'" onclick="selEvent(\''+e.id+'\')"><div class="eh"><div><div class="en">'+e.ic+' '+e.n+'</div><div class="edt">'+e.when+'</div></div><div class="k2">'+e.k2+'</div></div><div class="desc">'+e.desc+'</div><div class="roles">'+e.roles.map(function(r){return '<span>'+r+'</span>';}).join('')+'</div><div class="ha">'+e.ha+'</div></div>';}).join('');
+ document.getElementById('panel').innerHTML='<div class="subtabs"><div class="subtab" id="s-on" onclick="swSub(\'on\')">🟦 온라인</div><div class="subtab" id="s-off" onclick="swSub(\'off\')">🟧 오프라인</div></div><div id="sub-on" style="display:none">'+ig+'</div><div id="sub-off">'+evs+'</div>';
+ swSub(window._sub||'off');}
+function swSub(t){window._sub=t;var on=document.getElementById('s-on');if(!on)return;on.classList.toggle('on',t==='on');document.getElementById('s-off').classList.toggle('on',t==='off');document.getElementById('sub-on').style.display=t==='on'?'block':'none';document.getElementById('sub-off').style.display=t==='off'?'block':'none';}
+
+function buildCFG(d){
+ var ci=d._cellsInfo,avgV=(ci.sumVac/ci.sumStores*100),hi=ci.cells.filter(function(c){return c.v>=28;}).length;
+ var sAvg=d.zones.reduce(function(a,z){return a+z.s*z.r;},0)/d.zones.reduce(function(a,z){return a+z.r;},0);
+ var sumR=d.zones.reduce(function(a,z){return a+z.r;},0),warn=d.zones.filter(function(z){return z.s<40;}).length;
+ var cP=d.units.filter(function(u){return u.rec==='premium';}).length,cV=d.units.filter(function(u){return u.rec==='value';}).length,cF=d.units.filter(function(u){return u.rec==='factory';}).length;
+ var avgRoi=d.units.reduce(function(a,u){return a+roiM(scenarios(u)[u.rec]);},0)/d.units.length;
+ return {
+  P1:{title:'상권 감성 히트맵',hint:'원=리뷰량 · 색=감성점수 · 클릭 상세',legend:'<span class="lt">감성</span><span><i class="r" style="background:#d9716a"></i>위험</span><span><i class="r" style="background:#e3b95e"></i>주의</span><span><i class="r" style="background:#7faa55"></i>양호</span><span><i class="r" style="background:#3a5a98"></i>우수</span>',flow:'<b style="color:var(--P1)">① Platform</b><span class="ar">→</span>Page<span class="ar">→</span>Posting<span class="ar">→</span>Program',
+   kpis:[{l:'😊 감성 지수',v:sAvg.toFixed(1),c:fgV(sAvg)},{l:'🗂 리뷰',v:sumR.toLocaleString()},{l:'👍 긍정',v:(sAvg*0.92).toFixed(1),suf:'%',c:'#4f7a31'},{l:'⚠ 위험 구역',v:warn,suf:'개',c:warn?'#b23b39':'#4f7a31'},{l:'⚙ 신뢰도',v:'90.'+(d.zones.length)+'',suf:'%'}],init:function(){var w=d.zones.slice().sort(function(a,b){return a.s-b.s;})[0];selZone(w.id);}},
+  P2:{title:'공실 히트맵 · 전 공실 밀도',hint:'색 진할수록 공실 밀집 · 지도 클릭 → 구역 상세',legend:'<span class="lt">공실 밀도</span><span><i class="bar" style="background:#cfe3cf"></i>희박</span><span><i class="bar" style="background:#fbe7a6"></i>낮음</span><span><i class="bar" style="background:#f6b96b"></i>보통</span><span><i class="bar" style="background:#e8743b"></i>높음</span><span><i class="bar" style="background:#c0392b"></i>밀집</span>',flow:'Platform<span class="ar">→</span><b style="color:var(--P2)">② Page</b><span class="ar">→</span>Posting<span class="ar">→</span>Program',
+   kpis:[{l:'🏢 평균 공실률',v:avgV.toFixed(1),suf:'%',c:'#c0392b'},{l:'🟥 고공실 셀',v:hi,suf:'칸',c:'#c0392b'},{l:'🏬 상업 셀',v:ci.cells.length,suf:'칸'},{l:'🪧 공실 점포',v:ci.sumVac,suf:'곳',c:'#e8743b'},{l:'📐 해상도',v:'100',suf:'m'}],init:function(){var t=ci.cells.slice().sort(function(a,b){return b.v-a.v;})[0];if(t)selCell(t.i+'_'+t.j);}},
+  P3:{title:'공실 유닛 추천 Tier',hint:'마커 색=추천 Tier · 클릭 비용-효용',legend:'<span class="lt">Tier</span><span><i style="background:#7a4f9a"></i>고급화</span><span><i style="background:#2f7d4f"></i>가성비</span><span><i style="background:#b06a1e"></i>공장제</span>',flow:'Platform<span class="ar">→</span>Page<span class="ar">→</span><b style="color:var(--P3)">③ Posting</b><span class="ar">→</span>Program',
+   kpis:[{l:'🟪 고급화',v:cP,suf:'곳',c:'#7a4f9a'},{l:'🟩 가성비',v:cV,suf:'곳',c:'#2f7d4f'},{l:'🟧 공장제',v:cF,suf:'곳',c:'#b06a1e'},{l:'🪧 공실 유닛',v:d.units.length,suf:'곳'},{l:'⏱ 평균 회수',v:avgRoi.toFixed(1),suf:'개월',c:'#9a7b1e'}],init:function(){selUnit(d.units[0].id);}},
+  P4:{title:'온·오프라인 마케팅',hint:'핀=행사 거점 · 파란원=온라인 발행',legend:'<span class="lt">마케팅</span><span><i style="background:#b06a1e"></i>오프라인 행사</span><span><i class="r" style="background:#2563b0"></i>온라인 발행구역</span>',flow:'Platform<span class="ar">→</span>Page<span class="ar">→</span>Posting<span class="ar">→</span><b style="color:var(--P4)">④ Program</b>',
+   kpis:[{l:'📤 주간 발행',v:(8+d.zones.length),suf:'건',c:'#2563b0'},{l:'🎪 행사 후보',v:d.events.length,suf:'건',c:'#b06a1e'},{l:'📈 유입 증대',v:'+'+(24+warn*3),suf:'%',c:'#2f7d4f'},{l:'🤝 상생 매칭',v:(d.units.length+1),suf:'건'},{l:'💬 감성 매칭',v:'9'+d.events.length,suf:'점'}],init:function(){renderP4();}},
+ };
+}
+function setP(p){curP=p;
+ ['P1','P2','P3','P4'].forEach(function(k){if(map.hasLayer(G[k]))map.removeLayer(G[k]);});
+ map.addLayer(G[p]);
+ document.querySelectorAll('.ptab').forEach(function(t){t.classList.toggle('on',t.dataset.p===p);});
+ var cfg=buildCFG(CUR)[p];
+ document.getElementById('maptitle').textContent=cfg.title;
+ document.getElementById('maphint').textContent=cfg.hint;
+ document.getElementById('legb').innerHTML=cfg.legend;
+ document.getElementById('flow').innerHTML=cfg.flow;
+ document.getElementById('kpis').innerHTML=kpiHTML(cfg.kpis);
+ cfg.init();
+}
+setInterval(function(){document.getElementById('liverate').textContent=(36+Math.floor(Math.random()*14));},2000);
+showOverview();
+</script>
+</body>
+</html>

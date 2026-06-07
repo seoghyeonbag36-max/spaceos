@@ -1,0 +1,9 @@
+# SpaceOS 거점 점수 파이프라인 — 실측 수집 의존성
+requests>=2.31.0
+
+# 선택: Airflow 배포 시
+# apache-airflow>=2.8.0
+
+# 선택: SNS 자체 크롤링(인스타 Graph API 미사용 시)
+# playwright>=1.40.0
+# beautifulsoup4>=4.12.0

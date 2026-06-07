@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SpaceOS · 고양시 PPPP 상권 플랫폼</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#0e1117;--panel:#161b22;--panel2:#1c232d;--line:#2a323d;--txt:#e6edf3;--sub:#9aa7b4;--accent:#4dd0a7;--blue:#5aa9ff;--warn:#e85d5d;--gold:#e8c15d;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--txt);overflow:hidden}
+#app{display:grid;grid-template-columns:268px 1fr 360px;grid-template-rows:56px 1fr;height:100vh}
+header{grid-column:1/4;display:flex;align-items:center;gap:14px;padding:0 18px;background:linear-gradient(90deg,#11161d,#161b22);border-bottom:1px solid var(--line)}
+header .logo{font-weight:800;font-size:17px;letter-spacing:.5px}
+header .logo b{color:var(--accent)}
+header .sub{font-size:11.5px;color:var(--sub)}
+header .spacer{flex:1}
+header .meta{font-size:11px;color:var(--sub);text-align:right;line-height:1.5}
+.sidebar{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:14px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.tab{padding:9px 6px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--sub);font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:.15s}
+.tab .en{display:block;font-size:9px;font-weight:600;opacity:.7;margin-top:2px}
+.tab.on{background:var(--accent);color:#06231a;border-color:var(--accent)}
+.sec-t{font-size:10.5px;color:var(--sub);letter-spacing:1px;margin:6px 0 8px;font-weight:700}
+.dlist{display:flex;flex-direction:column;gap:6px}
+.ditem{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);cursor:pointer;transition:.15s}
+.ditem:hover{border-color:var(--accent)}
+.ditem.on{border-color:var(--accent);background:#15271f}
+.ditem .rk{width:20px;height:20px;border-radius:50%;background:#2a323d;color:var(--txt);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ditem.on .rk{background:var(--accent);color:#06231a}
+.ditem .nm{font-size:13px;font-weight:700}
+.ditem .gu{font-size:10px;color:var(--sub)}
+.dot{width:9px;height:9px;border-radius:50%;margin-left:auto;flex-shrink:0}
+#map{height:100%;width:100%}
+.mapwrap{position:relative}
+.maplegend{position:absolute;left:12px;bottom:18px;z-index:500;background:rgba(20,26,33,.92);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:11px;color:var(--sub)}
+.maplegend .row{display:flex;align-items:center;gap:6px;margin-top:4px}
+.maplegend .sw{width:26px;height:9px;border-radius:3px}
+.panel{background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;padding:16px}
+.p-head{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+.p-badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;background:var(--accent);color:#06231a}
+.p-title{font-size:18px;font-weight:800}
+.p-gu{font-size:11.5px;color:var(--sub);margin-bottom:12px}
+.p-char{font-size:12px;line-height:1.6;color:#c9d3dd;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:10px 12px;margin-bottom:14px}
+.kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.kpi{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px}
+.kpi .v{font-size:18px;font-weight:800}
+.kpi .l{font-size:10px;color:var(--sub);margin-top:2px}
+.block{margin-bottom:16px}
+.block h4{font-size:12px;color:var(--sub);letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.block h4:before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px}
+.bar{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11.5px}
+.bar .lab{width:42px;color:var(--sub)}
+.bar .track{flex:1;height:8px;background:#222b35;border-radius:5px;overflow:hidden}
+.bar .fill{height:100%;border-radius:5px}
+.bar .num{width:34px;text-align:right;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:10.5px;padding:4px 9px;border-radius:20px;border:1px solid var(--line);background:var(--panel2);color:#c9d3dd}
+.chip.pos{border-color:#2e6f5a;color:#7fe3c0}
+.chip.neg{border-color:#7a3636;color:#f0a0a0}
+.tier{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:10px;background:var(--panel2)}
+.tier .tt{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tier .tg{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px}
+.tg.premium{background:#3a2e5e;color:#c8b4ff}
+.tg.value{background:#2e4a5e;color:#a8d8ff}
+.tg.factory{background:#5e4a2e;color:#ffd9a8}
+.tier .biz{font-size:14px;font-weight:800}
+.tier .cc{font-size:11px;color:var(--sub);margin-bottom:8px}
+.tier .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px}
+.tier .mt{background:#11161d;border-radius:7px;padding:7px;text-align:center}
+.tier .mt .mv{font-size:13px;font-weight:800;color:var(--accent)}
+.tier .mt .ml{font-size:9px;color:var(--sub);margin-top:2px}
+.tier .fit{font-size:11px;line-height:1.55;color:#c9d3dd}
+.prog{border:1px solid var(--line);border-radius:10px;padding:11px;margin-bottom:9px;background:var(--panel2)}
+.prog .pt{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;margin-bottom:5px}
+.prog .pd{font-size:11px;line-height:1.55;color:var(--sub)}
+.ha{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;margin-left:auto;flex-shrink:0}
+.ha.균형{background:#2e4a5e;color:#a8d8ff}.ha.공생{background:#2e5e44;color:#a8ffcb}.ha.공감{background:#5e2e4a;color:#ffa8d8}
+.subhead{font-size:11px;font-weight:800;color:var(--blue);margin:4px 0 9px;display:flex;align-items:center;gap:6px}
+.subhead.off{color:var(--gold)}
+.gridstat{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.note{font-size:11px;color:var(--sub);line-height:1.5;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px;margin-bottom:12px}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:#2a323d;border-radius:4px}
+</style></head>
+<body>
+<div id="app">
+  <header>
+    <div><div class="logo">Space<b>OS</b> · 고양시 상권 플랫폼</div>
+    <div class="sub">물리적 Place의 Platform화 — PPPP 디지털 트윈</div></div>
+    <div class="spacer"></div>
+    <div class="meta">데이터 기준 2025–2026 · 네이버 지도 좌표 정합<br/>감성/공실: 웹 정성평가 + 라페스타 13.6% 실측 정합</div>
+  </header>
+  <div class="sidebar">
+    <div class="tabs" id="tabs">
+      <div class="tab on" data-layer="platform">Platform<span class="en">상권 감성 지도</span></div>
+      <div class="tab" data-layer="page">Page<span class="en">공실 100m 그리드</span></div>
+      <div class="tab" data-layer="posting">Posting<span class="en">3-Tier 입점</span></div>
+      <div class="tab" data-layer="program">Program<span class="en">마케팅 솔루션</span></div>
+    </div>
+    <div class="sec-t">고양시 상권 (중요도순)</div>
+    <div class="dlist" id="dlist"></div>
+  </div>
+  <div class="mapwrap"><div id="map"></div>
+    <div class="maplegend" id="legend"></div>
+  </div>
+  <div class="panel" id="panel"></div>
+</div>
+<script>
+var DISTRICTS = [{"id": "lafesta", "rank": 1, "name": "라페스타", "gu": "일산동구 장항동", "lat": 37.6586, "lng": 126.7701, "importance": 100, "sentiment": 50, "vacRate": 13.6, "stores": "367개 점포", "flow": "고양 제1상권", "char": "경기북부 최대 번화가였으나 공실 심화·고령화로 활력 저하. SpaceOS 공실 솔루션 1순위 거점.", "kw": ["스트리트형 쇼핑몰", "야간 이벤트", "공실 심화", "고령화"], "pos": ["야간 조명·이벤트", "넓은 보행거리", "교통 편리"], "neg": ["공실·임대 현수막", "한산·칙칙", "고령화"], "platform": {"insta": 66.8, "naver": 71.5, "google": 58.9}, "page": {"rows": 9, "cols": 6, "avg": 13.6, "hotspots": [[6, 4], [7, 5]], "note": "동측·남동측(스트리트 후면부) 공실 핫스팟"}, "posting": {"premium": {"biz": "프리미엄 다이닝 & 루프탑 바", "concept": "야간 경제 앵커", "capex": "2.5억", "rev": "월 6,000만", "payback": "30개월", "fit": "넓은 보행거리·야간 조명 인프라를 활용해 침체 이미지를 반전시키는 앵커 점포"}, "value": {"biz": "무인 셀프 스튜디오·포토부스", "concept": "저인건비 고회전", "capex": "6,000만", "rev": "월 1,200만", "payback": "18개월", "fit": "소형 공실 점포 다수·야간 유동 흡수, 고정비 최소화로 빠른 손익분기"}, "factory": {"biz": "공유주방 배달 제조거점", "concept": "유휴공간의 제조 플랫폼화", "capex": "1.2억", "rev": "월 3,000만(수수료)", "payback": "24개월", "fit": "1층 외 저층·후면 공실을 배달 제조거점으로 전환, 고령 상권 배달 수요 흡수"}}, "program": {"online": [{"t": "'야간 라페스타' 숏폼 캠페인", "d": "야간 조명·이벤트 테마 릴스를 LLM이 주 3회 자동 생성·발행", "ha": "공감"}, {"t": "공실 팝업 모집 랜딩 + 타겟광고", "d": "예비창업자 커뮤니티 대상 공실 팝업 입점 캠페인 자동 운영", "ha": "균형"}], "offline": [{"t": "야간 스트리트 마켓·버스킹 정기화", "d": "금·토 12–18시 피크를 야간까지 연장하는 정기 마켓", "ha": "공생"}, {"t": "세대공감 플리마켓", "d": "고령 1세대 상인 + 청년 셀러 상생 마켓", "ha": "공생"}]}}, {"id": "westerndom", "rank": 2, "name": "웨스턴돔", "gu": "일산동구 장항동", "lat": 37.6608, "lng": 126.7723, "importance": 88, "sentiment": 68, "vacRate": 7.0, "stores": "약 500개 점포(식당 407)", "flow": "요식업 1번지", "char": "라페스타와 연결된 복합몰. '일산 요식업 일번지'로 공실률이 상대적으로 낮고 체류형 콘텐츠 강세.", "kw": ["맛집·요식업 강세", "소품샵", "멀티플렉스", "라페스타 연결"], "pos": ["맛집 다양", "소품샵·볼거리", "영화관 체류"], "neg": ["야외 날씨 영향", "라페스타 침체 여파"], "platform": {"insta": 72.0, "naver": 74.5, "google": 63.0}, "page": {"rows": 8, "cols": 6, "avg": 7.0, "hotspots": [[1, 1]], "note": "상층부 일부 공실, 식음 층 공실 거의 없음"}, "posting": {"premium": {"biz": "오마카세·파인다이닝", "concept": "미식 클러스터 고급화", "capex": "3억", "rev": "월 7,000만", "payback": "30개월", "fit": "검증된 요식 집객력과 체류형 미식 수요 기반"}, "value": {"biz": "백반·분식 로테이션 맛집", "concept": "가성비 점심 회전", "capex": "5,000만", "rev": "월 1,500만", "payback": "15개월", "fit": "점심 직장·가족 수요, 낮은 공실로 빠른 안착"}, "factory": {"biz": "디저트 중앙주방 + 멀티브랜드", "concept": "1제조 N브랜드", "capex": "9,000만", "rev": "월 2,500만", "payback": "20개월", "fit": "영화관·소품샵 체류객 디저트 수요, 멀티브랜드 효율"}}, "program": {"online": [{"t": "407 식당 미식 지도 콘텐츠", "d": "LLM이 식당 큐레이션 카드뉴스·릴스 자동 생성", "ha": "공감"}, {"t": "리뷰 리타게팅 광고", "d": "다이닝코드·인스타 리뷰 기반 재방문 리타게팅", "ha": "균형"}], "offline": [{"t": "웨스턴돔 미식 위크 스탬프투어", "d": "기간 한정 식당 순회 스탬프 이벤트", "ha": "공생"}, {"t": "디너 + 무비 패키지", "d": "멀티플렉스 연계 식사·영화 결합 상품", "ha": "공감"}]}}, {"id": "starfield", "rank": 3, "name": "스타필드 고양·삼송", "gu": "덕양구 동산동", "lat": 37.6479, "lng": 126.8946, "importance": 80, "sentiment": 72, "vacRate": 3.0, "stores": "연면적 13.5만㎡", "flow": "광역 흡인 상권", "char": "신세계 복합몰이 덕양구 광역 소비를 견인. 흡인력이 높으나 인근 가두상권 잠식 효과(GNN 핵심 노드).", "kw": ["복합 쇼핑몰", "트레이더스", "광역 흡인력", "주변 상권 흡수"], "pos": ["먹거리 폭넓음", "아쿠아필드", "무료 주차"], "neg": ["주말 혼잡", "저녁 이후 한산", "주변 상권 잠식"], "platform": {"insta": 73.0, "naver": 75.0, "google": 68.0}, "page": {"rows": 7, "cols": 7, "avg": 3.0, "hotspots": [[5, 0]], "note": "몰 내부 공실 극소, 외곽 가두상권에 공실 전이"}, "posting": {"premium": {"biz": "플래그십 체험형 리테일", "concept": "브랜드 쇼룸", "capex": "4억", "rev": "월 8,000만", "payback": "30개월", "fit": "광역 흡인력·무료주차 기반 체험 소비"}, "value": {"biz": "키즈·패밀리 카페", "concept": "가족 장시간 체류", "capex": "1억", "rev": "월 2,000만", "payback": "18개월", "fit": "패밀리 동선·주말 집객 최적"}, "factory": {"biz": "라이브커머스 스튜디오 + 물류 픽업", "concept": "온·오프 융합 거점", "capex": "1.5억", "rev": "월 3,500만", "payback": "22개월", "fit": "광역 접근성·주차로 온라인 연계 픽업·방송 거점화"}}, "program": {"online": [{"t": "주말 이벤트 캘린더 자동 발행", "d": "가족 체험 콘텐츠·행사 일정 LLM 자동 게시", "ha": "공감"}, {"t": "광역 지오펜싱 광고", "d": "반경 광역 타겟 위치기반 프로모션", "ha": "균형"}], "offline": [{"t": "패밀리데이·키즈 페스타", "d": "아쿠아필드 연계 가족 행사", "ha": "공생"}, {"t": "동산동 로컬존 상생존", "d": "인근 가두상권 입점·홍보로 잠식 완화", "ha": "균형"}]}}, {"id": "hwajeong", "rank": 4, "name": "화정 로데오거리", "gu": "덕양구 화정동", "lat": 37.6345, "lng": 126.8324, "importance": 74, "sentiment": 64, "vacRate": 9.0, "stores": "대형마트·터미널·CGV", "flow": "덕양구 최대 번화가", "char": "화정역 중심 덕양구 최대 번화가. 대형마트·영화관·터미널을 갖춘 안정적 생활형 상권, 외식업 번성.", "kw": ["로데오거리", "대형마트", "화정터미널", "외식 번성"], "pos": ["가성비 맛집 다수", "대형마트·터미널 편의", "유동인구 최다"], "neg": ["노상주차 어려움", "주말 밤 혼잡"], "platform": {"insta": 65.0, "naver": 70.0, "google": 60.0}, "page": {"rows": 9, "cols": 6, "avg": 9.0, "hotspots": [[2, 5], [6, 1]], "note": "로데오 이면도로·구상가 공실 집중"}, "posting": {"premium": {"biz": "루프탑 다이닝 & 와인바", "concept": "로데오 상향 평준화", "capex": "2.3억", "rev": "월 5,500만", "payback": "28개월", "fit": "터미널·CGV 야간 수요, 가성비 일변도 탈피 앵커"}, "value": {"biz": "무한리필·가성비 고깃집", "concept": "회전 극대화", "capex": "7,000만", "rev": "월 1,800만", "payback": "16개월", "fit": "유동인구 최다·가성비 맛집 선호 성향"}, "factory": {"biz": "공유오피스 + 공유주방 복합", "concept": "교통결절 주중 가동", "capex": "1.3억", "rev": "월 2,800만", "payback": "22개월", "fit": "터미널 인접 직장·1인 수요, 주중 가동률 확보"}}, "program": {"online": [{"t": "가성비 맛집 랭킹 콘텐츠", "d": "LLM이 카테고리별 맛집 랭킹 자동 큐레이션", "ha": "공감"}, {"t": "터미널 이용객 쿠폰 푸시", "d": "버스 이용객 타겟 즉시 사용 쿠폰", "ha": "균형"}], "offline": [{"t": "로데오 야시장 + CGV 심야 연계", "d": "심야 영화 관객 야시장 유입", "ha": "공생"}, {"t": "장보기 + 외식 패키지", "d": "대형마트 협업 결합 프로모션", "ha": "공생"}]}}, {"id": "bamridan", "rank": 5, "name": "정발산·밤리단길", "gu": "일산동구 마두동", "lat": 37.6655, "lng": 126.776, "importance": 62, "sentiment": 78, "vacRate": 5.0, "stores": "감성 카페·소형 점포", "flow": "SNS 핫플레이스", "char": "빈티지·감성 카페가 모인 SNS 핫플('보넷길'→밤리단길). 감성 점수 최고, 감성 디지털 트윈 최적.", "kw": ["밤리단길", "감성 카페", "빈티지", "SNS 핫플"], "pos": ["감성 카페", "빈티지·낭만", "SNS 인증"], "neg": ["주차 협소", "소형 점포 변동성"], "platform": {"insta": 82.0, "naver": 78.0, "google": 70.0}, "page": {"rows": 8, "cols": 5, "avg": 5.0, "hotspots": [[7, 4]], "note": "골목 안쪽 소형 점포 변동성, 핵심 골목 공실 거의 없음"}, "posting": {"premium": {"biz": "시그니처 로스터리 & 갤러리카페", "concept": "감성 브랜딩 고단가", "capex": "2억", "rev": "월 4,500만", "payback": "26개월", "fit": "SNS 인증·감성 키워드 최고 상권, 고단가 가능"}, "value": {"biz": "소형 디저트·테이크아웃", "concept": "골목 회전", "capex": "4,500만", "rev": "월 1,100만", "payback": "16개월", "fit": "보행 골목·인증샷 수요, 소형 점포 최적"}, "factory": {"biz": "로컬 브랜드 공유 쇼룸·팝업", "concept": "회전형 임대", "capex": "8,000만", "rev": "월 2,000만", "payback": "20개월", "fit": "빈티지·로컬 감성, 팝업 회전으로 공실 최소화"}}, "program": {"online": [{"t": "감성 인증샷 UGC 콘테스트", "d": "LLM 캡션·해시태그 추천 결합 UGC 이벤트", "ha": "공감"}, {"t": "블로그 감성 키워드 SEO 자동화", "d": "감성 키워드 추출·콘텐츠 자동 발행", "ha": "공감"}], "offline": [{"t": "밤리단길 아트마켓·소규모 전시", "d": "감성 분위기와 일치하는 전시·마켓", "ha": "공생"}, {"t": "로컬 작가·소품샵 팝업 릴레이", "d": "공실을 활용한 릴레이 팝업", "ha": "균형"}]}}, {"id": "baekseok", "rank": 6, "name": "백석·요진", "gu": "일산동구 백석동", "lat": 37.6432, "lng": 126.7896, "importance": 55, "sentiment": 62, "vacRate": 10.0, "stores": "오피스+상업 복합", "flow": "직장인 배후수요", "char": "요진 와이시티 등 오피스·주거 혼합 백석역 일대. 직장인 평일 수요가 견고, 페르소나 데이터 확보 유리.", "kw": ["요진 와이시티", "오피스 상권", "직장인", "평일 수요"], "pos": ["벨라시타·코스트코·교보문고", "직장인 평일 수요", "교통·치안"], "neg": ["주말 한산", "주거·상업 혼재"], "platform": {"insta": 60.0, "naver": 66.0, "google": 58.0}, "page": {"rows": 9, "cols": 6, "avg": 10.0, "hotspots": [[3, 0], [8, 3]], "note": "오피스 저층부·주말 의존 점포 공실"}, "posting": {"premium": {"biz": "비즈니스 다이닝 & 미팅 라운지", "concept": "법인 수요", "capex": "2.2억", "rev": "월 5,000만", "payback": "28개월", "fit": "와이시티 오피스·법인카드 수요 기반"}, "value": {"biz": "직장인 백반·샐러드 구독", "concept": "점심 집중", "capex": "5,500만", "rev": "월 1,400만", "payback": "16개월", "fit": "평일 직장 점심 수요 견고"}, "factory": {"biz": "공유주방(배달+구내식 위탁)", "concept": "B2B 급식", "capex": "1.1억", "rev": "월 3,000만", "payback": "22개월", "fit": "오피스 밀집 배달·위탁 수요"}}, "program": {"online": [{"t": "직장인 점심 예약·구독 콘텐츠", "d": "런치 메뉴 구독 자동 안내", "ha": "균형"}, {"t": "평일 런치타임 타겟 광고", "d": "오피스 반경 점심시간 푸시", "ha": "균형"}], "offline": [{"t": "오피스 연계 푸드트럭 데이", "d": "빌딩 광장 푸드트럭 정기 운영", "ha": "공생"}, {"t": "애프터워크 네트워킹 이벤트", "d": "직장인 퇴근 후 상권 체류 유도", "ha": "공생"}]}}, {"id": "haengsin", "rank": 7, "name": "행신", "gu": "덕양구 행신동", "lat": 37.612, "lng": 126.8345, "importance": 48, "sentiment": 62, "vacRate": 9.0, "stores": "백화점·대형상가", "flow": "주거 밀착 상권", "char": "백화점·대형상가가 들어선 주거 밀착형 상권. KTX 행신역 접근성으로 배후수요 안정, 생활형 베이스라인.", "kw": ["행신역(KTX)", "주거 밀착", "먹자골목", "배후 안정"], "pos": ["먹자골목·다양한 맛집", "상가 재건축", "KTX 접근성"], "neg": ["역세권 주차 제한", "광역 흡인력 약함"], "platform": {"insta": 61.0, "naver": 66.0, "google": 58.0}, "page": {"rows": 8, "cols": 6, "avg": 9.0, "hotspots": [[5, 5]], "note": "역 이면 구상가 공실, 먹자골목 공실 낮음"}, "posting": {"premium": {"biz": "동네 프리미엄 한우·오마카세", "concept": "주거 상향 외식", "capex": "2억", "rev": "월 4,500만", "payback": "27개월", "fit": "안정 배후·가족 외식 상향 수요"}, "value": {"biz": "먹자골목 가성비 술집·분식", "concept": "야간 회전", "capex": "5,000만", "rev": "월 1,300만", "payback": "15개월", "fit": "먹자골목·주거 야간 수요"}, "factory": {"biz": "반찬·밀키트 제조 직판", "concept": "생활 밀착 제조", "capex": "8,500만", "rev": "월 2,200만", "payback": "20개월", "fit": "주거 배후 식자재 수요, KTX 픽업 연계"}}, "program": {"online": [{"t": "동네 맛집 가족 콘텐츠", "d": "가족 외식 코스 LLM 자동 큐레이션", "ha": "공감"}, {"t": "KTX 이용객 픽업 프로모션", "d": "열차 이용객 테이크아웃·픽업 타겟", "ha": "균형"}], "offline": [{"t": "먹자골목 야간 페스타", "d": "주거·야간 수요 집객 행사", "ha": "공생"}, {"t": "반찬·밀키트 장터", "d": "주거단지 연계 생활 장터", "ha": "공생"}]}}, {"id": "juyeop", "rank": 8, "name": "주엽·대화", "gu": "일산서구 주엽동", "lat": 37.6705, "lng": 126.7615, "importance": 42, "sentiment": 58, "vacRate": 11.0, "stores": "호수공원 인근·학원가", "flow": "주거·학원 수요", "char": "일산호수공원 배후 주거·학원 상권. 후곡 학원가는 경기 2위 사교육 중심지로 견고하나 중심 상권 이동으로 침체.", "kw": ["호수공원 인접", "주거 상권", "학원가", "가족 단위"], "pos": ["후곡 학원가(경기 2위)", "호수공원 인접", "금융기관 건재"], "neg": ["중심상권 정발산 이동", "이용객 감소", "야간 활력 낮음"], "platform": {"insta": 58.0, "naver": 63.0, "google": 55.0}, "page": {"rows": 9, "cols": 6, "avg": 11.0, "hotspots": [[1, 4], [7, 2]], "note": "중심상권 이동에 따른 노후 점포 공실 확대"}, "posting": {"premium": {"biz": "호수뷰 브런치·디저트", "concept": "가족·주말", "capex": "2.1억", "rev": "월 4,200만", "payback": "28개월", "fit": "호수공원 산책 수요·주말 가족"}, "value": {"biz": "학원가 분식·스터디카페", "concept": "학생·학부모", "capex": "5,000만", "rev": "월 1,200만", "payback": "16개월", "fit": "후곡 학원가(경기 2위) 고정 수요"}, "factory": {"biz": "무인 스터디카페 + 공유 자습실", "concept": "저인건비 무인", "capex": "9,000만", "rev": "월 1,800만", "payback": "18개월", "fit": "학원가 자습 수요, 무인 운영 효율"}}, "program": {"online": [{"t": "호수공원 산책+카페 코스 콘텐츠", "d": "주말 가족 코스 LLM 자동 발행", "ha": "공감"}, {"t": "학부모 타겟 정보 콘텐츠", "d": "학원가 학부모 대상 정보·프로모션", "ha": "균형"}], "offline": [{"t": "호수공원 연계 주말 플리마켓", "d": "공원 산책객 상권 유입", "ha": "공생"}, {"t": "시험기간 응원 상생 이벤트", "d": "학생 대상 응원·할인 캠페인", "ha": "공감"}]}}];
+var layer='platform', curId='lafesta';
+var map=L.map('map',{zoomControl:true,attributionControl:false}).setView([37.652,126.81],12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+var pinLayer=L.layerGroup().addTo(map), gridLayer=L.layerGroup().addTo(map);
+
+function d(id){return DISTRICTS.find(function(x){return x.id===id});}
+function sentColor(s){var t=Math.max(0,Math.min(1,(s-45)/40));var r,g,b;
+  if(t<.5){var k=t/.5;r=232+(232-232)*k;g=93+(193-93)*k;b=93+(93-93)*k;}
+  else{var k=(t-.5)/.5;r=232+(77-232)*k;g=193+(208-193)*k;b=93+(167-93)*k;}
+  return 'rgb('+(r|0)+','+(g|0)+','+(b|0)+')';}
+function vacColor(v){var t=Math.max(0,Math.min(1,v/25));var r,g,b;
+  if(t<.5){var k=t/.5;r=77+(232-77)*k;g=208+(193-208)*k;b=167+(93-167)*k;}
+  else{var k=(t-.5)/.5;r=232+(200-232)*k;g=193+(40-193)*k;b=93+(40-93)*k;}
+  return 'rgb('+(r|0)+','+(g|0)+','+(b|0)+')';}
+function mul(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+function renderPins(){pinLayer.clearLayers();
+  DISTRICTS.forEach(function(x){
+    var col=layer==='page'?vacColor(x.page.avg):sentColor(x.sentiment);
+    var rad=8+x.importance/12;
+    var m=L.circleMarker([x.lat,x.lng],{radius:rad,fillColor:col,color:x.id===curId?'#fff':'rgba(255,255,255,.5)',weight:x.id===curId?3:1.3,fillOpacity:.82});
+    m.on('click',function(){select(x.id);});
+    m.bindTooltip(x.rank+'. '+x.name,{direction:'top',offset:[0,-rad]});
+    m.addTo(pinLayer);
+  });}
+
+function renderGrid(){gridLayer.clearLayers();
+  if(layer!=='page'){return;}
+  var x=d(curId),p=x.page;
+  var dLat=0.0009, dLng=0.001134;
+  var r0=x.lat+(p.rows/2)*dLat, c0=x.lng-(p.cols/2)*dLng;
+  var rnd=mul(x.rank*9301+49297);
+  for(var i=0;i<p.rows;i++)for(var j=0;j<p.cols;j++){
+    var v=p.avg+(rnd()*2-1)*p.avg*0.55;
+    p.hotspots.forEach(function(h){var dist=Math.abs(h[0]-i)+Math.abs(h[1]-j);if(dist<=1)v+=(2-dist)*9;});
+    v=Math.max(0,v);
+    var lat1=r0-i*dLat, lat2=lat1-dLat, lng1=c0+j*dLng, lng2=lng1+dLng;
+    var rect=L.rectangle([[lat2,lng1],[lat1,lng2]],{color:'#0e1117',weight:.6,fillColor:vacColor(v),fillOpacity:.62});
+    rect.bindTooltip('공실률 '+v.toFixed(1)+'%'+(v>=20?' ⚠ 위험':''),{sticky:true});
+    rect.addTo(gridLayer);
+  }
+  map.setView([x.lat,x.lng],16);
+}
+
+function bar(lab,val,col){return '<div class="bar"><div class="lab">'+lab+'</div><div class="track"><div class="fill" style="width:'+val+'%;background:'+col+'"></div></div><div class="num">'+val+'</div></div>';}
+
+function renderPanel(){var x=d(curId);var h='';
+  h+='<div class="p-head"><span class="p-badge">'+layerLabel()+'</span><span class="p-title">'+x.name+'</span></div>';
+  h+='<div class="p-gu">'+x.gu+' · '+x.flow+'</div>';
+  h+='<div class="p-char">'+x.char+'</div>';
+  if(layer==='platform'){
+    h+='<div class="kpis"><div class="kpi"><div class="v">'+x.sentiment+'</div><div class="l">감성 점수</div></div>'
+      +'<div class="kpi"><div class="v">'+x.vacRate+'%</div><div class="l">공실률</div></div>'
+      +'<div class="kpi"><div class="v">'+x.importance+'</div><div class="l">중요도</div></div></div>';
+    h+='<div class="block"><h4>플랫폼별 감성 수집</h4>'
+      +bar('인스타',x.platform.insta,'#e1306c')+bar('네이버',x.platform.naver,'#03c75a')+bar('구글',x.platform.google,'#5aa9ff')+'</div>';
+    h+='<div class="block"><h4>긍정 신호</h4><div class="chips">'+x.pos.map(function(k){return '<span class="chip pos">'+k+'</span>';}).join('')+'</div></div>';
+    h+='<div class="block"><h4>부정 신호 (개선 과제)</h4><div class="chips">'+x.neg.map(function(k){return '<span class="chip neg">'+k+'</span>';}).join('')+'</div></div>';
+  } else if(layer==='page'){
+    var p=x.page; var total=p.rows*p.cols;
+    h+='<div class="gridstat"><div class="kpi"><div class="v">'+p.avg+'%</div><div class="l">평균 공실률</div></div>'
+      +'<div class="kpi"><div class="v">'+p.rows+'×'+p.cols+'</div><div class="l">100m 그리드 ('+total+'셀)</div></div></div>';
+    h+='<div class="note"><b>핫스팟:</b> '+p.note+'<br/>각 셀 = 100m×100m. 공실률 ≥20% 셀은 위험(적색)으로 표시되며, 마우스를 올리면 셀별 수치를 확인할 수 있습니다. 지도는 네이버 지도 좌표에 정합됩니다.</div>';
+    h+='<div class="block"><h4>공실 분포 해석</h4><div class="prog"><div class="pd">평균 '+p.avg+'%를 기준으로 핫스팟 인접 셀에 공실이 집중됩니다. SpaceOS는 이 그리드를 Posting(입점 추천) 우선순위 산정의 입력값으로 사용합니다 — 위험 셀일수록 입점 인센티브·임대 협상 여지가 큽니다.</div></div></div>';
+  } else if(layer==='posting'){
+    var ps=x.posting; var tiers=[['premium','고급화',ps.premium],['value','가성비',ps.value],['factory','공장제',ps.factory]];
+    h+='<div class="block"><h4>3-Tier 공실 입점 추천</h4>';
+    tiers.forEach(function(t){var o=t[2];
+      h+='<div class="tier"><div class="tt"><span class="tg '+t[0]+'">'+t[1]+'</span><span class="biz">'+o.biz+'</span></div>'
+        +'<div class="cc">'+o.concept+'</div>'
+        +'<div class="grid3"><div class="mt"><div class="mv">'+o.capex+'</div><div class="ml">초기 투자</div></div>'
+        +'<div class="mt"><div class="mv">'+o.rev+'</div><div class="ml">예상 매출</div></div>'
+        +'<div class="mt"><div class="mv">'+o.payback+'</div><div class="ml">회수 기간</div></div></div>'
+        +'<div class="fit">▸ '+o.fit+'</div></div>';
+    });
+    h+='</div>';
+  } else if(layer==='program'){
+    var pr=x.program;
+    h+='<div class="block"><div class="subhead">◈ 온라인 — LLM 콘텐츠 자동화</div>';
+    pr.online.forEach(function(o){h+='<div class="prog"><div class="pt">'+o.t+'<span class="ha '+o.ha+'">'+o.ha+'</span></div><div class="pd">'+o.d+'</div></div>';});
+    h+='</div><div class="block"><div class="subhead off">◈ 오프라인 — 행사·팝업 기획</div>';
+    pr.offline.forEach(function(o){h+='<div class="prog"><div class="pt">'+o.t+'<span class="ha '+o.ha+'">'+o.ha+'</span></div><div class="pd">'+o.d+'</div></div>';});
+    h+='</div><div class="note"><b>Humanistic Authority:</b> 균형(공정한 기회 배분) · 공생(상인·건물주·소비자 상호작용) · 공감(상권 고유 분위기와 일치). 모든 Program은 위 3대 지표를 만족하도록 설계됩니다.</div>';
+  }
+  document.getElementById('panel').innerHTML=h;
+}
+function layerLabel(){return {platform:'PLATFORM',page:'PAGE',posting:'POSTING',program:'PROGRAM'}[layer];}
+
+function renderLegend(){var el=document.getElementById('legend');
+  if(layer==='page'){el.innerHTML='<b style="color:#e6edf3">공실률 (100m 그리드)</b>'
+    +'<div class="row"><span class="sw" style="background:'+vacColor(2)+'"></span>낮음 0–8%</div>'
+    +'<div class="row"><span class="sw" style="background:'+vacColor(13)+'"></span>주의 8–20%</div>'
+    +'<div class="row"><span class="sw" style="background:'+vacColor(23)+'"></span>위험 ≥20%</div>';}
+  else{el.innerHTML='<b style="color:#e6edf3">감성 점수 · 중요도</b>'
+    +'<div class="row"><span class="sw" style="background:'+sentColor(50)+'"></span>낮음</div>'
+    +'<div class="row"><span class="sw" style="background:'+sentColor(65)+'"></span>중간</div>'
+    +'<div class="row"><span class="sw" style="background:'+sentColor(80)+'"></span>높음</div>'
+    +'<div class="row" style="margin-top:6px;color:#9aa7b4">원 크기 = 상권 중요도</div>';}
+}
+
+function renderList(){var el=document.getElementById('dlist');el.innerHTML='';
+  DISTRICTS.forEach(function(x){var col=layer==='page'?vacColor(x.page.avg):sentColor(x.sentiment);
+    var div=document.createElement('div');div.className='ditem'+(x.id===curId?' on':'');
+    div.innerHTML='<div class="rk">'+x.rank+'</div><div><div class="nm">'+x.name+'</div><div class="gu">'+x.gu+'</div></div><div class="dot" style="background:'+col+'"></div>';
+    div.onclick=function(){select(x.id);};el.appendChild(div);
+  });}
+
+function select(id){curId=id;renderList();renderPins();renderGrid();renderPanel();
+  if(layer!=='page'){var x=d(id);map.setView([x.lat,x.lng],14);}}
+function setLayer(l){layer=l;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.layer===l);});
+  renderList();renderPins();renderLegend();
+  if(l==='page'){renderGrid();}else{gridLayer.clearLayers();var x=d(curId);map.setView([x.lat,x.lng],l==='platform'?12:14);}
+  renderPanel();}
+
+document.querySelectorAll('.tab').forEach(function(t){t.onclick=function(){setLayer(t.dataset.layer);};});
+renderList();renderPins();renderLegend();renderPanel();
+map.setView([37.652,126.81],12);
+</script>
+</body></html>

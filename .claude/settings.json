@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(pytest:*)",
+      "Bash(pip install:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(uvicorn:*)",
+      "Bash(docker compose:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git add:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Read(./apps/backend/.env)",
+      "Read(./**/.env)"
+    ]
+  }
+}

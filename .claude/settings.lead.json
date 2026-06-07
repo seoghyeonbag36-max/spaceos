@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(apps/**)",
+      "Edit(ml/**)",
+      "Edit(data/**)",
+      "Edit(design/**)",
+      "Edit(docs/**)",
+      "Edit(.claude/**)",
+      "Bash(python:*)",
+      "Bash(pytest:*)",
+      "Bash(pip install:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(uvicorn:*)",
+      "Bash(docker compose:*)",
+      "Bash(grep:*)",
+      "Bash(mlflow:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Read(./**/.env)",
+      "Bash(rm -rf:*)",
+      "Bash(git push:*)"
+    ]
+  },
+  "env": { "PYTHONUNBUFFERED": "1" }
+}

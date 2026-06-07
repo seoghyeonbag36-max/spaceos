@@ -1,0 +1,22 @@
+/* 디자인 토큰 — CSS 변수 (Tailwind 미사용 영역/지도 오버레이용) */
+/* TODO: Pretendard 폰트 public/fonts 에 배치 후 @font-face 연결 */
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Regular.woff2") format("woff2");
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Bold.woff2") format("woff2");
+  font-weight: 700; font-display: swap;
+}
+:root {
+  --naver-green: #03C75A; --naver-green-pressed: #02B350;
+  --brand: #0EA5B7; --brand-pressed: #0B8294;
+  --ink: #1C2533; --muted: #6B7280; --line: #E3E9F2; --surface: #FFFFFF; --bg: #F4F7FB;
+  --radius-md: 12px; --radius-lg: 16px;
+  --shadow-card: 0 1px 3px rgba(11,27,51,.08), 0 4px 12px rgba(11,27,51,.06);
+  --shadow-sheet: 0 -4px 24px rgba(11,27,51,.12);
+  --font-sans: "Pretendard", system-ui, sans-serif;
+}
+html, body { font-family: var(--font-sans); color: var(--ink); background: var(--bg); }

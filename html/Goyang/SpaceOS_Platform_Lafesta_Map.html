@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS · Platform · 라페스타·웨스턴돔 감성 지도 v4</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+ --bg:#eef1f4;--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;
+ --good:#4f7a31;--goodbg:#e3ecd7;--ok:#9a7b1e;--okbg:#f1ead6;
+ --warn:#b23b39;--warnbg:#f6dcdc;--best:#3a5a98;--bestbg:#dde6f5;
+ --green:#3f7d3f;--blue:#3a5a98;
+ /* 네이버 지도 팔레트 */
+ --nv-land:#f7f6f2;--nv-road:#ffffff;--nv-road-case:#e3e0d8;--nv-arter:#fbe7a6;
+ --nv-arter-case:#e9cf73;--nv-park:#d9ead0;--nv-water:#cfe3f0;--nv-bldg:#ece9e2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);padding:22px;line-height:1.4}
+.wrap{max-width:1180px;margin:0 auto}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.hd .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+.hd h1{font-size:30px;font-weight:800;margin:6px 0 5px;letter-spacing:-.5px}
+.hd .sub{font-size:13px;color:var(--sub)}
+.hd .rt{display:flex;gap:8px;align-items:center}
+.chip{font-size:12px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:7px 13px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.chip.live{color:var(--green);border-color:#cfe3cf;background:#f1f8f1;font-weight:600}
+.chip.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(63,125,63,.18)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+.kpi .l{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.kpi .v{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.kpi .v small{font-size:13px;font-weight:700;color:var(--green);margin-left:5px}
+.kpi .d{font-size:11px;color:var(--sub);margin-top:6px}
+.kpi .pbar{height:6px;border-radius:4px;background:#eceff2;margin-top:9px;overflow:hidden;display:flex}
+.kpi .pbar i{display:block;height:100%}
+.cols{display:grid;grid-template-columns:1.55fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px 18px;margin-bottom:14px}
+.card .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.card .ch h2{font-size:16px;font-weight:800}
+.card .ch .hint{font-size:11px;color:#9aa3af}
+#map{height:540px;border-radius:12px;border:1px solid var(--line);z-index:1;background:var(--nv-land)}
+.leaflet-container{background:var(--nv-land)}
+.legb{display:flex;gap:14px;justify-content:center;margin-top:13px;flex-wrap:wrap}
+.legb span{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.legb i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.mlbl{font-size:11px;font-weight:800;color:#1f2937;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.poi{font-size:10.5px;font-weight:700;color:#7b8794;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.poi.sta{color:#c0504a}.poi.park{color:#4f7a31}
+.lpop b{font-weight:800}
+.lpop .ps{font-size:18px;font-weight:800}
+.detail .top{display:flex;justify-content:space-between;align-items:flex-start}
+.detail .znm{font-size:18px;font-weight:800}
+.detail .zlab{font-size:11px;color:var(--sub)}
+.detail .zsc{font-size:30px;font-weight:800;text-align:right;line-height:1}
+.detail .zrisk{font-size:11px;text-align:right;margin-top:3px;font-weight:600}
+.detail .fct{margin-top:14px}
+.detail .fct .ft{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:9px}
+.fr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+.fr b{font-weight:700}.fr .up{color:var(--warn)}.fr .dn{color:var(--blue)}
+.btn{width:100%;margin-top:14px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;padding:11px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{background:#3a5a98;color:#fff;border-color:#3a5a98}
+.plat{display:flex;flex-direction:column;gap:14px}
+.prow .pt{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;margin-bottom:5px}
+.prow .pt .nm{display:flex;align-items:center;gap:7px}
+.prow .pt .ic{width:16px;height:16px;border-radius:4px;display:inline-block}
+.prow .pbar{height:7px;border-radius:5px;background:#eceff2;overflow:hidden}
+.prow .pbar i{display:block;height:100%;border-radius:5px}
+.prow .ps{font-size:11px;color:var(--sub);margin-top:4px}
+.per{display:flex;flex-direction:column;gap:11px}
+.prr .pt{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:4px}
+.prr .pt .nm{display:flex;align-items:center;gap:7px}
+.prr .pt .dt{width:9px;height:9px;border-radius:50%}
+.prr .bar{height:8px;border-radius:5px;background:#eceff2;overflow:hidden}
+.prr .bar i{display:block;height:100%;border-radius:5px}
+.opp{margin-top:13px;background:#f4f8f4;border:1px solid #d8e8d8;border-radius:10px;padding:11px 13px;font-size:12px;color:#3f6b3f;line-height:1.6}
+.opp b{color:#2f5a2f}
+.foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:18px;line-height:1.6}
+.nvbadge{position:absolute;right:10px;bottom:8px;z-index:500;background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:10px;color:#9aa3af}
+.maphost{position:relative}
+@media(max-width:920px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}#map{height:440px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <div class="ey">SPACEOS · PLATFORM · 상권 감성 지도 v4.0 (네이버 지도 정합)</div>
+      <h1>일산 라페스타 · 웨스턴돔</h1>
+      <div class="sub">고양시 일산동구 장항동 · 정발산역 일대 · 네이버 지도 도로·구역 정합 · 8개 구역 · 312개 점포 · LSTM v3.2</div>
+    </div>
+    <div class="rt">
+      <div class="chip">📍 정발산역(3호선)</div>
+      <div class="chip live"><span id="liverate">47</span>건/s</div>
+    </div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="cols">
+    <div class="left">
+      <div class="card">
+        <div class="ch"><h2>네이버 지도 정합 감성 히트맵</h2><div class="hint">원 크기=리뷰량 · 색=감성점수 · 마커 클릭 → 상세</div></div>
+        <div class="maphost"><div id="map"></div><div class="nvbadge">베이스: 네이버 지도 스타일 정합 · 키 발급 시 실타일 교체</div></div>
+        <div class="legb">
+          <span><i style="background:#d9716a"></i>위험 0-40</span>
+          <span><i style="background:#e3b95e"></i>주의 40-60</span>
+          <span><i style="background:#7faa55"></i>양호 60-80</span>
+          <span><i style="background:#3a5a98"></i>우수 80+</span>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="card detail" id="detail"></div>
+      <div class="card">
+        <div class="ch"><h2>플랫폼별 수집 현황</h2></div>
+        <div class="plat" id="plat"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><h2>방문 페르소나 매칭</h2><div class="hint">통신사·카드사 · 10만 표본</div></div>
+        <div class="per" id="per"></div>
+        <div class="opp" id="opp"></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">SpaceOS Digital Twin Platform · 프로토타입 · 좌표는 네이버 지도 기준 라페스타(37.6586,126.7701)·웨스턴돔(37.6608,126.7723)·정발산역(37.6595,126.7741) 정합. 도로·공원·구역 형상은 네이버 지도 장항동 일대를 정합한 벡터 레이어입니다. 감성/리뷰 수치는 라페스타 공실 13.6%(실측)를 기준으로 한 시뮬레이션이며 크롤링·LBS·카드사 실데이터 연동 시 자동 갱신됩니다.</div>
+</div>
+<script>
+function fgHex(s){return s<40?'#d9716a':s<60?'#e3b95e':s<80?'#7faa55':'#3a5a98';}
+function fg(s){return s<40?'var(--warn)':s<60?'var(--ok)':s<80?'var(--good)':'var(--best)';}
+function arrow(d){return d>0?'↑'+d.toFixed(1):d<0?'↓'+Math.abs(d).toFixed(1):'→'+d.toFixed(1);}
+function rev(n){return n>=1000?(n/1000).toFixed(1)+'K':n;}
+
+var kpis=[
+ {l:'😊 상권 감성 지수',v:'62.4',plus:'+1.2'},
+ {l:'🗂 수집된 리뷰',v:'6,697',d:'이번 주 +827건'},
+ {l:'👍 긍정 비율',v:'68.2%',bar:[['#4f7a31',68.2],['#cfd5db',20],['#c98b86',11.8]]},
+ {l:'⚠ 공실 리스크 구역',v:'3',vsuf:'개',d:'감성점수 40 미만'},
+ {l:'⚙ AI 예측 신뢰도',v:'91.4%',d:'LSTM v3.2 · 7일',blue:true},
+];
+document.getElementById('kpis').innerHTML=kpis.map(function(k){
+ var v='<div class="v"'+(k.blue?' style="color:var(--blue)"':'')+'>'+k.v+(k.vsuf?'<small style="color:var(--sub);font-weight:700">'+k.vsuf+'</small>':'')+(k.plus?'<small>'+k.plus+'</small>':'')+'</div>';
+ var extra='';
+ if(k.bar)extra='<div class="pbar">'+k.bar.map(function(b){return '<i style="background:'+b[0]+';width:'+b[1]+'%"></i>';}).join('')+'</div>';
+ if(k.d)extra+='<div class="d">'+k.d+'</div>';
+ return '<div class="kpi"><div class="l">'+k.l+'</div>'+v+extra+'</div>';
+}).join('');
+
+// 실제 좌표 기반 구역 (라페스타: NW-SE 스트리트형 보행로 / 웨스턴돔: 정발산역측 복합몰)
+var zones=[
+ {id:'laf-jm',n:'라페스타 정문광장',grp:'라페스타',lat:37.65945,lng:126.76935,s:74.2,d:1.8,r:856,
+  f:[['인스타 노출량','+58%','up'],['주말 유입 증가','+33%','up'],['이벤트 언급','+21%','up']]},
+ {id:'laf-cc',n:'라페스타 중앙상가',grp:'라페스타',lat:37.65880,lng:126.77010,s:68.4,d:-0.6,r:1900,
+  f:[['공실 점포 언급','+44%','up'],['가격 만족도','-12%','dn'],['브랜드 다양성','+8%','up']]},
+ {id:'laf-rt',n:'라페스타 레스토랑거리',grp:'라페스타',lat:37.65820,lng:126.77085,s:76.8,d:2.4,r:1100,
+  f:[['맛집 재방문 의향','+61%','up'],['웨이팅 불만','+19%','up'],['SNS 인증샷','+47%','up']]},
+ {id:'laf-pk',n:'라페스타 후면주차장',grp:'라페스타',lat:37.65775,lng:126.77150,s:38.9,d:-4.2,r:287,
+  f:[['주차 불편 언급','+276%','up'],['야간 안전 우려','+148%','up'],['접근성 평가','-39%','dn']]},
+ {id:'laf-cv',n:'라페스타 편의시설',grp:'라페스타',lat:37.65845,lng:126.76960,s:65.3,d:0.2,r:642,
+  f:[['생활 편의 만족','+27%','up'],['노후 시설 지적','+31%','up'],['청결도 언급','+14%','up']]},
+ {id:'wes-1',n:'웨스턴돔 1F (요식)',grp:'웨스턴돔',lat:37.66055,lng:126.77205,s:62.1,d:0.4,r:824,
+  f:[['F&B 만족도','+22%','up'],['혼잡도 불만','+18%','up'],['접근 편의','+6%','up']]},
+ {id:'wes-2',n:'웨스턴돔 2F',grp:'웨스턴돔',lat:37.66085,lng:126.77245,s:43.7,d:-2.1,r:412,
+  f:[['공실 확대 언급','+187%','up'],['동선 혼란','+92%','up'],['체류시간','-28%','dn']]},
+ {id:'wes-3',n:'웨스턴돔 3F',grp:'웨스턴돔',lat:37.66110,lng:126.77285,s:31.5,d:-5.8,r:168,
+  f:[['관리필요 키워드','+312%','up'],['접근불편 언급','+184%','up'],['인스타 노출량','-47%','dn']]},
+];
+var allz={};zones.forEach(function(z){allz[z.id]=z;});
+
+var map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,minZoom:15,maxZoom:18}).setView([37.65945,126.77110],16);
+
+/* ===========================================================
+ *  [2단계] 네이버 실타일 버전은 별도 파일로 완성됨:
+ *    → SpaceOS_Platform_Lafesta_Map_Naver.html (ncpKeyId=9nbzrvj8qj)
+ *  NCP 콘솔 Web 서비스 URL 에 http://localhost:5173 등록 후
+ *  localhost 서버에서 열면 실제 네이버 타일이 표시됨.
+ *  (참고: 정적타일 PoC 옵션)
+ *
+ *  L.tileLayer('https://map.pstatic.net/nrb/styles/basic/{z}/{x}/{y}.png?mt=bg.ol.sw',
+ *    {maxZoom:19}).addTo(map);   // (정적 타일 PoC)
+ *  // 또는 React 통합 시 apps/frontend/src/lib/naverMap.ts 의 maps.js?ncpKeyId= 사용
+ *  ※ 그 전까지는 아래 'CartoCDN positron(라이트) + 네이버 스타일 벡터' 베이스를 사용.
+ * =========================================================== */
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
+  {maxZoom:19,subdomains:'abcd',opacity:.55}).addTo(map);
+
+// ---- 네이버 지도 스타일 벡터 베이스 레이어 (장항동 일대 정합) ----
+function fill(coords,color,op,line,lw){L.polygon(coords,{color:line||color,weight:lw||0,opacity:.5,fillColor:color,fillOpacity:op}).addTo(map);}
+function road(coords,color,w,case_,cw){
+ if(case_)L.polyline(coords,{color:case_,weight:cw||w+3,opacity:.9,lineCap:'round',lineJoin:'round'}).addTo(map);
+ L.polyline(coords,{color:color,weight:w,opacity:1,lineCap:'round',lineJoin:'round'}).addTo(map);
+}
+
+// 정발산 근린공원 / 일산문화공원 (동측 녹지)
+fill([[37.6618,126.7738],[37.6628,126.7762],[37.6612,126.7780],[37.6598,126.7772],[37.6600,126.7748]],'#d9ead0',.85);
+// 호수공원 북측 경계(남측 녹지 힌트)
+fill([[37.6560,126.7690],[37.6566,126.7730],[37.6548,126.7742],[37.6542,126.7700]],'#d9ead0',.7);
+
+// 간선도로: 중앙로(북측 E-W), 호수로(남측), 정발산로(동측 N-S)
+road([[37.6606,126.7660],[37.6612,126.7710],[37.6616,126.7762],[37.6618,126.7810]],'#fbe7a6',6,'#e9cf73',9); // 중앙로
+road([[37.6568,126.7665],[37.6572,126.7715],[37.6574,126.7770],[37.6575,126.7815]],'#fbe7a6',5,'#e9cf73',8); // 호수로
+road([[37.6585,126.7748],[37.6612,126.7745],[37.6635,126.7742]],'#ffffff',4,'#e3e0d8',6); // 정발산로
+road([[37.6588,126.7672],[37.6586,126.7720],[37.6584,126.7772]],'#ffffff',4,'#e3e0d8',6); // 장항로(서측 N-S)
+
+// 라페스타 보행 스트리트 스파인 (A~F동, NW→SE)
+road([[37.65960,126.76920],[37.65885,126.77005],[37.65820,126.77090],[37.65775,126.77150]],'#ffffff',5,'#d7d2c6',8);
+// 라페스타 블록(보행로 양옆 상가 매스)
+fill([[37.65975,126.76905],[37.65905,126.76985],[37.65760,126.77140],[37.65745,126.77120],[37.65895,126.76960],[37.65960,126.76890]],'#ece9e2',.7);
+fill([[37.65945,126.76945],[37.65800,126.77110],[37.65790,126.77160],[37.65760,126.77170],[37.65880,126.77020],[37.65935,126.76955]],'#ece9e2',.7);
+
+// 웨스턴돔 복합몰 매스 (정발산역 남서측 블록)
+fill([[37.66035,126.77185],[37.66130,126.77300],[37.66100,126.77335],[37.66005,126.77220]],'#e7e2d6',.8,'#cdbf9e',1);
+
+// 정발산역(3호선) 위치 마커
+L.circleMarker([37.65950,126.77415],{radius:6,color:'#fff',weight:2,fillColor:'#c0504a',fillOpacity:1}).addTo(map)
+ .bindTooltip('<div class="poi sta">◉ 정발산역</div>',{permanent:true,direction:'right',offset:[6,0],opacity:1,className:'ptt'});
+
+// 보조 POI 라벨
+function poi(lat,lng,txt,cls){L.marker([lat,lng],{icon:L.divIcon({className:'',html:'<div class="poi '+(cls||'')+'">'+txt+'</div>',iconSize:[0,0]})}).addTo(map);}
+poi(37.66205,126.77580,'정발산 근린공원','park');
+poi(37.65560,126.77100,'일산호수공원','park');
+poi(37.66160,126.76950,'중앙로','');
+poi(37.65660,126.77450,'호수로','');
+
+function radius(r){return 12+Math.sqrt(r)/3;}
+zones.forEach(function(z){
+ var c=fgHex(z.s);
+ L.circle([z.lat,z.lng],{radius:radius(z.r),color:c,weight:1.4,opacity:.55,fillColor:c,fillOpacity:.18}).addTo(map);
+ var m=L.circleMarker([z.lat,z.lng],{radius:9,fillColor:c,color:'#fff',weight:2,opacity:1,fillOpacity:.95}).addTo(map);
+ m.on('click',function(){selZone(z.id);});
+ m.bindTooltip('<div class="mlbl">'+z.n.replace('라페스타 ','').replace('웨스턴돔 ','웨돔 ')+' · '+z.s.toFixed(0)+'</div>',{permanent:true,direction:'right',offset:[8,0],className:'mtt',opacity:1});
+});
+
+var plat=[
+ {n:'인스타그램',ic:'linear-gradient(135deg,#f58529,#dd2a7b)',s:66.8,r:'1,284개 리뷰 · 7일 +18%',bar:'#dd2a7b'},
+ {n:'네이버 플레이스',ic:'#2db400',s:71.5,r:'4,521개 리뷰 · 7일 +12%',bar:'#2db400'},
+ {n:'구글맵',ic:'#4285f4',s:58.9,r:'892개 리뷰 · 7일 +6%',bar:'#4285f4'},
+];
+document.getElementById('plat').innerHTML=plat.map(function(p){
+ return '<div class="prow"><div class="pt"><span class="nm"><span class="ic" style="background:'+p.ic+'"></span>'+p.n+'</span><b>'+p.s.toFixed(1)+'</b></div>'
+  +'<div class="pbar"><i style="width:'+p.s+'%;background:'+p.bar+'"></i></div><div class="ps">'+p.r+'</div></div>';
+}).join('');
+
+var per=[
+ {n:'20대 여성 · 직장인',p:28.4,c:'#3a5a98'},
+ {n:'30대 · 가족 단위',p:24.2,c:'#3f7d3f'},
+ {n:'20대 · 데이트 커플',p:18.6,c:'#6b7d3a'},
+ {n:'40-50대 · 지역 주민',p:16.1,c:'#7a4f9a'},
+ {n:'그 외 (10대·60대+)',p:12.7,c:'#9aa3af'},
+];
+document.getElementById('per').innerHTML=per.map(function(x){
+ return '<div class="prr"><div class="pt"><span class="nm"><span class="dt" style="background:'+x.c+'"></span>'+x.n+'</span><b>'+x.p+'%</b></div>'
+  +'<div class="bar"><i style="width:'+(x.p/28.4*100)+'%;background:'+x.c+'"></i></div></div>';
+}).join('');
+document.getElementById('opp').innerHTML='<b>매칭 기회</b> — 20대 여성·직장인 비중 대비 카페·뷰티 점포 비율이 부족. 후면주차장·웨스턴돔 3F 공실에 <b>뷰티/디저트 업종</b> 입점 추천.';
+
+function selZone(id){
+ var z=allz[id];
+ var risk=z.s<40?'위험':z.s<60?'주의':z.s<80?'양호':'우수';
+ var frows=z.f.map(function(f){var c=f[2]==='dn'?'dn':'up';return '<div class="fr"><span>'+f[0]+'</span><b class="'+c+'">'+f[1]+'</b></div>';}).join('');
+ document.getElementById('detail').innerHTML=
+  '<div class="ch" style="margin-bottom:6px"><div class="zlab">선택된 구역 · '+z.grp+'</div></div>'
+  +'<div class="top"><div class="znm">'+z.n+'</div>'
+  +'<div><div class="zsc" style="color:'+fg(z.s)+'">'+z.s.toFixed(1)+'</div>'
+  +'<div class="zrisk" style="color:'+fg(z.s)+'">'+risk+' · '+arrow(z.d)+' · '+rev(z.r)+'건</div></div></div>'
+  +'<div class="fct"><div class="ft">'+(z.d<0?'점수 하락 핵심 요인':'점수 변동 핵심 요인')+'</div>'+frows+'</div>'
+  +'<button class="btn" onclick="alert(\'PPPP 회복 전략 생성 (프로토타입)\\n\\n· Page: '+z.n+' 3D 공실 트윈 + 임차 매칭\\n· Posting: 고급화/가성비/공장제 입점 솔루션\\n· Program: 유입 이벤트 + 임대인-임차인 상생\')">PPPP 회복 전략 생성 ↗</button>';
+ map.setView([z.lat,z.lng],17,{animate:true});
+}
+setInterval(function(){document.getElementById('liverate').textContent=(42+Math.floor(Math.random()*12));},2000);
+selZone('wes-3');
+</script>
+</body>
+</html>

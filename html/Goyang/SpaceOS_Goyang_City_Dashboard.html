@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS · 고양시 39거점 비교 대시보드</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#eef1f4;--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#3a5a98;--green:#3f7d3f;--nv-land:#f7f6f2}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);padding:20px;line-height:1.4}
+.wrap{max-width:1240px;margin:0 auto}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+h1{font-size:27px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
+.sub{font-size:13px;color:var(--sub)}
+.rt{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.toggle{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.toggle button{font-family:inherit;font-size:13px;font-weight:700;padding:9px 15px;border:none;background:var(--card);color:var(--sub);cursor:pointer}
+.toggle button.on{background:var(--blue);color:#fff}
+.chip{font-size:12px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:7px 13px;color:var(--sub)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:13px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 15px}
+.kpi .l{font-size:11.5px;color:var(--sub);margin-bottom:7px}
+.kpi .v{font-size:22px;font-weight:800;letter-spacing:-.5px}.kpi .v small{font-size:12px;font-weight:700;margin-left:3px;color:var(--sub)}
+.kpi .d{font-size:10.5px;color:var(--sub);margin-top:5px}
+.cols{display:grid;grid-template-columns:1.45fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 17px;margin-bottom:14px}
+.card .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.card .ch h2{font-size:15px;font-weight:800}.card .ch .hint{font-size:11px;color:#9aa3af}
+#map{height:560px;border-radius:12px;border:1px solid var(--line);background:var(--nv-land)}
+.leaflet-container{background:var(--nv-land)}
+.dmk{transform:translate(-50%,-50%);border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px}
+.dlbl{font-size:11px;font-weight:800;color:#1f2937;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.legb{display:flex;gap:13px;justify-content:center;margin-top:12px;flex-wrap:wrap;align-items:center}
+.legb .lt{font-size:11px;color:var(--sub)}.legb span{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:5px}.legb i{width:14px;height:14px;border-radius:50%;display:inline-block}
+.rk{display:flex;flex-direction:column;gap:8px}
+.rkr{display:flex;align-items:center;gap:9px;cursor:pointer;padding:7px 8px;border-radius:9px;transition:.12s;border:1px solid transparent}
+.rkr:hover{background:#f4f6f9}.rkr.sel{background:#f2f5fb;border-color:#d6e0f0}
+.rkr .rn{width:18px;font-size:13px;font-weight:800;color:#9aa3af;text-align:center}
+.rkr .rinfo{flex:1;min-width:0}
+.rkr .rnm{font-size:12.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rkr .rgu{font-size:10px;color:var(--sub)}
+.rkr .rbarw{height:9px;border-radius:5px;background:#eceff2;overflow:hidden;margin-top:4px}.rkr .rbarw i{display:block;height:100%;border-radius:5px}
+.rkr .rv{font-size:15px;font-weight:800;flex:0 0 58px;text-align:right}
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.tbl th,.tbl td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl th{color:var(--sub);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px}
+.tbl td.nm,.tbl th.nm{text-align:left;font-weight:700}
+.tbl td .pill{display:inline-block;font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px}
+.tbl tr{cursor:pointer}.tbl tr:hover td{background:#f7f8fa}
+.tbl tr.sel td{background:#f2f5fb}
+.det{display:flex;flex-direction:column;gap:9px}
+.det .dh{display:flex;justify-content:space-between;align-items:flex-start}
+.det .dn{font-size:16px;font-weight:800}.det .dg{font-size:11px;color:var(--sub)}
+.det .dmet{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px}
+.det .mc{background:#f7f8fa;border:1px solid var(--line);border-radius:10px;padding:10px 11px}
+.det .mc .mk{font-size:10.5px;color:var(--sub)}.det .mc .mv{font-size:18px;font-weight:800;margin-top:3px}
+.det .note{font-size:11.5px;color:#555;line-height:1.55;background:#f4f8f4;border:1px solid #d8e8d8;border-radius:9px;padding:9px 11px}
+.btn{width:100%;margin-top:4px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:.15s;text-decoration:none;display:block;text-align:center}
+.btn:hover{background:#3a5a98;color:#fff;border-color:#3a5a98}
+.foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:16px;line-height:1.6}
+@media(max-width:920px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}#map{height:440px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <div class="ey">SPACEOS · DIGITAL TWIN · 고양시 전체 비교 대시보드</div>
+      <h1>고양시 39거점 상권 비교</h1>
+      <div class="sub">일산동구·일산서구·덕양구 39개 주요 상권 · 네이버 지도 정합 · 감성지수 vs 공실률 비교 · 거점 클릭 → 상세</div>
+    </div>
+    <div class="rt">
+      <div class="toggle"><button id="tg-s" class="on" onclick="setMetric('s')">😊 감성지수</button><button id="tg-v" onclick="setMetric('v')">🏢 공실률</button></div>
+    </div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="cols">
+    <div class="left"><div class="card">
+      <div class="ch"><h2 id="maptitle">거점별 감성지수 지도</h2><div class="hint">원 크기=리뷰량 · 색=지표 · 클릭 → 상세</div></div>
+      <div id="map"></div>
+      <div class="legb" id="legb"></div>
+    </div></div>
+    <div class="right">
+      <div class="card"><div class="ch"><h2 id="rktitle">감성지수 랭킹</h2><div class="hint">클릭 시 지도 이동</div></div><div class="rk" id="rk"></div></div>
+      <div class="card det" id="det"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><h2>39거점 종합 비교표</h2><div class="hint">행 클릭 → 상세 · 정렬: 현재 지표</div></div>
+    <div style="overflow-x:auto"><table class="tbl" id="tbl"></table></div>
+  </div>
+  <div class="foot">SpaceOS Digital Twin Platform · 고양시 39거점 비교(3구 주요 상권 전수). 감성지수는 거점 내 구역 감성의 리뷰가중 평균, 공실률은 100m 그리드 합성 평균. 수치는 거점 특성(신상권/대형몰배후/성숙상권/택지/구도심)을 반영한 시뮬레이션이며 실데이터 연동 시 자동 갱신. 거점별 심층 분석은 멀티거점 통합본(SpaceOS_Goyang_MultiDistrict_PPPP.html) 참조.</div>
+</div>
+<script>
+function fgHex(s){return s<40?'#d9716a':s<50?'#e0a13e':s<60?'#e3b95e':s<70?'#9ab85a':s<80?'#7faa55':'#3a5a98';}
+function vacHex(v){return v<8?'#cfe3cf':v<13?'#fbe7a6':v<18?'#f6b96b':v<24?'#e8743b':'#c0392b';}
+function distM(a,b,c,d){var dy=(a-c)*111000,dx=(b-d)*88300;return Math.sqrt(dx*dx+dy*dy);}
+function seed(i,j){var x=Math.sin(i*12.9898+j*78.233)*43758.5453;return x-Math.floor(x);}
+
+/* 거점 요약 데이터 (멀티거점 통합본과 동일 소스) — zones:[감성,리뷰], grid:공실합성, units:[추천tier] */
+var D=[
+ {id:'lafesta',name:'라페스타·웨스턴돔',gu:'일산동구',type:'신상권',center:[37.6593,126.7711],
+  z:[[74.2,856],[68.4,1900],[76.8,1100],[38.9,287],[43.7,412],[31.5,168]],
+  g:{bb:{s:37.6565,n:37.6620,w:126.7685,e:126.7745},dlat:.0009,dlng:.001135,core:[37.6594,126.7711],maxd:340,hot:[[37.65775,126.77150,90,34],[37.66085,126.77245,80,31],[37.66110,126.77285,85,42],[37.65880,126.77010,70,16],[37.65945,126.76935,60,6],[37.65820,126.77085,60,5]]},
+  u:['premium','premium','value','value','factory'],note:'신상권 핵심. 1F·먹자 활성 vs 웨스턴돔 상층·후면 고공실. M1 1순위 거점.'},
+ {id:'starfield',name:'스타필드·삼송·원흥',gu:'덕양구',type:'대형몰 배후',center:[37.6502,126.8966],
+  z:[[81.4,2400],[75.6,1850],[66.1,1240],[40.6,392],[35.9,248],[48.7,430]],
+  g:{bb:{s:37.6452,n:37.6552,w:126.8920,e:126.9012},dlat:.0009,dlng:.001146,core:[37.6502,126.8966],maxd:560,hot:[[37.64900,126.89720,120,5],[37.64790,126.89830,90,7],[37.65140,126.89600,95,40],[37.65040,126.89960,90,34],[37.65275,126.89470,80,15],[37.65180,126.89380,80,27]]},
+  u:['premium','value','value','factory','factory'],note:'대형몰 저공실 vs 택지 신축상가 고공실 양극화. 상생 동선 설계 기회.'},
+ {id:'hwajeong',name:'화정 로데오',gu:'덕양구',type:'성숙상권',center:[37.6352,126.8328],
+  z:[[72.5,1680],[69.8,1180],[58.4,742],[64.2,910],[33.7,268],[38.9,312]],
+  g:{bb:{s:37.6312,n:37.6392,w:126.8290,e:126.8362},dlat:.0009,dlng:.001150,core:[37.6352,126.8328],maxd:470,hot:[[37.63480,126.83320,85,38],[37.63560,126.83400,90,32],[37.63620,126.83260,80,20],[37.63340,126.83120,85,24],[37.63600,126.83300,70,6],[37.63520,126.83205,65,7]]},
+  u:['premium','value','value','factory','factory'],note:'성숙상권. 1F 활성 vs 지하·상층 노후 공실. 레트로 자산화 기회.'},
+ {id:'bamridan',name:'정발산·밤리단길',gu:'일산동구',type:'골목 트렌드',center:[37.6580,126.7755],
+  z:[[79.3,1420],[71.6,640],[63.4,880],[57.2,520],[45.1,288],[41.8,196]],
+  g:{bb:{s:37.6548,n:37.6628,w:126.7728,e:126.7800},dlat:.0009,dlng:.001135,core:[37.6580,126.7758],maxd:430,hot:[[37.65720,126.77620,75,8],[37.65660,126.77700,70,12],[37.65780,126.77760,80,28],[37.65620,126.77520,80,33],[37.66050,126.77520,75,22],[37.65905,126.77380,65,10]]},
+  u:['premium','value','value','factory','factory'],note:'골목 트렌드 핫플. 메인골목 활성 vs 이면·노후개조 공실. 젠트리 균형 관건.'},
+ {id:'baekseok',name:'백석·요진 와이시티',gu:'일산동구',type:'주상복합 배후',center:[37.6428,126.7900],
+  z:[[70.4,1560],[66.2,1040],[68.9,920],[54.7,612],[43.6,348],[39.2,254]],
+  g:{bb:{s:37.6388,n:37.6468,w:126.7858,e:126.7942},dlat:.0009,dlng:.001135,core:[37.6428,126.7900],maxd:470,hot:[[37.64430,126.79080,80,8],[37.64180,126.78930,70,9],[37.64080,126.79020,70,11],[37.64320,126.78820,80,22],[37.64520,126.79160,80,30],[37.63980,126.78880,80,34]]},
+  u:['premium','value','value','factory','factory'],note:'주상복합·오피스 배후. 역세권·먹자 활성 vs 오피스 주말 한산·노후상가.'},
+ {id:'haengsin',name:'행신',gu:'덕양구',type:'주거 생활상권',center:[37.6125,126.8345],
+  z:[[67.1,1180],[64.8,860],[55.3,540],[52.9,468],[40.4,286],[44.7,212]],
+  g:{bb:{s:37.6085,n:37.6165,w:126.8302,e:126.8386},dlat:.0009,dlng:.001135,core:[37.6125,126.8345],maxd:470,hot:[[37.61320,126.83480,75,10],[37.61420,126.83400,68,11],[37.61180,126.83120,82,24],[37.61560,126.83560,78,23],[37.60980,126.83260,80,32],[37.61280,126.83660,78,28]]},
+  u:['value','premium','value','factory','factory'],note:'주거밀집 생활상권. 역세권·카페 활성 vs 단지 주말 공동화·노후상가.'},
+ {id:'juyeop',name:'주엽·대화',gu:'일산서구',type:'학원·전시 배후',center:[37.6720,126.7560],
+  z:[[69.2,1480],[57.4,720],[62.8,840],[55.1,560],[48.3,402],[40.9,268]],
+  g:{bb:{s:37.6668,n:37.6748,w:126.7568,e:126.7652},dlat:.0009,dlng:.001135,core:[37.6708,126.7610],maxd:480,hot:[[37.67050,126.76060,78,9],[37.66980,126.76360,72,11],[37.67220,126.76260,82,24],[37.67120,126.75980,75,15],[37.67280,126.76420,80,29],[37.66900,126.76200,78,21]]},
+  u:['premium','value','value','factory','factory'],note:'학원가+킨텍스 배후. 문화거리·학원가 활성 vs 전시 비수기 공동화·노후상가.'},
+ {id:'deokyang',name:'덕양구(주교·원당·성사)',gu:'덕양구',type:'행정 구도심',center:[37.6560,126.8360],
+  z:[[65.3,1240],[61.7,980],[58.9,860],[56.4,640],[41.2,318],[44.6,242]],
+  g:{bb:{s:37.6500,n:37.6610,w:126.8300,e:126.8456},dlat:.0009,dlng:.001135,core:[37.6556,126.8378],maxd:640,hot:[[37.65420,126.84080,80,12],[37.65840,126.83200,78,14],[37.65760,126.83440,75,15],[37.65180,126.83760,80,22],[37.65280,126.84320,80,33],[37.65920,126.83480,78,27]]},
+  u:['premium','value','value','factory','factory'],note:'행정중심 구도심. 로데오·시청 활성 vs 재래시장 청년 이탈·노후 근린상가.'},
+ {id:'madu',name:'마두역·일산역 방면',gu:'일산동구',type:'학원+구도심',center:[37.6520,126.7800],
+  z:[[66.7,1320],[56.8,680],[63.1,760],[52.4,590],[47.9,448],[39.7,262]],
+  g:{bb:{s:37.6480,n:37.6560,w:126.7758,e:126.7842},dlat:.0009,dlng:.001135,core:[37.6520,126.7800],maxd:480,hot:[[37.65150,126.78120,78,10],[37.65040,126.78240,72,11],[37.65360,126.78280,82,24],[37.65240,126.77980,76,16],[37.65420,126.78420,80,28],[37.64960,126.78060,78,22]]},
+  u:['value','premium','value','factory','factory'],note:'마두 학원가 + 일산 원도심. 학원가·먹자 활성 vs 일산역 구도심·전통시장 노후.'},
+ {id:'tanhyeon',name:'탄현',gu:'일산서구',type:'역세권 주거',center:[37.6905,126.7480],
+  z:[[63.8,1020],[58.2,640],[61.4,560],[57.6,520],[42.3,288],[45.7,214]],
+  g:{bb:{s:37.6865,n:37.6945,w:126.7438,e:126.7522},dlat:.0009,dlng:.001135,core:[37.6905,126.7480],maxd:470,hot:[[37.69010,126.74880,75,11],[37.68920,126.74960,68,12],[37.69180,126.74700,80,22],[37.69080,126.74720,72,16],[37.68820,126.74640,80,30],[37.69240,126.74940,78,26]]},
+  u:['value','premium','value','factory','factory'],note:'탄현역 역세권 주거상권. 큰마을·카페거리 활성 vs 노후·이면 공실.'},
+ {id:'gajwa',name:'가좌·송포마을',gu:'일산서구',type:'외곽 생활',center:[37.6850,126.7400],
+  z:[[56.4,720],[59.1,540],[52.8,468],[57.3,512],[40.9,278],[43.6,196]],
+  g:{bb:{s:37.6810,n:37.6890,w:126.7358,e:126.7442},dlat:.0009,dlng:.001135,core:[37.6850,126.7400],maxd:470,hot:[[37.68520,126.74080,78,14],[37.68440,126.74010,68,12],[37.68640,126.73900,80,23],[37.68380,126.74160,72,15],[37.68700,126.74060,80,32],[37.68560,126.73820,78,27]]},
+  u:['value','premium','value','factory','factory'],note:'일산서구 외곽 주거 생활상권. 단지 배후 vs 노후·이면 공실.'},
+ {id:'kintexone',name:'킨텍스원시티·일산테크노',gu:'일산서구',type:'신축 프리미엄',center:[37.6680,126.7530],
+  z:[[72.6,1480],[46.2,386],[53.4,512],[64.8,720],[68.3,640],[41.7,268]],
+  g:{bb:{s:37.6640,n:37.6720,w:126.7488,e:126.7572},dlat:.0009,dlng:.001135,core:[37.6680,126.7530],maxd:480,hot:[[37.66900,126.75400,80,8],[37.67020,126.75520,80,30],[37.66640,126.75180,80,22],[37.66760,126.74780,75,16],[37.66980,126.75300,68,9],[37.66520,126.75440,80,33]]},
+  u:['premium','premium','value','factory','factory'],note:'킨텍스 신축 주상복합. 스트리트몰·가로카페 활성 vs 단지내·신축 고공실.'},
+ {id:'pungdong',name:'풍동·식사 위시티',gu:'일산동구',type:'신도시+카페',center:[37.6770,126.8010],
+  z:[[74.1,1380],[63.7,1020],[55.2,680],[61.8,720],[40.3,312],[44.9,248]],
+  g:{bb:{s:37.6730,n:37.6810,w:126.7958,e:126.8062},dlat:.0009,dlng:.001135,core:[37.6760,126.8000],maxd:520,hot:[[37.67400,126.79620,75,7],[37.67720,126.80120,72,14],[37.67900,126.80260,82,24],[37.67560,126.79780,70,12],[37.67840,126.80060,90,40],[37.67620,126.80320,80,30]]},
+  u:['premium','premium','value','factory','factory'],note:'식사 위시티 신도시 + 애니골 카페거리. 카페·먹자 활성 vs 신축 상층 고공실.'},
+ {id:'jungsan',name:'중산지구',gu:'일산동구',type:'1기신도시 외곽',center:[37.6860,126.7860],
+  z:[[58.9,860],[60.4,640],[57.1,580],[53.6,512],[41.8,286],[44.3,212]],
+  g:{bb:{s:37.6820,n:37.6900,w:126.7818,e:126.7902},dlat:.0009,dlng:.001135,core:[37.6860,126.7860],maxd:470,hot:[[37.68620,126.78680,78,13],[37.68460,126.78720,72,12],[37.68740,126.78540,72,16],[37.68860,126.78760,80,23],[37.68380,126.78600,80,31],[37.68920,126.78920,78,26]]},
+  u:['value','premium','value','factory','factory'],note:'중산마을 1기신도시 외곽 생활상권. 중심·학원가 활성 vs 노후·이면 공실.'},
+ {id:'hyangdong',name:'향동지구',gu:'덕양구',type:'신도시 초기입주',center:[37.6090,126.8830],
+  z:[[60.4,920],[52.7,640],[64.1,560],[49.3,480],[36.8,288],[43.2,224]],
+  g:{bb:{s:37.6050,n:37.6130,w:126.8788,e:126.8872},dlat:.0009,dlng:.001135,core:[37.6090,126.8830],maxd:500,hot:[[37.60920,126.88380,75,16],[37.60840,126.88240,80,28],[37.61020,126.88460,68,9],[37.60760,126.88500,80,30],[37.60680,126.88340,90,40],[37.61080,126.88620,80,33]]},
+  u:['premium','premium','value','factory','factory'],note:'DMC 배후 신도시 초기입주. 카페·스타街 활성 vs 신축 공실 클러스터 심각.'},
+ {id:'jichuk',name:'지축지구',gu:'덕양구',type:'역세권 신축택지',center:[37.6480,126.9130],
+  z:[[61.2,980],[53.4,640],[63.8,560],[48.7,480],[37.4,292],[43.9,228]],
+  g:{bb:{s:37.6440,n:37.6520,w:126.9088,e:126.9172},dlat:.0009,dlng:.001135,core:[37.6480,126.9130],maxd:500,hot:[[37.64820,126.91380,75,15],[37.64740,126.91240,80,28],[37.64920,126.91460,68,9],[37.64660,126.91500,80,29],[37.64580,126.91340,90,39],[37.64980,126.91620,80,32]]},
+  u:['premium','premium','value','factory','factory'],note:'지축역 역세권 신축 택지. 스트리트몰·카페 활성 vs 신축 공실 클러스터 심각.'},
+ {id:'neunggok',name:'능곡',gu:'덕양구',type:'재래시장 구도심',center:[37.6020,126.8150],
+  z:[[57.6,1080],[61.3,860],[58.9,640],[52.4,512],[40.2,288],[44.1,214]],
+  g:{bb:{s:37.5980,n:37.6060,w:126.8108,e:126.8192},dlat:.0009,dlng:.001135,core:[37.6020,126.8150],maxd:480,hot:[[37.60420,126.81320,82,14],[37.60220,126.81460,75,11],[37.60100,126.81560,72,16],[37.60340,126.81680,80,23],[37.59940,126.81400,80,33],[37.60480,126.81620,78,27]]},
+  u:['value','value','premium','factory','factory'],note:'능곡역 재래시장 구도심. 시장·먹자 활성 vs 노후 근린·이면 공실.'},
+ {id:'deokeun',name:'덕은지구',gu:'덕양구',type:'DMC 신축 프리미엄',center:[37.5870,126.8650],
+  z:[[67.2,1080],[45.1,386],[69.4,620],[52.8,512],[38.6,298],[43.7,232]],
+  g:{bb:{s:37.5830,n:37.5910,w:126.8608,e:126.8692},dlat:.0009,dlng:.001135,core:[37.5870,126.8650],maxd:490,hot:[[37.58720,126.86580,80,9],[37.58840,126.86700,80,30],[37.58620,126.86460,68,8],[37.58920,126.86420,80,22],[37.58780,126.86340,90,40],[37.58560,126.86680,80,32]]},
+  u:['premium','premium','value','factory','factory'],note:'덕은 DMC 배후 한강조망 신축. 한강뷰 카페·스트리트몰 활성 vs 단지내·신축 고공실.'},
+ {id:'haengju',name:'행주·행주산성',gu:'덕양구',type:'관광·음식',center:[37.5990,126.8230],
+  z:[[70.3,1240],[67.8,720],[63.4,640],[51.2,440],[42.6,268],[45.8,196]],
+  g:{bb:{s:37.5950,n:37.6030,w:126.8188,e:126.8272},dlat:.0009,dlng:.001135,core:[37.5990,126.8230],maxd:480,hot:[[37.59880,126.82280,82,9],[37.60020,126.82480,72,11],[37.59760,126.82160,68,14],[37.60120,126.82340,80,24],[37.59680,126.82380,80,33],[37.60200,126.82120,78,27]]},
+  u:['premium','premium','value','factory','factory'],note:'행주산성 관광·음식 상권. 음식거리·한강뷰 활성 vs 비수기 계절 공실.'},
+ {id:'hwajeon',name:'화전·항공대',gu:'덕양구',type:'대학가 소상권',center:[37.6100,126.8430],
+  z:[[62.7,940],[64.3,820],[58.4,520],[51.6,468],[41.4,278],[44.7,202]],
+  g:{bb:{s:37.6060,n:37.6140,w:126.8388,e:126.8472},dlat:.0009,dlng:.001135,core:[37.6100,126.8430],maxd:480,hot:[[37.61020,126.84380,78,13],[37.60900,126.84240,75,11],[37.61120,126.84460,68,16],[37.60820,126.84500,80,24],[37.61180,126.84300,80,32],[37.60760,126.84380,78,27]]},
+  u:['value','value','premium','factory','factory'],note:'화전역 항공대 대학가 소상권. 대학가·먹자 활성 vs 방학 변동·노후 공실.'},
+
+ {id:'hugok',name:'후곡마을 학원가',gu:'일산서구',type:'학원가',center:[37.679,126.766],
+  z:[[64.6,1180],[60.2,820],[62.8,640],[53.4,560],[41.2,288],[44.6,210]],
+  g:{bb:{s:37.675,n:37.683,w:126.761,e:126.771},dlat:.0009,dlng:.001135,core:[37.679,126.766],maxd:470,hot:[[37.6802,126.767,80,12],[37.6794,126.765,80,12],[37.6784,126.767,80,12],[37.6776,126.765,80,20],[37.6782,126.766,80,30],[37.68,126.765,80,30]]},
+  u:['value','premium','value','factory','factory'],note:'일산3동 후곡마을 학원가. 학원가·카페 활성 vs 노후·이면 공실.'},
+ {id:'deokyi',name:'덕이·하이파크시티',gu:'일산서구',type:'신축 프리미엄',center:[37.696,126.76],
+  z:[[71.8,1420],[45.8,372],[67.4,620],[53.6,520],[39.4,296],[43.8,224]],
+  g:{bb:{s:37.692,n:37.7,w:126.755,e:126.765},dlat:.0009,dlng:.001135,core:[37.696,126.76],maxd:480,hot:[[37.6972,126.761,68,7],[37.6964,126.759,80,30],[37.6954,126.761,80,12],[37.6946,126.759,80,20],[37.6952,126.76,80,40],[37.697,126.759,80,30]]},
+  u:['premium','premium','value','factory','factory'],note:'덕이동 하이파크시티 신축 주상복합. 스트리트몰·카페 활성 vs 단지내·신축 고공실.'},
+ {id:'pungsan',name:'풍산·고봉',gu:'일산동구',type:'역세권 주거',center:[37.672,126.8],
+  z:[[62.4,1020],[54.7,680],[60.8,640],[52.1,512],[41.6,288],[44.3,206]],
+  g:{bb:{s:37.668,n:37.676,w:126.795,e:126.805},dlat:.0009,dlng:.001135,core:[37.672,126.8],maxd:470,hot:[[37.6732,126.801,80,12],[37.6724,126.799,80,20],[37.6714,126.801,80,12],[37.6706,126.799,80,20],[37.6712,126.8,80,30],[37.673,126.799,80,30]]},
+  u:['value','premium','value','factory','factory'],note:'풍산역 역세권 주거상권. 역세권·먹자 활성 vs 노후·이면 공실.'},
+ {id:'gwansan',name:'관산지구',gu:'덕양구',type:'외곽 주거',center:[37.672,126.865],
+  z:[[57.2,760],[59.6,560],[52.8,512],[55.4,440],[40.8,278],[43.4,196]],
+  g:{bb:{s:37.668,n:37.676,w:126.86,e:126.87},dlat:.0009,dlng:.001135,core:[37.672,126.865],maxd:470,hot:[[37.6732,126.866,80,20],[37.6724,126.864,80,20],[37.6714,126.866,80,20],[37.6706,126.864,80,20],[37.6712,126.865,80,30],[37.673,126.864,80,30]]},
+  u:['value','premium','value','factory','factory'],note:'관산지구 외곽 주거 생활상권. 중심·먹자 활성 vs 노후·외곽 공실.'},
+ {id:'goyangdong',name:'고양동',gu:'덕양구',type:'외곽 구도심',center:[37.676,126.882],
+  z:[[56.8,820],[54.2,640],[58.4,560],[51.6,468],[40.4,278],[43.6,192]],
+  g:{bb:{s:37.672,n:37.68,w:126.877,e:126.887},dlat:.0009,dlng:.001135,core:[37.676,126.882],maxd:470,hot:[[37.6772,126.883,80,20],[37.6764,126.881,80,20],[37.6754,126.883,80,20],[37.6746,126.881,80,20],[37.6752,126.882,80,30],[37.677,126.881,80,30]]},
+  u:['value','premium','value','factory','factory'],note:'고양동 발원 구도심 외곽상권. 중심·먹자 활성 vs 재래·노후 공실.'},
+ {id:'daeja',name:'대자·벽제',gu:'덕양구',type:'외곽 외식',center:[37.692,126.895],
+  z:[[64.2,940],[60.4,620],[55.6,560],[51.8,468],[41.2,278],[44.1,196]],
+  g:{bb:{s:37.688,n:37.696,w:126.89,e:126.9},dlat:.0009,dlng:.001135,core:[37.692,126.895],maxd:480,hot:[[37.6932,126.896,80,12],[37.6924,126.894,80,12],[37.6914,126.896,80,20],[37.6906,126.894,80,20],[37.6912,126.895,80,30],[37.693,126.894,80,30]]},
+  u:['premium','value','value','factory','factory'],note:'대자·벽제 외곽 화훼·외식 상권. 외식거리·화훼 활성 vs 비수기 계절 공실.'},
+ {id:'sinwon',name:'신원·삼송2',gu:'덕양구',type:'신축 택지',center:[37.66,126.898],
+  z:[[60.8,860],[52.4,560],[63.2,520],[49.6,468],[38.4,288],[43.6,212]],
+  g:{bb:{s:37.656,n:37.664,w:126.893,e:126.903},dlat:.0009,dlng:.001135,core:[37.66,126.898],maxd:500,hot:[[37.6612,126.899,80,12],[37.6604,126.897,80,20],[37.6594,126.899,80,12],[37.6586,126.897,80,30],[37.6592,126.898,80,40],[37.661,126.897,80,30]]},
+  u:['premium','premium','value','factory','factory'],note:'신원동 삼송 인근 신축 택지. 카페·중심 활성 vs 신축 공실 클러스터.'},
+ {id:'donae',name:'도내·원흥2',gu:'덕양구',type:'택지 오피스',center:[37.642,126.882],
+  z:[[61.4,920],[53.2,560],[64.6,520],[50.8,468],[39.2,288],[43.8,206]],
+  g:{bb:{s:37.638,n:37.646,w:126.877,e:126.887},dlat:.0009,dlng:.001135,core:[37.642,126.882],maxd:480,hot:[[37.6432,126.883,80,12],[37.6424,126.881,80,20],[37.6414,126.883,80,12],[37.6406,126.881,80,20],[37.6412,126.882,80,40],[37.643,126.881,80,30]]},
+  u:['premium','premium','value','factory','factory'],note:'도내동 원흥 인근 택지·오피스 배후. 카페·중심 활성 vs 오피스 한산·신축 공실.'},
+
+ {id:'gangmae',name:'강매·도래',gu:'덕양구',type:'역세권 외곽',center:[37.608,126.828],
+  z:[[60.4,820],[53.2,560],[57.8,520],[51.4,440],[40.6,272],[43.8,192]],
+  g:{bb:{s:37.604,n:37.612,w:126.823,e:126.833},dlat:.0009,dlng:.001135,core:[37.608,126.828],maxd:470,hot:[[37.6092,126.829,80,12],[37.6084,126.827,80,20],[37.6074,126.829,80,20],[37.6066,126.827,80,20],[37.6072,126.828,80,30],[37.609,126.827,80,30]]},
+  u:['value','premium','value','factory','factory'],note:'강매역 역세권 외곽상권. 역세권·먹자 활성 vs 노후·이면 공실.'},
+ {id:'hyoja',name:'효자·북한산',gu:'덕양구',type:'관광·외식',center:[37.668,126.955],
+  z:[[66.4,940],[62.8,640],[64.2,560],[50.8,420],[41.4,268],[44.6,188]],
+  g:{bb:{s:37.664,n:37.672,w:126.95,e:126.96},dlat:.0009,dlng:.001135,core:[37.668,126.955],maxd:480,hot:[[37.6692,126.956,80,12],[37.6684,126.954,80,12],[37.6674,126.956,80,12],[37.6666,126.954,80,20],[37.6672,126.955,80,30],[37.669,126.954,80,30]]},
+  u:['premium','premium','value','factory','factory'],note:'효자동 북한산성 입구 관광·외식 상권. 음식거리·산뷰 활성 vs 비수기 계절 공실.'},
+ {id:'sarihyeon',name:'사리현·식사2',gu:'일산동구',type:'외곽 주거',center:[37.685,126.805],
+  z:[[57.6,720],[52.4,520],[59.2,480],[50.6,440],[40.2,262],[43.4,186]],
+  g:{bb:{s:37.681,n:37.689,w:126.8,e:126.81},dlat:.0009,dlng:.001135,core:[37.685,126.805],maxd:470,hot:[[37.6862,126.806,80,20],[37.6854,126.804,80,20],[37.6844,126.806,80,20],[37.6836,126.804,80,20],[37.6842,126.805,80,30],[37.686,126.804,80,30]]},
+  u:['value','premium','value','factory','factory'],note:'사리현·식사2 외곽 주거·물류 배후. 중심·먹자 활성 vs 노후·외곽 공실.'},
+ {id:'seongseok',name:'성석·고봉',gu:'일산동구',type:'농촌형 외곽',center:[37.7,126.82],
+  z:[[55.2,560],[60.4,520],[52.6,440],[49.8,386],[40.4,248],[43.2,176]],
+  g:{bb:{s:37.696,n:37.704,w:126.815,e:126.825},dlat:.0009,dlng:.001135,core:[37.7,126.82],maxd:500,hot:[[37.7012,126.821,80,20],[37.7004,126.819,80,12],[37.6994,126.821,80,20],[37.6986,126.819,80,30],[37.6992,126.82,80,30],[37.701,126.819,80,30]]},
+  u:['premium','value','value','factory','factory'],note:'성석·고봉 농촌형 외곽상권. 가든외식·중심 활성 vs 농촌·노후 공실.'},
+ {id:'beopgot',name:'법곳·구산',gu:'일산서구',type:'한강변 외곽',center:[37.668,126.735],
+  z:[[56.4,620],[63.8,520],[51.8,440],[49.6,386],[40.8,248],[43.6,182]],
+  g:{bb:{s:37.664,n:37.672,w:126.73,e:126.74},dlat:.0009,dlng:.001135,core:[37.668,126.735],maxd:480,hot:[[37.6692,126.736,80,20],[37.6684,126.734,80,12],[37.6674,126.736,80,20],[37.6666,126.734,80,30],[37.6672,126.735,80,30],[37.669,126.734,80,30]]},
+  u:['premium','value','value','factory','factory'],note:'법곳·구산 킨텍스 서측 한강변 외곽. 한강뷰 카페 활성 vs 비수기·외곽 공실.'},
+ {id:'yongdu',name:'용두·삼송3',gu:'덕양구',type:'택지 인근',center:[37.645,126.905],
+  z:[[59.2,820],[62.4,560],[52.6,512],[50.4,440],[40.6,272],[43.8,188]],
+  g:{bb:{s:37.641,n:37.649,w:126.9,e:126.91},dlat:.0009,dlng:.001135,core:[37.645,126.905],maxd:470,hot:[[37.6462,126.906,80,20],[37.6454,126.904,80,12],[37.6444,126.906,80,20],[37.6436,126.904,80,20],[37.6442,126.905,80,30],[37.646,126.904,80,30]]},
+  u:['premium','value','value','factory','factory'],note:'용두·삼송3 택지 인근 상권. 카페·중심 활성 vs 신축·외곽 공실.'},
+ {id:'dongsan',name:'동산·원흥오피스',gu:'덕양구',type:'오피스 배후',center:[37.64,126.91],
+  z:[[60.8,860],[63.4,560],[54.6,520],[52.2,468],[39.6,278],[43.6,196]],
+  g:{bb:{s:37.636,n:37.644,w:126.905,e:126.915},dlat:.0009,dlng:.001135,core:[37.64,126.91],maxd:480,hot:[[37.6412,126.911,80,12],[37.6404,126.909,80,12],[37.6394,126.911,80,20],[37.6386,126.909,80,20],[37.6392,126.91,80,40],[37.641,126.909,80,30]]},
+  u:['premium','value','value','factory','factory'],note:'동산·원흥오피스 스타필드 인근 오피스 배후. 카페·점심 활성 vs 오피스 한산·신축 공실.'},
+ {id:'naeyu',name:'내유·오금',gu:'덕양구',type:'농촌 외곽',center:[37.705,126.9],
+  z:[[54.4,520],[59.6,480],[52.2,420],[49.4,372],[40.2,238],[43.2,170]],
+  g:{bb:{s:37.701,n:37.709,w:126.895,e:126.905},dlat:.0009,dlng:.001135,core:[37.705,126.9],maxd:500,hot:[[37.7062,126.901,80,20],[37.7054,126.899,80,20],[37.7044,126.901,80,20],[37.7036,126.899,80,30],[37.7042,126.9,80,30],[37.706,126.899,80,30]]},
+  u:['premium','value','value','factory','factory'],note:'내유·오금 북부 농촌형 외곽상권. 가든외식·중심 활성 vs 농촌·노후 공실.'},
+ {id:'seonyu',name:'선유·운동장',gu:'덕양구',type:'행사 배후',center:[37.66,126.925],
+  z:[[62.6,860],[61.8,560],[54.2,520],[51.4,468],[40.8,268],[43.6,186]],
+  g:{bb:{s:37.656,n:37.664,w:126.92,e:126.93},dlat:.0009,dlng:.001135,core:[37.66,126.925],maxd:480,hot:[[37.6612,126.926,80,12],[37.6604,126.924,80,12],[37.6594,126.926,80,20],[37.6586,126.924,80,20],[37.6592,126.925,80,30],[37.661,126.924,80,30]]},
+  u:['premium','premium','value','factory','factory'],note:'선유·운동장 행사 배후상권. 외식·카페 활성 vs 비경기 변동·외곽 공실.'},
+ {id:'ilsan1',name:'일산1동 구시가',gu:'일산서구',type:'원도심',center:[37.685,126.768],
+  z:[[58.4,920],[61.2,720],[60.6,560],[52.4,512],[40.6,288],[43.8,206]],
+  g:{bb:{s:37.681,n:37.689,w:126.763,e:126.773},dlat:.0009,dlng:.001135,core:[37.685,126.768],maxd:470,hot:[[37.6862,126.769,80,20],[37.6854,126.767,80,12],[37.6844,126.769,80,12],[37.6836,126.767,80,20],[37.6842,126.768,80,30],[37.686,126.767,80,30]]},
+  u:['premium','premium','value','factory','factory'],note:'일산1동 원도심 구시가 생활상권. 먹자·카페 활성 vs 구도심 노후·이면 공실.'},
+ {id:'gusan',name:'구산·송포',gu:'일산서구',type:'한강변 외곽',center:[37.695,126.725],
+  z:[[55.4,560],[62.6,480],[52,420],[49.2,372],[40.4,238],[43.2,168]],
+  g:{bb:{s:37.691,n:37.699,w:126.72,e:126.73},dlat:.0009,dlng:.001135,core:[37.695,126.725],maxd:500,hot:[[37.6962,126.726,80,20],[37.6954,126.724,80,12],[37.6944,126.726,80,20],[37.6936,126.724,80,30],[37.6942,126.725,80,30],[37.696,126.724,80,30]]},
+  u:['premium','value','value','factory','factory'],note:'구산·송포 한강변 서북 외곽. 한강뷰 카페 활성 vs 비수기·농촌 공실.'},
+];
+
+/* 집계 계산 */
+function buildCells(g){var out=[],ss=0,sv=0;
+ for(var lat=g.bb.s,i=0;lat<g.bb.n-1e-9;lat+=g.dlat,i++){for(var lng=g.bb.w,j=0;lng<g.bb.e-1e-9;lng+=g.dlng,j++){
+  var cLat=lat+g.dlat/2,cLng=lng+g.dlng/2,v=2.5,infl=0;
+  g.hot.forEach(function(h){var dd=distM(cLat,cLng,h[0],h[1]),w=Math.exp(-(dd*dd)/(2*h[2]*h[2]));v+=h[3]*w;infl+=w;});
+  v+=(seed(i,j)-0.5)*4;var dc=distM(cLat,cLng,g.core[0],g.core[1]);
+  if(!(infl>0.12&&dc<g.maxd))continue;
+  v=Math.max(2,Math.min(48,v));var st=Math.round(8+22*Math.min(1,infl)+seed(j,i)*10);
+  out.push(v);ss+=st;sv+=Math.round(st*v/100);
+ }}
+ return {avgV:sv/ss*100,cellN:out.length,sumVac:sv,sumStores:ss};
+}
+D.forEach(function(d){
+ var sumR=d.z.reduce(function(a,z){return a+z[1];},0);
+ d.sent=d.z.reduce(function(a,z){return a+z[0]*z[1];},0)/sumR;
+ d.reviews=sumR;
+ d.risk=d.z.filter(function(z){return z[0]<40;}).length;
+ var ci=buildCells(d.g);d.vac=ci.avgV;d.vacN=ci.sumVac;d.cellN=ci.cellN;
+ d.prem=d.u.filter(function(x){return x==='premium';}).length;
+ d.recTop=d.u[0]==='premium'?'고급화':d.u[0]==='value'?'가성비':'공장제';
+});
+
+var metric='s',selId='lafesta';
+var map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,minZoom:11,maxZoom:16}).setView([37.6520,126.8080],12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',opacity:.6}).addTo(map);
+var markers={};
+function metricVal(d){return metric==='s'?d.sent:d.vac;}
+function metricColor(d){return metric==='s'?fgHex(d.sent):vacHex(d.vac);}
+function mkSize(d){return metric==='s'?(20+d.reviews/130):(22+d.vacN/9);}
+
+function drawMarkers(){
+ Object.values(markers).forEach(function(m){m.remove();});markers={};
+ D.forEach(function(d){
+  var col=metricColor(d),sz=Math.max(20,Math.min(46,mkSize(d))),val=metricVal(d);
+  var ic=L.divIcon({className:'',html:'<div class="dmk" style="width:'+sz+'px;height:'+sz+'px;background:'+col+';'+(d.id===selId?'outline:3px solid #1f2937;outline-offset:2px;':'')+'">'+val.toFixed(0)+'</div>',iconSize:[0,0]});
+  var m=L.marker(d.center,{icon:ic}).addTo(map);
+  m.on('click',function(){selectD(d.id);});
+  var lm=L.marker(d.center,{icon:L.divIcon({className:'',html:'<div class="dlbl">'+d.name+'</div>',iconSize:[0,0]})}).addTo(map);
+  markers[d.id]=L.layerGroup([m,lm]);markers[d.id].addTo(map);
+ });
+}
+
+function setMetric(mm){metric=mm;
+ document.getElementById('tg-s').classList.toggle('on',mm==='s');
+ document.getElementById('tg-v').classList.toggle('on',mm==='v');
+ document.getElementById('maptitle').textContent='거점별 '+(mm==='s'?'감성지수':'공실률')+' 지도';
+ document.getElementById('rktitle').textContent=(mm==='s'?'감성지수':'공실률')+' 랭킹';
+ document.getElementById('legb').innerHTML=mm==='s'
+  ?'<span class="lt">감성</span><span><i style="background:#d9716a"></i>위험</span><span><i style="background:#e3b95e"></i>주의</span><span><i style="background:#9ab85a"></i>양호</span><span><i style="background:#3a5a98"></i>우수</span>'
+  :'<span class="lt">공실률</span><span><i style="background:#cfe3cf"></i>낮음</span><span><i style="background:#fbe7a6"></i>보통</span><span><i style="background:#e8743b"></i>높음</span><span><i style="background:#c0392b"></i>심각</span>';
+ drawMarkers();renderRank();renderTable();renderKpis();
+}
+
+function renderKpis(){
+ var sAvg=D.reduce(function(a,d){return a+d.sent;},0)/D.length;
+ var vAvg=D.reduce(function(a,d){return a+d.vac;},0)/D.length;
+ var topS=D.slice().sort(function(a,b){return b.sent-a.sent;})[0];
+ var worstV=D.slice().sort(function(a,b){return b.vac-a.vac;})[0];
+ var totRev=D.reduce(function(a,d){return a+d.reviews;},0);
+ var totVac=D.reduce(function(a,d){return a+d.vacN;},0);
+ var k=[
+  {l:'🏙 거점 수',v:D.length,suf:'개',d:'일산동·서구·덕양구'},
+  {l:'😊 평균 감성지수',v:sAvg.toFixed(1),c:fgHex(sAvg),d:'최고 '+topS.name.split('·')[0]},
+  {l:'🏢 평균 공실률',v:vAvg.toFixed(1),suf:'%',c:'#c0392b',d:'최고 '+worstV.name.split('·')[0]},
+  {l:'🗂 누적 리뷰',v:(totRev/1000).toFixed(1),suf:'K',d:'39거점 합산'},
+  {l:'🪧 총 공실 점포',v:totVac,suf:'곳',d:'입점 솔루션 후보'},
+ ];
+ document.getElementById('kpis').innerHTML=k.map(function(x){return '<div class="kpi"><div class="l">'+x.l+'</div><div class="v" style="color:'+(x.c||'inherit')+'">'+x.v+(x.suf?'<small>'+x.suf+'</small>':'')+'</div><div class="d">'+x.d+'</div></div>';}).join('');
+}
+
+function sorted(){return D.slice().sort(function(a,b){return metric==='s'?b.sent-a.sent:b.vac-a.vac;});}
+function renderRank(){
+ var arr=sorted(),mx=metric==='s'?100:Math.max.apply(null,D.map(function(d){return d.vac;}));
+ document.getElementById('rk').innerHTML=arr.map(function(d,i){
+  var val=metricVal(d),col=metricColor(d);
+  return '<div class="rkr '+(d.id===selId?'sel':'')+'" onclick="selectD(\''+d.id+'\')"><div class="rn">'+(i+1)+'</div><div class="rinfo"><div class="rnm">'+d.name+'</div><div class="rgu">'+d.gu+' · '+d.type+'</div><div class="rbarw"><i style="width:'+(val/mx*100)+'%;background:'+col+'"></i></div></div><div class="rv" style="color:'+col+'">'+val.toFixed(1)+(metric==='v'?'%':'')+'</div></div>';
+ }).join('');
+}
+function renderTable(){
+ var arr=sorted();
+ var head='<tr><th class="nm">거점</th><th>감성</th><th>공실률</th><th>리뷰</th><th>위험구역</th><th>공실점포</th><th>추천Tier</th></tr>';
+ var rows=arr.map(function(d){
+  return '<tr class="'+(d.id===selId?'sel':'')+'" onclick="selectD(\''+d.id+'\')"><td class="nm">'+d.name+'<div style="font-size:10px;color:#9aa3af;font-weight:400">'+d.gu+'</div></td>'
+   +'<td><span class="pill" style="background:'+fgHex(d.sent)+'22;color:'+fgHex(d.sent)+'">'+d.sent.toFixed(1)+'</span></td>'
+   +'<td><span class="pill" style="background:'+vacHex(d.vac)+'22;color:'+vacHex(d.vac)+'">'+d.vac.toFixed(1)+'%</span></td>'
+   +'<td>'+d.reviews.toLocaleString()+'</td><td style="color:'+(d.risk?'#b23b39':'#4f7a31')+'">'+d.risk+'개</td><td>'+d.vacN+'곳</td><td>'+d.recTop+'</td></tr>';
+ }).join('');
+ document.getElementById('tbl').innerHTML=head+rows;
+}
+function selectD(id){selId=id;var d=D.filter(function(x){return x.id===id;})[0];
+ map.setView(d.center,13,{animate:true});
+ drawMarkers();renderRank();renderTable();
+ document.getElementById('det').innerHTML='<div class="dh"><div><div class="dn">'+d.name+'</div><div class="dg">'+d.gu+' · '+d.type+'</div></div></div>'
+  +'<div class="dmet"><div class="mc"><div class="mk">😊 감성지수</div><div class="mv" style="color:'+fgHex(d.sent)+'">'+d.sent.toFixed(1)+'</div></div>'
+  +'<div class="mc"><div class="mk">🏢 공실률</div><div class="mv" style="color:'+vacHex(d.vac)+'">'+d.vac.toFixed(1)+'%</div></div>'
+  +'<div class="mc"><div class="mk">🗂 누적 리뷰</div><div class="mv">'+d.reviews.toLocaleString()+'</div></div>'
+  +'<div class="mc"><div class="mk">⚠ 위험구역 / 공실</div><div class="mv">'+d.risk+'개 · '+d.vacN+'곳</div></div></div>'
+  +'<div class="note">'+d.note+'</div>'
+  +'<a class="btn" href="SpaceOS_Goyang_MultiDistrict_PPPP.html" target="_blank">이 거점 PPPP 심층분석 열기 ↗</a>';
+}
+
+setMetric('s');selectD('lafesta');
+</script>
+</body>
+</html>

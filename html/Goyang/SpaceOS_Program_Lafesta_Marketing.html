@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS · Program · 라페스타 온·오프라인 마케팅 솔루션</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+ --bg:#eef1f4;--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#3a5a98;--green:#3f7d3f;
+ --on:#2563b0;--onbg:#e3edf8;--off:#b06a1e;--offbg:#f6e9d4;--nv-park:#d9ead0;--nv-land:#f7f6f2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);padding:22px;line-height:1.4}
+.wrap{max-width:1180px;margin:0 auto}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.hd .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+.hd h1{font-size:30px;font-weight:800;margin:6px 0 5px;letter-spacing:-.5px}
+.hd .sub{font-size:13px;color:var(--sub)}
+.hd .rt{display:flex;gap:8px}
+.chip{font-size:12px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:7px 13px;color:var(--sub)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+.kpi .l{font-size:12px;color:var(--sub);margin-bottom:9px}
+.kpi .v{font-size:25px;font-weight:800;letter-spacing:-.5px}
+.kpi .v small{font-size:13px;font-weight:700;margin-left:4px;color:var(--sub)}
+.kpi .d{font-size:11px;color:var(--sub);margin-top:6px}
+.cols{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px 18px;margin-bottom:14px}
+.card .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.card .ch h2{font-size:16px;font-weight:800}
+.card .ch .hint{font-size:11px;color:#9aa3af}
+.maphost{position:relative}
+#map{height:420px;border-radius:12px;border:1px solid var(--line);background:var(--nv-land)}
+.leaflet-container{background:var(--nv-land)}
+.poi{font-size:10.5px;font-weight:700;color:#7b8794;text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.poi.sta{color:#c0504a}
+.emk{transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50% 50% 50% 4px;border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
+.legb{display:flex;gap:16px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.legb span{font-size:11.5px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.legb i{width:13px;height:13px;border-radius:4px;display:inline-block}
+/* 탭 */
+.tabs{display:flex;gap:6px;margin-bottom:13px}
+.tab{flex:1;text-align:center;font-size:13px;font-weight:700;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fafbfc;color:var(--sub);cursor:pointer;transition:.12s}
+.tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+/* 온라인 콘텐츠 카드 */
+.gen{border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:11px;background:#fbfcfd}
+.gen .gh{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.gen .pf{font-size:12px;font-weight:800;display:flex;align-items:center;gap:7px}
+.gen .pf .ic{width:18px;height:18px;border-radius:5px}
+.gen .badge{font-size:10px;font-weight:700;color:var(--on);background:var(--onbg);border-radius:5px;padding:2px 7px}
+.gen .body{font-size:12.5px;line-height:1.65;white-space:pre-wrap;color:#28303a}
+.gen .tags{margin-top:7px;font-size:11.5px;color:var(--blue);font-weight:600}
+.gen .meta{margin-top:8px;display:flex;gap:8px;font-size:10.5px;color:var(--sub);flex-wrap:wrap}
+.gen .meta b{color:var(--green)}
+.regen{font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-weight:700;font-family:inherit}
+/* 오프라인 이벤트 */
+.ev{border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:11px;cursor:pointer;transition:.12s}
+.ev:hover{box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.ev.sel{border-width:2px;border-color:var(--off)}
+.ev .eh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.ev .en{font-size:14px;font-weight:800}
+.ev .ed{font-size:11px;color:var(--sub);margin-top:2px}
+.ev .kpi2{font-size:11px;font-weight:800;color:var(--off);background:var(--offbg);border-radius:6px;padding:3px 8px;white-space:nowrap}
+.ev .desc{font-size:12px;color:#444;line-height:1.55;margin-top:6px}
+.ev .roles{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.ev .roles span{font-size:10.5px;border:1px solid var(--line);border-radius:20px;padding:3px 9px;color:var(--sub)}
+.ha{margin-top:6px;background:#f4f8f4;border:1px solid #d8e8d8;border-radius:10px;padding:10px 12px;font-size:11.5px;color:#3f6b3f;line-height:1.6}
+.ha b{color:#2f5a2f}
+.btn{width:100%;margin-top:12px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;padding:11px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{background:#3a5a98;color:#fff;border-color:#3a5a98}
+.foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:18px;line-height:1.6}
+.nvbadge{position:absolute;right:10px;bottom:8px;z-index:500;background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:10px;color:#9aa3af}
+@media(max-width:920px){.kpis{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <div class="ey">SPACEOS · PROGRAM · 온·오프라인 마케팅 솔루션 (PPPP)</div>
+      <h1>일산 라페스타 · 웨스턴돔</h1>
+      <div class="sub">고양시 일산동구 장항동 · 네이버 지도 정합 · LLM 콘텐츠 자동생성 + 지역 행사 기획 자동화</div>
+    </div>
+    <div class="rt"><div class="chip">자동 발행 <b>주 12</b>건</div><div class="chip">행사 후보 <b id="evcnt">0</b>건</div></div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="cols">
+    <div class="left">
+      <div class="card">
+        <div class="ch"><h2>오프라인 행사 배치 지도</h2><div class="hint">마커 클릭 → 행사 상세 · 핀=행사 거점</div></div>
+        <div class="maphost"><div id="map"></div><div class="nvbadge">베이스: 네이버 지도 스타일 정합 · Platform 감성/Page 공실 연계</div></div>
+        <div class="legb">
+          <span><i style="background:#b06a1e"></i>오프라인 행사 거점</span>
+          <span><i style="background:#2563b0"></i>온라인 집중 발행 구역</span>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="card">
+        <div class="tabs"><div class="tab on" id="tab-on" onclick="showTab('on')">🟦 온라인 (LLM 콘텐츠)</div><div class="tab" id="tab-off" onclick="showTab('off')">🟧 오프라인 (행사 기획)</div></div>
+        <div id="pane-on"></div>
+        <div id="pane-off" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">SpaceOS Digital Twin Platform · Program 레이어 · PPPP의 Posting(자동 발행)+Program(상인·건물주·소비자 관계 설계) 결합. 콘텐츠는 Platform 감성분석 + Page 공실 + Posting 입점 Tier를 입력으로 LLM이 생성하며, 행사 ROI는 유동인구·카드매출 기준 시뮬레이션입니다. Humanistic Authority(균형·공생·공감)를 콘텐츠/행사 설계의 윤리 기준으로 적용합니다.</div>
+</div>
+<script>
+// ===== 온라인: LLM 자동생성 콘텐츠 =====
+var insta=[
+ "📍일산 라페스타 레스토랑거리, 요즘 여기 줄 서는 이유\n\n정발산역 3번 출구 도보 5분. 주말 저녁 웨이팅 핫플 TOP3 골목을 한 컷에 담았어요. 오늘 인증샷 남기면 디저트 1+1 🍰\n\n#일산맛집 #라페스타 #정발산역맛집 #일산데이트",
+ "🌿웨스턴돔 3F가 달라졌습니다\n\n비어있던 공간이 무인 디저트·플리마켓 존으로! 평일 낮 조용한 작업 공간 찾는 분들께 추천. 24시간 오픈 ☕\n\n#웨스턴돔 #일산카페 #무인카페 #일산가볼만한곳",
+ "✨라페스타 가을 골목축제 D-7\n\n중앙상가부터 정문광장까지, 200개 점포가 함께하는 거리 페스타. 스탬프 투어 완주 시 굿즈 증정 🎁\n\n#라페스타축제 #고양시 #일산나들이 #주말나들이"
+];
+var place=[
+ {nm:'라페스타 레스토랑거리 (네이버 플레이스 소개문)',body:"정발산역 도보 5분, 일산 대표 다이닝 골목. 20·30대 데이트·모임 수요가 높은 핵심 보행축에 위치해 점심·저녁 회전율이 우수합니다. 주말 저녁 웨이팅이 잦아 예약을 권장합니다.",tag:'#일산맛집 #정발산역 #라페스타'},
+];
+function metaLine(){var r=function(a,b){return (a+Math.random()*(b-a));};return '예상 도달 <b>'+Math.round(r(8,16))+'K</b> · 저장률 <b>'+r(4,9).toFixed(1)+'%</b> · 감성 매칭 <b>'+Math.round(r(88,96))+'</b>';}
+function renderOnline(){
+ var ig=insta.map(function(t,i){
+  return '<div class="gen"><div class="gh"><span class="pf"><span class="ic" style="background:linear-gradient(135deg,#f58529,#dd2a7b)"></span>인스타그램 피드 #'+(i+1)+'</span><button class="regen" onclick="renderOnline()">↻ 재생성</button></div>'
+   +'<div class="body">'+t.split('\n\n')[0]+'\n\n'+t.split('\n\n').slice(1,-1).join('\n\n')+'</div>'
+   +'<div class="tags">'+t.split('\n\n').slice(-1)[0]+'</div>'
+   +'<div class="meta"><span>'+metaLine()+'</span></div></div>';
+ }).join('');
+ var pl=place.map(function(p){
+  return '<div class="gen"><div class="gh"><span class="pf"><span class="ic" style="background:#2db400"></span>네이버 플레이스</span><span class="badge">감성분석 반영</span></div>'
+   +'<div class="body">'+p.body+'</div><div class="tags">'+p.tag+'</div></div>';
+ }).join('');
+ document.getElementById('pane-on').innerHTML=ig+pl
+  +'<button class="btn" onclick="alert(\'자동 발행 스케줄 (프로토타입)\\n\\n· 인스타 3건 → 주 3회 예약 발행\\n· 네이버 플레이스 소개문 → 즉시 반영\\n· 발행 후 저장·도달 지표 → Platform 감성지표로 피드백\')">주간 발행 스케줄 자동 편성 ↗</button>';
+}
+
+// ===== 오프라인: 지역 행사 기획 =====
+var events=[
+ {id:'e1',n:'라페스타 골목 페스타',lat:37.65900,lng:126.76980,ic:'🎪',when:'2026.09 · 주말 3일',kpi:'유입 +38%',
+  desc:'정문광장~중앙상가 보행축 200개 점포 연계 거리 축제. 스탬프 투어로 공실 인접 구역까지 동선 유도.',
+  roles:['상인회: 부스 운영','건물주: 공실 임시개방','소비자: 스탬프 투어'],
+  ha:'<b>공생</b> — 공실(웨돔/후면동)을 팝업 부스로 임시 개방해 임대인-임차인 접점 생성, 잠재 입점 매칭으로 연결.'},
+ {id:'e2',n:'웨스턴돔 빈공간 팝업위크',lat:37.66095,lng:126.77260,ic:'🛍',when:'2026.07 · 2주',kpi:'전환 12%',
+  desc:'고공실 2·3F를 2주 단기 팝업 스토어로 운영. 브랜드 입점 테스트 + 소비자 반응 데이터 수집.',
+  roles:['건물주: 무상 단기임대','브랜드: 팝업 입점','SpaceOS: 반응 데이터'],
+  ha:'<b>균형</b> — 대형 자본뿐 아니라 로컬·신생 브랜드에 공정한 노출 기회 배분.'},
+ {id:'e3',n:'정발산 나이트 마켓',lat:37.65800,lng:126.77120,ic:'🌙',when:'매월 마지막 금요일',kpi:'야간매출 +22%',
+  desc:'후면주차장 야간 안전·공실 이슈 구역을 플리마켓·푸드트럭 존으로 전환. 야간 체류시간 확대.',
+  roles:['상인회: 야시장','지자체: 안전·인허가','소비자: 야간 콘텐츠'],
+  ha:'<b>공감</b> — 라페스타 고유의 야간 상권 분위기를 살린 로컬 감성 행사로 설계.'},
+];
+document.getElementById('evcnt').textContent=events.length;
+var alle={};events.forEach(function(e){alle[e.id]=e;});
+
+function renderOffline(selId){
+ document.getElementById('pane-off').innerHTML=events.map(function(e){
+  var sel=e.id===selId?'sel':'';
+  return '<div class="ev '+sel+'" onclick="selEvent(\''+e.id+'\')"><div class="eh"><div><div class="en">'+e.ic+' '+e.n+'</div><div class="ed">'+e.when+'</div></div><div class="kpi2">'+e.kpi+'</div></div>'
+   +'<div class="desc">'+e.desc+'</div>'
+   +'<div class="roles">'+e.roles.map(function(r){return '<span>'+r+'</span>';}).join('')+'</div>'
+   +'<div class="ha">'+e.ha+'</div></div>';
+ }).join('')
+ +'<button class="btn" onclick="alert(\'행사 운영계획 자동 생성 (프로토타입)\\n\\n· 예산·타임라인·인허가 체크리스트\\n· 상인-건물주-소비자 역할 배분\\n· 온라인 사전 홍보 콘텐츠 연동 발행\')">선택 행사 운영계획 자동 생성 ↗</button>';
+}
+function selEvent(id){renderOffline(id);var e=alle[id];map.setView([e.lat,e.lng],17,{animate:true});}
+
+// ===== 지도 =====
+var map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,minZoom:15,maxZoom:18}).setView([37.6592,126.7710],16);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',opacity:.5}).addTo(map);
+function fill(c,col,op){L.polygon(c,{color:col,weight:0,fillColor:col,fillOpacity:op}).addTo(map);}
+function road(c,col,w,cs,cw){L.polyline(c,{color:cs,weight:cw,opacity:.9,lineCap:'round'}).addTo(map);L.polyline(c,{color:col,weight:w,opacity:1,lineCap:'round'}).addTo(map);}
+fill([[37.6618,126.7738],[37.6628,126.7762],[37.6612,126.7780],[37.6600,126.7748]],'#d9ead0',.7);
+road([[37.6606,126.7660],[37.6612,126.7710],[37.6616,126.7762]],'#fbe7a6',6,'#e9cf73',9);
+road([[37.65960,126.76920],[37.65820,126.77090],[37.65775,126.77150]],'#ffffff',5,'#d7d2c6',8);
+L.circleMarker([37.65950,126.77415],{radius:6,color:'#fff',weight:2,fillColor:'#c0504a',fillOpacity:1}).addTo(map)
+ .bindTooltip('<div class="poi sta">◉ 정발산역</div>',{permanent:true,direction:'right',offset:[6,0],opacity:1});
+// 온라인 집중 발행 구역(감성 핫플)
+L.circle([37.65820,126.77085],{radius:70,color:'#2563b0',weight:1.4,opacity:.5,fillColor:'#2563b0',fillOpacity:.12}).addTo(map);
+events.forEach(function(e){
+ var m=L.marker([e.lat,e.lng],{icon:L.divIcon({html:'<div class="emk" style="background:#b06a1e">'+e.ic+'</div>',iconSize:[0,0],className:''})}).addTo(map);
+ m.on('click',function(){selEvent(e.id);showTab('off');});
+ m.bindTooltip('<div class="poi" style="color:#b06a1e">'+e.n+'</div>',{permanent:true,direction:'right',offset:[14,0],opacity:1});
+});
+
+// ===== KPI =====
+var kpis=[
+ {l:'📤 주간 자동 발행',v:'12',suf:'건',c:'#2563b0',d:'인스타·네이버·블로그'},
+ {l:'🎪 행사 기획 후보',v:'3',suf:'건',c:'#b06a1e',d:'공실 연계 자동 도출'},
+ {l:'📈 예상 유입 증대',v:'+34',suf:'%',c:'#2f7d4f',d:'행사+콘텐츠 합산'},
+ {l:'🤝 상생 매칭',v:'5',suf:'건',d:'임대인-임차인 접점'},
+];
+document.getElementById('kpis').innerHTML=kpis.map(function(k){
+ return '<div class="kpi"><div class="l">'+k.l+'</div><div class="v" style="color:'+(k.c||'inherit')+'">'+k.v+'<small>'+k.suf+'</small></div><div class="d">'+k.d+'</div></div>';
+}).join('');
+
+function showTab(t){
+ document.getElementById('tab-on').classList.toggle('on',t==='on');
+ document.getElementById('tab-off').classList.toggle('on',t==='off');
+ document.getElementById('pane-on').style.display=t==='on'?'block':'none';
+ document.getElementById('pane-off').style.display=t==='off'?'block':'none';
+}
+renderOnline();renderOffline('e1');
+</script>
+</body>
+</html>

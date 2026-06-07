@@ -1,0 +1,4 @@
+[
+  "tests/test_health.py::test_building_history",
+  "tests/test_health.py::test_health"
+]

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS · 화정 로데오 PPPP 통합 플랫폼</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+ --bg:#eef1f4;--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#3a5a98;--green:#3f7d3f;
+ --P1:#3a5a98;--P2:#c0392b;--P3:#7a4f9a;--P4:#2563b0;
+ --t1:#7a4f9a;--t1bg:#efe7f5;--t2:#2f7d4f;--t2bg:#e0f0e6;--t3:#b06a1e;--t3bg:#f6e9d4;
+ --on:#2563b0;--onbg:#e3edf8;--off:#b06a1e;--offbg:#f6e9d4;--nv-land:#f7f6f2;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);padding:20px;line-height:1.4}
+.wrap{max-width:1200px;margin:0 auto}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.hd .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+.hd h1{font-size:28px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
+.hd .sub{font-size:13px;color:var(--sub)}
+.hd .rt{display:flex;gap:8px;align-items:center}
+.chip{font-size:12px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:7px 13px;color:var(--sub)}
+.chip.live{color:var(--green);border-color:#cfe3cf;background:#f1f8f1;font-weight:600}
+.ptabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.ptab{border:1px solid var(--line);background:var(--card);border-radius:13px;padding:13px 15px;cursor:pointer;transition:.15s;border-left-width:4px}
+.ptab .pk{font-size:11px;font-weight:800;letter-spacing:.5px;color:#9aa3af}
+.ptab .pn{font-size:15px;font-weight:800;margin-top:3px}
+.ptab .pd{font-size:11px;color:var(--sub);margin-top:3px}
+.ptab.on{box-shadow:0 3px 10px rgba(0,0,0,.08);transform:translateY(-1px)}
+.ptab[data-p="P1"]{border-left-color:var(--P1)} .ptab[data-p="P1"].on{background:#f2f5fb}
+.ptab[data-p="P2"]{border-left-color:var(--P2)} .ptab[data-p="P2"].on{background:#fbf2f1}
+.ptab[data-p="P3"]{border-left-color:var(--P3)} .ptab[data-p="P3"].on{background:#f7f2fb}
+.ptab[data-p="P4"]{border-left-color:var(--P4)} .ptab[data-p="P4"].on{background:#f1f6fc}
+.kpis{display:grid;gap:11px;margin-bottom:13px;grid-template-columns:repeat(5,1fr)}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 15px}
+.kpi .l{font-size:11.5px;color:var(--sub);margin-bottom:7px}
+.kpi .v{font-size:23px;font-weight:800;letter-spacing:-.5px}
+.kpi .v small{font-size:12px;font-weight:700;margin-left:3px;color:var(--sub)}
+.kpi .d{font-size:10.5px;color:var(--sub);margin-top:5px}
+.cols{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 17px;margin-bottom:14px}
+.card .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.card .ch h2{font-size:15px;font-weight:800}
+.card .ch .hint{font-size:11px;color:#9aa3af}
+.maphost{position:relative}
+#map{height:540px;border-radius:12px;border:1px solid var(--line);background:var(--nv-land)}
+.leaflet-container{background:var(--nv-land)}
+.poi{font-size:10.5px;font-weight:700;color:#7b8794;text-shadow:0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.poi.sta{color:#c0504a}.poi.park{color:#4f7a31}.poi.hos{color:#3a7ca5}
+.mlbl{font-size:11px;font-weight:800;color:#1f2937;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none}
+.glab{font-size:9px;font-weight:800;color:#3a2f2f;text-shadow:0 0 2px #fff,0 0 2px #fff;pointer-events:none}
+.zmk{transform:translate(-50%,-50%);width:20px;height:20px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:pointer}
+.umk{transform:translate(-50%,-50%);width:22px;height:22px;border-radius:6px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+.emk{transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50% 50% 50% 4px;border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
+.legb{display:flex;gap:13px;justify-content:center;margin-top:12px;flex-wrap:wrap;align-items:center}
+.legb .lt{font-size:11px;color:var(--sub)}
+.legb span{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:5px}
+.legb i{width:12px;height:12px;border-radius:4px;display:inline-block}.legb i.r{border-radius:50%}.legb i.bar{width:28px;height:10px;border-radius:0}
+.rp .top{display:flex;justify-content:space-between;align-items:flex-start}
+.rp .nm{font-size:17px;font-weight:800}.rp .lab{font-size:11px;color:var(--sub)}
+.rp .sc{font-size:28px;font-weight:800;text-align:right;line-height:1}.rp .suf{font-size:11px;text-align:right;margin-top:3px;font-weight:600;color:var(--sub)}
+.fr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+.fr b{font-weight:700}.fr .up{color:#b23b39}.fr .dn{color:var(--blue)}
+.sec{margin-top:13px}.sec .st{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:8px}
+.mix{display:flex;height:11px;border-radius:6px;overflow:hidden;margin-bottom:7px}.mix i{height:100%}
+.mixleg{display:flex;flex-wrap:wrap;gap:7px 11px;font-size:11px;color:var(--sub)}.mixleg span{display:flex;align-items:center;gap:5px}.mixleg .dt{width:8px;height:8px;border-radius:2px}
+.recbadge{display:inline-block;font-size:12px;font-weight:800;padding:5px 11px;border-radius:8px;margin-top:8px}
+.uspec{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}.uspec .sp{flex:1;min-width:80px;background:#f7f8fa;border:1px solid var(--line);border-radius:9px;padding:8px 9px}
+.uspec .sp .k{font-size:10px;color:var(--sub)}.uspec .sp .vv{font-size:13px;font-weight:800;margin-top:3px}
+.tier{border:1px solid var(--line);border-radius:11px;padding:10px 11px;margin-bottom:8px}.tier.sel{border-width:2px}
+.tier .th{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.tier .th .tn{font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px}.tier .th .tn .dot{width:10px;height:10px;border-radius:3px}
+.tier .roi{font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px}
+.tier .met{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;font-size:11px}.tier .met .m{background:#f7f8fa;border-radius:7px;padding:5px 6px}.tier .met .m .mk{color:var(--sub);font-size:9.5px}.tier .met .m .mv{font-weight:800;margin-top:2px}
+.subtabs{display:flex;gap:6px;margin-bottom:12px}.subtab{flex:1;text-align:center;font-size:12.5px;font-weight:700;padding:9px;border:1px solid var(--line);border-radius:9px;background:#fafbfc;color:var(--sub);cursor:pointer}.subtab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.gen{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:10px;background:#fbfcfd}.gen .gh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.gen .pf{font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px}.gen .pf .ic{width:17px;height:17px;border-radius:5px}.gen .body{font-size:12px;line-height:1.6;white-space:pre-wrap;color:#28303a}.gen .tags{margin-top:6px;font-size:11px;color:var(--blue);font-weight:600}.gen .meta{margin-top:7px;font-size:10.5px;color:var(--sub)}.gen .meta b{color:var(--green)}
+.ev{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:10px;cursor:pointer}.ev.sel{border-width:2px;border-color:var(--off)}.ev .eh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}.ev .en{font-size:13.5px;font-weight:800}.ev .edt{font-size:11px;color:var(--sub);margin-top:2px}.ev .k2{font-size:11px;font-weight:800;color:var(--off);background:var(--offbg);border-radius:6px;padding:3px 8px;white-space:nowrap}.ev .desc{font-size:11.5px;color:#444;line-height:1.5;margin-top:5px}.ev .roles{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}.ev .roles span{font-size:10px;border:1px solid var(--line);border-radius:20px;padding:3px 8px;color:var(--sub)}
+.ha{margin-top:6px;background:#f4f8f4;border:1px solid #d8e8d8;border-radius:9px;padding:9px 11px;font-size:11px;color:#3f6b3f;line-height:1.55}.ha b{color:#2f5a2f}
+.flow{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--sub);margin-top:10px;flex-wrap:wrap}.flow b{color:var(--ink)}.flow .ar{color:#c3c9d2}
+.btn{width:100%;margin-top:12px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;padding:10px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{background:#3a5a98;color:#fff;border-color:#3a5a98}
+.foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:16px;line-height:1.6}
+.nvbadge{position:absolute;right:10px;bottom:8px;z-index:500;background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:10px;color:#9aa3af}
+@media(max-width:920px){.ptabs{grid-template-columns:repeat(2,1fr)}.cols{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}#map{height:440px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <div class="ey">SPACEOS · DIGITAL TWIN · 통합 PPPP · 3거점 확장</div>
+      <h1>화정 로데오</h1>
+      <div class="sub">고양시 덕양구 화정동 · 화정역(3호선·서해선) · 네이버 지도 정합 · 성숙상권 노후공실 · Platform→Page→Posting→Program</div>
+    </div>
+    <div class="rt"><div class="chip">📍 거점 #3 · 화정 성숙상권</div><div class="chip live"><span id="liverate">44</span>건/s</div></div>
+  </div>
+  <div class="ptabs" id="ptabs">
+    <div class="ptab on" data-p="P1" onclick="setP('P1')"><div class="pk">PLATFORM</div><div class="pn">상권 감성 지도</div><div class="pd">Place→Platform · 8구역</div></div>
+    <div class="ptab" data-p="P2" onclick="setP('P2')"><div class="pk">PAGE</div><div class="pn">공실률 그리드</div><div class="pd">Product→Page · 100m</div></div>
+    <div class="ptab" data-p="P3" onclick="setP('P3')"><div class="pk">POSTING</div><div class="pn">입점 솔루션</div><div class="pd">Promo→Posting · 3-Tier</div></div>
+    <div class="ptab" data-p="P4" onclick="setP('P4')"><div class="pk">PROGRAM</div><div class="pn">마케팅 솔루션</div><div class="pd">Promo→Program · 온·오프</div></div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="cols">
+    <div class="left">
+      <div class="card">
+        <div class="ch"><h2 id="maptitle">상권 감성 히트맵</h2><div class="hint" id="maphint"></div></div>
+        <div class="maphost"><div id="map"></div><div class="nvbadge">네이버 지도 스타일 정합 · 키 발급 시 실타일 교체</div></div>
+        <div class="legb" id="legb"></div>
+        <div class="flow" id="flow"></div>
+      </div>
+    </div>
+    <div class="right"><div class="card rp" id="panel"></div></div>
+  </div>
+  <div class="foot">SpaceOS Digital Twin Platform · 거점 #3(화정 로데오). 좌표는 네이버 지도 기준 화정역(37.6347,126.8326)·로데오 먹자골목(37.6360,126.8330) 정합. 성숙상권의 1층 활성 대비 지하·상층부 노후 공실 패턴을 반영한 시뮬레이션이며 건축물대장·SNS·카드사 실데이터 연동 시 자동 갱신. Humanistic Authority(균형·공생·공감) 설계 기준 적용.</div>
+</div>
+
+<script>
+function fgHex(s){return s<40?'#d9716a':s<60?'#e3b95e':s<80?'#7faa55':'#3a5a98';}
+function fgV(s){return s<40?'#b23b39':s<60?'#9a7b1e':s<80?'#4f7a31':'#3a5a98';}
+function vacColor(v){return v<5?'#cfe3cf':v<10?'#fbe7a6':v<18?'#f6b96b':v<28?'#e8743b':'#c0392b';}
+function arrow(d){return d>0?'↑'+d.toFixed(1):d<0?'↓'+Math.abs(d).toFixed(1):'→'+d.toFixed(1);}
+function rev(n){return n>=1000?(n/1000).toFixed(1)+'K':n;}
+function distM(aLat,aLng,bLat,bLng){var dy=(aLat-bLat)*111000,dx=(aLng-bLng)*88200;return Math.sqrt(dx*dx+dy*dy);}
+function seed(i,j){var x=Math.sin(i*12.9898+j*78.233)*43758.5453;return x-Math.floor(x);}
+function rad(r){return 12+Math.sqrt(r)/3;}
+
+/* P1 감성 구역 — 1층 먹자/카페 활성 vs 지하·상층 노후 공실 */
+var zones=[
+ {id:'rd-meokja',n:'로데오 먹자골목',grp:'로데오',lat:37.63600,lng:126.83300,s:72.5,d:1.4,r:1680,f:[['저녁 회전율','+48%','up'],['배달 주문','+36%','up'],['노포 재방문','+27%','up']]},
+ {id:'rd-cafe',n:'화정 카페거리',grp:'로데오',lat:37.63520,lng:126.83205,s:69.8,d:1.1,r:1180,f:[['디저트 인증샷','+44%','up'],['주말 체류','+29%','up'],['신규 카페 유입','+18%','up']]},
+ {id:'rd-fashion',n:'화정 패션거리',grp:'로데오',lat:37.63620,lng:126.83260,s:58.4,d:-1.9,r:742,f:[['온라인 이탈','+62%','up'],['공실 언급','+41%','up'],['업종 전환','+23%','up']]},
+ {id:'hj-exit1',n:'화정역 1번출구 상가',grp:'화정역',lat:37.63470,lng:126.83245,s:64.2,d:0.4,r:910,f:[['역세권 유입','+22%','up'],['프랜차이즈 편중','+34%','up'],['임대료 부담','+16%','up']]},
+ {id:'hj-byeolbit',n:'별빛마을 단지상가',grp:'화정동',lat:37.63340,lng:126.83120,s:52.1,d:-2.2,r:486,f:[['생활밀착 수요','+24%','up'],['주말 공동화','+47%','up'],['업종 중복','+31%','up']]},
+ {id:'rd-jiha',n:'화정 중앙 지하상가',grp:'로데오',lat:37.63480,lng:126.83320,s:33.7,d:-4.6,r:268,f:[['지하 공실','+243%','up'],['노후 시설','+128%','up'],['유동 단절','-39%','dn']]},
+ {id:'rd-old',n:'노후 상가 2~3F',grp:'로데오',lat:37.63560,lng:126.83400,s:38.9,d:-3.4,r:312,f:[['상층 공실','+196%','up'],['엘리베이터 노후','+84%','up'],['임차 기피','-33%','dn']]},
+ {id:'hj-myeongji',n:'명지병원 배후상가',grp:'화정동',lat:37.63420,lng:126.83010,s:60.3,d:0.2,r:638,f:[['병원 배후수요','+28%','up'],['약국·의료 편중','+39%','up'],['야간 한산','+21%','up']]},
+];
+var allz={};zones.forEach(function(z){allz[z.id]=z;});
+
+/* P2 공실 그리드 */
+var BB={s:37.6312,n:37.6392,w:126.8290,e:126.8362},DLAT=0.0009,DLNG=0.001150;
+var hot=[{lat:37.63480,lng:126.83320,r:85,pk:38},{lat:37.63560,lng:126.83400,r:90,pk:32},{lat:37.63620,lng:126.83260,r:80,pk:20},{lat:37.63340,lng:126.83120,r:85,pk:24},{lat:37.63600,lng:126.83300,r:70,pk:6},{lat:37.63520,lng:126.83205,r:65,pk:7},{lat:37.63420,lng:126.83010,r:70,pk:14}];
+var coreC={lat:37.6352,lng:126.8328};
+var cells=[],sumStores=0,sumVac=0;
+for(var lat=BB.s,i=0;lat<BB.n-1e-9;lat+=DLAT,i++){for(var lng=BB.w,j=0;lng<BB.e-1e-9;lng+=DLNG,j++){
+ var cLat=lat+DLAT/2,cLng=lng+DLNG/2,v=2.5,infl=0;
+ hot.forEach(function(h){var d=distM(cLat,cLng,h.lat,h.lng),w=Math.exp(-(d*d)/(2*h.r*h.r));v+=h.pk*w;infl+=w;});
+ v+=(seed(i,j)-0.5)*4;var dc=distM(cLat,cLng,coreC.lat,coreC.lng);
+ if(!(infl>0.12&&dc<470))continue;
+ v=Math.max(2,Math.min(46,v));var st=Math.round(8+22*Math.min(1,infl)+seed(j,i)*10),vn=Math.round(st*v/100);
+ cells.push({i:i,j:j,lat:lat,lng:lng,cLat:cLat,cLng:cLng,v:v,stores:st,vacN:vn});sumStores+=st;sumVac+=vn;
+}}
+var mixHi=[['요식',26,'#e8743b'],['공실',36,'#c0392b'],['노래·유흥',12,'#9aa3af'],['의류',8,'#c98bbf'],['기타',18,'#cbd2d9']];
+var mixMid=[['요식',32,'#e8743b'],['공실',17,'#c0392b'],['생활편의',16,'#9aa3af'],['카페',13,'#b07a4a'],['뷰티',10,'#c98bbf'],['기타',12,'#cbd2d9']];
+var mixLo=[['요식',40,'#e8743b'],['카페',20,'#b07a4a'],['뷰티',14,'#c98bbf'],['생활편의',12,'#9aa3af'],['공실',6,'#c0392b'],['기타',8,'#cbd2d9']];
+
+/* P3 입점 유닛 */
+var TIER={premium:{nm:'고급화',sub:'Premium',c:'#7a4f9a',bg:'#efe7f5'},value:{nm:'가성비',sub:'Value',c:'#2f7d4f',bg:'#e0f0e6'},factory:{nm:'공장제',sub:'Standardized',c:'#b06a1e',bg:'#f6e9d4'}};
+var units=[
+ {id:'u-jiha',n:'화정 중앙 지하상가 B1',grp:'로데오',lat:37.63482,lng:126.83325,area:42,rent:120,prem:0,floor:'B1',was:'의류',rec:'factory',foot:'저',persona:'역 환승객',note:'지하 노후·저유동 → 무인 셀프·창고형 표준 운영으로 공실 차단'},
+ {id:'u-old3',n:'노후 상가 3F',grp:'로데오',lat:37.63562,lng:126.83405,area:55,rent:135,prem:0,floor:'3F',was:'학원',rec:'factory',foot:'저',persona:'교습·스터디',note:'상층 노후 → 무인스터디카페·공유오피스 표준화'},
+ {id:'u-fashion2',n:'패션거리 2F',grp:'로데오',lat:37.63622,lng:126.83265,area:46,rent:200,prem:200,floor:'2F',was:'의류',rec:'value',foot:'중',persona:'10·20대',note:'온라인 이탈 의류 → 회전형 체험·F&B 가성비 전환'},
+ {id:'u-byeolbit',n:'별빛마을 단지상가 1F',grp:'화정동',lat:37.63342,lng:126.83122,area:33,rent:230,prem:300,floor:'1F',was:'문구',rec:'value',foot:'중',persona:'단지 가족',note:'생활밀착 수요 → 가성비 베이커리/반찬가게'},
+ {id:'u-meokja1',n:'로데오 먹자골목 1F',grp:'로데오',lat:37.63602,lng:126.83302,area:40,rent:340,prem:1000,floor:'1F',was:'호프',rec:'premium',foot:'고',persona:'20·30대 외식',note:'먹자골목 핵심 1F → 고객단가 높은 다이닝/바'},
+ {id:'u-exit1',n:'화정역 1번출구 1F',grp:'화정역',lat:37.63472,lng:126.83248,area:28,rent:300,prem:600,floor:'1F',was:'편의점',rec:'value',foot:'고',persona:'역세권 통근',note:'역세권 유동 → 회전형 테이크아웃 가성비'},
+];
+var allu={};units.forEach(function(u){allu[u.id]=u;});
+function scenarios(u){var fK={'저':0.8,'중':1.0,'고':1.25}[u.foot],base=u.area*fK;return{
+ premium:{invest:Math.round(u.prem/100+u.area*0.55+4),monthCost:Math.round(u.rent+u.area*1.8+180),monthRev:Math.round(base*41+1150)},
+ value:{invest:Math.round(u.prem/100+u.area*0.32+2.2),monthCost:Math.round(u.rent+u.area*1.1+95),monthRev:Math.round(base*30+760)},
+ factory:{invest:Math.round(u.prem/100+u.area*0.2+1.1),monthCost:Math.round(u.rent+u.area*0.45+25),monthRev:Math.round(base*18+430)}};}
+function roiM(s){var net=s.monthRev-s.monthCost;return net<=0?99:s.invest/net;}
+
+/* P4 마케팅 */
+var events=[
+ {id:'e1',n:'화정 로데오 레트로 페스타',lat:37.63580,lng:126.83330,ic:'🎶',when:'2026.10 · 주말 3일',k2:'유입 +35%',desc:'먹자골목~패션거리 노포·노후상가를 레트로 컨셉으로 재조명. 노후 상권의 정체성을 콘텐츠 자산화.',roles:['상인회: 노포 투어','건물주: 상층 개방','소비자: 레트로 인증'],ha:'<b>공감</b> — 오래된 상권의 역사를 비하 아닌 향수 콘텐츠로 재해석.'},
+ {id:'e2',n:'지하상가 리뉴얼 팝업',lat:37.63480,lng:126.83320,ic:'🛍',when:'2026.08 · 3주',k2:'전환 13%',desc:'공동화된 중앙 지하상가를 무인·창작자 팝업존으로 단기 전환. 리뉴얼 전 수요 검증.',roles:['건물주: 무상 단기임대','창작자: 입점','SpaceOS: 데이터'],ha:'<b>균형</b> — 임대료 진입장벽이 낮은 지하공간을 청년·창작자에게 우선 배분.'},
+ {id:'e3',n:'명지병원 연계 건강마켓',lat:37.63420,lng:126.83010,ic:'🩺',when:'매월 셋째 토요일',k2:'배후 +19%',desc:'명지병원 배후상가에서 건강·웰니스 테마 마켓 운영. 의료 편중 상권에 생활 콘텐츠 보강.',roles:['병원: 건강부스','상인회: 웰니스','주민: 건강체험'],ha:'<b>공생</b> — 병원-상권-주민을 건강 테마로 잇는 지역 자산 결합.'},
+];
+var alle={};events.forEach(function(e){alle[e.id]=e;});
+var insta=["🍻화정 로데오 먹자골목, 노포의 반격\n\n화정역 1번출구 도보 3분. 20년 노포부터 신상 포차까지 한 골목에. 레트로 스탬프 찍고 굿즈 받기 🎟\n\n#화정맛집 #화정로데오 #화정역맛집 #덕양구","🎨비어있던 화정 지하상가가 팝업존으로\n\n청년 창작자 셀렉트숍·무인 굿즈샵 오픈! 환승길에 구경 한번 🛍\n\n#화정 #지하상가 #팝업스토어 #고양가볼만한곳"];
+
+var map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,minZoom:14,maxZoom:18}).setView([37.6352,126.8328],16);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',opacity:.5}).addTo(map);
+function fillP(c,col,op,ln,lw){L.polygon(c,{color:ln||col,weight:lw||0,opacity:.5,fillColor:col,fillOpacity:op}).addTo(map);}
+function roadP(c,col,w,cs,cw){L.polyline(c,{color:cs,weight:cw,opacity:.9,lineCap:'round'}).addTo(map);L.polyline(c,{color:col,weight:w,opacity:1,lineCap:'round'}).addTo(map);}
+// 화정문화공원(북측 녹지), 명지병원 매스(서측)
+fillP([[37.6378,126.8320],[37.6390,126.8344],[37.6376,126.8356],[37.6366,126.8336]],'#d9ead0',.7);
+fillP([[37.6338,126.8294],[37.6350,126.8296],[37.6348,126.8312],[37.6336,126.8310]],'#e3e8ef',.8,'#c3ccd8',1); // 명지병원
+// 중앙로(E-W 간선), 화정로(N-S), 로데오 보행 스파인
+roadP([[37.6345,126.8296],[37.6347,126.8328],[37.6349,126.8360]],'#fbe7a6',6,'#e9cf73',9); // 중앙로
+roadP([[37.6320,126.8330],[37.6352,126.8332],[37.6388,126.8334]],'#fbe7a6',5,'#e9cf73',8); // 화정로
+roadP([[37.63520,126.83200],[37.63600,126.83300],[37.63560,126.83400]],'#ffffff',5,'#d7d2c6',8); // 로데오 보행로
+// 화정역(3호선·서해선)
+L.circleMarker([37.63470,126.83260],{radius:6,color:'#fff',weight:2,fillColor:'#c0504a',fillOpacity:1}).addTo(map)
+ .bindTooltip('<div class="poi sta">◉ 화정역</div>',{permanent:true,direction:'right',offset:[6,0],opacity:1});
+L.marker([37.63420,126.83010],{icon:L.divIcon({html:'<div class="poi hos">✚ 명지병원</div>',iconSize:[0,0]})}).addTo(map);
+L.marker([37.63800,126.83380],{icon:L.divIcon({html:'<div class="poi park">화정문화공원</div>',iconSize:[0,0]})}).addTo(map);
+
+var G={P1:L.layerGroup().addTo(map),P2:L.layerGroup(),P3:L.layerGroup(),P4:L.layerGroup()};
+
+zones.forEach(function(z){var c=fgHex(z.s);
+ L.circle([z.lat,z.lng],{radius:rad(z.r),color:c,weight:1.4,opacity:.55,fillColor:c,fillOpacity:.18}).addTo(G.P1);
+ var m=L.circleMarker([z.lat,z.lng],{radius:9,fillColor:c,color:'#fff',weight:2,fillOpacity:.95}).addTo(G.P1);
+ m.on('click',function(){selZone(z.id);});
+ m.bindTooltip('<div class="mlbl">'+z.n.replace('로데오 ','').replace('화정 ','').replace('화정역 ','')+' · '+z.s.toFixed(0)+'</div>',{permanent:true,direction:'right',offset:[8,0],opacity:1});
+});
+var rects={};
+cells.forEach(function(c){var col=vacColor(c.v);
+ var rc=L.rectangle([[c.lat,c.lng],[c.lat+DLAT,c.lng+DLNG]],{color:'#fff',weight:1,opacity:.7,fillColor:col,fillOpacity:.62}).addTo(G.P2);
+ rc.on('click',function(){selCell(c.i+'_'+c.j);});
+ rc.on('mouseover',function(){rc.setStyle({weight:2,color:'#1f2937',fillOpacity:.78});});
+ rc.on('mouseout',function(){rc.setStyle({weight:1,color:'#fff',fillOpacity:.62});});
+ if(c.v>=9)L.marker([c.cLat,c.cLng],{icon:L.divIcon({html:'<div class="glab">'+c.v.toFixed(0)+'</div>',iconSize:[0,0]})}).addTo(G.P2);
+ rects[c.i+'_'+c.j]=c;
+});
+units.forEach(function(u){var t=TIER[u.rec];
+ var m=L.marker([u.lat,u.lng],{icon:L.divIcon({html:'<div class="umk" style="background:'+t.c+'">'+t.nm.charAt(0)+'</div>',iconSize:[0,0]})}).addTo(G.P3);
+ m.on('click',function(){selUnit(u.id);});
+ m.bindTooltip('<div class="poi" style="color:'+t.c+'">'+u.n.replace('로데오 ','')+'</div>',{permanent:true,direction:'right',offset:[12,0],opacity:1});
+});
+L.circle([37.63580,126.83300],{radius:80,color:'#2563b0',weight:1.4,opacity:.5,fillColor:'#2563b0',fillOpacity:.12}).addTo(G.P4);
+events.forEach(function(e){
+ var m=L.marker([e.lat,e.lng],{icon:L.divIcon({html:'<div class="emk" style="background:#b06a1e">'+e.ic+'</div>',iconSize:[0,0]})}).addTo(G.P4);
+ m.on('click',function(){selEvent(e.id);});
+ m.bindTooltip('<div class="poi" style="color:#b06a1e">'+e.n+'</div>',{permanent:true,direction:'right',offset:[14,0],opacity:1});
+});
+
+function kpiHTML(arr){return arr.map(function(k){return '<div class="kpi"><div class="l">'+k.l+'</div><div class="v" style="color:'+(k.c||'inherit')+'">'+k.v+(k.suf?'<small>'+k.suf+'</small>':'')+'</div>'+(k.d?'<div class="d">'+k.d+'</div>':'')+'</div>';}).join('');}
+function selZone(id){var z=allz[id];var risk=z.s<40?'위험':z.s<60?'주의':z.s<80?'양호':'우수';
+ var frows=z.f.map(function(f){return '<div class="fr"><span>'+f[0]+'</span><b class="'+(f[2]==='dn'?'dn':'up')+'">'+f[1]+'</b></div>';}).join('');
+ document.getElementById('panel').innerHTML='<div class="lab">선택 구역 · '+z.grp+'</div><div class="top"><div class="nm">'+z.n+'</div><div><div class="sc" style="color:'+fgV(z.s)+'">'+z.s.toFixed(1)+'</div><div class="suf" style="color:'+fgV(z.s)+'">'+risk+' · '+arrow(z.d)+' · '+rev(z.r)+'건</div></div></div><div class="sec"><div class="st">'+(z.d<0?'점수 하락 핵심 요인':'점수 변동 핵심 요인')+'</div>'+frows+'</div><button class="btn" onclick="setP(\'P2\')">이 구역 공실 그리드 ↗</button>';
+ map.setView([z.lat,z.lng],17,{animate:true});}
+function mixFor(v){return v>=24?mixHi:v>=10?mixMid:mixLo;}
+function selCell(id){var c=rects[id];if(!c)return;var lv=c.v<5?['양호','#3f7d3f']:c.v<10?['주의','#9a7b1e']:c.v<18?['경계','#d2691e']:c.v<28?['위험','#e8743b']:['심각','#c0392b'];
+ var mm=mixFor(c.v),mixBar=mm.map(function(x){return '<i style="width:'+x[1]+'%;background:'+x[2]+'"></i>';}).join(''),mixLeg=mm.map(function(x){return '<span><span class="dt" style="background:'+x[2]+'"></span>'+x[0]+' '+x[1]+'%</span>';}).join('');
+ document.getElementById('panel').innerHTML='<div class="lab">선택 셀 · 100m 격자 ('+c.i+','+c.j+')</div><div class="top"><div><div class="nm">N'+c.cLat.toFixed(4)+' E'+c.cLng.toFixed(4)+'</div><div class="lab" style="margin-top:4px">'+lv[0]+' 공실 구간</div></div><div><div class="sc" style="color:'+lv[1]+'">'+c.v.toFixed(1)+'<small style="font-size:14px">%</small></div><div class="suf">공실 '+c.vacN+' / 총 '+c.stores+'</div></div></div><div class="sec"><div class="fr"><span>총 점포</span><b>'+c.stores+'개</b></div><div class="fr"><span>공실 점포</span><b style="color:'+lv[1]+'">'+c.vacN+'개</b></div><div class="fr"><span>입주율</span><b>'+(100-c.v).toFixed(1)+'%</b></div></div><div class="sec"><div class="st">업종 구성</div><div class="mix">'+mixBar+'</div><div class="mixleg">'+mixLeg+'</div></div><button class="btn" onclick="setP(\'P3\')">이 셀 입점 솔루션(3-Tier) ↗</button>';
+ map.setView([c.cLat,c.cLng],17,{animate:true});}
+function selUnit(id){var u=allu[id],sc=scenarios(u),keys=['premium','value','factory'];
+ var spec='<div class="uspec"><div class="sp"><div class="k">면적</div><div class="vv">'+u.area+'㎡</div></div><div class="sp"><div class="k">월 임대료</div><div class="vv">'+u.rent+'만</div></div><div class="sp"><div class="k">권리금</div><div class="vv">'+(u.prem?u.prem+'만':'없음')+'</div></div><div class="sp"><div class="k">유동인구</div><div class="vv">'+u.foot+'</div></div></div>';
+ var tiers=keys.map(function(k){var t=TIER[k],s=sc[k],roi=roiM(s),net=s.monthRev-s.monthCost,sel=k===u.rec?'sel':'';
+  return '<div class="tier '+sel+'" style="'+(k===u.rec?'border-color:'+t.c:'')+'"><div class="th"><span class="tn"><span class="dot" style="background:'+t.c+'"></span>'+t.nm+' · '+t.sub+(k===u.rec?' ✓':'')+'</span><span class="roi" style="background:'+t.bg+';color:'+t.c+'">ROI '+(roi>=99?'—':roi.toFixed(1)+'개월')+'</span></div><div class="met"><div class="m"><div class="mk">초기투자</div><div class="mv">'+s.invest+'백만</div></div><div class="m"><div class="mk">월 순익</div><div class="mv" style="color:'+(net>0?'#2f7d4f':'#b23b39')+'">'+(net>0?'+':'')+net+'만</div></div><div class="m"><div class="mk">월 매출</div><div class="mv">'+s.monthRev+'만</div></div></div></div>';}).join('');
+ document.getElementById('panel').innerHTML='<div class="lab">'+u.grp+' · '+u.floor+' · 구 '+u.was+'</div><div class="top"><div class="nm">'+u.n+'</div></div><div class="recbadge" style="background:'+TIER[u.rec].bg+';color:'+TIER[u.rec].c+'">추천 · '+TIER[u.rec].nm+' ('+TIER[u.rec].sub+')</div><div class="lab" style="margin-top:8px;line-height:1.5">'+u.note+' · 타깃: '+u.persona+'</div>'+spec+'<div class="sec"><div class="st">3-Tier 비용-효용 (월, 만원/백만원)</div>'+tiers+'</div><button class="btn" onclick="setP(\'P4\')">입점 후 마케팅(Program) ↗</button>';
+ map.setView([u.lat,u.lng],17,{animate:true});}
+var curEvent='e1';
+function selEvent(id){curEvent=id;renderP4();var e=alle[id];map.setView([e.lat,e.lng],17,{animate:true});}
+function renderP4(){
+ var ig=insta.map(function(t,i){var first=t.split('\n\n');return '<div class="gen"><div class="gh"><span class="pf"><span class="ic" style="background:linear-gradient(135deg,#f58529,#dd2a7b)"></span>인스타 피드 #'+(i+1)+'</span></div><div class="body">'+first.slice(0,-1).join('\n\n')+'</div><div class="tags">'+first.slice(-1)[0]+'</div><div class="meta">예상 도달 <b>'+(8+i*3)+'K</b> · 감성 매칭 <b>9'+(1+i)+'</b></div></div>';}).join('');
+ var evs=events.map(function(e){var sel=e.id===curEvent?'sel':'';return '<div class="ev '+sel+'" onclick="selEvent(\''+e.id+'\')"><div class="eh"><div><div class="en">'+e.ic+' '+e.n+'</div><div class="edt">'+e.when+'</div></div><div class="k2">'+e.k2+'</div></div><div class="desc">'+e.desc+'</div><div class="roles">'+e.roles.map(function(r){return '<span>'+r+'</span>';}).join('')+'</div><div class="ha">'+e.ha+'</div></div>';}).join('');
+ document.getElementById('panel').innerHTML='<div class="subtabs"><div class="subtab" id="s-on" onclick="swSub(\'on\')">🟦 온라인</div><div class="subtab" id="s-off" onclick="swSub(\'off\')">🟧 오프라인</div></div><div id="sub-on" style="display:none">'+ig+'</div><div id="sub-off">'+evs+'</div>';
+ swSub(window._sub||'off');}
+function swSub(t){window._sub=t;var on=document.getElementById('s-on');if(!on)return;on.classList.toggle('on',t==='on');document.getElementById('s-off').classList.toggle('on',t==='off');document.getElementById('sub-on').style.display=t==='on'?'block':'none';document.getElementById('sub-off').style.display=t==='off'?'block':'none';}
+
+var CFG={
+ P1:{title:'상권 감성 히트맵',hint:'원=리뷰량 · 색=감성점수 · 클릭 상세',legend:'<span class="lt">감성</span><span><i class="r" style="background:#d9716a"></i>위험</span><span><i class="r" style="background:#e3b95e"></i>주의</span><span><i class="r" style="background:#7faa55"></i>양호</span><span><i class="r" style="background:#3a5a98"></i>우수</span>',flow:'<b style="color:var(--P1)">① Platform</b><span class="ar">→</span>Page<span class="ar">→</span>Posting<span class="ar">→</span>Program',kpis:[{l:'😊 감성 지수',v:'56.2',c:'#9a7b1e'},{l:'🗂 리뷰',v:'7,438'},{l:'👍 긍정',v:'61.4',suf:'%',c:'#4f7a31'},{l:'⚠ 위험 구역',v:'2',suf:'개',c:'#b23b39'},{l:'⚙ 신뢰도',v:'90.3',suf:'%'}],init:function(){selZone('rd-jiha');}},
+ P2:{title:'100m 그리드 공실률',hint:'색=공실률 · 숫자=셀 공실률% · 클릭 상세',legend:'<span class="lt">공실률</span><span><i class="bar" style="background:#cfe3cf"></i>0~5</span><span><i class="bar" style="background:#fbe7a6"></i>5~10</span><span><i class="bar" style="background:#f6b96b"></i>10~18</span><span><i class="bar" style="background:#e8743b"></i>18~28</span><span><i class="bar" style="background:#c0392b"></i>28%+</span>',flow:'Platform<span class="ar">→</span><b style="color:var(--P2)">② Page</b><span class="ar">→</span>Posting<span class="ar">→</span>Program',kpis:[{l:'🏢 평균 공실률',v:(sumVac/sumStores*100).toFixed(1),suf:'%',c:'#c0392b'},{l:'🟥 고공실 셀',v:cells.filter(function(c){return c.v>=28;}).length,suf:'칸',c:'#c0392b'},{l:'🏬 상업 셀',v:cells.length,suf:'칸'},{l:'🪧 공실 점포',v:sumVac,suf:'곳',c:'#e8743b'},{l:'📐 해상도',v:'100',suf:'m'}],init:function(){var t=cells.slice().sort(function(a,b){return b.v-a.v;})[0];selCell(t.i+'_'+t.j);}},
+ P3:{title:'공실 유닛 추천 Tier',hint:'마커 색=추천 Tier · 클릭 비용-효용',legend:'<span class="lt">Tier</span><span><i style="background:#7a4f9a"></i>고급화</span><span><i style="background:#2f7d4f"></i>가성비</span><span><i style="background:#b06a1e"></i>공장제</span>',flow:'Platform<span class="ar">→</span>Page<span class="ar">→</span><b style="color:var(--P3)">③ Posting</b><span class="ar">→</span>Program',kpis:[{l:'🟪 고급화',v:units.filter(function(u){return u.rec==='premium';}).length,suf:'곳',c:'#7a4f9a'},{l:'🟩 가성비',v:units.filter(function(u){return u.rec==='value';}).length,suf:'곳',c:'#2f7d4f'},{l:'🟧 공장제',v:units.filter(function(u){return u.rec==='factory';}).length,suf:'곳',c:'#b06a1e'},{l:'🪧 공실 유닛',v:units.length,suf:'곳'},{l:'⏱ 평균 회수',v:'15.4',suf:'개월',c:'#9a7b1e'}],init:function(){selUnit('u-jiha');}},
+ P4:{title:'온·오프라인 마케팅',hint:'핀=행사 거점 · 파란원=온라인 집중 발행',legend:'<span class="lt">마케팅</span><span><i style="background:#b06a1e"></i>오프라인 행사</span><span><i class="r" style="background:#2563b0"></i>온라인 발행구역</span>',flow:'Platform<span class="ar">→</span>Page<span class="ar">→</span>Posting<span class="ar">→</span><b style="color:var(--P4)">④ Program</b>',kpis:[{l:'📤 주간 발행',v:'11',suf:'건',c:'#2563b0'},{l:'🎪 행사 후보',v:'3',suf:'건',c:'#b06a1e'},{l:'📈 유입 증대',v:'+31',suf:'%',c:'#2f7d4f'},{l:'🤝 상생 매칭',v:'7',suf:'건'},{l:'💬 감성 매칭',v:'91',suf:'점'}],init:function(){renderP4();}},
+};
+function setP(p){
+ ['P1','P2','P3','P4'].forEach(function(k){if(map.hasLayer(G[k]))map.removeLayer(G[k]);});
+ map.addLayer(G[p]);
+ document.querySelectorAll('.ptab').forEach(function(t){t.classList.toggle('on',t.dataset.p===p);});
+ var c=CFG[p];
+ document.getElementById('maptitle').textContent=c.title;
+ document.getElementById('maphint').textContent=c.hint;
+ document.getElementById('legb').innerHTML=c.legend;
+ document.getElementById('flow').innerHTML=c.flow;
+ document.getElementById('kpis').innerHTML=kpiHTML(c.kpis);
+ c.init();
+}
+setInterval(function(){document.getElementById('liverate').textContent=(40+Math.floor(Math.random()*10));},2000);
+setP('P1');
+</script>
+</body>
+</html>
