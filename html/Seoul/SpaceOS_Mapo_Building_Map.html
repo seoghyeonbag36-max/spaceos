@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS · 마포구 건물 단위 상권 세분화</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+:root{
+  --bg:#0f1024;--panel:#15172e;--card:#1b1e3d;--ink:#e8e9f5;--mut:#9aa0c8;
+  --line:#2b2f57;--accent:#6366f1;--accent2:#a78bfa;
+  --good:#34d399;--warn:#fb923c;--danger:#f87171;--info:#38bdf8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);
+  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;font-size:13px}
+.wrap{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+header{flex:0 0 auto;padding:14px 20px;background:var(--panel);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .logo{font-size:17px;font-weight:900;letter-spacing:-.5px;color:#fff}
+.brand .logo span{color:var(--accent2)}
+.brand .sep{width:1px;height:20px;background:var(--line)}
+.brand .title{font-size:14px;font-weight:700;color:var(--ink)}
+.badge-live{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--good);
+  background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);padding:4px 10px;border-radius:99px}
+.badge-live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--good);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.ctrl-bar{flex:0 0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 20px;background:var(--card);border-bottom:1px solid var(--line)}
+.ctrl-bar label{font-size:11.5px;color:var(--mut);margin-right:4px}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{background:transparent;color:var(--mut);border:0;padding:6px 12px;
+  font-size:12px;font-family:inherit;cursor:pointer;transition:.15s}
+.seg button.on{background:var(--accent);color:#fff;font-weight:700}
+.seg button:hover:not(.on){background:rgba(99,102,241,.15);color:var(--ink)}
+.sel{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;
+  padding:6px 10px;font-size:12px;font-family:inherit;cursor:pointer}
+.ctrl-search{flex:1;min-width:180px;max-width:280px;background:var(--panel);
+  border:1px solid var(--line);color:var(--ink);border-radius:8px;
+  padding:6px 10px;font-size:12px;font-family:inherit}
+.ctrl-search::placeholder{color:var(--mut)}
+.ctrl-search:focus,.sel:focus{outline:none;border-color:var(--accent)}
+.ctrl-info{margin-left:auto;font-size:11.5px;color:var(--mut)}
+.ctrl-info b{color:var(--accent2)}
+.main{flex:1;display:flex;overflow:hidden}
+.map-wrap{flex:1;position:relative;overflow:hidden}
+#map{width:100%;height:100%}
+.map-overlay{position:absolute;bottom:14px;left:14px;z-index:500;
+  background:rgba(21,23,46,.92);border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;min-width:180px}
+.map-overlay h4{font-size:11.5px;font-weight:700;color:var(--mut);margin-bottom:8px;
+  letter-spacing:.5px;text-transform:uppercase}
+.legend-row{display:flex;align-items:center;gap:7px;font-size:11.5px;margin-bottom:5px}
+.legend-row:last-child{margin-bottom:0}
+.legend-row .swatch{width:14px;height:14px;border-radius:4px;flex-shrink:0}
+.legend-row span{color:var(--mut)}
+.side{flex:0 0 340px;display:flex;flex-direction:column;
+  background:var(--panel);border-left:1px solid var(--line);overflow-y:auto}
+.side-sec{padding:14px 16px;border-bottom:1px solid var(--line)}
+.side-sec h3{font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:10px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kpi .kl{font-size:11px;color:var(--mut);margin-bottom:6px}
+.kpi .kv{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.kpi .kv small{font-size:11px;font-weight:700;color:var(--mut);margin-left:3px}
+.kpi .kb{height:4px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
+.kpi .kb i{display:block;height:100%;border-radius:3px}
+.blist{display:flex;flex-direction:column;gap:5px;max-height:320px;overflow-y:auto}
+.brow{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;
+  border:1px solid transparent;cursor:pointer;transition:.15s}
+.brow:hover{background:rgba(99,102,241,.08);border-color:var(--line)}
+.brow.sel{background:rgba(99,102,241,.15);border-color:var(--accent)}
+.brow .bcat{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.brow .binfo{flex:1;min-width:0}
+.brow .bnm{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brow .bdong{font-size:10.5px;color:var(--mut)}
+.brow .bvac{font-size:13px;font-weight:800;text-align:right;flex-shrink:0}
+.detail{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px}
+.det-hint{color:var(--mut);font-size:12.5px;text-align:center;padding:40px 18px;line-height:1.7}
+.det-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.det-name{font-size:17px;font-weight:800;line-height:1.3}
+.det-sub{font-size:11.5px;color:var(--mut);margin-top:3px}
+.det-score{text-align:right;flex-shrink:0}
+.det-score .sv{font-size:28px;font-weight:800;line-height:1}
+.det-score .sl{font-size:10.5px;color:var(--mut);margin-top:2px}
+.det-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.dm{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 10px;text-align:center}
+.dm .dml{font-size:10px;color:var(--mut);margin-bottom:5px}
+.dm .dmv{font-size:16px;font-weight:800}
+.det-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--mut)}
+.det-bar-sec h4{font-size:11.5px;color:var(--mut);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px}
+.det-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:12px}
+.det-bar-row .dbl{flex:0 0 80px;color:var(--mut)}
+.det-bar-row .dbw{flex:1;height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+.det-bar-row .dbw i{display:block;height:100%;border-radius:4px;transition:.4s}
+.det-bar-row .dbv{flex:0 0 36px;text-align:right;font-weight:700;font-size:11.5px}
+.det-insight{background:var(--card);border:1px solid var(--line);
+  border-left:3px solid var(--accent);border-radius:8px;padding:10px 12px;
+  font-size:12.5px;line-height:1.65;color:#d7d9ef}
+.btn-primary{width:100%;border:0;background:var(--accent);color:#fff;
+  border-radius:10px;padding:11px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:.15s}
+.btn-primary:hover{background:#818cf8}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--panel)}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="logo">Space<span>OS</span></div>
+      <div class="sep"></div>
+      <div class="title">마포구 건물 단위 상권 세분화 — Digital Twin</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--mut)">데이터: Leaflet + V-World WFS + 상가정보 API</span>
+      <div class="badge-live" id="vworld-badge">샘플 데이터</div>
+    </div>
+  </header>
+
+  <div class="ctrl-bar">
+    <label>지역</label>
+    <div class="seg">
+      <button class="on" onclick="filterZone(this,'all')">전체</button>
+      <button onclick="filterZone(this,'홍대')">홍대</button>
+      <button onclick="filterZone(this,'합정')">합정·망원</button>
+      <button onclick="filterZone(this,'연남')">연남동</button>
+      <button onclick="filterZone(this,'상암')">상암 DMC</button>
+      <button onclick="filterZone(this,'공덕')">공덕·마포</button>
+    </div>
+
+    <label>지표</label>
+    <div class="seg">
+      <button class="on" id="metric-vac"  onclick="setMetric(this,'vacancy')">공실률</button>
+      <button         id="metric-sent" onclick="setMetric(this,'sentiment')">감성지수</button>
+      <button         id="metric-rent" onclick="setMetric(this,'rent')">임대료</button>
+    </div>
+
+    <label>업종</label>
+    <select class="sel" onchange="filterCategory(this.value)">
+      <option value="">전체</option>
+      <option value="오피스">오피스</option>
+      <option value="상업">상업/판매</option>
+      <option value="F&B">F&amp;B</option>
+      <option value="복합">복합</option>
+      <option value="미디어">미디어</option>
+      <option value="의료">의료/뷰티</option>
+    </select>
+
+    <input class="ctrl-search" placeholder="건물명 검색..." oninput="filterSearch(this.value)">
+
+    <div class="ctrl-info">
+      건물 <b id="cnt-visible">0</b> / <b id="cnt-total">0</b> 표시 &nbsp;·&nbsp; 클릭 → 상세
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="map-overlay" id="legend">
+        <h4 id="legend-title">공실률</h4>
+        <div class="legend-row"><div class="swatch" style="background:#34d399"></div><span>0–5% (우량)</span></div>
+        <div class="legend-row"><div class="swatch" style="background:#fbbf24"></div><span>5–15% (주의)</span></div>
+        <div class="legend-row"><div class="swatch" style="background:#f87171"></div><span>15–30% (위험)</span></div>
+        <div class="legend-row"><div class="swatch" style="background:#7f2d2d"></div><span>30%+ (고위험)</span></div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="side-sec">
+        <h3>마포구 상권 현황</h3>
+        <div class="kpis">
+          <div class="kpi">
+            <div class="kl">평균 공실률</div>
+            <div class="kv" id="kpi-vac">--<small>%</small></div>
+            <div class="kb"><i id="kb-vac" style="background:var(--warn)"></i></div>
+          </div>
+          <div class="kpi">
+            <div class="kl">감성지수 평균</div>
+            <div class="kv" id="kpi-sent">--<small>pt</small></div>
+            <div class="kb"><i id="kb-sent" style="background:var(--accent)"></i></div>
+          </div>
+          <div class="kpi">
+            <div class="kl">분석 건물 수</div>
+            <div class="kv" id="kpi-cnt">--<small>동</small></div>
+            <div class="kb"><i id="kb-cnt" style="background:var(--info);width:100%"></i></div>
+          </div>
+          <div class="kpi">
+            <div class="kl">평균 임대료</div>
+            <div class="kv" id="kpi-rent">--<small>만원/평</small></div>
+            <div class="kb"><i id="kb-rent" style="background:var(--accent2)"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-sec" style="flex:0 0 auto">
+        <h3>건물 목록</h3>
+        <div class="blist" id="blist"></div>
+      </div>
+
+      <div class="detail" id="detail-wrap">
+        <div class="det-hint" id="det-hint">지도 위 건물 폴리곤 또는<br>좌측 목록에서 건물을 선택하세요</div>
+        <div id="det-content" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const VWORLD_KEY = 'YOUR_VWORLD_API_KEY'; // vworld.kr에서 발급
+
+/* ── 마포구 샘플 건물 30동 ──────────────────────────────────────────── */
+const BUILDINGS = [
+  /* ── 홍대 상권 ── */
+  { id:'MP001', name:'AK플라자 홍대점',       dong:'서교동', zone:'홍대',
+    addr:'양화로 152',    cat:'상업',   floors:10, year:2002,
+    area:32000, vac:4.8,  sent:92, rent:18.5, tenants:220,
+    polygon:[[37.5571,126.9224],[37.5571,126.9234],[37.5565,126.9234],[37.5565,126.9224]] },
+
+  { id:'MP002', name:'홍대 메세나폴리스몰',   dong:'합정동', zone:'홍대',
+    addr:'양화로 45',     cat:'복합',   floors:8,  year:2012,
+    area:55000, vac:7.2,  sent:88, rent:16.2, tenants:180,
+    polygon:[[37.5567,126.9216],[37.5567,126.9226],[37.5561,126.9226],[37.5561,126.9216]] },
+
+  { id:'MP003', name:'홍대 상상마당',         dong:'서교동', zone:'홍대',
+    addr:'잔다리로 6',    cat:'복합',   floors:7,  year:2007,
+    area:8500,  vac:2.1,  sent:95, rent:14.8, tenants:42,
+    polygon:[[37.5576,126.9243],[37.5576,126.9249],[37.5572,126.9249],[37.5572,126.9243]] },
+
+  { id:'MP004', name:'홍대 현대카드 라이브러리',dong:'서교동', zone:'홍대',
+    addr:'어울마당로 65', cat:'F&B',    floors:3,  year:2013,
+    area:4200,  vac:0.0,  sent:96, rent:20.5, tenants:8,
+    polygon:[[37.5585,126.9249],[37.5585,126.9255],[37.5581,126.9255],[37.5581,126.9249]] },
+
+  { id:'MP005', name:'홍대 걷고싶은거리 플라자',dong:'서교동', zone:'홍대',
+    addr:'어울마당로 48', cat:'상업',   floors:4,  year:2001,
+    area:6800,  vac:13.5, sent:82, rent:15.5, tenants:55,
+    polygon:[[37.5578,126.9228],[37.5578,126.9235],[37.5574,126.9235],[37.5574,126.9228]] },
+
+  { id:'MP006', name:'홍대 오피스타워A',       dong:'동교동', zone:'홍대',
+    addr:'동교로 20',     cat:'오피스', floors:14, year:2009,
+    area:18500, vac:9.8,  sent:78, rent:11.2, tenants:32,
+    polygon:[[37.5562,126.9272],[37.5562,126.9280],[37.5557,126.9280],[37.5557,126.9272]] },
+
+  /* ── 합정·망원 상권 ── */
+  { id:'MP007', name:'합정 메세나폴리스 오피스',dong:'합정동', zone:'합정',
+    addr:'양화로 45',     cat:'오피스', floors:25, year:2012,
+    area:68000, vac:5.5,  sent:85, rent:13.8, tenants:95,
+    polygon:[[37.5498,126.9134],[37.5498,126.9144],[37.5492,126.9144],[37.5492,126.9134]] },
+
+  { id:'MP008', name:'합정역 상업빌딩',        dong:'합정동', zone:'합정',
+    addr:'합정동 347',    cat:'상업',   floors:5,  year:1999,
+    area:7200,  vac:18.5, sent:72, rent:10.5, tenants:38,
+    polygon:[[37.5503,126.9138],[37.5503,126.9144],[37.5499,126.9144],[37.5499,126.9138]] },
+
+  { id:'MP009', name:'망원시장 복합빌딩',      dong:'망원동', zone:'합정',
+    addr:'망원로 78',     cat:'복합',   floors:4,  year:2005,
+    area:5500,  vac:11.2, sent:83, rent:9.8,  tenants:60,
+    polygon:[[37.5561,126.9039],[37.5561,126.9046],[37.5557,126.9046],[37.5557,126.9039]] },
+
+  { id:'MP010', name:'망원 카페거리 빌딩A',    dong:'망원동', zone:'합정',
+    addr:'포은로2나길 25', cat:'F&B',   floors:3,  year:2016,
+    area:3800,  vac:6.3,  sent:91, rent:12.5, tenants:22,
+    polygon:[[37.5568,126.9047],[37.5568,126.9053],[37.5564,126.9053],[37.5564,126.9047]] },
+
+  { id:'MP011', name:'망원 복합상가 B',        dong:'망원동', zone:'합정',
+    addr:'월드컵로 123',  cat:'복합',   floors:5,  year:2010,
+    area:6200,  vac:14.8, sent:77, rent:10.2, tenants:45,
+    polygon:[[37.5555,126.9052],[37.5555,126.9058],[37.5551,126.9058],[37.5551,126.9052]] },
+
+  /* ── 연남동 상권 ── */
+  { id:'MP012', name:'연남동 경의선숲길 플라자A',dong:'연남동', zone:'연남',
+    addr:'연남로1길 22',  cat:'F&B',    floors:3,  year:2015,
+    area:3200,  vac:5.8,  sent:93, rent:15.8, tenants:18,
+    polygon:[[37.5626,126.9224],[37.5626,126.9230],[37.5622,126.9230],[37.5622,126.9224]] },
+
+  { id:'MP013', name:'연남동 카페거리 빌딩B',  dong:'연남동', zone:'연남',
+    addr:'동교로51길 18', cat:'F&B',    floors:3,  year:2017,
+    area:2800,  vac:3.2,  sent:94, rent:16.5, tenants:14,
+    polygon:[[37.5633,126.9212],[37.5633,126.9218],[37.5629,126.9218],[37.5629,126.9212]] },
+
+  { id:'MP014', name:'연남동 복합상가C',       dong:'연남동', zone:'연남',
+    addr:'연남로 34',     cat:'복합',   floors:4,  year:2014,
+    area:4500,  vac:8.5,  sent:89, rent:14.2, tenants:28,
+    polygon:[[37.5620,126.9231],[37.5620,126.9237],[37.5616,126.9237],[37.5616,126.9231]] },
+
+  { id:'MP015', name:'연남동 상업빌딩D',       dong:'연남동', zone:'연남',
+    addr:'성미산로29길 6', cat:'상업',  floors:3,  year:2018,
+    area:2500,  vac:7.1,  sent:88, rent:15.0, tenants:12,
+    polygon:[[37.5641,126.9202],[37.5641,126.9208],[37.5637,126.9208],[37.5637,126.9202]] },
+
+  { id:'MP016', name:'연남동 뷰티·의료 타운',  dong:'연남동', zone:'연남',
+    addr:'동교로 252',    cat:'의료',   floors:5,  year:2012,
+    area:5800,  vac:4.5,  sent:87, rent:13.5, tenants:35,
+    polygon:[[37.5615,126.9218],[37.5615,126.9224],[37.5611,126.9224],[37.5611,126.9218]] },
+
+  /* ── 상암 DMC 상권 ── */
+  { id:'MP017', name:'MBC 상암 사옥',         dong:'상암동', zone:'상암',
+    addr:'성암로 267',    cat:'미디어', floors:18, year:2014,
+    area:82000, vac:2.5,  sent:88, rent:11.5, tenants:48,
+    polygon:[[37.5796,126.8892],[37.5796,126.8902],[37.5790,126.8902],[37.5790,126.8892]] },
+
+  { id:'MP018', name:'JTBC 미디어센터',       dong:'상암동', zone:'상암',
+    addr:'성암로 217',    cat:'미디어', floors:15, year:2015,
+    area:62000, vac:1.8,  sent:90, rent:10.8, tenants:35,
+    polygon:[[37.5792,126.8884],[37.5792,126.8893],[37.5786,126.8893],[37.5786,126.8884]] },
+
+  { id:'MP019', name:'DMC 첨단산업센터',      dong:'상암동', zone:'상암',
+    addr:'월드컵북로 396', cat:'오피스', floors:12, year:2007,
+    area:48000, vac:8.5,  sent:82, rent:9.5,  tenants:65,
+    polygon:[[37.5788,126.8871],[37.5788,126.8880],[37.5782,126.8880],[37.5782,126.8871]] },
+
+  { id:'MP020', name:'상암 누리꿈스퀘어',     dong:'상암동', zone:'상암',
+    addr:'월드컵북로 400', cat:'복합',  floors:11, year:2008,
+    area:55000, vac:5.2,  sent:85, rent:10.2, tenants:88,
+    polygon:[[37.5813,126.8879],[37.5813,126.8889],[37.5807,126.8889],[37.5807,126.8879]] },
+
+  { id:'MP021', name:'CJ ENM 상암센터',       dong:'상암동', zone:'상암',
+    addr:'성암로 330',    cat:'미디어', floors:8,  year:2017,
+    area:38000, vac:3.1,  sent:91, rent:11.8, tenants:28,
+    polygon:[[37.5803,126.8887],[37.5803,126.8895],[37.5797,126.8895],[37.5797,126.8887]] },
+
+  { id:'MP022', name:'상암 DMC 오피스타워B',  dong:'상암동', zone:'상암',
+    addr:'월드컵북로 366', cat:'오피스', floors:20, year:2010,
+    area:44000, vac:11.5, sent:79, rent:9.8,  tenants:72,
+    polygon:[[37.5778,126.8883],[37.5778,126.8892],[37.5772,126.8892],[37.5772,126.8883]] },
+
+  /* ── 공덕·마포 상권 ── */
+  { id:'MP023', name:'AK플라자 공덕',         dong:'공덕동', zone:'공덕',
+    addr:'마포대로 109',  cat:'상업',   floors:9,  year:2007,
+    area:28000, vac:6.8,  sent:84, rent:13.2, tenants:165,
+    polygon:[[37.5438,126.9509],[37.5438,126.9518],[37.5432,126.9518],[37.5432,126.9509]] },
+
+  { id:'MP024', name:'공덕 센트럴타워',       dong:'공덕동', zone:'공덕',
+    addr:'마포대로 130',  cat:'오피스', floors:22, year:2015,
+    area:52000, vac:4.2,  sent:86, rent:12.5, tenants:68,
+    polygon:[[37.5448,126.9519],[37.5448,126.9528],[37.5442,126.9528],[37.5442,126.9519]] },
+
+  { id:'MP025', name:'마포 한화생명빌딩',     dong:'마포동', zone:'공덕',
+    addr:'마포대로 144',  cat:'오피스', floors:28, year:2000,
+    area:68000, vac:7.5,  sent:81, rent:11.8, tenants:84,
+    polygon:[[37.5425,126.9497],[37.5425,126.9506],[37.5419,126.9506],[37.5419,126.9497]] },
+
+  { id:'MP026', name:'마포 프레스센터',       dong:'마포동', zone:'공덕',
+    addr:'마포대로 20길', cat:'오피스', floors:18, year:1998,
+    area:35000, vac:12.8, sent:76, rent:10.5, tenants:52,
+    polygon:[[37.5456,126.9500],[37.5456,126.9508],[37.5450,126.9508],[37.5450,126.9500]] },
+
+  { id:'MP027', name:'아현 메디컬 빌딩',      dong:'아현동', zone:'공덕',
+    addr:'마포대로 165',  cat:'의료',   floors:8,  year:2005,
+    area:9800,  vac:5.5,  sent:83, rent:10.2, tenants:42,
+    polygon:[[37.5483,126.9565],[37.5483,126.9572],[37.5479,126.9572],[37.5479,126.9565]] },
+
+  { id:'MP028', name:'도화동 복합상가',       dong:'도화동', zone:'공덕',
+    addr:'마포대로 12',   cat:'복합',   floors:7,  year:2008,
+    area:12000, vac:16.5, sent:71, rent:9.2,  tenants:55,
+    polygon:[[37.5396,126.9449],[37.5396,126.9457],[37.5391,126.9457],[37.5391,126.9449]] },
+
+  { id:'MP029', name:'신수동 근린상가',       dong:'신수동', zone:'공덕',
+    addr:'신수로 52',     cat:'상업',   floors:5,  year:2003,
+    area:7500,  vac:21.3, sent:66, rent:8.5,  tenants:40,
+    polygon:[[37.5388,126.9437],[37.5388,126.9444],[37.5384,126.9444],[37.5384,126.9437]] },
+
+  { id:'MP030', name:'마포구청 인근 상가',    dong:'성산동', zone:'합정',
+    addr:'월드컵로 212',  cat:'의료',   floors:4,  year:2001,
+    area:6800,  vac:9.2,  sent:80, rent:9.5,  tenants:38,
+    polygon:[[37.5551,126.9100],[37.5551,126.9107],[37.5547,126.9107],[37.5547,126.9100]] }
+];
+
+/* ── 상태 ── */
+let map = null, layerGroup = null;
+let currentMetric = 'vacancy';
+let selectedId = null;
+let visibleIds = new Set(BUILDINGS.map(b => b.id));
+
+/* ── 색상 ── */
+function colorByVacancy(v){ return v<5?'#34d399':v<15?'#fbbf24':v<30?'#f87171':'#7f2d2d'; }
+function colorBySentiment(s){ return s>=85?'#34d399':s>=70?'#60a5fa':s>=55?'#fbbf24':'#f87171'; }
+function colorByRent(r){ return r>=20?'#a78bfa':r>=12?'#6366f1':r>=8?'#38bdf8':'#9aa0c8'; }
+function getColor(b){
+  if(currentMetric==='sentiment') return colorBySentiment(b.sent);
+  if(currentMetric==='rent')      return colorByRent(b.rent);
+  return colorByVacancy(b.vac);
+}
+function metricVal(b){
+  if(currentMetric==='sentiment') return b.sent+'pt';
+  if(currentMetric==='rent')      return b.rent+'만원';
+  return b.vac+'%';
+}
+
+/* ── 지도 초기화 ── */
+function initMap(){
+  map = L.map('map',{zoomControl:true}).setView([37.5596,126.9230],13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom:19
+  }).addTo(map);
+  layerGroup = L.layerGroup().addTo(map);
+  renderPolygons(); renderList(); updateKPIs();
+  if(VWORLD_KEY !== 'YOUR_VWORLD_API_KEY') loadVWorldData();
+}
+
+/* ── 폴리곤 렌더링 ── */
+function renderPolygons(){
+  if(!map||!layerGroup) return;
+  layerGroup.clearLayers();
+  BUILDINGS.filter(b=>visibleIds.has(b.id)).forEach(b=>{
+    const color = getColor(b), isSel = selectedId===b.id;
+    const poly = L.polygon(b.polygon,{
+      fillColor:color, fillOpacity:isSel?0.75:0.50,
+      color:isSel?'#ffffff':color, weight:isSel?2.5:1.2, opacity:0.9
+    });
+    poly.on('click',()=>selectBuilding(b.id));
+    poly.on('mouseover',function(){ if(selectedId!==b.id) this.setStyle({fillOpacity:0.70,color:'#ffffff',weight:2}); });
+    poly.on('mouseout', function(){ if(selectedId!==b.id) this.setStyle({fillOpacity:0.50,color,weight:1.2}); });
+    layerGroup.addLayer(poly);
+  });
+}
+
+/* ── 목록 렌더링 ── */
+function renderList(){
+  const container = document.getElementById('blist');
+  const visible = BUILDINGS.filter(b=>visibleIds.has(b.id));
+  document.getElementById('cnt-visible').textContent = visible.length;
+  document.getElementById('cnt-total').textContent   = BUILDINGS.length;
+  container.innerHTML = visible.map(b=>`
+    <div class="brow ${b.id===selectedId?'sel':''}" id="row-${b.id}" onclick="selectBuilding('${b.id}')">
+      <div class="bcat" style="background:${getColor(b)}"></div>
+      <div class="binfo">
+        <div class="bnm">${b.name}</div>
+        <div class="bdong">${b.dong} · ${b.cat}</div>
+      </div>
+      <div class="bvac" style="color:${getColor(b)}">${metricVal(b)}</div>
+    </div>`).join('');
+}
+
+/* ── 건물 선택 ── */
+function selectBuilding(id){
+  selectedId = id;
+  const b = BUILDINGS.find(x=>x.id===id);
+  if(!b) return;
+  if(map){
+    const center = b.polygon.reduce((acc,[lat,lng])=>[acc[0]+lat/b.polygon.length,acc[1]+lng/b.polygon.length],[0,0]);
+    map.setView(center,Math.max(map.getZoom(),16));
+  }
+  renderPolygons(); renderList(); renderDetail(b);
+}
+
+/* ── 상세 패널 ── */
+function renderDetail(b){
+  document.getElementById('det-hint').style.display='none';
+  const el = document.getElementById('det-content');
+  el.style.cssText='display:flex;flex-direction:column;gap:12px';
+  const vacColor=colorByVacancy(b.vac), sentColor=colorBySentiment(b.sent);
+  el.innerHTML=`
+    <div class="det-top">
+      <div>
+        <div class="det-name">${b.name}</div>
+        <div class="det-sub">${b.dong} · ${b.addr} · 지상 ${b.floors}층 · ${b.year}년</div>
+      </div>
+      <div class="det-score">
+        <div class="sv" style="color:${vacColor}">${b.vac}%</div>
+        <div class="sl">공실률</div>
+      </div>
+    </div>
+    <div class="det-tags">
+      <span class="tag">${b.cat}</span>
+      <span class="tag">임차인 ${b.tenants}개소</span>
+      <span class="tag">연면적 ${(b.area/1000).toFixed(0)}천㎡</span>
+      <span class="tag">임대료 ${b.rent}만원/평</span>
+    </div>
+    <div class="det-metrics">
+      <div class="dm"><div class="dml">공실률</div><div class="dmv" style="color:${vacColor}">${b.vac}<small style="font-size:11px">%</small></div></div>
+      <div class="dm"><div class="dml">감성지수</div><div class="dmv" style="color:${sentColor}">${b.sent}<small style="font-size:11px">pt</small></div></div>
+      <div class="dm"><div class="dml">평균 임대료</div><div class="dmv" style="color:var(--accent2)">${b.rent}<small style="font-size:11px">만</small></div></div>
+    </div>
+    <div class="det-bar-sec">
+      <h4>세부 지표</h4>
+      ${makeBar('임차인 수',b.tenants,250,'#38bdf8','개소')}
+      ${makeBar('연면적',b.area/1000,100,'#a78bfa','천㎡')}
+      ${makeBar('공실률',b.vac,40,vacColor,'%')}
+      ${makeBar('감성지수',b.sent,100,sentColor,'pt')}
+    </div>
+    <div class="det-insight">${getInsight(b)}</div>
+    <button class="btn-primary" onclick="alert('PPPP 플랫폼 상세 분석 연동 예정')">PPPP 플랫폼 상세 분석 →</button>`;
+}
+
+function makeBar(label,val,max,color,unit){
+  const pct=Math.min(100,Math.round((val/max)*100));
+  return `<div class="det-bar-row">
+    <span class="dbl">${label}</span>
+    <div class="dbw"><i style="width:${pct}%;background:${color}"></i></div>
+    <span class="dbv">${typeof val==='number'&&val%1!==0?val.toFixed(1):val}${unit}</span>
+  </div>`;
+}
+
+function getInsight(b){
+  if(b.vac<5)  return `<b>우량 건물</b> — 공실률 ${b.vac}%로 마포구 최상위 수준. 안정적 임대 수익 확보 가능.`;
+  if(b.vac<15) return `<b>주의 필요</b> — 공실률 ${b.vac}%로 평균 수준. 임차인 믹스 최적화 검토 권장.`;
+  if(b.vac<30) return `<b>위험 신호</b> — 공실률 ${b.vac}%로 높음. 업종 전환 또는 임대조건 재설계 필요.`;
+  return `<b>고위험</b> — 공실률 ${b.vac}%로 심각. SpaceOS AI 업종 추천 모델 적용 검토 필요.`;
+}
+
+/* ── KPI ── */
+function updateKPIs(){
+  const visible = BUILDINGS.filter(b=>visibleIds.has(b.id));
+  if(!visible.length) return;
+  const avgVac  = (visible.reduce((a,b)=>a+b.vac,0)/visible.length).toFixed(1);
+  const avgSent = Math.round(visible.reduce((a,b)=>a+b.sent,0)/visible.length);
+  const avgRent = (visible.reduce((a,b)=>a+b.rent,0)/visible.length).toFixed(1);
+  document.getElementById('kpi-vac').innerHTML  = `${avgVac}<small>%</small>`;
+  document.getElementById('kpi-sent').innerHTML = `${avgSent}<small>pt</small>`;
+  document.getElementById('kpi-cnt').innerHTML  = `${visible.length}<small>동</small>`;
+  document.getElementById('kpi-rent').innerHTML = `${avgRent}<small>만원/평</small>`;
+  document.getElementById('kb-vac').style.width  = Math.min(100,avgVac*2.5)+'%';
+  document.getElementById('kb-sent').style.width = avgSent+'%';
+  document.getElementById('kb-cnt').style.width  = Math.min(100,visible.length/30*100)+'%';
+  document.getElementById('kb-rent').style.width = Math.min(100,avgRent*3)+'%';
+}
+
+/* ── 필터 ── */
+let activeZone='all', activeCat='', activeSearch='';
+
+function applyFilters(){
+  visibleIds = new Set(BUILDINGS
+    .filter(b=>activeZone==='all'||b.zone===activeZone)
+    .filter(b=>!activeCat||b.cat.includes(activeCat))
+    .filter(b=>!activeSearch||b.name.includes(activeSearch)||b.dong.includes(activeSearch))
+    .map(b=>b.id));
+  if(selectedId&&!visibleIds.has(selectedId)){
+    selectedId=null;
+    document.getElementById('det-hint').style.display='';
+    document.getElementById('det-content').style.display='none';
+  }
+  renderPolygons(); renderList(); updateKPIs();
+}
+
+function filterZone(btn,zone){
+  document.querySelectorAll('.ctrl-bar .seg:first-of-type button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  activeZone=zone;
+  const centers={
+    '홍대':[37.558,126.924],'합정':[37.553,126.909],
+    '연남':[37.562,126.922],'상암':[37.579,126.889],'공덕':[37.544,126.951]
+  };
+  if(map){
+    if(zone!=='all' && centers[zone]) map.setView(centers[zone],15);
+    else map.setView([37.5596,126.9230],13);
+  }
+  applyFilters();
+}
+
+function setMetric(btn,metric){
+  document.querySelectorAll('#metric-vac,#metric-sent,#metric-rent').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  currentMetric=metric;
+  const legends={
+    vacancy:  {title:'공실률',rows:[['#34d399','0–5% (우량)'],['#fbbf24','5–15% (주의)'],['#f87171','15–30% (위험)'],['#7f2d2d','30%+ (고위험)']]},
+    sentiment:{title:'감성지수',rows:[['#34d399','85+ (매우 좋음)'],['#60a5fa','70–85 (좋음)'],['#fbbf24','55–70 (보통)'],['#f87171','55 미만 (나쁨)']]},
+    rent:     {title:'평균 임대료 (만원/평)',rows:[['#a78bfa','20+ (최고가)'],['#6366f1','12–20 (고가)'],['#38bdf8','8–12 (중가)'],['#9aa0c8','8 미만 (저가)']]}
+  };
+  const lg=legends[metric];
+  document.getElementById('legend-title').textContent=lg.title;
+  const rows=document.getElementById('legend').querySelectorAll('.legend-row');
+  lg.rows.forEach(([color,label],i)=>{
+    rows[i].querySelector('.swatch').style.background=color;
+    rows[i].querySelector('span').textContent=label;
+  });
+  renderPolygons(); renderList();
+}
+
+function filterCategory(cat){ activeCat=cat; applyFilters(); }
+function filterSearch(val){ activeSearch=val.trim(); applyFilters(); }
+
+/* ── V-World WFS 연동 ── */
+async function loadVWorldData(){
+  const MAPO_BBOX=[37.5180,126.8620,37.5950,126.9700];
+  setVWorldStatus('loading','V-World 건물 폴리곤 로드 중...');
+  try{
+    let buildings=await fetchVWorldBuildings(MAPO_BBOX,'lt_c_aisfield');
+    if(!buildings||buildings.length===0){
+      buildings=await fetchVWorldBuildings(MAPO_BBOX,'LP_PA_CBND_BUBUN');
+    }
+    if(buildings&&buildings.length>0){
+      BUILDINGS.length=0; BUILDINGS.push(...buildings);
+      visibleIds=new Set(BUILDINGS.map(b=>b.id));
+      renderPolygons(); renderList(); updateKPIs();
+      setVWorldStatus('ok',`V-World ${buildings.length}개 건물 로드 완료`);
+    } else {
+      setVWorldStatus('warn','샘플 데이터 사용 중');
+    }
+  }catch(e){
+    console.error('[V-World]',e);
+    setVWorldStatus('warn',`V-World 오류 — 샘플 데이터 유지`);
+  }
+}
+
+async function fetchVWorldBuildings(bbox,typename='lt_c_aisfield'){
+  const [minLat,minLng,maxLat,maxLng]=bbox;
+  const vwUrl=new URL('https://api.vworld.kr/req/wfs');
+  vwUrl.searchParams.set('SERVICE','WFS');
+  vwUrl.searchParams.set('VERSION','2.0.0');
+  vwUrl.searchParams.set('REQUEST','GetFeature');
+  vwUrl.searchParams.set('TYPENAME',typename);
+  vwUrl.searchParams.set('BBOX',`${minLng},${minLat},${maxLng},${maxLat}`);
+  vwUrl.searchParams.set('SRSNAME','EPSG:4326');
+  vwUrl.searchParams.set('output','application/json');
+  vwUrl.searchParams.set('maxFeatures','500');
+  vwUrl.searchParams.set('apiKey',VWORLD_KEY);
+  /* TODO: 운영 시 FastAPI 프록시(/api/v1/vworld/wfs)로 교체 */
+  const CORS_PROXY='https://corsproxy.io/?url=';
+  const res=await fetch(CORS_PROXY+encodeURIComponent(vwUrl.toString()));
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const gj=await res.json();
+  return parseVWorldGeoJSON(gj);
+}
+
+function parseVWorldGeoJSON(gj){
+  if(!gj.features||!gj.features.length) return [];
+  return gj.features.map((f,i)=>{
+    const props=f.properties||{}, geom=f.geometry;
+    let coords=[];
+    if(geom.type==='Polygon') coords=geom.coordinates[0].map(([lng,lat])=>[lat,lng]);
+    else if(geom.type==='MultiPolygon') coords=geom.coordinates[0][0].map(([lng,lat])=>[lat,lng]);
+    return{
+      id:`VW${String(i).padStart(4,'0')}`,
+      name:props.BLDG_NM||`건물-${i}`, dong:props.DONG_NM||'마포구',
+      zone:'all', addr:props.ROAD_NM_ADDR||'', cat:'기타',
+      floors:parseInt(props.GRND_FLR||0)||1,
+      year:parseInt(props.USE_APR_DT?.substring(0,4)||0)||2000,
+      area:parseFloat(props.TOTAREA||0),
+      vac:Math.random()*25, sent:60+Math.round(Math.random()*35),
+      rent:6+Math.round(Math.random()*14), tenants:Math.round(props.HO_CNT||1),
+      polygon:coords
+    };
+  });
+}
+
+function setVWorldStatus(type,msg){
+  const badge=document.getElementById('vworld-badge');
+  if(!badge) return;
+  const colors={loading:'#fbbf24',ok:'#34d399',warn:'#f87171'};
+  badge.style.color=colors[type]||'#9aa0c8';
+  badge.textContent=msg;
+}
+
+window.addEventListener('load',initMap);
+</script>
+</body>
+</html>
