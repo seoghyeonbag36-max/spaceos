@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpaceOS · 강남구 건물 단위 상권 세분화</title>
+
+  <!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  필요 API / 데이터 목록                                              ║
+  ║  1. 네이버 클라우드 플랫폼 "Dynamic Map" → ncpClientId 교체         ║
+  ║     ※ NCP 콘솔에서 "Maps JavaScript API"는 "Dynamic Map"으로 표시  ║
+  ║     ※ SpaceOS-DigitalTwin Application → 인증 정보 탭 → Client ID   ║
+  ║  2. 브이월드(V-World) WFS API           → VWORLD_KEY 교체          ║
+  ║  3. 소상공인진흥공단 상가정보 API        → SGIS_KEY 교체            ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+
+  네이버 지도 API 키 확인 방법:
+  1. console.ncloud.com → Maps → Application → SpaceOS-DigitalTwin 클릭
+  2. "인증 정보" 탭 상단에서 Client ID 복사
+  3. 아래 script src의 ncpClientId=YOUR_NAVER_CLIENT_ID 를 복사한 값으로 교체
+
+  ※ 허용 도메인 등록 필수 (미등록 시 지도 인증 오류):
+     "한도 및 알림 설정" 탭 → Web 서비스 URL → http://localhost:* 추가
+
+  ※ Dynamic Map = Maps JavaScript API (NCP 콘솔 표기 차이)
+     이미 SpaceOS-DigitalTwin Application에 Dynamic Map이 등록되어 있으므로
+     추가 API 신청 없이 Client ID만 입력하면 바로 사용 가능합니다.
+
+  다른 API 발급처:
+  - V-World:  https://www.vworld.kr/dev/v4dv_apiGuideCnts_s002.do
+  - 소상공인: https://www.data.go.kr  (소상공인진흥공단_상가(상권)정보)
+-->
+
+  <!-- ■ Leaflet (API 키 불필요) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f1024;
+      --panel: #15172e;
+      --card: #1b1e3d;
+      --ink: #e8e9f5;
+      --mut: #9aa0c8;
+      --line: #2b2f57;
+      --accent: #6366f1;
+      --accent2: #a78bfa;
+      --good: #34d399;
+      --warn: #fb923c;
+      --danger: #f87171;
+      --info: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+      font-size: 13px
+    }
+
+    /* ── Layout ── */
+    .wrap {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden
+    }
+
+    header {
+      flex: 0 0 auto;
+      padding: 14px 20px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .brand .logo {
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: -.5px;
+      color: #fff
+    }
+
+    .brand .logo span {
+      color: var(--accent2)
+    }
+
+    .brand .sep {
+      width: 1px;
+      height: 20px;
+      background: var(--line)
+    }
+
+    .brand .title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink)
+    }
+
+    .badge-live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: var(--good);
+      background: rgba(52, 211, 153, .1);
+      border: 1px solid rgba(52, 211, 153, .2);
+      padding: 4px 10px;
+      border-radius: 99px
+    }
+
+    .badge-live::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--good);
+      animation: pulse 1.5s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    .ctrl-bar {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 20px;
+      background: var(--card);
+      border-bottom: 1px solid var(--line)
+    }
+
+    .ctrl-bar label {
+      font-size: 11.5px;
+      color: var(--mut);
+      margin-right: 4px
+    }
+
+    .seg {
+      display: flex;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden
+    }
+
+    .seg button {
+      background: transparent;
+      color: var(--mut);
+      border: 0;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: .15s
+    }
+
+    .seg button.on {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700
+    }
+
+    .seg button:hover:not(.on) {
+      background: rgba(99, 102, 241, .15);
+      color: var(--ink)
+    }
+
+    .sel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer
+    }
+
+    .sel:focus {
+      outline: none;
+      border-color: var(--accent)
+    }
+
+    .ctrl-search {
+      flex: 1;
+      min-width: 180px;
+      max-width: 280px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-family: inherit
+    }
+
+    .ctrl-search::placeholder {
+      color: var(--mut)
+    }
+
+    .ctrl-search:focus {
+      outline: none;
+      border-color: var(--accent)
+    }
+
+    .ctrl-info {
+      margin-left: auto;
+      font-size: 11.5px;
+      color: var(--mut)
+    }
+
+    .ctrl-info b {
+      color: var(--accent2)
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      overflow: hidden
+    }
+
+    /* ── Map ── */
+    .map-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden
+    }
+
+    #map {
+      width: 100%;
+      height: 100%
+    }
+
+    .map-overlay {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      z-index: 100;
+      background: rgba(21, 23, 46, .92);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      min-width: 180px
+    }
+
+    .map-overlay h4 {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--mut);
+      margin-bottom: 8px;
+      letter-spacing: .5px;
+      text-transform: uppercase
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11.5px;
+      margin-bottom: 5px
+    }
+
+    .legend-row:last-child {
+      margin-bottom: 0
+    }
+
+    .legend-row .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      flex-shrink: 0
+    }
+
+    .legend-row span {
+      color: var(--mut)
+    }
+
+    .map-api-warn {
+      position: absolute;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 16, 36, .96);
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+      padding: 32px
+    }
+
+    .map-api-warn.show {
+      display: flex
+    }
+
+    .map-api-warn .warn-icon {
+      font-size: 40px
+    }
+
+    .map-api-warn h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--warn)
+    }
+
+    .map-api-warn p {
+      font-size: 13px;
+      color: var(--mut);
+      line-height: 1.7;
+      max-width: 500px
+    }
+
+    .map-api-warn code {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-size: 12px;
+      color: var(--accent2)
+    }
+
+    /* ── Side Panel ── */
+    .side {
+      flex: 0 0 340px;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border-left: 1px solid var(--line);
+      overflow-y: auto
+    }
+
+    .side-sec {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .side-sec h3 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--mut);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      margin-bottom: 10px
+    }
+
+    /* KPI grid */
+    .kpis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .kpi {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px
+    }
+
+    .kpi .kl {
+      font-size: 11px;
+      color: var(--mut);
+      margin-bottom: 6px
+    }
+
+    .kpi .kv {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.5px
+    }
+
+    .kpi .kv small {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--mut);
+      margin-left: 3px
+    }
+
+    .kpi .kb {
+      height: 4px;
+      border-radius: 3px;
+      background: var(--line);
+      margin-top: 8px;
+      overflow: hidden
+    }
+
+    .kpi .kb i {
+      display: block;
+      height: 100%;
+      border-radius: 3px
+    }
+
+    /* Building list */
+    .blist {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 320px;
+      overflow-y: auto
+    }
+
+    .brow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: .15s
+    }
+
+    .brow:hover {
+      background: rgba(99, 102, 241, .08);
+      border-color: var(--line)
+    }
+
+    .brow.sel {
+      background: rgba(99, 102, 241, .15);
+      border-color: var(--accent)
+    }
+
+    .brow .bcat {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .brow .binfo {
+      flex: 1;
+      min-width: 0
+    }
+
+    .brow .bnm {
+      font-size: 12.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .brow .bdong {
+      font-size: 10.5px;
+      color: var(--mut)
+    }
+
+    .brow .bvac {
+      font-size: 13px;
+      font-weight: 800;
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    /* Detail panel */
+    .detail {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px
+    }
+
+    .det-hint {
+      color: var(--mut);
+      font-size: 12.5px;
+      text-align: center;
+      padding: 40px 18px;
+      line-height: 1.7
+    }
+
+    .det-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px
+    }
+
+    .det-name {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.3
+    }
+
+    .det-sub {
+      font-size: 11.5px;
+      color: var(--mut);
+      margin-top: 3px
+    }
+
+    .det-score {
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .det-score .sv {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1
+    }
+
+    .det-score .sl {
+      font-size: 10.5px;
+      color: var(--mut);
+      margin-top: 2px
+    }
+
+    .det-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px
+    }
+
+    .dm {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 10px;
+      text-align: center
+    }
+
+    .dm .dml {
+      font-size: 10px;
+      color: var(--mut);
+      margin-bottom: 5px
+    }
+
+    .dm .dmv {
+      font-size: 16px;
+      font-weight: 800
+    }
+
+    .det-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 99px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--mut)
+    }
+
+    .det-bar-sec h4 {
+      font-size: 11.5px;
+      color: var(--mut);
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .4px
+    }
+
+    .det-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+      font-size: 12px
+    }
+
+    .det-bar-row .dbl {
+      flex: 0 0 80px;
+      color: var(--mut)
+    }
+
+    .det-bar-row .dbw {
+      flex: 1;
+      height: 7px;
+      border-radius: 4px;
+      background: var(--line);
+      overflow: hidden
+    }
+
+    .det-bar-row .dbw i {
+      display: block;
+      height: 100%;
+      border-radius: 4px;
+      transition: .4s
+    }
+
+    .det-bar-row .dbv {
+      flex: 0 0 36px;
+      text-align: right;
+      font-weight: 700;
+      font-size: 11.5px
+    }
+
+    .det-insight {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #d7d9ef
+    }
+
+    .btn-primary {
+      width: 100%;
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: .15s
+    }
+
+    .btn-primary:hover {
+      background: #818cf8
+    }
+
+    /* API info panel */
+    .api-info {
+      background: var(--card);
+      border: 1px solid rgba(251, 146, 60, .3);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 0 16px 14px
+    }
+
+    .api-info h4 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--warn);
+      margin-bottom: 8px
+    }
+
+    .api-info p {
+      font-size: 11.5px;
+      color: var(--mut);
+      line-height: 1.6
+    }
+
+    .api-info a {
+      color: var(--accent2);
+      text-decoration: none
+    }
+
+    .api-info a:hover {
+      text-decoration: underline
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--panel)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--line);
+      border-radius: 3px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--mut)
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="logo">Space<span>OS</span></div>
+        <div class="sep"></div>
+        <div class="title">강남구 건물 단위 상권 세분화 — Digital Twin</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--mut)">데이터: 네이버 지도 + V-World WFS + 상가정보 API</span>
+        <div class="badge-live">데모 모드 (샘플 데이터)</div>
+      </div>
+    </header>
+
+    <!-- Control bar -->
+    <div class="ctrl-bar">
+      <label>지역</label>
+      <div class="seg">
+        <button class="on" onclick="filterZone(this,'all')">전체</button>
+        <button onclick="filterZone(this,'강남역')">강남역</button>
+        <button onclick="filterZone(this,'선릉')">선릉</button>
+        <button onclick="filterZone(this,'COEX')">COEX</button>
+        <button onclick="filterZone(this,'압구정')">압구정</button>
+        <button onclick="filterZone(this,'청담')">청담</button>
+        <button onclick="filterZone(this,'신사')">신사</button>
+      </div>
+
+      <label>지표</label>
+      <div class="seg">
+        <button class="on" id="metric-vac" onclick="setMetric(this,'vacancy')">공실률</button>
+        <button id="metric-sent" onclick="setMetric(this,'sentiment')">감성지수</button>
+        <button id="metric-rent" onclick="setMetric(this,'rent')">임대료</button>
+      </div>
+
+      <label>업종</label>
+      <select class="sel" onchange="filterCategory(this.value)">
+        <option value="">전체</option>
+        <option value="오피스">오피스</option>
+        <option value="상업">상업/판매</option>
+        <option value="F&B">F&amp;B</option>
+        <option value="복합">복합</option>
+        <option value="의료">의료/뷰티</option>
+      </select>
+
+      <input class="ctrl-search" placeholder="건물명 검색..." oninput="filterSearch(this.value)">
+
+      <div class="ctrl-info">
+        건물 <b id="cnt-visible">0</b> / <b id="cnt-total">0</b> 표시
+        &nbsp;·&nbsp; 클릭 → 상세
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+
+      <!-- Map -->
+      <div class="map-wrap">
+        <div id="map"></div>
+
+        <!-- API 미설정 시 경고 오버레이 -->
+        <div class="map-api-warn" id="api-warn">
+          <div class="warn-icon">🗺️</div>
+          <h3>네이버 지도 API 키가 필요합니다</h3>
+          <p>
+            HTML 파일 상단 <code>&lt;script src="...ncpClientId=<b>YOUR_NAVER_CLIENT_ID</b>"&gt;</code> 를
+            네이버 클라우드 플랫폼에서 발급받은 Client ID로 교체하세요.<br><br>
+            발급처: <code>console.ncloud.com</code> → Application 생성 → Maps JavaScript API 활성화<br>
+            아래 API 목록 패널에서 V-World / 상가정보 API 키도 함께 설정하세요.
+          </p>
+          <p style="font-size:12px;color:var(--mut);margin-top:8px">
+            API 키 없이도 우측 패널의 건물 목록과 상세 정보는 확인 가능합니다.
+          </p>
+        </div>
+
+        <!-- 범례 -->
+        <div class="map-overlay" id="legend">
+          <h4 id="legend-title">공실률</h4>
+          <div class="legend-row">
+            <div class="swatch" style="background:#34d399"></div><span>0–5% (우량)</span>
+          </div>
+          <div class="legend-row">
+            <div class="swatch" style="background:#fbbf24"></div><span>5–15% (주의)</span>
+          </div>
+          <div class="legend-row">
+            <div class="swatch" style="background:#f87171"></div><span>15–30% (위험)</span>
+          </div>
+          <div class="legend-row">
+            <div class="swatch" style="background:#7f1d1d"></div><span>30%+ (고위험)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side panel -->
+      <div class="side">
+
+        <!-- KPI -->
+        <div class="side-sec">
+          <h3>강남구 상권 현황</h3>
+          <div class="kpis">
+            <div class="kpi">
+              <div class="kl">평균 공실률</div>
+              <div class="kv" id="kpi-vac">--<small>%</small></div>
+              <div class="kb"><i id="kb-vac" style="background:var(--warn)"></i></div>
+            </div>
+            <div class="kpi">
+              <div class="kl">감성지수 평균</div>
+              <div class="kv" id="kpi-sent">--<small>pt</small></div>
+              <div class="kb"><i id="kb-sent" style="background:var(--accent)"></i></div>
+            </div>
+            <div class="kpi">
+              <div class="kl">분석 건물 수</div>
+              <div class="kv" id="kpi-cnt">--<small>동</small></div>
+              <div class="kb"><i id="kb-cnt" style="background:var(--info);width:100%"></i></div>
+            </div>
+            <div class="kpi">
+              <div class="kl">평균 임대료</div>
+              <div class="kv" id="kpi-rent">--<small>만원/평</small></div>
+              <div class="kb"><i id="kb-rent" style="background:var(--accent2)"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Building list -->
+        <div class="side-sec" style="flex:0 0 auto">
+          <h3>건물 목록</h3>
+          <div class="blist" id="blist"></div>
+        </div>
+
+        <!-- Detail -->
+        <div class="detail" id="detail-wrap">
+          <div class="det-hint" id="det-hint">
+            지도 위 건물 폴리곤 또는<br>좌측 목록에서 건물을 선택하세요
+          </div>
+          <div id="det-content" style="display:none"></div>
+        </div>
+
+      </div><!-- /side -->
+    </div><!-- /main -->
+  </div><!-- /wrap -->
+
+  <!-- ══════════════════════════════════════════════════════════
+     데이터 모델 + 강남구 샘플 건물 (30동)
+     실제 서비스 시 V-World WFS / 소상공인진흥공단 API로 대체
+     ══════════════════════════════════════════════════════════ -->
+  <script>
+    /* ── API 키 상수 ─────────────────────────────────────────────────────
+       TODO: 각 키를 발급받아 아래 상수에 입력하세요.
+       ──────────────────────────────────────────────────────────────────── */
+    const NAVER_CLIENT_ID = '9nbzrvj8qj'; // console.ncloud.com
+    const VWORLD_KEY = '4DA36B92-32E3-3858-8D6F-DE12DBF6D181';  // vworld.kr
+    const SGIS_KEY = 'YOUR_SGIS_KEY';         // data.go.kr → 소상공인진흥공단
+
+    /* ── 강남구 샘플 건물 30동 ──────────────────────────────────────────
+       polygon: [[lat,lng], ...] 시계방향 (Naver Maps 기준)
+       실제 폴리곤은 V-World WFS 또는 건물통합정보마스터 API로 대체
+       ──────────────────────────────────────────────────────────────────── */
+    const BUILDINGS = [
+      /* ── 강남역 상권 ── */
+      {
+        id: 'GN001', name: '강남 파이낸스센터', dong: '역삼1동', zone: '강남역',
+        addr: '테헤란로 152', cat: '오피스', floors: 39, year: 2001,
+        area: 85000, vac: 6.2, sent: 84, rent: 12.5, tenants: 52,
+        polygon: [[37.4993, 127.0278], [37.4993, 127.0286], [37.4988, 127.0286], [37.4988, 127.0278]]
+      },
+
+      {
+        id: 'GN002', name: '강남 CGV 빌딩', dong: '역삼1동', zone: '강남역',
+        addr: '강남대로 427', cat: '상업', floors: 12, year: 2005,
+        area: 18000, vac: 18.5, sent: 73, rent: 9.2, tenants: 24,
+        polygon: [[37.4980, 127.0271], [37.4980, 127.0277], [37.4976, 127.0277], [37.4976, 127.0271]]
+      },
+
+      {
+        id: 'GN003', name: '역삼 엘타워', dong: '역삼2동', zone: '강남역',
+        addr: '논현로 508', cat: '복합', floors: 20, year: 2003,
+        area: 32000, vac: 11.0, sent: 79, rent: 8.8, tenants: 35,
+        polygon: [[37.4973, 127.0314], [37.4973, 127.0320], [37.4968, 127.0320], [37.4968, 127.0314]]
+      },
+
+      {
+        id: 'GN004', name: '강남구 KDB 타워', dong: '역삼1동', zone: '강남역',
+        addr: '테헤란로 84', cat: '오피스', floors: 16, year: 1999,
+        area: 22000, vac: 9.7, sent: 81, rent: 10.1, tenants: 28,
+        polygon: [[37.4998, 127.0265], [37.4998, 127.0270], [37.4994, 127.0270], [37.4994, 127.0265]]
+      },
+
+      {
+        id: 'GN005', name: '강남 오라클빌딩', dong: '역삼1동', zone: '강남역',
+        addr: '테헤란로 70', cat: '오피스', floors: 21, year: 1997,
+        area: 28000, vac: 13.2, sent: 76, rent: 9.6, tenants: 31,
+        polygon: [[37.5003, 127.0258], [37.5003, 127.0264], [37.4999, 127.0264], [37.4999, 127.0258]]
+      },
+
+      /* ── 선릉 상권 ── */
+      {
+        id: 'GN006', name: '현대해상빌딩', dong: '역삼2동', zone: '선릉',
+        addr: '테헤란로 108', cat: '오피스', floors: 18, year: 2002,
+        area: 24000, vac: 5.8, sent: 87, rent: 11.2, tenants: 29,
+        polygon: [[37.5012, 127.0373], [37.5012, 127.0380], [37.5007, 127.0380], [37.5007, 127.0373]]
+      },
+
+      {
+        id: 'GN007', name: '선릉 아이파크', dong: '삼성1동', zone: '선릉',
+        addr: '선릉로 428', cat: '복합', floors: 28, year: 2009,
+        area: 45000, vac: 8.3, sent: 83, rent: 10.8, tenants: 48,
+        polygon: [[37.5025, 127.0392], [37.5025, 127.0400], [37.5019, 127.0400], [37.5019, 127.0392]]
+      },
+
+      {
+        id: 'GN008', name: '선릉역 삼환빌딩', dong: '역삼2동', zone: '선릉',
+        addr: '테헤란로 138', cat: '오피스', floors: 22, year: 2004,
+        area: 31000, vac: 12.1, sent: 77, rent: 9.9, tenants: 33,
+        polygon: [[37.5035, 127.0432], [37.5035, 127.0439], [37.5030, 127.0439], [37.5030, 127.0432]]
+      },
+
+      {
+        id: 'GN009', name: '삼성 생명 강남사옥', dong: '삼성1동', zone: '선릉',
+        addr: '삼성로 2길 14', cat: '오피스', floors: 25, year: 1998,
+        area: 38000, vac: 4.5, sent: 89, rent: 12.0, tenants: 41,
+        polygon: [[37.5048, 127.0447], [37.5048, 127.0455], [37.5043, 127.0455], [37.5043, 127.0447]]
+      },
+
+      /* ── COEX / 삼성 상권 ── */
+      {
+        id: 'GN010', name: 'COEX 아티움', dong: '삼성2동', zone: 'COEX',
+        addr: '봉은사로 524', cat: '상업', floors: 6, year: 2000,
+        area: 55000, vac: 7.4, sent: 91, rent: 15.2, tenants: 180,
+        polygon: [[37.5113, 127.0588], [37.5113, 127.0602], [37.5103, 127.0602], [37.5103, 127.0588]]
+      },
+
+      {
+        id: 'GN011', name: '포스코센터', dong: '대치1동', zone: 'COEX',
+        addr: '테헤란로 440', cat: '오피스', floors: 39, year: 1995,
+        area: 92000, vac: 3.8, sent: 88, rent: 13.5, tenants: 63,
+        polygon: [[37.5087, 127.0621], [37.5087, 127.0631], [37.5080, 127.0631], [37.5080, 127.0621]]
+      },
+
+      {
+        id: 'GN012', name: '봉은사 센터빌딩', dong: '삼성2동', zone: 'COEX',
+        addr: '봉은사로 441', cat: '복합', floors: 14, year: 2007,
+        area: 20000, vac: 16.7, sent: 68, rent: 8.5, tenants: 22,
+        polygon: [[37.5096, 127.0561], [37.5096, 127.0567], [37.5091, 127.0567], [37.5091, 127.0561]]
+      },
+
+      {
+        id: 'GN013', name: '트레이드타워', dong: '삼성2동', zone: 'COEX',
+        addr: '테헤란로 511', cat: '오피스', floors: 54, year: 1988,
+        area: 120000, vac: 11.5, sent: 82, rent: 14.2, tenants: 95,
+        polygon: [[37.5124, 127.0594], [37.5124, 127.0603], [37.5117, 127.0603], [37.5117, 127.0594]]
+      },
+
+      /* ── 압구정 상권 ── */
+      {
+        id: 'GN014', name: '갤러리아 백화점 명품관', dong: '압구정동', zone: '압구정',
+        addr: '압구정로 343', cat: '상업', floors: 7, year: 1990,
+        area: 65000, vac: 1.2, sent: 94, rent: 28.0, tenants: 320,
+        polygon: [[37.5266, 127.0407], [37.5266, 127.0419], [37.5258, 127.0419], [37.5258, 127.0407]]
+      },
+
+      {
+        id: 'GN015', name: '현대백화점 압구정본점', dong: '압구정동', zone: '압구정',
+        addr: '압구정로 165', cat: '상업', floors: 9, year: 1985,
+        area: 72000, vac: 0.8, sent: 92, rent: 25.5, tenants: 380,
+        polygon: [[37.5271, 127.0390], [37.5271, 127.0401], [37.5263, 127.0401], [37.5263, 127.0390]]
+      },
+
+      {
+        id: 'GN016', name: '압구정 로데오 빌딩', dong: '압구정동', zone: '압구정',
+        addr: '강남대로 156', cat: 'F&B', floors: 5, year: 2001,
+        area: 8500, vac: 21.3, sent: 71, rent: 14.8, tenants: 38,
+        polygon: [[37.5253, 127.0397], [37.5253, 127.0402], [37.5249, 127.0402], [37.5249, 127.0397]]
+      },
+
+      {
+        id: 'GN017', name: '압구정 오렌지 플라자', dong: '압구정동', zone: '압구정',
+        addr: '압구정로 46길', cat: '상업', floors: 4, year: 1998,
+        area: 7200, vac: 28.9, sent: 62, rent: 13.2, tenants: 30,
+        polygon: [[37.5247, 127.0408], [37.5247, 127.0413], [37.5243, 127.0413], [37.5243, 127.0408]]
+      },
+
+      /* ── 청담 상권 ── */
+      {
+        id: 'GN018', name: '도산공원 블록A', dong: '청담동', zone: '청담',
+        addr: '도산대로 55길', cat: 'F&B', floors: 4, year: 2015,
+        area: 4200, vac: 9.5, sent: 88, rent: 18.5, tenants: 26,
+        polygon: [[37.5234, 127.0470], [37.5234, 127.0476], [37.5230, 127.0476], [37.5230, 127.0470]]
+      },
+
+      {
+        id: 'GN019', name: '청담 럭셔리 갤러리', dong: '청담동', zone: '청담',
+        addr: '청담동 88', cat: '상업', floors: 3, year: 2018,
+        area: 3800, vac: 4.2, sent: 93, rent: 22.0, tenants: 18,
+        polygon: [[37.5225, 127.0480], [37.5225, 127.0485], [37.5221, 127.0485], [37.5221, 127.0480]]
+      },
+
+      {
+        id: 'GN020', name: '청담동 메디컬 센터', dong: '청담동', zone: '청담',
+        addr: '압구정로 79', cat: '의료', floors: 8, year: 2012,
+        area: 9600, vac: 6.8, sent: 85, rent: 16.3, tenants: 44,
+        polygon: [[37.5216, 127.0462], [37.5216, 127.0467], [37.5212, 127.0467], [37.5212, 127.0462]]
+      },
+
+      /* ── 신사/가로수길 상권 ── */
+      {
+        id: 'GN021', name: '가로수길 플래그십 A', dong: '신사동', zone: '신사',
+        addr: '도산대로 13길', cat: '상업', floors: 3, year: 2013,
+        area: 2800, vac: 13.6, sent: 80, rent: 16.0, tenants: 14,
+        polygon: [[37.5224, 127.0228], [37.5224, 127.0233], [37.5221, 127.0233], [37.5221, 127.0228]]
+      },
+
+      {
+        id: 'GN022', name: '가로수길 상업빌딩 B', dong: '신사동', zone: '신사',
+        addr: '압구정로 12', cat: 'F&B', floors: 4, year: 2016,
+        area: 3500, vac: 8.2, sent: 86, rent: 17.5, tenants: 20,
+        polygon: [[37.5220, 127.0236], [37.5220, 127.0241], [37.5216, 127.0241], [37.5216, 127.0236]]
+      },
+
+      {
+        id: 'GN023', name: '신사 오피스텔 복합', dong: '신사동', zone: '신사',
+        addr: '강남대로 102길', cat: '복합', floors: 12, year: 2008,
+        area: 15000, vac: 19.4, sent: 66, rent: 8.9, tenants: 29,
+        polygon: [[37.5208, 127.0220], [37.5208, 127.0226], [37.5204, 127.0226], [37.5204, 127.0220]]
+      },
+
+      /* ── 논현 상권 ── */
+      {
+        id: 'GN024', name: '논현 CGI센터', dong: '논현1동', zone: '강남역',
+        addr: '언주로 718', cat: '오피스', floors: 14, year: 2006,
+        area: 18500, vac: 10.3, sent: 79, rent: 8.2, tenants: 24,
+        polygon: [[37.5093, 127.0276], [37.5093, 127.0282], [37.5088, 127.0282], [37.5088, 127.0276]]
+      },
+
+      {
+        id: 'GN025', name: '논현 스퀘어 상가', dong: '논현2동', zone: '강남역',
+        addr: '강남대로 238', cat: '상업', floors: 5, year: 2010,
+        area: 8900, vac: 22.5, sent: 65, rent: 7.8, tenants: 36,
+        polygon: [[37.5080, 127.0264], [37.5080, 127.0269], [37.5076, 127.0269], [37.5076, 127.0264]]
+      },
+
+      /* ── 대치 상권 ── */
+      {
+        id: 'GN026', name: '대치 아이파크', dong: '대치2동', zone: 'COEX',
+        addr: '남부순환로 2840', cat: '복합', floors: 30, year: 2011,
+        area: 48000, vac: 7.9, sent: 82, rent: 9.5, tenants: 55,
+        polygon: [[37.4972, 127.0620], [37.4972, 127.0630], [37.4964, 127.0630], [37.4964, 127.0620]]
+      },
+
+      {
+        id: 'GN027', name: '대치 메리츠타워', dong: '대치4동', zone: 'COEX',
+        addr: '테헤란로 521', cat: '오피스', floors: 28, year: 2008,
+        area: 42000, vac: 5.1, sent: 85, rent: 11.8, tenants: 47,
+        polygon: [[37.5063, 127.0638], [37.5063, 127.0647], [37.5056, 127.0647], [37.5056, 127.0638]]
+      },
+
+      /* ── 개포/일원 ── */
+      {
+        id: 'GN028', name: '개포 디지털혁신파크', dong: '개포2동', zone: '강남역',
+        addr: '개포로 416', cat: '오피스', floors: 9, year: 2019,
+        area: 35000, vac: 3.2, sent: 90, rent: 7.5, tenants: 62,
+        polygon: [[37.4791, 127.0489], [37.4791, 127.0498], [37.4784, 127.0498], [37.4784, 127.0489]]
+      },
+
+      {
+        id: 'GN029', name: '수서 역세권 복합몰', dong: '수서동', zone: '강남역',
+        addr: '수서로 42', cat: '복합', floors: 8, year: 2020,
+        area: 29000, vac: 15.8, sent: 74, rent: 8.0, tenants: 85,
+        polygon: [[37.4870, 127.1013], [37.4870, 127.1021], [37.4863, 127.1021], [37.4863, 127.1013]]
+      },
+
+      {
+        id: 'GN030', name: '일원 의료 클러스터', dong: '일원1동', zone: '강남역',
+        addr: '일원로 81', cat: '의료', floors: 6, year: 2017,
+        area: 14500, vac: 4.8, sent: 87, rent: 9.2, tenants: 38,
+        polygon: [[37.4905, 127.0863], [37.4905, 127.0871], [37.4900, 127.0871], [37.4900, 127.0863]]
+      }
+    ];
+
+    /* ── 상태 ─────────────────────────────────────────────────────────── */
+    let map = null;
+    let layerGroup = null;
+    let currentMetric = 'vacancy';
+    let selectedId = null;
+    let visibleIds = new Set(BUILDINGS.map(b => b.id));
+
+    /* ── 색상 함수 ─────────────────────────────────────────────────────── */
+    function colorByVacancy(v) {
+      if (v < 5) return '#34d399';
+      if (v < 15) return '#fbbf24';
+      if (v < 30) return '#f87171';
+      return '#7f2d2d';
+    }
+    function colorBySentiment(s) {
+      if (s >= 85) return '#34d399';
+      if (s >= 70) return '#60a5fa';
+      if (s >= 55) return '#fbbf24';
+      return '#f87171';
+    }
+    function colorByRent(r) {
+      if (r >= 20) return '#a78bfa';
+      if (r >= 12) return '#6366f1';
+      if (r >= 8) return '#38bdf8';
+      return '#9aa0c8';
+    }
+    function getColor(b) {
+      if (currentMetric === 'sentiment') return colorBySentiment(b.sent);
+      if (currentMetric === 'rent') return colorByRent(b.rent);
+      return colorByVacancy(b.vac);
+    }
+    function metricVal(b) {
+      if (currentMetric === 'sentiment') return b.sent + 'pt';
+      if (currentMetric === 'rent') return b.rent + '만원';
+      return b.vac + '%';
+    }
+
+    /* ── 지도 초기화 ──────────────────────────────────────────────────── */
+    function initMap() {
+      map = L.map('map', { zoomControl: true }).setView([37.5172, 127.0473], 13);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 19
+      }).addTo(map);
+
+      layerGroup = L.layerGroup().addTo(map);
+
+      renderPolygons();
+      renderList();
+      updateKPIs();
+
+      if (VWORLD_KEY !== 'YOUR_VWORLD_API_KEY') {
+        loadVWorldData();
+      }
+    }
+
+    /* ── V-World 실데이터 로드 ─────────────────────────────────────────── */
+    async function loadVWorldData() {
+      // 강남구 핵심 상권 bbox [minLat, minLng, maxLat, maxLng]
+      const GANGNAM_BBOX = [37.4813, 127.0010, 37.5381, 127.1050];
+
+      setVWorldStatus('loading', 'V-World 건물 폴리곤 로드 중...');
+
+      try {
+        // 1차: lt_c_aisfield (건물통합정보)
+        let buildings = await fetchVWorldBuildings(GANGNAM_BBOX, 'lt_c_aisfield');
+
+        // 결과 없으면 2차: LP_PA_CBND_BUBUN (연속지적도)
+        if (!buildings || buildings.length === 0) {
+          console.warn('[V-World] lt_c_aisfield 결과 없음 → LP_PA_CBND_BUBUN 시도');
+          buildings = await fetchVWorldBuildings(GANGNAM_BBOX, 'LP_PA_CBND_BUBUN');
+        }
+
+        if (buildings && buildings.length > 0) {
+          BUILDINGS.length = 0;
+          BUILDINGS.push(...buildings);
+          visibleIds = new Set(BUILDINGS.map(b => b.id));
+          renderPolygons();
+          renderList();
+          updateKPIs();
+          setVWorldStatus('ok', `V-World ${buildings.length}개 건물 로드 완료`);
+        } else {
+          setVWorldStatus('warn', '샘플 데이터 사용 중 (V-World 응답 비어 있음)');
+          console.warn('[V-World] 두 레이어 모두 결과 없음. 콘솔에서 WFS 응답 확인 필요');
+        }
+      } catch (e) {
+        console.error('[V-World] 오류:', e);
+        setVWorldStatus('warn', `V-World 오류 — 샘플 데이터 유지 (${e.message})`);
+      }
+    }
+
+    function setVWorldStatus(type, msg) {
+      const badge = document.querySelector('.badge-live');
+      if (!badge) return;
+      const colors = { loading: '#fbbf24', ok: '#34d399', warn: '#f87171' };
+      badge.style.color = colors[type] || '#9aa0c8';
+      badge.style.borderColor = (colors[type] || '#9aa0c8').replace(')', ',.3)').replace('rgb', 'rgba');
+      badge.textContent = msg;
+    }
+
+    function handleMapLoadError() {
+      renderList();
+      updateKPIs();
+    }
+
+    /* ── 폴리곤 렌더링 ─────────────────────────────────────────────────── */
+    function renderPolygons() {
+      if (!map || !layerGroup) return;
+      layerGroup.clearLayers();
+
+      BUILDINGS.filter(b => visibleIds.has(b.id)).forEach(b => {
+        const color = getColor(b);
+        const isSel = selectedId === b.id;
+
+        const poly = L.polygon(b.polygon, {
+          fillColor: color,
+          fillOpacity: isSel ? 0.75 : 0.50,
+          color: isSel ? '#ffffff' : color,
+          weight: isSel ? 2.5 : 1.2,
+          opacity: 0.9
+        });
+
+        poly.on('click', () => selectBuilding(b.id));
+        poly.on('mouseover', function () {
+          if (selectedId !== b.id)
+            this.setStyle({ fillOpacity: 0.70, color: '#ffffff', weight: 2 });
+        });
+        poly.on('mouseout', function () {
+          if (selectedId !== b.id)
+            this.setStyle({ fillOpacity: 0.50, color, weight: 1.2 });
+        });
+
+        layerGroup.addLayer(poly);
+      });
+    }
+
+    /* ── 목록 렌더링 ─────────────────────────────────────────────────────*/
+    function renderList() {
+      const container = document.getElementById('blist');
+      const visible = BUILDINGS.filter(b => visibleIds.has(b.id));
+      document.getElementById('cnt-visible').textContent = visible.length;
+      document.getElementById('cnt-total').textContent = BUILDINGS.length;
+
+      container.innerHTML = visible.map(b => `
+    <div class="brow ${b.id === selectedId ? 'sel' : ''}" id="row-${b.id}" onclick="selectBuilding('${b.id}')">
+      <div class="bcat" style="background:${getColor(b)}"></div>
+      <div class="binfo">
+        <div class="bnm">${b.name}</div>
+        <div class="bdong">${b.dong} · ${b.cat}</div>
+      </div>
+      <div class="bvac" style="color:${getColor(b)}">${metricVal(b)}</div>
+    </div>
+  `).join('');
+    }
+
+    /* ── 건물 선택 ────────────────────────────────────────────────────── */
+    function selectBuilding(id) {
+      selectedId = id;
+      const b = BUILDINGS.find(x => x.id === id);
+      if (!b) return;
+
+      // 지도 이동
+      if (map) {
+        const center = b.polygon.reduce(
+          (acc, [lat, lng]) => [acc[0] + lat / b.polygon.length, acc[1] + lng / b.polygon.length],
+          [0, 0]
+        );
+        map.setView(center, Math.max(map.getZoom(), 16));
+      }
+
+      renderPolygons();
+      renderList();
+      renderDetail(b);
+    }
+
+    /* ── 상세 패널 ────────────────────────────────────────────────────── */
+    function renderDetail(b) {
+      document.getElementById('det-hint').style.display = 'none';
+      const el = document.getElementById('det-content');
+      el.style.display = 'flex';
+      el.style.flexDirection = 'column';
+      el.style.gap = '12px';
+
+      const vacColor = colorByVacancy(b.vac);
+      const sentColor = colorBySentiment(b.sent);
+
+      el.innerHTML = `
+    <div class="det-top">
+      <div>
+        <div class="det-name">${b.name}</div>
+        <div class="det-sub">${b.dong} · ${b.addr} · 지상 ${b.floors}층 · ${b.year}년</div>
+      </div>
+      <div class="det-score">
+        <div class="sv" style="color:${vacColor}">${b.vac}%</div>
+        <div class="sl">공실률</div>
+      </div>
+    </div>
+
+    <div class="det-tags">
+      <span class="tag">${b.cat}</span>
+      <span class="tag">임차인 ${b.tenants}개소</span>
+      <span class="tag">연면적 ${(b.area / 1000).toFixed(0)}천㎡</span>
+      <span class="tag">임대료 ${b.rent}만원/평</span>
+    </div>
+
+    <div class="det-metrics">
+      <div class="dm">
+        <div class="dml">공실률</div>
+        <div class="dmv" style="color:${vacColor}">${b.vac}<small style="font-size:11px">%</small></div>
+      </div>
+      <div class="dm">
+        <div class="dml">감성지수</div>
+        <div class="dmv" style="color:${sentColor}">${b.sent}<small style="font-size:11px">pt</small></div>
+      </div>
+      <div class="dm">
+        <div class="dml">평균 임대료</div>
+        <div class="dmv" style="color:var(--accent2)">${b.rent}<small style="font-size:11px">만</small></div>
+      </div>
+    </div>
+
+    <div class="det-bar-sec">
+      <h4>세부 지표</h4>
+      ${makeBar('임차인 수', b.tenants, 100, '#38bdf8', '개소')}
+      ${makeBar('연면적', b.area / 1000, 120, '#a78bfa', '천㎡')}
+      ${makeBar('공실률', b.vac, 40, vacColor, '%')}
+      ${makeBar('감성지수', b.sent, 100, sentColor, 'pt')}
+    </div>
+
+    <div class="det-insight">
+      ${getInsight(b)}
+    </div>
+
+    <button class="btn-primary" onclick="alert('PPPP 상세 분석 페이지 연동 예정 (TODO: Platform 트랙 연결)')">
+      PPPP 플랫폼 상세 분석 →
+    </button>
+  `;
+    }
+
+    function makeBar(label, val, max, color, unit) {
+      const pct = Math.min(100, Math.round((val / max) * 100));
+      return `
+    <div class="det-bar-row">
+      <span class="dbl">${label}</span>
+      <div class="dbw"><i style="width:${pct}%;background:${color}"></i></div>
+      <span class="dbv">${typeof val === 'number' && val % 1 !== 0 ? val.toFixed(1) : val}${unit}</span>
+    </div>`;
+    }
+
+    function getInsight(b) {
+      if (b.vac < 5) return `<b>우량 건물</b> — 공실률 ${b.vac}%로 강남구 평균 이하. 임차인 이탈 리스크 낮음. 프리미엄 임대 조건 협상 가능.`;
+      if (b.vac < 15) return `<b>주의 필요</b> — 공실률 ${b.vac}%로 평균 수준. 임차인 다변화 전략과 리뉴얼 검토 권장.`;
+      if (b.vac < 30) return `<b>위험 신호</b> — 공실률 ${b.vac}%로 높음. 인근 신규 공급 물량 또는 업종 쇠퇴 분석 필요.`;
+      return `<b>고위험</b> — 공실률 ${b.vac}%로 심각. SpaceOS AI 기반 업종 전환 추천 검토 필요.`;
+    }
+
+    /* ── KPI 업데이트 ─────────────────────────────────────────────────── */
+    function updateKPIs() {
+      const visible = BUILDINGS.filter(b => visibleIds.has(b.id));
+      if (!visible.length) return;
+
+      const avgVac = (visible.reduce((a, b) => a + b.vac, 0) / visible.length).toFixed(1);
+      const avgSent = Math.round(visible.reduce((a, b) => a + b.sent, 0) / visible.length);
+      const avgRent = (visible.reduce((a, b) => a + b.rent, 0) / visible.length).toFixed(1);
+
+      document.getElementById('kpi-vac').innerHTML = `${avgVac}<small>%</small>`;
+      document.getElementById('kpi-sent').innerHTML = `${avgSent}<small>pt</small>`;
+      document.getElementById('kpi-cnt').innerHTML = `${visible.length}<small>동</small>`;
+      document.getElementById('kpi-rent').innerHTML = `${avgRent}<small>만원/평</small>`;
+
+      document.getElementById('kb-vac').style.width = Math.min(100, avgVac * 2.5) + '%';
+      document.getElementById('kb-sent').style.width = avgSent + '%';
+      document.getElementById('kb-cnt').style.width = Math.min(100, visible.length / 30 * 100) + '%';
+      document.getElementById('kb-rent').style.width = Math.min(100, avgRent * 3) + '%';
+    }
+
+    /* ── 필터 함수 ────────────────────────────────────────────────────── */
+    let activeZone = 'all';
+    let activeCat = '';
+    let activeSearch = '';
+
+    function applyFilters() {
+      visibleIds = new Set(
+        BUILDINGS
+          .filter(b => activeZone === 'all' || b.zone === activeZone)
+          .filter(b => !activeCat || b.cat.includes(activeCat))
+          .filter(b => !activeSearch || b.name.includes(activeSearch) || b.dong.includes(activeSearch))
+          .map(b => b.id)
+      );
+      if (selectedId && !visibleIds.has(selectedId)) {
+        selectedId = null;
+        document.getElementById('det-hint').style.display = '';
+        document.getElementById('det-content').style.display = 'none';
+      }
+      renderPolygons();
+      renderList();
+      updateKPIs();
+    }
+
+    function filterZone(btn, zone) {
+      document.querySelectorAll('.ctrl-bar .seg:first-of-type button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      activeZone = zone;
+      if (map && zone !== 'all') {
+        const centers = {
+          '강남역': [37.499, 127.028], '선릉': [37.504, 127.044],
+          'COEX': [37.511, 127.059], '압구정': [37.526, 127.040],
+          '청담': [37.522, 127.047], '신사': [37.521, 127.023]
+        };
+        if (centers[zone]) map.setView(centers[zone], 15);
+      } else if (map && zone === 'all') {
+        map.setView([37.5172, 127.0473], 13);
+      }
+      applyFilters();
+    }
+
+    function setMetric(btn, metric) {
+      document.querySelectorAll('#metric-vac,#metric-sent,#metric-rent').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      currentMetric = metric;
+
+      const legends = {
+        vacancy: {
+          title: '공실률',
+          rows: [['#34d399', '0–5% (우량)'], ['#fbbf24', '5–15% (주의)'], ['#f87171', '15–30% (위험)'], ['#7f2d2d', '30%+ (고위험)']]
+        },
+        sentiment: {
+          title: '감성지수',
+          rows: [['#34d399', '85+ (매우 좋음)'], ['#60a5fa', '70–85 (좋음)'], ['#fbbf24', '55–70 (보통)'], ['#f87171', '55 미만 (나쁨)']]
+        },
+        rent: {
+          title: '평균 임대료 (만원/평)',
+          rows: [['#a78bfa', '20+ (최고가)'], ['#6366f1', '12–20 (고가)'], ['#38bdf8', '8–12 (중가)'], ['#9aa0c8', '8 미만 (저가)']]
+        }
+      };
+
+      const lg = legends[metric];
+      document.getElementById('legend-title').textContent = lg.title;
+      const rows = document.getElementById('legend').querySelectorAll('.legend-row');
+      lg.rows.forEach(([color, label], i) => {
+        rows[i].querySelector('.swatch').style.background = color;
+        rows[i].querySelector('span').textContent = label;
+      });
+
+      renderPolygons();
+      renderList();
+    }
+
+    function filterCategory(cat) {
+      activeCat = cat;
+      applyFilters();
+    }
+
+    function filterSearch(val) {
+      activeSearch = val.trim();
+      applyFilters();
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       V-World WFS 연동 함수 (실제 건물 폴리곤 데이터 fetch)
+       TODO: VWORLD_KEY 입력 후 activateVWorld() 호출
+       ══════════════════════════════════════════════════════════════════════ */
+    async function fetchVWorldBuildings(bbox, typename = 'lt_c_aisfield') {
+      const [minLat, minLng, maxLat, maxLng] = bbox;
+      const vwUrl = new URL('https://api.vworld.kr/req/wfs');
+      vwUrl.searchParams.set('SERVICE',     'WFS');
+      vwUrl.searchParams.set('VERSION',     '2.0.0');
+      vwUrl.searchParams.set('REQUEST',     'GetFeature');
+      vwUrl.searchParams.set('TYPENAME',    typename);
+      vwUrl.searchParams.set('BBOX',        `${minLng},${minLat},${maxLng},${maxLat}`);
+      vwUrl.searchParams.set('SRSNAME',     'EPSG:4326');
+      vwUrl.searchParams.set('output',      'application/json');
+      vwUrl.searchParams.set('maxFeatures', '500');
+      vwUrl.searchParams.set('apiKey',      VWORLD_KEY);
+
+      /* TODO: 운영 시 FastAPI 백엔드 프록시로 교체
+         GET /api/v1/vworld/wfs?bbox=...&typename=...
+         → apps/backend/app/api/v1/vworld.py 에서 httpx로 V-World 호출 */
+      const CORS_PROXY = 'https://corsproxy.io/?url=';
+      const fetchUrl = CORS_PROXY + encodeURIComponent(vwUrl.toString());
+
+      console.log(`[V-World] GET ${typename}`);
+      const res = await fetch(fetchUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const gj = await res.json();
+      console.log('[V-World] 응답:', gj);
+      return parseVWorldGeoJSON(gj);
+    }
+
+    function parseVWorldGeoJSON(gj) {
+      /* GeoJSON Feature → BUILDINGS 형식으로 변환
+         실제 속성 필드명은 V-World WFS 스키마 확인 필요:
+           BLDG_NM   건물명
+           DONG_NM   동명
+           FLOOR     지상 층수
+           BJDONG_CD 법정동 코드
+           GEOM_TYPE Polygon / MultiPolygon
+      */
+      return gj.features.map((f, i) => {
+        const props = f.properties || {};
+        const geom = f.geometry;
+        let coords = [];
+
+        if (geom.type === 'Polygon') {
+          coords = geom.coordinates[0].map(([lng, lat]) => [lat, lng]);
+        } else if (geom.type === 'MultiPolygon') {
+          coords = geom.coordinates[0][0].map(([lng, lat]) => [lat, lng]);
+        }
+
+        return {
+          id: `VW${String(i).padStart(4, '0')}`,
+          name: props.BLDG_NM || `건물-${i}`,
+          dong: props.DONG_NM || '강남구',
+          zone: 'all',
+          addr: props.ROAD_NM_ADDR || '',
+          cat: '기타',
+          floors: parseInt(props.GRND_FLR || 0) || 1,
+          year: parseInt(props.USE_APR_DT?.substring(0, 4) || 0) || 2000,
+          area: parseFloat(props.TOTAREA || 0),
+          vac: Math.random() * 25,   // TODO: 실제 공실 데이터 조인
+          sent: 60 + Math.round(Math.random() * 35),
+          rent: 6 + Math.round(Math.random() * 18),
+          tenants: Math.round(props.HO_CNT || 1),
+          polygon: coords
+        };
+      });
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       소상공인진흥공단 상가정보 API 연동
+       TODO: SGIS_KEY 입력 후 enrichWithSGIS() 호출
+       ══════════════════════════════════════════════════════════════════════ */
+    async function fetchSGISData(lat, lng, radius = 500) {
+      /*
+        공공데이터포털 소상공인진흥공단_상가(상권)정보
+        ────────────────────────────────────────────────
+        endpoint: https://apis.data.go.kr/B553077/api/open/sdsc2/storeListInRadius
+        key:      serviceKey (공공데이터포털 발급)
+        params:
+          cx      경도 (longitude)
+          cy      위도 (latitude)
+          radius  반경 (미터)
+          pageNo  페이지
+          numOfRows 건수
+        반환:
+          상가 목록 (상호명, 업종, 주소, 좌표)
+      */
+      const url = new URL('https://apis.data.go.kr/B553077/api/open/sdsc2/storeListInRadius');
+      url.searchParams.set('serviceKey', SGIS_KEY);
+      url.searchParams.set('cx', lng);
+      url.searchParams.set('cy', lat);
+      url.searchParams.set('radius', radius);
+      url.searchParams.set('numOfRows', '1000');
+      url.searchParams.set('pageNo', '1');
+      url.searchParams.set('type', 'json');
+
+      const res = await fetch(url.toString());
+      if (!res.ok) throw new Error(`SGIS API 오류: ${res.status}`);
+      return res.json();
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       국토교통부 건물통합정보마스터 API
+       https://www.data.go.kr → "건물통합정보마스터 API"
+       ══════════════════════════════════════════════════════════════════════ */
+    async function fetchMolitBuilding(bjdongCd, bun, ji) {
+      const url = new URL('http://apis.data.go.kr/1613000/BldRgstHubService/getBldRgstInfo');
+      url.searchParams.set('serviceKey', 'YOUR_DATA_GO_KR_KEY');
+      url.searchParams.set('bjdongCd', bjdongCd);  // 법정동코드 (강남구 역삼1동: 1168010100)
+      url.searchParams.set('bun', bun);        // 번지
+      url.searchParams.set('ji', ji);
+      url.searchParams.set('numOfRows', '10');
+      url.searchParams.set('pageNo', '1');
+      url.searchParams.set('type', 'json');
+      return fetch(url.toString()).then(r => r.json());
+    }
+
+    /* ── 초기화 ── */
+    window.addEventListener('load', initMap);
+  </script>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+     API 목록 정보 패널 (HTML 하단 — 화면에는 표시되지 않음, 개발자용 주석)
+     ══════════════════════════════════════════════════════════════════════
+
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  SpaceOS 강남구 건물 단위 상권 세분화 — 필요 API / 데이터 목록       │
+  ├─────────────┬───────────────────────────────────┬──────────────────┤
+  │  API        │ 발급처                             │ 용도             │
+  ├─────────────┼───────────────────────────────────┼──────────────────┤
+  │ 네이버 지도 │ console.ncloud.com                 │ 지도 베이스레이어 │
+  │ (NCP Maps) │ → Application → Maps JS API        │ 건물 클러스터 표시│
+  ├─────────────┼───────────────────────────────────┼──────────────────┤
+  │ V-World WFS │ vworld.kr → 개발자센터 → API Key   │ 건물 폴리곤 GeoJSON│
+  │             │ (무료, 일 10만 건)                  │ 층수·연면적·위치  │
+  ├─────────────┼───────────────────────────────────┼──────────────────┤
+  │ 소상공인    │ data.go.kr                          │ 건물 내 입점 업종│
+  │ 상가정보API │ → 소상공인진흥공단_상가(상권)정보    │ 상호명·업종·좌표  │
+  ├─────────────┼───────────────────────────────────┼──────────────────┤
+  │ 건물통합    │ data.go.kr                          │ 법적 건물 정보   │
+  │ 정보마스터  │ → 국토교통부_건물통합정보마스터API   │ 사용승인·면적    │
+  ├─────────────┼───────────────────────────────────┼──────────────────┤
+  │ 서울 열린   │ data.seoul.go.kr                    │ 공실률·권리금    │
+  │ 데이터광장  │ → 상권분석서비스 API                 │ 상권별 통계      │
+  └─────────────┴───────────────────────────────────┴──────────────────┘
+
+  V-World WFS 레이어 목록 (건물 관련):
+  - lt_c_aisfield     : 건물통합정보 (추천 — 건물 폴리곤 + 속성)
+  - LP_PA_CBND_BUBUN  : 연속지적도 (필지 단위, 건물보다 넓음)
+  - AL_D178_C0510     : 건물 구식 레이어 (연도별 스냅샷)
+
+  법정동 코드 (강남구 주요 동):
+  - 역삼1동: 1168010100
+  - 역삼2동: 1168010200
+  - 삼성1동: 1168011300
+  - 삼성2동: 1168011400
+  - 압구정동: 1168010700
+  - 청담동:  1168011200
+  - 신사동:  1168010800
+  - 논현1동: 1168010500
+  - 대치4동: 1168012400
+
+  데이터 파이프라인 권장 순서:
+  1. V-World WFS → 건물 폴리곤 (위치·형태)
+  2. 건물통합정보마스터 API → 층수·연면적·사용승인일
+  3. 소상공인 상가정보 API → 입점 업종·상호 (건물별 JOIN)
+  4. 서울 상권분석서비스 → 공실률·유동인구·매출
+  5. SpaceOS 크롤러 (네이버플레이스·카카오맵) → 감성점수
+  ─────────────────────────────────────────────────────────────────────
+-->
+
+</body>
+
+</html>
