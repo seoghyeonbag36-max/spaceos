@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS — 서울 상권 디지털 트윈 플랫폼</title>
+<style>
+:root{
+  --bg:#0f1024;--panel:#15172e;--card:#1b1e3d;--ink:#e8e9f5;--mut:#9aa0c8;
+  --line:#2b2f57;--accent:#6366f1;--accent2:#a78bfa;
+  --good:#34d399;--warn:#fb923c;--danger:#f87171;--info:#38bdf8;
+  --gangnam:#f59e0b;--mapo:#34d399;--jongno:#60a5fa;--seongdong:#f472b6;--jung:#fb923c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  font-size:14px;min-height:100vh}
+
+/* ── 네비게이션 ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 40px;background:rgba(15,16,36,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line)
+}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.logo{font-size:20px;font-weight:900;letter-spacing:-.5px;color:#fff}
+.logo span{color:var(--accent2)}
+.nav-badge{
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;
+  background:rgba(52,211,153,.12);color:var(--good);border:1px solid rgba(52,211,153,.25)
+}
+.nav-links{display:flex;gap:24px}
+.nav-links a{color:var(--mut);text-decoration:none;font-size:13px;transition:.15s}
+.nav-links a:hover{color:var(--ink)}
+
+/* ── 히어로 ── */
+.hero{
+  padding:80px 40px 64px;max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center
+}
+.hero-text h1{
+  font-size:44px;font-weight:900;letter-spacing:-1.5px;line-height:1.15;
+  background:linear-gradient(135deg,#fff 0%,var(--accent2) 60%,var(--accent) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
+}
+.hero-text h1 em{font-style:normal;-webkit-text-fill-color:var(--accent2)}
+.hero-sub{
+  margin-top:18px;font-size:16px;color:var(--mut);line-height:1.75;max-width:480px
+}
+.hero-cta{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;
+  cursor:pointer;text-decoration:none;transition:.2s;border:0;font-family:inherit
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#818cf8;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn-outline:hover{background:var(--card);border-color:var(--accent)}
+
+.hero-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px
+}
+.stat-card{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:20px 22px;position:relative;overflow:hidden
+}
+.stat-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(99,102,241,.08),transparent);
+  pointer-events:none
+}
+.stat-num{font-size:36px;font-weight:900;letter-spacing:-1px;color:var(--accent2)}
+.stat-unit{font-size:13px;font-weight:700;color:var(--mut);margin-left:4px}
+.stat-label{font-size:12px;color:var(--mut);margin-top:4px}
+.stat-card.featured .stat-num{color:var(--good)}
+
+/* ── 섹션 공통 ── */
+.section{max-width:1200px;margin:0 auto;padding:0 40px 72px}
+.section-head{margin-bottom:32px}
+.section-head h2{font-size:26px;font-weight:800;letter-spacing:-.5px}
+.section-head p{color:var(--mut);font-size:14px;margin-top:8px;line-height:1.65}
+.phase-tag{
+  display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;
+  margin-bottom:12px;letter-spacing:.5px
+}
+.phase-tag.done{background:rgba(52,211,153,.12);color:var(--good);border:1px solid rgba(52,211,153,.2)}
+.phase-tag.next{background:rgba(99,102,241,.1);color:var(--accent2);border:1px solid rgba(99,102,241,.2)}
+.phase-tag.later{background:rgba(154,160,200,.08);color:var(--mut);border:1px solid rgba(154,160,200,.15)}
+
+/* ── 통합 지도 카드 (featured) ── */
+.featured-card{
+  background:var(--card);border:1px solid var(--line);border-radius:20px;
+  overflow:hidden;position:relative;
+  display:grid;grid-template-columns:1fr auto;gap:0;
+  transition:.2s;cursor:pointer;text-decoration:none;color:inherit
+}
+.featured-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 12px 40px rgba(99,102,241,.15)}
+.featured-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(99,102,241,.06),rgba(167,139,250,.04),transparent);
+  pointer-events:none
+}
+.fc-body{padding:28px 32px}
+.fc-label{font-size:11px;font-weight:700;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.fc-title{font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.3}
+.fc-desc{color:var(--mut);font-size:13.5px;margin-top:10px;line-height:1.65}
+.fc-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.fc-badge{
+  font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:99px;border:1px solid
+}
+.fc-badge.g{color:var(--gangnam);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)}
+.fc-badge.m{color:var(--mapo);border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)}
+.fc-badge.j{color:var(--jongno);border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.08)}
+.fc-badge.s{color:var(--seongdong);border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.08)}
+.fc-badge.u{color:var(--jung);border-color:rgba(251,146,60,.3);background:rgba(251,146,60,.08)}
+.fc-meta{display:flex;gap:20px;margin-top:16px}
+.fc-meta-item{font-size:12px;color:var(--mut)}
+.fc-meta-item b{color:var(--ink);font-size:14px;display:block;margin-bottom:2px}
+.fc-arrow{
+  display:flex;align-items:center;padding:28px 28px 28px 0;
+  font-size:28px;color:var(--accent2);opacity:.6;transition:.2s
+}
+.featured-card:hover .fc-arrow{opacity:1;transform:translateX(4px)}
+
+/* ── 구 카드 그리드 ── */
+.district-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px
+}
+.district-card{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:20px;position:relative;overflow:hidden;
+  text-decoration:none;color:inherit;transition:.2s;cursor:pointer;
+  display:flex;flex-direction:column;gap:12px
+}
+.district-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.3)}
+.dc-accent-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.dc-header{display:flex;align-items:center;justify-content:space-between}
+.dc-name{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.dc-cnt{font-size:11px;color:var(--mut);padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.05)}
+.dc-zones{display:flex;flex-wrap:wrap;gap:5px}
+.dc-zone{font-size:11px;color:var(--mut);padding:2px 8px;border-radius:5px;background:var(--panel);border:1px solid var(--line)}
+.dc-desc{font-size:12px;color:var(--mut);line-height:1.6}
+.dc-link{
+  display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+  margin-top:auto;padding-top:12px;border-top:1px solid var(--line)
+}
+
+/* ── 로드맵 섹션 ── */
+.roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.roadmap-card{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px
+}
+.roadmap-card.active{border-color:rgba(52,211,153,.3)}
+.rm-phase{font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+.rm-title{font-size:16px;font-weight:800;margin-bottom:12px}
+.rm-districts{display:flex;flex-wrap:wrap;gap:6px}
+.rm-district{
+  font-size:11.5px;padding:3px 10px;border-radius:6px;
+  border:1px solid var(--line);color:var(--mut)
+}
+.rm-district.done{color:var(--good);border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.06)}
+
+/* ── 푸터 ── */
+footer{
+  border-top:1px solid var(--line);padding:32px 40px;max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px
+}
+.footer-brand{font-size:15px;font-weight:800;color:var(--mut)}
+.footer-brand span{color:var(--accent2)}
+.footer-note{font-size:12px;color:var(--mut);opacity:.6}
+
+/* ── 구분선 ── */
+.divider{border:0;border-top:1px solid var(--line);margin:0 40px 56px}
+
+/* 반응형 */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;gap:40px}
+  .hero-text h1{font-size:32px}
+  .roadmap-grid{grid-template-columns:1fr}
+  nav{padding:12px 20px}
+  .section,.hero,footer{padding-left:20px;padding-right:20px}
+  .divider{margin-left:20px;margin-right:20px}
+}
+@media(max-width:600px){
+  .district-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ── 네비게이션 ── -->
+<nav>
+  <div class="nav-brand">
+    <div class="logo">Space<span>OS</span></div>
+    <div class="nav-badge">Phase 1 완료</div>
+  </div>
+  <div class="nav-links">
+    <a href="#maps">지도</a>
+    <a href="#roadmap">로드맵</a>
+    <a href="https://spaceos.kr" onclick="return false" style="opacity:.4;cursor:default">플랫폼 (준비중)</a>
+  </div>
+</nav>
+
+<!-- ── 히어로 ── -->
+<section class="hero">
+  <div class="hero-text">
+    <h1>서울 상권<br>디지털 트윈<em>.</em></h1>
+    <p class="hero-sub">
+      건물 단위 공실률·감성지수·임대료를 실시간으로 시각화하는
+      SpaceOS Phase 1 대시보드. 서울 5개 자치구 150동의 상권 데이터를
+      인터랙티브 지도로 확인하세요.
+    </p>
+    <div class="hero-cta">
+      <a href="./Seoul/SpaceOS_Seoul_GangnamMapo_Building_Map.html" class="btn btn-primary">
+        Phase 1 통합 지도 열기 →
+      </a>
+      <a href="#maps" class="btn btn-outline">구별 지도 보기</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-card featured">
+      <div class="stat-num">5<span class="stat-unit">개 구</span></div>
+      <div class="stat-label">Phase 1 완료 자치구</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">150<span class="stat-unit">동</span></div>
+      <div class="stat-label">분석 건물 수 (샘플)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">25<span class="stat-unit">개</span></div>
+      <div class="stat-label">서울 전체 자치구 목표</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">3<span class="stat-unit">종</span></div>
+      <div class="stat-label">지표: 공실률·감성·임대료</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── Phase 1 지도 ── -->
+<section class="section" id="maps">
+  <div class="section-head">
+    <div class="phase-tag done">✓ PHASE 1 완료</div>
+    <h2>서울 Phase 1 — 5개 자치구</h2>
+    <p>강남구·마포구·종로구·성동구·중구의 건물 단위 상권 세분화 디지털 트윈</p>
+  </div>
+
+  <!-- 통합 지도 카드 (Featured) -->
+  <a href="./Seoul/SpaceOS_Seoul_GangnamMapo_Building_Map.html" class="featured-card" style="margin-bottom:20px;display:grid">
+    <div class="fc-body">
+      <div class="fc-label">★ Featured — Phase 1 통합 대시보드</div>
+      <div class="fc-title">강남구·마포구·종로구·성동구·중구<br>건물 단위 상권 세분화</div>
+      <div class="fc-desc">5개 자치구 150동을 하나의 지도에서 비교 분석. 구별 필터·상권 존 이동·공실률/감성지수/임대료 지표 전환 지원.</div>
+      <div class="fc-badges">
+        <span class="fc-badge g">강남구 30동</span>
+        <span class="fc-badge m">마포구 30동</span>
+        <span class="fc-badge j">종로구 30동</span>
+        <span class="fc-badge s">성동구 30동</span>
+        <span class="fc-badge u">중구 30동</span>
+      </div>
+      <div class="fc-meta">
+        <div class="fc-meta-item"><b>150동</b>분석 건물</div>
+        <div class="fc-meta-item"><b>25개</b>상권 존</div>
+        <div class="fc-meta-item"><b>3종</b>분석 지표</div>
+        <div class="fc-meta-item"><b>V-World</b>WFS 연동</div>
+      </div>
+    </div>
+    <div class="fc-arrow">→</div>
+  </a>
+
+  <!-- 개별 구 카드 -->
+  <div class="district-grid">
+
+    <a href="./Seoul/SpaceOS_Gangnam_Building_Map.html" class="district-card" style="--dc:#f59e0b">
+      <div class="dc-accent-bar" style="background:var(--gangnam)"></div>
+      <div class="dc-header">
+        <div class="dc-name" style="color:var(--gangnam)">강남구</div>
+        <div class="dc-cnt">30동</div>
+      </div>
+      <div class="dc-zones">
+        <span class="dc-zone">강남역</span><span class="dc-zone">선릉</span>
+        <span class="dc-zone">COEX</span><span class="dc-zone">압구정</span><span class="dc-zone">청담</span>
+      </div>
+      <div class="dc-desc">고임대료 프리미엄 오피스·럭셔리 리테일. 서울 최고 상권 밀도.</div>
+      <div class="dc-link" style="color:var(--gangnam)">지도 열기 →</div>
+    </a>
+
+    <a href="./Seoul/SpaceOS_Mapo_Building_Map.html" class="district-card">
+      <div class="dc-accent-bar" style="background:var(--mapo)"></div>
+      <div class="dc-header">
+        <div class="dc-name" style="color:var(--mapo)">마포구</div>
+        <div class="dc-cnt">30동</div>
+      </div>
+      <div class="dc-zones">
+        <span class="dc-zone">홍대</span><span class="dc-zone">합정</span>
+        <span class="dc-zone">연남</span><span class="dc-zone">상암</span><span class="dc-zone">공덕</span>
+      </div>
+      <div class="dc-desc">MZ세대 집중 상권. 미디어·F&B·라이프스타일 클러스터.</div>
+      <div class="dc-link" style="color:var(--mapo)">지도 열기 →</div>
+    </a>
+
+    <a href="./Seoul/SpaceOS_Jongno_Building_Map.html" class="district-card">
+      <div class="dc-accent-bar" style="background:var(--jongno)"></div>
+      <div class="dc-header">
+        <div class="dc-name" style="color:var(--jongno)">종로구</div>
+        <div class="dc-cnt">30동</div>
+      </div>
+      <div class="dc-zones">
+        <span class="dc-zone">익선동</span><span class="dc-zone">삼청</span>
+        <span class="dc-zone">서촌</span><span class="dc-zone">종로·광장</span><span class="dc-zone">경복궁</span>
+      </div>
+      <div class="dc-desc">역사·문화 입지. 한옥 기반 감성 공간과 글로벌 오피스 혼재.</div>
+      <div class="dc-link" style="color:var(--jongno)">지도 열기 →</div>
+    </a>
+
+    <a href="./Seoul/SpaceOS_Seongdong_Building_Map.html" class="district-card">
+      <div class="dc-accent-bar" style="background:var(--seongdong)"></div>
+      <div class="dc-header">
+        <div class="dc-name" style="color:var(--seongdong)">성동구</div>
+        <div class="dc-cnt">30동</div>
+      </div>
+      <div class="dc-zones">
+        <span class="dc-zone">성수</span><span class="dc-zone">서울숲</span>
+        <span class="dc-zone">뚝섬</span><span class="dc-zone">연무장</span><span class="dc-zone">왕십리</span>
+      </div>
+      <div class="dc-desc">팝업·리테일 핫플. 공장 → 크리에이티브 오피스 젠트리피케이션 진행 중.</div>
+      <div class="dc-link" style="color:var(--seongdong)">지도 열기 →</div>
+    </a>
+
+    <a href="./Seoul/SpaceOS_Jung_Building_Map.html" class="district-card">
+      <div class="dc-accent-bar" style="background:var(--jung)"></div>
+      <div class="dc-header">
+        <div class="dc-name" style="color:var(--jung)">중구</div>
+        <div class="dc-cnt">30동</div>
+      </div>
+      <div class="dc-zones">
+        <span class="dc-zone">명동</span><span class="dc-zone">을지로</span>
+        <span class="dc-zone">동대문</span><span class="dc-zone">충무로</span><span class="dc-zone">남대문</span>
+      </div>
+      <div class="dc-desc">관광·도매 밀집 상권. 힙지로 문화 재생과 DDP 앵커 효과 주목.</div>
+      <div class="dc-link" style="color:var(--jung)">지도 열기 →</div>
+    </a>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── 로드맵 ── -->
+<section class="section" id="roadmap">
+  <div class="section-head">
+    <h2>서울 25개 자치구 로드맵</h2>
+    <p>Phase 별 순차 배포 — Phase 1 완료 기준 나머지 20개 구 진행 예정</p>
+  </div>
+  <div class="roadmap-grid">
+
+    <div class="roadmap-card active">
+      <div class="rm-phase">Phase 1 — 완료</div>
+      <div class="rm-title" style="color:var(--good)">도심 핵심 5개 구</div>
+      <div class="rm-districts">
+        <span class="rm-district done">강남구</span>
+        <span class="rm-district done">마포구</span>
+        <span class="rm-district done">종로구</span>
+        <span class="rm-district done">성동구</span>
+        <span class="rm-district done">중구</span>
+      </div>
+    </div>
+
+    <div class="roadmap-card">
+      <div class="rm-phase">Phase 2 — 예정</div>
+      <div class="rm-title" style="color:var(--accent2)">확장 8개 구</div>
+      <div class="rm-districts">
+        <span class="rm-district">용산구</span>
+        <span class="rm-district">송파구</span>
+        <span class="rm-district">영등포구</span>
+        <span class="rm-district">서초구</span>
+        <span class="rm-district">서대문구</span>
+        <span class="rm-district">광진구</span>
+        <span class="rm-district">동대문구</span>
+        <span class="rm-district">성북구</span>
+      </div>
+    </div>
+
+    <div class="roadmap-card">
+      <div class="rm-phase">Phase 3–4 — 예정</div>
+      <div class="rm-title" style="color:var(--mut)">외곽 12개 구</div>
+      <div class="rm-districts">
+        <span class="rm-district">관악구</span>
+        <span class="rm-district">동작구</span>
+        <span class="rm-district">강서구</span>
+        <span class="rm-district">구로구</span>
+        <span class="rm-district">금천구</span>
+        <span class="rm-district">강동구</span>
+        <span class="rm-district">노원구</span>
+        <span class="rm-district">양천구</span>
+        <span class="rm-district">은평구</span>
+        <span class="rm-district">강북구</span>
+        <span class="rm-district">중랑구</span>
+        <span class="rm-district">도봉구</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── 푸터 ── -->
+<footer>
+  <div class="footer-brand">Space<span>OS</span> — 물리적 상권의 디지털 트윈 플랫폼</div>
+  <div class="footer-note">데이터: Leaflet.js · V-World WFS · 소상공인진흥공단 API (예정) | 현재 샘플 데이터 기반</div>
+</footer>
+
+</body>
+</html>
