@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceOS · 서울 Phase 1+2+3 건물 단위 상권 세분화 (19개구)</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --bg:#0f1024;--panel:#15172e;--card:#1b1e3d;--ink:#e8e9f5;--mut:#9aa0c8;
+  --line:#2b2f57;--accent:#6366f1;--accent2:#a78bfa;
+  --good:#34d399;--warn:#fb923c;--danger:#f87171;--info:#38bdf8;
+  /* Phase 1 */
+  --gangnam:#f59e0b;--mapo:#34d399;--jongno:#60a5fa;--seongdong:#f472b6;--jung:#fb923c;
+  /* Phase 2 */
+  --yongsan:#ec4899;--songpa:#14b8a6;--ydp:#8b5cf6;
+  --seocho:#06b6d4;--sdm:#f97316;--gwangjin:#84cc16;--ddm:#eab308;
+  /* Phase 3 */
+  --gwanak:#ef4444;--dongjak:#3b82f6;--gangseo:#10b981;
+  --guro:#c084fc;--geumcheon:#fb7185;--gangdong:#2dd4bf;--nowon:#fcd34d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);
+  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;font-size:13px}
+.wrap{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+header{flex:0 0 auto;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{font-size:17px;font-weight:900;letter-spacing:-.5px;color:#fff}
+.logo span{color:var(--accent2)}
+.sep{width:1px;height:20px;background:var(--line)}
+.title{font-size:13px;font-weight:700}
+.gu-badges{display:flex;gap:5px;flex-wrap:wrap}
+.gu-badge{font-size:10.5px;padding:3px 8px;border-radius:99px;font-weight:700;border:1px solid}
+.phase-badge{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:700}
+.p1{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.4);color:#a78bfa}
+.p2{background:rgba(236,72,153,.12);border:1px solid rgba(236,72,153,.4);color:#f9a8d4}
+.p3{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:#fca5a5}
+.gu-badge.gangnam{color:var(--gangnam);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)}
+.gu-badge.mapo{color:var(--mapo);border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)}
+.gu-badge.jongno{color:var(--jongno);border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.08)}
+.gu-badge.seongdong{color:var(--seongdong);border-color:rgba(244,114,182,.3);background:rgba(244,114,182,.08)}
+.gu-badge.jung{color:var(--jung);border-color:rgba(251,146,60,.3);background:rgba(251,146,60,.08)}
+.gu-badge.yongsan{color:var(--yongsan);border-color:rgba(236,72,153,.3);background:rgba(236,72,153,.08)}
+.gu-badge.songpa{color:var(--songpa);border-color:rgba(20,184,166,.3);background:rgba(20,184,166,.08)}
+.gu-badge.ydp{color:var(--ydp);border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.08)}
+.gu-badge.seocho{color:var(--seocho);border-color:rgba(6,182,212,.3);background:rgba(6,182,212,.08)}
+.gu-badge.sdm{color:var(--sdm);border-color:rgba(249,115,22,.3);background:rgba(249,115,22,.08)}
+.gu-badge.gwangjin{color:var(--gwangjin);border-color:rgba(132,204,22,.3);background:rgba(132,204,22,.08)}
+.gu-badge.ddm{color:var(--ddm);border-color:rgba(234,179,8,.3);background:rgba(234,179,8,.08)}
+.gu-badge.gwanak{color:var(--gwanak);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08)}
+.gu-badge.dongjak{color:var(--dongjak);border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.08)}
+.gu-badge.gangseo{color:var(--gangseo);border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.08)}
+.gu-badge.guro{color:var(--guro);border-color:rgba(192,132,252,.3);background:rgba(192,132,252,.08)}
+.gu-badge.geumcheon{color:var(--geumcheon);border-color:rgba(251,113,133,.3);background:rgba(251,113,133,.08)}
+.gu-badge.gangdong{color:var(--gangdong);border-color:rgba(45,212,191,.3);background:rgba(45,212,191,.08)}
+.gu-badge.nowon{color:var(--nowon);border-color:rgba(252,211,77,.3);background:rgba(252,211,77,.08)}
+
+.ctrl-bar{flex:0 0 auto;display:flex;align-items:center;gap:7px;flex-wrap:wrap;
+  padding:7px 18px;background:var(--card);border-bottom:1px solid var(--line)}
+.ctrl-bar label{font-size:11px;color:var(--mut);margin-right:2px;flex-shrink:0}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;flex-wrap:wrap}
+.seg button{background:transparent;color:var(--mut);border:0;padding:5px 9px;
+  font-size:11.5px;font-family:inherit;cursor:pointer;transition:.15s}
+.seg button.on{background:var(--accent);color:#fff;font-weight:700}
+.seg button.on-gangnam{background:var(--gangnam);color:#000;font-weight:700}
+.seg button.on-mapo{background:var(--mapo);color:#000;font-weight:700}
+.seg button.on-jongno{background:var(--jongno);color:#000;font-weight:700}
+.seg button.on-seongdong{background:var(--seongdong);color:#000;font-weight:700}
+.seg button.on-jung{background:var(--jung);color:#000;font-weight:700}
+.seg button.on-yongsan{background:var(--yongsan);color:#fff;font-weight:700}
+.seg button.on-songpa{background:var(--songpa);color:#000;font-weight:700}
+.seg button.on-ydp{background:var(--ydp);color:#fff;font-weight:700}
+.seg button.on-seocho{background:var(--seocho);color:#000;font-weight:700}
+.seg button.on-sdm{background:var(--sdm);color:#fff;font-weight:700}
+.seg button.on-gwangjin{background:var(--gwangjin);color:#000;font-weight:700}
+.seg button.on-ddm{background:var(--ddm);color:#000;font-weight:700}
+.seg button.on-gwanak{background:var(--gwanak);color:#fff;font-weight:700}
+.seg button.on-dongjak{background:var(--dongjak);color:#fff;font-weight:700}
+.seg button.on-gangseo{background:var(--gangseo);color:#000;font-weight:700}
+.seg button.on-guro{background:var(--guro);color:#000;font-weight:700}
+.seg button.on-geumcheon{background:var(--geumcheon);color:#fff;font-weight:700}
+.seg button.on-gangdong{background:var(--gangdong);color:#000;font-weight:700}
+.seg button.on-nowon{background:var(--nowon);color:#000;font-weight:700}
+.seg button:hover:not([class^="on"]){background:rgba(99,102,241,.15);color:var(--ink)}
+.sel{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;
+  padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer}
+.ctrl-search{flex:1;min-width:120px;max-width:200px;background:var(--panel);
+  border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:5px 10px;font-size:12px;font-family:inherit}
+.ctrl-search::placeholder{color:var(--mut)}
+.ctrl-search:focus,.sel:focus{outline:none;border-color:var(--accent)}
+.ctrl-info{margin-left:auto;font-size:11px;color:var(--mut);flex-shrink:0}
+.ctrl-info b{color:var(--accent2)}
+
+.main{flex:1;display:flex;overflow:hidden}
+.map-wrap{flex:1;position:relative;overflow:hidden}
+#map{width:100%;height:100%}
+
+.map-overlay{position:absolute;bottom:14px;left:14px;z-index:500;
+  background:rgba(21,23,46,.92);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+.map-overlay h4{font-size:10.5px;font-weight:700;color:var(--mut);margin-bottom:7px;letter-spacing:.5px;text-transform:uppercase}
+.legend-row{display:flex;align-items:center;gap:7px;font-size:11px;margin-bottom:3px}
+.legend-row .swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+
+.gu-legend{position:absolute;bottom:14px;left:210px;z-index:500;
+  background:rgba(21,23,46,.92);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.gu-legend h4{font-size:10.5px;font-weight:700;color:var(--mut);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.gu-legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.gu-row{display:flex;align-items:center;gap:6px;font-size:10.5px;margin-bottom:3px}
+.gu-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.gu-phase{font-size:9px;color:var(--mut);margin-left:2px}
+
+.side{flex:0 0 340px;display:flex;flex-direction:column;
+  background:var(--panel);border-left:1px solid var(--line);overflow-y:auto}
+.side-sec{padding:11px 14px;border-bottom:1px solid var(--line)}
+.side-sec h3{font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:8px 10px}
+.kpi .kl{font-size:10px;color:var(--mut);margin-bottom:4px}
+.kpi .kv{font-size:19px;font-weight:800;letter-spacing:-.5px}
+.kpi .kv small{font-size:11px;font-weight:700;color:var(--mut);margin-left:2px}
+.kpi .kb{height:4px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden}
+.kpi .kb i{display:block;height:100%;border-radius:3px}
+
+.gu-compare{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:5px;margin-top:7px}
+.gc{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 9px}
+.gc .gcl{font-size:9.5px;font-weight:700;margin-bottom:4px}
+.gc .gcv{font-size:13px;font-weight:800}
+.gc .gcs{font-size:9.5px;color:var(--mut);margin-top:1px}
+
+.blist{display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto}
+.brow{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;
+  border:1px solid transparent;cursor:pointer;transition:.15s}
+.brow:hover{background:rgba(99,102,241,.08);border-color:var(--line)}
+.brow.sel{background:rgba(99,102,241,.15);border-color:var(--accent)}
+.brow .bgu{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.brow .binfo{flex:1;min-width:0}
+.brow .bnm{font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brow .bdong{font-size:10px;color:var(--mut)}
+.brow .bvac{font-size:11.5px;font-weight:800;text-align:right;flex-shrink:0}
+
+.detail{flex:1;padding:13px;display:flex;flex-direction:column;gap:10px}
+.det-hint{color:var(--mut);font-size:12px;text-align:center;padding:30px 14px;line-height:1.7}
+.det-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.det-name{font-size:15px;font-weight:800;line-height:1.3}
+.det-sub{font-size:10.5px;color:var(--mut);margin-top:3px}
+.det-score{text-align:right;flex-shrink:0}
+.det-score .sv{font-size:24px;font-weight:800;line-height:1}
+.det-score .sl{font-size:10px;color:var(--mut);margin-top:2px}
+.det-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.dm{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:7px 8px;text-align:center}
+.dm .dml{font-size:10px;color:var(--mut);margin-bottom:3px}
+.dm .dmv{font-size:14px;font-weight:800}
+.det-tags{display:flex;flex-wrap:wrap;gap:3px}
+.tag{font-size:10px;padding:2px 7px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--mut)}
+.det-bar-sec h4{font-size:10.5px;color:var(--mut);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.det-bar-row{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:11px}
+.det-bar-row .dbl{flex:0 0 62px;color:var(--mut)}
+.det-bar-row .dbw{flex:1;height:6px;border-radius:4px;background:var(--line);overflow:hidden}
+.det-bar-row .dbw i{display:block;height:100%;border-radius:4px;transition:.4s}
+.det-bar-row .dbv{flex:0 0 36px;text-align:right;font-weight:700;font-size:10.5px}
+.det-insight{background:var(--card);border:1px solid var(--line);
+  border-left:3px solid var(--accent);border-radius:8px;padding:8px 10px;font-size:11.5px;line-height:1.65;color:#d7d9ef}
+.btn-primary{width:100%;border:0;background:var(--accent);color:#fff;
+  border-radius:9px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
+.btn-primary:hover{background:#818cf8}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--panel)}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <div class="logo">Space<span>OS</span></div>
+    <div class="sep"></div>
+    <div class="title">서울 19개구 건물 단위 상권 세분화 — Digital Twin</div>
+  </div>
+  <div class="gu-badges">
+    <span class="phase-badge p1">Phase 1</span>
+    <div class="gu-badge gangnam">강남구</div>
+    <div class="gu-badge mapo">마포구</div>
+    <div class="gu-badge jongno">종로구</div>
+    <div class="gu-badge seongdong">성동구</div>
+    <div class="gu-badge jung">중구</div>
+    <span class="phase-badge p2" style="margin-left:4px">Phase 2</span>
+    <div class="gu-badge yongsan">용산구</div>
+    <div class="gu-badge songpa">송파구</div>
+    <div class="gu-badge ydp">영등포구</div>
+    <div class="gu-badge seocho">서초구</div>
+    <div class="gu-badge sdm">서대문구</div>
+    <div class="gu-badge gwangjin">광진구</div>
+    <div class="gu-badge ddm">동대문구</div>
+    <span class="phase-badge p3" style="margin-left:4px">Phase 3</span>
+    <div class="gu-badge gwanak">관악구</div>
+    <div class="gu-badge dongjak">동작구</div>
+    <div class="gu-badge gangseo">강서구</div>
+    <div class="gu-badge guro">구로구</div>
+    <div class="gu-badge geumcheon">금천구</div>
+    <div class="gu-badge gangdong">강동구</div>
+    <div class="gu-badge nowon">노원구</div>
+    <div id="sample-badge" style="font-size:11px;color:var(--mut);padding:3px 8px">샘플 데이터</div>
+  </div>
+</header>
+
+<div class="ctrl-bar">
+  <label>구</label>
+  <div class="seg" id="seg-gu">
+    <button class="on"       onclick="filterGu(this,'all')">전체</button>
+    <button onclick="filterGu(this,'강남구')">강남구</button>
+    <button onclick="filterGu(this,'마포구')">마포구</button>
+    <button onclick="filterGu(this,'종로구')">종로구</button>
+    <button onclick="filterGu(this,'성동구')">성동구</button>
+    <button onclick="filterGu(this,'중구')">중구</button>
+    <button onclick="filterGu(this,'용산구')">용산구</button>
+    <button onclick="filterGu(this,'송파구')">송파구</button>
+    <button onclick="filterGu(this,'영등포구')">영등포구</button>
+    <button onclick="filterGu(this,'서초구')">서초구</button>
+    <button onclick="filterGu(this,'서대문구')">서대문구</button>
+    <button onclick="filterGu(this,'광진구')">광진구</button>
+    <button onclick="filterGu(this,'동대문구')">동대문구</button>
+    <button onclick="filterGu(this,'관악구')">관악구</button>
+    <button onclick="filterGu(this,'동작구')">동작구</button>
+    <button onclick="filterGu(this,'강서구')">강서구</button>
+    <button onclick="filterGu(this,'구로구')">구로구</button>
+    <button onclick="filterGu(this,'금천구')">금천구</button>
+    <button onclick="filterGu(this,'강동구')">강동구</button>
+    <button onclick="filterGu(this,'노원구')">노원구</button>
+  </div>
+
+  <label>상권</label>
+  <div class="seg" id="seg-zone">
+    <button class="on" onclick="filterZone(this,'all')">전체</button>
+    <!-- Phase 1 zones -->
+    <button onclick="filterZone(this,'강남역')"  data-gu="강남구">강남역</button>
+    <button onclick="filterZone(this,'선릉')"    data-gu="강남구">선릉</button>
+    <button onclick="filterZone(this,'COEX')"    data-gu="강남구">COEX</button>
+    <button onclick="filterZone(this,'압구정')"  data-gu="강남구">압구정</button>
+    <button onclick="filterZone(this,'청담')"    data-gu="강남구">청담</button>
+    <button onclick="filterZone(this,'홍대')"    data-gu="마포구">홍대</button>
+    <button onclick="filterZone(this,'합정')"    data-gu="마포구">합정</button>
+    <button onclick="filterZone(this,'연남')"    data-gu="마포구">연남</button>
+    <button onclick="filterZone(this,'상암')"    data-gu="마포구">상암</button>
+    <button onclick="filterZone(this,'공덕')"    data-gu="마포구">공덕</button>
+    <button onclick="filterZone(this,'익선동')"  data-gu="종로구">익선동</button>
+    <button onclick="filterZone(this,'삼청')"    data-gu="종로구">삼청·인사동</button>
+    <button onclick="filterZone(this,'서촌')"    data-gu="종로구">서촌</button>
+    <button onclick="filterZone(this,'광장')"    data-gu="종로구">종로·광장</button>
+    <button onclick="filterZone(this,'경복궁')"  data-gu="종로구">경복궁</button>
+    <button onclick="filterZone(this,'성수')"    data-gu="성동구">성수</button>
+    <button onclick="filterZone(this,'서울숲')"  data-gu="성동구">서울숲</button>
+    <button onclick="filterZone(this,'뚝섬')"    data-gu="성동구">뚝섬</button>
+    <button onclick="filterZone(this,'연무장')"  data-gu="성동구">연무장길</button>
+    <button onclick="filterZone(this,'왕십리')"  data-gu="성동구">왕십리</button>
+    <button onclick="filterZone(this,'명동')"    data-gu="중구">명동</button>
+    <button onclick="filterZone(this,'을지로')"  data-gu="중구">을지로</button>
+    <button onclick="filterZone(this,'동대문')"  data-gu="중구">동대문(중구)</button>
+    <button onclick="filterZone(this,'충무로')"  data-gu="중구">충무로</button>
+    <button onclick="filterZone(this,'남대문')"  data-gu="중구">남대문</button>
+    <!-- Phase 2 zones -->
+    <button onclick="filterZone(this,'이태원')"  data-gu="용산구">이태원</button>
+    <button onclick="filterZone(this,'한남동')"  data-gu="용산구">한남동</button>
+    <button onclick="filterZone(this,'용산역')"  data-gu="용산구">용산역</button>
+    <button onclick="filterZone(this,'잠실')"    data-gu="송파구">잠실</button>
+    <button onclick="filterZone(this,'석촌')"    data-gu="송파구">석촌호수</button>
+    <button onclick="filterZone(this,'여의도')"  data-gu="영등포구">여의도</button>
+    <button onclick="filterZone(this,'영등포역')" data-gu="영등포구">영등포역</button>
+    <button onclick="filterZone(this,'서초역')"  data-gu="서초구">서초역</button>
+    <button onclick="filterZone(this,'방배')"    data-gu="서초구">방배</button>
+    <button onclick="filterZone(this,'양재')"    data-gu="서초구">양재</button>
+    <button onclick="filterZone(this,'신촌')"    data-gu="서대문구">신촌</button>
+    <button onclick="filterZone(this,'이대')"    data-gu="서대문구">이대</button>
+    <button onclick="filterZone(this,'홍제')"    data-gu="서대문구">홍제</button>
+    <button onclick="filterZone(this,'건대입구')" data-gu="광진구">건대입구</button>
+    <button onclick="filterZone(this,'구의')"    data-gu="광진구">구의</button>
+    <button onclick="filterZone(this,'청량리')"  data-gu="동대문구">청량리</button>
+    <button onclick="filterZone(this,'회기')"    data-gu="동대문구">회기</button>
+    <button onclick="filterZone(this,'장안동')"  data-gu="동대문구">장안동</button>
+    <!-- Phase 3 zones -->
+    <button onclick="filterZone(this,'신림')"      data-gu="관악구">신림</button>
+    <button onclick="filterZone(this,'서울대입구')" data-gu="관악구">서울대입구</button>
+    <button onclick="filterZone(this,'봉천')"      data-gu="관악구">봉천</button>
+    <button onclick="filterZone(this,'사당')"      data-gu="동작구">사당</button>
+    <button onclick="filterZone(this,'이수')"      data-gu="동작구">이수</button>
+    <button onclick="filterZone(this,'노량진')"    data-gu="동작구">노량진</button>
+    <button onclick="filterZone(this,'마곡')"      data-gu="강서구">마곡</button>
+    <button onclick="filterZone(this,'발산')"      data-gu="강서구">발산</button>
+    <button onclick="filterZone(this,'화곡')"      data-gu="강서구">화곡</button>
+    <button onclick="filterZone(this,'구로디지털단지')" data-gu="구로구">구로디지털단지</button>
+    <button onclick="filterZone(this,'신도림')"    data-gu="구로구">신도림</button>
+    <button onclick="filterZone(this,'가산디지털단지')" data-gu="금천구">가산디지털단지</button>
+    <button onclick="filterZone(this,'독산')"      data-gu="금천구">독산</button>
+    <button onclick="filterZone(this,'천호')"      data-gu="강동구">천호</button>
+    <button onclick="filterZone(this,'암사')"      data-gu="강동구">암사</button>
+    <button onclick="filterZone(this,'길동')"      data-gu="강동구">길동</button>
+    <button onclick="filterZone(this,'노원')"      data-gu="노원구">노원</button>
+    <button onclick="filterZone(this,'중계')"      data-gu="노원구">중계</button>
+    <button onclick="filterZone(this,'하계')"      data-gu="노원구">하계</button>
+  </div>
+
+  <label>지표</label>
+  <div class="seg">
+    <button class="on" id="metric-vac"  onclick="setMetric(this,'vacancy')">공실률</button>
+    <button            id="metric-sent" onclick="setMetric(this,'sentiment')">감성지수</button>
+    <button            id="metric-rent" onclick="setMetric(this,'rent')">임대료</button>
+  </div>
+
+  <select class="sel" onchange="filterCategory(this.value)">
+    <option value="">전체 업종</option>
+    <option value="오피스">오피스</option>
+    <option value="상업">상업</option>
+    <option value="F&B">F&amp;B</option>
+    <option value="복합">복합</option>
+    <option value="미디어">미디어</option>
+    <option value="문화">문화·관광</option>
+    <option value="의료">의료</option>
+  </select>
+
+  <input class="ctrl-search" placeholder="건물명 검색..." oninput="filterSearch(this.value)">
+  <div class="ctrl-info">건물 <b id="cnt-visible">0</b> / <b id="cnt-total">0</b></div>
+</div>
+
+<div class="main">
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div class="map-overlay" id="legend">
+      <h4 id="legend-title">공실률</h4>
+      <div class="legend-row"><div class="swatch" style="background:#34d399"></div><span>0–5%</span></div>
+      <div class="legend-row"><div class="swatch" style="background:#fbbf24"></div><span>5–15%</span></div>
+      <div class="legend-row"><div class="swatch" style="background:#f87171"></div><span>15–30%</span></div>
+      <div class="legend-row"><div class="swatch" style="background:#7f2d2d"></div><span>30%+</span></div>
+    </div>
+    <div class="gu-legend">
+      <h4>자치구 (테두리색)</h4>
+      <div class="gu-legend-grid">
+        <div class="gu-row"><div class="gu-dot" style="background:var(--gangnam)"></div><span>강남구</span><span class="gu-phase">P1</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--mapo)"></div><span>마포구</span><span class="gu-phase">P1</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--jongno)"></div><span>종로구</span><span class="gu-phase">P1</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--seongdong)"></div><span>성동구</span><span class="gu-phase">P1</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--jung)"></div><span>중구</span><span class="gu-phase">P1</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--yongsan)"></div><span>용산구</span><span class="gu-phase">P2</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--songpa)"></div><span>송파구</span><span class="gu-phase">P2</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--ydp)"></div><span>영등포구</span><span class="gu-phase">P2</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--seocho)"></div><span>서초구</span><span class="gu-phase">P2</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--sdm)"></div><span>서대문구</span><span class="gu-phase">P2</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--gwangjin)"></div><span>광진구</span><span class="gu-phase">P2</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--ddm)"></div><span>동대문구</span><span class="gu-phase">P2</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--gwanak)"></div><span>관악구</span><span class="gu-phase">P3</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--dongjak)"></div><span>동작구</span><span class="gu-phase">P3</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--gangseo)"></div><span>강서구</span><span class="gu-phase">P3</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--guro)"></div><span>구로구</span><span class="gu-phase">P3</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--geumcheon)"></div><span>금천구</span><span class="gu-phase">P3</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--gangdong)"></div><span>강동구</span><span class="gu-phase">P3</span></div>
+        <div class="gu-row"><div class="gu-dot" style="background:var(--nowon)"></div><span>노원구</span><span class="gu-phase">P3</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="side-sec">
+      <h3>전체 현황</h3>
+      <div class="kpis">
+        <div class="kpi"><div class="kl">평균 공실률</div><div class="kv" id="kpi-vac">--<small>%</small></div><div class="kb"><i id="kb-vac" style="background:var(--warn)"></i></div></div>
+        <div class="kpi"><div class="kl">감성지수</div><div class="kv" id="kpi-sent">--<small>pt</small></div><div class="kb"><i id="kb-sent" style="background:var(--accent)"></i></div></div>
+        <div class="kpi"><div class="kl">분석 건물</div><div class="kv" id="kpi-cnt">--<small>동</small></div><div class="kb"><i id="kb-cnt" style="background:var(--info);width:100%"></i></div></div>
+        <div class="kpi"><div class="kl">평균 임대료</div><div class="kv" id="kpi-rent">--<small>만/평</small></div><div class="kb"><i id="kb-rent" style="background:var(--accent2)"></i></div></div>
+      </div>
+      <div class="gu-compare" id="gu-compare"></div>
+    </div>
+
+    <div class="side-sec" style="flex:0 0 auto">
+      <h3>건물 목록</h3>
+      <div class="blist" id="blist"></div>
+    </div>
+
+    <div class="detail">
+      <div class="det-hint" id="det-hint">지도 위 건물 폴리곤 또는<br>목록에서 건물을 선택하세요</div>
+      <div id="det-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* ============================================================
+   PHASE 1 BUILDING DATA
+   ============================================================ */
+const GANGNAM=[
+  {id:'GN001',name:'강남 파이낸스센터',dong:'역삼1동',gu:'강남구',zone:'강남역',addr:'테헤란로 152',cat:'오피스',floors:39,year:2001,area:85000,vac:6.2,sent:84,rent:12.5,tenants:52,polygon:[[37.4993,127.0278],[37.4993,127.0286],[37.4988,127.0286],[37.4988,127.0278]]},
+  {id:'GN002',name:'강남 CGV 빌딩',dong:'역삼1동',gu:'강남구',zone:'강남역',addr:'강남대로 427',cat:'상업',floors:12,year:2005,area:18000,vac:18.5,sent:73,rent:9.2,tenants:24,polygon:[[37.4980,127.0271],[37.4980,127.0277],[37.4976,127.0277],[37.4976,127.0271]]},
+  {id:'GN003',name:'역삼 엘타워',dong:'역삼2동',gu:'강남구',zone:'강남역',addr:'논현로 508',cat:'복합',floors:20,year:2003,area:32000,vac:11.0,sent:79,rent:8.8,tenants:35,polygon:[[37.4973,127.0314],[37.4973,127.0320],[37.4968,127.0320],[37.4968,127.0314]]},
+  {id:'GN004',name:'강남 KDB 타워',dong:'역삼1동',gu:'강남구',zone:'강남역',addr:'테헤란로 84',cat:'오피스',floors:16,year:1999,area:22000,vac:9.7,sent:81,rent:10.1,tenants:28,polygon:[[37.4998,127.0265],[37.4998,127.0270],[37.4994,127.0270],[37.4994,127.0265]]},
+  {id:'GN005',name:'강남 오라클빌딩',dong:'역삼1동',gu:'강남구',zone:'강남역',addr:'테헤란로 70',cat:'오피스',floors:21,year:1997,area:28000,vac:13.2,sent:76,rent:9.6,tenants:31,polygon:[[37.5003,127.0258],[37.5003,127.0264],[37.4999,127.0264],[37.4999,127.0258]]},
+  {id:'GN006',name:'현대해상빌딩',dong:'역삼2동',gu:'강남구',zone:'선릉',addr:'테헤란로 108',cat:'오피스',floors:18,year:2002,area:24000,vac:5.8,sent:87,rent:11.2,tenants:29,polygon:[[37.5012,127.0373],[37.5012,127.0380],[37.5007,127.0380],[37.5007,127.0373]]},
+  {id:'GN007',name:'선릉 아이파크',dong:'삼성1동',gu:'강남구',zone:'선릉',addr:'선릉로 428',cat:'복합',floors:28,year:2009,area:45000,vac:8.3,sent:83,rent:10.8,tenants:48,polygon:[[37.5025,127.0392],[37.5025,127.0400],[37.5019,127.0400],[37.5019,127.0392]]},
+  {id:'GN008',name:'선릉 삼환빌딩',dong:'역삼2동',gu:'강남구',zone:'선릉',addr:'테헤란로 138',cat:'오피스',floors:22,year:2004,area:31000,vac:12.1,sent:77,rent:9.9,tenants:33,polygon:[[37.5035,127.0432],[37.5035,127.0439],[37.5030,127.0439],[37.5030,127.0432]]},
+  {id:'GN009',name:'삼성생명 강남사옥',dong:'삼성1동',gu:'강남구',zone:'선릉',addr:'삼성로2길 14',cat:'오피스',floors:25,year:1998,area:38000,vac:4.5,sent:89,rent:12.0,tenants:41,polygon:[[37.5048,127.0447],[37.5048,127.0455],[37.5043,127.0455],[37.5043,127.0447]]},
+  {id:'GN010',name:'COEX 아티움',dong:'삼성2동',gu:'강남구',zone:'COEX',addr:'봉은사로 524',cat:'상업',floors:6,year:2000,area:55000,vac:7.4,sent:91,rent:15.2,tenants:180,polygon:[[37.5113,127.0588],[37.5113,127.0602],[37.5103,127.0602],[37.5103,127.0588]]},
+  {id:'GN011',name:'포스코센터',dong:'대치1동',gu:'강남구',zone:'COEX',addr:'테헤란로 440',cat:'오피스',floors:39,year:1995,area:92000,vac:3.8,sent:88,rent:13.5,tenants:63,polygon:[[37.5087,127.0621],[37.5087,127.0631],[37.5080,127.0631],[37.5080,127.0621]]},
+  {id:'GN012',name:'트레이드타워',dong:'삼성2동',gu:'강남구',zone:'COEX',addr:'테헤란로 511',cat:'오피스',floors:54,year:1988,area:120000,vac:11.5,sent:82,rent:14.2,tenants:95,polygon:[[37.5124,127.0594],[37.5124,127.0603],[37.5117,127.0603],[37.5117,127.0594]]},
+  {id:'GN013',name:'갤러리아 명품관',dong:'압구정동',gu:'강남구',zone:'압구정',addr:'압구정로 343',cat:'상업',floors:7,year:1990,area:65000,vac:1.2,sent:94,rent:28.0,tenants:320,polygon:[[37.5266,127.0407],[37.5266,127.0419],[37.5258,127.0419],[37.5258,127.0407]]},
+  {id:'GN014',name:'현대백화점 압구정',dong:'압구정동',gu:'강남구',zone:'압구정',addr:'압구정로 165',cat:'상업',floors:9,year:1985,area:72000,vac:0.8,sent:92,rent:25.5,tenants:380,polygon:[[37.5271,127.0390],[37.5271,127.0401],[37.5263,127.0401],[37.5263,127.0390]]},
+  {id:'GN015',name:'도산공원 F&B 블록',dong:'청담동',gu:'강남구',zone:'청담',addr:'도산대로55길',cat:'F&B',floors:4,year:2015,area:4200,vac:9.5,sent:88,rent:18.5,tenants:26,polygon:[[37.5234,127.0470],[37.5234,127.0476],[37.5230,127.0476],[37.5230,127.0470]]},
+  {id:'GN016',name:'청담 럭셔리 갤러리',dong:'청담동',gu:'강남구',zone:'청담',addr:'청담동 88',cat:'상업',floors:3,year:2018,area:3800,vac:4.2,sent:93,rent:22.0,tenants:18,polygon:[[37.5225,127.0480],[37.5225,127.0485],[37.5221,127.0485],[37.5221,127.0480]]}
+];
+
+const MAPO=[
+  {id:'MP001',name:'AK플라자 홍대점',dong:'서교동',gu:'마포구',zone:'홍대',addr:'양화로 152',cat:'상업',floors:10,year:2002,area:32000,vac:4.8,sent:92,rent:18.5,tenants:220,polygon:[[37.5571,126.9224],[37.5571,126.9234],[37.5565,126.9234],[37.5565,126.9224]]},
+  {id:'MP002',name:'홍대 상상마당',dong:'서교동',gu:'마포구',zone:'홍대',addr:'잔다리로 6',cat:'복합',floors:7,year:2007,area:8500,vac:2.1,sent:95,rent:14.8,tenants:42,polygon:[[37.5576,126.9243],[37.5576,126.9249],[37.5572,126.9249],[37.5572,126.9243]]},
+  {id:'MP003',name:'홍대 오피스타워A',dong:'동교동',gu:'마포구',zone:'홍대',addr:'동교로 20',cat:'오피스',floors:14,year:2009,area:18500,vac:9.8,sent:78,rent:11.2,tenants:32,polygon:[[37.5562,126.9272],[37.5562,126.9280],[37.5557,126.9280],[37.5557,126.9272]]},
+  {id:'MP004',name:'합정 메세나폴리스',dong:'합정동',gu:'마포구',zone:'합정',addr:'양화로 45',cat:'오피스',floors:25,year:2012,area:68000,vac:5.5,sent:85,rent:13.8,tenants:95,polygon:[[37.5498,126.9134],[37.5498,126.9144],[37.5492,126.9144],[37.5492,126.9134]]},
+  {id:'MP005',name:'연남동 경의선 플라자A',dong:'연남동',gu:'마포구',zone:'연남',addr:'연남로1길 22',cat:'F&B',floors:3,year:2015,area:3200,vac:5.8,sent:93,rent:15.8,tenants:18,polygon:[[37.5626,126.9224],[37.5626,126.9230],[37.5622,126.9230],[37.5622,126.9224]]},
+  {id:'MP006',name:'연남동 카페거리 빌딩B',dong:'연남동',gu:'마포구',zone:'연남',addr:'동교로51길 18',cat:'F&B',floors:3,year:2017,area:2800,vac:3.2,sent:94,rent:16.5,tenants:14,polygon:[[37.5633,126.9212],[37.5633,126.9218],[37.5629,126.9218],[37.5629,126.9212]]},
+  {id:'MP007',name:'MBC 상암 사옥',dong:'상암동',gu:'마포구',zone:'상암',addr:'성암로 267',cat:'미디어',floors:18,year:2014,area:82000,vac:2.5,sent:88,rent:11.5,tenants:48,polygon:[[37.5796,126.8892],[37.5796,126.8902],[37.5790,126.8902],[37.5790,126.8892]]},
+  {id:'MP008',name:'상암 누리꿈스퀘어',dong:'상암동',gu:'마포구',zone:'상암',addr:'월드컵북로 400',cat:'복합',floors:11,year:2008,area:55000,vac:5.2,sent:85,rent:10.2,tenants:88,polygon:[[37.5813,126.8879],[37.5813,126.8889],[37.5807,126.8889],[37.5807,126.8879]]},
+  {id:'MP009',name:'AK플라자 공덕',dong:'공덕동',gu:'마포구',zone:'공덕',addr:'마포대로 109',cat:'상업',floors:9,year:2007,area:28000,vac:6.8,sent:84,rent:13.2,tenants:165,polygon:[[37.5438,126.9509],[37.5438,126.9518],[37.5432,126.9518],[37.5432,126.9509]]},
+  {id:'MP010',name:'공덕 센트럴타워',dong:'공덕동',gu:'마포구',zone:'공덕',addr:'마포대로 130',cat:'오피스',floors:22,year:2015,area:52000,vac:4.2,sent:86,rent:12.5,tenants:68,polygon:[[37.5448,126.9519],[37.5448,126.9528],[37.5442,126.9528],[37.5442,126.9519]]}
+];
+
+const JONGNO=[
+  {id:'JK001',name:'익선동 한옥마을 카페빌딩',dong:'운니동',gu:'종로구',zone:'익선동',addr:'수표로28길 17',cat:'F&B',floors:3,year:2019,area:2800,vac:3.2,sent:95,rent:16.5,tenants:14,polygon:[[37.5742,126.9954],[37.5742,126.9962],[37.5737,126.9962],[37.5737,126.9954]]},
+  {id:'JK002',name:'익선동 복합문화공간',dong:'익선동',gu:'종로구',zone:'익선동',addr:'수표로28길 32',cat:'복합',floors:4,year:2018,area:3500,vac:5.8,sent:92,rent:15.8,tenants:18,polygon:[[37.5745,126.9960],[37.5745,126.9968],[37.5740,126.9968],[37.5740,126.9960]]},
+  {id:'JK003',name:'국립현대미술관 서울관',dong:'소격동',gu:'종로구',zone:'삼청',addr:'삼청로 30',cat:'문화',floors:3,year:2013,area:12000,vac:0.0,sent:96,rent:0.0,tenants:8,polygon:[[37.5794,126.9792],[37.5794,126.9801],[37.5788,126.9801],[37.5788,126.9792]]},
+  {id:'JK004',name:'삼청동 갤러리 빌딩',dong:'삼청동',gu:'종로구',zone:'삼청',addr:'삼청로 100',cat:'F&B',floors:3,year:2015,area:3200,vac:4.5,sent:93,rent:14.8,tenants:12,polygon:[[37.5826,126.9806],[37.5826,126.9814],[37.5821,126.9814],[37.5821,126.9806]]},
+  {id:'JK005',name:'체부동 카페거리 빌딩',dong:'체부동',gu:'종로구',zone:'서촌',addr:'필운대로1길 18',cat:'F&B',floors:3,year:2018,area:3200,vac:4.2,sent:93,rent:15.5,tenants:10,polygon:[[37.5794,126.9713],[37.5794,126.9721],[37.5789,126.9721],[37.5789,126.9713]]},
+  {id:'JK006',name:'서촌 오피스타워',dong:'누상동',gu:'종로구',zone:'서촌',addr:'자하문로 20',cat:'오피스',floors:10,year:2008,area:14500,vac:12.5,sent:79,rent:10.8,tenants:40,polygon:[[37.5810,126.9712],[37.5810,126.9721],[37.5804,126.9721],[37.5804,126.9712]]},
+  {id:'JK007',name:'광장시장 본관',dong:'예지동',gu:'종로구',zone:'광장',addr:'창경궁로 88',cat:'복합',floors:5,year:1905,area:35000,vac:9.5,sent:82,rent:7.5,tenants:580,polygon:[[37.5698,127.0020],[37.5698,127.0030],[37.5692,127.0030],[37.5692,127.0020]]},
+  {id:'JK008',name:'광화문 D타워',dong:'신문로',gu:'종로구',zone:'경복궁',addr:'종로1길 50',cat:'오피스',floors:28,year:2014,area:62000,vac:3.5,sent:90,rent:18.5,tenants:145,polygon:[[37.5726,126.9715],[37.5726,126.9724],[37.5720,126.9724],[37.5720,126.9715]]},
+  {id:'JK009',name:'KT 광화문빌딩',dong:'광화문',gu:'종로구',zone:'경복궁',addr:'세종대로 165',cat:'오피스',floors:22,year:2001,area:45000,vac:5.2,sent:86,rent:15.5,tenants:92,polygon:[[37.5714,126.9744],[37.5714,126.9753],[37.5708,126.9753],[37.5708,126.9744]]}
+];
+
+const SEONGDONG=[
+  {id:'SD001',name:'성수연방',dong:'성수동',gu:'성동구',zone:'성수',addr:'연무장길 8',cat:'복합',floors:4,year:2019,area:8500,vac:4.2,sent:94,rent:18.5,tenants:45,polygon:[[37.5445,127.0560],[37.5445,127.0568],[37.5440,127.0568],[37.5440,127.0560]]},
+  {id:'SD002',name:'대림창고 갤러리',dong:'성수동',gu:'성동구',zone:'성수',addr:'성수이로 54',cat:'F&B',floors:3,year:2015,area:5200,vac:2.8,sent:96,rent:22.0,tenants:18,polygon:[[37.5442,127.0572],[37.5442,127.0580],[37.5437,127.0580],[37.5437,127.0572]]},
+  {id:'SD003',name:'성수 오피스타워 A',dong:'성수동',gu:'성동구',zone:'성수',addr:'성수일로 50',cat:'오피스',floors:15,year:2012,area:28000,vac:9.5,sent:83,rent:13.5,tenants:72,polygon:[[37.5450,127.0548],[37.5450,127.0556],[37.5445,127.0556],[37.5445,127.0548]]},
+  {id:'SD004',name:'갤러리아포레',dong:'성수동',gu:'성동구',zone:'서울숲',addr:'뚝섬로 425',cat:'복합',floors:40,year:2011,area:95000,vac:3.2,sent:90,rent:15.2,tenants:285,polygon:[[37.5448,127.0382],[37.5448,127.0392],[37.5442,127.0392],[37.5442,127.0382]]},
+  {id:'SD005',name:'성수 SK V1 센터',dong:'성수동',gu:'성동구',zone:'서울숲',addr:'왕십리로 115',cat:'오피스',floors:20,year:2020,area:52000,vac:4.5,sent:88,rent:14.5,tenants:95,polygon:[[37.5460,127.0395],[37.5460,127.0404],[37.5454,127.0404],[37.5454,127.0395]]},
+  {id:'SD006',name:'뚝섬역 복합상가',dong:'성수동',gu:'성동구',zone:'뚝섬',addr:'뚝섬로 89',cat:'복합',floors:7,year:2009,area:18500,vac:18.5,sent:68,rent:8.5,tenants:62,polygon:[[37.5462,127.0665],[37.5462,127.0674],[37.5457,127.0674],[37.5457,127.0665]]},
+  {id:'SD007',name:'연무장 카페거리 A',dong:'성수동',gu:'성동구',zone:'연무장',addr:'연무장길 18',cat:'F&B',floors:2,year:2016,area:2500,vac:3.2,sent:95,rent:21.5,tenants:10,polygon:[[37.5436,127.0555],[37.5436,127.0563],[37.5432,127.0563],[37.5432,127.0555]]},
+  {id:'SD008',name:'왕십리 AK 플라자',dong:'행당동',gu:'성동구',zone:'왕십리',addr:'왕십리로 152',cat:'상업',floors:10,year:2016,area:55000,vac:6.8,sent:82,rent:12.5,tenants:280,polygon:[[37.5613,127.0374],[37.5613,127.0385],[37.5606,127.0385],[37.5606,127.0374]]},
+  {id:'SD009',name:'왕십리 오피스타워',dong:'행당동',gu:'성동구',zone:'왕십리',addr:'왕십리로 160',cat:'오피스',floors:22,year:2010,area:42000,vac:8.5,sent:81,rent:11.5,tenants:88,polygon:[[37.5618,127.0392],[37.5618,127.0402],[37.5612,127.0402],[37.5612,127.0392]]}
+];
+
+const JUNG=[
+  {id:'JG001',name:'롯데백화점 명동본점',dong:'충무로1가',gu:'중구',zone:'명동',addr:'나라대로 81',cat:'상업',floors:10,year:1979,area:85000,vac:2.5,sent:88,rent:35.0,tenants:420,polygon:[[37.5644,126.9839],[37.5644,126.9849],[37.5637,126.9849],[37.5637,126.9839]]},
+  {id:'JG002',name:'신세계백화점 본점',dong:'충무로1가',gu:'중구',zone:'명동',addr:'소공로 63',cat:'상업',floors:12,year:1930,area:72000,vac:1.8,sent:92,rent:38.5,tenants:380,polygon:[[37.5598,126.9767],[37.5598,126.9777],[37.5591,126.9777],[37.5591,126.9767]]},
+  {id:'JG003',name:'명동 밀리오레',dong:'명동2가',gu:'중구',zone:'명동',addr:'명동길 53',cat:'상업',floors:10,year:1999,area:28000,vac:21.5,sent:58,rent:12.5,tenants:350,polygon:[[37.5625,126.9854],[37.5625,126.9862],[37.5619,126.9862],[37.5619,126.9854]]},
+  {id:'JG004',name:'힙지로 복합빌딩',dong:'을지로3가',gu:'중구',zone:'을지로',addr:'을지로11길 22',cat:'복합',floors:4,year:2018,area:4200,vac:5.5,sent:91,rent:14.5,tenants:24,polygon:[[37.5661,126.9920],[37.5661,126.9928],[37.5656,126.9928],[37.5656,126.9920]]},
+  {id:'JG005',name:'을지로 센터원빌딩',dong:'을지로1가',gu:'중구',zone:'을지로',addr:'을지로 26',cat:'오피스',floors:35,year:2010,area:92000,vac:5.2,sent:84,rent:17.5,tenants:145,polygon:[[37.5666,126.9884],[37.5666,126.9893],[37.5660,126.9893],[37.5660,126.9884]]},
+  {id:'JG006',name:'두타 동대문',dong:'광희동1가',gu:'중구',zone:'동대문',addr:'을지로272',cat:'상업',floors:15,year:2000,area:45000,vac:14.5,sent:68,rent:9.5,tenants:420,polygon:[[37.5700,127.0079],[37.5700,127.0089],[37.5694,127.0089],[37.5694,127.0079]]},
+  {id:'JG007',name:'동대문 디자인플라자(DDP)',dong:'을지로7가',gu:'중구',zone:'동대문',addr:'을지로 281',cat:'문화',floors:4,year:2014,area:86000,vac:0.0,sent:93,rent:0.0,tenants:120,polygon:[[37.5675,127.0088],[37.5675,127.0098],[37.5669,127.0098],[37.5669,127.0088]]},
+  {id:'JG008',name:'서울스퀘어',dong:'봉래동2가',gu:'중구',zone:'남대문',addr:'한강대로 416',cat:'오피스',floors:23,year:2009,area:85000,vac:5.5,sent:86,rent:16.5,tenants:135,polygon:[[37.5548,126.9730],[37.5548,126.9740],[37.5542,126.9740],[37.5542,126.9730]]},
+  {id:'JG009',name:'남대문시장 본관',dong:'남창동',gu:'중구',zone:'남대문',addr:'남대문시장4길 21',cat:'복합',floors:5,year:1968,area:68000,vac:7.5,sent:76,rent:6.8,tenants:1200,polygon:[[37.5592,126.9778],[37.5592,126.9788],[37.5586,126.9788],[37.5586,126.9778]]},
+  {id:'JG010',name:'충무아트센터',dong:'충무로2가',gu:'중구',zone:'충무로',addr:'퇴계로 387',cat:'문화',floors:8,year:2004,area:28000,vac:3.5,sent:88,rent:0.0,tenants:35,polygon:[[37.5606,126.9948],[37.5606,126.9957],[37.5600,126.9957],[37.5600,126.9948]]}
+];
+
+/* ============================================================
+   PHASE 2 BUILDING DATA
+   ============================================================ */
+const YONGSAN=[
+  {id:'YS001',name:'이태원 더현대몰',dong:'이태원2동',gu:'용산구',zone:'이태원',addr:'이태원로 200',cat:'상업',floors:8,year:2021,area:42000,vac:5.2,sent:89,rent:22.5,tenants:185,polygon:[[37.5346,126.9940],[37.5346,126.9950],[37.5340,126.9950],[37.5340,126.9940]]},
+  {id:'YS002',name:'이태원 경리단길 빌딩',dong:'이태원2동',gu:'용산구',zone:'이태원',addr:'회나무로 18',cat:'F&B',floors:4,year:2016,area:4200,vac:11.5,sent:82,rent:18.5,tenants:25,polygon:[[37.5349,126.9951],[37.5349,126.9958],[37.5345,126.9958],[37.5345,126.9951]]},
+  {id:'YS003',name:'한남 블루스퀘어',dong:'한남동',gu:'용산구',zone:'한남동',addr:'이태원로 294',cat:'복합',floors:12,year:2011,area:68000,vac:3.8,sent:92,rent:24.5,tenants:68,polygon:[[37.5371,127.0012],[37.5371,127.0022],[37.5365,127.0022],[37.5365,127.0012]]},
+  {id:'YS004',name:'한남 나인원빌딩',dong:'한남동',gu:'용산구',zone:'한남동',addr:'독서당로 11',cat:'오피스',floors:20,year:2019,area:85000,vac:4.5,sent:91,rent:28.0,tenants:120,polygon:[[37.5358,127.0032],[37.5358,127.0042],[37.5352,127.0042],[37.5352,127.0032]]},
+  {id:'YS005',name:'용산 아이파크몰',dong:'한강로2가',gu:'용산구',zone:'용산역',addr:'한강대로 23길',cat:'상업',floors:9,year:2004,area:120000,vac:8.5,sent:80,rent:16.5,tenants:380,polygon:[[37.5299,126.9644],[37.5299,126.9656],[37.5291,126.9656],[37.5291,126.9644]]},
+  {id:'YS006',name:'용산 D타워',dong:'한강로3가',gu:'용산구',zone:'용산역',addr:'한강대로 32',cat:'오피스',floors:25,year:2015,area:58000,vac:7.2,sent:84,rent:18.5,tenants:92,polygon:[[37.5316,126.9651],[37.5316,126.9661],[37.5310,126.9661],[37.5310,126.9651]]}
+];
+
+const SONGPA=[
+  {id:'SP001',name:'롯데월드타워몰',dong:'신천동',gu:'송파구',zone:'잠실',addr:'올림픽로 300',cat:'상업',floors:15,year:2017,area:165000,vac:3.2,sent:94,rent:28.0,tenants:680,polygon:[[37.5128,127.1025],[37.5128,127.1038],[37.5119,127.1038],[37.5119,127.1025]]},
+  {id:'SP002',name:'롯데백화점 잠실점',dong:'신천동',gu:'송파구',zone:'잠실',addr:'올림픽로 240',cat:'상업',floors:11,year:1988,area:95000,vac:4.5,sent:90,rent:22.5,tenants:520,polygon:[[37.5131,127.1007],[37.5131,127.1019],[37.5124,127.1019],[37.5124,127.1007]]},
+  {id:'SP003',name:'잠실 파크리오 상가',dong:'잠실3동',gu:'송파구',zone:'잠실',addr:'잠실로 13',cat:'복합',floors:4,year:2008,area:12000,vac:12.5,sent:76,rent:11.5,tenants:88,polygon:[[37.5156,127.0985],[37.5156,127.0994],[37.5150,127.0994],[37.5150,127.0985]]},
+  {id:'SP004',name:'석촌호수 카페빌딩',dong:'석촌동',gu:'송파구',zone:'석촌',addr:'백제고분로37길 14',cat:'F&B',floors:4,year:2018,area:5200,vac:6.8,sent:91,rent:19.5,tenants:22,polygon:[[37.5095,127.1001],[37.5095,127.1009],[37.5091,127.1009],[37.5091,127.1001]]},
+  {id:'SP005',name:'방이동 복합상가',dong:'방이1동',gu:'송파구',zone:'석촌',addr:'방이동 86',cat:'복합',floors:6,year:2005,area:18000,vac:16.8,sent:69,rent:9.5,tenants:95,polygon:[[37.5062,127.1040],[37.5062,127.1049],[37.5057,127.1049],[37.5057,127.1040]]},
+  {id:'SP006',name:'잠실 트레지움 오피스',dong:'신천동',gu:'송파구',zone:'잠실',addr:'올림픽로8길 14',cat:'오피스',floors:18,year:2012,area:45000,vac:9.5,sent:83,rent:14.5,tenants:72,polygon:[[37.5142,127.1015],[37.5142,127.1025],[37.5136,127.1025],[37.5136,127.1015]]}
+];
+
+const YEONGDEUNGPO=[
+  {id:'YDP001',name:'여의도 IFC몰',dong:'여의도동',gu:'영등포구',zone:'여의도',addr:'국제금융로 10',cat:'복합',floors:5,year:2012,area:112000,vac:5.8,sent:88,rent:25.0,tenants:280,polygon:[[37.5257,126.9273],[37.5257,126.9285],[37.5249,126.9285],[37.5249,126.9273]]},
+  {id:'YDP002',name:'파크원',dong:'여의도동',gu:'영등포구',zone:'여의도',addr:'여의대로 108',cat:'오피스',floors:68,year:2020,area:320000,vac:6.5,sent:88,rent:30.0,tenants:245,polygon:[[37.5245,126.9263],[37.5245,126.9275],[37.5237,126.9275],[37.5237,126.9263]]},
+  {id:'YDP003',name:'한국거래소 빌딩',dong:'여의도동',gu:'영등포구',zone:'여의도',addr:'여의나루로 76',cat:'오피스',floors:16,year:1996,area:58000,vac:4.2,sent:84,rent:20.5,tenants:88,polygon:[[37.5238,126.9241],[37.5238,126.9251],[37.5232,126.9251],[37.5232,126.9241]]},
+  {id:'YDP004',name:'타임스퀘어',dong:'영등포동',gu:'영등포구',zone:'영등포역',addr:'영중로 15',cat:'상업',floors:9,year:2009,area:78000,vac:8.5,sent:82,rent:16.5,tenants:320,polygon:[[37.5157,126.9072],[37.5157,126.9085],[37.5149,126.9085],[37.5149,126.9072]]},
+  {id:'YDP005',name:'롯데백화점 영등포',dong:'영등포동',gu:'영등포구',zone:'영등포역',addr:'경인로 661',cat:'상업',floors:8,year:1984,area:62000,vac:10.5,sent:78,rent:14.5,tenants:380,polygon:[[37.5164,126.9055],[37.5164,126.9065],[37.5158,126.9065],[37.5158,126.9055]]},
+  {id:'YDP006',name:'여의도 MBC 구사옥',dong:'여의도동',gu:'영등포구',zone:'여의도',addr:'여의공원로 13',cat:'복합',floors:14,year:1973,area:42000,vac:18.5,sent:65,rent:12.0,tenants:55,polygon:[[37.5225,126.9225],[37.5225,126.9234],[37.5219,126.9234],[37.5219,126.9225]]}
+];
+
+const SEOCHO=[
+  {id:'SC001',name:'강남 센트럴시티',dong:'반포동',gu:'서초구',zone:'서초역',addr:'신반포로 176',cat:'복합',floors:9,year:2000,area:75000,vac:7.5,sent:84,rent:18.5,tenants:320,polygon:[[37.5046,127.0044],[37.5046,127.0056],[37.5038,127.0056],[37.5038,127.0044]]},
+  {id:'SC002',name:'교보타워',dong:'서초동',gu:'서초구',zone:'서초역',addr:'강남대로 465',cat:'오피스',floors:33,year:2003,area:98000,vac:5.2,sent:86,rent:22.5,tenants:145,polygon:[[37.4949,127.0285],[37.4949,127.0295],[37.4943,127.0295],[37.4943,127.0285]]},
+  {id:'SC003',name:'서초 삼성타운',dong:'서초동',gu:'서초구',zone:'서초역',addr:'서초대로74길 11',cat:'오피스',floors:20,year:2008,area:125000,vac:4.8,sent:88,rent:25.0,tenants:185,polygon:[[37.4973,127.0297],[37.4973,127.0307],[37.4967,127.0307],[37.4967,127.0297]]},
+  {id:'SC004',name:'방배 카페골목 빌딩',dong:'방배2동',gu:'서초구',zone:'방배',addr:'방배로 31',cat:'F&B',floors:3,year:2015,area:4500,vac:8.5,sent:88,rent:16.5,tenants:22,polygon:[[37.4807,127.0092],[37.4807,127.0100],[37.4803,127.0100],[37.4803,127.0092]]},
+  {id:'SC005',name:'양재 AT센터',dong:'양재1동',gu:'서초구',zone:'양재',addr:'강남대로 27',cat:'복합',floors:6,year:2002,area:45000,vac:12.5,sent:78,rent:12.5,tenants:95,polygon:[[37.4848,127.0469],[37.4848,127.0480],[37.4841,127.0480],[37.4841,127.0469]]},
+  {id:'SC006',name:'더플랫폼 서초',dong:'서초동',gu:'서초구',zone:'서초역',addr:'강남대로 395',cat:'오피스',floors:16,year:2010,area:52000,vac:9.5,sent:82,rent:20.5,tenants:88,polygon:[[37.4930,127.0258],[37.4930,127.0268],[37.4924,127.0268],[37.4924,127.0258]]}
+];
+
+const SEODAEMUN=[
+  {id:'SDM001',name:'현대 유플렉스 신촌',dong:'창천동',gu:'서대문구',zone:'신촌',addr:'신촌로 83',cat:'상업',floors:8,year:2000,area:28000,vac:15.5,sent:74,rent:14.5,tenants:220,polygon:[[37.5568,126.9375],[37.5568,126.9385],[37.5562,126.9385],[37.5562,126.9375]]},
+  {id:'SDM002',name:'신촌 그랜드마트',dong:'신촌동',gu:'서대문구',zone:'신촌',addr:'연세로 22',cat:'복합',floors:7,year:1998,area:22000,vac:18.5,sent:68,rent:12.5,tenants:185,polygon:[[37.5559,126.9365],[37.5559,126.9374],[37.5554,126.9374],[37.5554,126.9365]]},
+  {id:'SDM003',name:'이대 복합상가 A',dong:'대현동',gu:'서대문구',zone:'이대',addr:'이화여대길 34',cat:'상업',floors:5,year:2005,area:8500,vac:22.5,sent:64,rent:11.5,tenants:88,polygon:[[37.5572,126.9451],[37.5572,126.9460],[37.5567,126.9460],[37.5567,126.9451]]},
+  {id:'SDM004',name:'이대역 오피스빌딩',dong:'북아현동',gu:'서대문구',zone:'이대',addr:'신촌로 34',cat:'오피스',floors:12,year:2008,area:18500,vac:11.5,sent:78,rent:10.5,tenants:52,polygon:[[37.5545,126.9452],[37.5545,126.9461],[37.5540,126.9461],[37.5540,126.9452]]},
+  {id:'SDM005',name:'서대문 디지털혁신허브',dong:'홍제동',gu:'서대문구',zone:'홍제',addr:'통일로 484',cat:'오피스',floors:10,year:2017,area:32000,vac:8.5,sent:82,rent:9.5,tenants:68,polygon:[[37.5771,126.9547],[37.5771,126.9557],[37.5765,126.9557],[37.5765,126.9547]]},
+  {id:'SDM006',name:'신촌 연세로 카페빌딩',dong:'창천동',gu:'서대문구',zone:'신촌',addr:'연세로 14',cat:'F&B',floors:4,year:2018,area:5800,vac:9.5,sent:86,rent:15.5,tenants:35,polygon:[[37.5553,126.9378],[37.5553,126.9387],[37.5548,126.9387],[37.5548,126.9378]]}
+];
+
+const GWANGJIN=[
+  {id:'GJ001',name:'건대 스타시티몰',dong:'화양동',gu:'광진구',zone:'건대입구',addr:'광나루로 40',cat:'상업',floors:10,year:2009,area:72000,vac:8.5,sent:84,rent:15.5,tenants:350,polygon:[[37.5402,127.0695],[37.5402,127.0707],[37.5394,127.0707],[37.5394,127.0695]]},
+  {id:'GJ002',name:'홈플러스 건대점',dong:'자양1동',gu:'광진구',zone:'건대입구',addr:'아차산로 272',cat:'상업',floors:5,year:2001,area:35000,vac:12.5,sent:76,rent:11.5,tenants:180,polygon:[[37.5385,127.0709],[37.5385,127.0720],[37.5378,127.0720],[37.5378,127.0709]]},
+  {id:'GJ003',name:'자양 현대프라자',dong:'자양2동',gu:'광진구',zone:'건대입구',addr:'자양로 190',cat:'복합',floors:8,year:2006,area:22000,vac:16.5,sent:70,rent:10.2,tenants:95,polygon:[[37.5371,127.0726],[37.5371,127.0736],[37.5365,127.0736],[37.5365,127.0726]]},
+  {id:'GJ004',name:'구의 오피스타워 A',dong:'구의3동',gu:'광진구',zone:'구의',addr:'구천면로31길 6',cat:'오피스',floors:15,year:2010,area:28000,vac:10.5,sent:80,rent:12.5,tenants:72,polygon:[[37.5418,127.0922],[37.5418,127.0932],[37.5412,127.0932],[37.5412,127.0922]]},
+  {id:'GJ005',name:'건대입구 F&B빌딩',dong:'화양동',gu:'광진구',zone:'건대입구',addr:'능동로 210',cat:'F&B',floors:4,year:2016,area:6800,vac:7.5,sent:89,rent:16.5,tenants:38,polygon:[[37.5393,127.0702],[37.5393,127.0712],[37.5387,127.0712],[37.5387,127.0702]]},
+  {id:'GJ006',name:'뚝섬유원지 상업복합',dong:'자양3동',gu:'광진구',zone:'구의',addr:'강변북로 139',cat:'복합',floors:6,year:2003,area:15000,vac:21.5,sent:65,rent:8.5,tenants:55,polygon:[[37.5358,127.0835],[37.5358,127.0845],[37.5352,127.0845],[37.5352,127.0835]]}
+];
+
+const DONGDAEMUN=[
+  {id:'DDM001',name:'청량리 롯데몰',dong:'청량리동',gu:'동대문구',zone:'청량리',addr:'왕산로 214',cat:'상업',floors:9,year:2021,area:82000,vac:6.5,sent:84,rent:15.5,tenants:320,polygon:[[37.5814,127.0454],[37.5814,127.0467],[37.5806,127.0467],[37.5806,127.0454]]},
+  {id:'DDM002',name:'홈플러스 청량리',dong:'전농동',gu:'동대문구',zone:'청량리',addr:'왕산로 11',cat:'상업',floors:5,year:2003,area:45000,vac:10.5,sent:78,rent:12.5,tenants:280,polygon:[[37.5792,127.0464],[37.5792,127.0476],[37.5785,127.0476],[37.5785,127.0464]]},
+  {id:'DDM003',name:'경희대 주변 복합상가',dong:'회기동',gu:'동대문구',zone:'회기',addr:'경희대로 26',cat:'복합',floors:5,year:2005,area:12000,vac:14.5,sent:74,rent:9.5,tenants:88,polygon:[[37.5968,127.0519],[37.5968,127.0529],[37.5962,127.0529],[37.5962,127.0519]]},
+  {id:'DDM004',name:'한국외대 상권 빌딩',dong:'이문1동',gu:'동대문구',zone:'회기',addr:'이문로 107',cat:'F&B',floors:4,year:2010,area:8500,vac:11.5,sent:80,rent:11.0,tenants:55,polygon:[[37.5978,127.0562],[37.5978,127.0572],[37.5972,127.0572],[37.5972,127.0562]]},
+  {id:'DDM005',name:'장안동 복합상가',dong:'장안2동',gu:'동대문구',zone:'장안동',addr:'장안로 185',cat:'복합',floors:5,year:2002,area:15000,vac:19.5,sent:65,rent:8.5,tenants:95,polygon:[[37.5717,127.0560],[37.5717,127.0570],[37.5711,127.0570],[37.5711,127.0560]]},
+  {id:'DDM006',name:'청량리 역세권 오피스',dong:'청량리동',gu:'동대문구',zone:'청량리',addr:'왕산로 165',cat:'오피스',floors:18,year:2015,area:42000,vac:8.5,sent:82,rent:13.5,tenants:88,polygon:[[37.5805,127.0476],[37.5805,127.0488],[37.5797,127.0488],[37.5797,127.0476]]}
+];
+
+/* ============================================================
+   PHASE 3 BUILDING DATA
+   ============================================================ */
+const GWANAK=[
+  {id:'GWA001',name:'포도몰 신림',dong:'신림동',gu:'관악구',zone:'신림',addr:'신림로 350',cat:'상업',floors:8,year:2005,area:28000,vac:14.5,sent:71,rent:10.5,tenants:180,polygon:[[37.4842,126.9295],[37.4842,126.9305],[37.4836,126.9305],[37.4836,126.9295]]},
+  {id:'GWA002',name:'신림 복합상가 B',dong:'신림동',gu:'관악구',zone:'신림',addr:'조원로 15',cat:'복합',floors:5,year:2001,area:9500,vac:18.5,sent:64,rent:8.5,tenants:88,polygon:[[37.4849,126.9285],[37.4849,126.9293],[37.4844,126.9293],[37.4844,126.9285]]},
+  {id:'GWA003',name:'서울대입구 현대쇼핑',dong:'봉천동',gu:'관악구',zone:'서울대입구',addr:'남부순환로218길',cat:'상업',floors:6,year:2003,area:18000,vac:11.5,sent:77,rent:11.5,tenants:120,polygon:[[37.4817,126.9522],[37.4817,126.9532],[37.4811,126.9532],[37.4811,126.9522]]},
+  {id:'GWA004',name:'관악구청 인근 오피스',dong:'봉천동',gu:'관악구',zone:'봉천',addr:'관악로 145',cat:'오피스',floors:10,year:2008,area:12000,vac:16.5,sent:68,rent:9.2,tenants:45,polygon:[[37.4774,126.9516],[37.4774,126.9525],[37.4769,126.9525],[37.4769,126.9516]]},
+  {id:'GWA005',name:'신림 역세권 F&B빌딩',dong:'신림동',gu:'관악구',zone:'신림',addr:'신림로 395',cat:'F&B',floors:4,year:2016,area:5800,vac:9.5,sent:81,rent:12.5,tenants:35,polygon:[[37.4838,126.9305],[37.4838,126.9313],[37.4833,126.9313],[37.4833,126.9305]]},
+  {id:'GWA006',name:'낙성대 복합상가',dong:'낙성대동',gu:'관악구',zone:'봉천',addr:'낙성대로 32',cat:'복합',floors:5,year:2004,area:8800,vac:21.5,sent:60,rent:7.8,tenants:58,polygon:[[37.4754,126.9624],[37.4754,126.9633],[37.4749,126.9633],[37.4749,126.9624]]}
+];
+
+const DONGJAK=[
+  {id:'DJ001',name:'사당 이마트',dong:'사당동',gu:'동작구',zone:'사당',addr:'사당로 7',cat:'상업',floors:5,year:2000,area:35000,vac:7.8,sent:80,rent:13.5,tenants:280,polygon:[[37.4766,126.9815],[37.4766,126.9825],[37.4760,126.9825],[37.4760,126.9815]]},
+  {id:'DJ002',name:'사당 복합오피스',dong:'사당동',gu:'동작구',zone:'사당',addr:'동작대로 4',cat:'오피스',floors:14,year:2007,area:22000,vac:12.5,sent:74,rent:11.5,tenants:65,polygon:[[37.4778,126.9821],[37.4778,126.9830],[37.4773,126.9830],[37.4773,126.9821]]},
+  {id:'DJ003',name:'이수 역세권 상가',dong:'대방동',gu:'동작구',zone:'이수',addr:'이수대로 88',cat:'상업',floors:6,year:2005,area:15000,vac:15.5,sent:70,rent:12.0,tenants:95,polygon:[[37.4865,126.9832],[37.4865,126.9841],[37.4860,126.9841],[37.4860,126.9832]]},
+  {id:'DJ004',name:'노량진 수산시장 복합',dong:'노량진동',gu:'동작구',zone:'노량진',addr:'노들로 674',cat:'복합',floors:4,year:1971,area:25000,vac:19.5,sent:65,rent:7.5,tenants:550,polygon:[[37.5141,126.9421],[37.5141,126.9431],[37.5135,126.9431],[37.5135,126.9421]]},
+  {id:'DJ005',name:'노량진 학원가 빌딩',dong:'노량진동',gu:'동작구',zone:'노량진',addr:'노량진로 131',cat:'오피스',floors:10,year:2010,area:18000,vac:8.5,sent:78,rent:11.5,tenants:42,polygon:[[37.5135,126.9432],[37.5135,126.9441],[37.5130,126.9441],[37.5130,126.9432]]},
+  {id:'DJ006',name:'흑석 CJ 복합몰',dong:'흑석동',gu:'동작구',zone:'사당',addr:'서달로 135',cat:'상업',floors:7,year:2017,area:22000,vac:10.5,sent:82,rent:14.5,tenants:125,polygon:[[37.5100,126.9608],[37.5100,126.9617],[37.5095,126.9617],[37.5095,126.9608]]}
+];
+
+const GANGSEO=[
+  {id:'GS001',name:'마곡 LG사이언스파크',dong:'마곡동',gu:'강서구',zone:'마곡',addr:'마곡중앙로 136',cat:'오피스',floors:20,year:2019,area:180000,vac:3.2,sent:88,rent:18.5,tenants:380,polygon:[[37.5608,126.8327],[37.5608,126.8340],[37.5600,126.8340],[37.5600,126.8327]]},
+  {id:'GS002',name:'마곡 코오롱원앤온리타워',dong:'마곡동',gu:'강서구',zone:'마곡',addr:'마곡중앙6로 4',cat:'오피스',floors:18,year:2016,area:55000,vac:5.5,sent:85,rent:15.5,tenants:95,polygon:[[37.5588,126.8342],[37.5588,126.8352],[37.5582,126.8352],[37.5582,126.8342]]},
+  {id:'GS003',name:'마곡나루 복합상가',dong:'마곡동',gu:'강서구',zone:'마곡',addr:'마곡나루역로 18',cat:'복합',floors:8,year:2018,area:32000,vac:9.5,sent:80,rent:14.0,tenants:148,polygon:[[37.5601,126.8310],[37.5601,126.8319],[37.5596,126.8319],[37.5596,126.8310]]},
+  {id:'GS004',name:'발산역 현대하이퍼',dong:'내발산동',gu:'강서구',zone:'발산',addr:'강서로 164',cat:'상업',floors:6,year:2002,area:28000,vac:12.5,sent:74,rent:12.0,tenants:220,polygon:[[37.5513,126.8379],[37.5513,126.8390],[37.5507,126.8390],[37.5507,126.8379]]},
+  {id:'GS005',name:'화곡 로데오 상가',dong:'화곡1동',gu:'강서구',zone:'화곡',addr:'화곡로 40',cat:'상업',floors:4,year:1999,area:12000,vac:21.5,sent:61,rent:8.5,tenants:88,polygon:[[37.5467,126.8547],[37.5467,126.8557],[37.5462,126.8557],[37.5462,126.8547]]},
+  {id:'GS006',name:'강서 이마트 가양점',dong:'가양동',gu:'강서구',zone:'발산',addr:'가양대로 296',cat:'복합',floors:7,year:2004,area:45000,vac:8.5,sent:79,rent:11.5,tenants:280,polygon:[[37.5572,126.8626],[37.5572,126.8638],[37.5565,126.8638],[37.5565,126.8626]]}
+];
+
+const GURO=[
+  {id:'GR001',name:'구로 G밸리 IT타워',dong:'구로동',gu:'구로구',zone:'구로디지털단지',addr:'디지털로 26',cat:'오피스',floors:16,year:2008,area:42000,vac:8.5,sent:82,rent:12.5,tenants:185,polygon:[[37.4852,126.9012],[37.4852,126.9022],[37.4846,126.9022],[37.4846,126.9012]]},
+  {id:'GR002',name:'에이스하이엔드타워',dong:'구로동',gu:'구로구',zone:'구로디지털단지',addr:'디지털로33길 28',cat:'오피스',floors:18,year:2012,area:58000,vac:6.2,sent:84,rent:11.8,tenants:145,polygon:[[37.4846,126.8993],[37.4846,126.9003],[37.4840,126.9003],[37.4840,126.8993]]},
+  {id:'GR003',name:'구로디지털단지 복합몰',dong:'구로동',gu:'구로구',zone:'구로디지털단지',addr:'디지털로30길 28',cat:'복합',floors:10,year:2006,area:35000,vac:11.5,sent:77,rent:10.5,tenants:220,polygon:[[37.4860,126.9002],[37.4860,126.9012],[37.4854,126.9012],[37.4854,126.9002]]},
+  {id:'GR004',name:'신도림 디큐브시티',dong:'신도림동',gu:'구로구',zone:'신도림',addr:'경인로 661',cat:'복합',floors:15,year:2011,area:88000,vac:7.8,sent:83,rent:15.5,tenants:380,polygon:[[37.5083,126.8897],[37.5083,126.8910],[37.5075,126.8910],[37.5075,126.8897]]},
+  {id:'GR005',name:'신도림 테크노마트',dong:'신도림동',gu:'구로구',zone:'신도림',addr:'새말로 97',cat:'상업',floors:12,year:2001,area:65000,vac:18.5,sent:66,rent:9.5,tenants:580,polygon:[[37.5093,126.8882],[37.5093,126.8893],[37.5086,126.8893],[37.5086,126.8882]]},
+  {id:'GR006',name:'구일역 복합상가',dong:'고척동',gu:'구로구',zone:'구로디지털단지',addr:'고척로 25',cat:'복합',floors:5,year:2003,area:14000,vac:22.5,sent:60,rent:7.8,tenants:95,polygon:[[37.5050,126.8832],[37.5050,126.8841],[37.5045,126.8841],[37.5045,126.8832]]}
+];
+
+const GEUMCHEON=[
+  {id:'GC001',name:'가산 마리오아울렛',dong:'가산동',gu:'금천구',zone:'가산디지털단지',addr:'가산로 145',cat:'상업',floors:8,year:2001,area:55000,vac:8.5,sent:79,rent:12.5,tenants:280,polygon:[[37.4784,126.8831],[37.4784,126.8843],[37.4776,126.8843],[37.4776,126.8831]]},
+  {id:'GC002',name:'에이스 하이테크시티',dong:'가산동',gu:'금천구',zone:'가산디지털단지',addr:'디지털로9길 23',cat:'오피스',floors:20,year:2009,area:72000,vac:7.2,sent:82,rent:12.0,tenants:195,polygon:[[37.4771,126.8820],[37.4771,126.8831],[37.4764,126.8831],[37.4764,126.8820]]},
+  {id:'GC003',name:'가산 IT밸리 오피스',dong:'가산동',gu:'금천구',zone:'가산디지털단지',addr:'디지털로 130',cat:'오피스',floors:15,year:2011,area:48000,vac:10.5,sent:78,rent:11.5,tenants:145,polygon:[[37.4758,126.8843],[37.4758,126.8853],[37.4752,126.8853],[37.4752,126.8843]]},
+  {id:'GC004',name:'독산역 복합상가',dong:'독산동',gu:'금천구',zone:'독산',addr:'시흥대로 164',cat:'복합',floors:5,year:2000,area:18000,vac:19.5,sent:62,rent:8.0,tenants:120,polygon:[[37.4651,126.8964],[37.4651,126.8974],[37.4645,126.8974],[37.4645,126.8964]]},
+  {id:'GC005',name:'금천 가산 W-SPACE',dong:'가산동',gu:'금천구',zone:'가산디지털단지',addr:'가산로9길 35',cat:'오피스',floors:12,year:2017,area:32000,vac:5.8,sent:84,rent:13.0,tenants:88,polygon:[[37.4792,126.8809],[37.4792,126.8819],[37.4786,126.8819],[37.4786,126.8809]]},
+  {id:'GC006',name:'금천 시흥대로 상가',dong:'시흥동',gu:'금천구',zone:'독산',addr:'시흥대로 223',cat:'상업',floors:4,year:1998,area:9500,vac:24.5,sent:55,rent:7.0,tenants:65,polygon:[[37.4585,126.8976],[37.4585,126.8986],[37.4580,126.8986],[37.4580,126.8976]]}
+];
+
+const GANGDONG=[
+  {id:'GD001',name:'이마트 천호점',dong:'천호1동',gu:'강동구',zone:'천호',addr:'천호대로 1079',cat:'상업',floors:6,year:2002,area:42000,vac:8.5,sent:79,rent:13.5,tenants:280,polygon:[[37.5381,127.1245],[37.5381,127.1256],[37.5374,127.1256],[37.5374,127.1245]]},
+  {id:'GD002',name:'천호 현대백화점',dong:'천호1동',gu:'강동구',zone:'천호',addr:'천호대로 1059',cat:'상업',floors:9,year:2005,area:68000,vac:6.5,sent:82,rent:16.5,tenants:380,polygon:[[37.5388,127.1235],[37.5388,127.1246],[37.5381,127.1246],[37.5381,127.1235]]},
+  {id:'GD003',name:'강동 프라임 오피스',dong:'성내동',gu:'강동구',zone:'천호',addr:'천호대로 1023',cat:'오피스',floors:18,year:2010,area:35000,vac:11.5,sent:76,rent:12.0,tenants:88,polygon:[[37.5368,127.1228],[37.5368,127.1238],[37.5362,127.1238],[37.5362,127.1228]]},
+  {id:'GD004',name:'암사 역세권 복합',dong:'암사1동',gu:'강동구',zone:'암사',addr:'아리수로 98',cat:'복합',floors:8,year:2008,area:22000,vac:14.5,sent:72,rent:10.5,tenants:95,polygon:[[37.5524,127.1271],[37.5524,127.1281],[37.5518,127.1281],[37.5518,127.1271]]},
+  {id:'GD005',name:'길동 근린상가',dong:'길동',gu:'강동구',zone:'길동',addr:'올림픽로 661',cat:'상업',floors:5,year:2001,area:12000,vac:19.5,sent:64,rent:9.0,tenants:75,polygon:[[37.5357,127.1380],[37.5357,127.1390],[37.5352,127.1390],[37.5352,127.1380]]},
+  {id:'GD006',name:'고덕 그라시움 상가',dong:'고덕동',gu:'강동구',zone:'암사',addr:'고덕로 201',cat:'복합',floors:4,year:2019,area:8500,vac:5.5,sent:88,rent:14.5,tenants:55,polygon:[[37.5571,127.1348],[37.5571,127.1358],[37.5566,127.1358],[37.5566,127.1348]]}
+];
+
+const NOWON=[
+  {id:'NW001',name:'노원 롯데마트 복합',dong:'상계동',gu:'노원구',zone:'노원',addr:'동일로 1418',cat:'상업',floors:6,year:2003,area:42000,vac:11.5,sent:74,rent:11.5,tenants:280,polygon:[[37.6552,127.0572],[37.6552,127.0584],[37.6544,127.0584],[37.6544,127.0572]]},
+  {id:'NW002',name:'노원 경전철 복합상가',dong:'상계동',gu:'노원구',zone:'노원',addr:'마들로6길 4',cat:'복합',floors:5,year:2012,area:15000,vac:15.5,sent:70,rent:9.5,tenants:88,polygon:[[37.6558,127.0561],[37.6558,127.0571],[37.6552,127.0571],[37.6552,127.0561]]},
+  {id:'NW003',name:'노원 이마트',dong:'상계동',gu:'노원구',zone:'노원',addr:'동일로 1466',cat:'상업',floors:5,year:2000,area:35000,vac:8.5,sent:78,rent:10.5,tenants:320,polygon:[[37.6543,127.0584],[37.6543,127.0595],[37.6536,127.0595],[37.6536,127.0584]]},
+  {id:'NW004',name:'중계 복합상가',dong:'중계동',gu:'노원구',zone:'중계',addr:'중계로 58',cat:'복합',floors:6,year:2006,area:18000,vac:18.5,sent:65,rent:8.5,tenants:95,polygon:[[37.6371,127.0729],[37.6371,127.0739],[37.6365,127.0739],[37.6365,127.0729]]},
+  {id:'NW005',name:'하계역 상권빌딩',dong:'하계동',gu:'노원구',zone:'하계',addr:'한글비석로 145',cat:'상업',floors:4,year:2001,area:9500,vac:21.5,sent:62,rent:7.8,tenants:65,polygon:[[37.6396,127.0634],[37.6396,127.0643],[37.6391,127.0643],[37.6391,127.0634]]},
+  {id:'NW006',name:'노원구청 인근 오피스',dong:'상계동',gu:'노원구',zone:'중계',addr:'노원로 379',cat:'오피스',floors:10,year:2009,area:22000,vac:13.5,sent:73,rent:9.2,tenants:55,polygon:[[37.6480,127.0598],[37.6480,127.0607],[37.6475,127.0607],[37.6475,127.0598]]}
+];
+
+/* ============================================================
+   MERGE & CONFIG
+   ============================================================ */
+const BUILDINGS=[...GANGNAM,...MAPO,...JONGNO,...SEONGDONG,...JUNG,
+                 ...YONGSAN,...SONGPA,...YEONGDEUNGPO,...SEOCHO,...SEODAEMUN,...GWANGJIN,...DONGDAEMUN,
+                 ...GWANAK,...DONGJAK,...GANGSEO,...GURO,...GEUMCHEON,...GANGDONG,...NOWON];
+
+const GU_BORDER={
+  '강남구':'#f59e0b','마포구':'#34d399','종로구':'#60a5fa','성동구':'#f472b6','중구':'#fb923c',
+  '용산구':'#ec4899','송파구':'#14b8a6','영등포구':'#8b5cf6','서초구':'#06b6d4',
+  '서대문구':'#f97316','광진구':'#84cc16','동대문구':'#eab308',
+  '관악구':'#ef4444','동작구':'#3b82f6','강서구':'#10b981',
+  '구로구':'#c084fc','금천구':'#fb7185','강동구':'#2dd4bf','노원구':'#fcd34d'
+};
+
+const GU_CLASS={
+  '강남구':'on-gangnam','마포구':'on-mapo','종로구':'on-jongno','성동구':'on-seongdong','중구':'on-jung',
+  '용산구':'on-yongsan','송파구':'on-songpa','영등포구':'on-ydp','서초구':'on-seocho',
+  '서대문구':'on-sdm','광진구':'on-gwangjin','동대문구':'on-ddm',
+  '관악구':'on-gwanak','동작구':'on-dongjak','강서구':'on-gangseo',
+  '구로구':'on-guro','금천구':'on-geumcheon','강동구':'on-gangdong','노원구':'on-nowon'
+};
+
+const GU_CENTERS={
+  '강남구':[37.5172,127.0473,13],'마포구':[37.5596,126.9230,13],
+  '종로구':[37.5762,126.9862,14],'성동구':[37.5470,127.0530,14],'중구':[37.5635,126.9925,14],
+  '용산구':[37.5340,126.9950,14],'송파구':[37.5120,127.1020,13],
+  '영등포구':[37.5200,126.9200,13],'서초구':[37.4950,127.0270,13],
+  '서대문구':[37.5580,126.9400,14],'광진구':[37.5385,127.0720,14],'동대문구':[37.5800,127.0470,14],
+  '관악구':[37.4784,126.9516,14],'동작구':[37.4966,126.9640,14],'강서구':[37.5509,126.8495,13],
+  '구로구':[37.4954,126.8874,14],'금천구':[37.4568,126.8955,14],
+  '강동구':[37.5492,127.1465,13],'노원구':[37.6542,127.0568,13],
+  'all':[37.536,126.990,11]
+};
+
+const ZONE_CENTERS={
+  '강남역':[37.499,127.028],'선릉':[37.504,127.044],'COEX':[37.511,127.059],
+  '압구정':[37.526,127.040],'청담':[37.522,127.047],
+  '홍대':[37.558,126.924],'합정':[37.553,126.909],'연남':[37.562,126.922],
+  '상암':[37.579,126.889],'공덕':[37.544,126.951],
+  '익선동':[37.574,126.997],'삼청':[37.579,126.983],'서촌':[37.582,126.971],
+  '광장':[37.571,126.999],'경복궁':[37.574,126.975],
+  '성수':[37.5445,127.0565],'서울숲':[37.5445,127.0390],'뚝섬':[37.5460,127.0668],
+  '연무장':[37.5438,127.0558],'왕십리':[37.5613,127.0378],
+  '명동':[37.5618,126.9854],'을지로':[37.5660,126.9900],
+  '동대문':[37.5690,127.0090],'충무로':[37.5615,126.9970],'남대문':[37.5588,126.9775],
+  '이태원':[37.5346,126.9948],'한남동':[37.5365,127.0027],'용산역':[37.5305,126.9650],
+  '잠실':[37.5130,127.1020],'석촌':[37.5080,127.1020],
+  '여의도':[37.5240,126.9260],'영등포역':[37.5160,126.9065],
+  '서초역':[37.4960,127.0280],'방배':[37.4810,127.0095],'양재':[37.4848,127.0475],
+  '신촌':[37.5560,126.9380],'이대':[37.5560,126.9455],'홍제':[37.5770,126.9550],
+  '건대입구':[37.5390,127.0705],'구의':[37.5415,127.0925],
+  '청량리':[37.5800,127.0465],'회기':[37.5970,127.0540],'장안동':[37.5715,127.0560],
+  '신림':[37.4842,126.9295],'서울대입구':[37.4813,126.9527],'봉천':[37.4765,126.9520],
+  '사당':[37.4766,126.9815],'이수':[37.4863,126.9835],'노량진':[37.5138,126.9426],
+  '마곡':[37.5601,126.8325],'발산':[37.5510,126.8385],'화곡':[37.5465,126.8550],
+  '구로디지털단지':[37.4852,126.9015],'신도림':[37.5085,126.8893],
+  '가산디지털단지':[37.4780,126.8830],'독산':[37.4650,126.8970],
+  '천호':[37.5382,127.1242],'암사':[37.5525,127.1275],'길동':[37.5357,127.1385],
+  '노원':[37.6552,127.0578],'중계':[37.6370,127.0732],'하계':[37.6394,127.0638]
+};
+
+const GU_LIST=[
+  {key:'강남구',phase:1},{key:'마포구',phase:1},{key:'종로구',phase:1},{key:'성동구',phase:1},{key:'중구',phase:1},
+  {key:'용산구',phase:2},{key:'송파구',phase:2},{key:'영등포구',phase:2},{key:'서초구',phase:2},
+  {key:'서대문구',phase:2},{key:'광진구',phase:2},{key:'동대문구',phase:2},
+  {key:'관악구',phase:3},{key:'동작구',phase:3},{key:'강서구',phase:3},
+  {key:'구로구',phase:3},{key:'금천구',phase:3},{key:'강동구',phase:3},{key:'노원구',phase:3}
+];
+
+let map=null,layerGroup=null;
+let currentMetric='vacancy',selectedId=null;
+let activeGu='all',activeZone='all',activeCat='',activeSearch='';
+let visibleIds=new Set(BUILDINGS.map(b=>b.id));
+
+function colorByVacancy(v){return v<5?'#34d399':v<15?'#fbbf24':v<30?'#f87171':'#7f2d2d';}
+function colorBySentiment(s){return s>=85?'#34d399':s>=70?'#60a5fa':s>=55?'#fbbf24':'#f87171';}
+function colorByRent(r){return r>=20?'#a78bfa':r>=12?'#6366f1':r>=8?'#38bdf8':'#9aa0c8';}
+function getColor(b){
+  if(currentMetric==='sentiment')return colorBySentiment(b.sent);
+  if(currentMetric==='rent')return colorByRent(b.rent);
+  return colorByVacancy(b.vac);
+}
+function metricVal(b){
+  if(currentMetric==='sentiment')return b.sent+'pt';
+  if(currentMetric==='rent')return b.rent+'만원';
+  return b.vac+'%';
+}
+
+function initMap(){
+  map=L.map('map',{zoomControl:true}).setView([37.536,126.990],11);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© OpenStreetMap © CARTO',maxZoom:19
+  }).addTo(map);
+  layerGroup=L.layerGroup().addTo(map);
+  buildGuCompare();
+  renderPolygons();renderList();updateKPIs();
+}
+
+function renderPolygons(){
+  if(!map||!layerGroup)return;
+  layerGroup.clearLayers();
+  BUILDINGS.filter(b=>visibleIds.has(b.id)).forEach(b=>{
+    const fillColor=getColor(b);
+    const borderColor=GU_BORDER[b.gu]||fillColor;
+    const isSel=selectedId===b.id;
+    const poly=L.polygon(b.polygon,{
+      fillColor,fillOpacity:isSel?0.80:0.55,
+      color:isSel?'#ffffff':borderColor,
+      weight:isSel?3:1.8,opacity:0.95
+    });
+    poly.on('click',()=>selectBuilding(b.id));
+    poly.on('mouseover',function(){if(selectedId!==b.id)this.setStyle({fillOpacity:0.75,color:'#fff',weight:2.5});});
+    poly.on('mouseout',function(){if(selectedId!==b.id)this.setStyle({fillOpacity:0.55,color:borderColor,weight:1.8});});
+    layerGroup.addLayer(poly);
+  });
+}
+
+function renderList(){
+  const container=document.getElementById('blist');
+  const visible=BUILDINGS.filter(b=>visibleIds.has(b.id));
+  document.getElementById('cnt-visible').textContent=visible.length;
+  document.getElementById('cnt-total').textContent=BUILDINGS.length;
+  container.innerHTML=visible.map(b=>`
+    <div class="brow ${b.id===selectedId?'sel':''}" onclick="selectBuilding('${b.id}')">
+      <div class="bgu" style="background:${GU_BORDER[b.gu]}"></div>
+      <div class="binfo">
+        <div class="bnm">${b.name}</div>
+        <div class="bdong">${b.gu} · ${b.cat}</div>
+      </div>
+      <div class="bvac" style="color:${getColor(b)}">${metricVal(b)}</div>
+    </div>`).join('');
+}
+
+function selectBuilding(id){
+  selectedId=id;
+  const b=BUILDINGS.find(x=>x.id===id);
+  if(!b)return;
+  if(map){
+    const c=b.polygon.reduce((acc,[la,ln])=>[acc[0]+la/b.polygon.length,acc[1]+ln/b.polygon.length],[0,0]);
+    map.setView(c,Math.max(map.getZoom(),16));
+  }
+  renderPolygons();renderList();renderDetail(b);
+}
+
+function renderDetail(b){
+  document.getElementById('det-hint').style.display='none';
+  const el=document.getElementById('det-content');
+  el.style.cssText='display:flex;flex-direction:column;gap:10px';
+  const vc=colorByVacancy(b.vac),sc=colorBySentiment(b.sent);
+  const guColor=GU_BORDER[b.gu];
+  const phase=GU_LIST.find(g=>g.key===b.gu)?.phase||'?';
+  el.innerHTML=`
+    <div class="det-top">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:${guColor};margin-bottom:3px">${b.gu} · ${b.zone} 상권 · Phase ${phase}</div>
+        <div class="det-name">${b.name}</div>
+        <div class="det-sub">${b.dong} · ${b.addr} · ${b.floors}층 · ${b.year}년</div>
+      </div>
+      <div class="det-score">
+        <div class="sv" style="color:${vc}">${b.vac}%</div>
+        <div class="sl">공실률</div>
+      </div>
+    </div>
+    <div class="det-tags">
+      <span class="tag" style="border-color:${guColor};color:${guColor}">${b.gu}</span>
+      <span class="tag">${b.cat}</span>
+      <span class="tag">임차인 ${b.tenants}개소</span>
+      <span class="tag">${(b.area/1000).toFixed(0)}천㎡</span>
+      <span class="tag">${b.rent}만원/평</span>
+    </div>
+    <div class="det-metrics">
+      <div class="dm"><div class="dml">공실률</div><div class="dmv" style="color:${vc}">${b.vac}<small style="font-size:10px">%</small></div></div>
+      <div class="dm"><div class="dml">감성지수</div><div class="dmv" style="color:${sc}">${b.sent}<small style="font-size:10px">pt</small></div></div>
+      <div class="dm"><div class="dml">임대료</div><div class="dmv" style="color:var(--accent2)">${b.rent}<small style="font-size:10px">만</small></div></div>
+    </div>
+    <div class="det-bar-sec">
+      <h4>세부 지표</h4>
+      ${bar('임차인',b.tenants,500,'#38bdf8','개')}
+      ${bar('연면적',b.area/1000,150,'#a78bfa','천㎡')}
+      ${bar('공실률',b.vac,40,vc,'%')}
+      ${bar('감성',b.sent,100,sc,'pt')}
+    </div>
+    <div class="det-insight">${insight(b)}</div>
+    <button class="btn-primary" onclick="alert('PPPP 플랫폼 상세 분석 연동 예정')">PPPP 플랫폼 상세 분석 →</button>`;
+}
+
+function bar(l,v,m,c,u){
+  const p=Math.min(100,Math.round(v/m*100));
+  return `<div class="det-bar-row"><span class="dbl">${l}</span><div class="dbw"><i style="width:${p}%;background:${c}"></i></div><span class="dbv">${typeof v==='number'&&v%1!==0?v.toFixed(1):v}${u}</span></div>`;
+}
+function insight(b){
+  if(b.vac<5) return `<b>우량 건물</b> — 공실률 ${b.vac}%로 ${b.gu} 최상위. 안정적 임대 수익 확보 가능.`;
+  if(b.vac<15)return `<b>주의 필요</b> — 공실률 ${b.vac}%로 평균 수준. 임차인 믹스 최적화 검토 권장.`;
+  if(b.vac<30)return `<b>위험 신호</b> — 공실률 ${b.vac}%로 높음. 업종 전환 또는 임대조건 재설계 필요.`;
+  return `<b>고위험</b> — 공실률 ${b.vac}%로 심각. SpaceOS AI 업종 추천 모델 적용 필요.`;
+}
+
+function buildGuCompare(){
+  const container=document.getElementById('gu-compare');
+  container.innerHTML=GU_LIST.map(({key,phase})=>`
+    <div class="gc" id="gc-${key.replace('구','')}">
+      <div class="gcl" style="color:${GU_BORDER[key]}">■ ${key} <span style="font-size:8.5px;color:var(--mut)">P${phase}</span></div>
+      <div class="gcv" id="gcv-${key}">--%</div>
+      <div class="gcs" id="gcs-${key}">감성 --pt</div>
+    </div>`).join('');
+}
+
+function updateKPIs(){
+  const vis=BUILDINGS.filter(b=>visibleIds.has(b.id));
+  if(!vis.length)return;
+  const avg=(arr,key)=>arr.reduce((a,b)=>a+b[key],0)/arr.length;
+  const aVac=avg(vis,'vac').toFixed(1);
+  const aSent=Math.round(avg(vis,'sent'));
+  const aRent=avg(vis,'rent').toFixed(1);
+  document.getElementById('kpi-vac').innerHTML=`${aVac}<small>%</small>`;
+  document.getElementById('kpi-sent').innerHTML=`${aSent}<small>pt</small>`;
+  document.getElementById('kpi-cnt').innerHTML=`${vis.length}<small>동</small>`;
+  document.getElementById('kpi-rent').innerHTML=`${aRent}<small>만/평</small>`;
+  document.getElementById('kb-vac').style.width=Math.min(100,aVac*2.5)+'%';
+  document.getElementById('kb-sent').style.width=aSent+'%';
+  document.getElementById('kb-cnt').style.width=Math.min(100,vis.length/100*100)+'%';
+  document.getElementById('kb-rent').style.width=Math.min(100,aRent*3)+'%';
+  GU_LIST.forEach(({key})=>{
+    const arr=vis.filter(b=>b.gu===key);
+    const vEl=document.getElementById('gcv-'+key);
+    const sEl=document.getElementById('gcs-'+key);
+    if(arr.length&&vEl){
+      vEl.textContent=avg(arr,'vac').toFixed(1)+'%';
+      sEl.textContent=`감성 ${Math.round(avg(arr,'sent'))}pt`;
+    }
+  });
+}
+
+function applyFilters(){
+  visibleIds=new Set(BUILDINGS
+    .filter(b=>activeGu==='all'||b.gu===activeGu)
+    .filter(b=>activeZone==='all'||b.zone===activeZone)
+    .filter(b=>!activeCat||b.cat.includes(activeCat))
+    .filter(b=>!activeSearch||b.name.includes(activeSearch)||b.dong.includes(activeSearch)||b.gu.includes(activeSearch))
+    .map(b=>b.id));
+  if(selectedId&&!visibleIds.has(selectedId)){
+    selectedId=null;
+    document.getElementById('det-hint').style.display='';
+    document.getElementById('det-content').style.display='none';
+  }
+  renderPolygons();renderList();updateKPIs();
+}
+
+function filterGu(btn,gu){
+  document.querySelectorAll('#seg-gu button').forEach(b=>b.className='');
+  btn.className=GU_CLASS[gu]||'on';
+  activeGu=gu;
+  if(map){const c=GU_CENTERS[gu]||GU_CENTERS.all;map.setView([c[0],c[1]],c[2]);}
+  document.querySelectorAll('#seg-zone button[data-gu]').forEach(b=>{
+    b.style.display=(gu==='all'||b.dataset.gu===gu)?'':'none';
+  });
+  activeZone='all';
+  document.querySelectorAll('#seg-zone button').forEach(b=>b.classList.remove('on'));
+  document.querySelector('#seg-zone button:first-child').classList.add('on');
+  applyFilters();
+}
+
+function filterZone(btn,zone){
+  document.querySelectorAll('#seg-zone button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  activeZone=zone;
+  if(map&&zone!=='all'&&ZONE_CENTERS[zone])map.setView(ZONE_CENTERS[zone],15);
+  applyFilters();
+}
+
+function setMetric(btn,metric){
+  document.querySelectorAll('#metric-vac,#metric-sent,#metric-rent').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  currentMetric=metric;
+  const L={
+    vacancy:{title:'공실률',rows:[['#34d399','0–5%'],['#fbbf24','5–15%'],['#f87171','15–30%'],['#7f2d2d','30%+']]},
+    sentiment:{title:'감성지수',rows:[['#34d399','85+'],['#60a5fa','70–85'],['#fbbf24','55–70'],['#f87171','55-']]},
+    rent:{title:'임대료 (만원/평)',rows:[['#a78bfa','20+'],['#6366f1','12–20'],['#38bdf8','8–12'],['#9aa0c8','8-']]}
+  };
+  const lg=L[metric];
+  document.getElementById('legend-title').textContent=lg.title;
+  document.getElementById('legend').querySelectorAll('.legend-row').forEach((r,i)=>{
+    r.querySelector('.swatch').style.background=lg.rows[i][0];
+    r.querySelector('span').textContent=lg.rows[i][1];
+  });
+  renderPolygons();renderList();
+}
+
+function filterCategory(cat){activeCat=cat;applyFilters();}
+function filterSearch(val){activeSearch=val.trim();applyFilters();}
+
+window.addEventListener('load',initMap);
+</script>
+</body>
+</html>
