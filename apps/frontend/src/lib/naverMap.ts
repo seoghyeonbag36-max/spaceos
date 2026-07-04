@@ -17,7 +17,8 @@ export function loadNaverMaps(): Promise<void> {
     const keyId = import.meta.env.VITE_NAVER_MAPS_KEY_ID;
     if (!keyId) return reject(new Error('VITE_NAVER_MAPS_KEY_ID 미설정 (.env 확인)'));
     const s = document.createElement('script');
-    s.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${keyId}`;
+    // submodules=visualization: 유동인구 HeatMap(naver.maps.visualization.HeatMap) 사용에 필요.
+    s.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${keyId}&submodules=visualization`;
     s.async = true;
     s.onload = () => resolve();
     s.onerror = () => reject(new Error('네이버 지도 SDK 로드 실패 — 도메인 등록/키 확인'));

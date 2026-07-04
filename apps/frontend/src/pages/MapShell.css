@@ -1,0 +1,175 @@
+/* 지도-우선(map-first) 풀스크린 레이아웃 — 거지맵/직방식.
+   지도가 배경(absolute inset:0), 나머지 UI는 그 위에 떠있는 오버레이. */
+
+.mapshell {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  color: var(--ink, #1c2533);
+}
+
+.mapshell .map-canvas {
+  position: absolute;
+  inset: 0;
+  background: #e9eef5; /* 지도 로드 전/실패 시 바탕 */
+}
+
+/* 지도 키 미설정/도메인 미등록 시 안내 (레이아웃은 그대로 시연) */
+.mapshell .map-note {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  color: var(--muted, #6b7280);
+  background: var(--bg, #f4f7fb);
+  z-index: 1;
+}
+.mapshell .map-note strong { color: var(--ink, #1c2533); font-size: 15px; }
+.mapshell .map-note code {
+  background: #fff; border: 1px solid var(--line, #e3e9f2);
+  border-radius: 6px; padding: 2px 6px; font-size: 12px;
+}
+
+/* ── 오버레이 공통 ── */
+.mapshell .overlay { position: absolute; z-index: 5; }
+
+/* 상단: 검색 + 레이어 토글 */
+.mapshell .overlay-top {
+  top: 12px; left: 12px; right: 12px;
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start;
+  pointer-events: none; /* 빈 영역은 지도 드래그 통과 */
+}
+.mapshell .overlay-top > * { pointer-events: auto; }
+
+.mapshell .search {
+  flex: 0 1 260px; min-width: 160px;
+  height: 40px; padding: 0 14px;
+  border: 1px solid var(--line, #e3e9f2); border-radius: 10px;
+  background: #fff; box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+  font-size: 13px; outline: none;
+}
+.mapshell .search:focus { border-color: var(--brand, #0ea5b7); }
+
+/* 세그먼트 토글 (유동인구/공실/임대/인구밀도) */
+.mapshell .seg {
+  display: flex; background: #fff;
+  border: 1px solid var(--line, #e3e9f2); border-radius: 10px; overflow: hidden;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+}
+.mapshell .seg button {
+  appearance: none; border: 0; background: transparent; cursor: pointer;
+  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--muted, #6b7280);
+  padding: 0 14px; height: 40px; white-space: nowrap;
+  border-left: 1px solid var(--line, #e3e9f2);
+}
+.mapshell .seg button:first-child { border-left: 0; }
+.mapshell .seg button.active { background: var(--brand, #0ea5b7); color: #fff; }
+
+/* 우하단 범례 */
+.mapshell .legend {
+  right: 12px; bottom: 12px;
+  display: flex; gap: 12px; align-items: center;
+  background: rgba(255,255,255,.94); padding: 8px 12px;
+  border: 1px solid var(--line, #e3e9f2); border-radius: 10px;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+  font-size: 11px; color: var(--muted, #6b7280);
+}
+.mapshell .legend .chip { display: inline-flex; align-items: center; gap: 5px; }
+.mapshell .legend .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.mapshell .legend .note { color: var(--ink, #1c2533); font-weight: 700; }
+
+/* 좌측 리스트 패널 (데스크탑) */
+.mapshell .side-panel {
+  top: 64px; left: 12px; bottom: 12px; width: 320px;
+  display: flex; flex-direction: column;
+  background: #fff; border: 1px solid var(--line, #e3e9f2);
+  border-radius: 14px; box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+  overflow: hidden;
+}
+.mapshell .side-panel .sp-head {
+  padding: 14px 16px 10px; border-bottom: 1px solid var(--line, #e3e9f2);
+}
+.mapshell .side-panel .sp-title { font-size: 15px; font-weight: 800; }
+.mapshell .side-panel .sp-sub { font-size: 12px; color: var(--muted, #6b7280); margin-top: 2px; }
+.mapshell .side-panel .sp-list { flex: 1; overflow-y: auto; }
+
+.mapshell .b-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 12px 16px; border: 0; border-bottom: 1px solid #f1f4f9;
+  background: transparent; cursor: pointer; text-align: left; font-family: inherit;
+}
+.mapshell .b-item:hover { background: #f7faff; }
+.mapshell .b-item.active { background: var(--brand-soft, #e6f7f9); }
+.mapshell .b-dot { width: 12px; height: 12px; border-radius: 50%; flex: 0 0 auto; }
+.mapshell .b-name { font-size: 13px; font-weight: 700; color: var(--ink, #1c2533); }
+.mapshell .b-meta { font-size: 11px; color: var(--muted, #6b7280); margin-top: 1px; }
+.mapshell .b-vac { margin-left: auto; font-size: 13px; font-weight: 800; }
+
+/* 선택 건물 상세 (패널 하단) */
+.mapshell .b-detail { border-top: 1px solid var(--line, #e3e9f2); padding: 14px 16px; }
+.mapshell .b-detail .row { display: flex; justify-content: space-between; font-size: 12px; margin-top: 6px; }
+.mapshell .b-detail .row span:first-child { color: var(--muted, #6b7280); }
+.mapshell .b-detail .row span:last-child { font-weight: 700; }
+.mapshell .b-twin {
+  margin-top: 12px; width: 100%; height: 36px; border: 0; border-radius: 9px;
+  background: var(--ink, #1c2533); color: #fff; font-weight: 700; font-size: 13px;
+  cursor: pointer; font-family: inherit;
+}
+
+/* 시간 슬라이더 (유동인구 레이어에서만) */
+.mapshell .time-bar {
+  left: 50%; bottom: 12px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,.94); padding: 8px 14px;
+  border: 1px solid var(--line, #e3e9f2); border-radius: 999px;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+}
+.mapshell .time-bar input { width: 200px; }
+.mapshell .time-bar .t { font-size: 13px; font-weight: 800; color: var(--brand-pressed, #0b8294); min-width: 44px; text-align: center; }
+
+/* 모바일: 좌측 패널 → 하단 바텀시트, 범례/슬라이더 위치 보정 */
+@media (max-width: 768px) {
+  .mapshell .side-panel {
+    top: auto; left: 0; right: 0; bottom: 0; width: auto;
+    height: 44vh; border-radius: 16px 16px 0 0;
+  }
+  .mapshell .legend { bottom: calc(44vh + 12px); }
+  .mapshell .time-bar { bottom: calc(44vh + 12px); }
+}
+
+/* ── 3D 디지털 트윈 모달 ── */
+.mapshell .twin-modal {
+  position: absolute; inset: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(11, 27, 51, 0.5); padding: 20px;
+}
+.mapshell .twin-box {
+  width: min(560px, 92vw); height: min(460px, 80vh);
+  display: flex; flex-direction: column;
+  background: #fff; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(11, 27, 51, 0.35);
+}
+.mapshell .twin-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--line, #e3e9f2);
+  font-size: 14px; font-weight: 800;
+}
+.mapshell .twin-head button {
+  border: 0; background: transparent; cursor: pointer;
+  font-size: 16px; color: var(--muted, #6b7280); line-height: 1;
+}
+.mapshell .twin-canvas { flex: 1; min-height: 0; background: #eef2f8; }
+.mapshell .twin-load {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  color: var(--muted, #6b7280); font-size: 13px;
+}
+.mapshell .twin-foot {
+  padding: 10px 16px; border-top: 1px solid var(--line, #e3e9f2);
+  font-size: 12px; color: var(--muted, #6b7280);
+}

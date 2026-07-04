@@ -1,5 +1,4 @@
 // 공실 히트맵 범례 — vacancy 색계열 설명 (저위험→고위험)
-import React from "react";
 import { colors } from "../tokens/colors";
 const labels = ["안전", "양호", "주의", "위험", "고위험"];
 export function VacancyLegend() {

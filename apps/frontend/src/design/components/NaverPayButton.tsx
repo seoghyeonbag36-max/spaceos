@@ -1,7 +1,6 @@
 // ⚠ 네이버페이 결제 버튼 — 공식 디자인 고정 슬롯.
 // 네이버페이 정책상 버튼 색·모양·문구를 임의 변경하면 패널티. 공식 에셋/스크립트만 사용한다.
 // 우리는 주변 여백·정렬만 토큰으로 맞춘다. (결제 플로우는 backend payments.py 와 연동)
-import React from "react";
 
 export function NaverPayButton({ onPay }: { onPay?: () => void }) {
   // TODO: 네이버페이 공식 버튼 SDK/에셋으로 교체 (design/assets/naverpay/ 의 원본 사용)

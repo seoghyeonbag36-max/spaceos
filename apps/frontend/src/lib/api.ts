@@ -38,6 +38,23 @@ export const getDistrict = (id: string) => getJSON<unknown>(`/commercial-distric
 export const getSentiment = (id: string) => getJSON<unknown[]>(`/commercial-districts/${id}/sentiment`);
 /** 거점 100m 공실 히트맵(Page) */
 export const getVacancyHeatmap = (id: string) => getJSON<unknown>(`/heatmap/vacancy?district=${id}`);
+/** 건물 단위 공실 GeoJSON(FeatureCollection) — Page 공실 폴리곤 레이어 */
+export const getBuildingVacancy = (district: string) =>
+  getJSON<GeoJSONFC>(`/heatmap/buildings?district=${district}`);
+
+/** 건물 공실 GeoJSON 최소 타입 */
+export interface BuildingProps {
+  id: string; name: string; status: "full" | "partial" | "high" | "empty";
+  capacity: number; active: number; industry: string; vacancy_rate: number;
+}
+export interface GeoJSONFC {
+  type: "FeatureCollection";
+  features: Array<{
+    type: "Feature";
+    geometry: { type: "Polygon"; coordinates: number[][][] };
+    properties: BuildingProps;
+  }>;
+}
 /** 거점 공실 유닛 + 3-Tier 시나리오(Posting) */
 export const getPostings = (id: string) => getJSON<unknown[]>(`/commercial-districts/${id}/postings`);
 /** 거점 마케팅(행사 + 온라인 콘텐츠)(Program) */

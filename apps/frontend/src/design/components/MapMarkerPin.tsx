@@ -1,5 +1,4 @@
 // 공실 위험도 마커 — 네이버 지도 위 커스텀 오버레이. vacancy 색계열 사용.
-import React from "react";
 import { colors } from "../tokens/colors";
 
 // level: 0(저위험)~4(고위험)
