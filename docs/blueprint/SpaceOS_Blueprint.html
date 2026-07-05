@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>SpaceOS Blueprint</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1680px; }
+  body {
+    font-family:"Malgun Gothic","Segoe UI",sans-serif;
+    background:#0A1826;
+    color:#E8F1F8;
+    background-image:
+      linear-gradient(rgba(14,165,183,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14,165,183,0.055) 1px, transparent 1px);
+    background-size:42px 42px;
+    padding:36px 44px 28px;
+  }
+  .teal { color:#2BC8D9; }
+  .dim  { color:#8FA8BC; }
+  .white{ color:#FFFFFF; }
+
+  /* ───────── header ───────── */
+  .hdr { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #2BC8D9; padding-bottom:18px; }
+  .hdr h1 { font-size:40px; letter-spacing:1px; color:#FFF; }
+  .hdr h1 span { color:#2BC8D9; }
+  .hdr .sub { font-size:17px; color:#B9CCDB; margin-top:8px; }
+  .hdr .sub b { color:#2BC8D9; }
+  .hdr-right { text-align:right; }
+  .badge { display:inline-block; font-size:14px; padding:6px 14px; border-radius:20px; margin-left:8px; font-weight:bold; }
+  .badge.poc  { background:rgba(43,200,217,.15); border:1px solid #2BC8D9; color:#2BC8D9; }
+  .badge.exit { background:rgba(255,255,255,.08); border:1px solid #6B8299; color:#C7D6E2; }
+  .hdr-right .date { font-size:13px; color:#6B8299; margin-top:10px; }
+
+  /* ───────── section frame ───────── */
+  .sec { margin-top:22px; border:1px solid rgba(43,200,217,.35); border-radius:12px; background:rgba(10,30,48,.72); padding:18px 22px 20px; position:relative; }
+  .sec-tag { position:absolute; top:-13px; left:22px; background:#0A1826; padding:2px 12px; font-size:15px; font-weight:bold; color:#2BC8D9; letter-spacing:2px; border:1px solid #2BC8D9; border-radius:6px; }
+  .sec-title { font-size:22px; font-weight:bold; color:#FFF; margin-bottom:4px; }
+  .sec-why { font-size:14.5px; color:#8FA8BC; margin-bottom:14px; }
+  .sec-why b { color:#E8F1F8; }
+
+  /* connector */
+  .conn { text-align:center; margin:10px 0 -8px; }
+  .conn .arrow { font-size:20px; color:#2BC8D9; line-height:1; }
+  .conn .lbl { display:inline-block; font-size:14px; color:#2BC8D9; background:rgba(43,200,217,.1); border:1px dashed rgba(43,200,217,.5); padding:3px 16px; border-radius:14px; margin-bottom:2px; }
+
+  /* ───────── S1 vision ───────── */
+  .vision-grid { display:grid; grid-template-columns: 1.35fr 1fr; gap:20px; }
+  .loop-box { border:1px solid rgba(43,200,217,.3); border-radius:10px; padding:14px 16px; background:rgba(14,42,64,.5); }
+  .loop-title { font-size:15px; font-weight:bold; color:#2BC8D9; margin-bottom:10px; }
+  .loop-flow { display:flex; align-items:stretch; gap:0; }
+  .loop-step { flex:1; text-align:center; padding:10px 8px; border:1px solid rgba(143,168,188,.35); border-radius:8px; background:rgba(10,24,38,.6); }
+  .loop-step .n { font-size:12px; color:#2BC8D9; font-weight:bold; }
+  .loop-step .t { font-size:15px; font-weight:bold; color:#FFF; margin:3px 0; }
+  .loop-step .d { font-size:12px; color:#8FA8BC; line-height:1.45; }
+  .loop-arr { align-self:center; padding:0 7px; color:#2BC8D9; font-size:17px; }
+  .loop-back { text-align:center; font-size:12.5px; color:#2BC8D9; margin-top:8px; border-top:1px dashed rgba(43,200,217,.4); padding-top:6px; }
+  .prob-list { list-style:none; }
+  .prob-list li { font-size:13.5px; color:#C7D6E2; padding:7px 0 7px 2px; border-bottom:1px dashed rgba(143,168,188,.2); line-height:1.5; }
+  .prob-list li:last-child { border-bottom:none; }
+  .prob-list b { color:#FF8A5C; }
+  .prob-list .ans { color:#2BC8D9; font-weight:bold; }
+  .poc-strip { margin-top:14px; display:flex; gap:14px; align-items:center; border:1px solid rgba(255,138,92,.45); background:rgba(255,138,92,.07); border-radius:10px; padding:10px 16px; }
+  .poc-strip .k { font-size:14px; font-weight:bold; color:#FF8A5C; white-space:nowrap; }
+  .poc-strip .v { font-size:13.5px; color:#DCE7F0; line-height:1.5; }
+  .poc-strip .v b { color:#FF8A5C; }
+
+  /* ───────── S2 PPPP ───────── */
+  .pppp-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .pcard { border-radius:10px; border:1px solid rgba(143,168,188,.3); background:rgba(14,42,64,.45); overflow:hidden; display:flex; flex-direction:column; }
+  .pcard .head { padding:12px 14px 10px; border-bottom:2px solid; }
+  .pcard .head .seq { font-size:11.5px; letter-spacing:1.5px; color:#8FA8BC; }
+  .pcard .head h3 { font-size:22px; color:#FFF; margin-top:2px; }
+  .pcard .head .conv { font-size:12.5px; margin-top:2px; font-weight:bold; }
+  .pcard .body { padding:10px 14px 12px; flex:1; display:flex; flex-direction:column; gap:9px; }
+  .pf { font-size:12.5px; line-height:1.5; }
+  .pf .k { display:inline-block; font-size:11px; font-weight:bold; padding:1.5px 8px; border-radius:9px; margin-right:6px; vertical-align:top; margin-top:1.5px; white-space:nowrap; }
+  .pf .why-k { background:rgba(255,138,92,.16); color:#FF8A5C; }
+  .pf .how-k { background:rgba(43,200,217,.14); color:#2BC8D9; }
+  .pf .dat-k { background:rgba(190,150,255,.14); color:#C9A6FF; }
+  .pf .out-k { background:rgba(255,255,255,.1); color:#DCE7F0; }
+  .pf .txt { display:inline; color:#C7D6E2; }
+  .pf .txt b { color:#FFF; }
+  .pf .why-txt { color:#F4D9CC; }
+  .pcard .design { margin-top:auto; padding:9px 14px 11px; background:rgba(43,200,217,.08); border-top:1px dashed rgba(43,200,217,.45); }
+  .pcard .design .dk { font-size:11px; font-weight:bold; color:#2BC8D9; letter-spacing:1px; }
+  .pcard .design .dv { font-size:12px; color:#B9E6EC; line-height:1.5; margin-top:3px; }
+  .pcard .kpi { font-size:11.5px; color:#8FA8BC; padding:7px 14px; border-top:1px solid rgba(143,168,188,.2); }
+  .pcard .kpi b { color:#2BC8D9; }
+  /* per-card accent */
+  .pc1 .head { border-color:#2BC8D9; } .pc1 .head .conv { color:#2BC8D9; }
+  .pc2 .head { border-color:#4CAF7D; } .pc2 .head .conv { color:#6FD9A3; }
+  .pc3 .head { border-color:#E8B54D; } .pc3 .head .conv { color:#E8B54D; }
+  .pc4 .head { border-color:#C9A6FF; } .pc4 .head .conv { color:#C9A6FF; }
+  .vac-dots { letter-spacing:1px; }
+
+  /* ───────── S3 data ───────── */
+  .data-flow { display:grid; grid-template-columns: 1fr 34px 1.15fr 34px 1.5fr; align-items:stretch; gap:0; }
+  .dlayer { border:1px solid rgba(143,168,188,.35); border-radius:10px; background:rgba(14,42,64,.5); padding:12px 14px; }
+  .dlayer h4 { font-size:16px; color:#FFF; margin-bottom:2px; }
+  .dlayer h4 .medal { font-size:12px; font-weight:bold; margin-left:6px; }
+  .bronze h4 .medal { color:#C98A5B; } .silver h4 .medal { color:#B9CCDB; } .gold h4 .medal { color:#E8B54D; }
+  .dlayer .cap { font-size:12px; color:#8FA8BC; margin-bottom:9px; }
+  .ditem { font-size:12.5px; color:#C7D6E2; padding:5px 8px; border:1px solid rgba(143,168,188,.22); border-radius:6px; margin-bottom:5px; background:rgba(10,24,38,.55); line-height:1.45; }
+  .ditem b { color:#FFF; }
+  .ditem .src { color:#8FA8BC; font-size:11.5px; }
+  .darr { display:flex; align-items:center; justify-content:center; color:#2BC8D9; font-size:20px; }
+  .goldrow { display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center; margin-bottom:5px; }
+  .goldrow .gt { font-size:12.5px; color:#C7D6E2; padding:5px 8px; border:1px solid rgba(232,181,77,.35); border-radius:6px; background:rgba(232,181,77,.06); }
+  .goldrow .gt b { color:#E8B54D; font-family:Consolas,monospace; font-size:12px; }
+  .goldrow .to { font-size:12px; font-weight:bold; white-space:nowrap; }
+  .keys-strip { margin-top:12px; border:1px dashed rgba(43,200,217,.5); border-radius:8px; padding:9px 14px; font-size:13px; color:#B9E6EC; background:rgba(43,200,217,.06); }
+  .keys-strip b { color:#2BC8D9; font-family:Consolas,monospace; }
+
+  /* ───────── S4 design ───────── */
+  .design-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .dcard { border:1px solid rgba(43,200,217,.3); border-radius:10px; padding:12px 14px; background:rgba(14,42,64,.45); }
+  .dcard h4 { font-size:15px; color:#FFF; margin-bottom:7px; }
+  .dcard p, .dcard li { font-size:12.5px; color:#C7D6E2; line-height:1.55; }
+  .dcard ul { list-style:none; }
+  .dcard li { padding:3px 0; }
+  .sw { display:inline-block; width:13px; height:13px; border-radius:3px; vertical-align:-2px; margin-right:5px; }
+  .sw.teal-sw { background:#0EA5B7; } .sw.green-sw { background:#03C75A; }
+  .naver { color:#03C75A; font-weight:bold; }
+  .dcard b { color:#FFF; }
+  .dcard .rule { color:#2BC8D9; font-weight:bold; }
+
+  /* ───────── S5 roadmap ───────── */
+  .phase-track { display:grid; grid-template-columns: 0.95fr 0.85fr 1.15fr 0.95fr 0.95fr 1.05fr 0.9fr 1.0fr; gap:8px; margin-bottom:4px; }
+  .ph { border:1px solid rgba(143,168,188,.35); border-radius:9px; background:rgba(14,42,64,.5); padding:9px 10px 10px; position:relative; }
+  .ph .pn { font-size:11px; font-weight:bold; letter-spacing:1px; color:#8FA8BC; }
+  .ph .pt { font-size:14px; font-weight:bold; color:#FFF; margin:3px 0 5px; line-height:1.3; }
+  .ph .pd { font-size:11.5px; color:#9FB6C8; line-height:1.5; }
+  .ph .pd b { color:#DCE7F0; }
+  .ph.done { border-color:rgba(76,175,125,.6); }
+  .ph.done .pn { color:#6FD9A3; }
+  .ph.now { border:2px solid #FF8A5C; background:rgba(255,138,92,.1); box-shadow:0 0 18px rgba(255,138,92,.25); }
+  .ph.now .pn { color:#FF8A5C; }
+  .ph .flag { position:absolute; top:-12px; right:8px; font-size:11px; font-weight:bold; padding:2px 9px; border-radius:10px; }
+  .ph.done .flag { background:#1E4D38; color:#6FD9A3; }
+  .ph.now .flag { background:#FF8A5C; color:#0A1826; }
+  .ph.para .flag { background:#274A66; color:#7FC8E8; }
+  .cpath { margin-top:10px; border:1px solid rgba(255,138,92,.4); background:rgba(255,138,92,.05); border-radius:8px; padding:8px 14px; font-size:13px; color:#F4D9CC; }
+  .cpath b { color:#FF8A5C; }
+  .cpath .mono { font-family:Consolas,monospace; font-size:12.5px; color:#FFD9C7; }
+  .steps { margin-top:12px; display:flex; gap:6px; align-items:stretch; }
+  .step { flex:1; border:1px solid rgba(143,168,188,.3); border-radius:8px; padding:7px 9px; background:rgba(10,24,38,.55); }
+  .step .sn { font-size:10.5px; font-weight:bold; color:#2BC8D9; }
+  .step .st { font-size:12.5px; font-weight:bold; color:#FFF; margin:2px 0; line-height:1.25; }
+  .step .so { font-size:11px; color:#8FA8BC; line-height:1.4; }
+  .step.exit { border-color:rgba(76,175,125,.6); background:rgba(76,175,125,.08); }
+  .step.exit .sn { color:#6FD9A3; }
+  .steps-arr { align-self:center; color:#2BC8D9; font-size:14px; }
+
+  /* footer */
+  .ftr { margin-top:20px; display:flex; justify-content:space-between; font-size:12px; color:#5F7688; border-top:1px solid rgba(143,168,188,.25); padding-top:10px; }
+  .ftr b { color:#8FA8BC; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<div class="hdr">
+  <div>
+    <h1>SpaceOS <span>Blueprint</span> — 하나의 워크트리</h1>
+    <div class="sub">핵심 가설: <b>"물리적 Place의 가치는 Digital Platform으로 전이되었다"</b> — 물리적 상권을 디지털 트윈 SaaS로 플랫폼화한다</div>
+  </div>
+  <div class="hdr-right">
+    <span class="badge poc">PoC 거점: 강남구 신사동 가로수길</span>
+    <span class="badge exit">목표: 18~24개월 M&A Exit (네이버·카카오·직방)</span>
+    <div class="date">2026.07.05 · sh.pac</div>
+  </div>
+</div>
+
+<!-- ═══════════ S1. WHY ═══════════ -->
+<div class="sec">
+  <div class="sec-tag">1 — 왜 만드는가</div>
+  <div class="sec-title">디지털 스킨십(Digital Skinship) — 상권의 첫 접점은 이미 온라인이다</div>
+  <div class="sec-why">상권의 <b>존재</b>는 물리적이지만, 사람들의 <b>의사결정</b>은 온라인에서 먼저 일어난다. 이 순환의 입구이자 출구를 운영하는 것이 SpaceOS다.</div>
+  <div class="vision-grid">
+    <div class="loop-box">
+      <div class="loop-title">고객 여정 폐루프 — 모든 P는 이 루프 위에 놓인다</div>
+      <div class="loop-flow">
+        <div class="loop-step"><div class="n">① First Touch</div><div class="t">디지털 스킨십</div><div class="d">AI 추천 · 네이버 지도<br>인스타그램 · 블로그</div></div>
+        <div class="loop-arr">▶</div>
+        <div class="loop-step"><div class="n">② 방문</div><div class="t">물리적 경험</div><div class="d">실제 상권·상가에서<br>소비와 체류</div></div>
+        <div class="loop-arr">▶</div>
+        <div class="loop-step"><div class="n">③ 기록</div><div class="t">디지털 기록</div><div class="d">별점 · 리뷰 · 사진<br>해시태그로 감정 기록</div></div>
+      </div>
+      <div class="loop-back">↩ 기록은 다시 데이터로 회수(回收)되어 상권 프로필을 갱신 → 다음 고객의 첫 스킨십이 된다 (폐루프)</div>
+    </div>
+    <div>
+      <ul class="prob-list">
+        <li><b>문제 1.</b> 기존 상권분석은 카드매출·유동인구 등 <b>사후 지표</b>뿐 → <span class="ans">과거 폐업 사유를 AI로 분석</span></li>
+        <li><b>문제 2.</b> 건물의 <b>공실 히스토리가 단절</b>되어 있다 → <span class="ans">데이터 결합으로 건물 단위 공실을 '만들어서' 본다</span></li>
+        <li><b>문제 3.</b> 분석만 있고 <b>실행 솔루션이 없다</b> → <span class="ans">입점(Posting)·마케팅(Program)까지 실행을 제공</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="poc-strip">
+    <div class="k">▸ 왜 가로수길인가</div>
+    <div class="v">가두상권 공실률 <b>41.6% (서울 최고)</b> vs 신사역 집합상가 <b>9.99%</b> — 거시 통계가 숨기는 건물별 실상을 디지털 트윈이 드러낸다는 SpaceOS의 핵심 가치제안을 그대로 증명하는 무대. 공실 표본이 풍부해 추정 로직 검증(precision/recall)에 최적이고, "몰락한 상권의 재생 진단" 내러티브는 자산운용사·건물주·강남구청에 즉시 통한다.</div>
+  </div>
+</div>
+
+<div class="conn"><div class="lbl">이 루프를 4개 기능으로 구현한다</div><div class="arrow">▼</div></div>
+
+<!-- ═══════════ S2. PPPP ═══════════ -->
+<div class="sec">
+  <div class="sec-tag">2 — 무엇을 만드는가</div>
+  <div class="sec-title">PPPP Framework — 마케팅 4P의 디지털 전환</div>
+  <div class="sec-why">전개 순서 = <b>Page → Platform → Posting → Program</b>. 눈에 보이는 지도(Page)로 신뢰를 만들고, 지능(Platform)을 얹고, 의사결정(Posting)과 실행(Program)으로 확장한다.</div>
+  <div class="pppp-grid">
+
+    <div class="pcard pc2">
+      <div class="head">
+        <div class="seq">STEP 1 · 지금 구축 중</div>
+        <h3>Page</h3>
+        <div class="conv">Product/Price → Page</div>
+      </div>
+      <div class="body">
+        <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">"건물이 비었다"는 데이터는 세상에 존재하지 않는다. <b>결합해서 만들어야</b> 하고, 만들어야 눈에 보인다. 보여야 신뢰가 생긴다.</span></div>
+        <div class="pf"><span class="k how-k">구현</span><span class="txt">공실률 = 1 − (활성 점포 ÷ 상가 호 수). 상가정보(분자) ⊕ 건축물대장(분모) ⊕ GIS 폴리곤 결합 → <span class="naver">네이버 지도</span> 위 렌더 + Three.js 3D 트윈</span></div>
+        <div class="pf"><span class="k dat-k">데이터</span><span class="txt">소상공인 상가정보 · 건축물대장 · GIS건물폴리곤 · 서울 생활인구(KT) · SGIS 인구밀도 · 부동산원 임대/공실</span></div>
+        <div class="pf"><span class="k out-k">출력</span><span class="txt">건물 상태색 <span class="vac-dots">🟢만실 🟡부분 🟠고공실 🔴공실의심</span> + 시간 슬라이더 유동인구 흐름 + 건물 10년 업종 히스토리</span></div>
+      </div>
+      <div class="design"><div class="dk">CLAUDE DESIGN 적용</div><div class="dv">지도 위 한국형 패턴 — 건물 클릭 → <b>바텀시트</b> 상세, 공실 위험도 색 <b>MapMarkerPin</b> + <b>VacancyLegend</b>. 히트맵은 brand teal 계열, 길찾기만 네이버 그린</div></div>
+      <div class="kpi">KPI: 로딩 <b>&lt;3초</b> · <b>60fps</b> · status 정확도 <b>70%+</b></div>
+    </div>
+
+    <div class="pcard pc1">
+      <div class="head">
+        <div class="seq">STEP 2 · 지능화</div>
+        <h3>Platform</h3>
+        <div class="conv">Place → Platform</div>
+      </div>
+      <div class="body">
+        <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">상권에 대한 <b>첫 인식·정보·평가가 일어나는 디지털 공간</b>을 운영하는 것 — 분석 도구가 아니라 스킨십 루프의 입구이자 출구.</span></div>
+        <div class="pf"><span class="k how-k">구현</span><span class="txt">상권 디지털 프로필(노출량·고객층·감성지수) + <b>LSTM</b> 공실·매출 예측 + <b>GNN</b> 업종 시너지/잠식 분석 기반 AI 추천</span></div>
+        <div class="pf"><span class="k dat-k">데이터</span><span class="txt">서울 상권분석서비스 시계열(추정매출·개폐업률·길단위인구) · LOCALDATA 개폐업 이력(LSTM 라벨) · 리뷰 크롤링</span></div>
+        <div class="pf"><span class="k out-k">출력</span><span class="txt">페르소나·예산·업종 입력 → <b>적합 상권/입지 Top-K 추천</b> + 상권 카드(분위기 키워드·대표 이미지)</span></div>
+      </div>
+      <div class="design"><div class="dk">CLAUDE DESIGN 적용</div><div class="dv">고객이 상권을 "처음 만나는 화면" — 상권 카드 · 감성 프로필이 앱의 첫 스킨십 면(面). AI 추천은 <b>brand teal</b>로 SpaceOS 고유 기능임을 표시</div></div>
+      <div class="kpi">KPI: Top-3 정확도 <b>70%+</b> (MVP) → 85% → 90%</div>
+    </div>
+
+    <div class="pcard pc3">
+      <div class="head">
+        <div class="seq">STEP 3 · 의사결정</div>
+        <h3>Posting</h3>
+        <div class="conv">Promotion → Posting</div>
+      </div>
+      <div class="body">
+        <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">추천만으로는 아무도 계약하지 않는다. <b>비용-효용을 숫자로</b> 보여줘야 입점 의사결정이 일어난다 — 분석을 '실행'으로 잇는 관문.</span></div>
+        <div class="pf"><span class="k how-k">구현</span><span class="txt"><b>LSTM 매출 시뮬레이터</b> + ROI 계산기. 전략 3종: 고급화(객단가 3만·회전 3회) / 가성비(1.2만·8회) / 기능중심(배달·임대료 80%↓)</span></div>
+        <div class="pf"><span class="k dat-k">데이터</span><span class="txt">공정위 가맹정보(가맹금·인테리어 비용·평균매출) · 상권분석 추정매출/소득소비 · 부동산원 임대료 CSV</span></div>
+        <div class="pf"><span class="k out-k">출력</span><span class="txt">3개 시나리오 × <b>12개월 매출·회수기간·리스크</b> + PDF 1-pager (B2B 영업 무기)</span></div>
+      </div>
+      <div class="design"><div class="dk">CLAUDE DESIGN 적용</div><div class="dv">3개 시나리오 <b>비교 Card</b> 컴포넌트 + 재무 숫자의 한글 가독성(15px·행간 1.5). 결제·정산 연동 시 <b>NaverPayButton은 공식 에셋 고정 슬롯</b></div></div>
+      <div class="kpi">KPI: 데이터 일치율 <b>±15%</b> · 유료 전환 의향 <b>30%+</b></div>
+    </div>
+
+    <div class="pcard pc4">
+      <div class="head">
+        <div class="seq">STEP 4 · 실행/회수</div>
+        <h3>Program</h3>
+        <div class="conv">Promotion → Program</div>
+      </div>
+      <div class="body">
+        <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">입점 후 생존은 마케팅이 결정한다. 고객의 ③기록(리뷰·사진)을 <b>만들어내는 촉진자</b> — 폐루프를 완성해 데이터가 되돌아오게 한다.</span></div>
+        <div class="pf"><span class="k how-k">구현</span><span class="txt"><b>LLM(Claude) 프롬프트 체인</b>으로 채널별 콘텐츠 생성 + vision 상가 이미지 분석 + 오프라인 행사 카탈로그 50종 상권 매칭</span></div>
+        <div class="pf"><span class="k dat-k">데이터</span><span class="txt">네이버 검색/데이터랩(블로그·트렌드) · 카카오 로컬(현존 점포 검증) · 리뷰/이미지 크롤링 · 행사 템플릿</span></div>
+        <div class="pf"><span class="k out-k">출력</span><span class="txt">채널 믹스(인스타·블로그·당근·GFA) + LLM 콘텐츠 + A/B 테스트 + 축제·팝업 <b>행사 매칭</b></span></div>
+      </div>
+      <div class="design"><div class="dk">CLAUDE DESIGN 적용</div><div class="dv">생성 콘텐츠의 <b>채널별 미리보기</b> UI. Humanistic Authority(균형·공생·공감) 톤을 LLM 프롬프트와 UI 문구에 일관 적용</div></div>
+      <div class="kpi">KPI: B2B 파일럿 <b>5~10건</b> · 공실 해소 기간 <b>30% 단축</b></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="conn"><div class="lbl">4개 기능은 하나의 데이터 척추를 공유한다</div><div class="arrow">▼</div></div>
+
+<!-- ═══════════ S3. DATA ═══════════ -->
+<div class="sec">
+  <div class="sec-tag">3 — 데이터는 어떻게 흐르는가</div>
+  <div class="sec-title">Bronze → Silver → Gold — 공공데이터 결합이 곧 제품이다</div>
+  <div class="sec-why">원칙: <b>데이터가 UI를 결정한다.</b> 먼저 데이터를 확보하고, 지도 위 표현은 그 데이터로 결정한다. 키는 실질 3개+지도, 전부 무료(LLM만 유료).</div>
+  <div class="data-flow">
+    <div class="dlayer bronze">
+      <h4>Bronze <span class="medal">수집 (raw)</span></h4>
+      <div class="cap">API 콜렉터가 원본 JSON 적재</div>
+      <div class="ditem"><b>상가정보</b> — 활성 점포 <span class="src">(공실의 분자)</span></div>
+      <div class="ditem"><b>건축물대장</b> — 상가 호 수 <span class="src">(공실의 분모)</span></div>
+      <div class="ditem"><b>GIS 폴리곤</b> — 건물 형상 <span class="src">(시각화·매칭보정)</span></div>
+      <div class="ditem"><b>생활인구</b>(KT) · <b>SGIS</b> 밀도 · <b>부동산원</b> 임대/공실</div>
+      <div class="ditem"><b>상권분석 시계열</b> · <b>LOCALDATA</b> 개폐업 · 리뷰/트렌드</div>
+    </div>
+    <div class="darr">▶</div>
+    <div class="dlayer silver">
+      <h4>Silver <span class="medal">정제·매칭 (PostGIS)</span></h4>
+      <div class="cap">모든 테이블에 4개 조인 키를 부여 — B단계 정제의 핵심</div>
+      <div class="ditem">건물 <b>bdMgtSn</b> ↔ 점포 <b>bizesId</b> ↔ 상권 <b>TRDAR_CD</b> ↔ 행정동 <b>adongCd</b></div>
+      <div class="ditem">점포↔건물 매칭: bdMgtSn 그룹핑 → 지번으로 대장 조회 → 좌표 PIP 폴백 <span class="src">(match_method 기록)</span></div>
+      <div class="ditem">dim_building · fact_store · map_store_building</div>
+    </div>
+    <div class="darr">▶</div>
+    <div class="dlayer gold">
+      <h4>Gold <span class="medal">기능별 산출</span></h4>
+      <div class="cap">각 Gold 테이블이 P 하나를 먹여 살린다</div>
+      <div class="goldrow"><div class="gt"><b>page_building_master</b> — occupancy·상태색·GeoJSON</div><div class="to" style="color:#6FD9A3">→ Page</div></div>
+      <div class="goldrow"><div class="gt"><b>platform_district_timeseries</b> — LSTM 학습</div><div class="to" style="color:#2BC8D9">→ Platform</div></div>
+      <div class="goldrow"><div class="gt"><b>platform_store_graph</b> — GNN 노드/엣지</div><div class="to" style="color:#2BC8D9">→ Platform</div></div>
+      <div class="goldrow"><div class="gt"><b>posting_cost_benefit</b> — 비용·추정매출·임대료</div><div class="to" style="color:#E8B54D">→ Posting</div></div>
+      <div class="goldrow"><div class="gt"><b>program_content_context</b> — 리뷰·트렌드·이미지</div><div class="to" style="color:#C9A6FF">→ Program</div></div>
+    </div>
+  </div>
+  <div class="keys-strip">🔑 인증키: <b>DATA_GO_KR</b>(상가·대장·부동산원·가맹정보 공용) · <b>SEOUL_OPENAPI</b>(생활인구+상권분석 공용) · <b>SGIS</b> · <b>NAVER_MAPS</b> · 확장 3종 <b>LOCALDATA</b>(개폐업)·<b>KAKAO</b>(검증)·<b>LLM</b>(유일한 유료) — Gold까지 전부 이 키들로 조달</div>
+</div>
+
+<div class="conn"><div class="lbl">데이터가 화면이 될 때의 규칙</div><div class="arrow">▼</div></div>
+
+<!-- ═══════════ S4. DESIGN ═══════════ -->
+<div class="sec">
+  <div class="sec-tag">4 — Claude Design (통합 레이어)</div>
+  <div class="sec-title">Design 트랙 — 4개 산출물을 "하나의 앱"으로 묶는다</div>
+  <div class="sec-why">디자인도 코드처럼 <b>토큰 → 컴포넌트 → Storybook</b>의 단일 출처. 목표: "네이버 지도·네이버페이와 한 화면에 있어도 자연스러운" 한국형 앱.</div>
+  <div class="design-grid">
+    <div class="dcard">
+      <h4>색의 역할 분리 (핵심 규칙)</h4>
+      <ul>
+        <li><span class="sw teal-sw"></span><b>brand teal #0EA5B7</b> = SpaceOS 고유 기능 (AI 추천·공실 히트맵)</li>
+        <li><span class="sw green-sw"></span><span class="naver">네이버 그린 #03C75A</span> = 네이버 연동 맥락에서만 (길찾기·페이). 남발 금지</li>
+        <li>공실 상태색 🟢🟡🟠🔴 은 데이터 의미 전용</li>
+      </ul>
+    </div>
+    <div class="dcard">
+      <h4>단일 출처 & 컴포넌트</h4>
+      <ul>
+        <li><b>tokens.json ⇄ tokens/*.ts</b> 동기화 필수, 색상 하드코딩 금지</li>
+        <li>Button · Card · <b>BottomSheet</b> · <b>MapMarkerPin</b> · VacancyLegend</li>
+        <li><span class="naver">NaverPayButton</span>은 공식 에셋 <b>고정 슬롯</b> (변경 시 패널티)</li>
+      </ul>
+    </div>
+    <div class="dcard">
+      <h4>한국형 UX 원칙</h4>
+      <ul>
+        <li>지도 위 정보는 <b>바텀시트</b>로 (네이버지도·당근 패턴)</li>
+        <li>한글 가독성: Pretendard · 본문 15px · 행간 1.5</li>
+        <li>접근성 <b>WCAG AA</b> 대비 — Storybook a11y 검사로 강제</li>
+      </ul>
+    </div>
+    <div class="dcard">
+      <h4>통합의 완성 = 대시보드</h4>
+      <ul>
+        <li><b>1화면에서 4트랙</b>: 감성(Platform)·히트맵(Page)·입점(Posting)·마케팅(Program)</li>
+        <li>차별화 지표 <b>Humanistic Authority</b> — 균형·공생·공감</li>
+        <li>산출물 기록·공유는 Storybook 정적 빌드</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="conn"><div class="lbl">그래서 지금, 무엇부터 하는가</div><div class="arrow">▼</div></div>
+
+<!-- ═══════════ S5. ROADMAP ═══════════ -->
+<div class="sec">
+  <div class="sec-tag">5 — 전개 순서 (우리는 지금 여기)</div>
+  <div class="sec-title">빌드 워크트리 — 1단계 = 1 바이브 사이클 (PRD → AI 코드 생성 → /verify)</div>
+  <div class="sec-why">크리티컬 패스 = <b>데이터가 지도에 뜨는 최단 경로.</b> 지도 확대(4-1)는 데이터와 독립이라 지금 병렬 진행.</div>
+  <div class="phase-track">
+    <div class="ph done"><span class="flag">✅ 완료</span><div class="pn">PHASE 0</div><div class="pt">결정·기반</div><div class="pd">거점 확정(가로수길)<br>4대 데이터 조사<br>PoC 설계 + D1 스키마</div></div>
+    <div class="ph now"><span class="flag">★ 현재</span><div class="pn">(A) 0-3</div><div class="pt">인증키 발급</div><div class="pd">키 5종 + 필드 스펙 확정<br><b>Phase 1 전체의 전제</b><br>→ .env 채우면 지도가 뜬다</div></div>
+    <div class="ph"><div class="pn">PHASE 1</div><div class="pt">수집 (Bronze)</div><div class="pd">임대시세·인구밀도·유동인구 <b>병렬</b><br>핵심: <b>건물 단위 공실</b><br>(상가×대장×폴리곤 결합)</div></div>
+    <div class="ph"><div class="pn">PHASE 2</div><div class="pt">가공 (Silver/Gold)</div><div class="pd">점포↔건물 매칭<br>occupancy 산출<br>→ GeoJSON</div></div>
+    <div class="ph"><div class="pn">PHASE 3</div><div class="pt">백엔드 API</div><div class="pd">/heatmap · /buildings<br>더미 → 실데이터 교체<br>4대 레이어 토글</div></div>
+    <div class="ph para"><span class="flag">∥ 병렬 가능</span><div class="pn">PHASE 4</div><div class="pt">프론트 Page</div><div class="pd"><b>4-1 지도 확대(지금)</b><br>히트맵 레이어·토글<br>클릭→3D 트윈·시간 슬라이더</div></div>
+    <div class="ph"><div class="pn">PHASE 5</div><div class="pt">ML (Platform)</div><div class="pd">LSTM 공실 예측<br>GNN 업종 추천<br>→ AI 정확도 70%+</div></div>
+    <div class="ph"><div class="pn">PHASE 6</div><div class="pt">Posting·Program</div><div class="pd">입점 비용-효용 분석<br>LLM 마케팅 자동화<br>→ PPPP 완성</div></div>
+  </div>
+  <div class="cpath"><b>크리티컬 패스:</b> <span class="mono">(A) 키 발급 → 1-1·1-4 수집 → 2-2·2-3 가공 → 3-1 API → 4-2 지도 레이어</span> — 이 선이 뚫리면 "가로수길 건물 공실이 지도에 뜬다"</div>
+  <div class="steps">
+    <div class="step"><div class="sn">STEP 1 · 사용자</div><div class="st">키 검증</div><div class="so">지도 렌더 확인<br>(회의 1번 ✅)</div></div>
+    <div class="steps-arr">▶</div>
+    <div class="step"><div class="sn">STEP 2 · 사용자→개발</div><div class="st">D1 프로브 실행</div><div class="so">실제 스키마 로그 인계</div></div>
+    <div class="steps-arr">▶</div>
+    <div class="step"><div class="sn">STEP 3 · 개발</div><div class="st">Bronze 콜렉터</div><div class="so">building_vacancy.py 등 4종</div></div>
+    <div class="steps-arr">▶</div>
+    <div class="step"><div class="sn">STEP 4 · 개발</div><div class="st">Gold+GeoJSON</div><div class="so">/heatmap 실데이터 교체</div></div>
+    <div class="steps-arr">▶</div>
+    <div class="step"><div class="sn">STEP 5 · 환경</div><div class="st">백엔드 기동</div><div class="so">⚠ Python 3.11 필요</div></div>
+    <div class="steps-arr">▶</div>
+    <div class="step"><div class="sn">STEP 6 · 함께</div><div class="st">실데이터 지도</div><div class="so">회의 2·3번 완성</div></div>
+    <div class="steps-arr">▶</div>
+    <div class="step exit"><div class="sn">STEP 7 · PoC EXIT</div><div class="st">정합 검증</div><div class="so">부동산원 ±5%p<br>로드뷰 라벨 정확도 70%+</div></div>
+  </div>
+</div>
+
+<!-- footer -->
+<div class="ftr">
+  <div>근거 문서: <b>10-platform-redefinition</b> · <b>poc-building-vacancy</b> · <b>spaceos-vibe-build-sequence</b> · <b>api-keys-and-specs</b> · <b>next-steps-after-keys</b> · <b>feature-design-system</b></div>
+  <div><b>SpaceOS</b> — 물리적 상권의 디지털 트윈 플랫폼 · 이 청사진은 살아있는 문서다: 단계가 끝날 때마다 ★을 옮긴다</div>
+</div>
+
+</body>
+</html>

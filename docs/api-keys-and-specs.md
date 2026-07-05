@@ -1,6 +1,7 @@
-# A단계 — 무료 API 인증키 발급 절차 + 응답 필드 스펙
+# API 인증키 발급 절차 + 응답 필드 스펙 — A단계(Page) + B단계(PPPP 전체)
 
-> 빌드 순서(§0-3)의 산출물. Page의 4대 데이터(유동인구·공실률·임대시세·인구밀도)를 확보하기 위한 인증키 발급 방법과 각 API 응답 필드를 한곳에 정리한다. 조인·시각화 설계 근거는 [poc-building-vacancy.md](poc-building-vacancy.md) 참조.
+> **A단계(§0~6)**: Page의 4대 데이터(유동인구·공실률·임대시세·인구밀도) 인증키. 조인·시각화 설계 근거는 [poc-building-vacancy.md](poc-building-vacancy.md) 참조.
+> **B단계(§8~9)**: Platform·Posting·Program까지 Gold 데이터 구축에 필요한 확장 키. 신규 발급은 3개(LOCALDATA·카카오·LLM)뿐이고 나머지는 기존 키에 활용신청만 추가한다.
 
 ## 0. 한눈에 보기 — 키 5종 × 4대 데이터
 
@@ -153,22 +154,113 @@
 
 ---
 
-## 7. `.env` 체크리스트
+## 7. `.env` 체크리스트 (A+B단계 통합)
 
 ```ini
 # apps/frontend/.env
 VITE_NAVER_MAPS_KEY_ID=          # NCP Maps Client ID (도메인 등록 필수)
 
-# data/.env  (백엔드/수집)
-DATA_GO_KR_SERVICE_KEY=          # 공공데이터포털 Decoding 키 (상가·대장·부동산원 공용)
-SEOUL_OPENAPI_KEY=               # 서울 열린데이터광장 (생활인구)
+# data/.env  (수집 파이프라인)
+DATA_GO_KR_SERVICE_KEY=          # 공공데이터포털 Decoding 키 (상가·대장·부동산원 + 국세청·가맹정보 공용)
+SEOUL_OPENAPI_KEY=               # 서울 열린데이터광장 (생활인구 + 상권분석서비스 공용)
 SGIS_CONSUMER_KEY=               # 통계청 SGIS
 SGIS_CONSUMER_SECRET=
-NAVER_CLIENT_ID=                 # (선택) 검색/데이터랩
+LOCALDATA_API_KEY=               # [B·Platform] 지방행정 인허가 — 개·폐업 이력
+KAKAO_REST_API_KEY=              # [B·Program/Posting] 카카오 로컬 (장소·카테고리)
+NAVER_CLIENT_ID=                 # [B·Program] 검색(블로그·지역)+데이터랩 — 선택→필수 승격
 NAVER_CLIENT_SECRET=
+INSTAGRAM_ACCESS_TOKEN=          # [B·Program] 보류 (비즈니스 계정+앱 검수 필요)
+IG_USER_ID=
+
+# apps/backend/.env
+LLM_API_KEY=                     # [B·Program] Anthropic Claude 권장 (console.anthropic.com)
+NAVER_MAPS_KEY_ID=               # NCP REST (Geocoding)
+NAVER_MAPS_CLIENT_SECRET=
 ```
 
 ### 우선순위 (크리티컬 패스)
-1. **`DATA_GO_KR_SERVICE_KEY`** — 건물 공실(1-4)·거시공실·임대 → [probe_garosu_d1.py](../data/probe_garosu_d1.py) 실행 관문.
+1. **`DATA_GO_KR_SERVICE_KEY`** — 건물 공실(1-4)·거시공실·임대 → [probe_garosu_d1.py](../data/probe_garosu_d1.py) 실행 관문. 발급 후 **국세청·가맹정보 활용신청도 같은 날 몰아서** 처리.
 2. **`VITE_NAVER_MAPS_KEY_ID`** — 이미 만든 MapShell 지도 렌더.
-3. `SEOUL_OPENAPI_KEY` → 유동인구. 4. `SGIS_*` → 인구밀도.
+3. `SEOUL_OPENAPI_KEY` → 유동인구 + 상권분석 시계열(Platform 학습 데이터의 핵심).
+4. `SGIS_*` → 인구밀도.
+5. `LOCALDATA_API_KEY` → 개·폐업 이력(LSTM 라벨). **승인 대기가 있을 수 있어 A단계와 동시 신청 권장.**
+6. `KAKAO_REST_API_KEY`·`NAVER_CLIENT_ID/SECRET` → 즉시발급, Program 수집 시점에.
+7. `LLM_API_KEY` → Program 구현 착수 시(유일한 유료).
+
+---
+
+## 8. B단계 — Platform·Posting·Program 확장 키
+
+### 0-B. 한눈에 보기 — 기능 × 데이터 × 키
+
+| 기능 | 데이터 | 소스 | .env 변수 | 신규 발급 |
+|---|---|---|---|---|
+| Platform | 상권 시계열: 추정매출·점포수·개폐업률·길단위인구·소득소비·상권변화지표 | 서울 상권분석서비스 | `SEOUL_OPENAPI_KEY` (기존) | ✕ |
+| Platform | 개·폐업 인허가 이력 → LSTM 라벨·공실 히스토리 | LOCALDATA | `LOCALDATA_API_KEY` | **○** |
+| Platform·Page | 사업자 휴폐업 상태 검증 | 국세청(data.go.kr) | `DATA_GO_KR_SERVICE_KEY` (기존) | ✕(활용신청) |
+| Posting | 업종별 창업비용(가맹금·인테리어) | 공정위 가맹정보(data.go.kr) | `DATA_GO_KR_SERVICE_KEY` (기존) | ✕(활용신청) |
+| Posting | 임대시세·공실률·추정매출 | §4 CSV + 상권분석 재사용 | — | ✕ |
+| Program | LLM 콘텐츠 생성 + 상가 이미지 분석(vision) | Anthropic Claude | `LLM_API_KEY` (backend) | **○**(유료) |
+| Program | 블로그 리뷰·검색 트렌드 | 네이버 검색+데이터랩(§5-B) | `NAVER_CLIENT_ID/SECRET` | **○** |
+| Program·Posting | 장소·카테고리·좌표 크로스체크 | 카카오 로컬 | `KAKAO_REST_API_KEY` | **○** |
+| Program | 인스타그램 해시태그·리뷰 | Meta Graph API / 크롤러 | `INSTAGRAM_ACCESS_TOKEN` | △ 보류 |
+
+> ⚠️ **서울 한정 주의**: 생활인구(§2)·상권분석서비스(§8-A)는 서울시만 제공. 거점을 라페스타(고양시)로 확장하면 경기데이터드림 + 소상공인 상권정보로 대체 설계가 필요하다. PoC 거점(신사동 가로수길)은 문제 없음.
+
+### 8-A. 서울 상권분석서비스 — Platform 시계열 (기존 `SEOUL_OPENAPI_KEY` 공용)
+- 발급: 추가 키 불필요 — §2와 동일 키·동일 URL 형식(`http://openapi.seoul.go.kr:8088/{KEY}/json/{SERVICE}/{START}/{END}/…`). 분기 단위 갱신.
+- 주요 서비스(상권 단위, 서비스명은 상세페이지 [미리보기]에서 최종 확인):
+  `TbgisTrdarRelm`(상권영역 폴리곤) · `VwsmTrdarSelngQq`(추정매출) · `VwsmTrdarStorQq`(점포·개폐업) · `VwsmTrdarFlpopQq`(길단위인구) · `VwsmTrdarRepopQq`(상주인구) · `VwsmTrdarWrcPopltnQq`(직장인구) · `VwsmTrdarIncomeQq`(소득소비) · `VwsmTrdarFcltyQq`(집객시설) · `VwsmTrdarIxQq`(상권변화지표)
+
+| 응답 필드(대표) | 의미 | 용도 |
+|---|---|---|
+| `TRDAR_CD` / `TRDAR_CD_NM` | 상권 코드/명 | ★ Platform의 조인 키 (가로수길 상권 필터) |
+| `STDR_YYQU_CD` | 기준 년분기 | LSTM 시계열 축 |
+| `SVC_INDUTY_CD_NM` | 서비스 업종명 | GNN 노드 속성 |
+| `THSMON_SELNG_AMT` | 당월(분기) 추정매출액 | LSTM 피처 + Posting 예상매출 근거 |
+| `STOR_CO` / `OPBIZ_RT` / `CLSBIZ_RT` | 점포수 / 개업률 / 폐업률 | LSTM 피처·라벨 보조 |
+
+### 8-B. LOCALDATA 지방행정 인허가 `LOCALDATA_API_KEY` — 개·폐업 이력
+1. [localdata.go.kr](https://www.localdata.go.kr) 회원가입 → **오픈API 이용신청** → 인증키 발급(승인에 1~2일 걸릴 수 있음 → **A단계와 동시 신청**).
+2. REST: `http://www.localdata.go.kr/platform/rest/TO0/openDataApi?authKey={KEY}&localCode={개방자치단체코드}&state=Y|N&pageIndex=…` (강남구 코드는 포털의 개방자치단체코드표에서 확인). 전체 이력은 **일괄 CSV 다운로드**도 제공 — 초기 적재는 CSV, 증분은 API 권장.
+
+| 응답 필드(대표) | 의미 |
+|---|---|
+| `apvPermYmd` / `dcbYmd` | 인허가일자 / **폐업일자** (★ LSTM 라벨·공실 히스토리) |
+| `trdStateNm` / `dtlStateNm` | 영업상태 / 상세상태 |
+| `siteWhlAddr` / `rdnWhlAddr` | 지번/도로명 주소 (§1-A `bdMgtSn`과 조인) |
+| `uptaeNm` | 업태명 (GNN 노드 분류) |
+
+- 보조 검증: **국세청 사업자등록상태조회**(data.go.kr `15081808`, 기존 키 공용) — 휴폐업 여부 크로스체크.
+
+### 8-C. 공정위 가맹사업 정보공개서 — Posting 창업비용 (기존 `DATA_GO_KR_SERVICE_KEY` 공용)
+- 신청: data.go.kr에서 "공정거래위원회 가맹정보" 검색 → 활용신청(자동승인). 원자료: [franchise.ftc.go.kr](https://franchise.ftc.go.kr).
+- 제공: 브랜드별 **가맹금·보증금·인테리어 비용·기준면적, 가맹점 평균 매출** → `posting.py`의 전략별(고급화/가성비/기능중심) 초기 투자비·객단가 가정을 실데이터로 치환하는 소스. 더미 상수의 `TODO` 해소 지점.
+
+### 8-D. LLM `LLM_API_KEY` — Program 콘텐츠 생성 (backend, 유일한 유료 키)
+- 권장: **Anthropic Claude** — [console.anthropic.com](https://console.anthropic.com) 가입 → API Keys 발급 → `apps/backend/.env`의 `LLM_API_KEY`. ([config.py](../apps/backend/app/core/config.py) `llm_api_key` 이미 존재)
+- 모델: 품질 우선 `claude-sonnet-5`, 대량·저비용 생성 `claude-haiku-4-5-20251001`. **vision 내장**이라 상가 이미지 분석(Program의 이미지 정보 활용)에 별도 Vision API가 불필요.
+- `pip install anthropic langchain-anthropic` (requirements.txt에 추가). feature-program.md의 OpenAI/Gemini도 래퍼(`services/llm.py`)만 바꾸면 호환되도록 작성.
+
+### 8-E. 카카오 로컬 `KAKAO_REST_API_KEY` — 장소·카테고리 크로스체크
+1. [developers.kakao.com](https://developers.kakao.com) → 애플리케이션 추가 → **REST API 키** 복사(즉시발급, 무료 쿼터).
+2. 호출: `GET https://dapi.kakao.com/v2/local/search/keyword.json?query=…&x=…&y=…&radius=…` — 헤더 `Authorization: KakaoAK {KEY}`.
+- 용도: §1-A 상가정보의 폐업 반영 지연을 보완하는 **현존 점포 크로스체크** + 카테고리·장소URL(리뷰 크롤링 시드).
+
+### 8-F. 인스타그램·구글 — 보류/선택
+- **인스타그램 Graph API**: 해시태그 검색에 비즈니스 계정 + 앱 검수 필요, 주 30개 해시태그 제한 → PoC 단계에서는 보류하고 [data/crawlers](../data/README.md)의 Playwright 크롤러로 대체. `.env` 슬롯(`INSTAGRAM_ACCESS_TOKEN`)만 유지.
+- **Google Places API**: 리뷰·평점·사진 확보 가능하나 유료 쿼터 관리 필요 → 네이버·카카오로 부족할 때만.
+
+---
+
+## 9. Gold 레이어 매핑 — 기능별 산출 테이블
+
+| Gold 테이블 | 기능 | 조인 키 | 소스(§) |
+|---|---|---|---|
+| `gold/page_building_master` | Page | `bdMgtSn` | 1-A + 1-B + 6(폴리곤) |
+| `gold/platform_district_timeseries` | Platform(LSTM) | `TRDAR_CD` × 년분기 | 8-A + 2 + 4 + 8-B(폐업 집계) |
+| `gold/platform_store_graph` | Platform(GNN) | `bizesId`(노드) | 1-A + 8-A(업종·매출) + 리뷰 크롤링 |
+| `gold/posting_cost_benefit` | Posting | 업종코드 × 전략 | 8-C + 8-A(추정매출·소득소비) + 4(임대료) |
+| `gold/program_content_context` | Program | `TRDAR_CD` / `bizesId` | 5-B(블로그·트렌드) + 8-E + 크롤링(리뷰·이미지) |
+
+- 공통 조인 축: **건물(`bdMgtSn`) ↔ 점포(`bizesId`) ↔ 상권(`TRDAR_CD`) ↔ 행정동(`adongCd`)**. Silver 단계에서 이 4개 키를 모든 테이블에 부여하는 것이 B단계 정제의 핵심 작업.
