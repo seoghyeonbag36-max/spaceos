@@ -13,8 +13,9 @@
 
 주의:
   - 아래 3개 API 각각 data.go.kr에서 '활용신청'이 승인돼 있어야 한다(§ 하단 목록).
-  - 건축물대장 엔드포인트는 성숙한 BldRgstService_v2 기준. 건축HUB(15134735) 승인 시
-    BASE_BLD 를 그쪽 경로로 교체(필드명은 유사). 실패 시 로그로 원인 표시.
+  - 건축물대장 엔드포인트는 건축HUB(15134735, BldRgstHubService) 기준.
+    ※ 구 BldRgstService_v2(15044713)는 2026-07 확인 시 서비스 종료('Unexpected errors') —
+      건축HUB가 유일한 경로다. 실패 시 로그로 원인 표시.
   - 이 스크립트는 '검증용'이다. 확정된 필드/조인은 collectors/building_vacancy.py 로 옮긴다.
 """
 from __future__ import annotations
@@ -22,6 +23,10 @@ from __future__ import annotations
 import os
 import sys
 from collections import defaultdict
+
+# Windows 콘솔(cp949)에서 특수문자 출력 크래시 방지
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 try:
     import requests
@@ -37,7 +42,7 @@ GANGNAM_SIGUNGU = "11680"   # 강남구 시군구코드
 SINSA_BJDONG = "10700"      # 신사동 법정동코드 뒤 5자리(1168010700) ※실행 시 재확인
 
 BASE_SDSC = "http://apis.data.go.kr/B553077/api/open/sdsc2"
-BASE_BLD = "http://apis.data.go.kr/1613000/BldRgstService_v2"
+BASE_BLD = "http://apis.data.go.kr/1613000/BldRgstHubService"
 COMMERCIAL_PURPS = ("근린생활시설", "판매시설", "업무시설", "숙박시설", "위락시설")
 
 

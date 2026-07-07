@@ -28,7 +28,7 @@ data/
 
 ```bash
 py -m data.collectors.seoul_trdar    # [Platform] 상권분석 분기 시계열 (SEOUL_OPENAPI_KEY)
-py -m data.collectors.localdata      # [Platform] 개·폐업 인허가 이력 (LOCALDATA_API_KEY)
+py -m data.collectors.localdata      # [Platform] 개·폐업 인허가 이력 (⚠ data.go.kr 이관 대기 — 수집기 TODO 참조)
 py -m data.collectors.kakao_local    # [Program/Posting] 현존 점포·카테고리 (KAKAO_REST_API_KEY)
 py -m data.collectors.naver_blog     # [Program] 블로그 리뷰 + 데이터랩 트렌드 (NAVER_CLIENT_ID/SECRET)
 py -m data.pipelines.build_gold      # Bronze → Gold 4테이블 (platform_district_timeseries 등)

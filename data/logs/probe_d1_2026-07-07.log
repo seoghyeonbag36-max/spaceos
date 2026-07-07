@@ -1,0 +1,23 @@
+
+=== STEP 1. 소상공인 상가정보 (storeListInRadius) ===
+  총 2926건, 수신 1000건
+  응답 필드(39): ['adongCd', 'adongNm', 'bizesId', 'bizesNm', 'bldMngNo', 'bldMnno', 'bldNm', 'bldSlno', 'brchNm', 'ctprvnCd', 'ctprvnNm', 'dongNo', 'flrNo', 'hoNo', 'indsLclsCd', 'indsLclsNm', 'indsMclsCd', 'indsMclsNm', 'indsSclsCd', 'indsSclsNm', 'ksicCd', 'ksicNm', 'lat', 'ldongCd', 'ldongNm', 'lnoAdr', 'lnoCd', 'lnoMnno', 'lnoSlno', 'lon', 'newZipcd', 'oldZipcd', 'plotSctCd', 'plotSctNm', 'rdnm', 'rdnmAdr', 'rdnmCd', 'signguCd', 'signguNm']
+  ▶ 건물관리번호 필드 존재? 예
+  샘플 1건: {'bizesId': 'MA010120220803379774', 'bizesNm': '이루다크리에이티브', 'brchNm': '', 'indsLclsCd': 'M1', 'indsLclsNm': '과학·기술', 'indsMclsCd': 'M105', 'indsMclsNm': '광고', 'indsSclsCd': 'M10504', 'indsSclsNm': '광고물 설계/제작업', 'ksicCd': 'M71393', 'ksicNm': '광고물 문안, 도안, 설계 등 작성업', 'ctprvnCd': '11', 'ctprvnNm': '서울특별시', 'signguCd': '11680', 'signguNm': '강남구', 'adongCd': '11680510', 'adongNm': '신사동', 'ldongCd': '1168010700', 'ldongNm': '신사동', 'lnoCd': '1168010700105050000', 'plotSctCd': '1', 'plotSctNm': '대지', 'lnoMnno': 505, 'lnoSlno': '', 'lnoAdr': '서울특별시 강남구 신사동 505', 'rdnmCd': '116802102001', 'rdnm': '서울특별시 강남구 강남대로', 'bldMnno': 656, 'bldSlno': '', 'bldMngNo': '1168010700105050002011522', 'bldNm': '무림빌딩', 'rdnmAdr': '서울특별시 강남구 강남대로 656', 'oldZipcd': '135887', 'newZipcd': '06027', 'dongNo': '', 'flrNo': '3', 'hoNo': '', 'lon': 127.018936349846, 'lat': 37.5203780927031}
+
+=== STEP 2. 건물(bdMgtSn)별 그룹핑 → occupancy 분자 ===
+  건물 수(고유 bdMgtSn): 463
+   - 1168010800100060021005574: 활성점포 38개 (예: 명품세양세탁)
+   - 1168010700105110001027324: 활성점포 24개 (예: 허센트)
+   - 1168010700105390011011882: 활성점포 13개 (예: 유쾌한해운이)
+   - 1168010700105110004027391: 활성점포 12개 (예: 비티엘파트너)
+   - 1168010700105100011011812: 활성점포 12개 (예: 피그닉)
+
+=== STEP 3. 건축물대장 조인 (지번 기반) → capacity 분모 ===
+  대상 지번: 시군구 11680 / 법정동 10700 / 본번 505 / 부번 0
+  [표제부] 1건
+    주용도: 업무시설 / 연면적: 8002.4 / 지상층수: 6 / 세대·가구·호: 0·0·0
+  [전유공용면적] 전체 0행 / 상업 전유 호(capacity 후보): 0
+  ▶ capacity 산출 가능? 집합 아님/미검출 → 층별개요·면적근사 폴백 필요
+
+=== D1 관통 검증 종료 — 위 로그로 필드/조인 확정 후 collector 구현 ===

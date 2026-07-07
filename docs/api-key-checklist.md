@@ -4,14 +4,18 @@
 >
 > ⚠️ 발급받은 키는 **이 문서/채팅에 붙여넣지 말 것.** 오직 로컬 `.env`(gitignore됨)에만. `.env`는 `data/.env.example`·`apps/frontend/.env.example`을 복사해 만든다.
 
-## 진행 요약 (2026-07-04 기준)
-- [x] 공공데이터포털 회원가입 + `상가(상권)정보(15012005)` 활용신청
-- [x] 공공데이터포털 `건축HUB 건축물대장정보(15134735)` 활용신청 ← ⚠️ 프로브는 `15044713` 기준(§1 참고)
-- [ ] 공공데이터포털 **Decoding 인증키**를 `data/.env`에 입력
-- [ ] 서울 열린데이터광장 인증키
-- [ ] 통계청 SGIS consumer_key/secret
-- [ ] 네이버 NCP Maps Client ID (+도메인 등록)
-- [ ] (선택) 네이버 개발자센터 검색/데이터랩
+## 진행 요약 (2026-07-07 기준 — 실호출 검증 완료)
+- [x] 공공데이터포털 회원가입 + `상가(상권)정보(15012005)` 활용신청 → **✅ 실호출 정상**
+- [x] 공공데이터포털 `건축HUB 건축물대장정보(15134735)` 활용신청 → **✅ 실호출 정상** (구 15044713은 서비스 종료 — 프로브를 HUB로 교체함)
+- [x] 공공데이터포털 **Decoding 인증키**를 `data/.env`에 입력
+- [x] 서울 열린데이터광장 인증키 → **✅ 실호출 정상**
+- [x] 통계청 SGIS consumer_key/secret → **✅ accessToken 발급 정상** (API 도메인이 sgisapi.mods.go.kr로 302 리다이렉트 — requests는 자동 추적하므로 무해)
+- [x] 네이버 NCP Maps Client ID 입력 → **✅ 인증 서버 200 + 쿼터 20만/월 확인** (localhost:5173 기준. 배포 시 도메인 추가 등록)
+- [x] 네이버 개발자센터 검색/데이터랩 → **✅ 실호출 정상**
+- [x] 카카오 REST 키 입력 + 카카오맵 사용 설정 ON → **✅ 실호출 정상** (가로수길 장소 검색 응답 확인)
+- [x] V-World `VWORLD_API_KEY` 발급·입력 → **✅ WFS 실호출 정상** — GIS건물통합 폴리곤 **1,252동 Bronze 수집 완료** (`data/collectors/vworld_bldg.py`, 신사동 1,112동 포함. 舊 국가공간정보포털 폐쇄로 V-World 이관, data.go.kr 항목은 링크 페이지)
+- [x] **D1 프로브 관통 성공** (2026-07-07) — 로그: [data/logs/probe_d1_2026-07-07.log](../data/logs/probe_d1_2026-07-07.log). 상가 2,926건·39필드·bdMgtSn 확인, 463동 그룹핑, 표제부 조인 성공. 전유부 0행 건물은 층별개요·면적근사 폴백 필요(설계 §1-2 예상 케이스)
+- 지방행정 인허가(舊 LOCALDATA): localdata.go.kr **2026-04-16 폐쇄** → data.go.kr 이관. 별도 키 불필요 — 업종별 인허가 API 활용신청만 추가([api-keys-and-specs.md §8-B](api-keys-and-specs.md))
 
 ---
 
@@ -24,7 +28,7 @@
 - **넣을 곳**: `data/.env` → `DATA_GO_KR_SERVICE_KEY=` (한 줄, 두 API 공용)
 - **활용신청할 API 목록**(같은 키가 각각에 인가됨):
   - [x] 소상공인 상가(상권)정보 — [15012005](https://www.data.go.kr/data/15012005/openapi.do)
-  - [ ] 건축물대장정보 — **권장 [15044713](https://www.data.go.kr/data/15044713/openapi.do)** (프로브와 일치) / 또는 신청한 건축HUB [15134735](https://www.data.go.kr/data/15134735/openapi.do)
+  - [x] 건축물대장정보 — **건축HUB [15134735](https://www.data.go.kr/data/15134735/openapi.do)** (신청·실호출 검증 완료. 구 15044713은 서비스 종료 — 프로브도 HUB 기준으로 교체됨)
   - [ ] (선택) 부동산원 임대동향 — [15002275](https://www.data.go.kr/data/15002275/openapi.do)
 - **확인**(브라우저): `http://apis.data.go.kr/B553077/api/open/sdsc2/storeListInRadius?serviceKey={디코딩키}&radius=400&cx=127.0230&cy=37.5205&type=json&numOfRows=5&pageNo=1`
 

@@ -237,7 +237,7 @@
       <div class="body">
         <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">상권에 대한 <b>첫 인식·정보·평가가 일어나는 디지털 공간</b>을 운영하는 것 — 분석 도구가 아니라 스킨십 루프의 입구이자 출구.</span></div>
         <div class="pf"><span class="k how-k">구현</span><span class="txt">상권 디지털 프로필(노출량·고객층·감성지수) + <b>LSTM</b> 공실·매출 예측 + <b>GNN</b> 업종 시너지/잠식 분석 기반 AI 추천</span></div>
-        <div class="pf"><span class="k dat-k">데이터</span><span class="txt">서울 상권분석서비스 시계열(추정매출·개폐업률·길단위인구) · LOCALDATA 개폐업 이력(LSTM 라벨) · 리뷰 크롤링</span></div>
+        <div class="pf"><span class="k dat-k">데이터</span><span class="txt">서울 상권분석서비스 시계열(추정매출·개폐업률·길단위인구) · 지방행정 인허가 개폐업 이력(data.go.kr, LSTM 라벨) · 리뷰 크롤링</span></div>
         <div class="pf"><span class="k out-k">출력</span><span class="txt">페르소나·예산·업종 입력 → <b>적합 상권/입지 Top-K 추천</b> + 상권 카드(분위기 키워드·대표 이미지)</span></div>
       </div>
       <div class="design"><div class="dk">CLAUDE DESIGN 적용</div><div class="dv">고객이 상권을 "처음 만나는 화면" — 상권 카드 · 감성 프로필이 앱의 첫 스킨십 면(面). AI 추천은 <b>brand teal</b>로 SpaceOS 고유 기능임을 표시</div></div>
@@ -294,7 +294,7 @@
       <div class="ditem"><b>건축물대장</b> — 상가 호 수 <span class="src">(공실의 분모)</span></div>
       <div class="ditem"><b>GIS 폴리곤</b> — 건물 형상 <span class="src">(시각화·매칭보정)</span></div>
       <div class="ditem"><b>생활인구</b>(KT) · <b>SGIS</b> 밀도 · <b>부동산원</b> 임대/공실</div>
-      <div class="ditem"><b>상권분석 시계열</b> · <b>LOCALDATA</b> 개폐업 · 리뷰/트렌드</div>
+      <div class="ditem"><b>상권분석 시계열</b> · <b>인허가 개폐업</b>(data.go.kr) · 리뷰/트렌드</div>
     </div>
     <div class="darr">▶</div>
     <div class="dlayer silver">
@@ -315,7 +315,7 @@
       <div class="goldrow"><div class="gt"><b>program_content_context</b> — 리뷰·트렌드·이미지</div><div class="to" style="color:#C9A6FF">→ Program</div></div>
     </div>
   </div>
-  <div class="keys-strip">🔑 인증키: <b>DATA_GO_KR</b>(상가·대장·부동산원·가맹정보 공용) · <b>SEOUL_OPENAPI</b>(생활인구+상권분석 공용) · <b>SGIS</b> · <b>NAVER_MAPS</b> · 확장 3종 <b>LOCALDATA</b>(개폐업)·<b>KAKAO</b>(검증)·<b>LLM</b>(유일한 유료) — Gold까지 전부 이 키들로 조달</div>
+  <div class="keys-strip">🔑 인증키: <b>DATA_GO_KR</b>(상가·대장(건축HUB)·부동산원·가맹정보·인허가 공용) · <b>SEOUL_OPENAPI</b>(생활인구+상권분석 공용) · <b>SGIS</b> · <b>NAVER_MAPS</b> · 확장 2종 <b>KAKAO</b>(검증)·<b>LLM</b>(유일한 유료) — Gold까지 전부 이 키들로 조달 (舊 LOCALDATA는 2026-04 폐쇄 → data.go.kr 이관)</div>
 </div>
 
 <div class="conn"><div class="lbl">데이터가 화면이 될 때의 규칙</div><div class="arrow">▼</div></div>

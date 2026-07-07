@@ -46,7 +46,7 @@ cd spaceos/data
 python probe_garosu_d1.py     # DATA_GO_KR_SERVICE_KEY 사용
 ```
 - 확인점: 상가정보 실제 필드, `bdMgtSn` 존재, 지번→건축물대장 capacity 산출 여부
-- ⚠️ 먼저 건축물대장 API 확정 — **15044713(권장)** 또는 15134735(건축HUB). 후자면 프로브 `BASE_BLD` 경로 교체 필요.
+- ✅ 건축물대장 API 확정 — **15134735(건축HUB, BldRgstHubService)**. 구 15044713은 서비스 종료(2026-07 확인). 프로브 `BASE_BLD`는 HUB 경로로 교체 완료.
 - **출력 로그를 개발에 전달** → 실제 스키마 확정 후 STEP3 착수.
 
 ## STEP 3. Bronze 수집 콜렉터 구현 — 개발 (D1 결과 기반)

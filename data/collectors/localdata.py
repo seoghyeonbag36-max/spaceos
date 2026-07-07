@@ -1,11 +1,13 @@
-"""[B단계·Platform] LOCALDATA 지방행정 인허가 수집기 — 개·폐업 이력 (docs §8-B).
+"""[B단계·Platform] 지방행정 인허가 수집기 — 개·폐업 이력 (docs §8-B).
 
-`LOCALDATA_API_KEY`(localdata.go.kr 오픈API 이용신청, 승인 1~2일)로 강남구 인허가
-데이터를 받아 신사동 소재 행만 Bronze 에 저장한다. 폐업일자(dcbYmd)·영업상태가
-LSTM 라벨과 공실 히스토리의 원천.
+⚠️ TODO(이관): localdata.go.kr 은 2026-04-16 폐쇄 — 아래 _URL 은 죽은 엔드포인트다.
+   인허가 195종이 공공데이터포털(data.go.kr)로 통합 개방됨(이력 데이터 신규 제공).
+   data.go.kr 에서 '행정안전부 인허가' 업종별 API 활용신청(기존 DATA_GO_KR_SERVICE_KEY 공용)
+   후 이 수집기를 신규 스펙으로 교체할 것. LOCALDATA_API_KEY 는 폐기 → 미설정 시
+   본 수집기는 자동 건너뜀(안전). 상세: docs/api-keys-and-specs.md §8-B.
 
-⚠️ 초기 전체 적재는 포털의 일괄 CSV 다운로드가 빠르다 — 이 수집기는 증분(REST)용 골격.
-⚠️ 응답 JSON 구조·필드명은 승인 후 실호출로 확정할 것(TODO). 아래 파싱은 방어적.
+폐업일자(dcbYmd)·영업상태가 LSTM 라벨과 공실 히스토리의 원천.
+⚠️ 초기 전체 적재는 일괄 CSV 다운로드가 빠르다 — 이 수집기는 증분(REST)용 골격.
 
 실행: python -m data.collectors.localdata
 """
