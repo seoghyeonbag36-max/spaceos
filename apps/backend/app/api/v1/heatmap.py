@@ -13,7 +13,7 @@ async def building_vacancy(district: str) -> dict:
     """건물 단위 공실 GeoJSON(FeatureCollection). 쿼리: ?district=gangnam-garosugil
 
     MapShell 공실 레이어가 naver.maps.Polygon 으로 렌더한다.
-    TODO: 샘플 → Gold building_vacancy(상가정보 ⊕ 건축물대장) 로 교체.
+    실데이터: Gold page_building_master.geojson (없으면 샘플 폴백) — services/building_vacancy.py.
     """
     fc = bv.building_vacancy_geojson(district)
     if fc is None:

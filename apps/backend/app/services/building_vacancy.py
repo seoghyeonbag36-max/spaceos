@@ -3,11 +3,19 @@
 건물 footprint 폴리곤 + 추정 공실률을 GeoJSON FeatureCollection 으로 제공한다.
 프론트(MapShell)가 naver.maps.Polygon 으로 색칠 렌더한다.
 
-TODO(실데이터): docs/poc-building-vacancy.md 파이프라인 —
-  GIS건물통합정보 footprint ⊕ (소상공인 상가정보 활성점포 / 건축물대장 상업 호수)
-  로 산출한 Gold `building_vacancy` 테이블로 아래 _GAROSU 샘플을 대체.
+실데이터: data/gold/garosugil/page_building_master.geojson
+  (V-World 폴리곤 ⊕ 상가정보 활성점포 ⊕ 건축HUB capacity — build_page_master.py 산출)
+  파일이 없으면 아래 _GAROSU 샘플 8동으로 폴백. PoC 단계는 파일 기반(PostGIS 이후 과제).
 """
 from __future__ import annotations
+
+import json
+from pathlib import Path
+
+# repo/data/gold/garosugil/page_building_master.geojson (services → app → backend → apps → repo)
+_GOLD_GEOJSON = (Path(__file__).resolve().parents[4]
+                 / "data" / "gold" / "garosugil" / "page_building_master.geojson")
+_cache: dict = {}
 
 # 가로수길 코어 샘플 건물 (추정 공실). status: full/partial/high/empty
 _GAROSU = [
@@ -39,10 +47,27 @@ def _ring(lat: float, lng: float) -> list[list[float]]:
     ]
 
 
+def _load_gold() -> dict | None:
+    """Gold GeoJSON 로드 — mtime 캐시 (파이프라인 재실행 시 자동 반영)."""
+    if not _GOLD_GEOJSON.exists():
+        return None
+    mtime = _GOLD_GEOJSON.stat().st_mtime
+    if _cache.get("mtime") != mtime:
+        _cache["fc"] = json.loads(_GOLD_GEOJSON.read_text(encoding="utf-8"))
+        _cache["mtime"] = mtime
+    return _cache["fc"]
+
+
 def building_vacancy_geojson(district: str) -> dict | None:
     """건물 공실 GeoJSON FeatureCollection. 미지원 거점이면 None."""
     if district not in _ALIASES:
         return None
+
+    gold = _load_gold()
+    if gold is not None:
+        return {**gold, "district": district}
+
+    # ── 폴백: Gold 미생성 환경용 샘플 8동 ──
     features = []
     for b in _GAROSU:
         vac = round((1 - b["active"] / b["capacity"]) * 100, 1)
