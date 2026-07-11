@@ -59,10 +59,13 @@
 | `mainPurpsCdNm`(호별) | 호별 용도 (★ 상업 전유 호 = capacity) |
 | `dongNm` / `hoNm` / `flrNo` | 동 / 호 / 층 |
 
-### 1-C. (선택) 부동산원 임대동향 API — 거시 공실률·임대료
-- 신청: `data.go.kr/data/15002275/openapi.do` (신규환경 `15099345`)
-- R-ONE 통계 API 계열: 요청 `serviceKey`, `STATBL_ID`(통계표ID), `DTACYCLE_CD`(주기, 분기=`QY`), `WRTTIME_IDTFR_ID`(기간), `CLS_ID`(분류) → 응답 `TBL_NM`/`ITM_NM`/`CLS_NM`/`WRTTIME_DESC`/`DTA_VAL`.
-- **권장**: 아래 §4 CSV가 더 단순(분기 갱신이라 파일로 충분).
+### 1-C. 부동산원 상업용부동산 임대조사 API — 거시 공실률·임대료 (✅ 키 확보됨)
+> **2026-07 확보: 팀원이 "상업용부동산임대조사" API 키 발급.** 문서 §4의 CSV 계획을 **자동 증분 API**로 격상. 상권(대분류) 단위라 건물 해상도는 없음 → Page의 **지역 앵커/보정 계수**로 사용(건물별 값은 §1-A×§1-B가 담당).
+- 신청: `data.go.kr/data/15002275/openapi.do` (신규환경 `15099345`) / R-ONE 부동산통계 포털([r-one.co.kr](https://www.r-one.co.kr))은 별도 키 발급.
+- R-ONE 통계 API 계열: 요청 `serviceKey`(또는 R-ONE 전용키 `REB_RONE_API_KEY`), `STATBL_ID`(통계표ID), `DTACYCLE_CD`(주기, 분기=`QY`), `WRTTIME_IDTFR_ID`(기간), `CLS_ID`(분류) → 응답 `TBL_NM`/`ITM_NM`/`CLS_NM`/`WRTTIME_DESC`/`DTA_VAL`.
+- 제공 지표(상권별): **공실률·임대료(㎡당)·임대가격지수·투자수익률·전환율**.
+- 활용: Page(거시 공실 앵커, `VACANCY_MODE=base`) + Posting(전략별 임대료·수익률 실데이터 치환) + Platform(공실률·임대료 시계열 피처).
+- **참고**: §4 CSV는 오프라인 백업으로 유지(발급처 장애 시 폴백).
 
 ---
 
@@ -124,7 +127,7 @@
 - **권장(파일)**: data.go.kr 로그인 후 아래 CSV **다운로드**(별도 인증키 불필요, 분기 갱신):
   - 공실률: 오피스 `15069730` · 중대형상가 `15069735` · 소규모상가 `15069726`
   - 임대료: 소규모상가 `15069766` (오피스·중대형 동종 계열)
-- **선택(API)**: §1-C (data.go.kr 키 공용).
+- **선택(API)**: §1-C — **2026-07 "상업용부동산임대조사" API 키 확보**(자동 증분 수집 가능). CSV는 폴백으로 유지.
 
 | CSV 주요 컬럼 | 의미 |
 |---|---|
@@ -149,8 +152,30 @@
 
 ---
 
-## 6. GIS건물통합정보 — 건물 footprint 폴리곤 (파일)
-- `data.go.kr/data/15083092` — 시도별 **파일(shp/GeoJSON) 다운로드**(API 아님). **강남구** 분만 받아 PoC 폴리곤으로.
+## 6. 건물 footprint 폴리곤 — GIS건물통합정보 / V-World
+- **파일**: `data.go.kr/data/15083092` — 시도별 **파일(shp/GeoJSON) 다운로드**(API 아님). **강남구** 분만 받아 PoC 폴리곤으로.
+- **API(실제 사용 중)**: V-World 디지털트윈국토 `VWORLD_API_KEY` — GIS건물통합 WFS/데이터API. 발급: [vworld.kr](https://www.vworld.kr) 로그인 → 인증키 발급(도메인 `http://localhost:5173` 등록). `data/.env`에 이미 설정됨.
+
+---
+
+## 6-B. 토지이음 — 토지이용계획·용도지역·공시지가 (🆕 규제 레이어) `EUM_API_KEY`
+
+> **2026-07 신규 확보.** 상가정보(§1-A)·건축물대장(§1-B)에 **"이 땅에서 무엇을 할 수 있는가"(규제·용도)** 축을 추가하는 신규 레이어. Page 공실 판별 정밀화 + Posting 입점 가능성 판정의 핵심 소스.
+
+### 발급/획득
+- 원자료: 토지이음 [eum.go.kr](https://www.eum.go.kr). API: data.go.kr "국토교통부 토지이용계획정보"·"개별공시지가" 계열 활용신청(자동승인) → 발급처에 따라 `DATA_GO_KR_SERVICE_KEY` 공용 또는 전용 `EUM_API_KEY`.
+
+### 제공 정보 & 활용
+| 응답 필드(대표) | 의미 | PPPP 활용 |
+|---|---|---|
+| `prposAreaNm` / 용도지역 | 일반상업·근린상업·일반주거 등 | ★ **Page**: 상업 필터 강화(§1-B 보완) / ★ **Posting**: 용도지역별 허용 업종 판정 |
+| 행위제한(허용·금지 업종) | 지역별 입점 규제 | ★ **Posting**: `posting.py` 입점 가능성 더미 상수 치환 |
+| `bcRat` / `vlRat` | 건폐율 / 용적률 | 개발 잠재력·capacity 추정 |
+| `jimok` / 지목 | 대·잡종지 등 | 필지 성격 |
+| `pblntfPclnd` / 개별공시지가 | ㎡당 공시지가 | 임대시세 추정·검증 보조 앵커 |
+
+### 조인 키
+- **필지 PNU(19자리)** 또는 지번(§1-A `lnoMnno`/`lnoSlno`) → 건물(`bdMgtSn`) ↔ 점포(`bizesId`)와 연결.
 
 ---
 
@@ -162,9 +187,12 @@ VITE_NAVER_MAPS_KEY_ID=          # NCP Maps Client ID (도메인 등록 필수)
 
 # data/.env  (수집 파이프라인)
 DATA_GO_KR_SERVICE_KEY=          # 공공데이터포털 Decoding 키 (상가·대장·부동산원 + 국세청·가맹정보 공용)
-SEOUL_OPENAPI_KEY=               # 서울 열린데이터광장 (생활인구 + 상권분석서비스 공용)
+SEOUL_OPENAPI_KEY=               # 서울 열린데이터광장 (생활인구 + 상권분석서비스 공용 — 별도 키 발급 말고 이 1개로 통일)
 SGIS_CONSUMER_KEY=               # 통계청 SGIS
 SGIS_CONSUMER_SECRET=
+EUM_API_KEY=                     # [🆕 규제] 토지이음 토지이용계획·용도지역·공시지가 (§6-B, data.go.kr 공용일 수 있음)
+REB_RONE_API_KEY=                # [♻️] 부동산원 상업용부동산 임대조사 (§1-C, R-ONE 전용키. data.go.kr 경로면 DATA_GO_KR 공용)
+VWORLD_API_KEY=                  # 건물 폴리곤 V-World WFS/데이터API (§6, 도메인 등록 필수)
 # (폐기) LOCALDATA_API_KEY — localdata.go.kr 2026-04-16 폐쇄. 인허가 이력은 DATA_GO_KR_SERVICE_KEY 공용(§8-B)
 KAKAO_REST_API_KEY=              # [B·Program/Posting] 카카오 로컬 (장소·카테고리)
 NAVER_CLIENT_ID=                 # [B·Program] 검색(블로그·지역)+데이터랩 — 선택→필수 승격
@@ -207,8 +235,9 @@ NAVER_MAPS_CLIENT_SECRET=
 
 > ⚠️ **서울 한정 주의**: 생활인구(§2)·상권분석서비스(§8-A)는 서울시만 제공. 거점을 라페스타(고양시)로 확장하면 경기데이터드림 + 소상공인 상권정보로 대체 설계가 필요하다. PoC 거점(신사동 가로수길)은 문제 없음.
 
-### 8-A. 서울 상권분석서비스 — Platform 시계열 (기존 `SEOUL_OPENAPI_KEY` 공용)
+### 8-A. 서울 상권분석서비스 — Platform 시계열 (기존 `SEOUL_OPENAPI_KEY` 공용) ✅
 - 발급: 추가 키 불필요 — §2와 동일 키·동일 URL 형식(`http://openapi.seoul.go.kr:8088/{KEY}/json/{SERVICE}/{START}/{END}/…`). 분기 단위 갱신.
+- ⚠️ **2026-07 정리**: 팀원이 "서울시 상권분석 서비스" 키를 별도 발급했으나, 열린데이터광장은 **계정당 인증키 1개로 전 서비스 공용**이다 → **기존 `SEOUL_OPENAPI_KEY` 하나로 통일**하고 이중 키 관리는 지양(별도 발급 키는 백업으로만 보관).
 - 주요 서비스(상권 단위, 서비스명은 상세페이지 [미리보기]에서 최종 확인):
   `TbgisTrdarRelm`(상권영역 폴리곤) · `VwsmTrdarSelngQq`(추정매출) · `VwsmTrdarStorQq`(점포·개폐업) · `VwsmTrdarFlpopQq`(길단위인구) · `VwsmTrdarRepopQq`(상주인구) · `VwsmTrdarWrcPopltnQq`(직장인구) · `VwsmTrdarIncomeQq`(소득소비) · `VwsmTrdarFcltyQq`(집객시설) · `VwsmTrdarIxQq`(상권변화지표)
 
@@ -258,10 +287,10 @@ NAVER_MAPS_CLIENT_SECRET=
 
 | Gold 테이블 | 기능 | 조인 키 | 소스(§) |
 |---|---|---|---|
-| `gold/page_building_master` | Page | `bdMgtSn` | 1-A + 1-B + 6(폴리곤) |
-| `gold/platform_district_timeseries` | Platform(LSTM) | `TRDAR_CD` × 년분기 | 8-A + 2 + 4 + 8-B(폐업 집계) |
+| `gold/page_building_master` | Page | `bdMgtSn` | 1-A + 1-B + 6(폴리곤) + **6-B(용도지역·공시지가)** |
+| `gold/platform_district_timeseries` | Platform(LSTM) | `TRDAR_CD` × 년분기 | 8-A + 2 + **1-C/4(부동산원 공실률·임대료 API)** + 8-B(폐업 집계) |
 | `gold/platform_store_graph` | Platform(GNN) | `bizesId`(노드) | 1-A + 8-A(업종·매출) + 리뷰 크롤링 |
-| `gold/posting_cost_benefit` | Posting | 업종코드 × 전략 | 8-C + 8-A(추정매출·소득소비) + 4(임대료) |
+| `gold/posting_cost_benefit` | Posting | 업종코드 × 전략 | 8-C + 8-A(추정매출·소득소비) + **1-C/4(임대료·수익률)** + **6-B(허용업종·공시지가)** |
 | `gold/program_content_context` | Program | `TRDAR_CD` / `bizesId` | 5-B(블로그·트렌드) + 8-E + 크롤링(리뷰·이미지) |
 
 - 공통 조인 축: **건물(`bdMgtSn`) ↔ 점포(`bizesId`) ↔ 상권(`TRDAR_CD`) ↔ 행정동(`adongCd`)**. Silver 단계에서 이 4개 키를 모든 테이블에 부여하는 것이 B단계 정제의 핵심 작업.
