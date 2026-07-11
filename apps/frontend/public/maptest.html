@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="utf-8"><title>naver maps 진단</title></head>
+<body>
+<div id="log" style="font:13px monospace; white-space:pre-line; padding:8px; background:#eef"></div>
+<div id="map" style="width:800px;height:500px;border:2px solid red"></div>
+<script>
+  const log = (m) => { document.getElementById('log').textContent += m + '\n'; console.log('[maptest]', m); };
+  window.navermap_authFailure = () => log('AUTH FAILURE 콜백 호출됨');
+  log('1. 스크립트 태그 주입');
+  const s = document.createElement('script');
+  s.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=9nbzrvj8qj&submodules=visualization';
+  s.onload = () => {
+    log('2. maps.js onload OK / window.naver=' + typeof window.naver
+        + ' / naver.maps=' + typeof (window.naver && window.naver.maps));
+    try {
+      const map = new naver.maps.Map(document.getElementById('map'),
+        { center: new naver.maps.LatLng(37.5205, 127.023), zoom: 16 });
+      log('3. Map 객체 생성 OK');
+      setTimeout(() => {
+        const tiles = document.querySelectorAll('#map img').length;
+        log('4. 3초 후 타일 img 개수: ' + tiles);
+      }, 3000);
+    } catch (e) { log('3. Map 생성 실패: ' + e.message); }
+  };
+  s.onerror = () => log('2. maps.js 로드 실패 (onerror)');
+  document.head.appendChild(s);
+</script>
+</body>
+</html>

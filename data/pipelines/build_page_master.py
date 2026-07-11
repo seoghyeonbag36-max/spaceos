@@ -35,7 +35,9 @@ def _label(pnu: str, name: str) -> str:
     if name:
         return name
     dong = _DONG.get(pnu[5:10], pnu[5:10])
-    return f"{dong} {int(pnu[11:15])}-{int(pnu[15:19])}"
+    bon, bu = int(pnu[11:15]), int(pnu[15:19])
+    # 부번 0000 = 부번 없음 → "신사동 547-0" 이 아니라 "신사동 547" (지번 표기 규칙)
+    return f"{dong} {bon}-{bu}" if bu else f"{dong} {bon}"
 
 
 def _classify(occ: float | None) -> str | None:
