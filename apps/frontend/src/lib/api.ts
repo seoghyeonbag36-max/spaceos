@@ -57,5 +57,26 @@ export interface GeoJSONFC {
 }
 /** 거점 공실 유닛 + 3-Tier 시나리오(Posting) */
 export const getPostings = (id: string) => getJSON<unknown[]>(`/commercial-districts/${id}/postings`);
-/** 거점 마케팅(행사 + 온라인 콘텐츠)(Program) */
+/** 거점(상권) 마케팅 — TODO: Platform 수집 정보(Gold) 기반 생성으로 교체(Program) */
 export const getMarketing = (id: string) => getJSON<unknown>(`/marketing/${id}`);
+
+async function postJSON<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`API ${path} failed: ${res.status}`);
+  return res.json() as Promise<T>;
+}
+
+/** 입점 시뮬레이션(Posting) — 외부 AI 창업 코파일럿 어댑터 경유(미설정 시 3-Tier 폴백) */
+export const simulateRevenue = (req: {
+  district_id: string; unit_id?: string; industry_type?: string; strategy?: string;
+}) => postJSON<unknown>("/ai/simulate-revenue", req);
+
+/** 가게 단위 마케팅 광고 솔루션 자동 생성(Program) — 상가 사진·정보·리뷰 기반 */
+export const generateStoreMarketing = (profile: {
+  name: string; category: string; district_id?: string; address?: string;
+  reviews?: string[]; image_urls?: string[]; keywords?: string[];
+}) => postJSON<unknown>("/marketing/generate", profile);

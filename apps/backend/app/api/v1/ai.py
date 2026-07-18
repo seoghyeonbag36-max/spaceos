@@ -1,6 +1,9 @@
 """AI 추론 엔드포인트 — LSTM 공실 예측 / GNN 업종 추천 / 매출 시뮬레이션."""
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+
+from app.schemas.posting import SimulateRequest, SimulateResult
+from app.services import posting as posting_svc
 
 router = APIRouter()
 
@@ -24,3 +27,15 @@ async def predict_vacancy(req: VacancyRequest) -> dict[str, object]:
 async def recommend_industry(req: IndustryRequest) -> dict[str, object]:
     """GNN 기반 업종 추천. TODO: ml.inference 모듈 연동 (정확도 20% 향상 목표)."""
     return {"building_id": req.building_id, "recommendations": [], "model": "gnn-stub"}
+
+
+@router.post("/simulate-revenue", response_model=SimulateResult)
+async def simulate_revenue(req: SimulateRequest) -> dict:
+    """입점 시뮬레이션(Posting) — 외부 AI 창업 코파일럿 어댑터 경유.
+
+    코파일럿(settings.posting_copilot_url) 미설정 시 내부 3-Tier 폴백으로 응답한다.
+    """
+    result = posting_svc.simulate(req.district_id, req.unit_id, req.industry_type, req.strategy)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"unknown district: {req.district_id}")
+    return result

@@ -11,8 +11,8 @@
 |------|------|------|
 | **Platform** | Place → Platform | 상권 AI 추천 엔진 (각 상권을 하나의 플랫폼화) |
 | **Page** | Product/Price → Page | 공실 히트맵 + 3D 디지털 트윈 (어떤 업장이 어디에) |
-| **Posting** | Promotion → Posting | 입점 솔루션 (고급화/가성비/기능중심 비용-효용 분석) |
-| **Program** | Promotion → Program | 온/오프라인 마케팅 자동화 (LLM 콘텐츠 + 행사 추천) |
+| **Posting** | Promotion → Posting | 입점 솔루션 — **외부 AI 창업 코파일럿 연동**(어댑터) + 3-Tier 비용-효용 폴백 |
+| **Program** | Promotion → Program | 마케팅 자동화 — **가게 단위**(상가 사진·정보·리뷰 기반 온/오프라인 광고 솔루션) → **상권 단위**(Platform 수집 정보 기반) |
 
 ## Active Projects
 | 이름 | 내용 |
