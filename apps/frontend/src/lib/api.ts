@@ -20,9 +20,8 @@ export async function getBuildingHistory(buildingId: string) {
 }
 
 /* ===== 거점(commercial district) API =====
- * 백엔드(app/api/v1)로 분리된 9거점 데이터.
- * 현재 프론트 컴포넌트(CityDashboard / DistrictPPPP)는 정적 모듈을 사용 중.
- * TODO: 아래 함수로 교체해 서버 단일 소스로 전환(로딩/에러 상태 처리 추가).
+ * 백엔드(app/api/v1)가 단일 소스로 제공하는 서울 13 Page 거점 데이터
+ * (시드: app/data/seoul_pages.py — Gold 교체 TODO).
  */
 async function getJSON<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);
@@ -30,14 +29,80 @@ async function getJSON<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-/** 9거점 요약(감성·공실·리뷰·Tier) — City Dashboard */
-export const listDistricts = () => getJSON<unknown[]>("/commercial-districts");
-/** 거점 전체 원천 데이터(zones/units/events/poi/grid) — DistrictPPPP */
-export const getDistrict = (id: string) => getJSON<unknown>(`/commercial-districts/${id}`);
+/** 거점 요약 — GET /commercial-districts (backend DistrictSummary 스키마) */
+export interface DistrictSummary {
+  id: string; name: string; gu: string; type: string;
+  center: [number, number]; note: string; rec_top: string;
+  sentiment: number; reviews: number; risk_zones: number;
+  vacancy_rate: number; vacant_units: number; cell_count: number; store_count: number;
+  tier_mix: { premium: number; value: number; factory: number };
+}
+
+/** 감성 구역(Zone) — f: [키워드, 증감, 방향(up|dn)][] */
+export interface Zone {
+  id: string; n: string; grp: string; lat: number; lng: number;
+  s: number; d: number; r: number; f: [string, string, string][];
+}
+
+/** 거점 전체 원천 데이터 — GET /commercial-districts/{id} */
+export interface DistrictDetail {
+  id: string; name: string; sub: string; gu: string; type: string;
+  center: [number, number]; zoom: number;
+  poi: [number, number, string, string][];
+  zones: Zone[];
+  units: PostingUnit[];
+  events: MarketingEvent[];
+  insta: string[];
+}
+
+export interface TierScenario {
+  tier: string; name: string; sub: string;
+  invest_mn: number; month_cost: number; month_rev: number; month_net: number;
+  roi_months: number; recommended: boolean;
+}
+
+export interface PostingUnit {
+  id: string; n: string; grp: string; lat: number; lng: number;
+  area: number; rent: number; prem: number; floor: string; was: string;
+  rec: string; foot: string; persona: string; note: string;
+}
+
+/** 공실 유닛 + 3-Tier 시나리오 — GET /commercial-districts/{id}/postings */
+export interface Posting extends PostingUnit {
+  scenarios: Record<string, TierScenario>;
+}
+
+export interface MarketingEvent {
+  id: string; n: string; lat: number; lng: number; ic: string; when: string;
+  k2: string; desc: string; roles: string[]; ha: string;
+}
+
+/** 상권 마케팅 — GET /marketing/{id} */
+export interface Marketing {
+  district_id: string; events: MarketingEvent[]; online_contents: string[];
+}
+
+/** 100m 그리드 공실 셀 — lat/lng 는 셀 남서(SW) 모서리, dlat/dlng 는 셀 크기 */
+export interface HeatCell {
+  i: number; j: number; lat: number; lng: number;
+  c_lat: number; c_lng: number; v: number; stores: number; vac_n: number;
+  dlat: number; dlng: number;
+}
+
+/** 거점 공실 히트맵 — GET /heatmap/vacancy?district={id} */
+export interface VacancyHeatmap {
+  district_id: string; resolution_m: number;
+  cells: HeatCell[]; sum_stores: number; sum_vac: number; avg_vacancy: number;
+}
+
+/** 서울 13 Page 거점 요약(감성·공실·리뷰·Tier) — 거점 대시보드 */
+export const listDistricts = () => getJSON<DistrictSummary[]>("/commercial-districts");
+/** 거점 전체 원천 데이터(zones/units/events/poi/grid) */
+export const getDistrict = (id: string) => getJSON<DistrictDetail>(`/commercial-districts/${id}`);
 /** 거점 감성 구역(Platform) */
-export const getSentiment = (id: string) => getJSON<unknown[]>(`/commercial-districts/${id}/sentiment`);
+export const getSentiment = (id: string) => getJSON<Zone[]>(`/commercial-districts/${id}/sentiment`);
 /** 거점 100m 공실 히트맵(Page) */
-export const getVacancyHeatmap = (id: string) => getJSON<unknown>(`/heatmap/vacancy?district=${id}`);
+export const getVacancyHeatmap = (id: string) => getJSON<VacancyHeatmap>(`/heatmap/vacancy?district=${id}`);
 /** 건물 단위 공실 GeoJSON(FeatureCollection) — Page 공실 폴리곤 레이어 */
 export const getBuildingVacancy = (district: string) =>
   getJSON<GeoJSONFC>(`/heatmap/buildings?district=${district}`);
@@ -56,9 +121,9 @@ export interface GeoJSONFC {
   }>;
 }
 /** 거점 공실 유닛 + 3-Tier 시나리오(Posting) */
-export const getPostings = (id: string) => getJSON<unknown[]>(`/commercial-districts/${id}/postings`);
+export const getPostings = (id: string) => getJSON<Posting[]>(`/commercial-districts/${id}/postings`);
 /** 거점(상권) 마케팅 — TODO: Platform 수집 정보(Gold) 기반 생성으로 교체(Program) */
-export const getMarketing = (id: string) => getJSON<unknown>(`/marketing/${id}`);
+export const getMarketing = (id: string) => getJSON<Marketing>(`/marketing/${id}`);
 
 async function postJSON<T>(path: string, body: unknown): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

@@ -18,7 +18,7 @@
 | 이름 | 내용 |
 |------|------|
 | **PPPP 6개월 로드맵** | 2026-05-20 완성. MVP + M1~M6 로드맵 + 바이브 코딩 방법론 |
-| **MVP 거점** | 고양시 라페스타·웨스턴돔(1순위) OR 홍대·연남동 — M1 1주차 확정 예정 |
+| **MVP 거점** | 서울 강남구 신사동 가로수길 (건물 단위 공실 PoC) — 2순위 후보 홍대·연남동 |
 | **B2B 파일럿** | 6개월차 5~10건 목표 (프랜차이즈 본사·자산운용사·지자체) |
 
 → 상세: memory/projects/
@@ -38,7 +38,7 @@
 |------|------|
 | **PPPP** | Platform·Page·Posting·Program (디지털 4P 프레임워크) |
 | **바이브 코딩** | 자연어 PRD → AI 코드 생성 → 검증 사이클 (Cursor + Claude Code) |
-| **거점 상권** | MVP 검증할 1개 상권. 1순위 라페스타, 2순위 홍대·연남동 |
+| **거점 상권** | MVP 검증할 1개 상권. 1순위 신사동 가로수길, 2순위 홍대·연남동 |
 | **Bronze/Silver/Gold** | 데이터 레이크 3계층 (원본/정제/분석용) |
 | **GNN** | Graph Neural Network — 업종 간 시너지/잠식 분석 |
 | **LSTM** | 시계열 매출·공실 예측 모델 |
@@ -66,7 +66,6 @@
 ## Recent Deliverables
 - `SpaceOS_PPPP_6Month_Vibe_Roadmap.docx` (2026-05-20) — 본 로드맵
 - `SpaceOS_6Month_Technical_Roadmap.docx` — 기술 로드맵 (이전)
-- `SpaceOS_Goyang_Roadmap_v1.docx` — 고양시 로드맵 v1 (이전)
 
 ---
 

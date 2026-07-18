@@ -82,7 +82,7 @@ PPPP 4개 트랙의 산출물(추천·히트맵·시뮬레이션·콘텐츠)을 
 | **LSTM** | Long Short-Term Memory — 시계열 매출·공실 예측 모델. |
 | **Bronze / Silver / Gold** | 데이터 레이크 3계층 (원본 / 정제 / 분석용). |
 | **바이브 코딩(Vibe Coding)** | 자연어 PRD → AI 코드 생성 → 검증 사이클. Cursor + Claude Code. |
-| **거점 상권** | MVP 검증 대상 1개 상권 (1순위 라페스타, 2순위 홍대·연남동). |
+| **거점 상권** | MVP 검증 대상 1개 상권 (1순위 신사동 가로수길, 2순위 홍대·연남동). |
 | **Sentiment Score** | 리뷰·SNS 텍스트의 감성 점수 (−1 ~ +1). |
 | **DaaS** | Data as a Service — 월 구독형 상권 분석 데이터 제공 모델. |
 | **PostGIS** | PostgreSQL 공간 확장 — 좌표·폴리곤 공간 쿼리. |
@@ -376,14 +376,14 @@ data/
 
 ## 3.4 네이밍 · 파티셔닝 규약
 
-> 📌 **파티셔닝(Partitioning)** — 데이터를 지역·날짜 기준으로 폴더 분할 저장 → 필요한 부분만 빠르게 조회. **slug** — URL·경로용 영문 식별자(예: lapesta). **grid_id** — 100m×100m 격자 한 칸의 고유 ID(공간 키).
+> 📌 **파티셔닝(Partitioning)** — 데이터를 지역·날짜 기준으로 폴더 분할 저장 → 필요한 부분만 빠르게 조회. **slug** — URL·경로용 영문 식별자(예: garosugil). **grid_id** — 100m×100m 격자 한 칸의 고유 ID(공간 키).
 
 ```
 # 파일명:  {source}_{district}_{YYYYMMDD}.{ext}
-bronze/platform/reviews/lapesta/202606/naver_lapesta_20260604.json
+bronze/platform/reviews/garosugil/202606/naver_garosugil_20260604.json
 
 # 파티션:  {track}/{dataset}/{district}/{YYYYMM}/
-#  - district: 거점 상권 슬러그 (lapesta, hongdae, yongbong …)
+#  - district: 거점 상권 슬러그 (garosugil, hongdae …)
 #  - 기간 단위: 월별(Weekly 보완), 시간은 파일 단위로 분리
 ```
 
@@ -397,12 +397,12 @@ bronze/platform/reviews/lapesta/202606/naver_lapesta_20260604.json
 > 모든 수집 작업은 `manifests/`에 1건씩 기록 → 재현성·품질 추적.
 
 ```json
-// data/manifests/platform_reviews_lapesta_20260604.json
+// data/manifests/platform_reviews_garosugil_20260604.json
 {
   "track": "platform",
   "dataset": "reviews",
   "source": "naver_place",
-  "district": "lapesta",
+  "district": "garosugil",
   "period": "2026-06",
   "collected_at": "2026-06-04T10:21:00+09:00",
   "row_count": 1842,
@@ -551,7 +551,7 @@ router = APIRouter(prefix="/api/v1/ai", tags=["ai"])
 
 
 class RecommendRequest(BaseModel):
-    district: str           # 거점 상권 슬러그 (예: lapesta)
+    district: str           # 거점 상권 슬러그 (예: garosugil)
     grid_id: str            # 100m×100m 그리드 ID
     top_k: int = 5
 
@@ -581,7 +581,7 @@ async def recommend(req: RecommendRequest) -> list[IndustryScore]:
 # 목표
 거점 상권의 공실을 2D 지도 히트맵으로, 선택 건물은 3D 디지털 트윈으로 보여주는 React 컴포넌트를 만든다.
 # 입력 데이터
-- GET /api/v1/heatmap?district=lapesta → [{grid_id, lng, lat, vacancy_rate}]
+- GET /api/v1/heatmap?district=garosugil → [{grid_id, lng, lat, vacancy_rate}]
 - GET /api/v1/buildings/{id}/history → [{level, industry, vacant}]
 # 제약
 - React+TS, @react-three/fiber, Mapbox GL, Tailwind. API 호출은 src/lib/api.ts로 일원화
@@ -824,7 +824,7 @@ def generate_marketing(district: str, keywords: list[str], mood: str) -> str:
 
 
 if __name__ == "__main__":
-    print(generate_marketing("라페스타", ["레트로", "야장", "청춘"], "활기찬 저녁"))
+    print(generate_marketing("가로수길", ["레트로", "야장", "청춘"], "활기찬 저녁"))
 ```
 
 ## 4.5 Design — 디자인 시스템 + 화면 설계 + FE
@@ -910,7 +910,7 @@ export default function Card({ title, children }: { title: string; children: Rea
 import VacancyHeatmap from "@/components/VacancyHeatmap";
 import Card from "@/components/ui/Card";
 
-export default function Dashboard({ district = "lapesta" }: { district?: string }) {
+export default function Dashboard({ district = "garosugil" }: { district?: string }) {
   return (
     <main className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 bg-slate-50 min-h-screen">
       <div className="lg:col-span-2">

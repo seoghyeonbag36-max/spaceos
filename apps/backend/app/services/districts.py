@@ -1,14 +1,14 @@
 """거점(commercial district) 도메인 서비스.
 
-정적 시드 데이터(app/data/goyang_districts.py)를 기반으로 공실 그리드 합성·집계를 수행한다.
-프론트엔드(pppp.ts / summary.ts)와 동일한 알고리즘을 서버에서 단일 소스로 제공한다.
+정적 시드 데이터(app/data/seoul_pages.py — 서울 13 Page 거점)를 기반으로
+공실 그리드 합성·집계를 수행한다.
 TODO: Gold 레이어(매출·공실·감성) 적재 후 이 서비스의 입력을 DB 조회로 교체.
 """
 from __future__ import annotations
 
 import math
 
-from app.data.goyang_districts import DISTRICTS, DISTRICTS_BY_ID
+from app.data.seoul_pages import DISTRICTS, DISTRICTS_BY_ID
 
 # 입점 3-Tier 정의
 TIER = {
@@ -120,7 +120,7 @@ def _summary(d: dict) -> dict:
 
 
 def list_summaries() -> list[dict]:
-    """9거점 요약(감성·공실·리뷰·Tier) 목록 — City Dashboard 용."""
+    """거점 요약(감성·공실·리뷰·Tier) 목록 — City Dashboard 용."""
     return [_summary(d) for d in DISTRICTS]
 
 

@@ -23,7 +23,7 @@ async def building_vacancy(district: str) -> dict:
 
 @router.get("/vacancy", response_model=VacancyHeatmap)
 async def vacancy_heatmap(district: str) -> dict:
-    """거점 100m 그리드 공실률 히트맵. 쿼리: ?district=lafesta
+    """거점 100m 그리드 공실률 히트맵. 쿼리: ?district=<거점 id>
 
     TODO: 건축물대장(공공데이터) + 네이버플레이스 영업상태 크롤링 정합 시
           합성값을 실측 셀로 대체.

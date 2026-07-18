@@ -27,6 +27,21 @@ class ChannelPlan(BaseModel):
     rationale: str                    # 근거 (리뷰 키워드·상권 특성)
 
 
+class LLMChannelPlan(BaseModel):
+    """LLM 구조화 출력용 채널 플랜 (kind 는 서버가 부여)."""
+    channel: str
+    content: str
+    rationale: str
+
+
+class LLMStoreMarketing(BaseModel):
+    """LLM 구조화 출력 계약 — generate_store_marketing 의 llm 경로 응답 스키마."""
+    tone_keywords: list[str]
+    online: list[LLMChannelPlan]
+    offline: list[LLMChannelPlan]
+    ha_check: str                     # 균형·공생·공감 자체 점검 결과 서술
+
+
 class StoreMarketing(BaseModel):
     store_name: str
     category: str

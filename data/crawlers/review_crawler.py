@@ -21,4 +21,4 @@ def crawl_reviews(lat: float, lng: float, radius_m: int = 300) -> list[Review]:
 
 
 if __name__ == "__main__":
-    print("review_crawler 골격 — TODO: 라페스타 좌표로 수집 구현")
+    print("review_crawler 골격 — TODO: 신사동 가로수길 좌표로 수집 구현")

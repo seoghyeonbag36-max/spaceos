@@ -1,7 +1,7 @@
 """SpaceOS 데이터 레이크 ETL DAG (Airflow 골격).
 
 Bronze(원본) → Silver(정제) → Gold(분석/학습용) 3계층 파이프라인.
-거점 상권: 라페스타·웨스턴돔 → 성수동 → 용봉동.
+거점 상권: 신사동 가로수길 → 성수동.
 """
 from __future__ import annotations
 

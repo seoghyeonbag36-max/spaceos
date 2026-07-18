@@ -22,7 +22,7 @@ argument-hint: "<이번 작업 목표 한 문장>"
 - 토큰: `apps/frontend/src/design/tokens/` (단일출처 `design/tokens/tokens.json`)
 
 ## 실제 엔드포인트 / 함수 (현 코드 기준)
-- GET `/api/v1/heatmap/vacancy?district=lafesta`   ← FE `getVacancyHeatmap(id)`
+- GET `/api/v1/heatmap/vacancy?district=garosugil`  ← FE `getVacancyHeatmap(id)` (서울 13 Page 시드: app/data/seoul_pages.py)
 - GET `/api/v1/buildings/{id}/history`             ← FE `getBuildingHistory(id)`
 - 지도 키: `.env` 의 `VITE_NAVER_MAPS_KEY_ID` — NCP 콘솔 Web 서비스 URL에 `http://localhost:5173` 등록 필수.
 

@@ -233,7 +233,7 @@ NAVER_MAPS_CLIENT_SECRET=
 | Program·Posting | 장소·카테고리·좌표 크로스체크 | 카카오 로컬 | `KAKAO_REST_API_KEY` | **○** |
 | Program | 인스타그램 해시태그·리뷰 | Meta Graph API / 크롤러 | `INSTAGRAM_ACCESS_TOKEN` | △ 보류 |
 
-> ⚠️ **서울 한정 주의**: 생활인구(§2)·상권분석서비스(§8-A)는 서울시만 제공. 거점을 라페스타(고양시)로 확장하면 경기데이터드림 + 소상공인 상권정보로 대체 설계가 필요하다. PoC 거점(신사동 가로수길)은 문제 없음.
+> ⚠️ **서울 한정 주의**: 생활인구(§2)·상권분석서비스(§8-A)는 서울시만 제공. 거점을 서울 외 지역으로 확장하면 해당 지자체 공공데이터 + 소상공인 상권정보로 대체 설계가 필요하다. PoC 거점(신사동 가로수길)은 문제 없음.
 
 ### 8-A. 서울 상권분석서비스 — Platform 시계열 (기존 `SEOUL_OPENAPI_KEY` 공용) ✅
 - 발급: 추가 키 불필요 — §2와 동일 키·동일 URL 형식(`http://openapi.seoul.go.kr:8088/{KEY}/json/{SERVICE}/{START}/{END}/…`). 분기 단위 갱신.

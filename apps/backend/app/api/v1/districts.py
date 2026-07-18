@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.get("", response_model=list[DistrictSummary])
 async def list_districts() -> list[dict]:
-    """9거점 요약(감성·공실·리뷰·Tier 구성) — City Dashboard 용."""
+    """서울 13 Page 거점 요약(감성·공실·리뷰·Tier 구성) — City Dashboard 용."""
     return svc.list_summaries()
 
 

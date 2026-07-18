@@ -96,7 +96,7 @@ SpaceOS 저장소에서 작업해줘.
 목표: SpaceOS 웹앱의 PPPP 화면을 묶는 UX/UI를 표준화하고, 서울 우선순위 홈 화면을 디자인한다.
 
 1. apps/frontend/src/design/tokens(colors·typography·layout)와 styles/tokens.css를 점검해 색·타이포·간격 토큰을 단일 기준으로 정리하고, 불일치가 있으면 맞춘다.
-2. 4개 화면(Platform·Page·Posting·Program)이 공유하는 공통 레이아웃(상단 탭 + 좌측 상권 리스트 + 본문 지도/대시보드)을 design/components 컴포넌트로 표준화. 기존 SeoulDashboard·DistrictPPPP·LafestaPPPP와 일관되게.
+2. 4개 화면(Platform·Page·Posting·Program)이 공유하는 공통 레이아웃(상단 탭 + 좌측 상권 리스트 + 본문 지도/대시보드)을 design/components 컴포넌트로 표준화. 기존 SeoulDashboard·MapShell과 일관되게.
 3. 서울 25구 진입 우선순위(강남>마포>종로…)를 한눈에 보여주는 대시보드 홈 화면을 디자인한다.
 4. Tailwind 대신 기존 토큰/CSS 방식 유지. Storybook(.storybook)이 있으니 주요 컴포넌트 story도 갱신.
 

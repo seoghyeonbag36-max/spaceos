@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:5173"]
     # LLM API (PPPP 마케팅 콘텐츠 생성)
     llm_api_key: str = ""
+    llm_model: str = "claude-opus-4-8"
     # 외부 AI 창업 코파일럿 (Posting) — 미설정 시 내부 3-Tier 폴백
     posting_copilot_url: str = ""
     posting_copilot_key: str = ""

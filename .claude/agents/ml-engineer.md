@@ -12,4 +12,4 @@ tools: Read, Edit, Write, Bash, Grep, Glob
 - 서빙은 backend `/api/v1/ai/*`(predict-vacancy, recommend-industry, simulate-revenue)와 연동.
 
 목표: 공실 예측 정확도 70%+(Phase1, MAE/RMSE), GNN 업종 추천 정확도 20% 향상.
-거점 데이터 순서: 라페스타 → 성수동 → 용봉동. 더미엔 `# TODO: 실제 연동`. (spaceos-tech-expert 스킬 참조)
+거점 데이터 순서: 신사동 가로수길 → 성수동. 더미엔 `# TODO: 실제 연동`. (spaceos-tech-expert 스킬 참조)

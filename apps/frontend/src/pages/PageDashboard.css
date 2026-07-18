@@ -1,0 +1,109 @@
+/* SpaceOS 서울 13 Page 거점 대시보드 — 스코프 .pagedash (SeoulDashboard 톤 계승) */
+.pagedash{--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#2E6FB7;
+ font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);background:#eef1f4;padding:20px;line-height:1.4;min-height:100vh}
+.pagedash *{box-sizing:border-box}
+.pagedash .wrap{max-width:1240px;margin:0 auto}
+.pagedash .hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;gap:10px}
+.pagedash .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+.pagedash h1{font-size:27px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
+.pagedash .sub{font-size:13px;color:var(--sub)}
+.pagedash .back{font-family:inherit;font-size:12.5px;font-weight:700;color:var(--sub);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:6px 12px;cursor:pointer;margin-bottom:8px}
+.pagedash .back:hover{color:var(--blue);border-color:var(--blue)}
+.pagedash .loading{padding:60px 0;text-align:center;color:var(--sub);font-size:14px}
+.pagedash .err{background:#fef2f2;border:1px solid #fecaca;border-radius:13px;padding:16px 18px;font-size:13px;color:#7f1d1d;margin:16px 0;line-height:1.7}
+.pagedash .err code{background:#fff;border:1px solid #fecaca;border-radius:5px;padding:1px 6px;font-size:12px}
+.pagedash .errdetail{font-size:11px;color:#b91c1c;margin-top:6px;word-break:break-all}
+
+/* KPI */
+.pagedash .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin:14px 0 4px}
+.pagedash .kpi{background:var(--card);border:1px solid var(--line);border-top:4px solid #d4dde6;border-radius:13px;padding:13px 15px}
+.pagedash .kpi .l{font-size:11.5px;color:var(--sub);margin-bottom:6px;font-weight:700}
+.pagedash .kpi .v{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.pagedash .kpi .v small{font-size:12px;font-weight:700;margin-left:4px;color:var(--sub)}
+.pagedash .kpi .d{font-size:10.5px;color:var(--sub);margin-top:5px}
+
+/* 거점 카드 */
+.pagedash .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px;margin-top:12px}
+.pagedash .dcard{font-family:inherit;text-align:left;background:var(--card);border:1px solid var(--line);border-left:4px solid #d4dde6;border-radius:13px;padding:12px 13px;transition:.12s;cursor:pointer}
+.pagedash .dcard:hover{box-shadow:0 3px 12px rgba(0,0,0,.09);transform:translateY(-1px)}
+.pagedash .dtop{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.pagedash .dord{width:24px;height:24px;flex:0 0 24px;border-radius:7px;background:#f1f4f8;color:#5a6b85;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.pagedash .dname{font-size:14px;font-weight:800;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.pagedash .dpill{font-size:10px;font-weight:800;color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:2px 7px;flex:0 0 auto}
+.pagedash .dhot{font-size:11px;color:var(--sub);margin-bottom:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pagedash .brow{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:10.5px;color:var(--sub)}
+.pagedash .brow .bk{flex:0 0 30px}
+.pagedash .brow .bw{flex:1;height:8px;border-radius:4px;background:#eceff2;overflow:hidden}
+.pagedash .brow .bw i{display:block;height:100%;border-radius:4px}
+.pagedash .brow .bv{flex:0 0 48px;text-align:right;font-weight:800;color:var(--ink);font-size:11px}
+.pagedash .dmeta{display:flex;gap:10px;font-size:10.5px;color:var(--sub);margin-top:8px}
+.pagedash .dmeta .risk{color:#c2410c;font-weight:700}
+.pagedash .dtiers{display:flex;gap:5px;margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+.pagedash .tchip{font-size:10px;font-weight:700;border:1px solid;border-radius:6px;padding:1px 7px;background:#fff}
+.pagedash .foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:18px;line-height:1.6}
+
+/* 심층 — 섹션 */
+.pagedash .sec{font-size:16px;font-weight:800;margin:22px 0 10px}
+.pagedash .sec small{font-size:11.5px;font-weight:700;color:#9aa3af;margin-left:8px}
+
+/* 공실 히트맵 지도 */
+.pagedash .mapsec{background:var(--card);border:1px solid var(--line);border-radius:13px;overflow:hidden}
+.pagedash .mapbox{width:100%;height:420px;background:#e8ecef}
+.pagedash .maplegend{display:flex;align-items:center;gap:9px;padding:9px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
+.pagedash .ml-label{font-size:11px;font-weight:800;color:var(--sub)}
+.pagedash .ml-grad{width:120px;height:9px;border-radius:5px;background:linear-gradient(90deg,#22B07D,#8f9a55,#E03E36)}
+.pagedash .ml-ticks{display:flex;justify-content:space-between;width:74px;font-size:9.5px;color:#9aa3af}
+.pagedash .ml-ticks em{font-style:normal}
+.pagedash .ml-stat{font-size:11px;color:var(--sub);margin-left:auto}
+.pagedash .ml-stat b{font-weight:800}
+.pagedash .ml-hint{font-size:10px;color:#9aa3af}
+.pagedash .mapnotice{background:#fffbeb;border:1px solid #fde68a;border-radius:13px;padding:14px 16px;font-size:12.5px;color:#78350f;line-height:1.6}
+.pagedash .mapnotice-sub{font-size:11px;color:#a16207;margin-top:4px}
+@media(max-width:920px){.pagedash .mapbox{height:320px}}
+
+/* 감성 구역 */
+.pagedash .zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px}
+.pagedash .zone{background:var(--card);border:1px solid var(--line);border-top:4px solid #d4dde6;border-radius:13px;padding:12px 13px}
+.pagedash .zhead{display:flex;justify-content:space-between;align-items:center}
+.pagedash .zname{font-size:13.5px;font-weight:800}
+.pagedash .zscore{font-size:17px;font-weight:800}
+.pagedash .zmeta{font-size:11px;color:var(--sub);margin:4px 0 8px}
+.pagedash .zkw{display:flex;flex-wrap:wrap;gap:5px}
+.pagedash .kw{font-size:10.5px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:2px 7px}
+
+/* 공실 유닛 + 3-Tier */
+.pagedash .units{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:11px}
+.pagedash .unit{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px}
+.pagedash .uhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pagedash .uname{font-size:13.5px;font-weight:800}
+.pagedash .upill{font-size:10.5px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:2px 8px;flex:0 0 auto}
+.pagedash .umeta{font-size:11px;color:var(--sub);margin:5px 0 2px}
+.pagedash .unote{font-size:11px;color:var(--blue);font-weight:700;margin-bottom:9px}
+.pagedash .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.pagedash .tier{border:1px solid var(--line);border-radius:10px;padding:8px 9px;background:#fafbfc}
+.pagedash .tier.rec{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.pagedash .tname{font-size:11.5px;font-weight:800;margin-bottom:5px}
+.pagedash .tname em{font-style:normal;font-size:9.5px;background:#f1f4f8;border-radius:5px;padding:1px 5px;margin-left:4px;color:#5a6b85}
+.pagedash .trow{display:flex;justify-content:space-between;font-size:10.5px;color:var(--sub);margin:2px 0}
+.pagedash .trow b{color:var(--ink);font-weight:800}
+.pagedash .trow b.neg{color:#c2410c}
+
+/* 행사 + 콘텐츠 */
+.pagedash .events{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:11px}
+.pagedash .event{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px}
+.pagedash .ehead{display:flex;align-items:center;gap:7px}
+.pagedash .eic{font-size:17px}
+.pagedash .ename{font-size:13.5px;font-weight:800;flex:1}
+.pagedash .ek2{font-size:10.5px;font-weight:800;color:var(--blue);background:#eef4fb;border-radius:6px;padding:2px 7px}
+.pagedash .ewhen{font-size:11px;color:var(--sub);margin:4px 0 6px}
+.pagedash .edesc{font-size:12px;line-height:1.55}
+.pagedash .eroles{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+.pagedash .role{font-size:10px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:2px 7px}
+.pagedash .eha{font-size:10.5px;color:#8a6d3b;background:#fdf8ec;border:1px solid #f3e6c4;border-radius:8px;padding:6px 9px;line-height:1.5}
+.pagedash .insta{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:11px;margin-top:11px}
+.pagedash .ig{background:var(--card);border:1px dashed var(--line);border-radius:11px;padding:10px 13px;font-size:12px;color:var(--sub)}
+
+@media(max-width:920px){
+ .pagedash .kpis{grid-template-columns:repeat(2,1fr)}
+ .pagedash .tiers{grid-template-columns:1fr}
+}

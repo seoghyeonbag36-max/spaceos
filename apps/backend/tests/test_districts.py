@@ -1,23 +1,24 @@
-"""거점 API 테스트."""
+"""거점 API 테스트 — 서울 13 Page 시드(app/data/seoul_pages.py) 기준."""
 from fastapi.testclient import TestClient
 
+from app.data.seoul_pages import DISTRICTS
 from app.main import app
-from app.data.goyang_districts import DISTRICTS
 
 client = TestClient(app)
 V1 = "/api/v1"
+
+SEOUL_13_IDS = {
+    "garosugil", "apgujeong-rodeo", "hongdae", "yeonnam", "ikseon", "seochon",
+    "myeongdong", "euljiro", "seongsu", "seoulsup", "itaewon", "hannam", "songridan",
+}
 
 
 def test_list_districts():
     r = client.get(f"{V1}/commercial-districts")
     assert r.status_code == 200
     data = r.json()
-    assert len(data) == len(DISTRICTS) == 39
-    ids = {d["id"] for d in data}
-    assert {"lafesta", "starfield", "hwajeong", "bamridan", "baekseok",
-            "haengsin", "juyeop", "deokyang", "madu",
-            "tanhyeon", "gajwa", "kintexone", "pungdong", "jungsan",
-            "hyangdong", "jichuk", "neunggok", "deokeun", "haengju", "hwajeon"} <= ids
+    assert len(data) == len(DISTRICTS) == 13
+    assert {d["id"] for d in data} == SEOUL_13_IDS
     for d in data:
         assert 0 <= d["sentiment"] <= 100
         assert 0 <= d["vacancy_rate"] <= 100
@@ -25,29 +26,41 @@ def test_list_districts():
 
 
 def test_district_summary_and_detail():
-    r = client.get(f"{V1}/commercial-districts/lafesta/summary")
+    r = client.get(f"{V1}/commercial-districts/garosugil/summary")
     assert r.status_code == 200
-    assert r.json()["name"].startswith("일산 라페스타")
+    body = r.json()
+    assert body["name"] == "신사동 가로수길"
+    assert body["gu"] == "강남구"
 
-    r = client.get(f"{V1}/commercial-districts/lafesta")
+    r = client.get(f"{V1}/commercial-districts/garosugil")
     assert r.status_code == 200
     assert len(r.json()["zones"]) == 6
     assert len(r.json()["units"]) == 5
 
 
 def test_sentiment_and_heatmap():
-    r = client.get(f"{V1}/commercial-districts/hwajeong/sentiment")
+    r = client.get(f"{V1}/commercial-districts/seongsu/sentiment")
     assert r.status_code == 200 and len(r.json()) == 6
 
-    r = client.get(f"{V1}/heatmap/vacancy", params={"district": "hwajeong"})
+    r = client.get(f"{V1}/heatmap/vacancy", params={"district": "seongsu"})
     assert r.status_code == 200
     hm = r.json()
     assert hm["resolution_m"] == 100
     assert hm["cells"] and hm["sum_stores"] > 0
 
 
+def test_all_districts_have_heatmap_cells():
+    """13거점 전부 그리드 합성 셀이 비어 있지 않아야 한다 (hot 스팟 정합 검증)."""
+    for d in DISTRICTS:
+        r = client.get(f"{V1}/heatmap/vacancy", params={"district": d["id"]})
+        assert r.status_code == 200, d["id"]
+        hm = r.json()
+        assert hm["cells"], f"{d['id']} 그리드 셀 없음"
+        assert hm["sum_stores"] > 0, d["id"]
+
+
 def test_postings_and_marketing():
-    r = client.get(f"{V1}/commercial-districts/starfield/postings")
+    r = client.get(f"{V1}/commercial-districts/hongdae/postings")
     assert r.status_code == 200
     postings = r.json()
     assert len(postings) == 5
@@ -55,7 +68,7 @@ def test_postings_and_marketing():
     assert set(sc.keys()) == {"premium", "value", "factory"}
     assert any(v["recommended"] for v in sc.values())
 
-    r = client.get(f"{V1}/marketing/starfield")
+    r = client.get(f"{V1}/marketing/hongdae")
     assert r.status_code == 200
     assert len(r.json()["events"]) == 3
 
