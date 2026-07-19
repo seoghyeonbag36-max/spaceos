@@ -14,7 +14,8 @@ export function loadNaverMaps(): Promise<void> {
   if (window.naver?.maps) return Promise.resolve();
   if (_loading) return _loading;
   _loading = new Promise<void>((resolve, reject) => {
-    const keyId = import.meta.env.VITE_NAVER_MAPS_KEY_ID;
+    // 환경변수에 BOM(U+FEFF)·공백이 섞이면 네이버 인증이 실패하므로 반드시 제거한다.
+    const keyId = (import.meta.env.VITE_NAVER_MAPS_KEY_ID ?? '').replace(/\uFEFF/g, '').trim();
     if (!keyId) return reject(new Error('VITE_NAVER_MAPS_KEY_ID 미설정 (.env 확인)'));
     const s = document.createElement('script');
     // submodules=visualization: 유동인구 HeatMap(naver.maps.visualization.HeatMap) 사용에 필요.
