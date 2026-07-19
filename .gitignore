@@ -24,6 +24,10 @@ data/gold/*
 !data/gold/.gitkeep
 *.parquet
 *.glb
+# 예외: 가로수길 gold 실데이터 (~0.8MB) — Vercel git 배포에서 서빙하므로 추적.
+# *.parquet 전역 제외보다 뒤에 있어야 parquet 재포함이 유효하다.
+!data/gold/garosugil/
+!data/gold/garosugil/**
 
 # IDE / OS
 .DS_Store

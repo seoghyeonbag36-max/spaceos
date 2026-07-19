@@ -1,0 +1,9 @@
+{
+  "estimated_vacancy_pct": 56.1,
+  "anchor_street_pct": 41.6,
+  "anchor_mall_pct": 9.99,
+  "alpha_street": 0.742,
+  "gap_pp": 14.5,
+  "buildings_used": 571,
+  "note": "vacancy_calibrated = vacancy_bldg × alpha_street (근사). 가두/집합 분리 집계 정밀화 TODO (poc §5)."
+}

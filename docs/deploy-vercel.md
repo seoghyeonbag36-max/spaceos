@@ -62,9 +62,8 @@ curl.exe -s https://<프로젝트>.vercel.app/api/v1/commercial-districts   # 13
 
 ## 배포판 제약 (의도된 것)
 
-- `data/gold/` 미포함 → `/api/v1/heatmap/buildings` 는 샘플 폴백(8동) 응답.
-  실데이터를 서빙하려면 `.vercelignore` 에서 `data/gold/garosugil` 만 예외 처리(`!/data/gold/garosugil/`)할 것.
+- `data/gold/garosugil/` 은 포함(2026-07-19, ~0.8MB) → `/api/v1/heatmap/buildings` 가 실데이터 응답.
+  그 외 `data/` 는 미포함. git 자동 배포는 **GitHub 저장소 기준**이므로 `.vercelignore` 예외만으로는
+  부족하고 `.gitignore` 에도 `!data/gold/garosugil/**` 예외가 있어야 한다 (둘 다 적용됨, 2026-07-19).
 - `html/` 미포함 → `/maps` 정적 대시보드는 서빙되지 않음 (main.py 가 존재 시에만 mount — 에러 없음).
 - DB/Redis 미연동 (로컬과 동일 — 시드 데이터 서빙).
-- git 연동 배포(푸시 자동 배포)를 원하면: `git init` 후 GitHub 업로드 → Vercel 대시보드에서
-  Import → Root Directory 를 `spaceos` 로 지정하면 이 구성이 그대로 적용된다.

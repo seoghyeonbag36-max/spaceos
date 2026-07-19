@@ -7,7 +7,12 @@ node_modules
 **/.env
 
 # 대용량·배포 무관 루트 디렉토리
-/data/
+# data 는 gold/garosugil(실데이터 서빙, ~0.8MB)만 예외 포함 — 디렉토리 통째 제외 시
+# 하위 ! 재포함이 무시되므로 단계적으로 연다 (gitignore 의미론).
+/data/*
+!/data/gold/
+/data/gold/*
+!/data/gold/garosugil/
 /html/
 /ml/
 /design/
