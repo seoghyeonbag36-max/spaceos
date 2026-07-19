@@ -97,6 +97,9 @@ cd apps/frontend && npm run build         # 타입체크 + 빌드
 # 전체 로컬 스택 (DB + Redis + Backend)
 docker compose -f infra/docker/docker-compose.yml up
 
+# Vercel 배포 (프론트 정적 + FastAPI 서버리스 단일 프로젝트) — docs/deploy-vercel.md 참조
+cd spaceos && vercel --prod
+
 # ML 골격 확인
 cd ml && python models/lstm/vacancy_lstm.py
 ```

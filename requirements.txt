@@ -1,0 +1,9 @@
+# Vercel Python 서버리스 함수(api/index.py) 의존성 — 배포용 최소 셋.
+# 로컬 개발 전체 의존성은 apps/backend/requirements.txt (DB/Redis/Celery 포함) 사용.
+# sqlalchemy/redis/celery 는 앱 기동 시 import 되지 않으므로 제외 (연동 시 추가).
+# anthropic 은 LLM_API_KEY 설정 시에만 지연 import — Vercel 에서 Program LLM 생성을
+# 쓰려면 아래 주석을 해제할 것 (미설치 시 규칙 기반 폴백으로 동작).
+fastapi==0.115.0
+pydantic==2.9.2
+pydantic-settings==2.5.2
+# anthropic==0.117.0

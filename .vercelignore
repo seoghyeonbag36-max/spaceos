@@ -1,0 +1,30 @@
+# Vercel 업로드 제외 — 빌드(apps/frontend)와 서버리스 함수(api + apps/backend)에 필요한 것만 올린다.
+# 주의: 선행 슬래시(/)로 앵커 — 없으면 중첩 경로(apps/frontend/src/design 등)까지 제외된다.
+node_modules
+**/__pycache__
+**/.pytest_cache
+.env
+**/.env
+
+# 대용량·배포 무관 루트 디렉토리
+/data/
+/html/
+/ml/
+/design/
+/vision/
+/memory/
+/docs/
+/infra/
+/scripts/
+/.claude/
+
+# 산출물·스크립트 파일 (루트)
+/*.docx
+/*.pptx
+/*.log
+/run_score.bat
+/score.py
+/test_naver.py
+/apps/frontend/dist
+/apps/backend/tests
+/apps/frontend/.storybook
