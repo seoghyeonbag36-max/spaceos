@@ -16,6 +16,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from pathlib import Path
+
 from data.collectors.common import GOLD
 from data.config.garosugil import SLUG
 
@@ -30,11 +32,11 @@ _M_PER_DEG_LAT = 111000.0
 _M_PER_DEG_LON = 88300.0
 
 
-def build_edges() -> None:
-    if not _NODES.exists():
-        print(f"[edges] 노드 없음: {_NODES} — build_gold(build_store_graph_nodes) 먼저")
+def build_edges(nodes_path: Path = _NODES, edges_path: Path = _EDGES) -> None:
+    if not nodes_path.exists():
+        print(f"[edges] 노드 없음: {nodes_path} — build_gold(build_store_graph_nodes) 먼저")
         return
-    df = pd.read_parquet(_NODES)
+    df = pd.read_parquet(nodes_path)
     df["lat"] = pd.to_numeric(df["lat"], errors="coerce")
     df["lon"] = pd.to_numeric(df["lon"], errors="coerce")
     bad = df["lat"].isna() | df["lon"].isna()
@@ -70,15 +72,27 @@ def build_edges() -> None:
             })
 
     out = pd.DataFrame(rows)
-    out.to_parquet(_EDGES, index=False)
+    out.to_parquet(edges_path, index=False)
 
     # 품질 리포트 — 고립 노드(엣지 0개)가 많으면 반경/k 재검토
     deg = pd.concat([out["src"], out["dst"]]).value_counts()
     isolated = n - deg.index.nunique()
-    print(f"[edges] {_EDGES.name}: 노드 {n} → 엣지 {len(out)} (무방향)")
+    print(f"[edges] {edges_path.parent.name}/{edges_path.name}: 노드 {n} → 엣지 {len(out)} (무방향)")
     print(f"  평균 거리 {out['dist_m'].mean():.1f}m · 최대 {out['dist_m'].max():.1f}m"
           f" · 평균 차수 {2 * len(out) / n:.1f} · 고립 노드 {isolated}")
 
 
+def build_edges_platform13() -> None:
+    """13거점 노드(gold/platform13) 기반 엣지 — 150m 캡이 사실상 거점 내 연결만 남긴다."""
+    p13 = GOLD / "platform13"
+    build_edges(p13 / "platform_store_graph_nodes.parquet",
+                p13 / "platform_store_graph_edges.parquet")
+
+
 if __name__ == "__main__":
-    build_edges()
+    import sys
+
+    if "--platform13" in sys.argv:
+        build_edges_platform13()
+    else:
+        build_edges()

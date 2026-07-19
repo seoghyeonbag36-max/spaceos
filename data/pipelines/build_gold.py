@@ -162,6 +162,21 @@ def build_platform13_timeseries() -> None:
     else:
         print("[gold] platform13: seoul_trdar_flpop 없음 — flpop 수집 시 조인")
 
+    # 상권변화지표 조인 — 평균 운영/폐업 영업개월 (연속형, 거점 내 상권 평균)
+    ix = load_latest(SLUG13, "seoul_trdar_ix.json")
+    if ix:
+        xdf = pd.json_normalize(ix)
+        for c in ("OPR_SALE_MT_AVRG", "CLS_SALE_MT_AVRG"):
+            xdf[c] = pd.to_numeric(xdf.get(c), errors="coerce")
+        g = (xdf.groupby(["district_id", "STDR_YYQU_CD"], as_index=False)
+                [["OPR_SALE_MT_AVRG", "CLS_SALE_MT_AVRG"]].mean()
+                .rename(columns={"STDR_YYQU_CD": "quarter",
+                                 "OPR_SALE_MT_AVRG": "ix_opr_mt",
+                                 "CLS_SALE_MT_AVRG": "ix_cls_mt"}))
+        out = out.merge(g, on=["district_id", "quarter"], how="left")
+    else:
+        print("[gold] platform13: seoul_trdar_ix 없음 — income-ix 수집 시 조인")
+
     # R-ONE 공실률·임대료 조인 (rone_rent 수집분 — 없으면 건너뜀)
     for series, col in (("vac_small", "vac_small"), ("vac_mid", "vac_mid"),
                         ("rent_small", "rent_small")):
@@ -189,6 +204,32 @@ def build_platform13_timeseries() -> None:
         print(f"  [경고] 시계열 미포함 거점: {missing}")
 
     _save(out, GOLD / SLUG13, "platform_district_timeseries")
+
+
+def build_platform13_store_graph_nodes() -> None:
+    """[Platform·GNN] 13거점 점포 노드 — kakao_local --platform13 수집분.
+
+    gold/platform13/platform_store_graph_nodes.parquet (district_id 포함).
+    가로수길 단일 거점 노드(gold/garosugil)와 별개 신규 산출물.
+    """
+    places = load_latest(SLUG13, "kakao_places.json")
+    if not places:
+        print("[gold] platform13 graph nodes: Bronze 없음 — kakao_local --platform13 먼저")
+        return
+    rows = [{
+        "node_id": f"kakao:{d.get('id', '')}",
+        "name": d.get("place_name", ""),
+        "category": d.get("category_name", ""),
+        "lon": d.get("x"), "lat": d.get("y"),
+        "place_url": d.get("place_url", ""),
+        "district_id": d.get("district_id", ""),
+        "source": "kakao",
+    } for d in places]
+    df = pd.DataFrame(rows)
+    per = df.groupby("district_id").size()
+    print(f"[gold] platform13 graph nodes: {len(df)}노드 / 거점 {per.index.nunique()}곳"
+          f" (최소 {per.min()} · 최대 {per.max()})")
+    _save(df, GOLD / SLUG13, "platform_store_graph_nodes")
 
 
 def build_store_graph_nodes() -> None:
@@ -286,5 +327,19 @@ def run() -> None:
     build_program_context()
 
 
+def run_platform13() -> None:
+    """platform13 산출물만 갱신 — garosugil PoC gold 는 건드리지 않는다 (덮어쓰기 금지 규칙)."""
+    if pd is None:
+        print("pandas 필요: pip install pandas pyarrow")
+        return
+    build_platform13_timeseries()
+    build_platform13_store_graph_nodes()
+
+
 if __name__ == "__main__":
-    run()
+    import sys
+
+    if "--platform13" in sys.argv:
+        run_platform13()
+    else:
+        run()

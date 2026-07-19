@@ -91,8 +91,22 @@ def _log_mlflow(res: dict, run_name: str) -> None:
         print(f"[mlflow] 기록 실패(무시): {exc}")
 
 
+_MAX_HORIZON = 4  # 재귀 예측 최대 분기 수
+
+
+def _next_quarter(q: str) -> str:
+    """'20261' → '20262', '20264' → '20271'."""
+    y, qq = int(q[:4]), int(q[4])
+    return f"{y + 1}1" if qq == 4 else f"{y}{qq + 1}"
+
+
 def _forecast_next(res: dict) -> dict:
-    """거점별 최신 look_back 분기 윈도우로 다음 분기 vac_proxy 예측."""
+    """거점별 최신 look_back 분기 윈도우로 1~4분기 앞 vac_proxy 재귀 예측.
+
+    h2+ 는 예측 타깃값(피처 0)을 윈도우에 되먹이고 나머지 외생 피처는 마지막 관측값으로
+    고정(persistence)한다 — 외생 피처의 미래값을 모르는 상태의 보수적 근사. 검증된
+    홀드아웃 지표(방향 84.6%)는 h1 기준이며 h2+ 는 불확실성이 커진다(응답에 명시).
+    """
     ds, model = res["ds"], res["model"]
     df = load_gold()
     lb = res["params"]["look_back"]
@@ -105,17 +119,36 @@ def _forecast_next(res: dict) -> dict:
             continue
         onehot = np.zeros(len(ds.district_ids))
         onehot[di] = 1.0
-        win = np.hstack([z[-lb:], np.tile(onehot, (lb, 1))]).astype(np.float32)
-        with torch.no_grad():
-            p = float(model(torch.from_numpy(win[None])).item()) * ds.y_sd + ds.y_mu
+        win = z[-lb:].copy()
         last = float(g[TARGET].iloc[-1])
+        q = str(g["quarter"].iloc[-1])
+        horizons: list[dict] = []
+        prev = last
+        for _ in range(_MAX_HORIZON):
+            x = np.hstack([win, np.tile(onehot, (lb, 1))]).astype(np.float32)
+            with torch.no_grad():
+                p = float(model(torch.from_numpy(x[None])).item()) * ds.y_sd + ds.y_mu
+            q = _next_quarter(q)
+            horizons.append({
+                "quarter": q,
+                "forecast_vac_proxy": round(p, 3),
+                "delta": round(p - prev, 3),
+                "direction": "up" if p > prev else "down",
+            })
+            # 되먹임: 마지막 관측 피처행을 복제하되 타깃(0열)만 예측값으로 교체
+            nxt = win[-1].copy()
+            nxt[0] = (p - ds.mu[0]) / ds.sd[0]
+            win = np.vstack([win[1:], nxt])
+            prev = p
+        h1 = horizons[0]
         out[did] = {
-            "forecast_vac_proxy": round(p, 3),
+            "forecast_vac_proxy": h1["forecast_vac_proxy"],
             "last_vac_proxy": round(last, 3),
-            "delta": round(p - last, 3),
-            "direction": "up" if p > last else "down",
+            "delta": h1["delta"],
+            "direction": h1["direction"],
             "last_quarter": str(g["quarter"].iloc[-1]),
             "n_quarters": int(len(g)),
+            "horizons": horizons,
         }
     return out
 

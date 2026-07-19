@@ -35,8 +35,9 @@ CATEGORY_GROUPS: dict[str, str] = {
 }
 
 
-def _search_category(key: str, group: str) -> list[dict]:
-    """카테고리 1개를 페이징 수집 (최대 45건 제한)."""
+def _search_category(key: str, group: str, cx: float | None = None, cy: float | None = None,
+                     radius: int | None = None) -> list[dict]:
+    """카테고리 1개를 페이징 수집 (최대 45건 제한). 좌표 미지정 시 가로수길 기본."""
     docs: list[dict] = []
     for page in range(1, 4):  # size 15 × 3페이지 = 노출 상한 45건
         resp = requests.get(
@@ -44,7 +45,9 @@ def _search_category(key: str, group: str) -> list[dict]:
             headers={"Authorization": f"KakaoAK {key}"},
             params={
                 "category_group_code": group,
-                "x": CX, "y": CY, "radius": RADIUS_M,
+                "x": cx if cx is not None else CX,
+                "y": cy if cy is not None else CY,
+                "radius": radius if radius is not None else RADIUS_M,
                 "page": page, "size": 15, "sort": "distance",
             },
             timeout=15,
@@ -81,6 +84,50 @@ def collect() -> list[dict]:
     return places
 
 
+def collect_platform13() -> list[dict]:
+    """[Platform·GNN] 13거점 현존 점포 수집 — GNN 노드 확장(가로수길→13거점)의 원천.
+
+    거점×카테고리 반경 수집, 행마다 district_id 부가. 45건 상한에 걸린 카테고리는
+    ★ 로 표시 (격자 분할 수집은 TODO — 현 단계는 GNN 표본 확장이 목적).
+    Bronze: data/bronze/platform13/{날짜}/kakao_places.json
+    """
+    from data.config.platform_places import DISTRICT_PLACES
+
+    key = os.getenv("KAKAO_REST_API_KEY")
+    if not key or requests is None:
+        print("[kakao_local] KAKAO_REST_API_KEY 미설정(또는 requests 없음) — 건너뜀")
+        return []
+
+    seen: dict[str, dict] = {}
+    for did, (lat, lng, radius, _name) in DISTRICT_PLACES.items():
+        n_before = len(seen)
+        capped: list[str] = []
+        for group, label in CATEGORY_GROUPS.items():
+            try:
+                docs = _search_category(key, group, cx=lng, cy=lat, radius=radius)
+            except Exception as exc:
+                print(f"  {did} {group}({label}): 실패 — {exc}")
+                continue
+            if len(docs) >= 45:
+                capped.append(label)
+            for d in docs:
+                pid = d.get("id", d.get("place_url", ""))
+                # 인접 거점 반경 중복 시 먼저 수집한 거점 소속 유지
+                if pid not in seen:
+                    seen[pid] = {**d, "district_id": did}
+        cap = f" ★상한: {','.join(capped)}" if capped else ""
+        print(f"  {did}: {len(seen) - n_before}건{cap}")
+
+    places = list(seen.values())
+    save_json(places, "platform13", "kakao_places.json")
+    return places
+
+
 if __name__ == "__main__":
+    import sys
+
     load_env()
-    collect()
+    if "--platform13" in sys.argv:
+        collect_platform13()
+    else:
+        collect()

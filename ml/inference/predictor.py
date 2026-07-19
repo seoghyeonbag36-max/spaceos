@@ -15,8 +15,34 @@ from typing import Any
 _REPO = Path(__file__).resolve().parents[2]
 ARTIFACT = _REPO / "ml" / "artifacts" / "vacancy_lstm.pt"
 FORECAST_JSON = _REPO / "data" / "gold" / "platform_vacancy_forecast.json"
+CALIBRATION_JSON = _REPO / "data" / "gold" / "garosugil" / "calibration.json"
+
+# 지상검증 실측 앵커 보유 거점 (PoC exit 통과분 — 단일 시점 스냅샷)
+_ANCHOR_DISTRICTS = {"garosugil"}
 
 _cache: dict[str, Any] = {}
+
+
+def _anchor(district_id: str) -> dict | None:
+    """garosugil 은 building_vacancy PoC 실측(정확도 75%)을 참조 앵커로 부착.
+
+    단일 시점 스냅샷이라 시계열 피처가 아닌 서빙 참조값 — 예측(vac_proxy 스케일)과
+    실제 공실률 스케일(%)의 간극을 소비자가 가늠하게 한다.
+    """
+    if district_id not in _ANCHOR_DISTRICTS or not CALIBRATION_JSON.exists():
+        return None
+    if "anchor" not in _cache:
+        import datetime
+
+        cal = json.loads(CALIBRATION_JSON.read_text(encoding="utf-8"))
+        _cache["anchor"] = {
+            "estimated_vacancy_pct": cal.get("estimated_vacancy_pct"),
+            "anchor_street_pct": cal.get("anchor_street_pct"),
+            "buildings_used": cal.get("buildings_used"),
+            "as_of": datetime.date.fromtimestamp(CALIBRATION_JSON.stat().st_mtime).isoformat(),
+            "source": "building_vacancy PoC 지상검증(정확도 75%) — 단일 시점 스냅샷",
+        }
+    return _cache["anchor"]
 
 
 def _load_forecast() -> dict | None:
@@ -89,6 +115,9 @@ def predict_vacancy(district_id: str) -> dict | None:
         fc = _load_forecast() or {}
         out["metrics"] = fc.get("metrics")
         out["model"] = (fc or {}).get("model", "vacancy-lstm-pooled-v2")
+        anchor = _anchor(district_id)
+        if anchor:
+            out["ground_anchor"] = anchor
         return out
 
     fc = _load_forecast()
@@ -97,7 +126,7 @@ def predict_vacancy(district_id: str) -> dict | None:
     item = fc.get("forecasts", {}).get(district_id)
     if item is None:
         return None
-    return {
+    out = {
         "district_id": district_id,
         **item,
         "metrics": fc.get("metrics"),
@@ -105,6 +134,10 @@ def predict_vacancy(district_id: str) -> dict | None:
         "trained_at": fc.get("trained_at"),
         "source": "forecast_json",
     }
+    anchor = _anchor(district_id)
+    if anchor:
+        out["ground_anchor"] = anchor
+    return out
 
 
 if __name__ == "__main__":

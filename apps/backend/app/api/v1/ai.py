@@ -22,11 +22,13 @@ class IndustryRequest(BaseModel):
 async def predict_vacancy(req: VacancyRequest) -> dict[str, object]:
     """LSTM 공실 예측 — gold/platform_vacancy_forecast.json 서빙 (홀드아웃 방향정확도 84.6%).
 
+    horizon_months(1~12)는 분기로 환산(올림, 최대 4분기)해 재귀 예측 horizon 을 고른다.
     forecast json 부재 시(신규 클론 등) 스텁 응답으로 폴백, 미지원 거점은 404.
     """
     if not vacancy_svc.is_available():
         return {"district_id": req.district_id, "predicted_vacancy_rate": None, "model": "lstm-stub"}
-    out = vacancy_svc.get_forecast(req.district_id)
+    quarters = max(1, min(-(-req.horizon_months // 3), 4))  # ceil(months/3), 1~4 클램프
+    out = vacancy_svc.get_forecast(req.district_id, quarters=quarters)
     if out is None:
         raise HTTPException(status_code=404, detail=f"no forecast for district: {req.district_id}")
     return out

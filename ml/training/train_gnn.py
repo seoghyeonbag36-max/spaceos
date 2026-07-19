@@ -22,18 +22,21 @@ import pandas as pd
 _REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO))
 
-_GOLD = _REPO / "data" / "gold" / "garosugil"
-NODES = _GOLD / "platform_store_graph_nodes.parquet"
-EDGES = _GOLD / "platform_store_graph_edges.parquet"
+_GOLD = _REPO / "data" / "gold"
 
 MIN_CLASS_NODES = 10  # 이보다 작은 업종 대분류는 '기타'로 병합 예정
 
 
 def load_graph() -> tuple[pd.DataFrame, pd.DataFrame]:
-    if not NODES.exists() or not EDGES.exists():
-        raise FileNotFoundError(
-            "그래프 gold 없음 — build_gold + build_store_graph_edges 먼저 실행")
-    return pd.read_parquet(NODES), pd.read_parquet(EDGES)
+    """platform13(13거점) 그래프 우선, 없으면 garosugil 단일 거점 폴백."""
+    for slug in ("platform13", "garosugil"):
+        nodes = _GOLD / slug / "platform_store_graph_nodes.parquet"
+        edges = _GOLD / slug / "platform_store_graph_edges.parquet"
+        if nodes.exists() and edges.exists():
+            print(f"[gnn] 그래프 소스: gold/{slug}")
+            return pd.read_parquet(nodes), pd.read_parquet(edges)
+    raise FileNotFoundError(
+        "그래프 gold 없음 — build_gold + build_store_graph_edges 먼저 실행")
 
 
 def quality_report() -> dict:

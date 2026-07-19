@@ -10,7 +10,8 @@
   - R-ONE 유의: 일부 거점은 상권 공유 매핑(config/rone_districts.py) — 공유 거점끼리
     R-ONE 피처 동일.
   - garosugil 은 building_vacancy(지상검증 PoC) 실측 공실률이 있으나 단일 시점 스냅샷이라
-    시계열 피처 대신 서빙 단계 보정 앵커로 사용한다 (ml/inference/predictor.py 참조).
+    시계열 피처 대신 서빙 응답의 참조 앵커(ground_anchor)로 부착한다 —
+    ml/inference/predictor.py · apps/backend/app/services/vacancy_forecast.py 의 _anchor().
 
 분기 데이터라 look_back 은 월 단위(30)가 아니라 가용 분기 수에 맞춘다 — 거점당
 분기 수가 적으므로 전 거점 통합(pooled) 학습 + 거점 임베딩(정적 원핫) 방식.
@@ -30,8 +31,9 @@ GOLD_TS = _REPO / "data" / "gold" / "platform13" / "platform_district_timeseries
 SEQ_FEATURES = ("vac_proxy", "vac_small", "vac_mid", "rent_small",
                 "log_selng", "stor_idx", "opbiz_rt", "clsbiz_rt")
 TARGET = "vac_proxy"
-# log_flpop(유동인구)은 피처 제외 — 추가 시 MAE 0.901→1.018 악화 (2026-07-19 ablation,
-# mlruns 기록). gold 에는 flpop 컬럼 유지 — 표본 확대 후 재시도 TODO.
+# ablation 기각 피처 (2026-07-19, mlruns 기록 — gold 컬럼은 유지, 표본 확대 후 재시도 TODO):
+#   log_flpop(유동인구)        MAE 0.901→1.018 악화
+#   ix_opr_mt/ix_cls_mt(상권변화지표 평균 영업개월)  방향정확도 84.6%→76.9% 악화
 
 
 def load_gold() -> pd.DataFrame:

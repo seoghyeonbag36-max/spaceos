@@ -100,7 +100,56 @@ def collect_trend() -> dict:
     return data
 
 
+def collect_platform13_blog() -> list[dict]:
+    """[Platform·GNN/Program] 13거점 블로그 리뷰 수집 — 리뷰 유사도 엣지·감성 피처 원천.
+
+    거점당 '{명칭} 맛집'·'{명칭} 카페' 2키워드 × 2페이지(최대 400건). 행에 district_id 부가.
+    Bronze: data/bronze/platform13/{날짜}/naver_blog.json
+    """
+    from data.config.platform_places import DISTRICT_PLACES
+
+    headers = _headers()
+    if headers is None or requests is None:
+        print("[naver_blog] NAVER_CLIENT_ID/SECRET 미설정(또는 requests 없음) — 건너뜀")
+        return []
+
+    seen: dict[str, dict] = {}
+    for did, (_lat, _lng, _radius, name) in DISTRICT_PLACES.items():
+        got = 0
+        for kw in (f"{name} 맛집", f"{name} 카페"):
+            for page in range(2):
+                try:
+                    resp = requests.get(
+                        _BLOG_URL, headers=headers,
+                        params={"query": kw, "display": _DISPLAY,
+                                "start": page * _DISPLAY + 1, "sort": "date"},
+                        timeout=15,
+                    )
+                    resp.raise_for_status()
+                    items = resp.json().get("items", [])
+                except Exception as exc:
+                    print(f"  {did} '{kw}' p{page + 1}: 실패 — {exc}")
+                    break
+                for it in items:
+                    it["_query"] = kw
+                    it["district_id"] = did
+                    seen[it.get("link", "")] = it
+                got += len(items)
+                if len(items) < _DISPLAY:
+                    break
+        print(f"  {did}: {got}건")
+
+    posts = list(seen.values())
+    save_json(posts, "platform13", "naver_blog.json")
+    return posts
+
+
 if __name__ == "__main__":
+    import sys
+
     load_env()
-    collect_blog()
-    collect_trend()
+    if "--platform13" in sys.argv:
+        collect_platform13_blog()
+    else:
+        collect_blog()
+        collect_trend()

@@ -181,11 +181,11 @@ def collect_platform13() -> dict[str, int]:
     return counts
 
 
-def collect_platform13_flpop() -> int:
-    """[Platform·LSTM] 길단위(유동)인구 분기 시계열 — selng 와 같은 분기 전량 페이징.
+def _collect_platform13_quarterly(service: str, suffix: str) -> int:
+    """[Platform·LSTM] 상권당 1행/분기 서비스 공통 수집 — 분기 전량 페이징 + 로컬 필터.
 
-    VwsmTrdarFlpopQq 는 상권당 1행/분기(≈1,650행)라 분기별 2페이지면 전량이다.
-    Bronze: data/bronze/platform13/{날짜}/seoul_trdar_flpop.json (district_id 부가).
+    flpop(길단위인구)·income(소득소비)·ix(상권변화지표)가 이 패턴 (분기당 ≈1,650행 = 2페이지).
+    Bronze: data/bronze/platform13/{날짜}/seoul_trdar_{suffix}.json (district_id 부가).
     """
     key = os.getenv("SEOUL_OPENAPI_KEY")
     if not key or requests is None:
@@ -196,24 +196,38 @@ def collect_platform13_flpop() -> int:
         return [{**r, "district_id": TRDAR_TO_DISTRICT[str(r.get("TRDAR_CD", ""))]}
                 for r in rows if str(r.get("TRDAR_CD", "")) in TRDAR_TO_DISTRICT]
 
-    flpop_rows: list[dict] = []
+    all_rows: list[dict] = []
     for q in QUARTERS:
         start, total, q_rows = 1, 0, []
         while start <= _MAX_ROWS:
             try:
-                page, total = _fetch_page(key, "VwsmTrdarFlpopQq", start, start + _PAGE - 1, f"/{q}")
+                page, total = _fetch_page(key, service, start, start + _PAGE - 1, f"/{q}")
             except Exception as exc:
-                print(f"  flpop {q}: 실패 — {exc}")
+                print(f"  {suffix} {q}: 실패 — {exc}")
                 break
             q_rows.extend(r for r in page if str(r.get("TRDAR_CD", "")) in TRDAR_TO_DISTRICT)
             start += _PAGE
             if not page or start > total:
                 break
-        print(f"  flpop {q}: 전체 {total}행 중 거점 {len(q_rows)}행")
-        flpop_rows.extend(q_rows)
-    flpop_rows = _tag(flpop_rows)
-    save_json(flpop_rows, SLUG13, "seoul_trdar_flpop.json")
-    return len(flpop_rows)
+        print(f"  {suffix} {q}: 전체 {total}행 중 거점 {len(q_rows)}행")
+        all_rows.extend(q_rows)
+    all_rows = _tag(all_rows)
+    save_json(all_rows, SLUG13, f"seoul_trdar_{suffix}.json")
+    return len(all_rows)
+
+
+def collect_platform13_flpop() -> int:
+    """길단위(유동)인구 분기 시계열."""
+    return _collect_platform13_quarterly("VwsmTrdarFlpopQq", "flpop")
+
+
+def collect_platform13_income_ix() -> dict[str, int]:
+    """상권변화지표(ix) 분기 시계열.
+
+    ⚠️ 소득소비-상권(OA-21278)은 2026-06 서비스 종료 확인(ERROR-500) — 수집 불가.
+    자치구 단위(OA-22167)로의 대체는 상권 정밀도가 떨어져 보류.
+    """
+    return {"ix": _collect_platform13_quarterly("VwsmTrdarIxQq", "ix")}
 
 
 if __name__ == "__main__":
@@ -222,6 +236,8 @@ if __name__ == "__main__":
     load_env()
     if "--platform13-flpop" in sys.argv:
         collect_platform13_flpop()
+    elif "--platform13-income-ix" in sys.argv:
+        collect_platform13_income_ix()
     elif "--platform13" in sys.argv:
         collect_platform13()
     else:

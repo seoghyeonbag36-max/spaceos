@@ -13,11 +13,15 @@
   실험 기록(2026-07-19, mlruns): ① 타깃을 vac_small(실측)로 교체 → 방향정확도 46.2% 실패
   (표본개편 점프·소표본 0% 노이즈) ② log_flpop 피처 추가 → MAE 0.901→1.018 악화. 둘 다 보류.
 - 학습: look_back 8분기, 거점 원핫 pooled (v2 best: hidden 32 / 1층). 홀드아웃 = 거점별 마지막 분기. 방향 오답: apgujeong-rodeo, songridan
+- 다분기 예측: 1~4분기 재귀 예측(`horizons`) — API `horizon_months`(1~12, 분기 올림 환산)로 선택. h2+ 는 외생 피처 persistence 근사라 불확실성 증가(검증 지표는 h1 기준)
+- 실측 앵커: garosugil 응답에 `ground_anchor`(PoC 지상검증 39.1%, 가두 앵커 41.6%, 571동) 부착 — 프록시 스케일과 실제 공실률의 간극 참조용
+- 추가 피처 실험: 상권변화지표(ix_opr_mt/ix_cls_mt)는 방향정확도 84.6→76.9% 악화로 기각(gold 컬럼은 유지). 소득소비-상권(OA-21278)은 **서비스 종료**(2026-06)로 수집 불가
+- 분기 갱신 운영: `python -m data.pipelines.refresh_platform` — 수집→Gold(platform13 한정)→엣지→재학습 원커맨드 (배포는 git push). 새 분기 추가 시 `platform_districts.QUARTERS` 갱신 필요
 - 산출: `ml/artifacts/vacancy_lstm.pt` + `data/gold/platform_vacancy_forecast.json`(2026Q2 예측) + `ml/mlruns`
 - 서빙: Vercel 서버리스에 torch 를 싣지 않으므로 **forecast json 정적 서빙이 기본 경로** — `apps/backend/app/services/vacancy_forecast.py` (인메모리 TTL 5분, json은 .gitignore/.vercelignore 예외로 배포 포함)
 - 노출: `/api/v1/ai/predict-vacancy`(스텁 교체 완료) + 대시보드·히트맵 응답의 `predicted_rate/delta/direction` + 프론트 13거점 카드·심층·범례 ▲▼ 배지
 
-**GNN 업종 추천 — 골격만.** 가로수길 점포 그래프: 노드 209(kakao) + 공간 kNN 엣지 670(k=5, ≤150m, 평균 41.2m, 고립 0) — `data/pipelines/build_store_graph_edges.py`. `ml/training/train_gnn.py` 는 품질 리포트까지만 구현(업종 대분류 18종 중 11종이 10노드 미만 → 병합 필요, 엣지가 공간 근접뿐이라 시너지/잠식 구분 불가). **학습은 엣지 다양화(고객 공유·리뷰 유사도) 후 진행.**
+**GNN 업종 추천 — 그래프 13거점 확장 완료, 학습은 보류.** 점포 그래프를 가로수길 209노드 → **13거점 2,521노드 + 공간 kNN 엣지 7,949**(k=5, ≤150m, 평균 35.1m, 고립 4)로 확장 — `kakao_local --platform13` + `build_store_graph_edges --platform13` → `gold/platform13/`. 리뷰 유사도 엣지 원천으로 13거점 블로그 4,090건도 수집(`naver_blog --platform13`). `train_gnn.py` 품질 리포트: 업종 대분류 27종 중 희소(10노드 미만) 9종 — 표본 블로커는 크게 완화됐고, **잔여 블로커는 엣지 다양화(고객 공유·리뷰 유사도 계산)뿐.** 45건 상한에 걸린 카테고리(음식점·카페 등)는 격자 분할 수집 TODO.
 
 ## 1. 담당 코드 영역
 

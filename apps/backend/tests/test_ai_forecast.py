@@ -25,6 +25,32 @@ def test_predict_vacancy_unknown_district_404():
     assert r.status_code == 404
 
 
+def test_predict_vacancy_horizon_selection():
+    """horizon_months → 분기 환산(올림, 1~4 클램프) + horizons 재귀 예측 선택."""
+    r1 = client.post(f"{V1}/ai/predict-vacancy", json={"district_id": "garosugil"})
+    r6 = client.post(f"{V1}/ai/predict-vacancy",
+                     json={"district_id": "garosugil", "horizon_months": 6})
+    b1, b6 = r1.json(), r6.json()
+    assert b1["horizon_quarters"] == 1
+    assert b6["horizon_quarters"] == 2
+    assert len(b1["horizons"]) == 4
+    assert b6["forecast_vac_proxy"] == b1["horizons"][1]["forecast_vac_proxy"]
+    # 12개월(4분기) 초과분은 4로 클램프
+    b24 = client.post(f"{V1}/ai/predict-vacancy",
+                      json={"district_id": "garosugil", "horizon_months": 24}).json()
+    assert b24["horizon_quarters"] == 4
+
+
+def test_predict_vacancy_garosugil_ground_anchor():
+    """garosugil 은 PoC 지상검증 실측 앵커가 응답에 부착돼야 한다."""
+    body = client.post(f"{V1}/ai/predict-vacancy", json={"district_id": "garosugil"}).json()
+    anchor = body.get("ground_anchor")
+    assert anchor and anchor["estimated_vacancy_pct"] == 39.1
+    # 앵커 미보유 거점에는 없어야 한다
+    body2 = client.post(f"{V1}/ai/predict-vacancy", json={"district_id": "hongdae"}).json()
+    assert "ground_anchor" not in body2
+
+
 def test_district_summaries_carry_predicted_rate():
     """D단계 — 대시보드 응답에 다음 분기 예측 필드가 실려야 한다."""
     r = client.get(f"{V1}/commercial-districts")
