@@ -13,6 +13,7 @@ node_modules
 !/data/gold/
 /data/gold/*
 !/data/gold/garosugil/
+!/data/gold/platform_vacancy_forecast.json
 /html/
 /ml/
 /design/
