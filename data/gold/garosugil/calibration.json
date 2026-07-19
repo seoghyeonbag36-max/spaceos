@@ -5,5 +5,21 @@
   "alpha_street": 0.742,
   "gap_pp": 14.5,
   "buildings_used": 571,
-  "note": "vacancy_calibrated = vacancy_bldg × alpha_street (근사). 가두/집합 분리 집계 정밀화 TODO (poc §5)."
+  "segments": {
+    "street": {
+      "estimated_vacancy_pct": 57.6,
+      "anchor_pct": 41.6,
+      "alpha": 0.722,
+      "gap_pp": 16.0,
+      "buildings": 559
+    },
+    "mall": {
+      "estimated_vacancy_pct": 31.8,
+      "anchor_pct": 9.99,
+      "alpha": 0.314,
+      "gap_pp": 21.8,
+      "buildings": 20
+    }
+  },
+  "note": "combined(v1) = 가두·집합 혼합 단일 α (기존 소비층 호환용). segments(v2) = capacity_method 로 분리한 이중 앵커 — 가두 보정은 segments.street.alpha, 집합은 segments.mall.alpha 사용 권장."
 }
