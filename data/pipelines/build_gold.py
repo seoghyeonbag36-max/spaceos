@@ -27,6 +27,7 @@ except ImportError:  # pragma: no cover
 
 from data.collectors.common import GOLD, SILVER, load_latest
 from data.config.garosugil import SLUG
+from data.config.platform_districts import DISTRICT_TRDAR, SLUG as SLUG13
 
 _GOLD_DIR = GOLD / SLUG
 _SILVER_DIR = SILVER / SLUG
@@ -102,6 +103,65 @@ def build_platform_timeseries() -> None:
 
     # TODO(§9): 생활인구(§2)·부동산원 공실률/임대료(§4)·SGIS 인구밀도(§3) 조인
     _save(out, _GOLD_DIR, "platform_district_timeseries")
+
+
+def build_platform13_timeseries() -> None:
+    """[Platform·LSTM] 13거점×분기 피처 테이블 — gold/platform13/platform_district_timeseries.
+
+    소스: bronze/platform13/seoul_trdar_{stor,selng}.json (collect_platform13 산출,
+    행마다 district_id 부가됨). 집계 규칙:
+      selng_amt  분기 추정매출 합(거점 내 상권×업종 전체)
+      stor_co    분기 점포수 합
+      opbiz_rt / clsbiz_rt  개업률/폐업률 — 점포수(STOR_CO) 가중 평균
+      n_trdar    해당 분기에 데이터가 있는 상권코드 수 (커버리지 지표)
+    ⚠️ garosugil PoC gold 와 별개 신규 산출물 (덮어쓰기 아님).
+    TODO(R-ONE): 부동산원 공실률·임대료 분기 조인 (REB_RONE_API_KEY 검증 후 §4).
+    """
+    stor = load_latest(SLUG13, "seoul_trdar_stor.json")
+    selng = load_latest(SLUG13, "seoul_trdar_selng.json")
+    if not stor:
+        print("[gold] platform13 timeseries: Bronze 없음 — seoul_trdar --platform13 수집 먼저")
+        return
+
+    sdf = pd.json_normalize(stor)
+    for c in ("STOR_CO", "OPBIZ_RT", "CLSBIZ_RT"):
+        sdf[c] = pd.to_numeric(sdf.get(c), errors="coerce")
+    sdf["_w"] = sdf["STOR_CO"].fillna(0).clip(lower=1)  # 가중치 0 방지
+
+    def _agg_stor(g: "pd.DataFrame") -> "pd.Series":
+        w = g["_w"]
+        return pd.Series({
+            "stor_co": g["STOR_CO"].sum(),
+            "opbiz_rt": (g["OPBIZ_RT"] * w).sum() / w.sum(),
+            "clsbiz_rt": (g["CLSBIZ_RT"] * w).sum() / w.sum(),
+            "n_trdar": g["TRDAR_CD"].nunique(),
+        })
+
+    out = (sdf.groupby(["district_id", "STDR_YYQU_CD"])
+              .apply(_agg_stor, include_groups=False).reset_index()
+              .rename(columns={"STDR_YYQU_CD": "quarter"}))
+
+    if selng:
+        edf = pd.json_normalize(selng)
+        edf["THSMON_SELNG_AMT"] = pd.to_numeric(edf.get("THSMON_SELNG_AMT"), errors="coerce")
+        g = (edf.groupby(["district_id", "STDR_YYQU_CD"], as_index=False)["THSMON_SELNG_AMT"].sum()
+                .rename(columns={"STDR_YYQU_CD": "quarter", "THSMON_SELNG_AMT": "selng_amt"}))
+        out = out.merge(g, on=["district_id", "quarter"], how="left")
+
+    out = out.sort_values(["district_id", "quarter"]).reset_index(drop=True)
+
+    # 커버리지 검증 — 13거점 전부 포함 여부 (미포함 거점은 경고)
+    got = set(out["district_id"].unique())
+    missing = sorted(set(DISTRICT_TRDAR) - got)
+    q_min, q_max = out["quarter"].min(), out["quarter"].max()
+    print(f"[gold] platform13 커버리지: 거점 {len(got)}/13, 분기 {q_min}~{q_max}")
+    for did in sorted(got):
+        n = (out["district_id"] == did).sum()
+        print(f"  {did}: {n}분기")
+    if missing:
+        print(f"  [경고] 시계열 미포함 거점: {missing}")
+
+    _save(out, GOLD / SLUG13, "platform_district_timeseries")
 
 
 def build_store_graph_nodes() -> None:
@@ -193,6 +253,7 @@ def run() -> None:
         return
     _SILVER_DIR.mkdir(parents=True, exist_ok=True)
     build_platform_timeseries()
+    build_platform13_timeseries()
     build_store_graph_nodes()
     build_posting_cost_benefit()
     build_program_context()

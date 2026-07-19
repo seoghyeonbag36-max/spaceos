@@ -20,6 +20,12 @@ except ImportError:  # pragma: no cover
 
 from data.collectors.common import load_env, save_json
 from data.config.garosugil import SLUG, TRDAR_NAME_KEYWORDS
+from data.config.platform_districts import (
+    ALL_TRDAR_CODES,
+    QUARTERS,
+    SLUG as SLUG13,
+    TRDAR_TO_DISTRICT,
+)
 
 # 파일명 접미사 → 서울 열린데이터광장 서비스명 (※발급 후 [미리보기]로 재확인)
 SERVICES: dict[str, str] = {
@@ -85,6 +91,101 @@ def collect() -> dict[str, int]:
     return counts
 
 
+def _fetch_page(key: str, service: str, start: int, end: int, extra: str = "") -> tuple[list[dict], int]:
+    """단일 페이지 요청. (rows, list_total_count) 반환. 오류 응답은 예외."""
+    url = f"http://openapi.seoul.go.kr:8088/{key}/json/{service}/{start}/{end}{extra}"
+    resp = requests.get(url, timeout=30)
+    resp.raise_for_status()
+    body = resp.json()
+    if service not in body:
+        msg = body.get("RESULT", {}).get("MESSAGE", str(body)[:200])
+        raise RuntimeError(f"{service}: {msg}")
+    payload = body[service]
+    return payload.get("row", []), int(payload.get("list_total_count", 0))
+
+
+def collect_platform13() -> dict[str, int]:
+    """[Platform·LSTM] 13거점(platform_districts.DISTRICT_TRDAR) 분기 시계열 수집.
+
+    전략 (2026-07-19 프로브 확정 — data/probe_trdar_api.py):
+      relm  전량 1,650행(2페이지) → 코드 필터
+      stor  분기+상권코드 경로 필터 지원 → (코드×분기) 직접 쿼리
+      selng 코드 필터 미지원(총량 46만행) → 분기별 전량(~22페이지) 후 로컬 필터
+    Bronze: data/bronze/platform13/{날짜}/seoul_trdar_{relm,stor,selng}.json
+    각 행에 district_id(거점 id)를 부가한다 — 원본 필드는 무가공 유지.
+    """
+    key = os.getenv("SEOUL_OPENAPI_KEY")
+    if not key or requests is None:
+        print("[seoul_trdar] SEOUL_OPENAPI_KEY 미설정(또는 requests 없음) — 건너뜀")
+        return {}
+    counts: dict[str, int] = {}
+
+    def _tag(rows: list[dict]) -> list[dict]:
+        return [{**r, "district_id": TRDAR_TO_DISTRICT[str(r.get("TRDAR_CD", ""))]}
+                for r in rows if str(r.get("TRDAR_CD", "")) in TRDAR_TO_DISTRICT]
+
+    # 1) relm — 상권 마스터 (좌표·면적 포함)
+    rows: list[dict] = []
+    start = 1
+    while True:
+        page, total = _fetch_page(key, "TbgisTrdarRelm", start, start + _PAGE - 1)
+        rows.extend(page)
+        start += _PAGE
+        if not page or start > total:
+            break
+    hit = _tag(rows)
+    save_json(hit, SLUG13, "seoul_trdar_relm.json")
+    counts["relm"] = len(hit)
+    missing = set(ALL_TRDAR_CODES) - {str(r["TRDAR_CD"]) for r in hit}
+    if missing:
+        print(f"  [경고] relm 에 없는 매핑 코드: {sorted(missing)}")
+
+    # 2) stor — (코드×분기) 직접 쿼리
+    stor_rows: list[dict] = []
+    for q in QUARTERS:
+        q_hits = 0
+        for code in ALL_TRDAR_CODES:
+            try:
+                page, _ = _fetch_page(key, "VwsmTrdarStorQq", 1, _PAGE, f"/{q}/{code}")
+            except Exception as exc:
+                print(f"  stor {q}/{code}: 실패 — {exc}")
+                continue
+            # 필터 미적용 응답(전체 반환) 방지 — 코드 일치 행만 채택
+            page = [r for r in page if str(r.get("TRDAR_CD")) == code and str(r.get("STDR_YYQU_CD")) == q]
+            q_hits += len(page)
+            stor_rows.extend(page)
+        print(f"  stor {q}: {q_hits}행")
+    stor_rows = _tag(stor_rows)
+    save_json(stor_rows, SLUG13, "seoul_trdar_stor.json")
+    counts["stor"] = len(stor_rows)
+
+    # 3) selng — 분기 전량 페이징 후 로컬 필터
+    selng_rows: list[dict] = []
+    for q in QUARTERS:
+        start, total, q_rows = 1, 0, []
+        while start <= _MAX_ROWS:
+            try:
+                page, total = _fetch_page(key, "VwsmTrdarSelngQq", start, start + _PAGE - 1, f"/{q}")
+            except Exception as exc:
+                print(f"  selng {q}: 실패 — {exc}")
+                break
+            q_rows.extend(r for r in page if str(r.get("TRDAR_CD", "")) in TRDAR_TO_DISTRICT)
+            start += _PAGE
+            if not page or start > total:
+                break
+        print(f"  selng {q}: 전체 {total}행 중 거점 {len(q_rows)}행")
+        selng_rows.extend(q_rows)
+    selng_rows = _tag(selng_rows)
+    save_json(selng_rows, SLUG13, "seoul_trdar_selng.json")
+    counts["selng"] = len(selng_rows)
+    return counts
+
+
 if __name__ == "__main__":
+    import sys
+
     load_env()
-    collect()
+    if "--platform13" in sys.argv:
+        collect_platform13()
+    else:
+        collect()
