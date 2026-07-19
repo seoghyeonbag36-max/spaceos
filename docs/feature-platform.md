@@ -4,11 +4,15 @@
 
 ## 0. 구현 현황 (2026-07-19, /platform-autorun A~E)
 
-**LSTM 공실 예측 — 가동 중.** 13거점 pooled 학습으로 **홀드아웃 방향 정확도 84.6% (11/13, 목표 70% 달성)**, MAE 0.941 / RMSE 1.361 (vac_proxy 원단위).
+**LSTM 공실 예측 — v2 가동 중.** 13거점 pooled 학습으로 **홀드아웃 방향 정확도 84.6% (11/13, 목표 70% 달성)**, MAE 0.901 / RMSE 1.147 (vac_proxy 원단위) — v1(0.941/1.361) 대비 개선.
 
-- 데이터: 서울 상권분석서비스(trdar) 분기 시계열 → `gold/platform13/platform_district_timeseries` (13거점 × 21분기, 2021Q1~2026Q1, 결측 0)
-- 타깃: `vac_proxy = (폐업률 − 개업률) − 점포수 증감률(%)` — R-ONE 공실률 미연동 상태의 대리 지표 (직접 공실률 조인은 TODO)
-- 학습: 분기 데이터라 look_back 8분기, 거점 원핫 pooled (hidden 64 / 2층). 홀드아웃 = 거점별 마지막 분기. 방향 오답: apgujeong-rodeo, songridan
+- 데이터: 서울 상권분석서비스(trdar) 분기 시계열 + **R-ONE 실측 조인** → `gold/platform13/platform_district_timeseries` (13거점 × 21분기, 2021Q1~2026Q1, 11열, 결측 0)
+- R-ONE 조인(완료): 공실률 소규모/중대형(`vac_small`/`vac_mid`)·임대료(`rent_small`), 13거점 ↔ R-ONE 상권 매핑은 `data/config/rone_districts.py` (뚝섬·이태원 공유 매핑, 2024Q3 표본개편 유의). 수집기 `data/collectors/rone_rent.py`
+- 길단위 유동인구(`flpop`)도 수집·조인 완료 (`seoul_trdar --platform13-flpop`)
+- 타깃: `vac_proxy = (폐업률 − 개업률) − 점포수 증감률(%)` 유지, R-ONE 실측은 **피처**.
+  실험 기록(2026-07-19, mlruns): ① 타깃을 vac_small(실측)로 교체 → 방향정확도 46.2% 실패
+  (표본개편 점프·소표본 0% 노이즈) ② log_flpop 피처 추가 → MAE 0.901→1.018 악화. 둘 다 보류.
+- 학습: look_back 8분기, 거점 원핫 pooled (v2 best: hidden 32 / 1층). 홀드아웃 = 거점별 마지막 분기. 방향 오답: apgujeong-rodeo, songridan
 - 산출: `ml/artifacts/vacancy_lstm.pt` + `data/gold/platform_vacancy_forecast.json`(2026Q2 예측) + `ml/mlruns`
 - 서빙: Vercel 서버리스에 torch 를 싣지 않으므로 **forecast json 정적 서빙이 기본 경로** — `apps/backend/app/services/vacancy_forecast.py` (인메모리 TTL 5분, json은 .gitignore/.vercelignore 예외로 배포 포함)
 - 노출: `/api/v1/ai/predict-vacancy`(스텁 교체 완료) + 대시보드·히트맵 응답의 `predicted_rate/delta/direction` + 프론트 13거점 카드·심층·범례 ▲▼ 배지
@@ -48,7 +52,7 @@ mlflow ui --port 5000   # http://localhost:5000 에서 실험 추적
 
 ## 3. 작성해야 할 코드 (순서) — §0 구현 현황 반영
 
-1. ~~**데이터 로더** (`ml/training/datasets.py`)~~ **완료** — Gold `platform13/platform_district_timeseries`(분기) 기반. 원계획(월별·PostGIS·유동인구·감성·임대 시세)과 달리 분기 단위 + vac_proxy·매출·점포수·개폐업률 피처로 축소 구현. 잔여: R-ONE 공실률·생활인구 피처 조인.
+1. ~~**데이터 로더** (`ml/training/datasets.py`)~~ **완료** — Gold `platform13/platform_district_timeseries`(분기) 기반. R-ONE 공실률·임대료 + 유동인구 조인 완료(§0). 잔여: 실측 공실률 타깃 전환(노이즈 처리 후)·감성 피처.
 2. ~~**LSTM 학습** (`ml/training/train_lstm.py`)~~ **완료** — 분기 데이터라 look_back 은 30개월이 아닌 8분기. 방향 정확도 84.6% (목표 70% 달성).
 3. **GNN 학습** (`ml/training/train_gnn.py`) — **골격만** (품질 리포트까지). 엣지가 공간 kNN 뿐이라 학습 보류 — 고객 공유·리뷰 유사도 엣지 추가 후 `IndustryGNN` 노드 분류로 진행. **추천 정확도 20% 향상 목표**.
 4. ~~**추론 래퍼** (`ml/inference/predictor.py`)~~ **완료** — 체크포인트 실시간 추론 → forecast json 폴백. `recommend_industry` 는 GNN 학습 후. MLflow Registry 대신 로컬 파일 스토어(`ml/mlruns`) 사용.

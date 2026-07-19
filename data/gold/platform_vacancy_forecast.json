@@ -1,94 +1,95 @@
 {
-  "model": "vacancy-lstm-pooled-v1",
-  "trained_at": "2026-07-19T18:46:33",
+  "model": "vacancy-lstm-pooled-v2",
+  "target": "vac_proxy(공실 프록시) — R-ONE 실측(vac_small/vac_mid/rent_small)은 피처",
+  "trained_at": "2026-07-19T20:20:36",
   "metrics": {
-    "holdout_mae": 0.941,
-    "holdout_rmse": 1.361,
+    "holdout_mae": 0.901,
+    "holdout_rmse": 1.147,
     "holdout_direction_acc": 0.846
   },
   "params": {
-    "hidden": 64,
-    "layers": 2,
+    "hidden": 32,
+    "layers": 1,
     "look_back": 8,
     "epochs": 400,
     "lr": 0.001,
-    "train_loss": 0.05130456015467644
+    "train_loss": 0.009202179498970509
   },
   "holdout": {
     "apgujeong-rodeo": {
-      "pred": 1.49,
+      "pred": 0.788,
       "actual": 0.102,
       "prev": 0.547,
       "direction_hit": false
     },
     "euljiro": {
-      "pred": 0.127,
+      "pred": 0.027,
       "actual": 1.602,
       "prev": -0.456,
       "direction_hit": true
     },
     "garosugil": {
-      "pred": 1.503,
+      "pred": 1.23,
       "actual": 1.282,
       "prev": 0.62,
       "direction_hit": true
     },
     "hannam": {
-      "pred": -0.199,
+      "pred": -0.624,
       "actual": 1.201,
       "prev": -1.183,
       "direction_hit": true
     },
     "hongdae": {
-      "pred": 1.024,
+      "pred": 0.31,
       "actual": 0.844,
       "prev": 0.251,
       "direction_hit": true
     },
     "ikseon": {
-      "pred": 0.298,
+      "pred": 1.376,
       "actual": 1.556,
       "prev": 0.141,
       "direction_hit": true
     },
     "itaewon": {
-      "pred": 2.042,
+      "pred": 0.175,
       "actual": 1.712,
       "prev": -0.055,
       "direction_hit": true
     },
     "myeongdong": {
-      "pred": 0.638,
+      "pred": -0.115,
       "actual": 0.368,
       "prev": -0.471,
       "direction_hit": true
     },
     "seochon": {
-      "pred": -0.866,
+      "pred": 0.284,
       "actual": 1.3,
       "prev": -1.47,
       "direction_hit": true
     },
     "seongsu": {
-      "pred": -0.056,
+      "pred": -0.766,
       "actual": -0.167,
       "prev": -0.868,
       "direction_hit": true
     },
     "seoulsup": {
-      "pred": 0.127,
+      "pred": -0.397,
       "actual": 0.16,
       "prev": -0.722,
       "direction_hit": true
     },
     "songridan": {
-      "pred": -0.601,
+      "pred": 0.302,
       "actual": 2.785,
       "prev": 2.258,
       "direction_hit": false
     },
     "yeonnam": {
-      "pred": 1.306,
+      "pred": 1.512,
       "actual": 1.323,
       "prev": -0.194,
       "direction_hit": true
@@ -96,105 +97,105 @@
   },
   "forecasts": {
     "apgujeong-rodeo": {
-      "forecast_vac_proxy": 2.192,
+      "forecast_vac_proxy": 0.761,
       "last_vac_proxy": 0.102,
-      "delta": 2.091,
+      "delta": 0.659,
       "direction": "up",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "euljiro": {
-      "forecast_vac_proxy": -1.599,
+      "forecast_vac_proxy": -1.188,
       "last_vac_proxy": 1.602,
-      "delta": -3.201,
+      "delta": -2.79,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "garosugil": {
-      "forecast_vac_proxy": 1.389,
+      "forecast_vac_proxy": 0.624,
       "last_vac_proxy": 1.282,
-      "delta": 0.107,
-      "direction": "up",
+      "delta": -0.657,
+      "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "hannam": {
-      "forecast_vac_proxy": -1.715,
+      "forecast_vac_proxy": -3.141,
       "last_vac_proxy": 1.201,
-      "delta": -2.916,
+      "delta": -4.342,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "hongdae": {
-      "forecast_vac_proxy": 0.362,
+      "forecast_vac_proxy": -0.022,
       "last_vac_proxy": 0.844,
-      "delta": -0.482,
+      "delta": -0.867,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "ikseon": {
-      "forecast_vac_proxy": -0.387,
+      "forecast_vac_proxy": 0.667,
       "last_vac_proxy": 1.556,
-      "delta": -1.943,
+      "delta": -0.889,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "itaewon": {
-      "forecast_vac_proxy": 1.655,
+      "forecast_vac_proxy": -0.865,
       "last_vac_proxy": 1.712,
-      "delta": -0.057,
+      "delta": -2.577,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "myeongdong": {
-      "forecast_vac_proxy": 0.783,
+      "forecast_vac_proxy": -0.258,
       "last_vac_proxy": 0.368,
-      "delta": 0.416,
-      "direction": "up",
+      "delta": -0.625,
+      "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "seochon": {
-      "forecast_vac_proxy": -1.648,
+      "forecast_vac_proxy": -0.73,
       "last_vac_proxy": 1.3,
-      "delta": -2.948,
+      "delta": -2.029,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "seongsu": {
-      "forecast_vac_proxy": 0.056,
+      "forecast_vac_proxy": -0.623,
       "last_vac_proxy": -0.167,
-      "delta": 0.223,
-      "direction": "up",
+      "delta": -0.457,
+      "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "seoulsup": {
-      "forecast_vac_proxy": -0.657,
+      "forecast_vac_proxy": -0.81,
       "last_vac_proxy": 0.16,
-      "delta": -0.817,
+      "delta": -0.97,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "songridan": {
-      "forecast_vac_proxy": -2.546,
+      "forecast_vac_proxy": -0.854,
       "last_vac_proxy": 2.785,
-      "delta": -5.331,
+      "delta": -3.638,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21
     },
     "yeonnam": {
-      "forecast_vac_proxy": -0.523,
+      "forecast_vac_proxy": -0.504,
       "last_vac_proxy": 1.323,
-      "delta": -1.846,
+      "delta": -1.827,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21

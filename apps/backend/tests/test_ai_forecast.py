@@ -16,7 +16,7 @@ def test_predict_vacancy_all_13_districts():
         assert body["district_id"] == did
         assert isinstance(body["forecast_vac_proxy"], (int, float)), did
         assert body["direction"] in ("up", "down"), did
-        assert body["model"] == "vacancy-lstm-pooled-v1"
+        assert body["model"].startswith("vacancy-lstm-pooled")
         assert body["metrics"]["holdout_direction_acc"] >= 0.70  # PPPP Phase1 목표
 
 

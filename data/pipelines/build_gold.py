@@ -114,8 +114,11 @@ def build_platform13_timeseries() -> None:
       stor_co    분기 점포수 합
       opbiz_rt / clsbiz_rt  개업률/폐업률 — 점포수(STOR_CO) 가중 평균
       n_trdar    해당 분기에 데이터가 있는 상권코드 수 (커버리지 지표)
+      flpop                길단위(유동)인구 분기 합 — seoul_trdar flpop 수집분
+      vac_small / vac_mid  R-ONE 소규모/중대형 상가 공실률(%) — rone_rent 수집분
+      rent_small           R-ONE 소규모 상가 임대료(천원/㎡)
     ⚠️ garosugil PoC gold 와 별개 신규 산출물 (덮어쓰기 아님).
-    TODO(R-ONE): 부동산원 공실률·임대료 분기 조인 (REB_RONE_API_KEY 검증 후 §4).
+    ⚠️ R-ONE 은 표본개편(2024Q3)·공유 상권 매핑(config/rone_districts.py 주석) 유의.
     """
     stor = load_latest(SLUG13, "seoul_trdar_stor.json")
     selng = load_latest(SLUG13, "seoul_trdar_selng.json")
@@ -147,6 +150,30 @@ def build_platform13_timeseries() -> None:
         g = (edf.groupby(["district_id", "STDR_YYQU_CD"], as_index=False)["THSMON_SELNG_AMT"].sum()
                 .rename(columns={"STDR_YYQU_CD": "quarter", "THSMON_SELNG_AMT": "selng_amt"}))
         out = out.merge(g, on=["district_id", "quarter"], how="left")
+
+    # 길단위(유동)인구 조인 — seoul_trdar --platform13-flpop 수집분 (거점 내 상권 합)
+    flpop = load_latest(SLUG13, "seoul_trdar_flpop.json")
+    if flpop:
+        fdf = pd.json_normalize(flpop)
+        fdf["TOT_FLPOP_CO"] = pd.to_numeric(fdf.get("TOT_FLPOP_CO"), errors="coerce")
+        g = (fdf.groupby(["district_id", "STDR_YYQU_CD"], as_index=False)["TOT_FLPOP_CO"].sum()
+                .rename(columns={"STDR_YYQU_CD": "quarter", "TOT_FLPOP_CO": "flpop"}))
+        out = out.merge(g, on=["district_id", "quarter"], how="left")
+    else:
+        print("[gold] platform13: seoul_trdar_flpop 없음 — flpop 수집 시 조인")
+
+    # R-ONE 공실률·임대료 조인 (rone_rent 수집분 — 없으면 건너뜀)
+    for series, col in (("vac_small", "vac_small"), ("vac_mid", "vac_mid"),
+                        ("rent_small", "rent_small")):
+        rone = load_latest(SLUG13, f"rone_{series}.json")
+        if not rone:
+            print(f"[gold] platform13: rone_{series} 없음 — rone_rent 수집 시 조인")
+            continue
+        rdf = (pd.json_normalize(rone)[["district_id", "quarter", "value"]]
+                 .rename(columns={"value": col}))
+        rdf[col] = pd.to_numeric(rdf[col], errors="coerce")
+        rdf = rdf.groupby(["district_id", "quarter"], as_index=False)[col].mean()
+        out = out.merge(rdf, on=["district_id", "quarter"], how="left")
 
     out = out.sort_values(["district_id", "quarter"]).reset_index(drop=True)
 

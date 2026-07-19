@@ -37,7 +37,7 @@ def _predict_with_model(district_id: str) -> dict | None:
         import torch
 
         from ml.models.lstm.vacancy_lstm import VacancyLSTM
-        from ml.training.datasets import SEQ_FEATURES, load_gold
+        from ml.training.datasets import SEQ_FEATURES, TARGET, load_gold
 
         if not ARTIFACT.exists():
             return None
@@ -68,7 +68,7 @@ def _predict_with_model(district_id: str) -> dict | None:
         win = np.hstack([z[-lb:], np.tile(onehot, (lb, 1))]).astype(np.float32)
         with torch.no_grad():
             pred = float(model(torch.from_numpy(win[None])).item()) * ckpt["y_sd"] + ckpt["y_mu"]
-        last = float(g["vac_proxy"].iloc[-1])
+        last = float(g[TARGET].iloc[-1])
         return {
             "district_id": district_id,
             "forecast_vac_proxy": round(pred, 3),
@@ -88,7 +88,7 @@ def predict_vacancy(district_id: str) -> dict | None:
     if out is not None:
         fc = _load_forecast() or {}
         out["metrics"] = fc.get("metrics")
-        out["model"] = "vacancy-lstm-pooled-v1"
+        out["model"] = (fc or {}).get("model", "vacancy-lstm-pooled-v2")
         return out
 
     fc = _load_forecast()
@@ -101,7 +101,7 @@ def predict_vacancy(district_id: str) -> dict | None:
         "district_id": district_id,
         **item,
         "metrics": fc.get("metrics"),
-        "model": fc.get("model", "vacancy-lstm-pooled-v1"),
+        "model": fc.get("model", "vacancy-lstm-pooled-v2"),
         "trained_at": fc.get("trained_at"),
         "source": "forecast_json",
     }

@@ -1,10 +1,14 @@
 """Platform·LSTM 데이터셋 — Gold platform_district_timeseries → 거점×분기 피처 텐서.
 
 소스: data/gold/platform13/platform_district_timeseries.{parquet|csv}
-피처(분기 단위): vac_proxy(공실 프록시) · log_selng(추정매출) · stor_idx(점포수 지수)
+타깃: vac_proxy — 공실 프록시(= clsbiz_rt − opbiz_rt + 점포수 감소율%). 상승 = 공실 압력 증가.
+피처(분기 단위): vac_proxy + vac_small·vac_mid·rent_small(R-ONE 실측, rone_rent 조인 필수)
+                · log_selng(추정매출) · log_flpop(길단위 유동인구) · stor_idx(점포수 지수)
                 · opbiz_rt · clsbiz_rt
-  - vac_proxy = clsbiz_rt − opbiz_rt + 점포수 감소율(%) — 직접 공실률 데이터(R-ONE TODO)
-    부재 시의 대리 지표. 상승 = 공실 압력 증가.
+  - 타깃을 R-ONE 실측(vac_small)으로 바꾸는 실험은 방향정확도 46.2%로 실패(2026-07-19,
+    mlruns 기록) — 2024Q3 표본개편 점프·소표본 0% 값 노이즈 탓. 노이즈 처리 후 재시도 TODO.
+  - R-ONE 유의: 일부 거점은 상권 공유 매핑(config/rone_districts.py) — 공유 거점끼리
+    R-ONE 피처 동일.
   - garosugil 은 building_vacancy(지상검증 PoC) 실측 공실률이 있으나 단일 시점 스냅샷이라
     시계열 피처 대신 서빙 단계 보정 앵커로 사용한다 (ml/inference/predictor.py 참조).
 
@@ -22,9 +26,12 @@ import pandas as pd
 _REPO = Path(__file__).resolve().parents[2]
 GOLD_TS = _REPO / "data" / "gold" / "platform13" / "platform_district_timeseries"
 
-# 시계열 피처 열 순서 (거점 원핫은 뒤에 붙는다)
-SEQ_FEATURES = ("vac_proxy", "log_selng", "stor_idx", "opbiz_rt", "clsbiz_rt")
+# 시계열 피처 열 순서 (거점 원핫은 뒤에 붙는다) — 첫 열 = 타깃 (train_lstm 방향 판정이 인덱스 0 참조)
+SEQ_FEATURES = ("vac_proxy", "vac_small", "vac_mid", "rent_small",
+                "log_selng", "stor_idx", "opbiz_rt", "clsbiz_rt")
 TARGET = "vac_proxy"
+# log_flpop(유동인구)은 피처 제외 — 추가 시 MAE 0.901→1.018 악화 (2026-07-19 ablation,
+# mlruns 기록). gold 에는 flpop 컬럼 유지 — 표본 확대 후 재시도 TODO.
 
 
 def load_gold() -> pd.DataFrame:
@@ -36,6 +43,8 @@ def load_gold() -> pd.DataFrame:
     else:
         raise FileNotFoundError(f"Gold 없음: {GOLD_TS}.parquet — build_gold 먼저 실행")
 
+    if "vac_small" not in df.columns:
+        raise ValueError("gold 에 vac_small 없음 — rone_rent 수집 후 build_gold 재실행 필요")
     df = df.sort_values(["district_id", "quarter"]).reset_index(drop=True)
     out = []
     for did, g in df.groupby("district_id"):
@@ -45,6 +54,7 @@ def load_gold() -> pd.DataFrame:
         stor_chg = g["stor_co"].pct_change().fillna(0.0) * 100.0   # 점포수 증감률(%)
         g["vac_proxy"] = (g["clsbiz_rt"] - g["opbiz_rt"]) - stor_chg
         g["log_selng"] = np.log1p(g["selng_amt"].fillna(0.0))
+        g["log_flpop"] = np.log1p(g["flpop"].fillna(0.0)) if "flpop" in g else 0.0
         out.append(g)
     return pd.concat(out, ignore_index=True)
 

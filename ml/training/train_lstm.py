@@ -1,8 +1,12 @@
-"""VacancyLSTM 13거점 pooled 학습 + 다음 분기 공실 프록시 예측.
+"""VacancyLSTM 13거점 pooled 학습 + 다음 분기 공실률 예측.
+
+타깃: vac_proxy(대리 지표) 유지. v2 = R-ONE 실측(공실률 소규모/중대형·임대료)을 피처로
+추가 — v1 대비 MAE 0.941→0.901, RMSE 1.361→1.147, 방향정확도 84.6% 동일.
+실측(vac_small)을 타깃으로 쓰는 실험은 46.2%로 실패(표본개편 노이즈) — datasets.py 참조.
 
 전략 (분기 데이터 → look_back 자동 조정, /platform-autorun B단계):
   - 거점당 분기 수가 적어(≈20) 단일 거점 학습 불가 → 전 거점 통합(pooled) + 거점 원핫.
-  - 홀드아웃 = 거점별 마지막 분기 1개(13샘플). 지표: MAE/RMSE(원단위)·방향 정확도.
+  - 홀드아웃 = 거점별 마지막 분기 1개(13샘플). 지표: MAE/RMSE(%p)·방향 정확도.
   - 목표 방향 정확도 70%+. 미달 시 하이퍼파라미터 1~2회만 재시도 (무한 튜닝 금지).
 
 산출:
@@ -27,7 +31,7 @@ _REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO))
 
 from ml.models.lstm.vacancy_lstm import VacancyLSTM  # noqa: E402
-from ml.training.datasets import SEQ_FEATURES, build_dataset, load_gold  # noqa: E402
+from ml.training.datasets import SEQ_FEATURES, TARGET, build_dataset, load_gold  # noqa: E402
 
 ARTIFACT = _REPO / "ml" / "artifacts" / "vacancy_lstm.pt"
 FORECAST_JSON = _REPO / "data" / "gold" / "platform_vacancy_forecast.json"
@@ -104,7 +108,7 @@ def _forecast_next(res: dict) -> dict:
         win = np.hstack([z[-lb:], np.tile(onehot, (lb, 1))]).astype(np.float32)
         with torch.no_grad():
             p = float(model(torch.from_numpy(win[None])).item()) * ds.y_sd + ds.y_mu
-        last = float(g["vac_proxy"].iloc[-1])
+        last = float(g[TARGET].iloc[-1])
         out[did] = {
             "forecast_vac_proxy": round(p, 3),
             "last_vac_proxy": round(last, 3),
@@ -167,7 +171,8 @@ def main() -> None:
     # 서빙용 forecast json
     fc = _forecast_next(best)
     payload = {
-        "model": "vacancy-lstm-pooled-v1",
+        "model": "vacancy-lstm-pooled-v2",
+        "target": "vac_proxy(공실 프록시) — R-ONE 실측(vac_small/vac_mid/rent_small)은 피처",
         "trained_at": now,
         "metrics": {"holdout_mae": round(best["mae"], 3), "holdout_rmse": round(best["rmse"], 3),
                     "holdout_direction_acc": round(best["dir_acc"], 3)},

@@ -181,11 +181,48 @@ def collect_platform13() -> dict[str, int]:
     return counts
 
 
+def collect_platform13_flpop() -> int:
+    """[Platform·LSTM] 길단위(유동)인구 분기 시계열 — selng 와 같은 분기 전량 페이징.
+
+    VwsmTrdarFlpopQq 는 상권당 1행/분기(≈1,650행)라 분기별 2페이지면 전량이다.
+    Bronze: data/bronze/platform13/{날짜}/seoul_trdar_flpop.json (district_id 부가).
+    """
+    key = os.getenv("SEOUL_OPENAPI_KEY")
+    if not key or requests is None:
+        print("[seoul_trdar] SEOUL_OPENAPI_KEY 미설정(또는 requests 없음) — 건너뜀")
+        return 0
+
+    def _tag(rows: list[dict]) -> list[dict]:
+        return [{**r, "district_id": TRDAR_TO_DISTRICT[str(r.get("TRDAR_CD", ""))]}
+                for r in rows if str(r.get("TRDAR_CD", "")) in TRDAR_TO_DISTRICT]
+
+    flpop_rows: list[dict] = []
+    for q in QUARTERS:
+        start, total, q_rows = 1, 0, []
+        while start <= _MAX_ROWS:
+            try:
+                page, total = _fetch_page(key, "VwsmTrdarFlpopQq", start, start + _PAGE - 1, f"/{q}")
+            except Exception as exc:
+                print(f"  flpop {q}: 실패 — {exc}")
+                break
+            q_rows.extend(r for r in page if str(r.get("TRDAR_CD", "")) in TRDAR_TO_DISTRICT)
+            start += _PAGE
+            if not page or start > total:
+                break
+        print(f"  flpop {q}: 전체 {total}행 중 거점 {len(q_rows)}행")
+        flpop_rows.extend(q_rows)
+    flpop_rows = _tag(flpop_rows)
+    save_json(flpop_rows, SLUG13, "seoul_trdar_flpop.json")
+    return len(flpop_rows)
+
+
 if __name__ == "__main__":
     import sys
 
     load_env()
-    if "--platform13" in sys.argv:
+    if "--platform13-flpop" in sys.argv:
+        collect_platform13_flpop()
+    elif "--platform13" in sys.argv:
         collect_platform13()
     else:
         collect()
