@@ -20,6 +20,10 @@ class DistrictSummary(BaseModel):
     cell_count: int
     store_count: int
     tier_mix: dict[str, int]
+    # Platform·LSTM 다음 분기 예측 (forecast json 부재 시 None)
+    predicted_rate: float | None = None
+    predicted_delta: float | None = None
+    predicted_direction: str | None = None
 
 
 class Zone(BaseModel):
@@ -55,6 +59,10 @@ class VacancyHeatmap(BaseModel):
     sum_stores: int
     sum_vac: int
     avg_vacancy: float
+    # Platform·LSTM 다음 분기 예측 (거점 단위, forecast json 부재 시 None)
+    predicted_rate: float | None = None
+    predicted_delta: float | None = None
+    predicted_direction: str | None = None
 
 
 class TierScenario(BaseModel):

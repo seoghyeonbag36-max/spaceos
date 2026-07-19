@@ -107,6 +107,7 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
               <span>리뷰 {s.reviews.toLocaleString()}</span>
               <span>공실 {s.vacant_units}개</span>
               <span className={s.risk_zones > 0 ? "risk" : ""}>위험구역 {s.risk_zones}</span>
+              <Pred rate={s.predicted_rate} delta={s.predicted_delta} direction={s.predicted_direction} />
             </div>
             <div className="dtiers">
               {(["premium", "value", "factory"] as const).map((t) => (
@@ -121,6 +122,18 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
 
       <div className="foot">시드 데이터(app/data/seoul_pages.py) — 수집 파이프라인(Gold) 적재 시 실측으로 자동 교체 · SpaceOS PPPP</div>
     </div></div>
+  );
+}
+
+/** LSTM 다음 분기 공실 예측 배지 — forecast 미배포(null) 시 렌더하지 않음 */
+function Pred({ rate, delta, direction }: { rate: number | null; delta: number | null; direction: "up" | "down" | null }) {
+  if (rate == null || delta == null) return null;
+  const up = direction === "up";
+  return (
+    <span className="pred" style={{ color: up ? "#c2410c" : "#1d6feb" }}
+      title="Platform·LSTM 다음 분기 공실 예측 (홀드아웃 방향정확도 84.6%)">
+      예측 {rate.toFixed(1)}% {up ? "▲" : "▼"}{Math.abs(delta).toFixed(1)}
+    </span>
   );
 }
 
@@ -226,7 +239,13 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
         <span className="ml-label">공실률</span>
         <span className="ml-grad" />
         <span className="ml-ticks"><em>0%</em><em>25%+</em></span>
-        {hm && <span className="ml-stat">평균 <b style={{ color: vacHex(hm.avg_vacancy) }}>{hm.avg_vacancy.toFixed(1)}%</b> · 셀 {hm.cells.length} · 점포 {hm.sum_stores.toLocaleString()} · 공실 {hm.sum_vac}</span>}
+        {hm && (
+          <span className="ml-stat">
+            평균 <b style={{ color: vacHex(hm.avg_vacancy) }}>{hm.avg_vacancy.toFixed(1)}%</b>
+            {" "}<Pred rate={hm.predicted_rate} delta={hm.predicted_delta} direction={hm.predicted_direction} />
+            {" "}· 셀 {hm.cells.length} · 점포 {hm.sum_stores.toLocaleString()} · 공실 {hm.sum_vac}
+          </span>
+        )}
         <span className="ml-hint">셀 클릭 시 상세</span>
       </div>
     </div>
@@ -253,7 +272,11 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
         <div>
           <button className="back" onClick={onBack}>← 주요 Platform 보드</button>
           <h1>{summary.name}</h1>
-          <div className="sub">{detail?.sub ?? summary.note} · 공실률 {summary.vacancy_rate.toFixed(1)}% · 감성 {summary.sentiment.toFixed(1)}pt · 추천 상위 Tier {summary.rec_top}</div>
+          <div className="sub">
+            {detail?.sub ?? summary.note} · 공실률 {summary.vacancy_rate.toFixed(1)}%
+            {" "}<Pred rate={summary.predicted_rate} delta={summary.predicted_delta} direction={summary.predicted_direction} />
+            {" "}· 감성 {summary.sentiment.toFixed(1)}pt · 추천 상위 Tier {summary.rec_top}
+          </div>
         </div>
       </div>
 

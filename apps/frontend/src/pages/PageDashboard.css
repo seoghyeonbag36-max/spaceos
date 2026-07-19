@@ -38,6 +38,7 @@
 .pagedash .brow .bv{flex:0 0 48px;text-align:right;font-weight:800;color:var(--ink);font-size:11px}
 .pagedash .dmeta{display:flex;gap:10px;font-size:10.5px;color:var(--sub);margin-top:8px}
 .pagedash .dmeta .risk{color:#c2410c;font-weight:700}
+.pagedash .pred{font-weight:700;white-space:nowrap}
 .pagedash .dtiers{display:flex;gap:5px;margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
 .pagedash .tchip{font-size:10px;font-weight:700;border:1px solid;border-radius:6px;padding:1px 7px;background:#fff}
 .pagedash .foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:18px;line-height:1.6}

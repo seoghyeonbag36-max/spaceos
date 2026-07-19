@@ -9,6 +9,7 @@ from __future__ import annotations
 import math
 
 from app.data.seoul_pages import DISTRICTS, DISTRICTS_BY_ID
+from app.services import vacancy_forecast
 
 # 입점 3-Tier 정의
 TIER = {
@@ -102,6 +103,22 @@ def tier_scenarios(unit: dict) -> dict:
     return out
 
 
+def _predicted(district_id: str, current_rate: float) -> dict:
+    """LSTM forecast 의 vac_proxy delta(%p 근사)를 현재 공실률에 가산한 다음 분기 근사.
+
+    forecast json 부재/미지원 거점이면 세 필드 모두 None (프론트는 배지 숨김).
+    """
+    f = vacancy_forecast.all_forecasts().get(district_id)
+    if not f:
+        return {"predicted_rate": None, "predicted_delta": None, "predicted_direction": None}
+    delta = float(f.get("delta", 0.0))
+    return {
+        "predicted_rate": round(max(0.0, min(100.0, current_rate + delta)), 2),
+        "predicted_delta": round(delta, 2),
+        "predicted_direction": f.get("direction"),
+    }
+
+
 def _summary(d: dict) -> dict:
     sum_r = sum(z["r"] for z in d["zones"])
     sent = sum(z["s"] * z["r"] for z in d["zones"]) / sum_r
@@ -116,6 +133,7 @@ def _summary(d: dict) -> dict:
         "vacancy_rate": ci["avg_vacancy"], "vacant_units": ci["sum_vac"],
         "cell_count": len(ci["cells"]), "store_count": ci["sum_stores"],
         "tier_mix": tiers,
+        **_predicted(d["id"], ci["avg_vacancy"]),
     }
 
 
@@ -144,7 +162,8 @@ def get_vacancy_heatmap(district_id: str) -> dict | None:
     if not d:
         return None
     ci = build_cells(d["grid"])
-    return {"district_id": district_id, "resolution_m": 100, **ci}
+    return {"district_id": district_id, "resolution_m": 100, **ci,
+            **_predicted(district_id, ci["avg_vacancy"])}
 
 
 def get_postings(district_id: str) -> list[dict] | None:

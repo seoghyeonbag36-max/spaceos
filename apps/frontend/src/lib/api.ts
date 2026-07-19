@@ -36,6 +36,10 @@ export interface DistrictSummary {
   sentiment: number; reviews: number; risk_zones: number;
   vacancy_rate: number; vacant_units: number; cell_count: number; store_count: number;
   tier_mix: { premium: number; value: number; factory: number };
+  /** Platform·LSTM 다음 분기 예측 — forecast 미배포 시 null */
+  predicted_rate: number | null;
+  predicted_delta: number | null;
+  predicted_direction: "up" | "down" | null;
 }
 
 /** 감성 구역(Zone) — f: [키워드, 증감, 방향(up|dn)][] */
@@ -93,6 +97,10 @@ export interface HeatCell {
 export interface VacancyHeatmap {
   district_id: string; resolution_m: number;
   cells: HeatCell[]; sum_stores: number; sum_vac: number; avg_vacancy: number;
+  /** Platform·LSTM 다음 분기 예측 (거점 단위) — forecast 미배포 시 null */
+  predicted_rate: number | null;
+  predicted_delta: number | null;
+  predicted_direction: "up" | "down" | null;
 }
 
 /** 서울 13 Page 거점 요약(감성·공실·리뷰·Tier) — 거점 대시보드 */

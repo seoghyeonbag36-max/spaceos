@@ -23,3 +23,21 @@ def test_predict_vacancy_all_13_districts():
 def test_predict_vacancy_unknown_district_404():
     r = client.post(f"{V1}/ai/predict-vacancy", json={"district_id": "nope"})
     assert r.status_code == 404
+
+
+def test_district_summaries_carry_predicted_rate():
+    """D단계 — 대시보드 응답에 다음 분기 예측 필드가 실려야 한다."""
+    r = client.get(f"{V1}/commercial-districts")
+    assert r.status_code == 200
+    for d in r.json():
+        assert d["predicted_rate"] is not None, d["id"]
+        assert 0 <= d["predicted_rate"] <= 100
+        assert d["predicted_direction"] in ("up", "down")
+
+
+def test_heatmap_carries_predicted_rate():
+    r = client.get(f"{V1}/heatmap/vacancy", params={"district": "garosugil"})
+    assert r.status_code == 200
+    hm = r.json()
+    assert hm["predicted_rate"] is not None
+    assert hm["predicted_direction"] in ("up", "down")
