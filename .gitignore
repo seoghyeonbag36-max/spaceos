@@ -50,3 +50,4 @@ sedJOtKwK
 # ── 추가: env 변형 방어 (.env.local/.env.production 등 제외, .env.example은 추적) ──
 .env.*
 !.env.example
+.vercel
