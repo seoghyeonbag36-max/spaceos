@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from app.schemas.posting import SimulateRequest, SimulateResult
 from app.services import posting as posting_svc
+from app.services import vacancy_forecast as vacancy_svc
 
 router = APIRouter()
 
@@ -19,8 +20,16 @@ class IndustryRequest(BaseModel):
 
 @router.post("/predict-vacancy")
 async def predict_vacancy(req: VacancyRequest) -> dict[str, object]:
-    """LSTM 기반 공실률 예측. TODO: ml.inference 모듈 연동 (목표 정확도 70%+)."""
-    return {"district_id": req.district_id, "predicted_vacancy_rate": None, "model": "lstm-stub"}
+    """LSTM 공실 예측 — gold/platform_vacancy_forecast.json 서빙 (홀드아웃 방향정확도 84.6%).
+
+    forecast json 부재 시(신규 클론 등) 스텁 응답으로 폴백, 미지원 거점은 404.
+    """
+    if not vacancy_svc.is_available():
+        return {"district_id": req.district_id, "predicted_vacancy_rate": None, "model": "lstm-stub"}
+    out = vacancy_svc.get_forecast(req.district_id)
+    if out is None:
+        raise HTTPException(status_code=404, detail=f"no forecast for district: {req.district_id}")
+    return out
 
 
 @router.post("/recommend-industry")

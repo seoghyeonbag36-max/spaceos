@@ -28,6 +28,8 @@ data/gold/*
 # *.parquet 전역 제외보다 뒤에 있어야 parquet 재포함이 유효하다.
 !data/gold/garosugil/
 !data/gold/garosugil/**
+# 예외: Platform LSTM 분기 예측(수 KB) — 백엔드 predict-vacancy 가 정적 서빙.
+!data/gold/platform_vacancy_forecast.json
 
 # IDE / OS
 .DS_Store
