@@ -13,27 +13,28 @@
 | `requirements.txt` | 서버리스 최소 의존성 (fastapi/pydantic/pydantic-settings) |
 | `.vercelignore` | 대용량·무관 파일 업로드 제외 (data, html, ml, 문서 등) |
 
-## 배포 절차 (CLI — 이 저장소는 git 미연동이므로 CLI 업로드 방식)
+## 배포 방식 (git 자동 배포 — 2026-07-19 전환 완료)
+
+GitHub `seoghyeonbag36-max/spaceos` ↔ Vercel 프로젝트 `spaceos` 가 연결되어 있어
+**`main` 에 푸시하면 자동으로 프로덕션 배포**된다. 수동 배포가 필요하면 `vercel --prod`.
+
+- **프로덕션 URL**: https://spaceos-sandy.vercel.app
+- Root Directory: `.` (저장소 루트가 spaceos 자체이므로 기본값)
+- 배포 상태 확인: `vercel ls` / 실패 로그: `vercel inspect <배포URL> --logs`
+
+> **Python 버전 주의**: Vercel 서버리스 빌드는 Python 3.14 를 사용하며 `.python-version` 파일을
+> 무시한다. 루트 `requirements.txt` 는 cp314 휠이 있는 pydantic 2.12+/fastapi 0.119+ 하한을
+> 유지할 것 (구버전 고정 시 pydantic-core 소스 컴파일 → PyO3 미지원으로 빌드 실패).
+
+## 환경변수 (필수 1개 — 등록 완료)
+
+네이버 지도 키는 **빌드 타임** 변수라 Vercel 에 등록해야 지도가 뜬다.
+`VITE_NAVER_MAPS_KEY_ID` 는 production/preview 에 등록 완료 (2026-07-19). 키 변경 시:
 
 ```powershell
-npm i -g vercel                # 최초 1회
-cd C:\Users\USER\Documents\Claude\Projects\SpaceOS\spaceos
-vercel login                   # 최초 1회 (브라우저 인증)
-vercel                         # 프리뷰 배포 — 프로젝트 생성 질문에 기본값(현재 디렉토리 루트) 그대로
-vercel --prod                  # 프로덕션 배포
-```
-
-> 프로젝트 생성 질문 중 "In which directory is your code located?" 는 `./` (spaceos 루트) 그대로.
-> 빌드 설정은 vercel.json 이 우선하므로 프레임워크 자동감지 값은 무시해도 된다.
-
-## 환경변수 (필수 1개)
-
-네이버 지도 키는 **빌드 타임** 변수라 Vercel 에 등록해야 지도가 뜬다:
-
-```powershell
+vercel env rm VITE_NAVER_MAPS_KEY_ID production
 vercel env add VITE_NAVER_MAPS_KEY_ID production   # 값: apps/frontend/.env 의 키와 동일
-vercel env add VITE_NAVER_MAPS_KEY_ID preview
-vercel --prod                                       # env 추가 후 재배포
+git commit --allow-empty -m "redeploy"; git push    # env 변경 후 재배포 트리거
 ```
 
 선택(백엔드): `LLM_API_KEY`(Program LLM 생성 — requirements.txt 의 anthropic 주석 해제 필요),
@@ -44,7 +45,7 @@ vercel --prod                                       # env 추가 후 재배포
 NCP 콘솔 → Services > Maps > Application → **Web 서비스 URL** 에 배포 도메인 추가:
 
 ```
-https://<프로젝트>.vercel.app
+https://spaceos-sandy.vercel.app
 ```
 
 미등록 시 지도 타일이 인증오류로 표시되지 않는다 (localhost:5173 등록과 동일한 이유).
