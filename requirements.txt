@@ -3,7 +3,9 @@
 # sqlalchemy/redis/celery 는 앱 기동 시 import 되지 않으므로 제외 (연동 시 추가).
 # anthropic 은 LLM_API_KEY 설정 시에만 지연 import — Vercel 에서 Program LLM 생성을
 # 쓰려면 아래 주석을 해제할 것 (미설치 시 규칙 기반 폴백으로 동작).
-fastapi==0.115.0
-pydantic==2.9.2
-pydantic-settings==2.5.2
+# 버전 하한: Vercel 빌드가 Python 3.14 를 쓰므로 cp314 휠이 있는 pydantic 2.12+ 필수
+# (2.9.x 는 소스 빌드 시도 → PyO3 3.14 미지원으로 빌드 실패). fastapi 0.119+ 가 pydantic 2.12 호환.
+fastapi>=0.119,<1
+pydantic>=2.12,<3
+pydantic-settings>=2.8,<3
 # anthropic==0.117.0
