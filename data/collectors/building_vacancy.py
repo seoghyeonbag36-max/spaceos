@@ -31,7 +31,7 @@ except ImportError:  # pragma: no cover
     requests = None
 
 from data.collectors.common import load_env, save_json
-from data.config.garosugil import CX, CY, RADIUS_M, SLUG
+from data.config.garosugil import CX, CY, SLUG, STORES_RADIUS_M
 
 BASE_SDSC = "http://apis.data.go.kr/B553077/api/open/sdsc2"
 BASE_BLD = "http://apis.data.go.kr/1613000/BldRgstHubService"
@@ -62,13 +62,13 @@ def _get_json(url: str, params: dict) -> dict | None:
 # ── 1. 분자: 상가정보 반경 수집 → bdMgtSn 그룹핑 ─────────────────────
 
 def fetch_stores(key: str) -> list[dict]:
-    """가로수길 반경 400m 점포 전량 (페이징)."""
+    """가로수길 반경 STORES_RADIUS_M 점포 전량 (페이징) — 폴리곤 범위보다 넓게."""
     rows: list[dict] = []
     page = 1
     while True:
         data = _get_json(f"{BASE_SDSC}/storeListInRadius", {
             "serviceKey": key, "type": "json", "numOfRows": 1000, "pageNo": page,
-            "radius": RADIUS_M, "cx": CX, "cy": CY,
+            "radius": STORES_RADIUS_M, "cx": CX, "cy": CY,
         })
         items = (data or {}).get("body", {}).get("items", []) or []
         rows += items

@@ -70,7 +70,7 @@ def run() -> None:
         return
     fc = json.loads(src.read_text(encoding="utf-8"))
     known = [f["properties"] for f in fc["features"]
-             if f["properties"].get("source") == "stores+ledger"]
+             if str(f["properties"].get("source", "")).startswith("stores+ledger")]
     act = sum(p["active"] for p in known)
     cap = sum(p["capacity"] for p in known)
     est = round((1 - act / cap) * 100, 1)

@@ -7,3 +7,4 @@ requests>=2.31.0
 # 선택: SNS 자체 크롤링(인스타 Graph API 미사용 시)
 # playwright>=1.40.0
 # beautifulsoup4>=4.12.0
+pyproj>=3.6            # 인허가 X/Y(중부원점 TM) -> WGS84 변환 (build_page_master licensing PIP)
