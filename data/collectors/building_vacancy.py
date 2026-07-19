@@ -38,6 +38,11 @@ BASE_BLD = "http://apis.data.go.kr/1613000/BldRgstHubService"
 
 # 상업 용도 키워드 (표제부 주용도·전유부 호별 용도 공통 필터)
 COMMERCIAL_PURPS = ("근린생활", "판매", "업무", "숙박", "위락", "문화")
+
+# 분자에서 제외할 사무실형 업종 대분류 — 분모(상업 층·상가 호)와 도메인 정합.
+# 사무실 입주 업종을 세면 점포 수용량 대비 분자가 부풀어 공실이 과소추정된다
+# (2026-07-19 정합 교정: 미필터 시 집계 공실률 5.7% vs 부동산원 41.6%).
+NON_STOREFRONT_LCLS = ("과학·기술", "부동산", "시설관리·임대")
 STORES_PER_FLOOR = 2          # 일반건물 근사: 층당 상가 호 수 (α보정 §3 대상)
 _SLEEP = 0.05                 # API 예의 지연
 
@@ -86,6 +91,8 @@ def group_by_building(stores: list[dict]) -> dict[str, dict]:
     groups: dict[str, list[dict]] = defaultdict(list)
     no_key = 0
     for s in stores:
+        if s.get("indsLclsNm") in NON_STOREFRONT_LCLS:
+            continue           # 사무실형 업종 — 분모(상가 호수)와 도메인 불일치
         k = s.get("bldMngNo") or ""
         if not k:
             no_key += 1        # TODO(Silver): 좌표 PIP 폴백으로 건물 귀속

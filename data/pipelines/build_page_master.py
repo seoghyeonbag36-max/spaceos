@@ -24,6 +24,8 @@
 from __future__ import annotations
 
 import json
+import math
+import re
 from collections import Counter, defaultdict
 
 from data.collectors.common import GOLD, load_latest
@@ -143,11 +145,31 @@ def _pip_fallback(stores: list[dict], polys: list[dict]) -> dict[str, int]:
     return extra
 
 
+_JIBUN_ADDR_RE = re.compile(r"(신사동|압구정동|논현동|잠원동)\s+(\d+)(?:-(\d+))?")
+_DONG_CODE = {v: k for k, v in _DONG.items()}   # 동명 → 법정동코드 5자리
+
+
+def _addr_pnu(addr: str) -> str | None:
+    """지번주소 → PNU 19자리 (자가 보정 기준점 산출용 — 대지 가정)."""
+    m = _JIBUN_ADDR_RE.search(addr)
+    if not m:
+        return None
+    dong = _DONG_CODE.get(m.group(1))
+    if not dong:
+        return None
+    return f"11680{dong}1{int(m.group(2)):04d}{int(m.group(3) or 0):04d}"
+
+
 def _licensed_pip(polys: list[dict]) -> dict[str, int]:
     """인허가(bronze licensing_biz.json) '영업 중' 업소를 좌표 PIP 로 건물 귀속.
 
     상가정보가 누락한 영업 업소를 잡는 분자 하한(licensed) — 2026-07-19 지상검증의
-    high 오판(실제 영업 건물의 활성 과소집계) 보정. X/Y 는 중부원점 TM → WGS84 변환.
+    high 오판(실제 영업 건물의 활성 과소집계) 보정.
+
+    좌표계: X/Y 는 중부원점 TM 계열이나 표준 EPSG(2097/5174) 어느 것과도 정확히
+    일치하지 않는다(2026-07-19 실측: 2097 기준 동서 -257m 상수 오프셋 = 경도
+    10.405초). → **자가 보정**: 지번주소가 폴리곤과 매칭되는 행으로 중위 오프셋을
+    추정해 전체 좌표에 적용한다 (825점 검증: 보정 후 중위 잔차 2.7m, <20m 100%).
     """
     rows = load_latest(SLUG, "licensing_biz.json") or []
     alive = []
@@ -157,9 +179,10 @@ def _licensed_pip(polys: list[dict]) -> dict[str, int]:
         if str(r.get("TRDSTATEGBN", "")) != "01" and "영업" not in str(r.get("TRDSTATENM", "")):
             continue
         try:
-            alive.append((float(r["X"]), float(r["Y"])))
-        except (KeyError, TypeError, ValueError):
+            x, y = float(str(r.get("X", "")).strip()), float(str(r.get("Y", "")).strip())
+        except ValueError:
             continue
+        alive.append((x, y, str(r.get("SITEWHLADDR", ""))))
     if not alive:
         if rows:
             print("[page-master] licensing: 영업·좌표 유효 행 0 — 건너뜀")
@@ -170,30 +193,46 @@ def _licensed_pip(polys: list[dict]) -> dict[str, int]:
     except ImportError:
         print("[page-master] pyproj 없음 (pip install pyproj) — licensing 건너뜀")
         return {}
-    # 인허가 X/Y 는 중부원점 TM — EPSG:5174(보정 Bessel)가 표준이나 2097 혼용 사례가
-    # 있어, 첫 점이 서울 경위도 범위에 들어오는 CRS 를 골라 쓴다.
-    for epsg in ("5174", "2097"):
-        tr = Transformer.from_crs(f"EPSG:{epsg}", "EPSG:4326", always_xy=True)
-        lon, lat = tr.transform(*alive[0])
-        if 126.5 < lon < 127.5 and 37.0 < lat < 38.0:
-            break
-    else:
-        print("[page-master] licensing 좌표계 판별 실패 — 건너뜀")
-        return {}
+    tr = Transformer.from_crs("EPSG:2097", "EPSG:4326", always_xy=True)
 
+    # 폴리곤 인덱스 + pnu별 중심 (자가 보정 기준점)
     index = []
+    cent: dict[str, tuple[float, float]] = {}
     for f in polys:
         rings = _rings(f["geometry"])
         if not rings:
             continue
         xs = [c[0] for r in rings for c in r]
         ys = [c[1] for r in rings for c in r]
-        index.append((min(xs), min(ys), max(xs), max(ys), rings, f["properties"].get("pnu", "")))
+        pnu = f["properties"].get("pnu", "")
+        index.append((min(xs), min(ys), max(xs), max(ys), rings, pnu))
+        cent[pnu] = ((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2)
+
+    # 자가 보정: 지번주소→pnu 매칭 행의 (변환좌표 − 폴리곤중심) 중위 오프셋
+    dlons: list[float] = []
+    dlats: list[float] = []
+    for x, y, addr in alive:
+        pnu = _addr_pnu(addr)
+        if pnu not in cent:
+            continue
+        lon, lat = tr.transform(x, y)
+        clon, clat = cent[pnu]
+        kx = 111320.0 * math.cos(math.radians(clat))
+        dlons.append((lon - clon) * kx)
+        dlats.append((lat - clat) * 110540.0)
+    if len(dlons) < 20:
+        print(f"[page-master] licensing: 보정 기준점 부족({len(dlons)}) — 건너뜀")
+        return {}
+    dlons.sort(); dlats.sort()
+    off_e, off_n = dlons[len(dlons) // 2], dlats[len(dlats) // 2]
 
     out: dict[str, int] = defaultdict(int)
     hit = 0
-    for x, y in alive:
+    for x, y, _ in alive:
         lon, lat = tr.transform(x, y)
+        kx = 111320.0 * math.cos(math.radians(lat))
+        lon -= off_e / kx
+        lat -= off_n / 110540.0
         for x0, y0, x1, y1, rings, pnu in index:
             if not (x0 <= lon <= x1 and y0 <= lat <= y1):
                 continue
@@ -201,8 +240,8 @@ def _licensed_pip(polys: list[dict]) -> dict[str, int]:
                 out[pnu] += 1
                 hit += 1
                 break
-    print(f"[page-master] licensing(EPSG:{epsg}): 영업 업소 {len(alive)}건 중 "
-          f"{hit}건을 {len(out)}동에 귀속")
+    print(f"[page-master] licensing: 오프셋(동서 {off_e:.1f}m, 남북 {off_n:.1f}m, "
+          f"기준점 {len(dlons)}) 보정 — 영업 업소 {len(alive)}건 중 {hit}건을 {len(out)}동에 귀속")
     return out
 
 
@@ -244,7 +283,9 @@ def run() -> None:
     # 신선 재집계 + PIP 폴백: 직접 매칭 분자 갱신, 미계상 점포는 좌표로 건물에 귀속
     poly_pnu = {f["properties"].get("pnu", "") for f in polys["features"]}
     displayed_pnu = poly_pnu & set(by_lno)
-    stores = load_latest(SLUG, "stores_raw.json") or []
+    from data.collectors.building_vacancy import NON_STOREFRONT_LCLS
+    stores = [s for s in (load_latest(SLUG, "stores_raw.json") or [])
+              if s.get("indsLclsNm") not in NON_STOREFRONT_LCLS]
     fresh: dict[str, int] = {}
     extra: dict[str, int] = {}
     if stores:

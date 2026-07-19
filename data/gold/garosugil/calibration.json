@@ -1,16 +1,16 @@
 {
-  "estimated_vacancy_pct": 56.0,
+  "estimated_vacancy_pct": 39.1,
   "anchor_street_pct": 41.6,
   "anchor_mall_pct": 9.99,
-  "alpha_street": 0.743,
-  "gap_pp": 14.4,
+  "alpha_street": 1.064,
+  "gap_pp": -2.5,
   "buildings_used": 571,
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 57.6,
+      "estimated_vacancy_pct": 4.4,
       "anchor_pct": 41.6,
-      "alpha": 0.722,
-      "gap_pp": 16.0,
+      "alpha": 9.455,
+      "gap_pp": -37.2,
       "buildings": 559
     },
     "mall": {

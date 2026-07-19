@@ -24,8 +24,8 @@ from data.config.garosugil import SLUG
 ANCHOR_STREET = 41.6   # 부동산원 가두상권 공실률 (%) — TODO: CSV 로더로 대체
 ANCHOR_MALL = 9.99     # 부동산원 신사역 집합상가 공실률 (%)
 
-# capacity_method → 세그먼트: 전유부 호수 실측 = 집합건물, 층수 근사 = 일반(가두)
-_SEGMENT_OF = {"expos_units": "mall", "floor_approx": "street"}
+# capacity_method → 세그먼트: 전유부 호수 실측 = 집합건물, 층수 기반 = 일반(가두)
+_SEGMENT_OF = {"expos_units": "mall", "floor_approx": "street", "floor_ouln": "street"}
 
 
 def _segments() -> dict:
