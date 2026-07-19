@@ -1,0 +1,79 @@
+<!doctype html>
+<!-- 로드뷰 캡처 페이지 — capture_roadview.py 가 Playwright 로 연다 (내부 검증 전용).
+     쿼리: ?key={ncpKeyId}&lat={건물중심위도}&lon={경도}
+     동작: 좌표 최근접 파노라마를 열고, 파노라마 위치→건물중심 방위각으로 시점(pov)을
+     맞춘다. 준비되면 window.__pano 에 상태를 노출하고 title 을 'ready'/'fail' 로 바꾼다. -->
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>loading</title>
+  <style>html, body, #pano { margin: 0; width: 100vw; height: 100vh; }</style>
+</head>
+<body>
+<div id="pano"></div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const KEY = q.get('key');
+  const TGT = { lat: parseFloat(q.get('lat')), lon: parseFloat(q.get('lon')) };
+
+  // 파노라마 위치 → 건물 중심 방위각 (deg, 북 기준 시계방향)
+  function bearing(from, to) {
+    const rad = Math.PI / 180;
+    const dLon = (to.lon - from.lon) * rad;
+    const y = Math.sin(dLon) * Math.cos(to.lat * rad);
+    const x = Math.cos(from.lat * rad) * Math.sin(to.lat * rad)
+            - Math.sin(from.lat * rad) * Math.cos(to.lat * rad) * Math.cos(dLon);
+    return ((Math.atan2(y, x) / rad) + 360) % 360;
+  }
+
+  window.__pano = { status: 'loading', photoDate: '', panPct: null };
+  window.__setTilt = () => {};   // 파노라마 init 후 교체됨
+
+  function fail(msg) {
+    window.__pano.status = 'fail:' + msg;
+    document.title = 'fail';
+  }
+
+  const s = document.createElement('script');
+  s.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${KEY}&submodules=panorama`;
+  s.onerror = () => fail('sdk');
+  // 파노라마 서브모듈은 maps.js onload 이후 비동기로 로드된다 → 생성자 준비를 폴링.
+  s.onload = () => {
+    const t0 = Date.now();
+    const poll = setInterval(() => {
+      if (window.naver && naver.maps && typeof naver.maps.Panorama === 'function') {
+        clearInterval(poll);
+        start();
+      } else if (Date.now() - t0 > 10000) {
+        clearInterval(poll);
+        fail('panorama_submodule_timeout');
+      }
+    }, 200);
+  };
+
+  function start() {
+    let inited = false;
+    const pano = new naver.maps.Panorama('pano', {
+      position: new naver.maps.LatLng(TGT.lat, TGT.lon),
+      pov: { pan: 0, tilt: 0, fov: 100 },
+      flightSpot: false,
+      aroundControl: false,
+      zoomControl: false,
+    });
+    naver.maps.Event.addListener(pano, 'init', () => {
+      inited = true;
+      const p = pano.getPosition();
+      const pan = bearing({ lat: p.lat(), lon: p.lng() }, TGT);
+      window.__setTilt = (tilt) => pano.setPov({ pan, tilt, fov: 100 });
+      window.__setTilt(5);
+      try { window.__pano.photoDate = String(pano.getPhotoDate() || ''); } catch (e) {}
+      // 타일 로드 여유를 캡처 스크립트가 주도록 상태만 표시
+      window.__pano.status = 'ok';
+      document.title = 'ready';
+    });
+    setTimeout(() => { if (!inited) fail('no_pano_or_timeout'); }, 12000);
+  }
+  document.head.appendChild(s);
+</script>
+</body>
+</html>

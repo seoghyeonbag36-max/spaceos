@@ -55,3 +55,6 @@ sedJOtKwK
 .env.*
 !.env.example
 .vercel
+
+# 로드뷰 캡처 산출물 (로컬 검증 전용)
+data/validation/panorama/shots/
