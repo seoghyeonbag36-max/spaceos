@@ -1,4 +1,4 @@
-"""거점 API 테스트 — 서울 13 Page 시드(app/data/seoul_pages.py) 기준."""
+"""거점 API 테스트 — 서울 19 Page 시드(app/data/seoul_pages.py) 기준."""
 from fastapi.testclient import TestClient
 
 from app.data.seoul_pages import DISTRICTS
@@ -7,9 +7,11 @@ from app.main import app
 client = TestClient(app)
 V1 = "/api/v1"
 
-SEOUL_13_IDS = {
+SEOUL_DISTRICT_IDS = {
     "garosugil", "apgujeong-rodeo", "hongdae", "yeonnam", "ikseon", "seochon",
     "myeongdong", "euljiro", "seongsu", "seoulsup", "itaewon", "hannam", "songridan",
+    # 2026-07-22 Phase 1 자치구 미커버 상권 확장분
+    "gangnam", "hapjeong", "mangwon", "samcheong", "gwangjang", "dongdaemun",
 }
 
 
@@ -17,8 +19,8 @@ def test_list_districts():
     r = client.get(f"{V1}/commercial-districts")
     assert r.status_code == 200
     data = r.json()
-    assert len(data) == len(DISTRICTS) == 13
-    assert {d["id"] for d in data} == SEOUL_13_IDS
+    assert len(data) == len(DISTRICTS) == 19
+    assert {d["id"] for d in data} == SEOUL_DISTRICT_IDS
     for d in data:
         assert 0 <= d["sentiment"] <= 100
         assert 0 <= d["vacancy_rate"] <= 100

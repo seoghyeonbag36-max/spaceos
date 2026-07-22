@@ -2,14 +2,14 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
-from tests.test_districts import SEOUL_13_IDS
+from tests.test_districts import SEOUL_DISTRICT_IDS
 
 client = TestClient(app)
 V1 = "/api/v1"
 
 
-def test_predict_vacancy_all_13_districts():
-    for did in SEOUL_13_IDS:
+def test_predict_vacancy_all_districts():
+    for did in SEOUL_DISTRICT_IDS:
         r = client.post(f"{V1}/ai/predict-vacancy", json={"district_id": did})
         assert r.status_code == 200, did
         body = r.json()

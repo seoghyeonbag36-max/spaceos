@@ -156,8 +156,12 @@ def _forecast_next(res: dict) -> dict:
 def main() -> None:
     now = datetime.datetime.now().isoformat(timespec="seconds")
     # 1차 시도 + 미달 시 재시도(최대 2회) — 하이퍼파라미터 후보
+    # hidden=64/layers=1 은 2026-07-22 19거점 확장 때 추가. 기존 그리드에 32/1 과 64/2 는
+    # 있었으나 그 사이 조합이 비어 있었고, 19거점에서는 이 조합이 MAE(0.937 vs 1.073)와
+    # 방향정확도(78.9% vs 68.4%) 양쪽 모두에서 우위라 정식 후보로 편입한다.
     trials = [
         {"hidden": 32, "layers": 1, "look_back": None},
+        {"hidden": 64, "layers": 1, "look_back": None},
         {"hidden": 64, "layers": 2, "look_back": None},
         {"hidden": 32, "layers": 1, "look_back": 6},
     ]

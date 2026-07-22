@@ -106,7 +106,7 @@ def build_platform_timeseries() -> None:
 
 
 def build_platform13_timeseries() -> None:
-    """[Platform·LSTM] 13거점×분기 피처 테이블 — gold/platform13/platform_district_timeseries.
+    """[Platform·LSTM] 거점×분기 피처 테이블 — gold/platform13/platform_district_timeseries.
 
     소스: bronze/platform13/seoul_trdar_{stor,selng}.json (collect_platform13 산출,
     행마다 district_id 부가됨). 집계 규칙:
@@ -192,11 +192,11 @@ def build_platform13_timeseries() -> None:
 
     out = out.sort_values(["district_id", "quarter"]).reset_index(drop=True)
 
-    # 커버리지 검증 — 13거점 전부 포함 여부 (미포함 거점은 경고)
+    # 커버리지 검증 — 매핑된 거점 전부 포함 여부 (미포함 거점은 경고)
     got = set(out["district_id"].unique())
     missing = sorted(set(DISTRICT_TRDAR) - got)
     q_min, q_max = out["quarter"].min(), out["quarter"].max()
-    print(f"[gold] platform13 커버리지: 거점 {len(got)}/13, 분기 {q_min}~{q_max}")
+    print(f"[gold] platform13 커버리지: 거점 {len(got)}/{len(DISTRICT_TRDAR)}, 분기 {q_min}~{q_max}")
     for did in sorted(got):
         n = (out["district_id"] == did).sum()
         print(f"  {did}: {n}분기")
@@ -207,7 +207,7 @@ def build_platform13_timeseries() -> None:
 
 
 def build_platform13_store_graph_nodes() -> None:
-    """[Platform·GNN] 13거점 점포 노드 — kakao_local --platform13 수집분.
+    """[Platform·GNN] 거점 점포 노드 — kakao_local --platform13 수집분.
 
     gold/platform13/platform_store_graph_nodes.parquet (district_id 포함).
     가로수길 단일 거점 노드(gold/garosugil)와 별개 신규 산출물.

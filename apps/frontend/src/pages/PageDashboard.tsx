@@ -9,7 +9,7 @@ import { loadNaverMaps } from "@/lib/naverMap";
 import "./PageDashboard.css";
 
 /**
- * 서울 13 Page 거점 대시보드 + 거점 심층 뷰.
+ * 서울 Page 거점 대시보드 + 거점 심층 뷰(거점 수는 백엔드 시드에 따라 가변 — 2026-07 기준 19곳).
  * 데이터 출처: 백엔드 단일 소스(/api/v1/commercial-districts — 시드 app/data/seoul_pages.py).
  * 고양 버전(CityDashboard/DistrictPPPP, 정적 모듈)과 달리 서버 API로만 조회한다.
  * TODO: Gold 레이어 적재 후 수치가 실측으로 교체된다(백엔드 TODO와 연동).
@@ -52,7 +52,7 @@ export default function PageDashboard() {
       </div></div>
     );
   }
-  if (!summaries) return <div className="pagedash"><div className="wrap"><div className="loading">서울 13 Page 거점 불러오는 중…</div></div></div>;
+  if (!summaries) return <div className="pagedash"><div className="wrap"><div className="loading">서울 Page 거점 불러오는 중…</div></div></div>;
 
   const sel = selected ? summaries.find((s) => s.id === selected) : undefined;
   return sel
@@ -80,7 +80,7 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
       <div className="hd">
         <div>
           <div className="ey">SpaceOS · Platform</div>
-          <h1>주요 Platform — 서울 13거점</h1>
+          <h1>주요 Platform — 서울 {summaries.length}거점</h1>
           <div className="sub">감성·공실·리뷰·입점 Tier — 백엔드 단일 소스(시드, Gold 교체 예정) · 카드를 누르면 거점 심층으로 이동</div>
         </div>
       </div>
