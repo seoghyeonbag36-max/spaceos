@@ -105,7 +105,7 @@ def _fetch_page(key: str, service: str, start: int, end: int, extra: str = "") -
 
 
 def collect_platform13() -> dict[str, int]:
-    """[Platform·LSTM] 13거점(platform_districts.DISTRICT_TRDAR) 분기 시계열 수집.
+    """[Platform·LSTM] 27거점(platform_districts.DISTRICT_TRDAR) 분기 시계열 수집.
 
     전략 (2026-07-19 프로브 확정 — data/probe_trdar_api.py):
       relm  전량 1,650행(2페이지) → 코드 필터

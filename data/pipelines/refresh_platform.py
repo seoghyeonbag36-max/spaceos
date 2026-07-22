@@ -10,9 +10,19 @@
 """
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import time
+
+# 출력을 파이프로 받을 때 Windows 기본 cp949 로는 로그의 '—'·이모지에서 죽는다.
+# 자신과 하위 프로세스 모두 UTF-8 로 고정해 인코딩 크래시를 오탐(실패)으로 만들지 않는다.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
+_CHILD_ENV = {**os.environ, "PYTHONIOENCODING": "utf-8"}
 
 # (표시명, 모듈 argv, 실패 시 중단 여부) — 수집 단계는 실패해도 다음으로 진행(기존 bronze 재사용)
 _STEPS: list[tuple[str, list[str], bool]] = [
@@ -36,7 +46,7 @@ def run(skip_collect: bool = False) -> int:
     for name, argv, critical in steps:
         print(f"\n━━ {name} ({argv[0]}) ━━")
         t0 = time.time()
-        r = subprocess.run([sys.executable, "-m", *argv])
+        r = subprocess.run([sys.executable, "-m", *argv], env=_CHILD_ENV)
         dt = time.time() - t0
         if r.returncode != 0:
             failed.append(name)

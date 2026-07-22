@@ -1,4 +1,4 @@
-"""거점 API 테스트 — 서울 19 Page 시드(app/data/seoul_pages.py) 기준."""
+"""거점 API 테스트 — 서울 27 Page 시드(app/data/seoul_pages.py) 기준."""
 from fastapi.testclient import TestClient
 
 from app.data.seoul_pages import DISTRICTS
@@ -12,6 +12,8 @@ SEOUL_DISTRICT_IDS = {
     "myeongdong", "euljiro", "seongsu", "seoulsup", "itaewon", "hannam", "songridan",
     # 2026-07-22 Phase 1 자치구 미커버 상권 확장분
     "gangnam", "hapjeong", "mangwon", "samcheong", "gwangjang", "dongdaemun",
+    # 2026-07-22 Phase 2 자치구 확장분 (용산은 itaewon/hannam 이 이미 커버)
+    "jamsil", "konkuk", "yeouido", "mullae", "banpo", "sinchon", "yeonhui", "cheongnyangni",
 }
 
 
@@ -19,7 +21,7 @@ def test_list_districts():
     r = client.get(f"{V1}/commercial-districts")
     assert r.status_code == 200
     data = r.json()
-    assert len(data) == len(DISTRICTS) == 19
+    assert len(data) == len(DISTRICTS) == 27
     assert {d["id"] for d in data} == SEOUL_DISTRICT_IDS
     for d in data:
         assert 0 <= d["sentiment"] <= 100
@@ -52,7 +54,7 @@ def test_sentiment_and_heatmap():
 
 
 def test_all_districts_have_heatmap_cells():
-    """13거점 전부 그리드 합성 셀이 비어 있지 않아야 한다 (hot 스팟 정합 검증)."""
+    """전 거점 그리드 합성 셀이 비어 있지 않아야 한다 (hot 스팟 정합 검증)."""
     for d in DISTRICTS:
         r = client.get(f"{V1}/heatmap/vacancy", params={"district": d["id"]})
         assert r.status_code == 200, d["id"]

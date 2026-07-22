@@ -85,7 +85,7 @@ def collect() -> list[dict]:
 
 
 def collect_platform13() -> list[dict]:
-    """[Platform·GNN] 13거점 현존 점포 수집 — GNN 노드 확장(가로수길→13거점)의 원천.
+    """[Platform·GNN] 27거점 현존 점포 수집 — GNN 노드 확장(가로수길→27거점)의 원천.
 
     거점×카테고리 반경 수집, 행마다 district_id 부가. 45건 상한에 걸린 카테고리는
     ★ 로 표시 (격자 분할 수집은 TODO — 현 단계는 GNN 표본 확장이 목적).

@@ -1,4 +1,4 @@
-"""R-ONE 상업용부동산 임대동향 수집 — 13거점 공실률·임대료 분기 시계열 (Bronze).
+"""R-ONE 상업용부동산 임대동향 수집 — 27거점 공실률·임대료 분기 시계열 (Bronze).
 
 소스: reb.or.kr SttsApiTblData.do (키: REB_RONE_API_KEY, 분기 QY)
 산출: bronze/platform13/{날짜}/rone_{vac_small,vac_mid,rent_small}.json

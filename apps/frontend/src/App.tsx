@@ -4,7 +4,7 @@ import PageDashboard from "@/pages/PageDashboard";
 
 /**
  * SpaceOS 프론트엔드 진입점.
- * 전환: 서울(25구 로드맵) ↔ 주요 Platform(13거점 대시보드+심층).
+ * 전환: 서울(25구 로드맵) ↔ 주요 Platform(27거점 대시보드+심층).
  * TODO: react-router 도입 시 /seoul, /platforms 로 분리.
  */
 type View = "seoul" | "platforms";

@@ -9,7 +9,7 @@ import { loadNaverMaps } from "@/lib/naverMap";
 import "./PageDashboard.css";
 
 /**
- * 서울 Page 거점 대시보드 + 거점 심층 뷰(거점 수는 백엔드 시드에 따라 가변 — 2026-07 기준 19곳).
+ * 서울 Page 거점 대시보드 + 거점 심층 뷰(거점 수는 백엔드 시드에 따라 가변 — 2026-07 기준 27곳).
  * 데이터 출처: 백엔드 단일 소스(/api/v1/commercial-districts — 시드 app/data/seoul_pages.py).
  * 고양 버전(CityDashboard/DistrictPPPP, 정적 모듈)과 달리 서버 API로만 조회한다.
  * TODO: Gold 레이어 적재 후 수치가 실측으로 교체된다(백엔드 TODO와 연동).

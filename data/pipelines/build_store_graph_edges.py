@@ -83,7 +83,7 @@ def build_edges(nodes_path: Path = _NODES, edges_path: Path = _EDGES) -> None:
 
 
 def build_edges_platform13() -> None:
-    """13거점 노드(gold/platform13) 기반 엣지 — 150m 캡이 사실상 거점 내 연결만 남긴다."""
+    """27거점 노드(gold/platform13) 기반 엣지 — 150m 캡이 사실상 거점 내 연결만 남긴다."""
     p13 = GOLD / "platform13"
     build_edges(p13 / "platform_store_graph_nodes.parquet",
                 p13 / "platform_store_graph_edges.parquet")

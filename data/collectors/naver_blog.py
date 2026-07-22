@@ -101,7 +101,7 @@ def collect_trend() -> dict:
 
 
 def collect_platform13_blog() -> list[dict]:
-    """[Platform·GNN/Program] 13거점 블로그 리뷰 수집 — 리뷰 유사도 엣지·감성 피처 원천.
+    """[Platform·GNN/Program] 27거점 블로그 리뷰 수집 — 리뷰 유사도 엣지·감성 피처 원천.
 
     거점당 '{명칭} 맛집'·'{명칭} 카페' 2키워드 × 2페이지(최대 400건). 행에 district_id 부가.
     Bronze: data/bronze/platform13/{날짜}/naver_blog.json

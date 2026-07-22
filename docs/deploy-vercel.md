@@ -54,10 +54,10 @@ https://spaceos-sandy.vercel.app
 
 ```powershell
 curl.exe -s https://<프로젝트>.vercel.app/health                       # {"status":"ok",...}
-curl.exe -s https://<프로젝트>.vercel.app/api/v1/commercial-districts   # 13거점 JSON
+curl.exe -s https://<프로젝트>.vercel.app/api/v1/commercial-districts   # 27거점 JSON
 ```
 
-- `/` → 서울 25구 로드맵, "주요 Platform" 탭 → 13거점 대시보드 + 심층(히트맵 지도)
+- `/` → 서울 25구 로드맵, "주요 Platform" 탭 → 27거점 대시보드 + 심층(히트맵 지도)
 - 지도 타일 표시 여부 (안 뜨면 NCP 도메인 등록 확인)
 
 ## 배포판 제약 (의도된 것)

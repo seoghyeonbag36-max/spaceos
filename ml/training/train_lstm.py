@@ -1,4 +1,4 @@
-"""VacancyLSTM 13거점 pooled 학습 + 다음 분기 공실률 예측.
+"""VacancyLSTM 27거점 pooled 학습 + 다음 분기 공실률 예측.
 
 타깃: vac_proxy(대리 지표) 유지. v2 = R-ONE 실측(공실률 소규모/중대형·임대료)을 피처로
 추가 — v1 대비 MAE 0.941→0.901, RMSE 1.361→1.147, 방향정확도 84.6% 동일.
@@ -29,6 +29,14 @@ import torch.nn as nn
 
 _REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO))
+
+# 파이프라인이 출력을 파이프로 받으면 Windows 기본 인코딩이 cp949 로 잡혀
+# 로그의 '—' 하나에 UnicodeEncodeError 로 죽는다(2026-07-22 refresh_platform 오탐 원인).
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):  # 재설정 불가 스트림이면 그대로 둔다
+    pass
 
 from ml.models.lstm.vacancy_lstm import VacancyLSTM  # noqa: E402
 from ml.training.datasets import SEQ_FEATURES, TARGET, build_dataset, load_gold  # noqa: E402
@@ -159,11 +167,18 @@ def main() -> None:
     # hidden=64/layers=1 은 2026-07-22 19거점 확장 때 추가. 기존 그리드에 32/1 과 64/2 는
     # 있었으나 그 사이 조합이 비어 있었고, 19거점에서는 이 조합이 MAE(0.937 vs 1.073)와
     # 방향정확도(78.9% vs 68.4%) 양쪽 모두에서 우위라 정식 후보로 편입한다.
+    # look_back 10/12 와 hidden 96 은 2026-07-22 27거점(Phase 2) 확장 때 추가.
+    # 27거점에서는 기존 4-trial 그리드가 전부 66.7% 로 묶여 목표 미달이었다 — 거점이 늘어
+    # 홀드아웃 표본도 27개가 되면서 더 긴 문맥·넓은 은닉이 필요해진 것으로 보인다.
     trials = [
         {"hidden": 32, "layers": 1, "look_back": None},
         {"hidden": 64, "layers": 1, "look_back": None},
         {"hidden": 64, "layers": 2, "look_back": None},
         {"hidden": 32, "layers": 1, "look_back": 6},
+        {"hidden": 64, "layers": 1, "look_back": 10},
+        {"hidden": 96, "layers": 1, "look_back": None},
+        {"hidden": 96, "layers": 1, "look_back": 10},
+        {"hidden": 64, "layers": 1, "look_back": 12},
     ]
     best = None
     for i, hp in enumerate(trials):
@@ -171,7 +186,9 @@ def main() -> None:
         print(f"[trial {i}] {hp} → MAE {res['mae']:.3f} RMSE {res['rmse']:.3f} "
               f"방향정확도 {res['dir_acc']:.1%}")
         _log_mlflow(res, run_name=f"trial{i}")
-        if best is None or res["dir_acc"] > best["dir_acc"]:
+        # 방향정확도 우선, 동률이면 MAE 가 낮은 쪽. (동률에 부등호만 쓰면 먼저 나온 trial 이
+        # 계속 남아 MAE 가 더 나쁜 모델이 채택된다 — 2026-07-22 27거점에서 실제로 발생)
+        if best is None or (res["dir_acc"], -res["mae"]) > (best["dir_acc"], -best["mae"]):
             best = res
         if res["dir_acc"] >= 0.70:
             best = res
