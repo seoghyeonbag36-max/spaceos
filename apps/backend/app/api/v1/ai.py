@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from app.schemas.posting import SimulateRequest, SimulateResult
+from app.services import industry_recommend as industry_svc
 from app.services import posting as posting_svc
 from app.services import vacancy_forecast as vacancy_svc
 
@@ -15,7 +16,16 @@ class VacancyRequest(BaseModel):
 
 
 class IndustryRequest(BaseModel):
-    building_id: str
+    """업종 추천 요청 — 거점(+좌표)이 기본 키.
+
+    building_id 는 초기 스텁의 계약이라 남겨 뒀다(호출부가 아직 없어 깨질 소비자는 없다).
+    GNN 그래프의 노드는 카카오 점포 자리라 건물 대장 키와 join 되지 않는다 — 건물로
+    물으려면 좌표를 함께 준다.
+    """
+    district_id: str | None = None
+    lat: float | None = None
+    lon: float | None = None
+    building_id: str | None = None
 
 
 @router.post("/predict-vacancy")
@@ -36,8 +46,20 @@ async def predict_vacancy(req: VacancyRequest) -> dict[str, object]:
 
 @router.post("/recommend-industry")
 async def recommend_industry(req: IndustryRequest) -> dict[str, object]:
-    """GNN 기반 업종 추천. TODO: ml.inference 모듈 연동 (정확도 20% 향상 목표)."""
-    return {"building_id": req.building_id, "recommendations": [], "model": "gnn-stub"}
+    """GNN 업종 추천 — gold/platform_industry_recommend.json 서빙.
+
+    좌표를 주면 최근접 그래프 노드의 Top-3, 없으면 거점 단위 평균 Top-3.
+    추천 json 부재 시(신규 클론·미학습) 스텁 응답으로 폴백, 미지원 거점은 404.
+    """
+    if not req.district_id or not industry_svc.is_available():
+        return {"district_id": req.district_id, "building_id": req.building_id,
+                "recommendations": [], "model": "gnn-stub"}
+    out = industry_svc.recommend(req.district_id, req.lat, req.lon)
+    if out is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"no recommendation for district/좌표: {req.district_id}")
+    return {**out, "building_id": req.building_id}
 
 
 @router.post("/simulate-revenue", response_model=SimulateResult)

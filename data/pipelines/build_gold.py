@@ -221,6 +221,9 @@ def build_platform13_store_graph_nodes() -> None:
         "name": d.get("place_name", ""),
         "category": d.get("category_name", ""),
         "lon": d.get("x"), "lat": d.get("y"),
+        # 동일 건물 엣지(build_store_graph_edges)의 그룹 키 — 지번(address_name)은
+        # 같은 건물에도 표기가 갈려 도로명을 쓴다(카카오 보유율 99.6%)
+        "road_address": d.get("road_address_name", ""),
         "place_url": d.get("place_url", ""),
         "district_id": d.get("district_id", ""),
         "source": "kakao",
