@@ -26,6 +26,13 @@ SEOUL_DISTRICT_IDS = {
     "jamsil", "konkuk", "yeouido", "mullae", "banpo", "sinchon", "yeonhui", "cheongnyangni",
 }
 
+# 1~13번 초기 거점은 개·폐업률 주석 자체가 없다(Phase 1·2 확장분에만 병기).
+# 여기에 주석을 추가하면 이 집합에서 빼야 gold 대조 대상에 들어간다.
+IDS_WITHOUT_RATE_COMMENT = {
+    "garosugil", "apgujeong-rodeo", "hongdae", "yeonnam", "ikseon", "seochon",
+    "myeongdong", "euljiro", "seongsu", "seoulsup", "itaewon", "hannam", "songridan",
+}
+
 
 def test_list_districts():
     r = client.get(f"{V1}/commercial-districts")
@@ -105,7 +112,7 @@ def test_seed_comment_rates_match_gold():
     src = Path(seoul_pages.__file__).read_text(encoding="utf-8")
     # 거점 블록 단위로 잘라 주석 수치를 해당 거점 gold 와 대조
     blocks = re.split(r'\n(?=\{"id": )', src)
-    checked = 0
+    covered: set[str] = set()
     for block in blocks:
         m = re.match(r'\{"id": "([a-z0-9-]+)"', block)
         if not m:
@@ -117,13 +124,17 @@ def test_seed_comment_rates_match_gold():
         for cls, op in re.findall(r"폐업률 ([\d.]+)% (?:vs |· )개업률 ([\d.]+)%", block):
             assert float(cls) == pytest.approx(gold_cls, abs=0.005), f"{did} 폐업률 주석"
             assert float(op) == pytest.approx(gold_op, abs=0.005), f"{did} 개업률 주석"
-            checked += 1
+            covered.add(did)
         for stor in re.findall(r"점포 ([\d,]+) ", block):
             assert int(stor.replace(",", "")) == gold_stor, f"{did} 점포수 주석"
-            checked += 1
+            covered.add(did)
 
-    # 현재 42건(요율쌍 28 + 점포수 14). 정규식이 조용히 빗나가면 0건 통과가 되므로 하한을 둔다
-    assert checked >= 42, f"주석 대조 {checked}건 — 주석 형식이 바뀌었는지 확인"
+    # 정규식이 조용히 빗나가면 0건 통과가 되므로 커버리지 하한을 둔다. 건수가 아니라 거점 수로
+    # 세는 이유: 한 거점의 주석 줄이 늘거나 줄 때마다(예 samcheong 재보정) 매직넘버를 고쳐야 하는
+    # 반면, "주석을 가진 거점은 모두 대조됐다"는 불변식은 형식 변경에 흔들리지 않는다.
+    # 현재 개·폐업률 주석은 14~27번 14거점에만 있다(1~13번은 원래 없음 — 모듈 상단 ⚠️ 참조).
+    expected = {d["id"] for d in DISTRICTS} - IDS_WITHOUT_RATE_COMMENT
+    assert covered == expected, f"주석 대조 누락/초과: {covered ^ expected}"
 
 
 def test_unknown_district_404():
