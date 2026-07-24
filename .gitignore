@@ -30,6 +30,8 @@ data/gold/*
 !data/gold/garosugil/**
 # 예외: Platform LSTM 분기 예측(수 KB) — 백엔드 predict-vacancy 가 정적 서빙.
 !data/gold/platform_vacancy_forecast.json
+# 예외: Platform GNN 업종 추천(~4.8MB, 23,250노드) — recommend-industry 가 정적 서빙.
+!data/gold/platform_industry_recommend.json
 
 # IDE / OS
 .DS_Store

@@ -17,7 +17,9 @@ from __future__ import annotations
 
 import math
 import os
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 try:
     import requests
@@ -40,7 +42,25 @@ _MAX_SPLIT = 4        # 한 단계 최대 n×n (n=4 → 16분할). 과분할은 
 _MAX_DEPTH = 4        # 재귀 상한 — 초과 시 잔여 건수를 residual 로 보고
 _MIN_RADIUS_M = 40    # 이보다 작게 쪼개지 않는다(건물 단위, 좌표 오차와 구분 불가)
 _SLEEP_S = 0.05       # 공공 API 예의상 호출 간격
-_RETRIES = 4          # 일시 네트워크 오류 재시도 횟수(지수 백오프)
+# 일시 네트워크 오류 재시도 — DNS 장애(getaddrinfo)가 수십 초 지속될 수 있어
+# 짧은 백오프는 못 버틴다(2026-07-24 재수집 중 DNS 장애로 다수 거점 과소수집).
+# 8회 × 상한 15s ≈ 요청당 최대 ~90초까지 버틴다.
+_RETRIES = 8
+_MAX_BACKOFF_S = 15.0
+_WORKERS = 8          # 거점 병렬 수집 스레드 수(카카오 일 쿼터 10만/앱 대비 여유)
+
+# TLS 핸드셰이크 재수립이 요청 지연의 83%(673ms→115ms, 2026-07-23 측정)라 커넥션을
+# 재사용한다. requests.Session 은 스레드 안전하지 않으므로 스레드마다 하나씩 둔다.
+_local = threading.local()
+
+
+def _session(key: str) -> "requests.Session":
+    s = getattr(_local, "session", None)
+    if s is None:
+        s = requests.Session()
+        s.headers.update({"Authorization": f"KakaoAK {key}"})
+        _local.session = s
+    return s
 
 _M_PER_DEG_LAT = 111000.0
 
@@ -70,9 +90,8 @@ def _page(key: str, group: str, cx: float, cy: float, radius: int, page: int) ->
     last: Exception | None = None
     for attempt in range(_RETRIES):
         try:
-            resp = requests.get(
+            resp = _session(key).get(
                 _URL,
-                headers={"Authorization": f"KakaoAK {key}"},
                 params={
                     "category_group_code": group, "x": cx, "y": cy, "radius": radius,
                     "page": page, "size": _PAGE_SIZE, "sort": "distance",
@@ -88,7 +107,7 @@ def _page(key: str, group: str, cx: float, cy: float, radius: int, page: int) ->
             return resp.json()
         except Exception as exc:  # noqa: BLE001 — 네트워크 예외 전반을 재시도 대상으로
             last = exc
-            time.sleep(0.5 * 2 ** attempt)  # 0.5s → 1s → 2s
+            time.sleep(min(0.5 * 2 ** attempt, _MAX_BACKOFF_S))  # 0.5→1→2→…→상한
     raise RuntimeError(f"{_RETRIES}회 재시도 실패: {last}")
 
 
@@ -194,12 +213,53 @@ def collect() -> list[dict]:
     return places
 
 
-def collect_platform13(split: bool = True) -> list[dict]:
+def _collect_district(key: str, did: str, lat: float, lng: float, radius: int,
+                      split: bool) -> dict:
+    """거점 1개를 수집(카테고리 전부) → 반경 필터까지 적용한 {pid: place} 반환.
+
+    거점 병렬 실행의 작업 단위. district_id 는 여기서 부가한다. 스레드에서 도므로
+    print 대신 결과 dict 로만 소통하고(로그는 병합하는 메인 스레드가 순서대로 찍는다),
+    거점 간 중복 판정도 메인에서 결정적으로 처리한다.
+    """
+    found: dict[str, dict] = {}
+    stats = {"req": 0, "residual": 0}
+    capped: list[str] = []
+    failed: list[str] = []
+    for group, label in CATEGORY_GROUPS.items():
+        cat: dict[str, dict] = {}
+        try:
+            if split:
+                _collect_circle(key, group, lng, lat, radius, cat, stats,
+                                bounds=(lat, lng, radius))
+            else:
+                for d in _search_category(key, group, cx=lng, cy=lat, radius=radius):
+                    cat.setdefault(d.get("id", d.get("place_url", "")), d)
+                if len(cat) >= _CAP:
+                    capped.append(label)
+        except Exception as exc:
+            # 재시도까지 소진한 실패 — 그 거점·카테고리가 통째로 빈다. 부분 수집분은
+            # 살리되 메인에서 목록으로 다시 알린다(조용한 결측 방지).
+            failed.append(f"{did}/{label}: {exc}")
+        for pid, d in cat.items():
+            # 분할 시 자식 원이 거점 반경 밖까지 덮으므로 여기서 잘라낸다
+            try:
+                if _dist_m(lat, lng, float(d["y"]), float(d["x"])) > radius:
+                    continue
+            except (KeyError, TypeError, ValueError):
+                pass  # 좌표 파싱 실패는 버리지 않고 통과(하류에서 결측 처리)
+            if pid not in found:
+                found[pid] = {**d, "district_id": did}
+    return {"places": found, "stats": stats, "capped": capped, "failed": failed}
+
+
+def collect_platform13(split: bool = True, workers: int = _WORKERS) -> list[dict]:
     """[Platform·GNN] 27거점 현존 점포 수집 — GNN 노드 확장(가로수길→27거점)의 원천.
 
     거점×카테고리 반경 수집, 행마다 district_id 부가.
     split=True(기본)면 total_count 기준 재귀 분할로 45건 상한을 넘어 전수에 가깝게 모은다.
     split=False 면 구 동작(카테고리당 45건) — 빠른 확인용.
+    거점을 workers 스레드로 병렬 수집하되, 병합은 DISTRICT_PLACES 순서로 결정적으로
+    한다(인접 거점 반경 중복 시 먼저 정의된 거점 소속 유지 — 순차 실행과 동일 결과).
     Bronze: data/bronze/platform13/{날짜}/kakao_places.json
     """
     from data.config.platform_places import DISTRICT_PLACES
@@ -209,53 +269,35 @@ def collect_platform13(split: bool = True) -> list[dict]:
         print("[kakao_local] KAKAO_REST_API_KEY 미설정(또는 requests 없음) — 건너뜀")
         return []
 
-    seen: dict[str, dict] = {}
-    tot_req = tot_resid = 0
-    failed: list[str] = []
-    for did, (lat, lng, radius, _name) in DISTRICT_PLACES.items():
-        n_before = len(seen)
-        stats = {"req": 0, "residual": 0}
-        capped: list[str] = []
-        for group, label in CATEGORY_GROUPS.items():
-            found: dict[str, dict] = {}
-            try:
-                if split:
-                    _collect_circle(key, group, lng, lat, radius, found, stats,
-                                    bounds=(lat, lng, radius))
-                else:
-                    for d in _search_category(key, group, cx=lng, cy=lat, radius=radius):
-                        found.setdefault(d.get("id", d.get("place_url", "")), d)
-                    if len(found) >= _CAP:
-                        capped.append(label)
-            except Exception as exc:
-                # 재시도까지 소진한 실패 — 그 거점·카테고리가 통째로 빈다. 부분 수집분은
-                # 살리되 마지막에 목록으로 다시 알린다(조용한 결측 방지).
-                print(f"  {did} {group}({label}): 실패 — {exc}")
-                failed.append(f"{did}/{label}")
-            for pid, d in found.items():
-                # 분할 시 자식 원이 거점 반경 밖까지 덮으므로 여기서 잘라낸다
-                try:
-                    if _dist_m(lat, lng, float(d["y"]), float(d["x"])) > radius:
-                        continue
-                except (KeyError, TypeError, ValueError):
-                    pass  # 좌표 파싱 실패는 버리지 않고 통과(하류에서 결측 처리)
-                # 인접 거점 반경 중복 시 먼저 수집한 거점 소속 유지
-                if pid not in seen:
-                    seen[pid] = {**d, "district_id": did}
-        tot_req += stats["req"]
-        tot_resid += stats["residual"]
-        note = f" · 요청 {stats['req']}" if split else ""
-        if split and stats["residual"]:
-            note += f" · ⚠ 미수집 추정 {stats['residual']}"
-        elif capped:
-            note = f" ★상한: {','.join(capped)}"
-        print(f"  {did}: {len(seen) - n_before}건{note}")
+    order = list(DISTRICT_PLACES.items())
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futs = {did: ex.submit(_collect_district, key, did, lat, lng, radius, split)
+                for did, (lat, lng, radius, _n) in order}
+
+        seen: dict[str, dict] = {}
+        tot_req = tot_resid = 0
+        failed: list[str] = []
+        for did, _v in order:  # 결정적 병합 순서(완료를 기다리되 순서는 정의순)
+            res = futs[did].result()
+            n_before = len(seen)
+            for pid, d in res["places"].items():
+                if pid not in seen:  # 먼저 정의된 거점 우선
+                    seen[pid] = d
+            tot_req += res["stats"]["req"]
+            tot_resid += res["stats"]["residual"]
+            failed += res["failed"]
+            note = f" · 요청 {res['stats']['req']}" if split else ""
+            if split and res["stats"]["residual"]:
+                note += f" · ⚠ 미수집 추정 {res['stats']['residual']}"
+            elif res["capped"]:
+                note = f" ★상한: {','.join(res['capped'])}"
+            print(f"  {did}: {len(seen) - n_before}건{note}")
 
     places = list(seen.values())
     if split:
         print(f"[kakao_local] 총 {len(places)}건 · 요청 {tot_req}회 · 미수집 추정 {tot_resid}건")
     if failed:
-        print(f"[kakao_local] ⚠ 수집 실패 {len(failed)}건 — {', '.join(failed)}")
+        print(f"[kakao_local] ⚠ 수집 실패 {len(failed)}건 — {'; '.join(failed)}")
     save_json(places, "platform13", "kakao_places.json")
     return places
 

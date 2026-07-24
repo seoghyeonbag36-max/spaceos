@@ -220,6 +220,10 @@ def build_platform13_store_graph_nodes() -> None:
         "node_id": f"kakao:{d.get('id', '')}",
         "name": d.get("place_name", ""),
         "category": d.get("category_name", ""),
+        # GNN 분류 라벨 — 우리가 수집한 7개 카테고리 그룹(음식점/카페/편의점/병원/약국/
+        # 숙박/문화시설). category_name 의 1단계는 다른 분류체계(카페가 음식점 하위로
+        # 접혀 음식점 78%)라 라벨로 부적합 — category_group_name 이 균형 잡힌 대분류다.
+        "category_group": d.get("category_group_name", ""),
         "lon": d.get("x"), "lat": d.get("y"),
         # 동일 건물 엣지(build_store_graph_edges)의 그룹 키 — 지번(address_name)은
         # 같은 건물에도 표기가 갈려 도로명을 쓴다(카카오 보유율 99.6%)

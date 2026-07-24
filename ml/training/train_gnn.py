@@ -12,6 +12,18 @@
 가리고 주변 구조·입지만으로 맞히도록 학습하면, 같은 모델을 공실 유닛(업종이 비어 있는
 자리)에 그대로 적용해 Top-K 업종을 뽑을 수 있다.
 
+결과 해석(2026-07-24, 23,250노드·7 대분류·edge_types=all):
+  Top-1 62.2% / Top-3 91.1% (KPI Top-3 70% 달성) · macro-F1 0.179
+  ※ '거점 사전분포'(그 거점 학습셋 최빈 업종)만으로도 Top-1 60.1%/Top-3 89.4% 라
+     lift 는 +3.4%(Top-1)에 그친다. 대분류 업종은 대부분 '어느 거점이냐'로 결정되고
+     그래프가 얹는 정보가 작다는 뜻 — 그래도 GNN 은 거점 평균이 못 주는 '자리별' 점수를
+     주므로(공실 유닛 단위 추천) 제품 가치는 사전분포와 별개다.
+  엣지 ablation: spatial_knn 만 62.16%/90.8% → +same_building 61.66%/90.9% →
+     +same_chain(all) 62.2%/91.1%. 엣지 다양화의 한계 기여는 대분류 태스크에선 작다.
+  macro-F1 이 낮은 건 음식점 60% 편중 탓 — 약국·문화시설(각 2%) 은 거의 안 뽑힌다.
+  라벨을 category 2단계(30클래스)로 내리면 lift 는 +22% 로 커지지만 Top-3 는 57% 로
+     KPI 미달 — 세분 업종은 그래프 정보가 더 필요하나 절대 정확도가 낮다(_labels 주석 참조).
+
 ⚠️ 피처는 '공실 상태에서도 관측 가능한 것'만 쓴다. 점포명·체인 여부·자기 카테고리는
    빈 자리에는 존재하지 않으므로 제외했다(넣으면 검증 점수만 오르고 실제 추천에는 못 쓴다).
    남는 것은 입지뿐 — 거점 내 상대좌표·건물 규모·주변 밀집도·거점 원핫.
@@ -69,9 +81,17 @@ def load_graph() -> tuple[pd.DataFrame, pd.DataFrame]:
 
 
 def _labels(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]]:
-    """카카오 category 1~2단계를 라벨로 ("음식점 > 양식 > …" → "음식점 > 양식")."""
-    raw = nodes["category"].fillna("").map(
-        lambda c: " > ".join(str(c).split(" > ")[:2]) or "미분류")
+    """업종 대분류 라벨 — 수집 기준인 category_group(7종)을 쓴다.
+
+    category_group_name = 음식점/카페/편의점/병원/약국/숙박/문화시설. 이게 없는 옛
+    노드(garosugil 단일 거점 gold)는 category 2단계로 폴백한다 — category 1단계는
+    카카오의 다른 분류체계(카페가 음식점 하위)라 음식점 78% 로 degenerate 하다.
+    """
+    if "category_group" in nodes and nodes["category_group"].fillna("").str.len().gt(0).any():
+        raw = nodes["category_group"].fillna("").replace("", "미분류")
+    else:
+        raw = nodes["category"].fillna("").map(
+            lambda c: " > ".join(str(c).split(" > ")[:2]) or "미분류")
     counts = raw.value_counts()
     small = set(counts[counts < MIN_CLASS_NODES].index)
     merged = raw.map(lambda c: "기타" if c in small else c)
