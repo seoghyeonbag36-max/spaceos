@@ -3,8 +3,11 @@
 새 분기 데이터 공표 시점(대략 분기 종료 + 2~3개월) 후 실행하면 forecast 가 갱신된다.
 배포는 git push(main = Vercel 자동 배포)로 이어지며, 이 스크립트는 로컬 산출물까지만.
 
-실행: python -m data.pipelines.refresh_platform            # 전체 (약 30~40분)
-      python -m data.pipelines.refresh_platform --skip-collect  # 수집 생략(빌드·학습만)
+실행: python -m data.pipelines.refresh_platform            # 전체 (33거점 기준 약 40~50분)
+      python -m data.pipelines.refresh_platform --skip-collect  # 수집 생략(빌드·학습만, 약 7분)
+
+소요 실측(2026-07-24 · 33거점): 수집 35분(stor 119코드×21분기가 대부분) + 빌드·학습 7분
+(gold 25s · 엣지 29s · LSTM 170s · GNN 130s).
 
 주의: data/config/platform_districts.py 의 QUARTERS 에 새 분기를 추가한 뒤 실행할 것.
 """
@@ -35,6 +38,10 @@ _STEPS: list[tuple[str, list[str], bool]] = [
     ("Gold 빌드(platform13 한정)", ["data.pipelines.build_gold", "--platform13"], True),
     ("GNN 엣지 빌드", ["data.pipelines.build_store_graph_edges", "--platform13"], True),
     ("LSTM 재학습 + forecast", ["ml.training.train_lstm"], True),
+    # 2026-07-24 추가. 이 단계가 없으면 거점을 늘렸을 때 gold/platform_industry_recommend.json
+    # 이 옛 거점 집합에 머물러 신규 거점이 /api/v1/ai/recommend-industry 에서 404 가 된다
+    # (33거점 확장 때 실제로 발생 — 시드·forecast 는 33거점인데 업종추천만 27거점이었다).
+    ("GNN 재학습 + 업종추천", ["ml.training.train_gnn"], True),
 ]
 
 _COLLECT_STEPS = 6  # 앞 6단계가 수집
