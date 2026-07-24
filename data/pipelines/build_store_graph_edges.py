@@ -220,7 +220,7 @@ def _component_report(edges: pd.DataFrame, df: pd.DataFrame) -> None:
 
 
 def build_edges_platform13() -> None:
-    """27거점 노드(gold/platform13) 기반 엣지."""
+    """33거점 노드(gold/platform13) 기반 엣지."""
     p13 = GOLD / "platform13"
     build_edges(p13 / "platform_store_graph_nodes.parquet",
                 p13 / "platform_store_graph_edges.parquet")

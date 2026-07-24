@@ -10,7 +10,7 @@
 2026-07-23 분할 수집 도입 — 27거점 실측 총계 23,850건(분할 전 노출은 5,646건).
 
 실행: python -m data.collectors.kakao_local
-      python -m data.collectors.kakao_local --platform13          # 27거점 분할 수집
+      python -m data.collectors.kakao_local --platform13          # 33거점 분할 수집
       python -m data.collectors.kakao_local --platform13 --no-split  # 구 동작(45건 상한)
 """
 from __future__ import annotations
@@ -83,7 +83,7 @@ CATEGORY_GROUPS: dict[str, str] = {
 def _page(key: str, group: str, cx: float, cy: float, radius: int, page: int) -> dict:
     """카테고리 검색 1페이지. 응답 body(documents + meta) 를 그대로 반환.
 
-    27거점 분할 수집은 수천 요청·수십 분짜리라 일시 오류(SSLEOFError·타임아웃)를
+    33거점 분할 수집은 수천 요청·수십 분짜리라 일시 오류(SSLEOFError·타임아웃)를
     반드시 재시도한다. 재시도가 없으면 예외가 호출부까지 올라가 그 거점의 카테고리
     하나가 통째로 비어버린다(2026-07-23 hongdae 음식점 유실).
     """
@@ -253,7 +253,7 @@ def _collect_district(key: str, did: str, lat: float, lng: float, radius: int,
 
 
 def collect_platform13(split: bool = True, workers: int = _WORKERS) -> list[dict]:
-    """[Platform·GNN] 27거점 현존 점포 수집 — GNN 노드 확장(가로수길→27거점)의 원천.
+    """[Platform·GNN] 33거점 현존 점포 수집 — GNN 노드 확장(가로수길→33거점)의 원천.
 
     거점×카테고리 반경 수집, 행마다 district_id 부가.
     split=True(기본)면 total_count 기준 재귀 분할로 45건 상한을 넘어 전수에 가깝게 모은다.

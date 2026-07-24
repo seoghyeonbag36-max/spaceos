@@ -69,7 +69,7 @@ _M_PER_DEG_LON = 88300.0
 
 
 def load_graph() -> tuple[pd.DataFrame, pd.DataFrame]:
-    """platform13(27거점) 그래프 우선, 없으면 garosugil 단일 거점 폴백."""
+    """platform13(33거점) 그래프 우선, 없으면 garosugil 단일 거점 폴백."""
     for slug in ("platform13", "garosugil"):
         nodes = _GOLD / slug / "platform_store_graph_nodes.parquet"
         edges = _GOLD / slug / "platform_store_graph_edges.parquet"
