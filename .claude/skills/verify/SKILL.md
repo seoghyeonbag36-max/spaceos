@@ -22,8 +22,30 @@ cd apps\frontend ; npm run dev
 |---|---|---|
 | `apps/backend/**` | HTTP 소켓 | `curl.exe`로 `:8000` 직접 |
 | 프론트가 소비하는 API | Vite 프록시 이음매 | `:5173/api/v1/...` — 브라우저가 타는 실제 경로 |
-| `apps/frontend/**` | 픽셀 | Playwright 미설치. 필요 시 설치 필요 |
+| `apps/frontend/**` | 픽셀 | Playwright(python) + chromium 설치됨(2026-07-24) — 아래 참조 |
 | `data/pipelines/**` | Gold 산출물 → API | 파이프라인 재실행 대신 서빙되는 payload를 검사 |
+
+## 프론트 픽셀 검증 (Playwright)
+
+`python -m playwright install chromium` 완료(2026-07-24). 백엔드+Vite 를 띄운 뒤:
+
+```python
+from playwright.sync_api import sync_playwright
+with sync_playwright() as p:
+    pg = p.chromium.launch().new_page(viewport={'width':1440,'height':900})
+    pg.goto('http://localhost:5173/', wait_until='networkidle')
+    pg.get_by_role('button', name='주요 Platform').click()
+    pg.screenshot(path='...png')
+```
+
+레이아웃 회귀는 스크린샷보다 DOM 측정이 확실하다. 스크롤 구조를 볼 때:
+
+```js
+[...document.querySelectorAll('*')].filter(el => {
+  const oy = getComputedStyle(el).overflowY;
+  return (oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight + 1;
+})   // 창 스크롤 하나만 있어야 하므로 결과는 빈 배열이어야 한다
+```
 
 ## 함정 (실제로 밟은 것들)
 
@@ -37,6 +59,10 @@ cd apps\frontend ; npm run dev
   `$_.Exception.Response`가 null이라 404/422를 못 읽는다.
   `curl.exe -s -w "HTTP:%{http_code}"` 를 쓸 것.
 - **`py -3.11`** 로 부른다. `python`은 다른 버전일 수 있다.
+- **전역 CSS가 로드되는지부터 확인할 것.** `styles/tokens.css` 는 오래 MapShell.tsx
+  (라우팅되지 않는 컴포넌트)에서만 import 돼 있어 리셋이 죽어 있었다 — CSS 를 고쳐도
+  화면이 안 바뀐다. 빌드 산출물에서 규칙이 실제로 나오는지 보는 게 빠르다:
+  `grep -o "html,body{[^}]*}" dist/assets/*.css`
 
 ## 공실 레이어(`/api/v1/heatmap/buildings`) 검증
 
