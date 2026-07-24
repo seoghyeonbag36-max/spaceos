@@ -1,6 +1,6 @@
 /* SpaceOS 서울 13 Page 거점 대시보드 — 스코프 .pagedash (SeoulDashboard 톤 계승) */
 .pagedash{--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#2E6FB7;
- font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);background:#eef1f4;padding:20px;line-height:1.4;min-height:100vh}
+ font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);background:#eef1f4;padding:20px;line-height:1.4}
 .pagedash *{box-sizing:border-box}
 .pagedash .wrap{max-width:1240px;margin:0 auto}
 .pagedash .hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;gap:10px}

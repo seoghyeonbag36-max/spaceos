@@ -19,4 +19,8 @@
   --shadow-sheet: 0 -4px 24px rgba(11,27,51,.12);
   --font-sans: "Pretendard", system-ui, sans-serif;
 }
-html, body { font-family: var(--font-sans); color: var(--ink); background: var(--bg); }
+/* UA 기본 body 여백(8px)을 지우지 않으면 100dvh 레이아웃이 뷰포트를 넘겨
+   창 스크롤바가 하나 더 생긴다(2026-07-24 스크롤바 2개 증상의 원인). */
+html, body { margin: 0; padding: 0; }
+/* 스크롤은 문서(창) 한 곳에서만 일어난다 — App 은 내부 overflow 컨테이너를 두지 않는다. */
+html, body { font-family: var(--font-sans); color: var(--ink); background: #eef1f4; }

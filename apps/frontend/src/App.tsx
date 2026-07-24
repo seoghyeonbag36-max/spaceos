@@ -13,10 +13,11 @@ export default function App() {
   const [view, setView] = useState<View>("seoul");
 
   return (
-    // 풀높이 flex: 네비바(고정) + 콘텐츠(나머지 전체).
-    <div style={{ height: "100dvh", display: "flex", flexDirection: "column" }}>
+    // 스크롤은 문서(창) 한 곳에서만. 내부 overflow 컨테이너를 두면 스크롤바가 2개로 보인다
+    // (2026-07-24 수정 — 네비바는 sticky 로 상단에 고정된다).
+    <div>
       <nav style={{
-        flex: "0 0 auto", zIndex: 1000, display: "flex", gap: 8, alignItems: "center",
+        position: "sticky", top: 0, zIndex: 1000, display: "flex", gap: 8, alignItems: "center",
         padding: "10px 20px", background: "#fff", borderBottom: "1px solid #e5e7eb",
         fontFamily: "'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif",
       }}>
@@ -25,10 +26,8 @@ export default function App() {
         <NavBtn label="주요 Platform" active={view === "platforms"} onClick={() => setView("platforms")} />
       </nav>
 
-      <main style={{ flex: 1, minHeight: 0, position: "relative" }}>
-        <div style={{ position: "absolute", inset: 0, overflow: "auto" }}>
-          {view === "seoul" ? <SeoulDashboard /> : <PageDashboard />}
-        </div>
+      <main>
+        {view === "seoul" ? <SeoulDashboard /> : <PageDashboard />}
       </main>
     </div>
   );
