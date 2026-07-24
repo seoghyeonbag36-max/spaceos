@@ -1,215 +1,245 @@
 {
   "model": "vacancy-lstm-pooled-v2",
   "target": "vac_proxy(공실 프록시) — R-ONE 실측(vac_small/vac_mid/rent_small)은 피처",
-  "trained_at": "2026-07-24T17:13:38",
+  "trained_at": "2026-07-24T22:35:57",
   "metrics": {
-    "holdout_mae": 1.294,
-    "holdout_rmse": 1.826,
-    "holdout_direction_acc": 0.727
+    "holdout_mae": 1.04,
+    "holdout_rmse": 1.496,
+    "holdout_direction_acc": 0.816
   },
   "params": {
-    "hidden": 64,
-    "layers": 2,
+    "hidden": 96,
+    "layers": 1,
     "look_back": 8,
     "epochs": 400,
     "lr": 0.001,
-    "train_loss": 0.052841462194919586
+    "train_loss": 0.00934634916484356
   },
   "holdout": {
     "anam": {
-      "pred": -0.595,
+      "pred": 0.239,
       "actual": 3.111,
       "prev": -0.027,
-      "direction_hit": false
+      "direction_hit": true
     },
     "apgujeong-rodeo": {
-      "pred": 1.466,
+      "pred": 1.151,
       "actual": 0.102,
       "prev": 0.547,
       "direction_hit": false
     },
     "banpo": {
-      "pred": -0.047,
+      "pred": 0.029,
       "actual": 1.99,
       "prev": -0.164,
       "direction_hit": true
     },
+    "cheongdam": {
+      "pred": 2.098,
+      "actual": 0.797,
+      "prev": -1.585,
+      "direction_hit": true
+    },
     "cheongnyangni": {
-      "pred": -0.007,
+      "pred": -0.015,
       "actual": 1.299,
       "prev": -0.047,
       "direction_hit": true
     },
     "dongdaemun": {
-      "pred": 4.213,
+      "pred": 3.878,
       "actual": 3.943,
       "prev": 2.971,
       "direction_hit": true
     },
+    "dosan": {
+      "pred": -0.521,
+      "actual": -0.793,
+      "prev": -0.408,
+      "direction_hit": true
+    },
     "euljiro": {
-      "pred": 0.077,
+      "pred": -0.042,
       "actual": 1.602,
       "prev": -0.456,
       "direction_hit": true
     },
     "gangnam": {
-      "pred": -0.093,
+      "pred": 0.967,
       "actual": 1.692,
       "prev": 0.374,
-      "direction_hit": false
+      "direction_hit": true
     },
     "garosugil": {
-      "pred": 0.742,
+      "pred": 0.65,
       "actual": 1.282,
       "prev": 0.62,
       "direction_hit": true
     },
     "gwangjang": {
-      "pred": 0.462,
+      "pred": 1.379,
       "actual": -1.359,
       "prev": 0.544,
-      "direction_hit": true
+      "direction_hit": false
     },
     "hannam": {
-      "pred": 0.747,
+      "pred": 0.547,
       "actual": 1.201,
       "prev": -1.183,
       "direction_hit": true
     },
     "hapjeong": {
-      "pred": -0.631,
+      "pred": 1.144,
       "actual": 1.493,
       "prev": 1.21,
       "direction_hit": false
     },
     "hongdae": {
-      "pred": 0.432,
+      "pred": 0.072,
       "actual": 0.844,
       "prev": 0.251,
-      "direction_hit": true
+      "direction_hit": false
     },
     "ikseon": {
-      "pred": 0.291,
+      "pred": 0.518,
       "actual": 1.556,
       "prev": 0.141,
       "direction_hit": true
     },
     "itaewon": {
-      "pred": 0.917,
+      "pred": 0.904,
       "actual": 1.712,
       "prev": -0.055,
       "direction_hit": true
     },
     "jamsil": {
-      "pred": 2.004,
+      "pred": 1.231,
       "actual": 1.279,
       "prev": 2.209,
       "direction_hit": true
     },
     "konkuk": {
-      "pred": 1.526,
+      "pred": 0.684,
       "actual": 1.171,
       "prev": 0.105,
       "direction_hit": true
     },
     "mangwon": {
-      "pred": -0.132,
+      "pred": -0.085,
       "actual": 1.559,
       "prev": -1.018,
       "direction_hit": true
     },
     "mullae": {
-      "pred": 0.039,
+      "pred": -0.352,
       "actual": 0.035,
       "prev": -1.205,
       "direction_hit": true
     },
     "myeongdong": {
-      "pred": -0.714,
+      "pred": -0.164,
       "actual": 0.368,
       "prev": -0.471,
-      "direction_hit": false
+      "direction_hit": true
     },
     "nokdu": {
-      "pred": -0.387,
+      "pred": 0.332,
       "actual": 6.049,
       "prev": -0.749,
       "direction_hit": true
     },
+    "nonhyeon": {
+      "pred": 1.089,
+      "actual": 2.006,
+      "prev": -0.273,
+      "direction_hit": true
+    },
     "noryangjin": {
-      "pred": 3.42,
+      "pred": 2.779,
       "actual": 2.417,
       "prev": 2.848,
-      "direction_hit": false
+      "direction_hit": true
     },
     "samcheong": {
-      "pred": -0.895,
+      "pred": -0.192,
       "actual": -0.401,
       "prev": 0.084,
       "direction_hit": true
     },
     "seochon": {
-      "pred": -0.898,
+      "pred": -0.963,
       "actual": 1.3,
       "prev": -1.47,
       "direction_hit": true
     },
+    "seolleung": {
+      "pred": 1.06,
+      "actual": 2.398,
+      "prev": 1.148,
+      "direction_hit": false
+    },
     "seongsu": {
-      "pred": -0.425,
+      "pred": -0.022,
       "actual": -0.167,
       "prev": -0.868,
       "direction_hit": true
     },
     "seoulsup": {
-      "pred": -0.122,
+      "pred": 0.03,
       "actual": 0.16,
       "prev": -0.722,
       "direction_hit": true
     },
     "sharosugil": {
-      "pred": 0.761,
+      "pred": 0.958,
       "actual": 0.944,
       "prev": 1.451,
       "direction_hit": true
     },
     "sillim": {
-      "pred": 1.622,
+      "pred": 0.93,
       "actual": 2.045,
       "prev": 0.133,
       "direction_hit": true
     },
     "sinchon": {
-      "pred": 1.016,
+      "pred": 0.915,
       "actual": 1.006,
       "prev": 1.046,
       "direction_hit": true
     },
     "songridan": {
-      "pred": -0.785,
+      "pred": 0.639,
       "actual": 2.785,
       "prev": 2.258,
       "direction_hit": false
     },
     "sungshin": {
-      "pred": -0.33,
+      "pred": -0.038,
       "actual": 1.671,
       "prev": 0.556,
       "direction_hit": false
     },
+    "teheran": {
+      "pred": 0.443,
+      "actual": 1.263,
+      "prev": -0.258,
+      "direction_hit": true
+    },
     "yeonhui": {
-      "pred": 0.19,
+      "pred": -0.388,
       "actual": -1.31,
       "prev": 0.185,
-      "direction_hit": false
+      "direction_hit": true
     },
     "yeonnam": {
-      "pred": 1.053,
+      "pred": 1.014,
       "actual": 1.323,
       "prev": -0.194,
       "direction_hit": true
     },
     "yeouido": {
-      "pred": 1.734,
+      "pred": 0.917,
       "actual": 0.929,
       "prev": -0.107,
       "direction_hit": true
@@ -217,416 +247,1130 @@
   },
   "forecasts": {
     "anam": {
-      "forecast_vac_proxy": -3.129,
+      "forecast_vac_proxy": -0.959,
       "last_vac_proxy": 3.111,
-      "delta": -6.24,
+      "delta": -4.07,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -3.129,
-          "delta": -6.24,
+          "forecast_vac_proxy": -0.959,
+          "delta": -4.07,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -3.287,
-          "delta": -0.157,
-          "direction": "down"
+          "forecast_vac_proxy": -0.788,
+          "delta": 0.172,
+          "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -3.443,
-          "delta": -0.157,
+          "forecast_vac_proxy": -1.285,
+          "delta": -0.497,
           "direction": "down"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": -3.219,
-          "delta": 0.224,
+          "forecast_vac_proxy": -1.088,
+          "delta": 0.197,
           "direction": "up"
         }
       ]
     },
     "apgujeong-rodeo": {
-      "forecast_vac_proxy": 1.221,
+      "forecast_vac_proxy": 0.958,
       "last_vac_proxy": 0.102,
-      "delta": 1.119,
+      "delta": 0.856,
       "direction": "up",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": 1.221,
-          "delta": 1.119,
+          "forecast_vac_proxy": 0.958,
+          "delta": 0.856,
           "direction": "up"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": 0.197,
-          "delta": -1.024,
+          "forecast_vac_proxy": 0.567,
+          "delta": -0.392,
           "direction": "down"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -0.068,
-          "delta": -0.265,
+          "forecast_vac_proxy": 0.382,
+          "delta": -0.184,
           "direction": "down"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": -0.056,
-          "delta": 0.012,
-          "direction": "up"
+          "forecast_vac_proxy": 0.371,
+          "delta": -0.012,
+          "direction": "down"
         }
       ]
     },
     "banpo": {
-      "forecast_vac_proxy": -1.017,
+      "forecast_vac_proxy": -1.495,
       "last_vac_proxy": 1.99,
-      "delta": -3.007,
+      "delta": -3.485,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -1.017,
-          "delta": -3.007,
+          "forecast_vac_proxy": -1.495,
+          "delta": -3.485,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -0.598,
-          "delta": 0.419,
+          "forecast_vac_proxy": -1.214,
+          "delta": 0.281,
           "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -0.273,
-          "delta": 0.325,
+          "forecast_vac_proxy": -0.98,
+          "delta": 0.234,
           "direction": "up"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": -0.341,
-          "delta": -0.068,
+          "forecast_vac_proxy": -1.115,
+          "delta": -0.135,
           "direction": "down"
+        }
+      ]
+    },
+    "cheongdam": {
+      "forecast_vac_proxy": -0.654,
+      "last_vac_proxy": 0.797,
+      "delta": -1.451,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.654,
+          "delta": -1.451,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -4.022,
+          "delta": -3.368,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -3.346,
+          "delta": 0.676,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -0.324,
+          "delta": 3.023,
+          "direction": "up"
         }
       ]
     },
     "cheongnyangni": {
-      "forecast_vac_proxy": -0.365,
+      "forecast_vac_proxy": -0.982,
       "last_vac_proxy": 1.299,
-      "delta": -1.664,
+      "delta": -2.281,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -0.365,
-          "delta": -1.664,
+          "forecast_vac_proxy": -0.982,
+          "delta": -2.281,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -0.062,
-          "delta": 0.303,
+          "forecast_vac_proxy": -0.861,
+          "delta": 0.121,
           "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": 0.312,
-          "delta": 0.374,
+          "forecast_vac_proxy": -0.265,
+          "delta": 0.596,
           "direction": "up"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": 0.203,
-          "delta": -0.108,
-          "direction": "down"
+          "forecast_vac_proxy": 0.152,
+          "delta": 0.416,
+          "direction": "up"
         }
       ]
     },
     "dongdaemun": {
-      "forecast_vac_proxy": 4.412,
+      "forecast_vac_proxy": 3.716,
       "last_vac_proxy": 3.943,
-      "delta": 0.469,
+      "delta": -0.227,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": 3.716,
+          "delta": -0.227,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": 4.238,
+          "delta": 0.521,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": 4.201,
+          "delta": -0.036,
+          "direction": "down"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 4.353,
+          "delta": 0.152,
+          "direction": "up"
+        }
+      ]
+    },
+    "dosan": {
+      "forecast_vac_proxy": 1.5,
+      "last_vac_proxy": -0.793,
+      "delta": 2.293,
       "direction": "up",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": 4.412,
-          "delta": 0.469,
+          "forecast_vac_proxy": 1.5,
+          "delta": 2.293,
           "direction": "up"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": 4.491,
-          "delta": 0.079,
+          "forecast_vac_proxy": 1.63,
+          "delta": 0.13,
           "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": 4.445,
-          "delta": -0.047,
+          "forecast_vac_proxy": 0.695,
+          "delta": -0.936,
           "direction": "down"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": 4.423,
-          "delta": -0.022,
+          "forecast_vac_proxy": 0.101,
+          "delta": -0.594,
           "direction": "down"
         }
       ]
     },
     "euljiro": {
-      "forecast_vac_proxy": -1.247,
+      "forecast_vac_proxy": -1.713,
       "last_vac_proxy": 1.602,
-      "delta": -2.849,
+      "delta": -3.315,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -1.247,
-          "delta": -2.849,
+          "forecast_vac_proxy": -1.713,
+          "delta": -3.315,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -1.012,
-          "delta": 0.236,
+          "forecast_vac_proxy": -1.251,
+          "delta": 0.462,
           "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -1.069,
-          "delta": -0.057,
-          "direction": "down"
+          "forecast_vac_proxy": -0.822,
+          "delta": 0.428,
+          "direction": "up"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": -0.344,
-          "delta": 0.725,
+          "forecast_vac_proxy": -0.577,
+          "delta": 0.245,
           "direction": "up"
         }
       ]
     },
     "gangnam": {
-      "forecast_vac_proxy": -1.4,
+      "forecast_vac_proxy": -0.675,
       "last_vac_proxy": 1.692,
-      "delta": -3.092,
+      "delta": -2.368,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -1.4,
-          "delta": -3.092,
+          "forecast_vac_proxy": -0.675,
+          "delta": -2.368,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -1.036,
-          "delta": 0.364,
+          "forecast_vac_proxy": -0.414,
+          "delta": 0.261,
           "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -0.447,
-          "delta": 0.588,
-          "direction": "up"
+          "forecast_vac_proxy": -0.46,
+          "delta": -0.046,
+          "direction": "down"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": 0.616,
-          "delta": 1.064,
+          "forecast_vac_proxy": -0.176,
+          "delta": 0.284,
           "direction": "up"
         }
       ]
     },
     "garosugil": {
-      "forecast_vac_proxy": 0.39,
+      "forecast_vac_proxy": 0.65,
       "last_vac_proxy": 1.282,
-      "delta": -0.892,
+      "delta": -0.632,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": 0.39,
-          "delta": -0.892,
+          "forecast_vac_proxy": 0.65,
+          "delta": -0.632,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": 0.322,
-          "delta": -0.067,
-          "direction": "down"
+          "forecast_vac_proxy": 0.982,
+          "delta": 0.332,
+          "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -0.096,
-          "delta": -0.418,
+          "forecast_vac_proxy": 0.964,
+          "delta": -0.018,
           "direction": "down"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": 0.089,
-          "delta": 0.185,
+          "forecast_vac_proxy": 1.251,
+          "delta": 0.286,
           "direction": "up"
         }
       ]
     },
     "gwangjang": {
-      "forecast_vac_proxy": 0.48,
+      "forecast_vac_proxy": 1.431,
       "last_vac_proxy": -1.359,
-      "delta": 1.839,
+      "delta": 2.79,
       "direction": "up",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": 0.48,
-          "delta": 1.839,
+          "forecast_vac_proxy": 1.431,
+          "delta": 2.79,
           "direction": "up"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -0.458,
-          "delta": -0.939,
+          "forecast_vac_proxy": 0.223,
+          "delta": -1.208,
           "direction": "down"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -0.859,
-          "delta": -0.401,
+          "forecast_vac_proxy": -0.332,
+          "delta": -0.554,
           "direction": "down"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": -1.727,
-          "delta": -0.868,
+          "forecast_vac_proxy": -1.112,
+          "delta": -0.78,
           "direction": "down"
         }
       ]
     },
     "hannam": {
-      "forecast_vac_proxy": -1.01,
+      "forecast_vac_proxy": -0.786,
       "last_vac_proxy": 1.201,
-      "delta": -2.211,
+      "delta": -1.986,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -1.01,
-          "delta": -2.211,
+          "forecast_vac_proxy": -0.786,
+          "delta": -1.986,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -2.02,
-          "delta": -1.01,
+          "forecast_vac_proxy": -1.573,
+          "delta": -0.787,
           "direction": "down"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -2.272,
-          "delta": -0.252,
+          "forecast_vac_proxy": -2.368,
+          "delta": -0.796,
           "direction": "down"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": -1.548,
-          "delta": 0.724,
+          "forecast_vac_proxy": -0.879,
+          "delta": 1.489,
           "direction": "up"
         }
       ]
     },
     "hapjeong": {
-      "forecast_vac_proxy": -1.793,
+      "forecast_vac_proxy": -0.193,
       "last_vac_proxy": 1.493,
-      "delta": -3.286,
+      "delta": -1.686,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -1.793,
-          "delta": -3.286,
+          "forecast_vac_proxy": -0.193,
+          "delta": -1.686,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -1.033,
-          "delta": 0.76,
-          "direction": "up"
+          "forecast_vac_proxy": -0.841,
+          "delta": -0.648,
+          "direction": "down"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -0.582,
-          "delta": 0.451,
+          "forecast_vac_proxy": -0.719,
+          "delta": 0.122,
           "direction": "up"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": -0.652,
-          "delta": -0.07,
+          "forecast_vac_proxy": -0.763,
+          "delta": -0.044,
           "direction": "down"
         }
       ]
     },
     "hongdae": {
-      "forecast_vac_proxy": -0.351,
+      "forecast_vac_proxy": -0.374,
       "last_vac_proxy": 0.844,
-      "delta": -1.195,
+      "delta": -1.218,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -0.351,
-          "delta": -1.195,
+          "forecast_vac_proxy": -0.374,
+          "delta": -1.218,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -0.35,
-          "delta": 0.001,
+          "forecast_vac_proxy": -0.295,
+          "delta": 0.079,
           "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -0.217,
-          "delta": 0.133,
+          "forecast_vac_proxy": -0.195,
+          "delta": 0.1,
           "direction": "up"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": -0.114,
-          "delta": 0.103,
+          "forecast_vac_proxy": -0.082,
+          "delta": 0.113,
           "direction": "up"
         }
       ]
     },
     "ikseon": {
-      "forecast_vac_proxy": -0.327,
+      "forecast_vac_proxy": -0.75,
       "last_vac_proxy": 1.556,
+      "delta": -2.306,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.75,
+          "delta": -2.306,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -0.877,
+          "delta": -0.127,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.765,
+          "delta": 0.112,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -0.597,
+          "delta": 0.168,
+          "direction": "up"
+        }
+      ]
+    },
+    "itaewon": {
+      "forecast_vac_proxy": 0.464,
+      "last_vac_proxy": 1.712,
+      "delta": -1.249,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": 0.464,
+          "delta": -1.249,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": 0.322,
+          "delta": -0.142,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.017,
+          "delta": -0.338,
+          "direction": "down"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 0.021,
+          "delta": 0.038,
+          "direction": "up"
+        }
+      ]
+    },
+    "jamsil": {
+      "forecast_vac_proxy": 1.1,
+      "last_vac_proxy": 1.279,
+      "delta": -0.18,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": 1.1,
+          "delta": -0.18,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": 0.977,
+          "delta": -0.123,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": 1.053,
+          "delta": 0.076,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 1.084,
+          "delta": 0.031,
+          "direction": "up"
+        }
+      ]
+    },
+    "konkuk": {
+      "forecast_vac_proxy": 0.755,
+      "last_vac_proxy": 1.171,
+      "delta": -0.416,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": 0.755,
+          "delta": -0.416,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": 0.942,
+          "delta": 0.187,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": 1.006,
+          "delta": 0.063,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 1.131,
+          "delta": 0.125,
+          "direction": "up"
+        }
+      ]
+    },
+    "mangwon": {
+      "forecast_vac_proxy": -0.546,
+      "last_vac_proxy": 1.559,
+      "delta": -2.105,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.546,
+          "delta": -2.105,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -0.194,
+          "delta": 0.353,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": 0.407,
+          "delta": 0.601,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 0.775,
+          "delta": 0.367,
+          "direction": "up"
+        }
+      ]
+    },
+    "mullae": {
+      "forecast_vac_proxy": 0.599,
+      "last_vac_proxy": 0.035,
+      "delta": 0.564,
+      "direction": "up",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": 0.599,
+          "delta": 0.564,
+          "direction": "up"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": 0.199,
+          "delta": -0.4,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.041,
+          "delta": -0.24,
+          "direction": "down"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -0.039,
+          "delta": 0.002,
+          "direction": "up"
+        }
+      ]
+    },
+    "myeongdong": {
+      "forecast_vac_proxy": -0.285,
+      "last_vac_proxy": 0.368,
+      "delta": -0.653,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.285,
+          "delta": -0.653,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -0.128,
+          "delta": 0.157,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.127,
+          "delta": 0.001,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -0.106,
+          "delta": 0.021,
+          "direction": "up"
+        }
+      ]
+    },
+    "nokdu": {
+      "forecast_vac_proxy": -3.656,
+      "last_vac_proxy": 6.049,
+      "delta": -9.704,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -3.656,
+          "delta": -9.704,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -2.516,
+          "delta": 1.14,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -1.181,
+          "delta": 1.335,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -2.127,
+          "delta": -0.946,
+          "direction": "down"
+        }
+      ]
+    },
+    "nonhyeon": {
+      "forecast_vac_proxy": -0.15,
+      "last_vac_proxy": 2.006,
+      "delta": -2.156,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.15,
+          "delta": -2.156,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -0.047,
+          "delta": 0.103,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.219,
+          "delta": -0.172,
+          "direction": "down"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -0.135,
+          "delta": 0.084,
+          "direction": "up"
+        }
+      ]
+    },
+    "noryangjin": {
+      "forecast_vac_proxy": 3.283,
+      "last_vac_proxy": 2.417,
+      "delta": 0.866,
+      "direction": "up",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": 3.283,
+          "delta": 0.866,
+          "direction": "up"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": 3.321,
+          "delta": 0.038,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": 2.222,
+          "delta": -1.099,
+          "direction": "down"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 2.338,
+          "delta": 0.117,
+          "direction": "up"
+        }
+      ]
+    },
+    "samcheong": {
+      "forecast_vac_proxy": -0.082,
+      "last_vac_proxy": -0.401,
+      "delta": 0.32,
+      "direction": "up",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.082,
+          "delta": 0.32,
+          "direction": "up"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": 0.261,
+          "delta": 0.342,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": 0.523,
+          "delta": 0.262,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 0.631,
+          "delta": 0.108,
+          "direction": "up"
+        }
+      ]
+    },
+    "seochon": {
+      "forecast_vac_proxy": -0.959,
+      "last_vac_proxy": 1.3,
+      "delta": -2.258,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.959,
+          "delta": -2.258,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -0.48,
+          "delta": 0.478,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.344,
+          "delta": 0.137,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -0.378,
+          "delta": -0.035,
+          "direction": "down"
+        }
+      ]
+    },
+    "seolleung": {
+      "forecast_vac_proxy": 0.001,
+      "last_vac_proxy": 2.398,
+      "delta": -2.397,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": 0.001,
+          "delta": -2.397,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -0.047,
+          "delta": -0.048,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": 0.055,
+          "delta": 0.102,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 0.156,
+          "delta": 0.101,
+          "direction": "up"
+        }
+      ]
+    },
+    "seongsu": {
+      "forecast_vac_proxy": -0.047,
+      "last_vac_proxy": -0.167,
+      "delta": 0.119,
+      "direction": "up",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.047,
+          "delta": 0.119,
+          "direction": "up"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -0.054,
+          "delta": -0.006,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.573,
+          "delta": -0.519,
+          "direction": "down"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -0.974,
+          "delta": -0.401,
+          "direction": "down"
+        }
+      ]
+    },
+    "seoulsup": {
+      "forecast_vac_proxy": -0.225,
+      "last_vac_proxy": 0.16,
+      "delta": -0.385,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.225,
+          "delta": -0.385,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -0.344,
+          "delta": -0.118,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.454,
+          "delta": -0.11,
+          "direction": "down"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -0.473,
+          "delta": -0.02,
+          "direction": "down"
+        }
+      ]
+    },
+    "sharosugil": {
+      "forecast_vac_proxy": 0.505,
+      "last_vac_proxy": 0.944,
+      "delta": -0.439,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": 0.505,
+          "delta": -0.439,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": 0.497,
+          "delta": -0.007,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": 0.667,
+          "delta": 0.17,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 0.769,
+          "delta": 0.101,
+          "direction": "up"
+        }
+      ]
+    },
+    "sillim": {
+      "forecast_vac_proxy": -0.203,
+      "last_vac_proxy": 2.045,
+      "delta": -2.248,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -0.203,
+          "delta": -2.248,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -0.394,
+          "delta": -0.191,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.143,
+          "delta": 0.251,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 0.045,
+          "delta": 0.188,
+          "direction": "up"
+        }
+      ]
+    },
+    "sinchon": {
+      "forecast_vac_proxy": 0.978,
+      "last_vac_proxy": 1.006,
+      "delta": -0.028,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": 0.978,
+          "delta": -0.028,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": 0.801,
+          "delta": -0.178,
+          "direction": "down"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": 0.785,
+          "delta": -0.016,
+          "direction": "down"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": 1.085,
+          "delta": 0.3,
+          "direction": "up"
+        }
+      ]
+    },
+    "songridan": {
+      "forecast_vac_proxy": -1.778,
+      "last_vac_proxy": 2.785,
+      "delta": -4.562,
+      "direction": "down",
+      "last_quarter": "20261",
+      "n_quarters": 21,
+      "horizons": [
+        {
+          "quarter": "20262",
+          "forecast_vac_proxy": -1.778,
+          "delta": -4.562,
+          "direction": "down"
+        },
+        {
+          "quarter": "20263",
+          "forecast_vac_proxy": -1.155,
+          "delta": 0.623,
+          "direction": "up"
+        },
+        {
+          "quarter": "20264",
+          "forecast_vac_proxy": -0.737,
+          "delta": 0.418,
+          "direction": "up"
+        },
+        {
+          "quarter": "20271",
+          "forecast_vac_proxy": -0.182,
+          "delta": 0.555,
+          "direction": "up"
+        }
+      ]
+    },
+    "sungshin": {
+      "forecast_vac_proxy": -0.212,
+      "last_vac_proxy": 1.671,
       "delta": -1.883,
       "direction": "down",
       "last_quarter": "20261",
@@ -634,706 +1378,162 @@
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -0.327,
+          "forecast_vac_proxy": -0.212,
           "delta": -1.883,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -0.1,
-          "delta": 0.227,
+          "forecast_vac_proxy": -0.153,
+          "delta": 0.059,
           "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": 0.279,
-          "delta": 0.379,
+          "forecast_vac_proxy": -0.069,
+          "delta": 0.083,
           "direction": "up"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": 0.534,
-          "delta": 0.255,
+          "forecast_vac_proxy": -0.027,
+          "delta": 0.043,
           "direction": "up"
         }
       ]
     },
-    "itaewon": {
-      "forecast_vac_proxy": -0.218,
-      "last_vac_proxy": 1.712,
-      "delta": -1.93,
+    "teheran": {
+      "forecast_vac_proxy": 0.105,
+      "last_vac_proxy": 1.263,
+      "delta": -1.158,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -0.218,
-          "delta": -1.93,
+          "forecast_vac_proxy": 0.105,
+          "delta": -1.158,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -0.661,
-          "delta": -0.444,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": -0.523,
-          "delta": 0.139,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": 0.274,
-          "delta": 0.797,
-          "direction": "up"
-        }
-      ]
-    },
-    "jamsil": {
-      "forecast_vac_proxy": 1.286,
-      "last_vac_proxy": 1.279,
-      "delta": 0.007,
-      "direction": "up",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": 1.286,
-          "delta": 0.007,
-          "direction": "up"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": 1.186,
-          "delta": -0.1,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": 0.892,
-          "delta": -0.294,
-          "direction": "down"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": 0.567,
-          "delta": -0.326,
-          "direction": "down"
-        }
-      ]
-    },
-    "konkuk": {
-      "forecast_vac_proxy": 2.348,
-      "last_vac_proxy": 1.171,
-      "delta": 1.177,
-      "direction": "up",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": 2.348,
-          "delta": 1.177,
-          "direction": "up"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": 2.207,
-          "delta": -0.141,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": 1.745,
-          "delta": -0.462,
-          "direction": "down"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": 1.859,
-          "delta": 0.114,
-          "direction": "up"
-        }
-      ]
-    },
-    "mangwon": {
-      "forecast_vac_proxy": -2.328,
-      "last_vac_proxy": 1.559,
-      "delta": -3.887,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -2.328,
-          "delta": -3.887,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": -1.178,
-          "delta": 1.15,
+          "forecast_vac_proxy": 0.393,
+          "delta": 0.288,
           "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -0.729,
-          "delta": 0.449,
+          "forecast_vac_proxy": 0.58,
+          "delta": 0.187,
           "direction": "up"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": 3.571,
-          "delta": 4.301,
+          "forecast_vac_proxy": 0.733,
+          "delta": 0.152,
           "direction": "up"
-        }
-      ]
-    },
-    "mullae": {
-      "forecast_vac_proxy": 0.908,
-      "last_vac_proxy": 0.035,
-      "delta": 0.874,
-      "direction": "up",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": 0.908,
-          "delta": 0.874,
-          "direction": "up"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": 0.731,
-          "delta": -0.177,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": 0.666,
-          "delta": -0.065,
-          "direction": "down"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": 0.778,
-          "delta": 0.111,
-          "direction": "up"
-        }
-      ]
-    },
-    "myeongdong": {
-      "forecast_vac_proxy": -0.537,
-      "last_vac_proxy": 0.368,
-      "delta": -0.904,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -0.537,
-          "delta": -0.904,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": 0.09,
-          "delta": 0.627,
-          "direction": "up"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": 0.129,
-          "delta": 0.038,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": 0.068,
-          "delta": -0.061,
-          "direction": "down"
-        }
-      ]
-    },
-    "nokdu": {
-      "forecast_vac_proxy": -3.25,
-      "last_vac_proxy": 6.049,
-      "delta": -9.299,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -3.25,
-          "delta": -9.299,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": -4.79,
-          "delta": -1.54,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": -2.89,
-          "delta": 1.9,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": -4.0,
-          "delta": -1.109,
-          "direction": "down"
-        }
-      ]
-    },
-    "noryangjin": {
-      "forecast_vac_proxy": 3.562,
-      "last_vac_proxy": 2.417,
-      "delta": 1.145,
-      "direction": "up",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": 3.562,
-          "delta": 1.145,
-          "direction": "up"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": 2.685,
-          "delta": -0.878,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": 1.386,
-          "delta": -1.298,
-          "direction": "down"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": 1.264,
-          "delta": -0.123,
-          "direction": "down"
-        }
-      ]
-    },
-    "samcheong": {
-      "forecast_vac_proxy": -0.279,
-      "last_vac_proxy": -0.401,
-      "delta": 0.122,
-      "direction": "up",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -0.279,
-          "delta": 0.122,
-          "direction": "up"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": 0.061,
-          "delta": 0.341,
-          "direction": "up"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": 0.358,
-          "delta": 0.296,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": 1.082,
-          "delta": 0.725,
-          "direction": "up"
-        }
-      ]
-    },
-    "seochon": {
-      "forecast_vac_proxy": -1.599,
-      "last_vac_proxy": 1.3,
-      "delta": -2.899,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -1.599,
-          "delta": -2.899,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": -1.394,
-          "delta": 0.205,
-          "direction": "up"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": -1.164,
-          "delta": 0.23,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": -1.069,
-          "delta": 0.094,
-          "direction": "up"
-        }
-      ]
-    },
-    "seongsu": {
-      "forecast_vac_proxy": -0.657,
-      "last_vac_proxy": -0.167,
-      "delta": -0.49,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -0.657,
-          "delta": -0.49,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": -0.963,
-          "delta": -0.306,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": -1.158,
-          "delta": -0.195,
-          "direction": "down"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": -1.28,
-          "delta": -0.122,
-          "direction": "down"
-        }
-      ]
-    },
-    "seoulsup": {
-      "forecast_vac_proxy": -0.958,
-      "last_vac_proxy": 0.16,
-      "delta": -1.118,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -0.958,
-          "delta": -1.118,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": -1.286,
-          "delta": -0.328,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": -1.252,
-          "delta": 0.035,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": -1.27,
-          "delta": -0.019,
-          "direction": "down"
-        }
-      ]
-    },
-    "sharosugil": {
-      "forecast_vac_proxy": 0.219,
-      "last_vac_proxy": 0.944,
-      "delta": -0.725,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": 0.219,
-          "delta": -0.725,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": 0.598,
-          "delta": 0.38,
-          "direction": "up"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": 0.884,
-          "delta": 0.286,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": 0.904,
-          "delta": 0.02,
-          "direction": "up"
-        }
-      ]
-    },
-    "sillim": {
-      "forecast_vac_proxy": -0.12,
-      "last_vac_proxy": 2.045,
-      "delta": -2.165,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -0.12,
-          "delta": -2.165,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": -1.49,
-          "delta": -1.37,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": -2.01,
-          "delta": -0.519,
-          "direction": "down"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": -1.915,
-          "delta": 0.095,
-          "direction": "up"
-        }
-      ]
-    },
-    "sinchon": {
-      "forecast_vac_proxy": 1.106,
-      "last_vac_proxy": 1.006,
-      "delta": 0.1,
-      "direction": "up",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": 1.106,
-          "delta": 0.1,
-          "direction": "up"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": -0.538,
-          "delta": -1.644,
-          "direction": "down"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": -0.334,
-          "delta": 0.205,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": 1.294,
-          "delta": 1.627,
-          "direction": "up"
-        }
-      ]
-    },
-    "songridan": {
-      "forecast_vac_proxy": -2.707,
-      "last_vac_proxy": 2.785,
-      "delta": -5.492,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -2.707,
-          "delta": -5.492,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": -1.782,
-          "delta": 0.925,
-          "direction": "up"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": -1.108,
-          "delta": 0.674,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": -0.447,
-          "delta": 0.661,
-          "direction": "up"
-        }
-      ]
-    },
-    "sungshin": {
-      "forecast_vac_proxy": -1.408,
-      "last_vac_proxy": 1.671,
-      "delta": -3.079,
-      "direction": "down",
-      "last_quarter": "20261",
-      "n_quarters": 21,
-      "horizons": [
-        {
-          "quarter": "20262",
-          "forecast_vac_proxy": -1.408,
-          "delta": -3.079,
-          "direction": "down"
-        },
-        {
-          "quarter": "20263",
-          "forecast_vac_proxy": -1.194,
-          "delta": 0.215,
-          "direction": "up"
-        },
-        {
-          "quarter": "20264",
-          "forecast_vac_proxy": -0.676,
-          "delta": 0.517,
-          "direction": "up"
-        },
-        {
-          "quarter": "20271",
-          "forecast_vac_proxy": -0.815,
-          "delta": -0.139,
-          "direction": "down"
         }
       ]
     },
     "yeonhui": {
-      "forecast_vac_proxy": 0.948,
+      "forecast_vac_proxy": 0.311,
       "last_vac_proxy": -1.31,
-      "delta": 2.258,
+      "delta": 1.621,
       "direction": "up",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": 0.948,
-          "delta": 2.258,
+          "forecast_vac_proxy": 0.311,
+          "delta": 1.621,
           "direction": "up"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": 0.943,
-          "delta": -0.005,
-          "direction": "down"
+          "forecast_vac_proxy": 0.489,
+          "delta": 0.178,
+          "direction": "up"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": 1.069,
-          "delta": 0.126,
+          "forecast_vac_proxy": 0.957,
+          "delta": 0.467,
           "direction": "up"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": 1.162,
-          "delta": 0.093,
+          "forecast_vac_proxy": 1.52,
+          "delta": 0.564,
           "direction": "up"
         }
       ]
     },
     "yeonnam": {
-      "forecast_vac_proxy": -0.159,
+      "forecast_vac_proxy": 0.101,
       "last_vac_proxy": 1.323,
-      "delta": -1.482,
+      "delta": -1.222,
       "direction": "down",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": -0.159,
-          "delta": -1.482,
+          "forecast_vac_proxy": 0.101,
+          "delta": -1.222,
           "direction": "down"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": -0.324,
-          "delta": -0.166,
+          "forecast_vac_proxy": -0.027,
+          "delta": -0.128,
           "direction": "down"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": 0.032,
-          "delta": 0.357,
+          "forecast_vac_proxy": 0.165,
+          "delta": 0.193,
           "direction": "up"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": 0.374,
-          "delta": 0.342,
+          "forecast_vac_proxy": 0.595,
+          "delta": 0.43,
           "direction": "up"
         }
       ]
     },
     "yeouido": {
-      "forecast_vac_proxy": 1.851,
+      "forecast_vac_proxy": 1.017,
       "last_vac_proxy": 0.929,
-      "delta": 0.922,
+      "delta": 0.089,
       "direction": "up",
       "last_quarter": "20261",
       "n_quarters": 21,
       "horizons": [
         {
           "quarter": "20262",
-          "forecast_vac_proxy": 1.851,
-          "delta": 0.922,
+          "forecast_vac_proxy": 1.017,
+          "delta": 0.089,
           "direction": "up"
         },
         {
           "quarter": "20263",
-          "forecast_vac_proxy": 0.512,
-          "delta": -1.339,
+          "forecast_vac_proxy": 0.602,
+          "delta": -0.415,
           "direction": "down"
         },
         {
           "quarter": "20264",
-          "forecast_vac_proxy": -0.151,
-          "delta": -0.663,
+          "forecast_vac_proxy": 0.322,
+          "delta": -0.28,
           "direction": "down"
         },
         {
           "quarter": "20271",
-          "forecast_vac_proxy": 0.01,
-          "delta": 0.161,
+          "forecast_vac_proxy": 0.356,
+          "delta": 0.035,
           "direction": "up"
         }
       ]

@@ -1,4 +1,4 @@
-"""거점 API 테스트 — 서울 33 Page 시드(app/data/seoul_pages.py) 기준."""
+"""거점 API 테스트 — 서울 38 Page 시드(app/data/seoul_pages.py) 기준."""
 import re
 from pathlib import Path
 
@@ -26,6 +26,8 @@ SEOUL_DISTRICT_IDS = {
     "jamsil", "konkuk", "yeouido", "mullae", "banpo", "sinchon", "yeonhui", "cheongnyangni",
     # 2026-07-24 Phase 3(관악·동작) + Phase 4(성북) 확장분
     "sharosugil", "nokdu", "sillim", "noryangjin", "sungshin", "anam",
+    # 2026-07-24 Phase 1 자치구(강남) 내 미커버 상권 확장분
+    "cheongdam", "dosan", "nonhyeon", "teheran", "seolleung",
 }
 
 # 1~13번 초기 거점은 개·폐업률 주석 자체가 없다(Phase 1·2 확장분에만 병기).
@@ -40,7 +42,7 @@ def test_list_districts():
     r = client.get(f"{V1}/commercial-districts")
     assert r.status_code == 200
     data = r.json()
-    assert len(data) == len(DISTRICTS) == 33
+    assert len(data) == len(DISTRICTS) == 38
     assert {d["id"] for d in data} == SEOUL_DISTRICT_IDS
     for d in data:
         assert 0 <= d["sentiment"] <= 100
@@ -134,7 +136,7 @@ def test_seed_comment_rates_match_gold():
     # 정규식이 조용히 빗나가면 0건 통과가 되므로 커버리지 하한을 둔다. 건수가 아니라 거점 수로
     # 세는 이유: 한 거점의 주석 줄이 늘거나 줄 때마다(예 samcheong 재보정) 매직넘버를 고쳐야 하는
     # 반면, "주석을 가진 거점은 모두 대조됐다"는 불변식은 형식 변경에 흔들리지 않는다.
-    # 현재 개·폐업률 주석은 14~33번 20거점에만 있다(1~13번은 원래 없음 — 모듈 상단 ⚠️ 참조).
+    # 현재 개·폐업률 주석은 14~38번 25거점에만 있다(1~13번은 원래 없음 — 모듈 상단 ⚠️ 참조).
     expected = {d["id"] for d in DISTRICTS} - IDS_WITHOUT_RATE_COMMENT
     assert covered == expected, f"주석 대조 누락/초과: {covered ^ expected}"
 
