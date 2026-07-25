@@ -19,7 +19,11 @@
   properties: id/name/status/capacity/active/industry/vacancy_rate (+floors/height)
   → apps/backend/app/services/building_vacancy.py 가 이 파일을 서빙.
 
-실행: python -m data.pipelines.build_page_master
+다거점: config/page_hubs.py HUBS 를 순회한다. 동명맵(_DONG)은 거점 상수가 아니라
+점포 주소(lnoAdr)에서 동적으로 구성하고, gold building_vacancy.json(대장 산출물)이
+없는 거점은 V-World 폴리곤 지상층수로 capacity 를 근사한다(Tier 2 확장 경로).
+
+실행: python -m data.pipelines.build_page_master [slug ...]
 """
 from __future__ import annotations
 
@@ -29,19 +33,41 @@ import re
 from collections import Counter, defaultdict
 
 from data.collectors.common import GOLD, load_latest
-from data.config.garosugil import SLUG
+from data.config.page_hubs import HUBS, PageHub
 
 # 건물통합 용도코드(대분류 5자리) 중 상가 capacity 를 가질 수 있는 상업 계열
 _COMMERCIAL_PRPS = ("03", "04", "05", "07", "14", "15", "16")
 _STORES_PER_FLOOR = 2      # collectors/building_vacancy.py 와 동일 근사
 
-_DONG = {"10700": "신사동", "10800": "압구정동", "11000": "논현동", "10600": "잠원동"}
+# 지번주소(lnoAdr/SITEWHLADDR) → 법정동 토큰 (예: "신사동", "을지로3가"). 숫자 포함 동명 허용.
+# (?![가-힣]): 뒤에 한글이 더 붙는 토큰은 배제 — "성동구"의 '성동'을 동으로 오파싱하지 않게 한다
+# (성수동2가 를 놓치던 버그). 동명은 지번주소에서 뒤에 공백/숫자/끝이 오는 완결 토큰이다.
+_DONG_TOKEN = re.compile(r"([가-힣]+[0-9]*(?:동|가|리))(?![가-힣])")
 
 
-def _label(pnu: str, name: str) -> str:
+def _build_dong_map(stores: list[dict]) -> dict[str, str]:
+    """stores_raw 에서 {법정동코드5: 동명} 사전 구성 (lnoCd 뒤5 + lnoAdr).
+
+    거점 상수였던 _DONG 을 대체 — 어느 거점에서든 점포 주소로 라벨 동명을 얻는다.
+    """
+    m: dict[str, str] = {}
+    for s in stores:
+        lno = s.get("lnoCd", "")
+        if len(lno) != 19:
+            continue
+        code = lno[5:10]
+        if code in m:
+            continue
+        hit = _DONG_TOKEN.search(s.get("lnoAdr", "") or "")
+        if hit:
+            m[code] = hit.group(1)
+    return m
+
+
+def _label(pnu: str, name: str, dong_map: dict[str, str] | None = None) -> str:
     if name:
         return name
-    dong = _DONG.get(pnu[5:10], pnu[5:10])
+    dong = (dong_map or {}).get(pnu[5:10], pnu[5:10])
     bon, bu = int(pnu[11:15]), int(pnu[15:19])
     # 부번 0000 = 부번 없음 → "신사동 547-0" 이 아니라 "신사동 547" (지번 표기 규칙)
     return f"{dong} {bon}-{bu}" if bu else f"{dong} {bon}"
@@ -145,22 +171,25 @@ def _pip_fallback(stores: list[dict], polys: list[dict]) -> dict[str, int]:
     return extra
 
 
-_JIBUN_ADDR_RE = re.compile(r"(신사동|압구정동|논현동|잠원동)\s+(\d+)(?:-(\d+))?")
-_DONG_CODE = {v: k for k, v in _DONG.items()}   # 동명 → 법정동코드 5자리
+_ADDR_JIBUN_RE = re.compile(r"([가-힣]+[0-9]*(?:동|가|리))(?![가-힣])\s+(\d+)(?:-(\d+))?")
 
 
-def _addr_pnu(addr: str) -> str | None:
-    """지번주소 → PNU 19자리 (자가 보정 기준점 산출용 — 대지 가정)."""
-    m = _JIBUN_ADDR_RE.search(addr)
+def _addr_pnu(addr: str, dong_code: dict[str, str], sigungu: str) -> str | None:
+    """지번주소 → PNU 19자리 (자가 보정 기준점 산출용 — 대지 가정).
+
+    dong_code: {동명 → 법정동코드5}, sigungu: 시군구코드5 — 둘 다 점포에서 파생.
+    """
+    m = _ADDR_JIBUN_RE.search(addr)
     if not m:
         return None
-    dong = _DONG_CODE.get(m.group(1))
+    dong = dong_code.get(m.group(1))
     if not dong:
         return None
-    return f"11680{dong}1{int(m.group(2)):04d}{int(m.group(3) or 0):04d}"
+    return f"{sigungu}{dong}1{int(m.group(2)):04d}{int(m.group(3) or 0):04d}"
 
 
-def _licensed_pip(polys: list[dict]) -> dict[str, int]:
+def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
+                  sigungu: str) -> dict[str, int]:
     """인허가(bronze licensing_biz.json) '영업 중' 업소를 좌표 PIP 로 건물 귀속.
 
     상가정보가 누락한 영업 업소를 잡는 분자 하한(licensed) — 2026-07-19 지상검증의
@@ -171,7 +200,7 @@ def _licensed_pip(polys: list[dict]) -> dict[str, int]:
     10.405초). → **자가 보정**: 지번주소가 폴리곤과 매칭되는 행으로 중위 오프셋을
     추정해 전체 좌표에 적용한다 (825점 검증: 보정 후 중위 잔차 2.7m, <20m 100%).
     """
-    rows = load_latest(SLUG, "licensing_biz.json") or []
+    rows = load_latest(slug, "licensing_biz.json") or []
     alive = []
     for r in rows:
         if str(r.get("DCBYMD") or "").strip():
@@ -209,10 +238,11 @@ def _licensed_pip(polys: list[dict]) -> dict[str, int]:
         cent[pnu] = ((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2)
 
     # 자가 보정: 지번주소→pnu 매칭 행의 (변환좌표 − 폴리곤중심) 중위 오프셋
+    dong_code = {v: k for k, v in dong_map.items()}   # 동명 → 법정동코드5
     dlons: list[float] = []
     dlats: list[float] = []
     for x, y, addr in alive:
-        pnu = _addr_pnu(addr)
+        pnu = _addr_pnu(addr, dong_code, sigungu)
         if pnu not in cent:
             continue
         lon, lat = tr.transform(x, y)
@@ -267,13 +297,21 @@ def _aggregate(rows: list[dict], extra: int = 0, fresh: int | None = None,
     }
 
 
-def run() -> None:
-    polys = load_latest(SLUG, "bldg_polygons.geojson")
-    vac_path = GOLD / SLUG / "building_vacancy.json"
-    if not polys or not vac_path.exists():
-        print("[page-master] 입력 없음 — vworld_bldg / building_vacancy 수집 먼저")
-        return
-    vac = json.loads(vac_path.read_text(encoding="utf-8"))
+def run(hub: PageHub) -> bool:
+    """거점 하나의 page_building_master.geojson 산출. 반환: 성공 여부.
+
+    building_vacancy.json(대장 산출물)이 있으면 정밀 capacity(Tier 1), 없으면
+    폴리곤 지상층수 근사(Tier 2)로 동작한다.
+    """
+    slug = hub.slug
+    polys = load_latest(slug, "bldg_polygons.geojson")
+    if not polys:
+        print(f"[page-master:{slug}] bldg_polygons.geojson 없음 — vworld_bldg 수집 먼저")
+        return False
+
+    vac_path = GOLD / slug / "building_vacancy.json"
+    vac = json.loads(vac_path.read_text(encoding="utf-8")) if vac_path.exists() else []
+    tier = "Tier1(대장)" if vac else "Tier2(폴리곤근사)"
 
     by_lno: dict[str, list[dict]] = defaultdict(list)
     for r in vac:
@@ -284,16 +322,20 @@ def run() -> None:
     poly_pnu = {f["properties"].get("pnu", "") for f in polys["features"]}
     displayed_pnu = poly_pnu & set(by_lno)
     from data.collectors.building_vacancy import NON_STOREFRONT_LCLS
-    stores = [s for s in (load_latest(SLUG, "stores_raw.json") or [])
+    stores = [s for s in (load_latest(slug, "stores_raw.json") or [])
               if s.get("indsLclsNm") not in NON_STOREFRONT_LCLS]
+    if not stores:
+        print(f"[page-master:{slug}] stores_raw.json 없음 — PIP 폴백 생략(직접 매칭만)")
+    dong_map = _build_dong_map(stores)
+    sigungu = Counter(s["lnoCd"][0:5] for s in stores
+                      if len(s.get("lnoCd", "")) == 19).most_common(1)
+    sigungu_cd = sigungu[0][0] if sigungu else ""
     fresh: dict[str, int] = {}
     extra: dict[str, int] = {}
     if stores:
         fresh, candidates = _split_stores(stores, displayed_pnu)
         extra = _pip_fallback(candidates, polys["features"])
-    else:
-        print("[page-master] stores_raw.json 없음 — PIP 폴백 생략(직접 매칭만)")
-    licensed = _licensed_pip(polys["features"])
+    licensed = _licensed_pip(polys["features"], slug, dong_map, sigungu_cd)
 
     feats: list[dict] = []
     stats: Counter = Counter()
@@ -317,7 +359,7 @@ def run() -> None:
                 stats["excluded_unknown"] += 1
                 continue
             props = {
-                "name": _label(pnu, agg["name"]),
+                "name": _label(pnu, agg["name"], dong_map),
                 "status": status,
                 "capacity": agg["capacity"], "active": agg["active"],
                 "industry": agg["industry"],
@@ -331,7 +373,7 @@ def run() -> None:
             cap = max(floors * _STORES_PER_FLOOR, act, 1)
             occ = min(act / cap, 1.0)
             props = {
-                "name": _label(pnu, ""),
+                "name": _label(pnu, "", dong_map),
                 "status": _classify(occ),
                 "capacity": cap, "active": act,
                 "industry": "",
@@ -345,7 +387,7 @@ def run() -> None:
                 stats["excluded_non_commercial"] += 1
                 continue
             props = {
-                "name": _label(pnu, ""),
+                "name": _label(pnu, "", dong_map),
                 "status": "empty",
                 "capacity": max(floors * _STORES_PER_FLOOR, 1), "active": 0,
                 "industry": "",
@@ -364,20 +406,41 @@ def run() -> None:
         stats[props["status"]] += 1
         feats.append({"type": "Feature", "geometry": f["geometry"], "properties": props})
 
-    out = {"type": "FeatureCollection", "district": "gangnam-garosugil", "features": feats}
-    dst = GOLD / SLUG / "page_building_master.geojson"
+    out = {"type": "FeatureCollection", "district": slug, "features": feats}
+    dst = GOLD / slug / "page_building_master.geojson"
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(json.dumps(out, ensure_ascii=False), encoding="utf-8")
 
-    known = [f for f in feats if f["properties"]["source"].startswith("stores+ledger")]
-    act = sum(f["properties"]["active"] for f in known)
-    cap = sum(f["properties"]["capacity"] for f in known)
-    print(f"[gold] page_building_master.geojson: {len(feats)}동")
-    print(f"[page-master] status: " + ", ".join(f"{k}={stats[k]}" for k in ("full", "partial", "high", "empty")))
-    print(f"[page-master] 제외: unknown={stats['excluded_unknown']}, 비상업={stats['excluded_non_commercial']}")
+    # Tier1 은 대장 매칭 건물(stores+ledger), Tier2 는 폴리곤근사(pip_only) 기준으로 참고 공실률 산출
+    ref = [f for f in feats if f["properties"]["source"].startswith("stores+ledger")]
+    if not ref:
+        ref = [f for f in feats if f["properties"]["source"] == "pip_only"]
+    act = sum(f["properties"]["active"] for f in ref)
+    cap = sum(f["properties"]["capacity"] for f in ref)
+    print(f"[gold:{slug}] page_building_master.geojson: {len(feats)}동 · {tier}")
+    print(f"[page-master:{slug}] status: "
+          + ", ".join(f"{k}={stats[k]}" for k in ("full", "partial", "high", "empty")))
+    print(f"[page-master:{slug}] 제외: unknown={stats['excluded_unknown']}, "
+          f"비상업={stats['excluded_non_commercial']}")
     if cap:
-        print(f"[page-master] 매칭건물 집계 공실률(참고): {round((1 - act / cap) * 100, 1)}% (부동산원 가두 41.6% 와 비교용)")
+        print(f"[page-master:{slug}] 참고 집계 공실률: {round((1 - act / cap) * 100, 1)}%")
+    return True
+
+
+def main() -> None:
+    import sys
+    args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    slugs = args or list(HUBS)
+    ok = 0
+    for slug in slugs:
+        hub = HUBS.get(slug)
+        if hub is None:
+            print(f"[page-master] 미등록 거점 '{slug}' — page_hubs.HUBS 확인, 건너뜀")
+            continue
+        if run(hub):
+            ok += 1
+    print(f"[page-master] 완료: {ok}/{len(slugs)}거점")
 
 
 if __name__ == "__main__":
-    run()
+    main()

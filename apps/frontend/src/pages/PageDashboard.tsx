@@ -1,12 +1,25 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
-  listDistricts, getDistrict, getPostings, getMarketing, getVacancyHeatmap,
+  listDistricts, getDistrict, getPostings, getMarketing, getVacancyHeatmap, getBuildingVacancy,
 } from "@/lib/api";
 import type {
-  DistrictSummary, DistrictDetail, Posting, Marketing, TierScenario, VacancyHeatmap,
+  DistrictSummary, DistrictDetail, Posting, Marketing, TierScenario, VacancyHeatmap, GeoJSONFC,
 } from "@/lib/api";
 import { loadNaverMaps } from "@/lib/naverMap";
+import { colors } from "@/design/tokens/colors";
 import "./PageDashboard.css";
+
+const BuildingTwin = lazy(() => import("@/components/BuildingTwin"));
+
+// 건물 공실 상태 → 색·라벨 (design 토큰 vacancy 색계열 재사용 — MapShell 과 동일 규칙)
+const B_STATUS: Record<string, { color: string; label: string }> = {
+  full: { color: colors.vacancy[0], label: "만실" },
+  partial: { color: colors.vacancy[2], label: "부분공실" },
+  high: { color: colors.vacancy[3], label: "고공실" },
+  empty: { color: colors.vacancy[4], label: "공실의심" },
+};
+
+interface TwinSel { name: string; capacity: number; active: number; status: string; }
 
 /**
  * 서울 Page 거점 대시보드 + 거점 심층 뷰(거점 수는 백엔드 시드에 따라 가변 — 2026-07 기준 27곳).
@@ -153,76 +166,144 @@ function Bar({ k, v, max, color, text }: { k: string; v: number; max: number; co
 function VacancyMap({ detail }: { detail: DistrictDetail }) {
   const elRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
-  const overlaysRef = useRef<any[]>([]);
+  const overlaysRef = useRef<any[]>([]);   // 레이어 전환마다 지우는 오버레이(그리드/건물)
+  const poiRef = useRef<any[]>([]);        // 거점 전환까지 유지되는 POI 마커
+  const infoRef = useRef<any>(null);
   const [hm, setHm] = useState<VacancyHeatmap | null>(null);
+  const [bld, setBld] = useState<GeoJSONFC | null>(null);
+  const [layer, setLayer] = useState<"buildings" | "grid">("buildings");
+  const [mapReady, setMapReady] = useState(false);
   const [mapErr, setMapErr] = useState<string | null>(null);
+  const [sel, setSel] = useState<TwinSel | null>(null);   // 클릭한 건물(3D 트윈 대상)
+  const [twinOpen, setTwinOpen] = useState(false);
 
+  const clearOverlays = () => {
+    overlaysRef.current.forEach((o) => o.setMap?.(null));
+    overlaysRef.current = [];
+  };
+
+  // 거점 전환: 지도 재생성 + 그리드/건물 데이터 로드 + POI 그리기
   useEffect(() => {
     let live = true;
+    setMapReady(false); setSel(null);
 
-    const clear = () => {
-      overlaysRef.current.forEach((o) => o.setMap?.(null));
-      overlaysRef.current = [];
-    };
-
-    Promise.all([loadNaverMaps(), getVacancyHeatmap(detail.id)])
-      .then(([, heat]) => {
+    Promise.all([
+      loadNaverMaps(),
+      getVacancyHeatmap(detail.id),
+      getBuildingVacancy(detail.id).catch(() => null),   // 건물 gold 미배포 거점은 그리드만
+    ])
+      .then(([, heat, buildings]) => {
         if (!live || !elRef.current) return;
-        setHm(heat);
+        setHm(heat); setBld(buildings);
+        // 거점 전환마다 기본 레이어를 정한다: 건물 gold 가 있으면 건물, 없으면 그리드.
+        setLayer(buildings && buildings.features.length ? "buildings" : "grid");
         const naver = (window as any).naver;
 
-        // 지도는 거점 전환 시마다 재생성 (center/zoom 이 거점 정의를 따름)
         mapRef.current?.destroy?.();
         const map = new naver.maps.Map(elRef.current, {
           center: new naver.maps.LatLng(detail.center[0], detail.center[1]),
           zoom: detail.zoom, scaleControl: false, mapDataControl: false,
         });
         mapRef.current = map;
+        infoRef.current = new naver.maps.InfoWindow({ borderWidth: 0, disableAnchor: true, backgroundColor: "transparent" });
+        naver.maps.Event.addListener(map, "click", () => infoRef.current?.close());
 
-        const info = new naver.maps.InfoWindow({ borderWidth: 0, disableAnchor: true, backgroundColor: "transparent" });
+        // 역·랜드마크 POI 라벨 (레이어 전환과 무관하게 유지)
+        poiRef.current.forEach((o) => o.setMap?.(null));
+        poiRef.current = detail.poi.map(([lat, lng, label]) => new naver.maps.Marker({
+          map, position: new naver.maps.LatLng(lat, lng),
+          icon: {
+            content: `<div style="background:#1f2937;color:#fff;border-radius:7px;padding:2px 8px;`
+              + `font:700 10.5px 'Pretendard','Malgun Gothic',sans-serif;white-space:nowrap;`
+              + `box-shadow:0 1px 5px rgba(0,0,0,.3)">${label}</div>`,
+            anchor: new naver.maps.Point(0, 12),
+          },
+        }));
 
-        // 100m 그리드 셀 — lat/lng 는 SW 모서리, dlat/dlng 만큼의 사각형
-        heat.cells.forEach((c) => {
-          const rect = new naver.maps.Rectangle({
-            map,
-            bounds: new naver.maps.LatLngBounds(
-              new naver.maps.LatLng(c.lat, c.lng),
-              new naver.maps.LatLng(c.lat + c.dlat, c.lng + c.dlng),
-            ),
-            fillColor: vacHex(c.v), fillOpacity: 0.45,
-            strokeColor: "#ffffff", strokeOpacity: 0.25, strokeWeight: 1,
-            clickable: true,
-          });
-          naver.maps.Event.addListener(rect, "click", () => {
-            info.setContent(
-              `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:9px;padding:7px 11px;`
-              + `font:700 11.5px 'Pretendard','Malgun Gothic',sans-serif;color:#1f2937;box-shadow:0 2px 8px rgba(0,0,0,.12)">`
-              + `공실률 <span style="color:${vacHex(c.v)}">${c.v.toFixed(1)}%</span>`
-              + `<span style="color:#6b7280;font-weight:600"> · 점포 ${c.stores} · 공실 ${c.vac_n}</span></div>`,
-            );
-            info.open(map, new naver.maps.LatLng(c.c_lat, c.c_lng));
-          });
-          overlaysRef.current.push(rect);
-        });
-        naver.maps.Event.addListener(map, "click", () => info.close());
-
-        // 역·랜드마크 POI 라벨
-        detail.poi.forEach(([lat, lng, label]) => {
-          overlaysRef.current.push(new naver.maps.Marker({
-            map, position: new naver.maps.LatLng(lat, lng),
-            icon: {
-              content: `<div style="background:#1f2937;color:#fff;border-radius:7px;padding:2px 8px;`
-                + `font:700 10.5px 'Pretendard','Malgun Gothic',sans-serif;white-space:nowrap;`
-                + `box-shadow:0 1px 5px rgba(0,0,0,.3)">${label}</div>`,
-              anchor: new naver.maps.Point(0, 12),
-            },
-          }));
-        });
+        setMapReady(true);
       })
       .catch((e) => live && setMapErr(e?.message ?? String(e)));
 
-    return () => { live = false; clear(); mapRef.current?.destroy?.(); mapRef.current = null; };
+    return () => {
+      live = false;
+      clearOverlays();
+      poiRef.current.forEach((o) => o.setMap?.(null)); poiRef.current = [];
+      mapRef.current?.destroy?.(); mapRef.current = null;
+    };
   }, [detail]);
+
+  const hasBuildings = !!(bld && bld.features.length);
+
+  // 레이어 전환/데이터 변경 → 오버레이 다시 그림
+  useEffect(() => {
+    if (!mapReady || !mapRef.current) return;
+    const naver = (window as any).naver;
+    const map = mapRef.current;
+    const info = infoRef.current;
+    clearOverlays();
+
+    if (layer === "buildings" && bld) {
+      // 공실 지도: 공실의심(empty) 건물만 개별 red dot 으로 — "어디가 비었나".
+      // 만실·부분공실·고공실은 숨긴다(SpaceOS 공실 개별값 목표: 진짜 빈 건물만). 점 클릭 → 상세+3D.
+      bld.features.forEach((f) => {
+        const p = f.properties;
+        if (p.status !== "empty") return;
+        const st = B_STATUS[p.status];
+        const ring = f.geometry.coordinates[0] as [number, number][];
+        const lats = ring.map((r) => r[1]); const lngs = ring.map((r) => r[0]);
+        const c = new naver.maps.LatLng(
+          (Math.min(...lats) + Math.max(...lats)) / 2,
+          (Math.min(...lngs) + Math.max(...lngs)) / 2,
+        );
+        const size = 13;
+        const dot = new naver.maps.Marker({
+          map, position: c, zIndex: 60,
+          icon: {
+            content: `<div style="width:${size}px;height:${size}px;border-radius:50%;`
+              + `background:${st.color};border:1.5px solid #fff;`
+              + `box-shadow:0 0 0 1px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.35);opacity:.92"></div>`,
+            anchor: new naver.maps.Point(size / 2 + 1.5, size / 2 + 1.5),
+          },
+        });
+        naver.maps.Event.addListener(dot, "click", () => {
+          info.setContent(
+            `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:9px;padding:8px 11px;`
+            + `font:700 11.5px 'Pretendard','Malgun Gothic',sans-serif;color:#1f2937;box-shadow:0 2px 8px rgba(0,0,0,.12);max-width:200px">`
+            + `${p.name || "건물"} · <span style="color:${st.color}">${st.label}</span><br>`
+            + `<span style="color:#6b7280;font-weight:600">공실률(추정) ${p.vacancy_rate}% · 영업 ${p.active}/${p.capacity}호`
+            + `${p.industry ? " · " + p.industry : ""}</span></div>`,
+          );
+          info.open(map, c);
+          setSel({ name: p.name || "건물", capacity: p.capacity, active: p.active, status: p.status });
+        });
+        overlaysRef.current.push(dot);
+      });
+    } else if (layer === "grid" && hm) {
+      // 100m 그리드 셀 — lat/lng 는 SW 모서리, dlat/dlng 만큼의 사각형
+      hm.cells.forEach((c) => {
+        const rect = new naver.maps.Rectangle({
+          map,
+          bounds: new naver.maps.LatLngBounds(
+            new naver.maps.LatLng(c.lat, c.lng),
+            new naver.maps.LatLng(c.lat + c.dlat, c.lng + c.dlng),
+          ),
+          fillColor: vacHex(c.v), fillOpacity: 0.45,
+          strokeColor: "#ffffff", strokeOpacity: 0.25, strokeWeight: 1,
+          clickable: true,
+        });
+        naver.maps.Event.addListener(rect, "click", () => {
+          info.setContent(
+            `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:9px;padding:7px 11px;`
+            + `font:700 11.5px 'Pretendard','Malgun Gothic',sans-serif;color:#1f2937;box-shadow:0 2px 8px rgba(0,0,0,.12)">`
+            + `공실률 <span style="color:${vacHex(c.v)}">${c.v.toFixed(1)}%</span>`
+            + `<span style="color:#6b7280;font-weight:600"> · 점포 ${c.stores} · 공실 ${c.vac_n}</span></div>`,
+          );
+          info.open(map, new naver.maps.LatLng(c.c_lat, c.c_lng));
+        });
+        overlaysRef.current.push(rect);
+      });
+    }
+  }, [layer, mapReady, hm, bld]);
 
   if (mapErr) {
     return (
@@ -234,20 +315,63 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
   }
   return (
     <div className="mapsec">
-      <div ref={elRef} className="mapbox" />
-      <div className="maplegend">
-        <span className="ml-label">공실률</span>
-        <span className="ml-grad" />
-        <span className="ml-ticks"><em>0%</em><em>25%+</em></span>
-        {hm && (
-          <span className="ml-stat">
-            평균 <b style={{ color: vacHex(hm.avg_vacancy) }}>{hm.avg_vacancy.toFixed(1)}%</b>
-            {" "}<Pred rate={hm.predicted_rate} delta={hm.predicted_delta} direction={hm.predicted_direction} />
-            {" "}· 셀 {hm.cells.length} · 점포 {hm.sum_stores.toLocaleString()} · 공실 {hm.sum_vac}
-          </span>
+      {/* 레이어 토글: 건물(실측 footprint) ↔ 100m 그리드 */}
+      <div className="maptoggle">
+        <button className={layer === "buildings" ? "on" : ""} disabled={!hasBuildings}
+          onClick={() => setLayer("buildings")}>공실 건물</button>
+        <button className={layer === "grid" ? "on" : ""} onClick={() => setLayer("grid")}>100m 그리드</button>
+        {sel && layer === "buildings" && (
+          <button className="twinbtn" onClick={() => setTwinOpen(true)}>🏢 {sel.name} · 3D 트윈</button>
         )}
-        <span className="ml-hint">셀 클릭 시 상세</span>
       </div>
+
+      <div ref={elRef} className="mapbox" />
+
+      <div className="maplegend">
+        {layer === "buildings" ? (
+          <>
+            <span className="ml-chip"><i style={{ background: B_STATUS.empty.color }} />공실의심</span>
+            {bld && (() => {
+              const vac = bld.features.filter((f) => f.properties.status === "empty").length;
+              return <span className="ml-stat">공실의심 {vac.toLocaleString()}동(추정) · 점 클릭 시 상세·3D</span>;
+            })()}
+          </>
+        ) : (
+          <>
+            <span className="ml-label">공실률</span>
+            <span className="ml-grad" />
+            <span className="ml-ticks"><em>0%</em><em>25%+</em></span>
+            {hm && (
+              <span className="ml-stat">
+                평균 <b style={{ color: vacHex(hm.avg_vacancy) }}>{hm.avg_vacancy.toFixed(1)}%</b>
+                {" "}<Pred rate={hm.predicted_rate} delta={hm.predicted_delta} direction={hm.predicted_direction} />
+                {" "}· 셀 {hm.cells.length} · 점포 {hm.sum_stores.toLocaleString()} · 공실 {hm.sum_vac}
+              </span>
+            )}
+            <span className="ml-hint">셀 클릭 시 상세</span>
+          </>
+        )}
+      </div>
+
+      {/* 3D 디지털 트윈 모달 */}
+      {twinOpen && sel && (
+        <div className="twinmodal" onClick={() => setTwinOpen(false)}>
+          <div className="twinbox" onClick={(e) => e.stopPropagation()}>
+            <div className="twinhead">
+              <span>{sel.name} · 3D 디지털 트윈</span>
+              <button onClick={() => setTwinOpen(false)}>✕</button>
+            </div>
+            <div className="twincanvas">
+              <Suspense fallback={<div className="twinload">3D 로딩…</div>}>
+                <BuildingTwin b={{ name: sel.name, capacity: sel.capacity, active: sel.active, statusColor: B_STATUS[sel.status]?.color ?? colors.vacancy[4] }} />
+              </Suspense>
+            </div>
+            <div className="twinfoot">
+              녹색 = 영업 층 · {B_STATUS[sel.status]?.label ?? ""}색 = 공실(추정) · {sel.active}/{sel.capacity}호
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

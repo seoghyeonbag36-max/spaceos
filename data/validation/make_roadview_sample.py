@@ -21,9 +21,9 @@ import re
 from pathlib import Path
 from urllib.parse import quote
 
-from data.collectors.common import GOLD
+from data.collectors.common import GOLD, load_latest
 from data.config.garosugil import SLUG
-from data.pipelines.build_page_master import _label
+from data.pipelines.build_page_master import _build_dong_map, _label
 
 _OUT = Path(__file__).resolve().parent
 _QUOTA = {"empty": 12, "high": 8, "partial": 5, "full": 5}   # 계 30동
@@ -44,6 +44,7 @@ def _center(geom: dict) -> tuple[float, float]:
 def run() -> None:
     src = GOLD / SLUG / "page_building_master.geojson"
     fc = json.loads(src.read_text(encoding="utf-8"))
+    dong_map = _build_dong_map(load_latest(SLUG, "stores_raw.json") or [])
     rng = random.Random(_SEED)
 
     rows: list[dict] = []
@@ -54,7 +55,7 @@ def run() -> None:
             lat, lon = _center(f["geometry"])
             # 링크는 항상 pnu 지번주소로 만든다. name 은 상가정보 상호명이라
             # 잘리거나("제", "지") 동명 건물이 여럿("○○빌딩")이라 건물 특정이 안 된다.
-            jibun = _label(p["pnu"], "")
+            jibun = _label(p["pnu"], "", dong_map)
             addr = f"서울 강남구 {jibun}"
             rows.append({
                 "id": p["id"], "name": p["name"], "jibun": jibun,

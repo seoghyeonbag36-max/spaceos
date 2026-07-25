@@ -17,11 +17,21 @@ D1 프로브(2026-07-07)로 확정된 실측 필드 기준. 구 BldRgstService_v
 쿼터: 건축HUB 일 1,000건 가정 — 건물당 전유부 1콜(+일반건물만 표제부 1콜).
       LIMIT_BUILDINGS 환경변수로 스모크 테스트 가능 (예: LIMIT_BUILDINGS=8).
 
-실행: python -m data.collectors.building_vacancy
+다거점: config/page_hubs.py HUBS 를 순회한다. 점포(sdsc2)·폴리곤(V-World)은 쿼터가
+넉넉하나 **건축HUB 대장은 일일 쿼터가 빡빡**하다(garosugil 1곳 ≈ 720동 = 720~1,440콜).
+  --no-ledger (또는 PAGE_LEDGER=0): 대장 수집을 건너뛰고 stores_raw.json 만 남긴다.
+    → build_page_master 가 V-World 폴리곤 지상층수로 capacity 를 근사(Tier 2 확장 경로).
+  기본(ledger on)은 garosugil 처럼 대장까지 받는 정밀 경로(Tier 1). 쿼터 감안해 거점 지정 권장:
+    python -m data.collectors.building_vacancy seongsu           # 1곳 정밀
+    python -m data.collectors.building_vacancy --no-ledger       # 전 거점 점포만
+
+실행: python -m data.collectors.building_vacancy [slug ...] [--no-ledger] [--force]
 """
 from __future__ import annotations
 
+import json
 import os
+import sys
 import time
 from collections import Counter, defaultdict
 
@@ -30,8 +40,8 @@ try:
 except ImportError:  # pragma: no cover
     requests = None
 
-from data.collectors.common import load_env, save_json
-from data.config.garosugil import CX, CY, SLUG, STORES_RADIUS_M
+from data.collectors.common import GOLD, latest_bronze, load_env, load_latest, save_json
+from data.config.page_hubs import HUBS, PageHub
 
 BASE_SDSC = "http://apis.data.go.kr/B553077/api/open/sdsc2"
 BASE_BLD = "http://apis.data.go.kr/1613000/BldRgstHubService"
@@ -49,31 +59,40 @@ _SLEEP = 0.05                 # API 예의 지연
 
 _FAILS = [0]           # 연속 실패 카운터 (쿼터 소진 감지 → 부분 저장 후 중단)
 _ABORT_AFTER = 15
+_RETRIES = 4           # 연결·DNS 오류 재시도 횟수 (이 환경은 DNS getaddrinfo 가 간헐 실패)
+_BACKOFF = (1, 3, 8, 15)   # 재시도 간 대기(초) — 일시적 DNS 블립을 넘긴다
 
 
 def _get_json(url: str, params: dict) -> dict | None:
-    try:
-        r = requests.get(url, params=params, timeout=30)
-        r.raise_for_status()
-        data = r.json()
-        _FAILS[0] = 0
-        return data
-    except Exception as exc:
-        _FAILS[0] += 1
-        print(f"  [HTTP 실패 {_FAILS[0]}연속] {url.rsplit('/', 1)[-1]} — {exc}")
-        return None
+    """건축HUB GET. 연결/DNS 일시 오류는 백오프 재시도(_FAILS 미가산),
+    재시도 소진 시에만 실패로 집계 — DNS 블립에 배치 전체가 죽지 않게 한다."""
+    last = None
+    for attempt in range(_RETRIES + 1):
+        try:
+            r = requests.get(url, params=params, timeout=30)
+            r.raise_for_status()
+            data = r.json()
+            _FAILS[0] = 0
+            return data
+        except Exception as exc:
+            last = exc
+            if attempt < _RETRIES:
+                time.sleep(_BACKOFF[min(attempt, len(_BACKOFF) - 1)])
+    _FAILS[0] += 1
+    print(f"  [HTTP 실패 {_FAILS[0]}연속] {url.rsplit('/', 1)[-1]} — {last}")
+    return None
 
 
 # ── 1. 분자: 상가정보 반경 수집 → bdMgtSn 그룹핑 ─────────────────────
 
-def fetch_stores(key: str) -> list[dict]:
-    """가로수길 반경 STORES_RADIUS_M 점포 전량 (페이징) — 폴리곤 범위보다 넓게."""
+def fetch_stores(key: str, hub: PageHub) -> list[dict]:
+    """거점 반경 stores_radius_m 점포 전량 (페이징) — 폴리곤 범위보다 넓게."""
     rows: list[dict] = []
     page = 1
     while True:
         data = _get_json(f"{BASE_SDSC}/storeListInRadius", {
             "serviceKey": key, "type": "json", "numOfRows": 1000, "pageNo": page,
-            "radius": STORES_RADIUS_M, "cx": CX, "cy": CY,
+            "radius": hub.stores_radius_m, "cx": hub.cx, "cy": hub.cy,
         })
         items = (data or {}).get("body", {}).get("items", []) or []
         rows += items
@@ -204,32 +223,76 @@ def classify(occ: float | None, method: str) -> str:
     return "empty"
 
 
-def main() -> None:
-    load_env()
-    key = os.getenv("DATA_GO_KR_SERVICE_KEY")
-    if not key or requests is None:
-        print("[bldg-vac] DATA_GO_KR_SERVICE_KEY 미설정(또는 requests 없음) — 건너뜀")
-        return
+_CHECKPOINT = 150   # 이 동수마다 부분 저장 — 중단돼도 진행분 보존(재개 가능)
 
-    stores = fetch_stores(key)
-    if not stores:
-        print("[bldg-vac] 점포 0건 — 키/파라미터 확인")
-        return
-    save_json(stores, SLUG, "stores_raw.json")
+
+def _save_ledger(slug: str, results: list[dict], ledger_raw: dict[str, dict]) -> None:
+    """대장 결과 부분/최종 저장 — bronze(원본) + gold(building_vacancy)."""
+    save_json(ledger_raw, slug, "bldg_ledger_raw.json")
+    gold_dir = GOLD / slug
+    gold_dir.mkdir(parents=True, exist_ok=True)
+    (gold_dir / "building_vacancy.json").write_text(
+        json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def run_hub(key: str, hub: PageHub, do_ledger: bool = True,
+            refresh_stores: bool = False) -> bool:
+    """거점 하나 수집. do_ledger=False 면 점포만(Tier 2).
+
+    재개 가능: 대장 루프는 _CHECKPOINT 동마다 저장하고, 재실행 시 기존
+    building_vacancy.json 의 완료 건물(bdMgtSn)을 건너뛴다. 중단(쿼터 소진·강제
+    종료)돼도 진행분이 남아 다음 실행이 나머지만 채운다. refresh_stores=False 면
+    기존 stores_raw 를 재사용해 점포 재수집을 생략한다(재개 효율).
+    반환: 성공 여부.
+    """
+    _FAILS[0] = 0
+    slug = hub.slug
+
+    stores = None if refresh_stores else load_latest(slug, "stores_raw.json")
+    if stores is None:
+        stores = fetch_stores(key, hub)
+        if not stores:
+            print(f"[bldg-vac:{slug}] 점포 0건 — 키/파라미터 확인")
+            return False
+        save_json(stores, slug, "stores_raw.json")
+    else:
+        print(f"[bldg-vac:{slug}] 기존 stores_raw {len(stores)}건 재사용(--force 로 재수집)")
+
+    if not do_ledger:
+        print(f"[bldg-vac:{slug}] --no-ledger — 점포 {len(stores)}건만 저장(대장 생략, "
+              f"build_page_master 가 폴리곤 층수로 capacity 근사)")
+        return True
+
     buildings = group_by_building(stores)
-
     limit = int(os.getenv("LIMIT_BUILDINGS", "0"))
     targets = list(buildings.values())
     targets.sort(key=lambda b: -b["active"])          # 점포 많은 건물 우선
     if limit:
         targets = targets[:limit]
-        print(f"[bldg-vac] LIMIT_BUILDINGS={limit} — 스모크 테스트 모드")
+        print(f"[bldg-vac:{slug}] LIMIT_BUILDINGS={limit} — 스모크 테스트 모드")
 
-    ledger_raw: dict[str, dict] = {}
+    # 재개: 기존 대장 산출물(Tier1)의 완료 건물은 건너뛴다
     results: list[dict] = []
-    for i, b in enumerate(targets, 1):
+    done: set[str] = set()
+    gold_path = GOLD / slug / "building_vacancy.json"
+    if gold_path.exists():
+        try:
+            prev = json.loads(gold_path.read_text(encoding="utf-8"))
+            if isinstance(prev, list) and prev and "capacity_method" in prev[0]:
+                results = prev
+                done = {r.get("bdMgtSn") for r in prev if r.get("bdMgtSn")}
+        except (json.JSONDecodeError, OSError):
+            pass
+    ledger_raw: dict[str, dict] = (load_latest(slug, "bldg_ledger_raw.json") or {}) if done else {}
+
+    todo = [b for b in targets if b["bdMgtSn"] not in done]
+    print(f"[bldg-vac:{slug}] 대장 대상 {len(todo)}동 (전체 {len(targets)} · 기존완료 {len(done)})")
+
+    since = 0
+    for b in todo:
         if _FAILS[0] >= _ABORT_AFTER:
-            print(f"[bldg-vac] ⚠ 연속 실패 {_FAILS[0]}회(쿼터 소진 추정) — {i-1}동까지 부분 저장 후 중단")
+            print(f"[bldg-vac:{slug}] ⚠ 연속 실패 {_FAILS[0]}회(쿼터 소진 추정) — "
+                  f"{len(results)}동까지 저장 후 중단(다음 실행이 재개)")
             break
         jibun = _jibun(b["lnoCd"])
         if jibun is None:
@@ -251,23 +314,49 @@ def main() -> None:
             "status": classify(occ, method),
             "match_method": "bdMgtSn_group",
         })
-        if i % 50 == 0 or i == len(targets):
-            print(f"[ledger] {i}/{len(targets)}동 처리")
+        since += 1
+        if since >= _CHECKPOINT:
+            _save_ledger(slug, results, ledger_raw)
+            print(f"[checkpoint:{slug}] {len(results)}/{len(targets)}동 저장")
+            since = 0
 
-    save_json(ledger_raw, SLUG, "bldg_ledger_raw.json")
-
-    from data.collectors.common import GOLD
-    gold_dir = GOLD / SLUG
-    gold_dir.mkdir(parents=True, exist_ok=True)
-    import json
-    (gold_dir / "building_vacancy.json").write_text(
-        json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+    _save_ledger(slug, results, ledger_raw)
 
     st = Counter(r["status"] for r in results)
     cm = Counter(r["capacity_method"] for r in results)
-    print(f"[gold] building_vacancy.json ({len(results)}동)")
-    print(f"[bldg-vac] status 분포: {dict(st)}")
-    print(f"[bldg-vac] capacity 방식: {dict(cm)}")
+    print(f"[gold:{slug}] building_vacancy.json ({len(results)}동)")
+    print(f"[bldg-vac:{slug}] status 분포: {dict(st)}")
+    print(f"[bldg-vac:{slug}] capacity 방식: {dict(cm)}")
+    return True
+
+
+def main() -> None:
+    load_env()
+    key = os.getenv("DATA_GO_KR_SERVICE_KEY")
+    if not key or requests is None:
+        print("[bldg-vac] DATA_GO_KR_SERVICE_KEY 미설정(또는 requests 없음) — 건너뜀")
+        return
+
+    argv = sys.argv[1:]
+    args = [a for a in argv if not a.startswith("-")]
+    force = "--force" in argv
+    do_ledger = "--no-ledger" not in argv and os.getenv("PAGE_LEDGER", "1") != "0"
+    slugs = args or list(HUBS)
+    for slug in slugs:
+        hub = HUBS.get(slug)
+        if hub is None:
+            print(f"[bldg-vac] 미등록 거점 '{slug}' — page_hubs.HUBS 확인, 건너뜀")
+            continue
+        if do_ledger:
+            # 대장 모드: 완료 판정이 애매하므로 run_hub 의 재개 로직에 맡긴다
+            # (기존 완료 건물은 건너뛰고 나머지만 채운다). 점포는 기존분 재사용.
+            run_hub(key, hub, do_ledger=True, refresh_stores=force)
+        else:
+            # Tier2(점포만): 이미 있으면 건너뛰고, 있으면 신선 수집이 목적이라 재수집
+            if not force and latest_bronze(slug, "stores_raw.json") is not None:
+                print(f"[bldg-vac:{slug}] stores_raw.json 이미 존재 — 건너뜀(--force 로 재수집)")
+                continue
+            run_hub(key, hub, do_ledger=False, refresh_stores=True)
 
 
 if __name__ == "__main__":

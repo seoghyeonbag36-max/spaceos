@@ -80,6 +80,28 @@ def test_sentiment_and_heatmap():
     assert hm["cells"] and hm["sum_stores"] > 0
 
 
+def test_building_vacancy_geojson():
+    """건물 공실 GeoJSON(Page 폴리곤 레이어) — 실데이터/샘플/별칭/미지원 거점."""
+    # garosugil: gold 산출물(839동) 또는 최소 샘플 8동 — 어느 쪽이든 유효한 FC
+    r = client.get(f"{V1}/heatmap/buildings", params={"district": "garosugil"})
+    assert r.status_code == 200
+    fc = r.json()
+    assert fc["type"] == "FeatureCollection"
+    assert fc["district"] == "garosugil"
+    assert fc["features"], "garosugil 건물 피처 없음"
+    props = fc["features"][0]["properties"]
+    for k in ("id", "name", "status", "capacity", "active", "industry", "vacancy_rate"):
+        assert k in props, f"건물 속성 누락: {k}"
+    assert props["status"] in {"full", "partial", "high", "empty"}
+
+    # 별칭(gangnam-garosugil/sinsa)도 같은 거점으로 해석
+    r2 = client.get(f"{V1}/heatmap/buildings", params={"district": "gangnam-garosugil"})
+    assert r2.status_code == 200 and r2.json()["features"]
+
+    # 미지원 거점 → 404
+    assert client.get(f"{V1}/heatmap/buildings", params={"district": "nope"}).status_code == 404
+
+
 def test_all_districts_have_heatmap_cells():
     """전 거점 그리드 합성 셀이 비어 있지 않아야 한다 (hot 스팟 정합 검증)."""
     for d in DISTRICTS:

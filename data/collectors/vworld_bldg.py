@@ -1,6 +1,6 @@
 """[Page] V-World GIS건물통합정보 수집기 — 건물 footprint 폴리곤 (Bronze).
 
-`VWORLD_API_KEY`(vworld.kr 즉시발급)로 가로수길 코어 축 bbox의 건물 폴리곤을
+`VWORLD_API_KEY`(vworld.kr 즉시발급)로 거점 코어 축 bbox의 건물 폴리곤을
 WFS(getBldgisSpceWFS, 레이어 dt_d010)로 수집한다. 2026-07-08 실호출 검증 완료:
 PNU·층수·연면적·높이(hg)·용도코드 + gml 좌표 수신 확인.
 
@@ -9,12 +9,17 @@ PNU·층수·연면적·높이(hg)·용도코드 + gml 좌표 수신 확인.
 - 서버 maxFeatures 상한 1000 → 상한 도달 시 bbox 4분할 재귀 타일링, PNU+fid 로 중복 제거.
 - bbox 축 순서는 lon,lat (소량 bbox 실호출로 검증됨).
 
-실행: python -m data.collectors.vworld_bldg
+다거점: config/page_hubs.py HUBS 전체를 순회한다. 이미 bldg_polygons.geojson 이
+있는 거점은 건너뛴다(garosugil 검증 산출물 보존·재실행 안전). 특정 거점만 수집하려면
+인자로 slug 를 넘긴다: python -m data.collectors.vworld_bldg hongdae seongsu
+
+실행: python -m data.collectors.vworld_bldg [slug ...] [--force]
 """
 from __future__ import annotations
 
 import math
 import os
+import sys
 import xml.etree.ElementTree as ET
 
 try:
@@ -22,8 +27,8 @@ try:
 except ImportError:  # pragma: no cover
     requests = None
 
-from data.collectors.common import bronze_dir, load_env, save_json
-from data.config.garosugil import CX, CY, RADIUS_M, SLUG
+from data.collectors.common import bronze_dir, latest_bronze, load_env, save_json
+from data.config.page_hubs import HUBS, PageHub
 
 _URL = "https://api.vworld.kr/ned/wfs/getBldgisSpceWFS"
 _TYPENAME = "dt_d010"
@@ -131,18 +136,13 @@ def _collect(key: str, box: tuple[float, float, float, float],
     return feats
 
 
-def main() -> None:
-    load_env()
-    key = os.getenv("VWORLD_API_KEY")
-    if not key or requests is None:
-        print("[vworld] VWORLD_API_KEY 미설정(또는 requests 없음) — 건너뜀")
-        return
-
+def collect_hub(key: str, hub: PageHub) -> int:
+    """거점 하나의 건물 폴리곤 수집 → bldg_polygons.geojson. 반환: 건물 수."""
     raws: list[str] = []
-    feats = _collect(key, _bbox(CX, CY, RADIUS_M), raws)
+    feats = _collect(key, _bbox(hub.cx, hub.cy, hub.radius_m), raws)
     if not feats:
-        print("[vworld] 수집 실패 — 응답 XML/키/도메인 확인 필요")
-        return
+        print(f"[vworld:{hub.slug}] 수집 실패 — 응답 XML/키/도메인 확인 필요")
+        return 0
 
     # 타일 경계 중복 제거 (PNU + GIS식별번호)
     seen: set[tuple] = set()
@@ -154,14 +154,36 @@ def main() -> None:
         seen.add(k)
         uniq.append(f)
 
-    raw_path = bronze_dir(SLUG) / "vworld_bldg_raw.xml"
+    raw_path = bronze_dir(hub.slug) / "vworld_bldg_raw.xml"
     raw_path.write_text("\n<!-- TILE -->\n".join(raws), encoding="utf-8")
-    print(f"[bronze] {raw_path.name} (원본 XML {len(raws)}타일)")
-    save_json({"type": "FeatureCollection", "features": uniq}, SLUG, "bldg_polygons.geojson")
+    print(f"[bronze:{hub.slug}] {raw_path.name} (원본 XML {len(raws)}타일)")
+    save_json({"type": "FeatureCollection", "features": uniq}, hub.slug, "bldg_polygons.geojson")
 
     sample = uniq[0]["properties"]
-    print(f"[vworld] 총 {len(uniq)}동(중복 제거 전 {len(feats)}) · 샘플 PNU {sample.get('pnu')} "
-          f"(지상 {sample.get('ground_floor_co')}층)")
+    print(f"[vworld:{hub.slug}] 총 {len(uniq)}동(중복 제거 전 {len(feats)}) · 샘플 PNU "
+          f"{sample.get('pnu')} (지상 {sample.get('ground_floor_co')}층)")
+    return len(uniq)
+
+
+def main() -> None:
+    load_env()
+    key = os.getenv("VWORLD_API_KEY")
+    if not key or requests is None:
+        print("[vworld] VWORLD_API_KEY 미설정(또는 requests 없음) — 건너뜀")
+        return
+
+    args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    force = "--force" in sys.argv[1:]
+    slugs = args or list(HUBS)
+    for slug in slugs:
+        hub = HUBS.get(slug)
+        if hub is None:
+            print(f"[vworld] 미등록 거점 '{slug}' — page_hubs.HUBS 확인, 건너뜀")
+            continue
+        if not force and latest_bronze(slug, "bldg_polygons.geojson") is not None:
+            print(f"[vworld:{slug}] bldg_polygons.geojson 이미 존재 — 건너뜀(--force 로 재수집)")
+            continue
+        collect_hub(key, hub)
 
 
 if __name__ == "__main__":

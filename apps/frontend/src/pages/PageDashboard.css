@@ -62,6 +62,24 @@
 .pagedash .mapnotice-sub{font-size:11px;color:#a16207;margin-top:4px}
 @media(max-width:920px){.pagedash .mapbox{height:320px}}
 
+/* 지도 레이어 토글(건물 공실 ↔ 100m 그리드) */
+.pagedash .maptoggle{display:flex;align-items:center;gap:6px;padding:9px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.pagedash .maptoggle button{font:700 11.5px 'Pretendard','Malgun Gothic',sans-serif;cursor:pointer;padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:#fafbfc;color:var(--sub)}
+.pagedash .maptoggle button.on{background:#3a5a98;border-color:#3a5a98;color:#fff}
+.pagedash .maptoggle button:disabled{opacity:.4;cursor:not-allowed}
+.pagedash .maptoggle .twinbtn{margin-left:auto;background:#111827;border-color:#111827;color:#fff}
+/* 건물 공실 범례 칩 */
+.pagedash .ml-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--sub)}
+.pagedash .ml-chip i{width:11px;height:11px;border-radius:3px;display:inline-block}
+/* 3D 디지털 트윈 모달 */
+.pagedash .twinmodal{position:fixed;inset:0;z-index:2000;background:rgba(17,24,39,.55);display:flex;align-items:center;justify-content:center;padding:20px}
+.pagedash .twinbox{background:#fff;border-radius:15px;width:min(560px,94vw);overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.pagedash .twinhead{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);font-weight:800;font-size:13px}
+.pagedash .twinhead button{border:none;background:none;font-size:16px;cursor:pointer;color:var(--sub)}
+.pagedash .twincanvas{height:360px;background:#eef2f7}
+.pagedash .twinload{display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:12px}
+.pagedash .twinfoot{padding:10px 16px;font-size:11px;color:var(--sub);border-top:1px solid var(--line)}
+
 /* 감성 구역 */
 .pagedash .zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px}
 .pagedash .zone{background:var(--card);border:1px solid var(--line);border-top:4px solid #d4dde6;border-radius:13px;padding:12px 13px}

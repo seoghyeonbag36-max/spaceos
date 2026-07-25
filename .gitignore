@@ -32,6 +32,11 @@ data/gold/*
 !data/gold/platform_vacancy_forecast.json
 # 예외: Platform GNN 업종 추천(~4.8MB, 23,250노드) — recommend-industry 가 정적 서빙.
 !data/gold/platform_industry_recommend.json
+# 예외: Page 다거점 red dot 실데이터 — 각 거점 page_building_master.geojson 만 추적(Vercel 서빙).
+# building_vacancy.json·대장 원본·parquet 등 중간·원본 산출물은 계속 제외.
+!data/gold/*/
+data/gold/*/*
+!data/gold/*/page_building_master.geojson
 
 # IDE / OS
 .DS_Store
