@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 
 from data.collectors.common import GOLD
-from data.config.garosugil import SLUG
+from data.config.page_hubs import HUBS
 
 ANCHOR_STREET = 41.6   # 부동산원 가두상권 공실률 (%) — TODO: CSV 로더로 대체
 ANCHOR_MALL = 9.99     # 부동산원 신사역 집합상가 공실률 (%)
@@ -27,10 +27,45 @@ ANCHOR_MALL = 9.99     # 부동산원 신사역 집합상가 공실률 (%)
 # capacity_method → 세그먼트: 전유부 호수 실측 = 집합건물, 층수 기반 = 일반(가두)
 _SEGMENT_OF = {"expos_units": "mall", "floor_approx": "street", "floor_ouln": "street"}
 
+# methods(v3) 용 앵커 — 층수 기반 두 방법을 분리해 각각 α 를 낸다. 2026-07-26 실측상
+# floor_ouln(garosugil)은 앵커 대비 -37%p, floor_approx(12거점)는 +19~23%p 로 편향
+# 방향이 반대라 같은 α 를 공유할 수 없다. segments(v2)는 기존 소비층 호환을 위해
+# 둘을 street 로 묶은 채 유지하고, 거점별 보정은 methods 를 쓴다.
+_ANCHOR_OF = {"expos_units": ANCHOR_MALL, "floor_approx": ANCHOR_STREET,
+              "floor_ouln": ANCHOR_STREET}
 
-def _segments() -> dict:
+
+def _agg(rows: list[dict], keys: set[str]) -> dict | None:
+    """capacity_method 가 keys 에 속한 건물 집계 → 추정 공실률·α."""
+    act = cap = n = 0
+    for r in rows:
+        if r.get("capacity_method") not in keys or not r.get("capacity"):
+            continue
+        act += r["active"]
+        # 하한 = active (build_page_master 와 동일한 음수 공실률 방지 규칙)
+        cap += max(r["capacity"], r["active"])
+        n += 1
+    if not cap:
+        return None
+    est = round((1 - act / cap) * 100, 1)
+    anchor = _ANCHOR_OF.get(next(iter(keys)), ANCHOR_STREET) if len(keys) == 1 else None
+    out = {"estimated_vacancy_pct": est, "buildings": n}
+    if anchor is not None:
+        out |= {"anchor_pct": anchor,
+                "alpha": round(anchor / est, 3) if est else None,
+                "gap_pp": round(est - anchor, 1)}
+    return out
+
+
+def _methods(rows: list[dict]) -> dict:
+    """capacity_method 별 α (v3) — 거점별 보정의 권장 소스."""
+    present = {r.get("capacity_method") for r in rows} & set(_ANCHOR_OF)
+    return {m: a for m in sorted(present) if (a := _agg(rows, {m})) is not None}
+
+
+def _segments(slug: str) -> dict:
     """building_vacancy.json 을 가두/집합으로 분리 집계해 세그먼트별 α 산출."""
-    src = GOLD / SLUG / "building_vacancy.json"
+    src = GOLD / slug / "building_vacancy.json"
     if not src.exists():
         return {}
     rows = json.loads(src.read_text(encoding="utf-8"))
@@ -63,43 +98,72 @@ def _segments() -> dict:
     return out
 
 
-def run() -> None:
-    src = GOLD / SLUG / "page_building_master.geojson"
-    if not src.exists():
-        print("[calibrate] page_building_master 없음 — build_page_master 먼저")
-        return
-    fc = json.loads(src.read_text(encoding="utf-8"))
-    known = [f["properties"] for f in fc["features"]
-             if str(f["properties"].get("source", "")).startswith("stores+ledger")]
-    act = sum(p["active"] for p in known)
-    cap = sum(p["capacity"] for p in known)
-    est = round((1 - act / cap) * 100, 1)
-    alpha = round(ANCHOR_STREET / est, 3)
-    gap = round(est - ANCHOR_STREET, 1)
+def run(slug: str) -> bool:
+    """거점 하나의 calibration.json 산출. 반환: 성공 여부.
 
-    segments = _segments()
-    out = {
-        "estimated_vacancy_pct": est,
+    combined(v1)은 기존과 동일하게 page_building_master.geojson 에서 계산한다.
+    master 가 아직 없는 거점(수집만 끝난 상태)도 segments/methods 는 낼 수 있으므로
+    combined 키만 비운 채 저장한다.
+    """
+    vac = GOLD / slug / "building_vacancy.json"
+    if not vac.exists():
+        return False
+    rows = json.loads(vac.read_text(encoding="utf-8"))
+    if not rows or "capacity_method" not in rows[0]:
+        return False                       # Tier2(대장 없음) — 보정 대상 아님
+
+    out: dict = {
         "anchor_street_pct": ANCHOR_STREET,
         "anchor_mall_pct": ANCHOR_MALL,
-        "alpha_street": alpha,
-        "gap_pp": gap,
-        "buildings_used": len(known),
+    }
+    src = GOLD / slug / "page_building_master.geojson"
+    if src.exists():
+        fc = json.loads(src.read_text(encoding="utf-8"))
+        known = [f["properties"] for f in fc["features"]
+                 if str(f["properties"].get("source", "")).startswith("stores+ledger")]
+        act = sum(p["active"] for p in known)
+        cap = sum(p["capacity"] for p in known)
+        if cap:
+            est = round((1 - act / cap) * 100, 1)
+            out |= {
+                "estimated_vacancy_pct": est,
+                "alpha_street": round(ANCHOR_STREET / est, 3) if est else None,
+                "gap_pp": round(est - ANCHOR_STREET, 1),
+                "buildings_used": len(known),
+            }
+            print(f"[calibrate:{slug}] combined: 추정 {est}% vs 가두 앵커 "
+                  f"{ANCHOR_STREET}% → gap {out['gap_pp']}%p, α={out['alpha_street']}")
+    else:
+        print(f"[calibrate:{slug}] page_building_master 없음 — combined 생략"
+              f"(segments/methods 만 산출)")
+
+    segments = _segments(slug)
+    methods = _methods(rows)
+    out |= {
         "segments": segments,
+        "methods": methods,
         "note": "combined(v1) = 가두·집합 혼합 단일 α (기존 소비층 호환용). "
                 "segments(v2) = capacity_method 로 분리한 이중 앵커 — "
-                "가두 보정은 segments.street.alpha, 집합은 segments.mall.alpha 사용 권장.",
+                "가두 보정은 segments.street.alpha, 집합은 segments.mall.alpha 사용 권장. "
+                "methods(v3) = capacity_method 단위 α. floor_ouln 과 floor_approx 는 "
+                "편향 방향이 반대라 street 로 묶으면 안 되므로 거점별 보정은 이쪽을 쓴다.",
     }
-    dst = GOLD / SLUG / "calibration.json"
+    dst = GOLD / slug / "calibration.json"
     dst.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"[calibrate] combined: 추정 {est}% vs 가두 앵커 {ANCHOR_STREET}% → gap {gap}%p, α={alpha}")
-    for seg, label in (("street", "가두(floor_approx)"), ("mall", "집합(expos_units)")):
-        if seg in segments:
-            s = segments[seg]
-            print(f"[calibrate] {label}: 추정 {s['estimated_vacancy_pct']}% vs 앵커 {s['anchor_pct']}% "
-                  f"→ gap {s['gap_pp']}%p, α={s['alpha']} ({s['buildings']}동)")
-    print(f"[calibrate] {dst.relative_to(GOLD.parent)}")
+    for m, s in methods.items():
+        print(f"[calibrate:{slug}]   {m:13s} 추정 {s['estimated_vacancy_pct']:5.1f}% "
+              f"vs 앵커 {s['anchor_pct']:5.2f}% → gap {s['gap_pp']:+6.1f}%p, "
+              f"α={s['alpha']} ({s['buildings']}동)")
+    return True
+
+
+def main() -> None:
+    import sys
+
+    slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(HUBS)
+    ok = sum(1 for s in slugs if s in HUBS and run(s))
+    print(f"[calibrate] 완료: {ok}거점")
 
 
 if __name__ == "__main__":
-    run()
+    main()

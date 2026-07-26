@@ -1,25 +1,41 @@
 {
-  "estimated_vacancy_pct": 39.1,
   "anchor_street_pct": 41.6,
   "anchor_mall_pct": 9.99,
+  "estimated_vacancy_pct": 39.1,
   "alpha_street": 1.064,
   "gap_pp": -2.5,
   "buildings_used": 571,
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 4.4,
+      "estimated_vacancy_pct": 38.3,
       "anchor_pct": 41.6,
-      "alpha": 9.455,
-      "gap_pp": -37.2,
-      "buildings": 559
+      "alpha": 1.086,
+      "gap_pp": -3.3,
+      "buildings": 538
     },
     "mall": {
-      "estimated_vacancy_pct": 31.8,
+      "estimated_vacancy_pct": 28.4,
       "anchor_pct": 9.99,
-      "alpha": 0.314,
-      "gap_pp": 21.8,
-      "buildings": 20
+      "alpha": 0.352,
+      "gap_pp": 18.4,
+      "buildings": 51
     }
   },
-  "note": "combined(v1) = 가두·집합 혼합 단일 α (기존 소비층 호환용). segments(v2) = capacity_method 로 분리한 이중 앵커 — 가두 보정은 segments.street.alpha, 집합은 segments.mall.alpha 사용 권장."
+  "methods": {
+    "expos_units": {
+      "estimated_vacancy_pct": 28.4,
+      "buildings": 51,
+      "anchor_pct": 9.99,
+      "alpha": 0.352,
+      "gap_pp": 18.4
+    },
+    "floor_ouln": {
+      "estimated_vacancy_pct": 38.3,
+      "buildings": 538,
+      "anchor_pct": 41.6,
+      "alpha": 1.086,
+      "gap_pp": -3.3
+    }
+  },
+  "note": "combined(v1) = 가두·집합 혼합 단일 α (기존 소비층 호환용). segments(v2) = capacity_method 로 분리한 이중 앵커 — 가두 보정은 segments.street.alpha, 집합은 segments.mall.alpha 사용 권장. methods(v3) = capacity_method 단위 α. floor_ouln 과 floor_approx 는 편향 방향이 반대라 street 로 묶으면 안 되므로 거점별 보정은 이쪽을 쓴다."
 }

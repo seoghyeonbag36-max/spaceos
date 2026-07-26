@@ -46,8 +46,32 @@ from data.config.page_hubs import HUBS, PageHub
 BASE_SDSC = "http://apis.data.go.kr/B553077/api/open/sdsc2"
 BASE_BLD = "http://apis.data.go.kr/1613000/BldRgstHubService"
 
-# 상업 용도 키워드 (표제부 주용도·전유부 호별 용도 공통 필터)
+# 엔드포인트명 — 쿼터는 **오퍼레이션별로 따로** 걸린다. 2026-07-26 확인: 전유부가
+# 429 로 완전히 막힌 시각에도 표제부·층별개요는 100% 성공했다.
+EP_EXPOS = "getBrExposPubuseAreaInfo"   # 전유부 — capacity 정밀 경로(집합건물)
+EP_TITLE = "getBrTitleInfo"             # 표제부 — 층수 근사 폴백
+
+# 상업 용도 키워드 — **표제부 전용**. getBrTitleInfo 의 mainPurpsCdNm 은 대분류명
+# ("제2종근린생활시설"/"제1종근린생활시설"/"업무시설")이라 아래 positive 필터가 맞는다.
 COMMERCIAL_PURPS = ("근린생활", "판매", "업무", "숙박", "위락", "문화")
+
+# 전유부(getBrExposPubuseAreaInfo)의 mainPurpsCdNm 은 **세부용도명**("소매점"/"일반음식점"
+# /"의원"/"학원")이라 위 대분류 필터가 걸리지 않는다. 같은 상수를 양쪽에 쓰던 것이
+# 2026-07-26 확인된 버그: 압구정로데오 전유 호 중 대분류로 매칭되는 것은
+# "기타제1종근린생활시설" 24건뿐이고 소매점 209·일반음식점 104·의원 79·휴게음식점 41은
+# 전부 탈락 → capacity 14.6배 과소집계 → occupancy 1.0 clip 이 전체의 73%.
+# 세부용도명은 종류가 많아 positive 열거는 반드시 누락이 생기므로 negative 로 제외한다.
+# 주거 + 사무실형을 뺀다. 사무실형을 빼는 이유는 분자의 NON_STOREFRONT_LCLS 와 같다 —
+# 분자에서 사무실 입주 업종을 제외했으므로 분모(수용 호수)에서도 빼야 도메인이 맞는다.
+# 2026-07-26 garosugil 실측으로 확인: 사무소를 남기면 집합 세그먼트 추정 공실률이
+# 36.9%(앵커 격차 26.9%p), 빼면 31.1%(격차 21.1%p)로 부동산원 앵커에 더 가깝다.
+# 공장/창고류를 빼는 이유도 같다 — 지식산업센터(아파트형 공장)는 전유 호가 수백
+# 개인데 "기타공장"이라 상가가 아니다. 2026-07-26 성수 실측: capacity>200 인 9개 동의
+# 전유 호 2,268개 중 1,979개(87%)가 "기타공장"이었고, 이 때문에 expos_units 세그먼트
+# 추정 공실률이 88.5%(앵커 9.99%)까지 부풀었다.
+NON_CAPACITY_PURPS = ("아파트", "오피스", "다세대주택", "단독주택",
+                      "연립주택", "기숙사", "도시형생활주택", "사무소",
+                      "공장", "제조업소", "창고", "주차장", "공공시설")
 
 # 분자에서 제외할 사무실형 업종 대분류 — 분모(상업 층·상가 호)와 도메인 정합.
 # 사무실 입주 업종을 세면 점포 수용량 대비 분자가 부풀어 공실이 과소추정된다
@@ -57,29 +81,119 @@ STORES_PER_FLOOR = 2          # 일반건물 근사: 층당 상가 호 수 (α�
 _SLEEP = 0.05                 # API 예의 지연
 
 
-_FAILS = [0]           # 연속 실패 카운터 (쿼터 소진 감지 → 부분 저장 후 중단)
-_ABORT_AFTER = 15
+# 연속 실패 카운터는 **엔드포인트별**이다. 전역 하나로 두면 서로 다른 엔드포인트가
+# 카운터를 덮어써 중단 장치가 무력화된다 — 2026-07-26 을지로에서 실제로 발생했다:
+# 전유부가 429 로 죽어 _FAILS=1 이 되면 곧이어 표제부 호출이 성공해 0 으로 리셋되고,
+# 이 왕복이 무한 반복돼 "실패 1연속" 이 15 에 영원히 도달하지 못했다. 그 결과 전유부가
+# 완전히 막힌 채로 건물당 27초(백오프)를 태우며 31시간짜리 스톨이 됐다.
+_FAILS: dict[str, int] = defaultdict(int)
+_ABORT_AFTER = 15          # 한 엔드포인트가 이만큼 연속 실패하면 거점 수집을 중단
+_DEAD_AFTER = 5            # 429 로 이만큼 연속 소진되면 그 엔드포인트를 세션 내 포기
+_DEAD: set[str] = set()    # 포기한 엔드포인트 — 이후 호출은 즉시 None (대기 없음)
+
+
+def _ep(url: str) -> str:
+    return url.rsplit("/", 1)[-1]
+
+
 _RETRIES = 4           # 연결·DNS 오류 재시도 횟수 (이 환경은 DNS getaddrinfo 가 간헐 실패)
 _BACKOFF = (1, 3, 8, 15)   # 재시도 간 대기(초) — 일시적 DNS 블립을 넘긴다
+
+# 429(레이트 리밋)는 DNS 블립과 성격이 다르다. 블립은 27초면 지나가지만 리밋은
+# 계속 두드릴수록 조여진다. 2026-07-26 을지로 수집 중 getBrExposPubuseAreaInfo 에서
+# 429 가 발생, _BACKOFF 를 다 쓰고도 실패해 해당 건물이 조용히 no_ledger 로 강등됐다.
+# → 429 전용 백오프 + Retry-After 존중 + 전역 감속(_PACE)으로 분리 대응한다.
+#
+# 재시도를 2회로 줄인 이유: 엔드포인트가 **하드 블록**(일일 쿼터 소진)된 경우 긴 백오프는
+# 순손실이다. 을지로 실측에서 건물당 27초를 태우며 시간당 120동밖에 못 나갔다.
+# 짧게 두 번만 시도하고, _DEAD_AFTER 회 연속이면 엔드포인트 자체를 포기하는 쪽이 빠르다.
+# (일시적 리밋이면 _PACE 감속으로 회복되고, 하드 블록이면 몇 분 안에 포기한다.)
+_RETRIES_429 = 2
+_BACKOFF_429 = (5, 20)
+_PACE = [0.0]          # 429 누적 시 매 요청 앞에 붙는 전역 지연(초). 성공하면 서서히 회복
+_PACE_STEP = 0.25      # 429 1회당 가산
+_PACE_MAX = 3.0
+_PACE_DECAY = 0.01     # 성공 1회당 감산
+_N429 = [0]            # 429 총 발생 수 (리포트용)
+_LAST_429 = [False]    # 직전 _get_json 실패가 429 때문이었나 (강등 사유 구분용)
+
+
+def _resp_of(exc: Exception):
+    return getattr(exc, "response", None)
+
+
+def _is_429(exc: Exception) -> bool:
+    r = _resp_of(exc)
+    return r is not None and getattr(r, "status_code", None) == 429
+
+
+def _retry_after(exc: Exception) -> float | None:
+    """429 응답의 Retry-After(초) — 없거나 파싱 실패면 None."""
+    r = _resp_of(exc)
+    if r is None:
+        return None
+    try:
+        return max(0.0, float(r.headers.get("Retry-After", "")))
+    except (TypeError, ValueError):
+        return None
 
 
 def _get_json(url: str, params: dict) -> dict | None:
     """건축HUB GET. 연결/DNS 일시 오류는 백오프 재시도(_FAILS 미가산),
-    재시도 소진 시에만 실패로 집계 — DNS 블립에 배치 전체가 죽지 않게 한다."""
+    재시도 소진 시에만 실패로 집계 — DNS 블립에 배치 전체가 죽지 않게 한다.
+
+    429 는 별도 처리: Retry-After 를 우선 존중하고, 없으면 _BACKOFF_429 로 쉰다.
+    동시에 _PACE 를 올려 이후 모든 요청을 전역 감속시킨다(리밋 재유발 방지).
+    실패로 끝나면 _LAST_429 를 세워 호출부가 '대장 없음'과 구분할 수 있게 한다.
+
+    같은 엔드포인트가 429 로 _DEAD_AFTER 회 연속 소진되면 그 엔드포인트를 포기하고
+    이후 호출은 **대기 없이 즉시** None 을 돌려준다. 막힌 문을 계속 두드리며 백오프에
+    시간을 태우지 않기 위해서다.
+    """
+    ep = _ep(url)
+    if ep in _DEAD:
+        _LAST_429[0] = True          # 사유는 여전히 레이트 리밋 → rate_limited 로 기록
+        return None
+
     last = None
+    saw_429 = False
     for attempt in range(_RETRIES + 1):
         try:
+            if _PACE[0]:
+                time.sleep(_PACE[0])
             r = requests.get(url, params=params, timeout=30)
             r.raise_for_status()
             data = r.json()
-            _FAILS[0] = 0
+            _FAILS[ep] = 0
+            _LAST_429[0] = False
+            if _PACE[0]:                      # 성공 누적 시 감속 해제
+                _PACE[0] = max(0.0, _PACE[0] - _PACE_DECAY)
             return data
         except Exception as exc:
             last = exc
-            if attempt < _RETRIES:
-                time.sleep(_BACKOFF[min(attempt, len(_BACKOFF) - 1)])
-    _FAILS[0] += 1
-    print(f"  [HTTP 실패 {_FAILS[0]}연속] {url.rsplit('/', 1)[-1]} — {last}")
+            if _is_429(exc):
+                saw_429 = True
+                _N429[0] += 1
+                _PACE[0] = min(_PACE[0] + _PACE_STEP, _PACE_MAX)
+                wait = _retry_after(exc)
+                if wait is None:
+                    wait = _BACKOFF_429[min(attempt, len(_BACKOFF_429) - 1)]
+                limit = _RETRIES_429          # 429 는 짧게 끊는다
+            else:
+                wait = _BACKOFF[min(attempt, len(_BACKOFF) - 1)]
+                limit = _RETRIES
+            if attempt >= limit:
+                break
+            time.sleep(wait)
+
+    _FAILS[ep] += 1
+    _LAST_429[0] = saw_429
+    tag = f"429 x{_N429[0]} · pace {_PACE[0]:.2f}s" if saw_429 else "연결/기타"
+    print(f"  [HTTP 실패 {_FAILS[ep]}연속 | {tag}] {ep} — {last}")
+    if saw_429 and _FAILS[ep] >= _DEAD_AFTER:
+        _DEAD.add(ep)
+        print(f"  ⚠ [{ep}] 429 로 {_FAILS[ep]}회 연속 소진 — 이 엔드포인트를 "
+              f"이번 실행에서 포기합니다(이후 호출은 즉시 rate_limited).")
     return None
 
 
@@ -158,18 +272,47 @@ def _items(data: dict | None) -> list[dict]:
     return [item] if isinstance(item, dict) else (item or [])
 
 
-_MAX_EXPOS_PAGES = 8   # 건물당 전유부 페이지 상한 (100행×8 = 800호. 쿼터 보호)
+# 건물당 전유부 페이지 상한(100행/페이지). 대형 집합건물은 전유 호가 수천 개라
+# 기존 8페이지(800호)로는 원본이 잘렸다 — 2026-07-26 실측: 8거점 6,539동 중 49동이
+# 절단, 최대 7,881호(seoulsup). 절단되면 capacity 가 과소집계되고 재계산으로도
+# 복구되지 않아(원본 자체가 없음) 재수집이 필요하다. 80페이지=8,000호로 올린다.
+# 페이징은 totalCount 까지만 돌므로 일반 건물(대부분 1페이지)의 콜 수는 늘지 않는다.
+_MAX_EXPOS_PAGES = 80
+
+
+def expos_units(rows: list[dict]) -> set[tuple[str, str, str]]:
+    """전유부 응답 → 상업 전유 호 집합 (동/호/층 튜플).
+
+    bronze 의 bldg_ledger_raw.json 원본만으로 capacity 를 재산출할 수 있도록
+    필터를 함수로 분리한다(recalc_capacity 파이프라인이 같은 로직을 재사용).
+    """
+    return {
+        (r.get("dongNm", ""), r.get("hoNm", ""), r.get("flrNoNm", ""))
+        for r in rows
+        if r.get("exposPubuseGbCdNm") == "전유"
+        and not any(p in str(r.get("mainPurpsCdNm", "")) for p in NON_CAPACITY_PURPS)
+    }
 
 
 def fetch_capacity(key: str, jibun: dict, raw_store: dict) -> tuple[int | None, str]:
-    """(capacity, method). 전유부 상업 호 수 → 없으면 표제부 층수 근사."""
+    """(capacity, method). 전유부 상업 호 수 → 없으면 표제부 층수 근사.
+
+    429 로 응답을 못 받은 경우 "rate_limited" 를 돌려준다. 예전에는 이때 "no_ledger"
+    로 떨어져 **대장이 원래 없는 건물과 구분이 불가능**했고, 재개 로직이 완료로
+    간주해 영영 재시도되지 않았다(2026-07-26 을지로에서 확인).
+    전유부만 리밋에 걸리고 표제부는 성공하는 경우도 위험하다 — 실제로는 집합건물인데
+    floor_approx 로 강등돼 capacity 가 뒤바뀌므로, 이 경우도 재수집 대상으로 돌린다.
+    """
     common = {"serviceKey": key, "_type": "json", "numOfRows": 100, **jibun}
 
     # 전유공용면적 — 서버가 페이지당 100행 반환 → totalCount 까지 페이징
     rows: list[dict] = []
     page, total = 1, None
+    throttled = False
     while page <= _MAX_EXPOS_PAGES:
         expos = _get_json(f"{BASE_BLD}/getBrExposPubuseAreaInfo", {**common, "pageNo": page})
+        if expos is None and _LAST_429[0]:
+            throttled = True
         got = _items(expos)
         rows += got
         total = int(_body(expos).get("totalCount") or 0)
@@ -180,18 +323,18 @@ def fetch_capacity(key: str, jibun: dict, raw_store: dict) -> tuple[int | None, 
     raw_store["expos"] = rows
     raw_store["expos_total"] = total
 
-    # 상업 전유 호만 capacity 로 카운트 — 오피스텔·주택 호는 제외 (§1-2)
-    units = {
-        (r.get("dongNm", ""), r.get("hoNm", ""), r.get("flrNoNm", ""))
-        for r in rows
-        if r.get("exposPubuseGbCdNm") == "전유"
-        and any(p in str(r.get("mainPurpsCdNm", "")) for p in COMMERCIAL_PURPS)
-    }
+    # 상업 전유 호만 capacity 로 카운트 — 오피스텔·주택 호는 제외 (§1-2).
+    # 전유부는 세부용도명이므로 NON_CAPACITY_PURPS negative 필터를 쓴다(위 주석 참조).
+    units = expos_units(rows)
     if units:
         return len(units), "expos_units"
+    if throttled:
+        return None, "rate_limited"      # 전유부 유실 — 표제부 폴백은 오판 위험
 
     time.sleep(_SLEEP)
     title = _get_json(f"{BASE_BLD}/getBrTitleInfo", common)
+    if title is None and _LAST_429[0]:
+        return None, "rate_limited"
     rows = _items(title)
     raw_store["title"] = rows
     if not rows:
@@ -225,14 +368,33 @@ def classify(occ: float | None, method: str) -> str:
 
 _CHECKPOINT = 150   # 이 동수마다 부분 저장 — 중단돼도 진행분 보존(재개 가능)
 
+# 재개 시 '완료'로 치지 않고 다시 시도할 capacity_method — 수집 실패이지 사실이 아니다.
+_RETRY_METHODS = {"rate_limited"}
+
 
 def _save_ledger(slug: str, results: list[dict], ledger_raw: dict[str, dict]) -> None:
-    """대장 결과 부분/최종 저장 — bronze(원본) + gold(building_vacancy)."""
+    """대장 결과 부분/최종 저장 — bronze(원본) + gold(building_vacancy).
+
+    429 강등분은 gold/{slug}/rate_limited.json 에 따로 남긴다. building_vacancy.json
+    안에서도 capacity_method 로 식별되지만, 재수집 대상을 눈으로 찾을 수 있어야 한다.
+    """
     save_json(ledger_raw, slug, "bldg_ledger_raw.json")
     gold_dir = GOLD / slug
     gold_dir.mkdir(parents=True, exist_ok=True)
     (gold_dir / "building_vacancy.json").write_text(
         json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    limited = [{"bdMgtSn": r.get("bdMgtSn"), "lnoCd": r.get("lnoCd"),
+                "name": r.get("name"), "active": r.get("active")}
+               for r in results if r.get("capacity_method") in _RETRY_METHODS]
+    dst = gold_dir / "rate_limited.json"
+    if limited:
+        dst.write_text(json.dumps(
+            {"slug": slug, "count": len(limited), "n429": _N429[0],
+             "note": "429로 대장을 못 받은 건물. 다음 building_vacancy 실행이 자동 재시도한다.",
+             "buildings": limited}, ensure_ascii=False, indent=2), encoding="utf-8")
+    elif dst.exists():
+        dst.unlink()          # 모두 복구됐으면 흔적을 남기지 않는다
 
 
 def run_hub(key: str, hub: PageHub, do_ledger: bool = True,
@@ -245,7 +407,7 @@ def run_hub(key: str, hub: PageHub, do_ledger: bool = True,
     기존 stores_raw 를 재사용해 점포 재수집을 생략한다(재개 효율).
     반환: 성공 여부.
     """
-    _FAILS[0] = 0
+    _FAILS.clear()          # 거점마다 실패 카운터 초기화 (_DEAD 는 실행 전체에서 유지)
     slug = hub.slug
 
     stores = None if refresh_stores else load_latest(slug, "stores_raw.json")
@@ -279,8 +441,13 @@ def run_hub(key: str, hub: PageHub, do_ledger: bool = True,
         try:
             prev = json.loads(gold_path.read_text(encoding="utf-8"))
             if isinstance(prev, list) and prev and "capacity_method" in prev[0]:
-                results = prev
-                done = {r.get("bdMgtSn") for r in prev if r.get("bdMgtSn")}
+                # rate_limited 는 '완료'가 아니라 '429로 못 받은 것' — 재개 시 다시 시도해야
+                # 하므로 기존 행을 버리고 done 에서도 뺀다(안 그러면 영영 재수집 안 됨).
+                retry = sum(1 for r in prev if r.get("capacity_method") in _RETRY_METHODS)
+                results = [r for r in prev if r.get("capacity_method") not in _RETRY_METHODS]
+                done = {r.get("bdMgtSn") for r in results if r.get("bdMgtSn")}
+                if retry:
+                    print(f"[bldg-vac:{slug}] 이전 실행의 429 강등 {retry}동 — 재수집 대상에 포함")
         except (json.JSONDecodeError, OSError):
             pass
     ledger_raw: dict[str, dict] = (load_latest(slug, "bldg_ledger_raw.json") or {}) if done else {}
@@ -290,8 +457,16 @@ def run_hub(key: str, hub: PageHub, do_ledger: bool = True,
 
     since = 0
     for b in todo:
-        if _FAILS[0] >= _ABORT_AFTER:
-            print(f"[bldg-vac:{slug}] ⚠ 연속 실패 {_FAILS[0]}회(쿼터 소진 추정) — "
+        # 대장 산출에 필수인 전유부가 포기 상태면 더 돌 이유가 없다 — 남은 건물이
+        # 전부 rate_limited 로 채워질 뿐이다. 즉시 중단하고 다음 실행에 넘긴다.
+        if EP_EXPOS in _DEAD:
+            print(f"[bldg-vac:{slug}] ⚠ {EP_EXPOS} 쿼터 소진 — "
+                  f"{len(results)}동까지 저장 후 중단(쿼터 리셋 후 재실행하면 재개)")
+            break
+        worst = max(_FAILS.values(), default=0)
+        if worst >= _ABORT_AFTER:
+            ep = max(_FAILS, key=_FAILS.get)
+            print(f"[bldg-vac:{slug}] ⚠ {ep} 연속 실패 {worst}회 — "
                   f"{len(results)}동까지 저장 후 중단(다음 실행이 재개)")
             break
         jibun = _jibun(b["lnoCd"])
@@ -327,6 +502,9 @@ def run_hub(key: str, hub: PageHub, do_ledger: bool = True,
     print(f"[gold:{slug}] building_vacancy.json ({len(results)}동)")
     print(f"[bldg-vac:{slug}] status 분포: {dict(st)}")
     print(f"[bldg-vac:{slug}] capacity 방식: {dict(cm)}")
+    if _N429[0] or cm.get("rate_limited"):
+        print(f"[bldg-vac:{slug}] ⚠ 429 {_N429[0]}회 · 강등 {cm.get('rate_limited', 0)}동"
+              f" · 현재 감속 {_PACE[0]:.2f}s — 재실행하면 강등분만 자동 재수집")
     return True
 
 

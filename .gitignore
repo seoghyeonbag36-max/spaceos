@@ -38,6 +38,11 @@ data/gold/*
 data/gold/*/*
 !data/gold/*/page_building_master.geojson
 
+# 수집 로그 — **반드시 제외**. 건축HUB 오류 메시지는 실패한 요청 URL 을 통째로 찍는데
+# 거기에 serviceKey 가 평문으로 들어간다(2026-07-26 bldgvac-stdout.log 에서 103건 확인).
+data/logs/
+*.log
+
 # IDE / OS
 .DS_Store
 .idea/
