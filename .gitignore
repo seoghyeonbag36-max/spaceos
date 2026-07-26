@@ -37,6 +37,8 @@ data/gold/*
 !data/gold/*/
 data/gold/*/*
 !data/gold/*/page_building_master.geojson
+# 예외: 커버리지 리포트(거점당 ~600B) — 관리자 API 가 디스크에서 읽으므로 배포에 필요.
+!data/gold/*/coverage.json
 
 # 수집 로그 — **반드시 제외**. 건축HUB 오류 메시지는 실패한 요청 URL 을 통째로 찍는데
 # 거기에 serviceKey 가 평문으로 들어간다(2026-07-26 bldgvac-stdout.log 에서 103건 확인).

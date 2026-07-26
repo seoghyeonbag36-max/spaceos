@@ -27,6 +27,7 @@
 """
 from __future__ import annotations
 
+import datetime as _dt
 import json
 import math
 import re
@@ -424,6 +425,29 @@ def run(hub: PageHub) -> bool:
           f"비상업={stats['excluded_non_commercial']}")
     if cap:
         print(f"[page-master:{slug}] 참고 집계 공실률: {round((1 - act / cap) * 100, 1)}%")
+
+    # 커버리지 리포트 — **관리자 전용**. 공개 지도는 status 4종만 그리므로 '대장 미확인
+    # 으로 제외된 N동'이 사용자에게는 보이지 않는다. 그 사실을 운영자가 확인할 수 있게
+    # 별도 파일로 남긴다(2026-07-26). 지도에 섞어 표시하면 근거가 다른 데이터가 한
+    # 화면에 오게 되어 "대장 기반 실측" 논증이 무너지므로 노출 경로를 분리한다.
+    shown = sum(stats[k] for k in ("full", "partial", "high", "empty"))
+    excluded = stats["excluded_unknown"] + stats["excluded_non_commercial"]
+    (GOLD / slug / "coverage.json").write_text(json.dumps({
+        "slug": slug,
+        "hub_name": hub.name,
+        "tier": tier,
+        "built_at": _dt.datetime.now().isoformat(timespec="seconds"),
+        "shown": shown,
+        "excluded_total": excluded,
+        "excluded_unknown": stats["excluded_unknown"],
+        "excluded_non_commercial": stats["excluded_non_commercial"],
+        "coverage_pct": round(shown / (shown + excluded) * 100, 1) if shown + excluded else None,
+        "status": {k: stats[k] for k in ("full", "partial", "high", "empty")},
+        "source": dict(Counter(f["properties"]["source"] for f in feats)),
+        "reference_vacancy_pct": round((1 - act / cap) * 100, 1) if cap else None,
+        "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. "
+                "공개 지도에는 노출하지 않는다(관리자 전용).",
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
     return True
 
 

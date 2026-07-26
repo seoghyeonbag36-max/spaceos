@@ -1,0 +1,25 @@
+{
+  "slug": "hannam",
+  "hub_name": "한남동·용리단길",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-07-26T18:55:30",
+  "shown": 714,
+  "excluded_total": 2359,
+  "excluded_unknown": 266,
+  "excluded_non_commercial": 2093,
+  "coverage_pct": 23.2,
+  "status": {
+    "full": 123,
+    "partial": 210,
+    "high": 197,
+    "empty": 184
+  },
+  "source": {
+    "stores+ledger": 437,
+    "stores+ledger+pip": 6,
+    "pip_only": 87,
+    "polygon_only": 184
+  },
+  "reference_vacancy_pct": 50.5,
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+}

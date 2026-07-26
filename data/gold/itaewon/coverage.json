@@ -1,0 +1,25 @@
+{
+  "slug": "itaewon",
+  "hub_name": "이태원",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-07-26T18:55:26",
+  "shown": 844,
+  "excluded_total": 2657,
+  "excluded_unknown": 365,
+  "excluded_non_commercial": 2292,
+  "coverage_pct": 24.1,
+  "status": {
+    "full": 153,
+    "partial": 274,
+    "high": 218,
+    "empty": 199
+  },
+  "source": {
+    "stores+ledger": 521,
+    "polygon_only": 199,
+    "pip_only": 106,
+    "stores+ledger+pip": 18
+  },
+  "reference_vacancy_pct": 46.6,
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+}

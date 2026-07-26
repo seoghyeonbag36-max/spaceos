@@ -1,0 +1,25 @@
+{
+  "slug": "apgujeong-rodeo",
+  "hub_name": "압구정로데오",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-07-26T18:54:55",
+  "shown": 771,
+  "excluded_total": 201,
+  "excluded_unknown": 63,
+  "excluded_non_commercial": 138,
+  "coverage_pct": 79.3,
+  "status": {
+    "full": 107,
+    "partial": 267,
+    "high": 326,
+    "empty": 71
+  },
+  "source": {
+    "pip_only": 39,
+    "stores+ledger": 655,
+    "polygon_only": 71,
+    "stores+ledger+pip": 6
+  },
+  "reference_vacancy_pct": 51.5,
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+}

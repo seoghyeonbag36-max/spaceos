@@ -1,0 +1,25 @@
+{
+  "slug": "seochon",
+  "hub_name": "서촌",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-07-26T18:55:10",
+  "shown": 859,
+  "excluded_total": 1769,
+  "excluded_unknown": 316,
+  "excluded_non_commercial": 1453,
+  "coverage_pct": 32.7,
+  "status": {
+    "full": 137,
+    "partial": 323,
+    "high": 196,
+    "empty": 203
+  },
+  "source": {
+    "polygon_only": 203,
+    "stores+ledger": 581,
+    "pip_only": 60,
+    "stores+ledger+pip": 15
+  },
+  "reference_vacancy_pct": 52.9,
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "ikseon",
+  "hub_name": "익선동",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-07-26T18:55:08",
+  "shown": 1752,
+  "excluded_total": 656,
+  "excluded_unknown": 202,
+  "excluded_non_commercial": 454,
+  "coverage_pct": 72.8,
+  "status": {
+    "full": 375,
+    "partial": 613,
+    "high": 432,
+    "empty": 332
+  },
+  "source": {
+    "stores+ledger": 1188,
+    "pip_only": 167,
+    "polygon_only": 332,
+    "stores+ledger+pip": 65
+  },
+  "reference_vacancy_pct": 63.0,
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+}

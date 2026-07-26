@@ -1,0 +1,25 @@
+{
+  "slug": "myeongdong",
+  "hub_name": "명동",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-07-26T18:55:15",
+  "shown": 1081,
+  "excluded_total": 489,
+  "excluded_unknown": 154,
+  "excluded_non_commercial": 335,
+  "coverage_pct": 68.9,
+  "status": {
+    "full": 182,
+    "partial": 250,
+    "high": 460,
+    "empty": 189
+  },
+  "source": {
+    "stores+ledger": 705,
+    "pip_only": 119,
+    "polygon_only": 189,
+    "stores+ledger+pip": 68
+  },
+  "reference_vacancy_pct": 53.9,
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+}

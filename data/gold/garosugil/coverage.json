@@ -1,0 +1,25 @@
+{
+  "slug": "garosugil",
+  "hub_name": "신사동 가로수길",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-07-26T18:54:52",
+  "shown": 849,
+  "excluded_total": 403,
+  "excluded_unknown": 130,
+  "excluded_non_commercial": 273,
+  "coverage_pct": 67.8,
+  "status": {
+    "full": 127,
+    "partial": 236,
+    "high": 363,
+    "empty": 123
+  },
+  "source": {
+    "stores+ledger": 580,
+    "pip_only": 180,
+    "polygon_only": 88,
+    "stores+ledger+pip": 1
+  },
+  "reference_vacancy_pct": 54.2,
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+}

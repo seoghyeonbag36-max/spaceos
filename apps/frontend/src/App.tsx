@@ -1,16 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SeoulDashboard from "@/pages/SeoulDashboard";
 import PageDashboard from "@/pages/PageDashboard";
+import AdminCoverage from "@/pages/AdminCoverage";
 
 /**
  * SpaceOS 프론트엔드 진입점.
  * 전환: 서울(25구 로드맵) ↔ 주요 Platform(33거점 대시보드+심층).
  * TODO: react-router 도입 시 /seoul, /platforms 로 분리.
+ *
+ * #admin 해시는 관리자 커버리지 패널로 간다. 네비게이션에 버튼을 두지 않는다 —
+ * 지도에서 제외된 건물 수는 공개 대상이 아니다(2026-07-26). 데이터 자체도
+ * X-Admin-Token 이 있어야 오므로 해시를 안다고 값이 보이지는 않는다.
  */
 type View = "seoul" | "platforms";
 
 export default function App() {
   const [view, setView] = useState<View>("seoul");
+  const [isAdmin, setIsAdmin] = useState(() => window.location.hash === "#admin");
+
+  useEffect(() => {
+    const onHash = () => setIsAdmin(window.location.hash === "#admin");
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  if (isAdmin) return <AdminCoverage />;
 
   return (
     // 스크롤은 문서(창) 한 곳에서만. 내부 overflow 컨테이너를 두면 스크롤바가 2개로 보인다
