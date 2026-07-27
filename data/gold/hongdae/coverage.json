@@ -1,0 +1,25 @@
+{
+  "slug": "hongdae",
+  "hub_name": "홍대",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-07-27T22:38:12",
+  "shown": 1329,
+  "excluded_total": 875,
+  "excluded_unknown": 299,
+  "excluded_non_commercial": 576,
+  "coverage_pct": 60.3,
+  "status": {
+    "full": 97,
+    "partial": 335,
+    "high": 700,
+    "empty": 197
+  },
+  "source": {
+    "stores+ledger": 1086,
+    "pip_only": 41,
+    "polygon_only": 197,
+    "stores+ledger+pip": 5
+  },
+  "reference_vacancy_pct": 63.7,
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+}

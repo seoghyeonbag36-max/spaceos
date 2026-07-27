@@ -1,0 +1,25 @@
+{
+  "slug": "euljiro",
+  "hub_name": "을지로(힙지로)",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-07-27T22:38:21",
+  "shown": 1972,
+  "excluded_total": 1112,
+  "excluded_unknown": 170,
+  "excluded_non_commercial": 942,
+  "coverage_pct": 63.9,
+  "status": {
+    "full": 182,
+    "partial": 293,
+    "high": 660,
+    "empty": 837
+  },
+  "source": {
+    "stores+ledger": 839,
+    "polygon_only": 837,
+    "stores+ledger+pip": 71,
+    "pip_only": 225
+  },
+  "reference_vacancy_pct": 70.3,
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+}

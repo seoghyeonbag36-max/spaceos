@@ -25,7 +25,7 @@ from data.collectors.common import GOLD, load_env, save_json
 from data.config.page_hubs import HUBS
 from data.collectors.building_vacancy import (
     BASE_BLD, NON_CAPACITY_PURPS, STORES_PER_FLOOR, _body, _get_json, _items, _jibun,
-    classify,
+    _ts, classify,
 )
 
 _SLEEP = 0.05
@@ -119,7 +119,7 @@ def run(key: str, slug: str) -> None:
         b["status"] = classify(occ, "floor_ouln")
         updated += 1
         if i % 50 == 0 or i == len(targets):
-            print(f"[flr-cap:{slug}] {i}/{len(targets)}동 "
+            print(f"[{_ts()}] [flr-cap:{slug}] {i}/{len(targets)}동 "
                   f"(갱신 {updated}, 상업층0 유지 {skipped}, 응답없음 {failed})")
         time.sleep(_SLEEP)
 

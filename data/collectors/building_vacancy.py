@@ -372,6 +372,17 @@ _CHECKPOINT = 150   # 이 동수마다 부분 저장 — 중단돼도 진행분 
 _RETRY_METHODS = {"rate_limited"}
 
 
+def _ts() -> str:
+    """진행 로그용 시각.
+
+    배치는 로그를 append 만 하고 시각을 남기지 않았다. 그래서 2026-07-27 에 "어제보다
+    왜 느린가"를 따지는 데 파일 mtime 과 Windows 이벤트 로그(Kernel-Power 506/507)로
+    구간을 역산해야 했고, 절전으로 멈춘 146분을 실제 작업 시간으로 착각해 ETA 를 8배
+    틀리게 냈다. 체크포인트에 시각을 박으면 그 역산이 통째로 필요 없어진다.
+    """
+    return time.strftime("%H:%M:%S")
+
+
 def _save_ledger(slug: str, results: list[dict], ledger_raw: dict[str, dict]) -> None:
     """대장 결과 부분/최종 저장 — bronze(원본) + gold(building_vacancy).
 
@@ -453,7 +464,8 @@ def run_hub(key: str, hub: PageHub, do_ledger: bool = True,
     ledger_raw: dict[str, dict] = (load_latest(slug, "bldg_ledger_raw.json") or {}) if done else {}
 
     todo = [b for b in targets if b["bdMgtSn"] not in done]
-    print(f"[bldg-vac:{slug}] 대장 대상 {len(todo)}동 (전체 {len(targets)} · 기존완료 {len(done)})")
+    print(f"[{_ts()}] [bldg-vac:{slug}] 대장 대상 {len(todo)}동 "
+          f"(전체 {len(targets)} · 기존완료 {len(done)})")
 
     since = 0
     for b in todo:
@@ -492,14 +504,14 @@ def run_hub(key: str, hub: PageHub, do_ledger: bool = True,
         since += 1
         if since >= _CHECKPOINT:
             _save_ledger(slug, results, ledger_raw)
-            print(f"[checkpoint:{slug}] {len(results)}/{len(targets)}동 저장")
+            print(f"[{_ts()}] [checkpoint:{slug}] {len(results)}/{len(targets)}동 저장")
             since = 0
 
     _save_ledger(slug, results, ledger_raw)
 
     st = Counter(r["status"] for r in results)
     cm = Counter(r["capacity_method"] for r in results)
-    print(f"[gold:{slug}] building_vacancy.json ({len(results)}동)")
+    print(f"[{_ts()}] [gold:{slug}] building_vacancy.json ({len(results)}동)")
     print(f"[bldg-vac:{slug}] status 분포: {dict(st)}")
     print(f"[bldg-vac:{slug}] capacity 방식: {dict(cm)}")
     if _N429[0] or cm.get("rate_limited"):

@@ -32,6 +32,22 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# 출력 인코딩 고정 — Windows 기본 cp949 는 '—'(U+2014) 를 못 쓴다.
+#
+#   2026-07-27 hongdae: 수집 프로세스 사망을 감지하고 [DEAD] 줄을 찍는 순간
+#   UnicodeEncodeError 로 감시기 자신이 죽었다. 하필 보고해야 할 그 시점에 보고를
+#   못 하는 실패라, 사망 사실이 아무에게도 전달되지 않았다. 정상 경로([DONE])는
+#   한글만 써서 cp949 로 인코딩됐기 때문에 끝까지 멀쩡해 보였고, 그래서 이 버그는
+#   프로세스가 실제로 죽을 때까지 드러나지 않았다.
+#
+# UTF-8 로 고정하고, 그래도 못 쓰는 문자가 나오면 죽는 대신 치환한다 — 감시기는
+# 어떤 문자가 와도 죽지 않는 것이 정확히 출력하는 것보다 중요하다.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, OSError):    # 리다이렉트 대상에 따라 없을 수 있다
+        pass
+
 # 모드별 (완료 라인 정규식, 완료 시각을 읽을 bronze 파일명, 프로세스 식별 문자열)
 MODES = {
     "bldgvac": (re.compile(r"\[gold:([a-z0-9-]+)\] building_vacancy\.json"),
@@ -78,9 +94,16 @@ def watch(read, alive, done_re, expect, on_event, interval=20.0, sleep=time.slee
     reported: list[str] = []
 
     def drain(text: str) -> None:
-        """스냅샷에서 아직 보고하지 않은 완료 거점을 순서대로 내보낸다."""
+        """스냅샷에서 아직 보고하지 않은 완료 거점을 순서대로 내보낸다.
+
+        expect 에 없는 거점은 버린다 — 로그는 append-only 라 이전 실행의 완료 줄이
+        그대로 남아 있다. 2026-07-27: hongdae 만 재개하며 --expect hongdae 로 띄웠는데
+        같은 로그에 남은 euljiro 완료 줄(13:40)을 잡아 "euljiro 완료 (1/1)" 로 보고했다.
+        방금 끝난 것도 아니고 기다리던 거점도 아닌데 카운터와 소요시간까지 오염됐다.
+        (종료 판정은 expect 를 직접 확인하므로 조기 종료는 없었다 — 출력만 거짓이었다.)
+        """
         for slug in done_re.findall(text):
-            if slug not in reported:
+            if slug in expect and slug not in reported:
                 reported.append(slug)
                 on_event(slug)
 
