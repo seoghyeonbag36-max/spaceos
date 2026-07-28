@@ -1,9 +1,21 @@
 """α보정 — 건물 추정 공실률을 부동산원 공식 통계에 스케일 정렬 (poc §3-1).
 
-앵커(2025 기준, poc-building-vacancy.md §0.5 — 부동산원 CSV 로더 연동 시 자동 갱신 TODO):
-  가두상권(도로변) 41.6% / 신사역 집합상가 9.99%
+앵커는 **거점별 R-ONE 실측치**를 쓴다(2026-07-28 교정). 이전에는 전 거점에 단일
+상수 41.6% 를 적용했는데, 두 가지가 틀렸다:
 
-방법(v1): 매칭건물(stores+ledger) 집계 공실률 대비 가두 앵커의 비율 α를 산출해
+  1) 41.6% 는 부동산원 통계가 아니다. poc-building-vacancy.md §0.5 의 가로수길
+     **가두 1층 실태조사**(2024, 언론 인용) 값인데 코드 주석이 "부동산원 가두상권
+     공실률" 로 잘못 달려 있었다. 같은 상권의 실제 R-ONE 값은 신사역 중대형
+     **17.6%**(2026Q1)다 — 24%p 차이다.
+  2) 가로수길 전용 값을 13거점 전부에 썼다. 압구정 7.8%, 연남 4.5%, 명동 5.0%
+     인 상권까지 41.6% 에 정렬시키면 α 가 거점별로 최대 5배 어긋난다.
+
+R-ONE 원본은 collectors/rone_rent.py 가 이미 bronze/platform13/{날짜}/rone_vac_*.json
+에 받아 두었다(13거점 전 분기). 여기서 최신 분기를 읽어 거점별 앵커로 쓴다.
+중대형(vac_mid)을 주 앵커로 삼는다 — 13거점 전부 비영(非零) 값이 있는 유일한 계열이다.
+소규모(vac_small)는 표본이 없는 거점이 0.0 으로 내려와 α 를 발산시킨다(참고로만 기록).
+
+방법(v1): 매칭건물(stores+ledger) 집계 공실률 대비 거점 앵커의 비율 α를 산출해
 gold/{SLUG}/calibration.json 에 기록한다. 개별 건물 vacancy 에 α를 곱한
 `vacancy_calibrated` 는 소비층(API/ML)이 선택적으로 사용.
 
@@ -17,25 +29,55 @@ gold/{SLUG}/calibration.json 에 기록한다. 개별 건물 vacancy 에 α를 �
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 
-from data.collectors.common import GOLD
+from data.collectors.common import GOLD, load_latest
 from data.config.page_hubs import HUBS
+from data.config.rone_districts import DISTRICT_RONE
 
-ANCHOR_STREET = 41.6   # 부동산원 가두상권 공실률 (%) — TODO: CSV 로더로 대체
+# 폴백 앵커 — R-ONE 원본을 못 읽을 때만 쓴다. 전국 상권 중위 수준의 보수값이며
+# 특정 상권을 대표하지 않는다(과거의 41.6% 처럼 특정 거점 값을 전 거점에 퍼뜨리지 않기 위해).
+ANCHOR_FALLBACK = 10.0
+
+# 가로수길 가두 1층 실태조사(2024) — **부동산원 통계가 아니다.** PoC 거점 선정 근거
+# (poc §0.5)로 남기되 α 산출에는 쓰지 않는다. 측정 대상(메인도로 1층 점포)과
+# 우리 지표(건물 전체 상가 호수)의 모집단이 다르기 때문이다.
+REF_GAROSU_STREET_2024 = 41.6
+
+# R-ONE 상권이 없는 거점을 위한 하위호환 상수 — 이전 ANCHOR_MALL.
 ANCHOR_MALL = 9.99     # 부동산원 신사역 집합상가 공실률 (%)
+
+_RONE_SLUG = "platform13"      # rone_rent.py 가 13거점 R-ONE 시계열을 여기 저장한다
+
+
+@lru_cache(maxsize=None)
+def _rone_latest(kind: str) -> dict[str, float]:
+    """bronze 의 R-ONE 공실률 최신 분기 → {district_id: %}.
+
+    kind: "vac_mid"(중대형) | "vac_small"(소규모).
+    """
+    rows = load_latest(_RONE_SLUG, f"rone_{kind}.json") or []
+    if not rows:
+        return {}
+    latest = max(r["quarter"] for r in rows)
+    return {r["district_id"]: float(r["value"])
+            for r in rows if r["quarter"] == latest and r.get("value") is not None}
+
+
+def anchor_of(slug: str) -> float:
+    """거점의 R-ONE 중대형 공실률(%). 값이 없거나 0 이면 폴백."""
+    return _rone_latest("vac_mid").get(slug) or ANCHOR_FALLBACK
 
 # capacity_method → 세그먼트: 전유부 호수 실측 = 집합건물, 층수 기반 = 일반(가두)
 _SEGMENT_OF = {"expos_units": "mall", "floor_approx": "street", "floor_ouln": "street"}
 
-# methods(v3) 용 앵커 — 층수 기반 두 방법을 분리해 각각 α 를 낸다. 2026-07-26 실측상
-# floor_ouln(garosugil)은 앵커 대비 -37%p, floor_approx(12거점)는 +19~23%p 로 편향
-# 방향이 반대라 같은 α 를 공유할 수 없다. segments(v2)는 기존 소비층 호환을 위해
-# 둘을 street 로 묶은 채 유지하고, 거점별 보정은 methods 를 쓴다.
-_ANCHOR_OF = {"expos_units": ANCHOR_MALL, "floor_approx": ANCHOR_STREET,
-              "floor_ouln": ANCHOR_STREET}
+# methods(v3) 용 대상 — capacity 근거가 있는 방법만. 앵커는 거점별 R-ONE 값을 공유한다.
+# (이전에는 방법별로 다른 상수 앵커를 붙였으나, 그 상수들이 특정 거점 값이라 다른
+#  거점에서는 오히려 α 를 왜곡했다. 방법별 편향은 α 가 아니라 `gap_pp` 로 드러난다.)
+_METHODS = ("expos_units", "floor_ouln", "floor_approx")
 
 
-def _agg(rows: list[dict], keys: set[str]) -> dict | None:
+def _agg(rows: list[dict], keys: set[str], anchor: float | None = None) -> dict | None:
     """capacity_method 가 keys 에 속한 건물 집계 → 추정 공실률·α."""
     act = cap = n = 0
     for r in rows:
@@ -48,27 +90,22 @@ def _agg(rows: list[dict], keys: set[str]) -> dict | None:
     if not cap:
         return None
     est = round((1 - act / cap) * 100, 1)
-    anchor = _ANCHOR_OF.get(next(iter(keys)), ANCHOR_STREET) if len(keys) == 1 else None
     out = {"estimated_vacancy_pct": est, "buildings": n}
     if anchor is not None:
-        out |= {"anchor_pct": anchor,
+        out |= {"anchor_pct": round(anchor, 2),
                 "alpha": round(anchor / est, 3) if est else None,
                 "gap_pp": round(est - anchor, 1)}
     return out
 
 
-def _methods(rows: list[dict]) -> dict:
+def _methods(rows: list[dict], anchor: float) -> dict:
     """capacity_method 별 α (v3) — 거점별 보정의 권장 소스."""
-    present = {r.get("capacity_method") for r in rows} & set(_ANCHOR_OF)
-    return {m: a for m in sorted(present) if (a := _agg(rows, {m})) is not None}
+    present = {r.get("capacity_method") for r in rows} & set(_METHODS)
+    return {m: a for m in sorted(present) if (a := _agg(rows, {m}, anchor)) is not None}
 
 
-def _segments(slug: str) -> dict:
+def _segments(rows: list[dict], anchor: float) -> dict:
     """building_vacancy.json 을 가두/집합으로 분리 집계해 세그먼트별 α 산출."""
-    src = GOLD / slug / "building_vacancy.json"
-    if not src.exists():
-        return {}
-    rows = json.loads(src.read_text(encoding="utf-8"))
     agg: dict[str, dict[str, int]] = {
         "street": {"active": 0, "capacity": 0, "buildings": 0},
         "mall": {"active": 0, "capacity": 0, "buildings": 0},
@@ -83,14 +120,14 @@ def _segments(slug: str) -> dict:
         agg[seg]["buildings"] += 1
 
     out: dict[str, dict] = {}
-    for seg, anchor in (("street", ANCHOR_STREET), ("mall", ANCHOR_MALL)):
+    for seg in ("street", "mall"):
         a = agg[seg]
         if not a["capacity"]:
             continue
         est = round((1 - a["active"] / a["capacity"]) * 100, 1)
         out[seg] = {
             "estimated_vacancy_pct": est,
-            "anchor_pct": anchor,
+            "anchor_pct": round(anchor, 2),
             "alpha": round(anchor / est, 3) if est else None,
             "gap_pp": round(est - anchor, 1),
             "buildings": a["buildings"],
@@ -112,9 +149,13 @@ def run(slug: str) -> bool:
     if not rows or "capacity_method" not in rows[0]:
         return False                       # Tier2(대장 없음) — 보정 대상 아님
 
+    anchor = anchor_of(slug)
     out: dict = {
-        "anchor_street_pct": ANCHOR_STREET,
-        "anchor_mall_pct": ANCHOR_MALL,
+        "anchor_pct": round(anchor, 2),
+        "anchor_source": ("R-ONE 중대형상가 공실률 (최신 분기) — "
+                          f"{DISTRICT_RONE.get(slug, '매핑 없음')}"),
+        "anchor_vac_small_pct": _rone_latest("vac_small").get(slug),
+        "ref_garosu_street_2024_pct": REF_GAROSU_STREET_2024 if slug == "garosugil" else None,
     }
     src = GOLD / slug / "page_building_master.geojson"
     if src.exists():
@@ -127,29 +168,56 @@ def run(slug: str) -> bool:
             est = round((1 - act / cap) * 100, 1)
             out |= {
                 "estimated_vacancy_pct": est,
-                "alpha_street": round(ANCHOR_STREET / est, 3) if est else None,
-                "gap_pp": round(est - ANCHOR_STREET, 1),
+                "alpha_street": round(anchor / est, 3) if est else None,
+                "gap_pp": round(est - anchor, 1),
                 "buildings_used": len(known),
             }
-            print(f"[calibrate:{slug}] combined: 추정 {est}% vs 가두 앵커 "
-                  f"{ANCHOR_STREET}% → gap {out['gap_pp']}%p, α={out['alpha_street']}")
+            print(f"[calibrate:{slug}] combined: 추정 {est}% vs 앵커 "
+                  f"{anchor:.1f}% → gap {out['gap_pp']}%p, α={out['alpha_street']}")
     else:
         print(f"[calibrate:{slug}] page_building_master 없음 — combined 생략"
               f"(segments/methods 만 산출)")
 
-    segments = _segments(slug)
-    methods = _methods(rows)
+    segments = _segments(rows, anchor)
+    methods = _methods(rows, anchor)
+    # primary(v4) = 분모 근거가 정밀한 방법만 (전유부 실측 + 층별개요). floor_approx
+    # (지상 **전체** 층수 × 2호)는 주거·사무 층까지 상가로 세어 분모를 부풀리므로
+    # 대표값에서 뺀다. 이걸 섞어 두면 "그 거점 건물 중 몇 %가 어느 방법을 받았는가"
+    # 라는 수집 이력이 지표를 움직인다 — 2026-07-27 garosugil 이 그렇게 39.1%→56.0%
+    # 로 뛰었다(기존 건물은 단 한 동도 안 변했는데 신규 304동이 전부 floor_approx).
+    primary = _agg(rows, {"expos_units", "floor_ouln"}, anchor)
+    if primary is not None:
+        gross = sum(1 for r in rows if r.get("capacity_method") in _METHODS)
+        primary["coverage_pct"] = round(primary["buildings"] / gross * 100, 1) if gross else None
+        primary["excluded_floor_approx"] = sum(
+            1 for r in rows if r.get("capacity_method") == "floor_approx")
     out |= {
+        "primary": primary,
         "segments": segments,
         "methods": methods,
-        "note": "combined(v1) = 가두·집합 혼합 단일 α (기존 소비층 호환용). "
-                "segments(v2) = capacity_method 로 분리한 이중 앵커 — "
-                "가두 보정은 segments.street.alpha, 집합은 segments.mall.alpha 사용 권장. "
-                "methods(v3) = capacity_method 단위 α. floor_ouln 과 floor_approx 는 "
-                "편향 방향이 반대라 street 로 묶으면 안 되므로 거점별 보정은 이쪽을 쓴다.",
+        "note": "primary(v4) = **대표값**. capacity 근거가 정밀한 expos_units(전유부 실측) "
+                "+ floor_ouln(층별개요 상업층) 만 집계한다. floor_approx 는 분모 과대 편향이 "
+                "커서 제외하며, coverage_pct 가 낮으면 그 거점은 floor_capacity 수집이 "
+                "덜 된 상태다(대표값을 신뢰하기 전에 채울 것). "
+                "combined(v1) = 방법 혼합 — 하위호환용이며 방법 구성비에 흔들리므로 "
+                "앵커 비교에 쓰지 말 것. segments(v2) = 가두/집합 분리. "
+                "methods(v3) = capacity_method 단위. 앵커는 거점별 R-ONE 중대형 공실률이다 "
+                "(2026-07-28 이전의 전 거점 공통 41.6% 는 가로수길 가두 1층 실태조사 값을 "
+                "부동산원 통계로 잘못 표기한 것이라 폐기). "
+                "⚠ 알려진 한계: expos_units(집합건물) 세그먼트는 **분자**가 구조적으로 "
+                "부족하다 — 상가정보가 대형 집합상가 내부 점포를 그 건물의 bdMgtSn 으로 "
+                "귀속시키지 못한다. 11거점 실측(2026-07-28) 결과 floor_ouln 의 앵커 격차는 "
+                "+4~+19%p 인데 expos_units 는 +21~+72%p 로 갈린다(예: 익선 피카디리플러스 "
+                "capacity 1,031 / active 57). 집합건물 공실률은 아직 신뢰 구간 밖이며, "
+                "층·호 단위 매칭(flrNo/hoNo) 을 붙이기 전까지 단독 인용하지 말 것.",
     }
     dst = GOLD / slug / "calibration.json"
     dst.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    if primary is not None:
+        print(f"[calibrate:{slug}] primary: 추정 {primary['estimated_vacancy_pct']:5.1f}% "
+              f"vs 앵커 {anchor:5.2f}% → gap {primary['gap_pp']:+6.1f}%p, "
+              f"α={primary['alpha']} ({primary['buildings']}동, "
+              f"커버리지 {primary['coverage_pct']}%)")
     for m, s in methods.items():
         print(f"[calibrate:{slug}]   {m:13s} 추정 {s['estimated_vacancy_pct']:5.1f}% "
               f"vs 앵커 {s['anchor_pct']:5.2f}% → gap {s['gap_pp']:+6.1f}%p, "

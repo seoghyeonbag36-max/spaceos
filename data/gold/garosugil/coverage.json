@@ -2,16 +2,16 @@
   "slug": "garosugil",
   "hub_name": "신사동 가로수길",
   "tier": "Tier1(대장)",
-  "built_at": "2026-07-27T22:38:09",
+  "built_at": "2026-07-28T21:54:55",
   "shown": 836,
   "excluded_total": 416,
   "excluded_unknown": 147,
   "excluded_non_commercial": 269,
   "coverage_pct": 66.8,
   "status": {
-    "full": 125,
-    "partial": 244,
-    "high": 344,
+    "full": 358,
+    "partial": 207,
+    "high": 148,
     "empty": 123
   },
   "source": {
@@ -20,6 +20,23 @@
     "polygon_only": 88,
     "stores+ledger+pip": 1
   },
-  "reference_vacancy_pct": 56.0,
-  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+  "reference_vacancy_pct": 27.6,
+  "reference_buildings": 673,
+  "reference_coverage_pct": 100.0,
+  "mixed_vacancy_pct": 28.1,
+  "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 612,
+      "active": 1774,
+      "capacity": 2396,
+      "vacancy_pct": 26.0
+    },
+    "expos_units": {
+      "buildings": 61,
+      "active": 277,
+      "capacity": 435,
+      "vacancy_pct": 36.3
+    }
+  },
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
 }

@@ -38,8 +38,17 @@ def capacity_from_raw(raw: dict) -> tuple[int | None, str]:
     floor_approx 로 덮어써 회귀가 난다(2026-07-26 실제 발생: 537동 강등, 가두 세그먼트
     추정 공실률 4.4% → 58.6% 로 왜곡).
     """
-    units = expos_units(raw.get("expos") or [])
-    return (len(units), "expos_units") if units else (None, "")
+    rows = raw.get("expos") or []
+    units = expos_units(rows)
+    if units:
+        return len(units), "expos_units"
+    # 전유부 응답은 있는데 상업 호가 0 → 그 건물의 전유 호가 전부 비상가 용도다
+    # (주거·오피스텔·호텔 전용동 등). 이때 기존 값을 보존하면 필터 확장 전에 산출된
+    # 오염된 capacity 가 그대로 남는다 — 2026-07-28 NON_CAPACITY_PURPS 에 숙박·업무를
+    # 추가하며 실제로 2동이 이 상태가 됐다. '상가 수용력 없음'으로 강등해 집계에서 뺀다.
+    if rows:
+        return None, "non_commercial"
+    return None, ""                      # 전유부 응답 자체가 없음 — 기존 값 보존
 
 
 def run(slug: str, dry_run: bool) -> dict | None:
@@ -71,8 +80,15 @@ def run(slug: str, dry_run: bool) -> dict | None:
         if occ_b is not None and occ_b >= 1.0:
             clip_b += 1
         cap_b += r.get("capacity") or 0
-        if cap is None:                  # 전유부 판정 불가 — 기존 산출값 보존
-            cap_a += r.get("capacity") or 0
+        if cap is None:
+            if method == "non_commercial" and r.get("capacity_method") == "expos_units":
+                # 전유 호가 전부 비상가 용도 — 오염된 기존 capacity 를 지운다(위 주석 참조).
+                r["capacity"] = None
+                r["capacity_method"] = method
+                r["occupancy"] = r["vacancy_bldg"] = None
+                r["status"] = classify(None, method)
+                continue
+            cap_a += r.get("capacity") or 0   # 그 외(전유부 응답 없음)는 기존 값 보존
             if occ_b is not None and occ_b >= 1.0:
                 clip_a += 1
             continue

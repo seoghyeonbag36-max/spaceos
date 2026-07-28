@@ -31,10 +31,14 @@ def _anchor(district_id: str) -> dict | None:
         import datetime
 
         cal = json.loads(_CALIBRATION_JSON.read_text(encoding="utf-8"))
+        # 대표값은 primary(방법 정합 집계). combined(estimated_vacancy_pct)는 방법
+        # 구성비에 흔들려 앵커 비교에 못 쓴다 — calibrate_vacancy 의 note 참조.
+        primary = cal.get("primary") or {}
         _cache["anchor"] = {
-            "estimated_vacancy_pct": cal.get("estimated_vacancy_pct"),
-            "anchor_street_pct": cal.get("anchor_street_pct"),
-            "buildings_used": cal.get("buildings_used"),
+            "estimated_vacancy_pct": primary.get("estimated_vacancy_pct")
+                                     or cal.get("estimated_vacancy_pct"),
+            "anchor_street_pct": cal.get("anchor_pct"),
+            "buildings_used": primary.get("buildings") or cal.get("buildings_used"),
             "as_of": datetime.date.fromtimestamp(
                 _CALIBRATION_JSON.stat().st_mtime).isoformat(),
             "source": "building_vacancy PoC 지상검증(정확도 75%) — 단일 시점 스냅샷",

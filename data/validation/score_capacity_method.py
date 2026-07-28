@@ -22,7 +22,7 @@ from collections import Counter
 from pathlib import Path
 
 from data.collectors.building_vacancy import STORES_PER_FLOOR, classify
-from data.pipelines.calibrate_vacancy import ANCHOR_STREET
+from data.pipelines.calibrate_vacancy import anchor_of
 
 if hasattr(sys.stdout, "reconfigure"):     # Windows 콘솔 cp949 크래시 방지
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -55,6 +55,7 @@ def score(slug: str) -> None:
     if not path.exists():
         print(f"[score:{slug}] {path.name} 없음 — make_capacity_sample 을 먼저 실행하세요")
         return
+    anchor = anchor_of(slug)               # 거점별 R-ONE 앵커 (2026-07-28 이전 단일 41.6% 대체)
     rows = list(csv.DictReader(path.open(encoding="utf-8-sig")))
     labeled = [r for r in rows if (r.get("label_actual") or "").strip() in _ALLOWED]
     if not labeled:
@@ -125,7 +126,7 @@ def score(slug: str) -> None:
         acc = ok / n * 100
         est = (1 - act_sum / cap_sum) * 100 if cap_sum else float("nan")
         verdict[name] = acc
-        print(f"   {name:24s} {n:>6d} {acc:>7.1f}% {est:>8.1f}% {est - ANCHOR_STREET:>+8.1f}%p")
+        print(f"   {name:24s} {n:>6d} {acc:>7.1f}% {est:>8.1f}% {est - anchor:>+8.1f}%p")
 
     if verdict:
         best = max(verdict, key=verdict.get)
@@ -134,7 +135,7 @@ def score(slug: str) -> None:
             second = sorted(verdict.values(), reverse=True)[1]
             if verdict[best] - second < 5:
                 print("   ⚠ 2위와 5%p 이내 — 표본을 늘리기 전엔 결론을 확정하지 말 것.")
-        print(f"   (참고: 부동산원 가두 앵커 {ANCHOR_STREET}%. 앵커격차가 큰 산식이라도 "
+        print(f"   (참고: {slug} R-ONE 앵커 {anchor:.1f}%. 앵커격차가 큰 산식이라도 "
               "로드뷰 정확도가 높다면 앵커 쪽을 의심해야 한다.)")
 
     conf = Counter((r["label_actual"].strip(), r["status_predicted"]) for r in labeled)

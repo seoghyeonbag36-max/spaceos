@@ -1,41 +1,59 @@
 {
-  "anchor_street_pct": 41.6,
-  "anchor_mall_pct": 9.99,
-  "estimated_vacancy_pct": 39.1,
-  "alpha_street": 1.064,
-  "gap_pp": -2.5,
-  "buildings_used": 571,
+  "anchor_pct": 17.62,
+  "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>강남>신사역",
+  "anchor_vac_small_pct": 14.8760431186127,
+  "ref_garosu_street_2024_pct": 41.6,
+  "estimated_vacancy_pct": 28.1,
+  "alpha_street": 0.627,
+  "gap_pp": 10.5,
+  "buildings_used": 694,
+  "primary": {
+    "estimated_vacancy_pct": 29.3,
+    "buildings": 917,
+    "anchor_pct": 17.62,
+    "alpha": 0.601,
+    "gap_pp": 11.7,
+    "coverage_pct": 99.7,
+    "excluded_floor_approx": 3
+  },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 38.3,
-      "anchor_pct": 41.6,
-      "alpha": 1.086,
-      "gap_pp": -3.3,
-      "buildings": 538
+      "estimated_vacancy_pct": 27.4,
+      "anchor_pct": 17.62,
+      "alpha": 0.643,
+      "gap_pp": 9.8,
+      "buildings": 842
     },
     "mall": {
-      "estimated_vacancy_pct": 28.4,
-      "anchor_pct": 9.99,
-      "alpha": 0.352,
-      "gap_pp": 18.4,
-      "buildings": 51
+      "estimated_vacancy_pct": 38.7,
+      "anchor_pct": 17.62,
+      "alpha": 0.455,
+      "gap_pp": 21.1,
+      "buildings": 78
     }
   },
   "methods": {
     "expos_units": {
-      "estimated_vacancy_pct": 28.4,
-      "buildings": 51,
-      "anchor_pct": 9.99,
-      "alpha": 0.352,
-      "gap_pp": 18.4
+      "estimated_vacancy_pct": 38.7,
+      "buildings": 78,
+      "anchor_pct": 17.62,
+      "alpha": 0.455,
+      "gap_pp": 21.1
+    },
+    "floor_approx": {
+      "estimated_vacancy_pct": 83.3,
+      "buildings": 3,
+      "anchor_pct": 17.62,
+      "alpha": 0.212,
+      "gap_pp": 65.7
     },
     "floor_ouln": {
-      "estimated_vacancy_pct": 38.3,
-      "buildings": 538,
-      "anchor_pct": 41.6,
-      "alpha": 1.086,
-      "gap_pp": -3.3
+      "estimated_vacancy_pct": 27.0,
+      "buildings": 839,
+      "anchor_pct": 17.62,
+      "alpha": 0.653,
+      "gap_pp": 9.4
     }
   },
-  "note": "combined(v1) = 가두·집합 혼합 단일 α (기존 소비층 호환용). segments(v2) = capacity_method 로 분리한 이중 앵커 — 가두 보정은 segments.street.alpha, 집합은 segments.mall.alpha 사용 권장. methods(v3) = capacity_method 단위 α. floor_ouln 과 floor_approx 는 편향 방향이 반대라 street 로 묶으면 안 되므로 거점별 보정은 이쪽을 쓴다."
+  "note": "primary(v4) = **대표값**. capacity 근거가 정밀한 expos_units(전유부 실측) + floor_ouln(층별개요 상업층) 만 집계한다. floor_approx 는 분모 과대 편향이 커서 제외하며, coverage_pct 가 낮으면 그 거점은 floor_capacity 수집이 덜 된 상태다(대표값을 신뢰하기 전에 채울 것). combined(v1) = 방법 혼합 — 하위호환용이며 방법 구성비에 흔들리므로 앵커 비교에 쓰지 말 것. segments(v2) = 가두/집합 분리. methods(v3) = capacity_method 단위. 앵커는 거점별 R-ONE 중대형 공실률이다 (2026-07-28 이전의 전 거점 공통 41.6% 는 가로수길 가두 1층 실태조사 값을 부동산원 통계로 잘못 표기한 것이라 폐기)."
 }

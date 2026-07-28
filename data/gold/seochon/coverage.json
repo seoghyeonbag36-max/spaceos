@@ -2,16 +2,16 @@
   "slug": "seochon",
   "hub_name": "서촌",
   "tier": "Tier1(대장)",
-  "built_at": "2026-07-27T22:38:16",
+  "built_at": "2026-07-28T21:54:50",
   "shown": 859,
   "excluded_total": 1769,
   "excluded_unknown": 316,
   "excluded_non_commercial": 1453,
   "coverage_pct": 32.7,
   "status": {
-    "full": 137,
-    "partial": 323,
-    "high": 196,
+    "full": 438,
+    "partial": 156,
+    "high": 62,
     "empty": 203
   },
   "source": {
@@ -20,6 +20,29 @@
     "pip_only": 60,
     "stores+ledger+pip": 15
   },
-  "reference_vacancy_pct": 52.9,
-  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+  "reference_vacancy_pct": 26.8,
+  "reference_buildings": 448,
+  "reference_coverage_pct": 93.7,
+  "mixed_vacancy_pct": 29.9,
+  "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 428,
+      "active": 829,
+      "capacity": 990,
+      "vacancy_pct": 16.3
+    },
+    "floor_approx": {
+      "buildings": 30,
+      "active": 38,
+      "capacity": 134,
+      "vacancy_pct": 71.6
+    },
+    "expos_units": {
+      "buildings": 20,
+      "active": 130,
+      "capacity": 321,
+      "vacancy_pct": 59.5
+    }
+  },
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
 }

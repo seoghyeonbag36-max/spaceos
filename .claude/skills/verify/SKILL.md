@@ -84,7 +84,18 @@ curl.exe -s "http://localhost:5173/api/v1/heatmap/buildings?district=gangnam-gar
 `properties.source` 가 데이터 신뢰도를 가른다:
 
 - `stores+ledger` — 상가정보 점포 매칭됨 (실측 기반)
-- `polygon_only` — 매칭 없음. `active=0`, `capacity=floors×2`(합성), `vacancy_rate=100.0` 고정
+- `polygon_only` — 매칭 없음. `active=0`, `capacity=floors×STORES_PER_FLOOR`(합성), `vacancy_rate=100.0` 고정
 
 `polygon_only`를 섞은 채 평균 공실률을 논하지 말 것. `calibrate_vacancy.py` 도
-`stores+ledger` 만으로 집계한다. 부동산원 가두상권 앵커는 41.6%.
+`stores+ledger` 만으로 집계한다.
+
+`properties.capacity_method` 는 분모의 근거를 가른다 — 이것도 섞으면 안 된다:
+
+- `expos_units` / `floor_ouln` — 전유부 실측·층별개요 상업층. **대표 집계는 이 둘만** 쓴다
+  (`coverage.json` 의 `reference_vacancy_pct`).
+- `floor_approx` — 지상 **전체** 층수 근사. 주거·사무 층까지 상가로 세어 분모가 부푼다.
+  `mixed_vacancy_pct` 에만 섞여 있고 앵커 비교에 쓰면 안 된다.
+
+앵커는 **거점별 R-ONE 중대형상가 공실률**이다(`calibration.json.anchor_pct`,
+garosugil = 17.6%). 예전에 쓰던 공통 41.6% 는 부동산원 통계가 아니라 가로수길 가두
+1층 실태조사(2024) 값을 잘못 표기한 것이라 2026-07-28 폐기했다.

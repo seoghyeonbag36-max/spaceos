@@ -33,12 +33,15 @@ import math
 import re
 from collections import Counter, defaultdict
 
+from data.collectors.building_vacancy import (
+    NON_STOREFRONT_LCLS, STORES_PER_FLOOR as _STORES_PER_FLOOR)
 from data.collectors.common import GOLD, load_latest
 from data.config.page_hubs import HUBS, PageHub
 
 # 건물통합 용도코드(대분류 5자리) 중 상가 capacity 를 가질 수 있는 상업 계열
 _COMMERCIAL_PRPS = ("03", "04", "05", "07", "14", "15", "16")
-_STORES_PER_FLOOR = 2      # collectors/building_vacancy.py 와 동일 근사
+# 층당 호 수 근사는 수집기 상수를 **직접 import** 한다. 값을 여기 복제해 두면 한쪽만
+# 고쳤을 때 지도(pip_only·polygon_only)와 대장 산출물의 분모 정의가 조용히 갈라진다.
 
 # 지번주소(lnoAdr/SITEWHLADDR) → 법정동 토큰 (예: "신사동", "을지로3가"). 숫자 포함 동명 허용.
 # (?![가-힣]): 뒤에 한글이 더 붙는 토큰은 배제 — "성동구"의 '성동'을 동으로 오파싱하지 않게 한다
@@ -276,6 +279,20 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
     return out
 
 
+# capacity 근거의 정밀도 순위. 한 지번에 방법이 섞이면 **가장 조악한** 것으로 라벨링한다
+# — 집계에서 그 지번을 신뢰 구간 밖으로 빼기 위해서다(낙관 라벨은 편향을 숨긴다).
+_METHOD_RANK = {"expos_units": 0, "floor_ouln": 1, "floor_approx": 2}
+# 분모 근거가 정밀해 대표 집계에 넣는 방법 — calibrate_vacancy.primary 와 같은 정의.
+PRECISE_METHODS = ("expos_units", "floor_ouln")
+
+
+def _method_of(rows: list[dict]) -> str:
+    """지번에 속한 공실행들의 대표 capacity_method (가장 조악한 것)."""
+    ms = [r.get("capacity_method", "") for r in rows if r.get("capacity")]
+    ms = [m for m in ms if m in _METHOD_RANK]
+    return max(ms, key=lambda m: _METHOD_RANK[m]) if ms else ""
+
+
 def _aggregate(rows: list[dict], extra: int = 0, fresh: int | None = None,
                licensed: int = 0) -> dict:
     """같은 지번(lnoCd)의 공실행 합산 — active 합(+PIP 추가분), capacity 합(미확인 제외).
@@ -295,6 +312,7 @@ def _aggregate(rows: list[dict], extra: int = 0, fresh: int | None = None,
         "active": active, "capacity": cap,
         "industry": top.get("industry", ""),
         "occupancy": occ,
+        "capacity_method": _method_of(rows),
     }
 
 
@@ -322,7 +340,6 @@ def run(hub: PageHub) -> bool:
     # 신선 재집계 + PIP 폴백: 직접 매칭 분자 갱신, 미계상 점포는 좌표로 건물에 귀속
     poly_pnu = {f["properties"].get("pnu", "") for f in polys["features"]}
     displayed_pnu = poly_pnu & set(by_lno)
-    from data.collectors.building_vacancy import NON_STOREFRONT_LCLS
     stores = [s for s in (load_latest(slug, "stores_raw.json") or [])
               if s.get("indsLclsNm") not in NON_STOREFRONT_LCLS]
     if not stores:
@@ -366,6 +383,7 @@ def run(hub: PageHub) -> bool:
                 "industry": agg["industry"],
                 "vacancy_rate": round((1 - min(agg["active"] / agg["capacity"], 1.0)) * 100, 1),
                 "source": "stores+ledger" + ("+pip" if pip_n else ""),
+                "capacity_method": agg["capacity_method"],
                 "active_pip": pip_n, "licensed": lic_n,
             }
         elif pip_n > 0 or lic_n > 0:
@@ -380,6 +398,7 @@ def run(hub: PageHub) -> bool:
                 "industry": "",
                 "vacancy_rate": round((1 - occ) * 100, 1),
                 "source": "pip_only",             # TODO: 대장 조회로 capacity 정밀화
+                "capacity_method": "floor_approx",   # 폴리곤 지상층수 × 2 — 대장 근거 없음
                 "active_pip": pip_n, "licensed": lic_n,
             }
         else:
@@ -394,6 +413,7 @@ def run(hub: PageHub) -> bool:
                 "industry": "",
                 "vacancy_rate": 100.0,
                 "source": "polygon_only",         # TODO: 대장 재확인으로 승격
+                "capacity_method": "floor_approx",   # 상동 — 공실 의심 표시용이며 집계 제외
                 "active_pip": 0, "licensed": 0,
             }
 
@@ -423,8 +443,57 @@ def run(hub: PageHub) -> bool:
           + ", ".join(f"{k}={stats[k]}" for k in ("full", "partial", "high", "empty")))
     print(f"[page-master:{slug}] 제외: unknown={stats['excluded_unknown']}, "
           f"비상업={stats['excluded_non_commercial']}")
+
+    # ── 집계 공실률 — **capacity_method 별로 분해해서 본다** (2026-07-28) ──────────
+    # 예전에는 stores+ledger 전체를 한 덩어리로 합산했다. 그러면 지표가 "이 상권이
+    # 얼마나 비었나" 가 아니라 "이 거점 건물 중 몇 %가 어느 capacity 방법을 받았나"
+    # 를 재는 셈이 된다. 2026-07-27 garosugil 이 정확히 그렇게 39.1% → 56.0% 로 뛰었다:
+    # 기존 558동은 active·capacity 가 한 톨도 안 변했고, 신규 유입 372동 중 304동이
+    # 전부 floor_approx(지상 **전체** 층수 × 2호) 로 들어왔을 뿐이다.
+    # → 대표값(primary)은 분모 근거가 정밀한 expos_units + floor_ouln 만 쓴다.
+    # 지번(pnu) 단위로 **중복 제거**하고 집계한다. 한 지번에 폴리곤이 여러 개인 경우
+    # (동일 대지에 여러 동 — V-World 에서 흔하다) 지도에는 동마다 그려야 하지만, 각
+    # feature 는 그 지번의 active·capacity 를 통째로 물려받으므로 그대로 합산하면 같은
+    # 건물이 N 배 가중된다. 2026-07-28 seoulsup 실측: "쌍용아파트"(act 23 / cap 189)가
+    # 폴리곤 8개에 복제돼 거점 공실의 30% 를 혼자 만들어냈다.
+    seen: set[str] = set()
+    by_method: dict[str, list[dict]] = defaultdict(list)
+    for f in ref:
+        p = f["properties"]
+        if p["pnu"] in seen:
+            continue
+        seen.add(p["pnu"])
+        by_method[p.get("capacity_method") or "unknown"].append(p)
+
+    def _rate(ps: list[dict]) -> tuple[int, int, float | None]:
+        a = sum(p["active"] for p in ps)
+        c = sum(p["capacity"] for p in ps)
+        return a, c, round((1 - a / c) * 100, 1) if c else None
+
+    methods_rep: dict[str, dict] = {}
+    for m, ps in sorted(by_method.items(), key=lambda kv: -len(kv[1])):
+        a, c, v = _rate(ps)
+        methods_rep[m] = {"buildings": len(ps), "active": a, "capacity": c, "vacancy_pct": v}
+
+    precise = [p for m in PRECISE_METHODS for p in by_method.get(m, [])]
+    p_act, p_cap, p_vac = _rate(precise)
+    uniq = sum(len(v) for v in by_method.values())
+    coverage = round(len(precise) / uniq * 100, 1) if uniq else None
     if cap:
-        print(f"[page-master:{slug}] 참고 집계 공실률: {round((1 - act / cap) * 100, 1)}%")
+        print(f"[page-master:{slug}] 집계 공실률(혼합, 하위호환): "
+              f"{round((1 - act / cap) * 100, 1)}% — 방법 구성비에 흔들리므로 앵커 비교 금지")
+    for m, s in methods_rep.items():
+        print(f"[page-master:{slug}]   {m:13s} {s['buildings']:5d}동 "
+              f"{s['active']:5d}/{s['capacity']:6d} = {s['vacancy_pct']}%")
+    if p_cap:
+        print(f"[page-master:{slug}] ▶ 대표 집계 공실률(정밀 분모만): {p_vac}% "
+              f"({len(precise)}동, 커버리지 {coverage}%)")
+        if coverage is not None and coverage < 80:
+            print(f"[page-master:{slug}] ⚠ 커버리지 {coverage}% — floor_approx 잔여가 많다. "
+                  f"`python -m data.collectors.floor_capacity {slug}` 로 층별개요를 채울 것.")
+    else:
+        print(f"[page-master:{slug}] ⚠ 정밀 분모 건물 0동 — 대표 집계 공실률 산출 불가"
+              f"(floor_capacity 미수집 거점).")
 
     # 커버리지 리포트 — **관리자 전용**. 공개 지도는 status 4종만 그리므로 '대장 미확인
     # 으로 제외된 N동'이 사용자에게는 보이지 않는다. 그 사실을 운영자가 확인할 수 있게
@@ -444,9 +513,17 @@ def run(hub: PageHub) -> bool:
         "coverage_pct": round(shown / (shown + excluded) * 100, 1) if shown + excluded else None,
         "status": {k: stats[k] for k in ("full", "partial", "high", "empty")},
         "source": dict(Counter(f["properties"]["source"] for f in feats)),
-        "reference_vacancy_pct": round((1 - act / cap) * 100, 1) if cap else None,
+        "reference_vacancy_pct": p_vac,
+        "reference_buildings": len(precise),
+        "reference_coverage_pct": coverage,
+        "mixed_vacancy_pct": round((1 - act / cap) * 100, 1) if cap else None,
+        "by_capacity_method": methods_rep,
         "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. "
-                "공개 지도에는 노출하지 않는다(관리자 전용).",
+                "공개 지도에는 노출하지 않는다(관리자 전용). "
+                "reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 "
+                "집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. "
+                "mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 "
+                "구성비에 따라 흔들린다 — 하위호환용.",
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     return True
 
