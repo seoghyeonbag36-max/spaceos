@@ -37,6 +37,7 @@ const STATUS: Record<VacStatus, { color: string; label: string }> = {
 
 interface Building {
   id: string; name: string; status: VacStatus; capacity: number; active: number; industry: string;
+  floors?: number;   // 대장 지상 층수 — 3D 트윈 층 스택용. capacity(호 수)와 단위가 다르다.
   center: { lat: number; lng: number };
   ring: [number, number][]; // [lng, lat] (GeoJSON 순서)
 }
@@ -73,7 +74,7 @@ function fromGeoJSON(fc: GeoJSONFC): Building[] {
     const p = f.properties;
     return {
       id: p.id, name: p.name, status: p.status, capacity: p.capacity, active: p.active,
-      industry: p.industry, ring,
+      industry: p.industry, floors: p.floors, ring,
       center: { lat: (Math.min(...lats) + Math.max(...lats)) / 2, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 },
     };
   });
@@ -273,11 +274,12 @@ export default function MapShell() {
             </div>
             <div className="twin-canvas">
               <Suspense fallback={<div className="twin-load">3D 로딩…</div>}>
-                <BuildingTwin b={{ name: selected.name, capacity: selected.capacity, active: selected.active, statusColor: STATUS[selected.status].color }} />
+                <BuildingTwin b={{ name: selected.name, capacity: selected.capacity, active: selected.active, floors: selected.floors, statusColor: STATUS[selected.status].color }} />
               </Suspense>
             </div>
             <div className="twin-foot">
-              녹색 = 영업 층 · {STATUS[selected.status].label}색 = 공실(추정) · {selected.active}/{selected.capacity}호
+              녹색 = 영업 층(점유율 환산) · {STATUS[selected.status].label}색 = 공실(추정) · {selected.active}/{selected.capacity}호
+              {selected.floors ? ` · 지상 ${selected.floors}층` : ""}
             </div>
           </div>
         </div>

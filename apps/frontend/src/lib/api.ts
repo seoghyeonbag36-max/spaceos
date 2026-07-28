@@ -119,6 +119,11 @@ export const getBuildingVacancy = (district: string) =>
 export interface BuildingProps {
   id: string; name: string; status: "full" | "partial" | "high" | "empty";
   capacity: number; active: number; industry: string; vacancy_rate: number;
+  /** 건축물대장 지상 층수(V-World). 0 또는 누락 가능 — 3D 트윈 층 스택의 근거.
+   *  capacity(호 수)와 단위가 다르므로 층 수가 필요한 곳에서 capacity 를 대신 쓰지 말 것. */
+  floors?: number;
+  /** 건물 높이(m). 미사용 시 무시 가능. */
+  height?: number;
 }
 export interface GeoJSONFC {
   type: "FeatureCollection";

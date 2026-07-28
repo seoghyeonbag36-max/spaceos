@@ -6,16 +6,24 @@ import { OrbitControls } from "@react-three/drei";
 
 export interface TwinBuilding {
   name: string;
-  capacity: number;   // 상가 수용 호/층 수 (분모)
-  active: number;     // 영업 호/층 수 (분자)
+  capacity: number;    // 상가 수용 **호** 수 (분모)
+  active: number;      // 영업 **호** 수 (분자)
+  floors?: number;     // 건축물대장 지상 **층** 수 — 층 스택의 실제 높이
   statusColor: string; // 공실 상태색
 }
 
 const OCCUPIED = "#22B07D"; // 영업(녹색) — vacancy 색계열 저위험
+const MAX_STACK = 20;       // 렌더 상한 (실측 p99 = 20층, 최대 37층)
 
 export default function BuildingTwin({ b }: { b: TwinBuilding }) {
-  const floors = Math.max(1, Math.min(b.capacity, 14));
-  const occ = Math.max(0, Math.min(b.active, floors));
+  // 층 수는 대장 지상층수를 쓴다. 예전에는 capacity 를 그대로 층 수로 썼는데 capacity 는
+  // **호** 수라 단위가 다르다. 층당 2호 근사(STORES_PER_FLOOR=2) 시절엔 모든 건물이
+  // 실제의 2배 높이로 그려졌고, 집합건물은 지금도 어긋난다(낙원상가 267호 = 15층).
+  // floors 가 0/누락인 건물(실측 585/4,502동)만 예전처럼 capacity 로 근사한다.
+  const stack = Math.max(1, Math.min(b.floors || b.capacity, MAX_STACK));
+  // 점유 층 = 층수 × 점유율. active(호)를 층 인덱스에 그대로 쓰면 단위가 안 맞는다.
+  const ratio = b.capacity > 0 ? Math.min(b.active / b.capacity, 1) : 0;
+  const occ = Math.max(0, Math.min(Math.round(stack * ratio), stack));
   const H = 1;
   const GAP = 0.06;
 
@@ -24,7 +32,7 @@ export default function BuildingTwin({ b }: { b: TwinBuilding }) {
       <ambientLight intensity={0.75} />
       <directionalLight position={[6, 12, 6]} intensity={1.1} />
 
-      {Array.from({ length: floors }).map((_, i) => {
+      {Array.from({ length: stack }).map((_, i) => {
         const occupied = i < occ;
         return (
           <mesh key={i} position={[0, i * (H + GAP) + H / 2, 0]} castShadow>
