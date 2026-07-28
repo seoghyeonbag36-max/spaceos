@@ -2,16 +2,16 @@
   "slug": "hongdae",
   "hub_name": "홍대",
   "tier": "Tier1(대장)",
-  "built_at": "2026-07-27T22:38:12",
+  "built_at": "2026-07-28T22:33:08",
   "shown": 1329,
   "excluded_total": 875,
   "excluded_unknown": 299,
   "excluded_non_commercial": 576,
   "coverage_pct": 60.3,
   "status": {
-    "full": 97,
-    "partial": 335,
-    "high": 700,
+    "full": 301,
+    "partial": 391,
+    "high": 440,
     "empty": 197
   },
   "source": {
@@ -20,6 +20,29 @@
     "polygon_only": 197,
     "stores+ledger+pip": 5
   },
-  "reference_vacancy_pct": 63.7,
-  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용)."
+  "reference_vacancy_pct": 53.1,
+  "reference_buildings": 979,
+  "reference_coverage_pct": 96.4,
+  "mixed_vacancy_pct": 53.8,
+  "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 928,
+      "active": 2951,
+      "capacity": 5691,
+      "vacancy_pct": 48.1
+    },
+    "expos_units": {
+      "buildings": 51,
+      "active": 459,
+      "capacity": 1584,
+      "vacancy_pct": 71.0
+    },
+    "floor_approx": {
+      "buildings": 37,
+      "active": 81,
+      "capacity": 224,
+      "vacancy_pct": 63.8
+    }
+  },
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
 }
