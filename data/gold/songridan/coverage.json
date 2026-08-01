@@ -2,15 +2,15 @@
   "slug": "songridan",
   "hub_name": "송리단길",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-01T12:18:02",
+  "built_at": "2026-08-01T12:31:15",
   "shown": 450,
   "excluded_total": 1172,
   "excluded_unknown": 129,
   "excluded_non_commercial": 1043,
   "coverage_pct": 27.7,
   "status": {
-    "full": 271,
-    "partial": 81,
+    "full": 270,
+    "partial": 82,
     "high": 55,
     "empty": 43
   },
@@ -20,15 +20,15 @@
     "pip_only": 27,
     "stores+ledger+pip": 3
   },
-  "reference_vacancy_pct": 20.4,
-  "reference_buildings": 350,
-  "reference_coverage_pct": 99.4,
-  "mixed_vacancy_pct": 22.9,
+  "reference_vacancy_pct": 20.2,
+  "reference_buildings": 351,
+  "reference_coverage_pct": 99.7,
+  "mixed_vacancy_pct": 22.0,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 299,
-      "active": 778,
-      "capacity": 902,
+      "buildings": 300,
+      "active": 794,
+      "capacity": 920,
       "vacancy_pct": 13.7
     },
     "expos_units": {
@@ -38,10 +38,10 @@
       "vacancy_pct": 42.9
     },
     "floor_approx": {
-      "buildings": 2,
-      "active": 2,
-      "capacity": 20,
-      "vacancy_pct": 90.0
+      "buildings": 1,
+      "active": 1,
+      "capacity": 6,
+      "vacancy_pct": 83.3
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

@@ -451,7 +451,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
+    "active_floors_lo": 4,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -459,8 +459,8 @@
       3,
       4
     ],
-    "occupancy_lo": 0.75,
-    "vacancy_lo": 25.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -590,7 +590,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
+    "active_floors_lo": 4,
     "active_floors_hi": 6,
     "capacity_floors": [
       1,
@@ -600,8 +600,8 @@
       5,
       6
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -745,7 +745,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
+    "active_floors_lo": 4,
     "active_floors_hi": 5,
     "capacity_floors": [
       1,
@@ -754,8 +754,8 @@
       4,
       5
     ],
-    "occupancy_lo": 0.6,
-    "vacancy_lo": 40.0,
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -792,23 +792,24 @@
     "platGbCd": "0",
     "bun": "0548",
     "ji": "0004",
-    "capacity": 5,
+    "capacity": 6,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 4,
-    "active_floors_hi": 5,
+    "active_floors_lo": 5,
+    "active_floors_hi": 6,
     "capacity_floors": [
       1,
       2,
       3,
       4,
-      5
+      5,
+      6
     ],
-    "occupancy_lo": 0.8,
-    "vacancy_lo": 20.0,
+    "occupancy_lo": 0.833,
+    "vacancy_lo": 16.7,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -908,12 +909,12 @@
     "ji": "0016",
     "capacity": 15,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.6,
-    "vacancy_bldg": 40.0,
+    "occupancy": 0.733,
+    "vacancy_bldg": 26.7,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 6,
-    "active_floors_hi": 9,
+    "active_floors_lo": 7,
+    "active_floors_hi": 11,
     "capacity_floors": [
       1,
       2,
@@ -931,10 +932,10 @@
       14,
       15
     ],
-    "occupancy_lo": 0.4,
-    "vacancy_lo": 60.0,
-    "occupancy_hi": 0.6,
-    "vacancy_hi": 40.0
+    "occupancy_lo": 0.467,
+    "vacancy_lo": 53.3,
+    "occupancy_hi": 0.733,
+    "vacancy_hi": 26.7
   },
   {
     "bdMgtSn": "1168010700105360003011872",
@@ -1015,7 +1016,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 4,
+    "active_floors_lo": 5,
     "active_floors_hi": 6,
     "capacity_floors": [
       1,
@@ -1025,8 +1026,8 @@
       5,
       6
     ],
-    "occupancy_lo": 0.667,
-    "vacancy_lo": 33.3,
+    "occupancy_lo": 0.833,
+    "vacancy_lo": 16.7,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -1392,7 +1393,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
+    "active_floors_lo": 4,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -1400,8 +1401,8 @@
       4,
       5
     ],
-    "occupancy_lo": 0.75,
-    "vacancy_lo": 25.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -1455,7 +1456,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
+    "active_floors_lo": 4,
     "active_floors_hi": 5,
     "capacity_floors": [
       1,
@@ -1464,8 +1465,8 @@
       5,
       6
     ],
-    "occupancy_lo": 0.6,
-    "vacancy_lo": 40.0,
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -1766,7 +1767,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 4,
+    "active_floors_lo": 5,
     "active_floors_hi": 7,
     "capacity_floors": [
       1,
@@ -1777,8 +1778,8 @@
       6,
       7
     ],
-    "occupancy_lo": 0.571,
-    "vacancy_lo": 42.9,
+    "occupancy_lo": 0.714,
+    "vacancy_lo": 28.6,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -1894,22 +1895,23 @@
     "platGbCd": "0",
     "bun": "0512",
     "ji": "0016",
-    "capacity": 4,
+    "capacity": 5,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
-    "active_floors_hi": 4,
+    "active_floors_lo": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
+      2,
       3,
       4,
       5
     ],
-    "occupancy_lo": 0.75,
-    "vacancy_lo": 25.0,
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -2019,15 +2021,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       4
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -2149,7 +2151,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -2157,8 +2159,8 @@
       3,
       4
     ],
-    "occupancy_lo": 0.25,
-    "vacancy_lo": 75.0,
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -2456,7 +2458,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 4,
+    "active_floors_lo": 5,
     "active_floors_hi": 5,
     "capacity_floors": [
       1,
@@ -2465,8 +2467,8 @@
       4,
       5
     ],
-    "occupancy_lo": 0.8,
-    "vacancy_lo": 20.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -2489,15 +2491,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -2516,12 +2518,12 @@
     "ji": "0017",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.8,
-    "vacancy_bldg": 20.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 3,
-    "active_floors_hi": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -2531,8 +2533,8 @@
     ],
     "occupancy_lo": 0.6,
     "vacancy_lo": 40.0,
-    "occupancy_hi": 0.8,
-    "vacancy_hi": 20.0
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105570010011294",
@@ -2553,7 +2555,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 4,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -2561,8 +2563,8 @@
       4,
       5
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -3009,7 +3011,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 2,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -3017,8 +3019,8 @@
       3,
       4
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -3202,7 +3204,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 4,
     "active_floors_hi": 5,
     "capacity_floors": [
       1,
@@ -3211,8 +3213,8 @@
       4,
       5
     ],
-    "occupancy_lo": 0.4,
-    "vacancy_lo": 60.0,
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -3688,12 +3690,12 @@
     "ji": "0020",
     "capacity": 6,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
+    "occupancy": 0.833,
+    "vacancy_bldg": 16.7,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
-    "active_floors_hi": 4,
+    "active_floors_lo": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -3702,10 +3704,10 @@
       5,
       7
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
+    "occupancy_hi": 0.833,
+    "vacancy_hi": 16.7
   },
   {
     "bdMgtSn": "1168010700105240033012030",
@@ -4574,7 +4576,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 3,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -4582,8 +4584,8 @@
       3,
       4
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -4606,15 +4608,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -4792,12 +4794,12 @@
     "ji": "0007",
     "capacity": 6,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
+    "occupancy": 0.833,
+    "vacancy_bldg": 16.7,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
-    "active_floors_hi": 4,
+    "active_floors_lo": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -4806,10 +4808,10 @@
       5,
       7
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
+    "occupancy_hi": 0.833,
+    "vacancy_hi": 16.7
   },
   {
     "bdMgtSn": "1168010700105420008011704",
@@ -4939,12 +4941,12 @@
     "ji": "0011",
     "capacity": 6,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.833,
-    "vacancy_bldg": 16.7,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 5,
+    "active_floors_lo": 3,
+    "active_floors_hi": 6,
     "capacity_floors": [
       1,
       2,
@@ -4953,10 +4955,10 @@
       6,
       7
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
-    "occupancy_hi": 0.833,
-    "vacancy_hi": 16.7
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105430001011573",
@@ -4971,16 +4973,17 @@
     "platGbCd": "0",
     "bun": "0543",
     "ji": "0001",
-    "capacity": 1,
+    "capacity": 2,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
-      1
+      1,
+      2
     ],
     "occupancy_lo": 1.0,
     "vacancy_lo": 0.0,
@@ -5590,12 +5593,12 @@
     "ji": "0010",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.6,
-    "vacancy_bldg": 40.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
-    "active_floors_hi": 3,
+    "active_floors_lo": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -5603,10 +5606,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.6,
-    "vacancy_lo": 40.0,
-    "occupancy_hi": 0.6,
-    "vacancy_hi": 40.0
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105320004000001",
@@ -6130,15 +6133,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 3,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.667,
-    "vacancy_lo": 33.3,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -6181,15 +6184,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 3,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.667,
-    "vacancy_lo": 33.3,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -6246,15 +6249,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       4
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -6305,12 +6308,12 @@
     "ji": "0013",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.8,
-    "vacancy_bldg": 20.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
-    "active_floors_hi": 4,
+    "active_floors_lo": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -6318,10 +6321,10 @@
       6,
       7
     ],
-    "occupancy_lo": 0.6,
-    "vacancy_lo": 40.0,
-    "occupancy_hi": 0.8,
-    "vacancy_hi": 20.0
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105230022011168",
@@ -6424,7 +6427,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -6432,8 +6435,8 @@
       3,
       7
     ],
-    "occupancy_lo": 0.25,
-    "vacancy_lo": 75.0,
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -6743,12 +6746,12 @@
     "ji": "0006",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.8,
-    "vacancy_bldg": 20.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 4,
+    "active_floors_lo": 2,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -6756,10 +6759,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.2,
-    "vacancy_lo": 80.0,
-    "occupancy_hi": 0.8,
-    "vacancy_hi": 20.0
+    "occupancy_lo": 0.4,
+    "vacancy_lo": 60.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105370013011949",
@@ -6776,12 +6779,12 @@
     "ji": "0013",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.75,
-    "vacancy_bldg": 25.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 3,
-    "active_floors_hi": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
@@ -6790,8 +6793,8 @@
     ],
     "occupancy_lo": 0.75,
     "vacancy_lo": 25.0,
-    "occupancy_hi": 0.75,
-    "vacancy_hi": 25.0
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105470001010669",
@@ -6846,14 +6849,14 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 2,
     "capacity_floors": [
       1,
       3
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -6872,12 +6875,12 @@
     "ji": "0003",
     "capacity": 6,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
+    "occupancy": 0.833,
+    "vacancy_bldg": 16.7,
     "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 4,
-    "active_floors_hi": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -6888,8 +6891,8 @@
     ],
     "occupancy_lo": 0.667,
     "vacancy_lo": 33.3,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_hi": 0.833,
+    "vacancy_hi": 16.7
   },
   {
     "bdMgtSn": "1168010700105470002010725",
@@ -6910,7 +6913,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
+    "active_floors_lo": 4,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -6918,8 +6921,8 @@
       3,
       4
     ],
-    "occupancy_lo": 0.75,
-    "vacancy_lo": 25.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -6936,16 +6939,17 @@
     "platGbCd": "0",
     "bun": "0537",
     "ji": "0004",
-    "capacity": 2,
+    "capacity": 3,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
+      2,
       3
     ],
     "occupancy_lo": 1.0,
@@ -6972,7 +6976,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 3,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -6980,8 +6984,8 @@
       3,
       6
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -7157,12 +7161,12 @@
     "ji": "0022",
     "capacity": 7,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.571,
-    "vacancy_bldg": 42.9,
+    "occupancy": 0.714,
+    "vacancy_bldg": 28.6,
     "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 4,
-    "active_floors_hi": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -7174,8 +7178,8 @@
     ],
     "occupancy_lo": 0.571,
     "vacancy_lo": 42.9,
-    "occupancy_hi": 0.571,
-    "vacancy_hi": 42.9
+    "occupancy_hi": 0.714,
+    "vacancy_hi": 28.6
   },
   {
     "bdMgtSn": "1168010700105420007011708",
@@ -7227,15 +7231,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 3,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.667,
-    "vacancy_lo": 33.3,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -7319,7 +7323,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 3,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -7327,8 +7331,8 @@
       3,
       4
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -7347,12 +7351,12 @@
     "ji": "0022",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.8,
-    "vacancy_bldg": 20.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 4,
+    "active_floors_lo": 3,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -7360,10 +7364,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.4,
-    "vacancy_lo": 60.0,
-    "occupancy_hi": 0.8,
-    "vacancy_hi": 20.0
+    "occupancy_lo": 0.6,
+    "vacancy_lo": 40.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105430012011695",
@@ -7743,15 +7747,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -7887,12 +7891,12 @@
     "ji": "0018",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.8,
-    "vacancy_bldg": 20.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 4,
+    "active_floors_lo": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -7900,10 +7904,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.4,
-    "vacancy_lo": 60.0,
-    "occupancy_hi": 0.8,
-    "vacancy_hi": 20.0
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105570019011310",
@@ -8307,12 +8311,12 @@
     "ji": "0012",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.8,
-    "vacancy_bldg": 20.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 4,
+    "active_floors_lo": 5,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -8320,10 +8324,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.4,
-    "vacancy_lo": 60.0,
-    "occupancy_hi": 0.8,
-    "vacancy_hi": 20.0
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105240023011055",
@@ -8458,7 +8462,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 4,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -8466,8 +8470,8 @@
       3,
       4
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -8640,21 +8644,21 @@
     "ji": "0000",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       4
     ],
-    "occupancy_lo": 0.667,
-    "vacancy_lo": 33.3,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105270000011244",
@@ -9085,16 +9089,17 @@
     "platGbCd": "0",
     "bun": "0508",
     "ji": "0007",
-    "capacity": 2,
+    "capacity": 3,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
+      2,
       4
     ],
     "occupancy_lo": 1.0,
@@ -9340,15 +9345,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 3,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       4
     ],
-    "occupancy_lo": 0.667,
-    "vacancy_lo": 33.3,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -9876,22 +9881,22 @@
     "ji": "0029",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.75,
-    "vacancy_bldg": 25.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 3,
+    "active_floors_lo": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
       3,
       4
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.75,
-    "vacancy_hi": 25.0
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105340017011458",
@@ -9908,12 +9913,12 @@
     "ji": "0017",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.4,
-    "vacancy_bldg": 60.0,
-    "status": "high",
+    "occupancy": 0.6,
+    "vacancy_bldg": 40.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
@@ -9921,10 +9926,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.4,
-    "vacancy_lo": 60.0,
-    "occupancy_hi": 0.4,
-    "vacancy_hi": 60.0
+    "occupancy_lo": 0.6,
+    "vacancy_lo": 40.0,
+    "occupancy_hi": 0.6,
+    "vacancy_hi": 40.0
   },
   {
     "bdMgtSn": "1168010700105320012010652",
@@ -10037,12 +10042,12 @@
     "ji": "0001",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.4,
-    "vacancy_bldg": 60.0,
-    "status": "high",
+    "occupancy": 0.8,
+    "vacancy_bldg": 20.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 4,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
@@ -10050,10 +10055,10 @@
       5,
       6
     ],
-    "occupancy_lo": 0.4,
-    "vacancy_lo": 60.0,
-    "occupancy_hi": 0.4,
-    "vacancy_hi": 60.0
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
+    "occupancy_hi": 0.8,
+    "vacancy_hi": 20.0
   },
   {
     "bdMgtSn": "1168010700105360019011821",
@@ -10224,21 +10229,21 @@
     "ji": "0000",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 2,
+    "active_floors_lo": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105430008011705",
@@ -10509,12 +10514,12 @@
     "ji": "0009",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.25,
-    "vacancy_bldg": 75.0,
-    "status": "high",
+    "occupancy": 0.5,
+    "vacancy_bldg": 50.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -10523,8 +10528,8 @@
     ],
     "occupancy_lo": 0.25,
     "vacancy_lo": 75.0,
-    "occupancy_hi": 0.25,
-    "vacancy_hi": 75.0
+    "occupancy_hi": 0.5,
+    "vacancy_hi": 50.0
   },
   {
     "bdMgtSn": "1168010700105560014011192",
@@ -10954,24 +10959,25 @@
     "platGbCd": "0",
     "bun": "0527",
     "ji": "0004",
-    "capacity": 4,
+    "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.75,
-    "vacancy_bldg": 25.0,
+    "occupancy": 0.8,
+    "vacancy_bldg": 20.0,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 3,
+    "active_floors_lo": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
       3,
-      4
+      4,
+      9
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.75,
-    "vacancy_hi": 25.0
+    "occupancy_lo": 0.6,
+    "vacancy_lo": 40.0,
+    "occupancy_hi": 0.8,
+    "vacancy_hi": 20.0
   },
   {
     "bdMgtSn": "1168010700105260003011195",
@@ -11119,16 +11125,17 @@
     "platGbCd": "0",
     "bun": "0511",
     "ji": "0013",
-    "capacity": 2,
+    "capacity": 3,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
+      2,
       3
     ],
     "occupancy_lo": 1.0,
@@ -11432,20 +11439,20 @@
     "ji": "0023",
     "capacity": 2,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105350013011712",
@@ -11529,15 +11536,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 3,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.667,
-    "vacancy_lo": 33.3,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -11556,12 +11563,12 @@
     "ji": "0015",
     "capacity": 7,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.429,
-    "vacancy_bldg": 57.1,
-    "status": "high",
+    "occupancy": 0.571,
+    "vacancy_bldg": 42.9,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
-    "active_floors_hi": 3,
+    "active_floors_lo": 4,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
@@ -11571,10 +11578,10 @@
       6,
       7
     ],
-    "occupancy_lo": 0.429,
-    "vacancy_lo": 57.1,
-    "occupancy_hi": 0.429,
-    "vacancy_hi": 57.1
+    "occupancy_lo": 0.571,
+    "vacancy_lo": 42.9,
+    "occupancy_hi": 0.571,
+    "vacancy_hi": 42.9
   },
   {
     "bdMgtSn": "1168010700105420002011631",
@@ -11687,14 +11694,14 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 2,
     "capacity_floors": [
       1,
       5
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -11787,15 +11794,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       4
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -11834,22 +11841,22 @@
     "ji": "0029",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.75,
-    "vacancy_bldg": 25.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 3,
+    "active_floors_lo": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
       3,
       4
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.75,
-    "vacancy_hi": 25.0
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105190013011561",
@@ -11864,20 +11871,21 @@
     "platGbCd": "0",
     "bun": "0519",
     "ji": "0013",
-    "capacity": 2,
+    "capacity": 3,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
-      2
+      2,
+      3
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -11900,15 +11908,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 2,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -12023,15 +12031,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       4
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -12079,12 +12087,12 @@
     "ji": "0000",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
+    "occupancy": 0.75,
+    "vacancy_bldg": 25.0,
     "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
@@ -12093,8 +12101,8 @@
     ],
     "occupancy_lo": 0.5,
     "vacancy_lo": 50.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_hi": 0.75,
+    "vacancy_hi": 25.0
   },
   {
     "bdMgtSn": "1168010700105110000011936",
@@ -12239,24 +12247,25 @@
     "platGbCd": "0",
     "bun": "0525",
     "ji": "0007",
-    "capacity": 4,
+    "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
+    "occupancy": 0.6,
+    "vacancy_bldg": 40.0,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 2,
+    "active_floors_lo": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
+      2,
       4,
       5,
       6
     ],
-    "occupancy_lo": 0.25,
-    "vacancy_lo": 75.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 0.4,
+    "vacancy_lo": 60.0,
+    "occupancy_hi": 0.6,
+    "vacancy_hi": 40.0
   },
   {
     "bdMgtSn": "1168010700105100008011897",
@@ -12398,14 +12407,14 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -12483,17 +12492,18 @@
     "platGbCd": "0",
     "bun": "0525",
     "ji": "0022",
-    "capacity": 2,
+    "capacity": 3,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
-      2
+      2,
+      3
     ],
     "occupancy_lo": 1.0,
     "vacancy_lo": 0.0,
@@ -12539,14 +12549,14 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 2,
     "capacity_floors": [
       1,
       3
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -12985,12 +12995,12 @@
     "ji": "0017",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.4,
-    "vacancy_bldg": 60.0,
-    "status": "high",
+    "occupancy": 0.6,
+    "vacancy_bldg": 40.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 2,
+    "active_floors_lo": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
@@ -12998,10 +13008,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.2,
-    "vacancy_lo": 80.0,
-    "occupancy_hi": 0.4,
-    "vacancy_hi": 60.0
+    "occupancy_lo": 0.4,
+    "vacancy_lo": 60.0,
+    "occupancy_hi": 0.6,
+    "vacancy_hi": 40.0
   },
   {
     "bdMgtSn": "1168010700105450000011278",
@@ -13144,14 +13154,14 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 2,
     "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -13257,14 +13267,14 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -13352,22 +13362,22 @@
     "ji": "0000",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
+    "occupancy": 0.75,
+    "vacancy_bldg": 25.0,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3,
       4
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
+    "occupancy_hi": 0.75,
+    "vacancy_hi": 25.0
   },
   {
     "bdMgtSn": "1168010700105610001011718",
@@ -13456,23 +13466,25 @@
     "platGbCd": "0",
     "bun": "0553",
     "ji": "0022",
-    "capacity": 3,
+    "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
+    "occupancy": 0.8,
+    "vacancy_bldg": 20.0,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 2,
+    "active_floors_lo": 2,
+    "active_floors_hi": 4,
     "capacity_floors": [
+      1,
+      2,
       3,
       4,
       5
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_lo": 0.4,
+    "vacancy_lo": 60.0,
+    "occupancy_hi": 0.8,
+    "vacancy_hi": 20.0
   },
   {
     "bdMgtSn": "1168010700105530029011040",
@@ -13620,16 +13632,17 @@
     "platGbCd": "0",
     "bun": "0561",
     "ji": "0035",
-    "capacity": 2,
+    "capacity": 3,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
+      2,
       4
     ],
     "occupancy_lo": 1.0,
@@ -13680,15 +13693,16 @@
     "platGbCd": "0",
     "bun": "0558",
     "ji": "0001",
-    "capacity": 2,
+    "capacity": 3,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
+      1,
       2,
       3
     ],
@@ -14353,20 +14367,20 @@
     "ji": "0015",
     "capacity": 2,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105230019011410",
@@ -14453,22 +14467,22 @@
     "ji": "0015",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
+    "occupancy": 0.75,
+    "vacancy_bldg": 25.0,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3,
       4
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
+    "occupancy_hi": 0.75,
+    "vacancy_hi": 25.0
   },
   {
     "bdMgtSn": "1168010700105160007011866",
@@ -14485,12 +14499,12 @@
     "ji": "0007",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.4,
-    "vacancy_bldg": 60.0,
-    "status": "high",
+    "occupancy": 0.6,
+    "vacancy_bldg": 40.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
@@ -14500,8 +14514,8 @@
     ],
     "occupancy_lo": 0.4,
     "vacancy_lo": 60.0,
-    "occupancy_hi": 0.4,
-    "vacancy_hi": 60.0
+    "occupancy_hi": 0.6,
+    "vacancy_hi": 40.0
   },
   {
     "bdMgtSn": "1168010700105150004011908",
@@ -14558,12 +14572,12 @@
     "ji": "0000",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.4,
-    "vacancy_bldg": 60.0,
-    "status": "high",
+    "occupancy": 0.8,
+    "vacancy_bldg": 20.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
@@ -14571,10 +14585,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.2,
-    "vacancy_lo": 80.0,
-    "occupancy_hi": 0.4,
-    "vacancy_hi": 60.0
+    "occupancy_lo": 0.6,
+    "vacancy_lo": 40.0,
+    "occupancy_hi": 0.8,
+    "vacancy_hi": 20.0
   },
   {
     "bdMgtSn": "1168010700105370010011950",
@@ -14655,12 +14669,12 @@
     "ji": "0001",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.4,
-    "vacancy_bldg": 60.0,
-    "status": "high",
+    "occupancy": 0.8,
+    "vacancy_bldg": 20.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 4,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
@@ -14668,10 +14682,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.4,
-    "vacancy_lo": 60.0,
-    "occupancy_hi": 0.4,
-    "vacancy_hi": 60.0
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
+    "occupancy_hi": 0.8,
+    "vacancy_hi": 20.0
   },
   {
     "bdMgtSn": "1168010800100040020005980",
@@ -14688,21 +14702,21 @@
     "ji": "0020",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 2,
+    "active_floors_lo": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105420004011671",
@@ -14857,23 +14871,24 @@
     "platGbCd": "0",
     "bun": "0554",
     "ji": "0003",
-    "capacity": 3,
+    "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
+    "occupancy": 0.75,
+    "vacancy_bldg": 25.0,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
+      2,
       3,
       4
     ],
-    "occupancy_lo": 0.667,
-    "vacancy_lo": 33.3,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
+    "occupancy_hi": 0.75,
+    "vacancy_hi": 25.0
   },
   {
     "bdMgtSn": "1168010700105510028010992",
@@ -15078,14 +15093,14 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
+    "active_floors_lo": 2,
     "active_floors_hi": 2,
     "capacity_floors": [
       1,
       3
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -15104,12 +15119,12 @@
     "ji": "0015",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.2,
-    "vacancy_bldg": 80.0,
+    "occupancy": 0.4,
+    "vacancy_bldg": 60.0,
     "status": "high",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -15117,10 +15132,10 @@
       6,
       7
     ],
-    "occupancy_lo": 0.2,
-    "vacancy_lo": 80.0,
-    "occupancy_hi": 0.2,
-    "vacancy_hi": 80.0
+    "occupancy_lo": 0.4,
+    "vacancy_lo": 60.0,
+    "occupancy_hi": 0.4,
+    "vacancy_hi": 60.0
   },
   {
     "bdMgtSn": "1168010700105580010011434",
@@ -15304,14 +15319,14 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 1,
     "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -15330,12 +15345,12 @@
     "ji": "0016",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 0,
-    "active_floors_hi": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
@@ -15343,8 +15358,8 @@
     ],
     "occupancy_lo": 0.0,
     "vacancy_lo": 100.0,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010800100040028000001",
@@ -15430,22 +15445,22 @@
     "ji": "0014",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       3,
       4,
       5
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105510007011096",
@@ -15731,12 +15746,12 @@
     "ji": "0001",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.2,
-    "vacancy_bldg": 80.0,
+    "occupancy": 0.4,
+    "vacancy_bldg": 60.0,
     "status": "high",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -15744,10 +15759,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.2,
-    "vacancy_lo": 80.0,
-    "occupancy_hi": 0.2,
-    "vacancy_hi": 80.0
+    "occupancy_lo": 0.4,
+    "vacancy_lo": 60.0,
+    "occupancy_hi": 0.4,
+    "vacancy_hi": 60.0
   },
   {
     "bdMgtSn": "1168010700105080011011827",
@@ -15937,22 +15952,22 @@
     "ji": "0014",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.25,
-    "vacancy_bldg": 75.0,
-    "status": "high",
+    "occupancy": 0.5,
+    "vacancy_bldg": 50.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
       3,
       4
     ],
-    "occupancy_lo": 0.25,
-    "vacancy_lo": 75.0,
-    "occupancy_hi": 0.25,
-    "vacancy_hi": 75.0
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
+    "occupancy_hi": 0.5,
+    "vacancy_hi": 50.0
   },
   {
     "bdMgtSn": "1168010700105230021011212",
@@ -16000,22 +16015,22 @@
     "ji": "0022",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.25,
-    "vacancy_bldg": 75.0,
-    "status": "high",
+    "occupancy": 0.5,
+    "vacancy_bldg": 50.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
       5,
       6
     ],
-    "occupancy_lo": 0.25,
-    "vacancy_lo": 75.0,
-    "occupancy_hi": 0.25,
-    "vacancy_hi": 75.0
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
+    "occupancy_hi": 0.5,
+    "vacancy_hi": 50.0
   },
   {
     "bdMgtSn": "1168010700105210017026791",
@@ -16360,21 +16375,21 @@
     "ji": "0012",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105350014000001",
@@ -16423,12 +16438,12 @@
     "ji": "0003",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.25,
-    "vacancy_bldg": 75.0,
-    "status": "high",
+    "occupancy": 0.5,
+    "vacancy_bldg": 50.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -16437,8 +16452,8 @@
     ],
     "occupancy_lo": 0.0,
     "vacancy_lo": 100.0,
-    "occupancy_hi": 0.25,
-    "vacancy_hi": 75.0
+    "occupancy_hi": 0.5,
+    "vacancy_hi": 50.0
   },
   {
     "bdMgtSn": "1168010700105460005011124",
@@ -16860,21 +16875,21 @@
     "ji": "0006",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 0.667,
+    "vacancy_bldg": 33.3,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
       5
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
+    "occupancy_hi": 0.667,
+    "vacancy_hi": 33.3
   },
   {
     "bdMgtSn": "1168010700105590028011666",
@@ -17605,12 +17620,12 @@
     "ji": "0011",
     "capacity": 6,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.167,
-    "vacancy_bldg": 83.3,
-    "status": "high",
+    "occupancy": 0.5,
+    "vacancy_bldg": 50.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
@@ -17621,8 +17636,8 @@
     ],
     "occupancy_lo": 0.167,
     "vacancy_lo": 83.3,
-    "occupancy_hi": 0.167,
-    "vacancy_hi": 83.3
+    "occupancy_hi": 0.5,
+    "vacancy_hi": 50.0
   },
   {
     "bdMgtSn": "1168010700105160014000002",
@@ -17700,20 +17715,20 @@
     "ji": "0030",
     "capacity": 2,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105300002010506",
@@ -17762,12 +17777,12 @@
     "ji": "0027",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.2,
-    "vacancy_bldg": 80.0,
+    "occupancy": 0.4,
+    "vacancy_bldg": 60.0,
     "status": "high",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -17775,10 +17790,10 @@
       5,
       6
     ],
-    "occupancy_lo": 0.2,
-    "vacancy_lo": 80.0,
-    "occupancy_hi": 0.2,
-    "vacancy_hi": 80.0
+    "occupancy_lo": 0.4,
+    "vacancy_lo": 60.0,
+    "occupancy_hi": 0.4,
+    "vacancy_hi": 60.0
   },
   {
     "bdMgtSn": "1168010700105330015011178",
@@ -17865,22 +17880,22 @@
     "ji": "0013",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.25,
-    "vacancy_bldg": 75.0,
-    "status": "high",
+    "occupancy": 0.5,
+    "vacancy_bldg": 50.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
       3,
       5
     ],
-    "occupancy_lo": 0.25,
-    "vacancy_lo": 75.0,
-    "occupancy_hi": 0.25,
-    "vacancy_hi": 75.0
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
+    "occupancy_hi": 0.5,
+    "vacancy_hi": 50.0
   },
   {
     "bdMgtSn": "1168010800100040018005956",
@@ -17998,13 +18013,13 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 1,
     "active_floors_hi": 1,
     "capacity_floors": [
       1
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -18047,13 +18062,13 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 1,
     "active_floors_hi": 1,
     "capacity_floors": [
       1
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -18072,12 +18087,12 @@
     "ji": "0021",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.25,
-    "vacancy_bldg": 75.0,
-    "status": "high",
+    "occupancy": 0.5,
+    "vacancy_bldg": 50.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -18086,8 +18101,8 @@
     ],
     "occupancy_lo": 0.0,
     "vacancy_lo": 100.0,
-    "occupancy_hi": 0.25,
-    "vacancy_hi": 75.0
+    "occupancy_hi": 0.5,
+    "vacancy_hi": 50.0
   },
   {
     "bdMgtSn": "1168010700105420003011620",
@@ -18104,20 +18119,20 @@
     "ji": "0003",
     "capacity": 2,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105540001011201",
@@ -18290,16 +18305,17 @@
     "platGbCd": "0",
     "bun": "0011",
     "ji": "0005",
-    "capacity": 1,
+    "capacity": 2,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
-      1
+      1,
+      2
     ],
     "occupancy_lo": 1.0,
     "vacancy_lo": 0.0,
@@ -18880,21 +18896,21 @@
     "ji": "0001",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 0.667,
+    "vacancy_bldg": 33.3,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_lo": 0.333,
+    "vacancy_lo": 66.7,
+    "occupancy_hi": 0.667,
+    "vacancy_hi": 33.3
   },
   {
     "bdMgtSn": "1168010700105080005011761",
@@ -18975,13 +18991,13 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 1,
     "active_floors_hi": 1,
     "capacity_floors": [
       1
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -19074,13 +19090,13 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 1,
     "active_floors_hi": 1,
     "capacity_floors": [
       1
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -19099,20 +19115,20 @@
     "ji": "0023",
     "capacity": 2,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105180017011765",
@@ -19213,13 +19229,13 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 1,
     "active_floors_hi": 1,
     "capacity_floors": [
       1
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -19288,20 +19304,20 @@
     "ji": "0010",
     "capacity": 2,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105240034011011",
@@ -19318,21 +19334,21 @@
     "ji": "0034",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 0.667,
+    "vacancy_bldg": 33.3,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_lo": 0.333,
+    "vacancy_lo": 66.7,
+    "occupancy_hi": 0.667,
+    "vacancy_hi": 33.3
   },
   {
     "bdMgtSn": "1168010700105240018011200",
@@ -19349,20 +19365,20 @@
     "ji": "0018",
     "capacity": 2,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105180012000001",
@@ -19399,20 +19415,20 @@
     "ji": "0012",
     "capacity": 2,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105320011010737",
@@ -19480,21 +19496,21 @@
     "ji": "0003",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105350004011650",
@@ -19544,21 +19560,21 @@
     "ji": "0004",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 0.667,
+    "vacancy_bldg": 33.3,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
+    "occupancy_hi": 0.667,
+    "vacancy_hi": 33.3
   },
   {
     "bdMgtSn": "1168010700105360006011922",
@@ -19573,23 +19589,24 @@
     "platGbCd": "0",
     "bun": "0536",
     "ji": "0006",
-    "capacity": 3,
+    "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 0.5,
+    "vacancy_bldg": 50.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
-      3
+      3,
+      4
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_lo": 0.25,
+    "vacancy_lo": 75.0,
+    "occupancy_hi": 0.5,
+    "vacancy_hi": 50.0
   },
   {
     "bdMgtSn": "1168010700105480005010523",
@@ -19606,21 +19623,21 @@
     "ji": "0005",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 0.667,
+    "vacancy_bldg": 33.3,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_lo": 0.333,
+    "vacancy_lo": 66.7,
+    "occupancy_hi": 0.667,
+    "vacancy_hi": 33.3
   },
   {
     "bdMgtSn": "1168010700105470000010596",
@@ -19637,12 +19654,12 @@
     "ji": "0000",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.2,
-    "vacancy_bldg": 80.0,
+    "occupancy": 0.4,
+    "vacancy_bldg": 60.0,
     "status": "high",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -19650,10 +19667,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.2,
-    "vacancy_lo": 80.0,
-    "occupancy_hi": 0.2,
-    "vacancy_hi": 80.0
+    "occupancy_lo": 0.4,
+    "vacancy_lo": 60.0,
+    "occupancy_hi": 0.4,
+    "vacancy_hi": 60.0
   },
   {
     "bdMgtSn": "1168010700105350027011593",
@@ -19668,19 +19685,20 @@
     "platGbCd": "0",
     "bun": "0535",
     "ji": "0027",
-    "capacity": 1,
+    "capacity": 2,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
-      1
+      1,
+      2
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -19730,21 +19748,21 @@
     "ji": "0008",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_lo": 0.667,
+    "vacancy_lo": 33.3,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105450007011401",
@@ -19792,22 +19810,22 @@
     "ji": "0007",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.25,
-    "vacancy_bldg": 75.0,
-    "status": "high",
+    "occupancy": 0.75,
+    "vacancy_bldg": 25.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 1,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3,
       5
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.25,
-    "vacancy_hi": 75.0
+    "occupancy_lo": 0.25,
+    "vacancy_lo": 75.0,
+    "occupancy_hi": 0.75,
+    "vacancy_hi": 25.0
   },
   {
     "bdMgtSn": "1168010700105450018011549",
@@ -19824,12 +19842,12 @@
     "ji": "0018",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.2,
-    "vacancy_bldg": 80.0,
-    "status": "high",
+    "occupancy": 0.8,
+    "vacancy_bldg": 20.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
@@ -19837,10 +19855,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.2,
-    "vacancy_hi": 80.0
+    "occupancy_lo": 0.6,
+    "vacancy_lo": 40.0,
+    "occupancy_hi": 0.8,
+    "vacancy_hi": 20.0
   },
   {
     "bdMgtSn": "1168010700105440001011399",
@@ -20022,20 +20040,20 @@
     "ji": "0020",
     "capacity": 2,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_lo": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 0.5,
+    "vacancy_lo": 50.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105510026011024",
@@ -20363,12 +20381,12 @@
     "ji": "0014",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 0.667,
+    "vacancy_bldg": 33.3,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 0,
-    "active_floors_hi": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -20376,8 +20394,8 @@
     ],
     "occupancy_lo": 0.0,
     "vacancy_lo": 100.0,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_hi": 0.667,
+    "vacancy_hi": 33.3
   },
   {
     "bdMgtSn": "1168010700105660005010851",
@@ -22357,16 +22375,17 @@
     "platGbCd": "0",
     "bun": "0511",
     "ji": "0019",
-    "capacity": 2,
+    "capacity": 3,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
+      2,
       3
     ],
     "occupancy_lo": 1.0,
@@ -23481,15 +23500,15 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 3,
     "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3
     ],
-    "occupancy_lo": 0.667,
-    "vacancy_lo": 33.3,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -23506,16 +23525,17 @@
     "platGbCd": "0",
     "bun": "0566",
     "ji": "0029",
-    "capacity": 3,
+    "capacity": 4,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
-    "active_floors_hi": 3,
+    "active_floors_lo": 4,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
+      2,
       3,
       4
     ],
@@ -24109,22 +24129,22 @@
     "ji": "0004",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.75,
-    "vacancy_bldg": 25.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 3,
+    "active_floors_lo": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
       3,
       4
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.75,
-    "vacancy_hi": 25.0
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105740006010279",
@@ -24681,12 +24701,12 @@
     "ji": "0020",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.8,
-    "vacancy_bldg": 20.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 2,
-    "active_floors_hi": 4,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
@@ -24696,8 +24716,8 @@
     ],
     "occupancy_lo": 0.4,
     "vacancy_lo": 60.0,
-    "occupancy_hi": 0.8,
-    "vacancy_hi": 20.0
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010800100010002000001",
@@ -24826,7 +24846,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
+    "active_floors_lo": 4,
     "active_floors_hi": 4,
     "capacity_floors": [
       1,
@@ -24834,8 +24854,8 @@
       3,
       5
     ],
-    "occupancy_lo": 0.75,
-    "vacancy_lo": 25.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -24914,19 +24934,20 @@
     "platGbCd": "0",
     "bun": "0512",
     "ji": "0021",
-    "capacity": 4,
+    "capacity": 5,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 4,
-    "active_floors_hi": 4,
+    "active_floors_lo": 5,
+    "active_floors_hi": 5,
     "capacity_floors": [
       1,
       2,
       3,
-      4
+      4,
+      5
     ],
     "occupancy_lo": 1.0,
     "vacancy_lo": 0.0,
@@ -24948,12 +24969,12 @@
     "ji": "0021",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.667,
-    "vacancy_bldg": 33.3,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
@@ -24961,8 +24982,8 @@
     ],
     "occupancy_lo": 0.667,
     "vacancy_lo": 33.3,
-    "occupancy_hi": 0.667,
-    "vacancy_hi": 33.3
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105020001011941",
@@ -25101,21 +25122,22 @@
     "platGbCd": "0",
     "bun": "0012",
     "ji": "0004",
-    "capacity": 3,
+    "capacity": 4,
     "capacity_method": "floor_ouln",
     "occupancy": 1.0,
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 1,
-    "active_floors_hi": 3,
+    "active_floors_lo": 4,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
+      2,
       3,
       5
     ],
-    "occupancy_lo": 0.333,
-    "vacancy_lo": 66.7,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -25275,7 +25297,7 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
+    "active_floors_lo": 4,
     "active_floors_hi": 5,
     "capacity_floors": [
       1,
@@ -25284,8 +25306,8 @@
       4,
       5
     ],
-    "occupancy_lo": 0.4,
-    "vacancy_lo": 60.0,
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -26930,22 +26952,22 @@
     "ji": "0008",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.75,
-    "vacancy_bldg": 25.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 3,
+    "active_floors_lo": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
       3,
       4
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.75,
-    "vacancy_hi": 25.0
+    "occupancy_lo": 0.75,
+    "vacancy_lo": 25.0,
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010700105690031010565",
@@ -27409,12 +27431,12 @@
     "ji": "0009",
     "capacity": 4,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.75,
-    "vacancy_bldg": 25.0,
-    "status": "partial",
+    "occupancy": 1.0,
+    "vacancy_bldg": 0.0,
+    "status": "full",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 3,
-    "active_floors_hi": 3,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
@@ -27423,8 +27445,8 @@
     ],
     "occupancy_lo": 0.75,
     "vacancy_lo": 25.0,
-    "occupancy_hi": 0.75,
-    "vacancy_hi": 25.0
+    "occupancy_hi": 1.0,
+    "vacancy_hi": 0.0
   },
   {
     "bdMgtSn": "1168010800100090020005607",
@@ -28551,12 +28573,12 @@
     "ji": "0008",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.6,
-    "vacancy_bldg": 40.0,
+    "occupancy": 0.8,
+    "vacancy_bldg": 20.0,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 3,
-    "active_floors_hi": 3,
+    "active_floors_lo": 4,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
@@ -28564,10 +28586,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.6,
-    "vacancy_lo": 40.0,
-    "occupancy_hi": 0.6,
-    "vacancy_hi": 40.0
+    "occupancy_lo": 0.8,
+    "vacancy_lo": 20.0,
+    "occupancy_hi": 0.8,
+    "vacancy_hi": 20.0
   },
   {
     "bdMgtSn": "1168010700105900023011363",
@@ -29026,13 +29048,13 @@
     "vacancy_bldg": 0.0,
     "status": "full",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
+    "active_floors_lo": 1,
     "active_floors_hi": 1,
     "capacity_floors": [
       1
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
+    "occupancy_lo": 1.0,
+    "vacancy_lo": 0.0,
     "occupancy_hi": 1.0,
     "vacancy_hi": 0.0
   },
@@ -30516,12 +30538,12 @@
     "ji": "0000",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 0.667,
+    "vacancy_bldg": 33.3,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -30529,8 +30551,8 @@
     ],
     "occupancy_lo": 0.333,
     "vacancy_lo": 66.7,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_hi": 0.667,
+    "vacancy_hi": 33.3
   },
   {
     "bdMgtSn": "1168010700105020010011990",
@@ -31158,24 +31180,25 @@
     "platGbCd": "0",
     "bun": "0567",
     "ji": "0029",
-    "capacity": 4,
+    "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.5,
-    "vacancy_bldg": 50.0,
+    "occupancy": 0.6,
+    "vacancy_bldg": 40.0,
     "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 2,
-    "active_floors_hi": 2,
+    "active_floors_lo": 3,
+    "active_floors_hi": 3,
     "capacity_floors": [
       1,
       2,
       3,
+      4,
       5
     ],
-    "occupancy_lo": 0.5,
-    "vacancy_lo": 50.0,
-    "occupancy_hi": 0.5,
-    "vacancy_hi": 50.0
+    "occupancy_lo": 0.6,
+    "vacancy_lo": 40.0,
+    "occupancy_hi": 0.6,
+    "vacancy_hi": 40.0
   },
   {
     "bdMgtSn": "1168010800100090004005749",
@@ -31212,12 +31235,12 @@
     "ji": "0034",
     "capacity": 3,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.333,
-    "vacancy_bldg": 66.7,
-    "status": "high",
+    "occupancy": 0.667,
+    "vacancy_bldg": 33.3,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
     "active_floors_lo": 1,
-    "active_floors_hi": 1,
+    "active_floors_hi": 2,
     "capacity_floors": [
       1,
       2,
@@ -31225,8 +31248,8 @@
     ],
     "occupancy_lo": 0.333,
     "vacancy_lo": 66.7,
-    "occupancy_hi": 0.333,
-    "vacancy_hi": 66.7
+    "occupancy_hi": 0.667,
+    "vacancy_hi": 33.3
   },
   {
     "bdMgtSn": "1168010700105630033027840",
@@ -31589,12 +31612,12 @@
     "ji": "0004",
     "capacity": 5,
     "capacity_method": "floor_ouln",
-    "occupancy": 0.4,
-    "vacancy_bldg": 60.0,
-    "status": "high",
+    "occupancy": 0.8,
+    "vacancy_bldg": 20.0,
+    "status": "partial",
     "match_method": "bdMgtSn_group",
-    "active_floors_lo": 0,
-    "active_floors_hi": 2,
+    "active_floors_lo": 1,
+    "active_floors_hi": 4,
     "capacity_floors": [
       1,
       2,
@@ -31602,10 +31625,10 @@
       4,
       5
     ],
-    "occupancy_lo": 0.0,
-    "vacancy_lo": 100.0,
-    "occupancy_hi": 0.4,
-    "vacancy_hi": 60.0
+    "occupancy_lo": 0.2,
+    "vacancy_lo": 80.0,
+    "occupancy_hi": 0.8,
+    "vacancy_hi": 20.0
   },
   {
     "bdMgtSn": "1168010700105900019011377",

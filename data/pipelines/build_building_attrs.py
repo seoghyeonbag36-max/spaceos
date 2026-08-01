@@ -5,7 +5,8 @@
 silver/{거점}/building_attrs.json 에 캐시한다.
 
   · R-ONE 모집단 판정용 — 일반/집합, 지상층수, 연면적, 표제부 주용도
-  · 층 단위 매칭용     — 층별개요의 지상 상업층 번호, 상가정보 점포의 층(flrNo)
+  · 층 단위 매칭용     — 층별개요의 지상 상업층 번호, 상가정보 점포의 층(flrNo),
+                         인허가 영업 업소의 층(주소 문자열, 영업 중의 86.3%에 있다)
   · 면적 기준 대조용   — 지상 상업층 면적(일반) / 상업 전유면적(집합)
 
 수집기가 소유한 gold/building_vacancy.json 을 건드리지 않는 사이드카라 프론트·백엔드
@@ -24,11 +25,11 @@ from __future__ import annotations
 import json
 import re
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from data.collectors.building_vacancy import NON_CAPACITY_PURPS
-from data.collectors.common import BRONZE, SILVER
+from data.collectors.common import BRONZE, SILVER, load_latest
 from data.config.page_hubs import HUBS
 
 # R-ONE 중대형/소규모 표본이 되는 '상가건물'의 표제부 주용도. 업무시설·숙박시설은
@@ -150,6 +151,46 @@ def _flr_out(acc: dict) -> dict:
             "f1_com": 1 in acc["com_flrs"]}
 
 
+# 인허가 주소의 층 표기: "지상1층" · "지상1,2층" · "1층9호" · "(신사동,지하1층)"
+_LIC_FLR = re.compile(r"(지하|지상)?\s*(\d+)\s*(?:[,~]\s*\d+\s*)*층")
+
+
+def lic_floors(addr: str) -> tuple[set[int], bool]:
+    """인허가 주소 → (지상 층번호 집합, 층 표기 존재 여부). 지하는 버린다.
+
+    영업 중 인허가의 86.3%(13거점 44,493건)에 층이 적혀 있다 — 상가정보 flrNo 공란
+    약 30%를 메우는 독립 층 소스다.
+    """
+    out: set[int] = set()
+    found = False
+    for m in _LIC_FLR.finditer(addr or ""):
+        found = True
+        if m.group(1) == "지하":
+            continue
+        for n in re.findall(r"\d+", m.group(0)):
+            if 0 < int(n) < 100:
+                out.add(int(n))
+    return out, found
+
+
+def licensed_floors(slug: str) -> dict[str, dict]:
+    """거점의 인허가 영업 업소를 좌표 PIP 로 건물에 귀속 → {pnu: {n, floors, unknown}}.
+
+    좌표 자가보정·PIP 는 build_page_master 가 이미 갖고 있다(오프셋 −257m 보정).
+    같은 로직을 두 벌 두지 않으려고 **함수 안에서** import 한다 — 모듈 최상단에서
+    끌어오면 build_page_master ↔ build_building_attrs 순환 import 가 된다.
+    """
+    from data.pipelines.build_page_master import _build_dong_map, _licensed_pip
+
+    polys = load_latest(slug, "bldg_polygons.geojson")
+    stores = load_latest(slug, "stores_raw.json") or []
+    if not polys or not stores:
+        return {}
+    dong_map = _build_dong_map(stores)
+    sig = Counter(s["lnoCd"][0:5] for s in stores if len(s.get("lnoCd", "")) == 19).most_common(1)
+    return _licensed_pip(polys["features"], slug, dong_map, sig[0][0] if sig else "")
+
+
 def store_floors(slug: str) -> tuple[dict[str, list], dict[str, int]]:
     """상가정보 원본 → (지번별 점포 확인 지상층, 지번별 층 미상 점포 수).
 
@@ -210,6 +251,11 @@ def run(slug: str) -> int:
         acc.setdefault(pnu, {})["store_flr_nos"] = floors
     for pnu, n in unknown.items():
         acc.setdefault(pnu, {})["store_flr_unknown"] = n
+    for pnu, lic in licensed_floors(slug).items():
+        a = acc.setdefault(pnu, {})
+        a["lic_flr_nos"] = lic["floors"]
+        a["lic_n"] = lic["n"]
+        a["lic_unknown"] = lic["unknown"]
 
     for pnu, a in acc.items():
         # 집합건물 판정 — 전유부가 있거나 표제부 등록구분이 '집합'.
@@ -227,7 +273,8 @@ def run(slug: str) -> int:
     shop = sum(1 for a in acc.values() if a["is_shop"])
     print(f"[attrs:{slug}] 지번 {len(acc)} (집합 {mall} · 상가주용도 {shop} · "
           f"층별개요 {sum(1 for a in acc.values() if a.get('com_flr_nos'))} · "
-          f"점포층 {len(known)}) → silver/{slug}/building_attrs.json")
+          f"점포층 {len(known)} · 인허가층 {sum(1 for a in acc.values() if a.get('lic_flr_nos'))}) "
+          f"→ silver/{slug}/building_attrs.json")
     return len(acc)
 
 

@@ -18,7 +18,8 @@ floor_capacity 가 층별개요 응답 원본을 bronze/{SLUG}/bldg_flr_raw.json
 '지상 상업층 수'라 단위가 달랐고 min(active, capacity) 클램프가 그 불일치를 덮고
 있었다(`docs/finding-anchor-population.md`). 상가정보 원본의 flrNo 를 층별개요 층번호와
 맞춰 두 가지를 같이 고친다:
-  · 분모 = 층별개요 상업층 **∪ 점포가 확인된 지상층** — 점포의 22.6%가 분모 밖에 있었다.
+  · 분모 = 층별개요 상업층 **∪ 점포·인허가가 확인된 지상층** — 점포의 22.6%가 분모 밖에
+    있었다. 인허가는 주소에 층이 적혀 있어(영업 중의 86.3%) 상층부를 덮는 독립 소스다.
   · 분자 = **점포가 확인된 층 수**. flrNo 공란이 약 30%라 단일 값이 될 수 없어
     하한(층이 확인된 점포만)과 상한(층 미상 점포를 빈 층에 낮은 층부터 배정)을 함께 쓴다.
     대표 occupancy 는 **상한**이다 — 하한은 공란 30%를 전부 공실로 미는 편향이 있다.
@@ -118,7 +119,8 @@ def run(slug: str, apply: bool, legacy: bool = False) -> dict | None:
         n_grnd = ground_floors(recs)
         com_nos = commercial_floor_nos(recs)
         at = attrs.get(pnu, {})
-        store_nos = set(at.get("store_flr_nos") or [])
+        # 분자·분모의 층 근거 = 상가정보 flrNo ∪ 인허가 주소의 층 표기(독립 소스)
+        store_nos = set(at.get("store_flr_nos") or []) | set(at.get("lic_flr_nos") or [])
         floors = (com_nos if legacy
                   else capacity_floors(com_nos, store_nos, at.get("grnd_flr") or 0))
         n_com = len(floors) if not legacy else _commercial_floors(recs)
@@ -134,7 +136,9 @@ def run(slug: str, apply: bool, legacy: bool = False) -> dict | None:
             extra: dict = {}
         else:
             # 층 단위 매칭 — 분자도 층으로 센다(상한을 대표값으로).
-            lo, hi = occupied_floors(floors, store_nos, at.get("store_flr_unknown") or 0)
+            lo, hi = occupied_floors(
+                floors, store_nos,
+                (at.get("store_flr_unknown") or 0) + (at.get("lic_unknown") or 0))
             occ = round(hi / cap, 3) if cap else 0.0
             vac = round((1 - occ) * 100, 1)
             st = classify(occ, "floor_ouln")

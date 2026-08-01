@@ -37,6 +37,7 @@ from data.collectors.building_vacancy import (
     NON_STOREFRONT_LCLS, STORES_PER_FLOOR as _STORES_PER_FLOOR)
 from data.collectors.common import GOLD, load_latest
 from data.config.page_hubs import HUBS, PageHub
+from data.pipelines.build_building_attrs import lic_floors
 from data.pipelines.build_building_attrs import load as load_attrs
 
 # 건물통합 용도코드(대분류 5자리) 중 상가 capacity 를 가질 수 있는 상업 계열
@@ -194,7 +195,7 @@ def _addr_pnu(addr: str, dong_code: dict[str, str], sigungu: str) -> str | None:
 
 
 def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
-                  sigungu: str) -> dict[str, int]:
+                  sigungu: str) -> dict[str, dict]:
     """인허가(bronze licensing_biz.json) '영업 중' 업소를 좌표 PIP 로 건물 귀속.
 
     상가정보가 누락한 영업 업소를 잡는 분자 하한(licensed) — 2026-07-19 지상검증의
@@ -216,7 +217,8 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
             x, y = float(str(r.get("X", "")).strip()), float(str(r.get("Y", "")).strip())
         except ValueError:
             continue
-        alive.append((x, y, str(r.get("SITEWHLADDR", ""))))
+        alive.append((x, y, str(r.get("SITEWHLADDR", "")),
+                      str(r.get("RDNWHLADDR", ""))))
     if not alive:
         if rows:
             print("[page-master] licensing: 영업·좌표 유효 행 0 — 건너뜀")
@@ -246,7 +248,7 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
     dong_code = {v: k for k, v in dong_map.items()}   # 동명 → 법정동코드5
     dlons: list[float] = []
     dlats: list[float] = []
-    for x, y, addr in alive:
+    for x, y, addr, _rdn in alive:
         pnu = _addr_pnu(addr, dong_code, sigungu)
         if pnu not in cent:
             continue
@@ -261,9 +263,9 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
     dlons.sort(); dlats.sort()
     off_e, off_n = dlons[len(dlons) // 2], dlats[len(dlats) // 2]
 
-    out: dict[str, int] = defaultdict(int)
+    out: dict[str, dict] = defaultdict(lambda: {"n": 0, "floors": set(), "unknown": 0})
     hit = 0
-    for x, y, _ in alive:
+    for x, y, addr, rdn in alive:
         lon, lat = tr.transform(x, y)
         kx = 111320.0 * math.cos(math.radians(lat))
         lon -= off_e / kx
@@ -272,12 +274,20 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
             if not (x0 <= lon <= x1 and y0 <= lat <= y1):
                 continue
             if any(_pip(lon, lat, r) for r in rings):
-                out[pnu] += 1
+                o = out[pnu]
+                o["n"] += 1
+                # 인허가 주소에는 층이 문자열로 들어 있다("지상2층 201호") — 영업 중
+                # 업소의 86.3%(13거점 44,493건)에서 파싱된다. 상가정보 flrNo 공란
+                # 30%를 메우는 **독립 층 소스**다(2026-08-01).
+                fl, found = lic_floors(f"{addr} {rdn}")
+                o["floors"] |= fl
+                o["unknown"] += not fl and not found
                 hit += 1
                 break
     print(f"[page-master] licensing: 오프셋(동서 {off_e:.1f}m, 남북 {off_n:.1f}m, "
           f"기준점 {len(dlons)}) 보정 — 영업 업소 {len(alive)}건 중 {hit}건을 {len(out)}동에 귀속")
-    return out
+    return {k: {"n": v["n"], "floors": sorted(v["floors"]), "unknown": v["unknown"]}
+            for k, v in out.items()}
 
 
 # capacity 근거의 정밀도 순위. 한 지번에 방법이 섞이면 **가장 조악한** 것으로 라벨링한다
@@ -295,7 +305,7 @@ def _method_of(rows: list[dict]) -> str:
 
 
 def _aggregate(rows: list[dict], extra: int = 0, fresh: int | None = None,
-               licensed: int = 0, at: dict | None = None) -> dict:
+               licensed: int = 0, at: dict | None = None, lic: dict | None = None) -> dict:
     """같은 지번(lnoCd)의 공실행 → 분자·분모.
 
     **층 단위(2026-08-01).** 행에 `capacity_floors`(recalc_floor_ouln 산출)가 있으면
@@ -322,11 +332,12 @@ def _aggregate(rows: list[dict], extra: int = 0, fresh: int | None = None,
         floors |= set(r.get("capacity_floors") or [])
     if floors:
         at = at or {}
-        known = set(at.get("store_flr_nos") or [])
+        lic = lic or {}
+        # 분자 = 점포(상가정보 flrNo) ∪ 인허가(주소 층 표기) 로 확인된 층
+        known = set(at.get("store_flr_nos") or []) | set(lic.get("floors") or [])
         lo = len(floors & known)
-        # 층 미상 점포 + PIP + 인허가 초과분을 빈 층에 배정(상한). 상가정보 flrNo 공란이
-        # 약 30% 라 하한만 쓰면 그 30%가 전부 공실로 밀린다.
-        spare = (at.get("store_flr_unknown") or 0) + extra + max(licensed - lo, 0)
+        # 층을 모르는 것만 빈 층에 배정(상한): 상가정보 공란 + 인허가 무표기 + PIP 점포.
+        spare = ((at.get("store_flr_unknown") or 0) + (lic.get("unknown") or 0) + extra)
         hi = min(len(floors), lo + spare)
         return base | {"active": hi, "capacity": len(floors),
                        "active_floors_lo": lo, "active_floors_hi": hi,
@@ -392,11 +403,12 @@ def run(hub: PageHub) -> bool:
         floors = int(p.get("ground_floor_co") or 0)
 
         pip_n = extra.get(pnu, 0)
-        lic_n = licensed.get(pnu, 0)
+        lic = licensed.get(pnu) or {}
+        lic_n = lic.get("n", 0)
         if pnu in by_lno:
             agg = _aggregate(by_lno[pnu], extra=pip_n,
                              fresh=fresh.get(pnu, 0) if stores else None,
-                             licensed=lic_n, at=attrs.get(pnu))
+                             licensed=lic_n, at=attrs.get(pnu), lic=lic)
             status = _classify(agg["occupancy"])
             if status is None:                    # capacity 미확인 → 지도 제외
                 stats["excluded_unknown"] += 1
