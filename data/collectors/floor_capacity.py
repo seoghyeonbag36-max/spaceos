@@ -53,14 +53,31 @@ def _commercial_floors(rows: list[dict]) -> int:
     mainPurpsCdNm 만 본다(etcPurps 병합 안 함) — expos_units 와 도메인을 맞추기 위해서다.
     etcPurps 까지 이어 붙이면 "소매점 + 부속 사무소" 같은 층이 통째로 탈락한다.
     """
-    floors = set()
-    for r in rows:
-        if str(r.get("flrGbCdNm", "")) not in ("지상", ""):
-            continue
-        if any(p in str(r.get("mainPurpsCdNm", "")) for p in NON_CAPACITY_PURPS):
-            continue
-        floors.add((r.get("flrGbCd", ""), r.get("flrNo", "")))
-    return len(floors)
+    return len(commercial_floor_nos(rows))
+
+
+def commercial_floor_nos(rows: list[dict]) -> set[int]:
+    """지상 상업층의 **층번호 집합**. 층 단위 매칭(점포 flrNo 대조)의 분모 후보다.
+
+    _commercial_floors 와 같은 필터이며 결과를 개수 대신 번호로 돌려준다. flrNo 가
+    비어 있는 행은 뺀다(13거점 지상 상업행 11,812개 중 2개뿐이라 영향이 없다).
+    """
+    return {int(r.get("flrNo") or 0) for r in rows
+            if str(r.get("flrGbCdNm", "")) in ("지상", "")
+            and not any(p in str(r.get("mainPurpsCdNm", "")) for p in NON_CAPACITY_PURPS)
+            and int(r.get("flrNo") or 0) > 0}
+
+
+def capacity_floors(com_nos: set[int], store_nos: set[int], grnd_flr: int = 0) -> set[int]:
+    """분모 층 집합 = 층별개요 상업층 ∪ **점포가 확인된 지상층**.
+
+    점포가 있는 층은 정의상 상업층인데, 층별개요 용도 필터가 그런 층을 떨어뜨려
+    13거점 점포의 22.6%가 분모 밖에 있었다(`docs/finding-anchor-population.md`).
+    상가정보 flrNo 에는 실제 층수를 넘는 오기가 섞여 있어 표제부 지상층수(모르면
+    상업층 최댓값)까지만 인정한다.
+    """
+    cap = grnd_flr or max(com_nos, default=0)
+    return com_nos | {f for f in store_nos if 0 < f <= cap}
 
 
 def run(key: str, slug: str) -> None:

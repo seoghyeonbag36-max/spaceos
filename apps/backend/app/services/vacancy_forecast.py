@@ -31,14 +31,20 @@ def _anchor(district_id: str) -> dict | None:
         import datetime
 
         cal = json.loads(_CALIBRATION_JSON.read_text(encoding="utf-8"))
-        # 대표값은 primary(방법 정합 집계). combined(estimated_vacancy_pct)는 방법
-        # 구성비에 흔들려 앵커 비교에 못 쓴다 — calibrate_vacancy 의 note 참조.
+        # 대표값은 rone_aligned.mid — R-ONE 과 같은 모집단(일반건축물·상가 주용도·
+        # 중대형 규모)·단위(면적 기준)로 잰 값이다(2026-08-01). primary 는 집합건물이
+        # 섞여 있어 앵커 대조 시 과대추정된다. combined 는 방법 구성비에 흔들린다.
+        mid = (cal.get("rone_aligned") or {}).get("mid") or {}
         primary = cal.get("primary") or {}
         _cache["anchor"] = {
-            "estimated_vacancy_pct": primary.get("estimated_vacancy_pct")
+            "estimated_vacancy_pct": mid.get("vacancy_area_pct")
+                                     or primary.get("estimated_vacancy_pct")
                                      or cal.get("estimated_vacancy_pct"),
+            "vacancy_band_pct": ([mid["vacancy_floor_hi_pct"], mid["vacancy_floor_lo_pct"]]
+                                 if "vacancy_floor_lo_pct" in mid else None),
             "anchor_street_pct": cal.get("anchor_pct"),
-            "buildings_used": primary.get("buildings") or cal.get("buildings_used"),
+            "buildings_used": mid.get("buildings") or primary.get("buildings")
+                              or cal.get("buildings_used"),
             "as_of": datetime.date.fromtimestamp(
                 _CALIBRATION_JSON.stat().st_mtime).isoformat(),
             "source": "building_vacancy PoC 지상검증(정확도 75%) — 단일 시점 스냅샷",

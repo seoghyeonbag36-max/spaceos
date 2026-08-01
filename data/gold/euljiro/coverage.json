@@ -2,17 +2,17 @@
   "slug": "euljiro",
   "hub_name": "을지로(힙지로)",
   "tier": "Tier1(대장)",
-  "built_at": "2026-07-28T22:56:11",
+  "built_at": "2026-08-01T12:17:57",
   "shown": 1970,
   "excluded_total": 1114,
   "excluded_unknown": 172,
   "excluded_non_commercial": 942,
   "coverage_pct": 63.9,
   "status": {
-    "full": 303,
-    "partial": 331,
-    "high": 499,
-    "empty": 837
+    "full": 736,
+    "partial": 248,
+    "high": 148,
+    "empty": 838
   },
   "source": {
     "stores+ledger": 837,
@@ -20,28 +20,28 @@
     "stores+ledger+pip": 71,
     "pip_only": 225
   },
-  "reference_vacancy_pct": 66.4,
-  "reference_buildings": 700,
-  "reference_coverage_pct": 94.6,
-  "mixed_vacancy_pct": 65.0,
+  "reference_vacancy_pct": 54.6,
+  "reference_buildings": 728,
+  "reference_coverage_pct": 98.4,
+  "mixed_vacancy_pct": 53.2,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 663,
-      "active": 2074,
-      "capacity": 4936,
-      "vacancy_pct": 58.0
-    },
-    "floor_approx": {
-      "buildings": 40,
-      "active": 86,
-      "capacity": 248,
-      "vacancy_pct": 65.3
+      "buildings": 691,
+      "active": 1746,
+      "capacity": 2237,
+      "vacancy_pct": 21.9
     },
     "expos_units": {
       "buildings": 37,
       "active": 467,
       "capacity": 2633,
       "vacancy_pct": 82.3
+    },
+    "floor_approx": {
+      "buildings": 12,
+      "active": 18,
+      "capacity": 56,
+      "vacancy_pct": 67.9
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

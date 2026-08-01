@@ -2,16 +2,16 @@
   "slug": "myeongdong",
   "hub_name": "명동",
   "tier": "Tier1(대장)",
-  "built_at": "2026-07-28T22:56:10",
+  "built_at": "2026-08-01T12:17:55",
   "shown": 1082,
   "excluded_total": 488,
   "excluded_unknown": 153,
   "excluded_non_commercial": 335,
   "coverage_pct": 68.9,
   "status": {
-    "full": 464,
-    "partial": 233,
-    "high": 196,
+    "full": 546,
+    "partial": 198,
+    "high": 149,
     "empty": 189
   },
   "source": {
@@ -20,16 +20,16 @@
     "polygon_only": 189,
     "stores+ledger+pip": 68
   },
-  "reference_vacancy_pct": 53.4,
-  "reference_buildings": 622,
-  "reference_coverage_pct": 96.9,
-  "mixed_vacancy_pct": 51.8,
+  "reference_vacancy_pct": 59.3,
+  "reference_buildings": 638,
+  "reference_coverage_pct": 99.4,
+  "mixed_vacancy_pct": 58.0,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 592,
-      "active": 2533,
-      "capacity": 3283,
-      "vacancy_pct": 22.8
+      "buildings": 608,
+      "active": 1746,
+      "capacity": 2268,
+      "vacancy_pct": 23.0
     },
     "expos_units": {
       "buildings": 30,
@@ -38,10 +38,10 @@
       "vacancy_pct": 86.4
     },
     "floor_approx": {
-      "buildings": 20,
-      "active": 67,
-      "capacity": 189,
-      "vacancy_pct": 64.6
+      "buildings": 4,
+      "active": 11,
+      "capacity": 34,
+      "vacancy_pct": 67.6
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

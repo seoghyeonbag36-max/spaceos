@@ -14,9 +14,21 @@ floor_capacity 가 층별개요 응답 원본을 bronze/{SLUG}/bldg_flr_raw.json
   floor_approx = 지상 전체 층수 × STORES_PER_FLOOR
   floor_ouln   = 상업용도 지상 층수 × STORES_PER_FLOOR   (주거·사무소·공장류 제외)
 
+**2026-08-01 층 단위 매칭.** 지금까지 분자는 '건물 내 점포 수'(층 무관), 분모는
+'지상 상업층 수'라 단위가 달랐고 min(active, capacity) 클램프가 그 불일치를 덮고
+있었다(`docs/finding-anchor-population.md`). 상가정보 원본의 flrNo 를 층별개요 층번호와
+맞춰 두 가지를 같이 고친다:
+  · 분모 = 층별개요 상업층 **∪ 점포가 확인된 지상층** — 점포의 22.6%가 분모 밖에 있었다.
+  · 분자 = **점포가 확인된 층 수**. flrNo 공란이 약 30%라 단일 값이 될 수 없어
+    하한(층이 확인된 점포만)과 상한(층 미상 점포를 빈 층에 낮은 층부터 배정)을 함께 쓴다.
+    대표 occupancy 는 **상한**이다 — 하한은 공란 30%를 전부 공실로 미는 편향이 있다.
+행에 occupancy_lo/hi · vacancy_lo/hi · active_floors_lo/hi · capacity_floors 를 남긴다.
+기존 `active`(점포 수)는 하위호환으로 그대로 둔다.
+
 실행:
   python -m data.pipelines.recalc_floor_ouln --dry-run          # 영향만 출력
   python -m data.pipelines.recalc_floor_ouln garosugil          # 반영
+  python -m data.pipelines.recalc_floor_ouln --legacy garosugil # 점포수 기준(구식)
 """
 from __future__ import annotations
 
@@ -27,8 +39,12 @@ from collections import Counter
 
 from data.collectors.building_vacancy import STORES_PER_FLOOR, classify
 from data.collectors.common import GOLD, load_latest
-from data.collectors.floor_capacity import _commercial_floors, ground_floors
+from data.collectors.floor_capacity import (
+    _commercial_floors, capacity_floors, commercial_floor_nos, ground_floors,
+)
 from data.config.page_hubs import HUBS
+from data.pipelines.build_building_attrs import load as load_attrs
+from data.pipelines.build_building_attrs import run as build_attrs
 
 # 재계산 대상 — 층별개요로 분모를 다시 깔 수 있는 방식만. expos_units(전유부 실측)는
 # 층수 근사보다 정밀하므로 건드리지 않는다(recalc_capacity 의 회귀 교훈과 동일).
@@ -38,6 +54,16 @@ _TARGET_METHODS = {"floor_ouln", "floor_approx"}
 def _vac(active: int, cap: int) -> tuple[float, float, str]:
     occ = min(active / cap, 1.0) if cap else 0.0
     return round(occ, 3), round((1 - occ) * 100, 1), classify(occ, "floor_ouln")
+
+
+def occupied_floors(floors: set[int], store_nos: set[int], unknown: int) -> tuple[int, int]:
+    """(점포 확인 층 수 하한, 층 미상 점포까지 배정한 상한).
+
+    상한은 층 미상 점포를 **낮은 층부터** 빈 층에 하나씩 앉힌다. 1층 점포가 주소에
+    층 표기를 생략하는 경우가 많아(공란 약 30%) 낮은 층 우선이 현실에 가깝다.
+    """
+    lo = len(floors & store_nos)
+    return lo, min(len(floors), lo + max(unknown, 0))
 
 
 def _truncated(flr: dict) -> float:
@@ -52,13 +78,14 @@ def _truncated(flr: dict) -> float:
     return sum(1 for v in flr.values() if len(v) <= 1) / len(flr)
 
 
-def run(slug: str, apply: bool) -> dict | None:
+def run(slug: str, apply: bool, legacy: bool = False) -> dict | None:
     flr = load_latest(slug, "bldg_flr_raw.json")
     if not flr:
         return None
     path = GOLD / slug / "building_vacancy.json"
     if not path.exists():
         return None
+    attrs = {} if legacy else (load_attrs(slug) or (build_attrs(slug), load_attrs(slug))[1])
 
     trunc = _truncated(flr)
     if trunc > 0.5:
@@ -78,27 +105,48 @@ def run(slug: str, apply: bool) -> dict | None:
                   if r.get("capacity_method") in _TARGET_METHODS
                   and isinstance(r.get("vacancy_bldg"), (int, float))]
 
-    changed = zero_com = 0
+    changed = zero_com = widened = 0
     ratios: list[float] = []
     after_vac: list[float] = []
     for r in rows:
         if r.get("capacity_method") not in _TARGET_METHODS:
             continue
-        recs = flr.get(r.get("lnoCd", ""))
+        pnu = r.get("lnoCd", "")
+        recs = flr.get(pnu)
         if not recs:
             continue
-        n_com, n_grnd = _commercial_floors(recs), ground_floors(recs)
+        n_grnd = ground_floors(recs)
+        com_nos = commercial_floor_nos(recs)
+        at = attrs.get(pnu, {})
+        store_nos = set(at.get("store_flr_nos") or [])
+        floors = (com_nos if legacy
+                  else capacity_floors(com_nos, store_nos, at.get("grnd_flr") or 0))
+        n_com = len(floors) if not legacy else _commercial_floors(recs)
         if not n_com:
             zero_com += 1          # 상업층 0 — 값을 지어내지 않고 기존 행 유지
             continue
+        widened += len(floors) > len(com_nos)
         if n_grnd:
             ratios.append(n_grnd / n_com)
         cap = max(n_com * STORES_PER_FLOOR, 1)
-        occ, vac, st = _vac(r.get("active", 0), cap)
+        if legacy:
+            occ, vac, st = _vac(r.get("active", 0), cap)
+            extra: dict = {}
+        else:
+            # 층 단위 매칭 — 분자도 층으로 센다(상한을 대표값으로).
+            lo, hi = occupied_floors(floors, store_nos, at.get("store_flr_unknown") or 0)
+            occ = round(hi / cap, 3) if cap else 0.0
+            vac = round((1 - occ) * 100, 1)
+            st = classify(occ, "floor_ouln")
+            extra = {"active_floors_lo": lo, "active_floors_hi": hi,
+                     "capacity_floors": sorted(floors),
+                     "occupancy_lo": round(lo / cap, 3) if cap else 0.0,
+                     "vacancy_lo": round((1 - lo / cap) * 100, 1) if cap else 0.0,
+                     "occupancy_hi": occ, "vacancy_hi": vac}
         after_vac.append(vac)
         if apply:
             r.update(capacity=cap, capacity_method="floor_ouln",
-                     occupancy=occ, vacancy_bldg=vac, status=st)
+                     occupancy=occ, vacancy_bldg=vac, status=st, **extra)
         changed += 1
 
     if apply and changed:
@@ -106,6 +154,7 @@ def run(slug: str, apply: bool) -> dict | None:
 
     return {
         "slug": slug, "층별개요보유": len(flr), "재계산": changed, "상업층0유지": zero_com,
+        "분모확장": widened,
         "before_pinned": before_pin,
         "before_vac": round(statistics.fmean(before_vac), 1) if before_vac else None,
         "after_vac": round(statistics.fmean(after_vac), 1) if after_vac else None,
@@ -117,6 +166,8 @@ def run(slug: str, apply: bool) -> dict | None:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true", help="반영하지 않고 영향만 출력")
+    ap.add_argument("--legacy", action="store_true",
+                    help="층 단위 매칭 없이 점포 수 기준으로 재계산(2026-08-01 이전 방식)")
     ap.add_argument("slugs", nargs="*", help="대상 거점 (기본: 전 거점)")
     args = ap.parse_args()
     apply = not args.dry_run
@@ -127,7 +178,7 @@ def main() -> None:
         if s not in HUBS:
             print(f"[recalc-ouln] 미등록 거점 '{s}' — 건너뜀")
             continue
-        r = run(s, apply)
+        r = run(s, apply, legacy=args.legacy)
         if r is None:
             continue
         hit += 1
@@ -135,6 +186,7 @@ def main() -> None:
               f"층별개요 {r['층별개요보유']}지번 → 재계산 {r['재계산']}동 "
               f"(상업층0 유지 {r['상업층0유지']})")
         print(f"    capacity==active 로 고정돼 있던 행: {r['before_pinned']}동")
+        print(f"    점포 확인 층으로 분모가 넓어진 건물: {r['분모확장']}동")
         print(f"    평균 공실 {r['before_vac']}% → {r['after_vac']}%")
         print(f"    지상 전체층수 / 상업층수 중앙값: {r['지상/상업 층비 중앙값']}배")
     if not hit:

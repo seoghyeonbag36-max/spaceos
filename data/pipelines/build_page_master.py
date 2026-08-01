@@ -37,6 +37,7 @@ from data.collectors.building_vacancy import (
     NON_STOREFRONT_LCLS, STORES_PER_FLOOR as _STORES_PER_FLOOR)
 from data.collectors.common import GOLD, load_latest
 from data.config.page_hubs import HUBS, PageHub
+from data.pipelines.build_building_attrs import load as load_attrs
 
 # 건물통합 용도코드(대분류 5자리) 중 상가 capacity 를 가질 수 있는 상업 계열
 _COMMERCIAL_PRPS = ("03", "04", "05", "07", "14", "15", "16")
@@ -294,26 +295,49 @@ def _method_of(rows: list[dict]) -> str:
 
 
 def _aggregate(rows: list[dict], extra: int = 0, fresh: int | None = None,
-               licensed: int = 0) -> dict:
-    """같은 지번(lnoCd)의 공실행 합산 — active 합(+PIP 추가분), capacity 합(미확인 제외).
+               licensed: int = 0, at: dict | None = None) -> dict:
+    """같은 지번(lnoCd)의 공실행 → 분자·분모.
+
+    **층 단위(2026-08-01).** 행에 `capacity_floors`(recalc_floor_ouln 산출)가 있으면
+    분자·분모를 모두 **층**으로 센다. STORES_PER_FLOOR=1 이라 '층 수 = 호 수' 로
+    기존 표기(active/capacity)와 단위가 그대로 맞는다.
+      · 분모 = 지번의 상업층 합집합 — 같은 지번 여러 동을 **합산하지 않는다**
+        (capacity 는 지번당 산출물이라 합산하면 동 수만큼 부풀었다).
+      · 분자 = 점포가 확인된 층 수 + 층을 모르는 점포(공란 약 30%)·PIP·인허가를
+        빈 층에 낮은 층부터 앉힌 상한. 하한은 `active_floors_lo` 로 따로 보고한다.
+    층 근거가 없는 행(집합건물 expos_units 등)은 종전대로 점포 수로 센다.
 
     fresh 가 주어지면 gold 의 active 합 대신 사용한다 (최신·광반경 stores_raw 재집계).
     licensed(인허가 영업 업소 수)는 분자의 하한 — 상가정보 누락 보정 (max 결합).
     """
     active = max((fresh if fresh is not None else sum(r["active"] for r in rows)) + extra,
                  licensed)
+    top = max(rows, key=lambda r: r["active"])
+    base = {"name": next((r["name"] for r in rows if r.get("name")), ""),
+            "industry": top.get("industry", ""),
+            "capacity_method": _method_of(rows)}
+
+    floors: set[int] = set()
+    for r in rows:
+        floors |= set(r.get("capacity_floors") or [])
+    if floors:
+        at = at or {}
+        known = set(at.get("store_flr_nos") or [])
+        lo = len(floors & known)
+        # 층 미상 점포 + PIP + 인허가 초과분을 빈 층에 배정(상한). 상가정보 flrNo 공란이
+        # 약 30% 라 하한만 쓰면 그 30%가 전부 공실로 밀린다.
+        spare = (at.get("store_flr_unknown") or 0) + extra + max(licensed - lo, 0)
+        hi = min(len(floors), lo + spare)
+        return base | {"active": hi, "capacity": len(floors),
+                       "active_floors_lo": lo, "active_floors_hi": hi,
+                       "stores": active,                    # 점포 수(참고·하위호환)
+                       "occupancy": hi / len(floors)}
+
     caps = [r["capacity"] for r in rows if r.get("capacity")]
     # capacity 하한 = active (근사 과소추정 시 음수 공실률 방지 — 프론트 vacRate 클램프 겸용)
     cap = max(sum(caps), active) if caps else None
-    occ = min(active / cap, 1.0) if cap else None
-    top = max(rows, key=lambda r: r["active"])
-    return {
-        "name": next((r["name"] for r in rows if r.get("name")), ""),
-        "active": active, "capacity": cap,
-        "industry": top.get("industry", ""),
-        "occupancy": occ,
-        "capacity_method": _method_of(rows),
-    }
+    return base | {"active": active, "capacity": cap, "stores": active,
+                   "occupancy": min(active / cap, 1.0) if cap else None}
 
 
 def run(hub: PageHub) -> bool:
@@ -328,6 +352,7 @@ def run(hub: PageHub) -> bool:
         print(f"[page-master:{slug}] bldg_polygons.geojson 없음 — vworld_bldg 수집 먼저")
         return False
 
+    attrs = load_attrs(slug)          # 층 단위 매칭용 사이드카(없으면 점포 수 기준으로 폴백)
     vac_path = GOLD / slug / "building_vacancy.json"
     vac = json.loads(vac_path.read_text(encoding="utf-8")) if vac_path.exists() else []
     tier = "Tier1(대장)" if vac else "Tier2(폴리곤근사)"
@@ -371,7 +396,7 @@ def run(hub: PageHub) -> bool:
         if pnu in by_lno:
             agg = _aggregate(by_lno[pnu], extra=pip_n,
                              fresh=fresh.get(pnu, 0) if stores else None,
-                             licensed=lic_n)
+                             licensed=lic_n, at=attrs.get(pnu))
             status = _classify(agg["occupancy"])
             if status is None:                    # capacity 미확인 → 지도 제외
                 stats["excluded_unknown"] += 1
@@ -382,6 +407,11 @@ def run(hub: PageHub) -> bool:
                 "capacity": agg["capacity"], "active": agg["active"],
                 "industry": agg["industry"],
                 "vacancy_rate": round((1 - min(agg["active"] / agg["capacity"], 1.0)) * 100, 1),
+                "vacancy_rate_lo": (round((1 - agg["active_floors_hi"] / agg["capacity"]) * 100, 1)
+                                    if "active_floors_hi" in agg else None),
+                "vacancy_rate_hi": (round((1 - agg["active_floors_lo"] / agg["capacity"]) * 100, 1)
+                                    if "active_floors_lo" in agg else None),
+                "stores": agg["stores"],
                 "source": "stores+ledger" + ("+pip" if pip_n else ""),
                 "capacity_method": agg["capacity_method"],
                 "active_pip": pip_n, "licensed": lic_n,

@@ -2,17 +2,17 @@
   "slug": "garosugil",
   "hub_name": "신사동 가로수길",
   "tier": "Tier1(대장)",
-  "built_at": "2026-07-28T22:56:04",
+  "built_at": "2026-08-01T12:16:32",
   "shown": 836,
   "excluded_total": 416,
   "excluded_unknown": 147,
   "excluded_non_commercial": 269,
   "coverage_pct": 66.8,
   "status": {
-    "full": 358,
-    "partial": 207,
-    "high": 148,
-    "empty": 123
+    "full": 396,
+    "partial": 225,
+    "high": 121,
+    "empty": 94
   },
   "source": {
     "stores+ledger": 693,
@@ -20,16 +20,16 @@
     "polygon_only": 88,
     "stores+ledger+pip": 1
   },
-  "reference_vacancy_pct": 27.6,
+  "reference_vacancy_pct": 24.3,
   "reference_buildings": 673,
   "reference_coverage_pct": 100.0,
-  "mixed_vacancy_pct": 28.1,
+  "mixed_vacancy_pct": 25.3,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 612,
-      "active": 1774,
-      "capacity": 2396,
-      "vacancy_pct": 26.0
+      "active": 1704,
+      "capacity": 2182,
+      "vacancy_pct": 21.9
     },
     "expos_units": {
       "buildings": 61,

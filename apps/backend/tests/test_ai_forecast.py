@@ -1,4 +1,7 @@
 """AI 공실 예측 API 테스트 — platform_vacancy_forecast.json 서빙 검증 (C단계)."""
+import json
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -6,6 +9,7 @@ from tests.test_districts import SEOUL_DISTRICT_IDS
 
 client = TestClient(app)
 V1 = "/api/v1"
+_GOLD = Path(__file__).resolve().parents[3] / "data" / "gold"
 
 
 def test_predict_vacancy_all_districts():
@@ -56,7 +60,12 @@ def test_predict_vacancy_garosugil_ground_anchor():
     """garosugil 은 PoC 지상검증 실측 앵커가 응답에 부착돼야 한다."""
     body = client.post(f"{V1}/ai/predict-vacancy", json={"district_id": "garosugil"}).json()
     anchor = body.get("ground_anchor")
-    assert anchor and anchor["estimated_vacancy_pct"] == 39.1
+    # 값을 박제하지 않는다 — 파이프라인이 재산출할 때마다 바뀌므로 산출물과 대조한다
+    # (2026-08-01: 39.1 로 박제돼 있어 07-28 재산출 이후 계속 실패하고 있었다).
+    cal = json.loads((_GOLD / "garosugil" / "calibration.json").read_text(encoding="utf-8"))
+    expected = ((cal.get("rone_aligned") or {}).get("mid") or {}).get("vacancy_area_pct")
+    assert anchor and anchor["estimated_vacancy_pct"] == expected
+    assert 0 < anchor["estimated_vacancy_pct"] < 100
     # 앵커 미보유 거점에는 없어야 한다
     body2 = client.post(f"{V1}/ai/predict-vacancy", json={"district_id": "hongdae"}).json()
     assert "ground_anchor" not in body2

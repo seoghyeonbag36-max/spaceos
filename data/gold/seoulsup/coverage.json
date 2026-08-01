@@ -2,17 +2,17 @@
   "slug": "seoulsup",
   "hub_name": "서울숲 아틀리에길",
   "tier": "Tier1(대장)",
-  "built_at": "2026-07-28T22:56:12",
+  "built_at": "2026-08-01T12:17:58",
   "shown": 699,
   "excluded_total": 909,
   "excluded_unknown": 184,
   "excluded_non_commercial": 725,
   "coverage_pct": 43.5,
   "status": {
-    "full": 366,
-    "partial": 99,
-    "high": 136,
-    "empty": 98
+    "full": 379,
+    "partial": 94,
+    "high": 127,
+    "empty": 99
   },
   "source": {
     "stores+ledger": 546,
@@ -20,28 +20,28 @@
     "pip_only": 46,
     "stores+ledger+pip": 9
   },
-  "reference_vacancy_pct": 31.6,
-  "reference_buildings": 319,
-  "reference_coverage_pct": 90.6,
-  "mixed_vacancy_pct": 63.6,
+  "reference_vacancy_pct": 35.9,
+  "reference_buildings": 342,
+  "reference_coverage_pct": 97.2,
+  "mixed_vacancy_pct": 67.4,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 298,
-      "active": 834,
-      "capacity": 967,
-      "vacancy_pct": 13.8
-    },
-    "floor_approx": {
-      "buildings": 33,
-      "active": 69,
-      "capacity": 160,
-      "vacancy_pct": 56.9
+      "buildings": 321,
+      "active": 660,
+      "capacity": 796,
+      "vacancy_pct": 17.1
     },
     "expos_units": {
       "buildings": 21,
       "active": 186,
       "capacity": 524,
       "vacancy_pct": 64.5
+    },
+    "floor_approx": {
+      "buildings": 10,
+      "active": 14,
+      "capacity": 46,
+      "vacancy_pct": 69.6
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

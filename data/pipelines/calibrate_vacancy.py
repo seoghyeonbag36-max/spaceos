@@ -34,6 +34,7 @@ from functools import lru_cache
 from data.collectors.common import GOLD, load_latest
 from data.config.page_hubs import HUBS
 from data.config.rone_districts import DISTRICT_RONE
+from data.pipelines.build_building_attrs import load as load_attrs
 
 # 폴백 앵커 — R-ONE 원본을 못 읽을 때만 쓴다. 전국 상권 중위 수준의 보수값이며
 # 특정 상권을 대표하지 않는다(과거의 41.6% 처럼 특정 거점 값을 전 거점에 퍼뜨리지 않기 위해).
@@ -135,6 +136,77 @@ def _segments(rows: list[dict], anchor: float) -> dict:
     return out
 
 
+def _rone_aligned(rows: list[dict], attrs: dict, anchor_mid: float,
+                  anchor_small: float | None) -> dict:
+    """R-ONE 과 **같은 모집단·단위**로 잰 공실률 (2026-08-01, docs/finding-anchor-population.md).
+
+    R-ONE 중대형은 ① 면적 기준(공실면적/임대가능면적) ② 일반건축물 중 3층 이상 또는
+    연면적 330㎡ 초과 ③ 표본(전국 5,761동, 상권당 약 16동)이다. 집합상가는 **별도 계열**
+    이라 중대형 앵커에 넣으면 안 된다 — 13거점 집합 755동의 공실률이 72.7%로 대표값을
+    통째로 끌어올리고 있었다.
+
+    분자는 층 단위다(recalc_floor_ouln 이 넣은 active_floors_lo/hi). 상가정보 flrNo
+    공란이 약 30% 라 단일 값이 될 수 없어 **밴드**로 낸다 — 하한은 공란을 전부 공실로,
+    상한은 빈 층에 낮은 층부터 배정한다. 대표값은 면적가중 상한이다.
+    """
+    per: dict[str, dict] = {}
+    for r in rows:
+        if not r.get("capacity"):
+            continue
+        pnu = r.get("lnoCd", "")
+        at = attrs.get(pnu, {})
+        seg = ("mall" if r.get("capacity_method") == "expos_units" or at.get("is_mall")
+               else at.get("rone_size") if at.get("is_shop") else None)
+        if seg is None:
+            continue
+        # capacity·층 지표는 지번당 산출물이라 동(bdMgtSn)별로 합산하면 안 된다.
+        prev = per.get(pnu)
+        if prev and prev["cap"] >= r["capacity"]:
+            prev["stores"] += r.get("active", 0)
+            continue
+        per[pnu] = {"seg": seg, "cap": r["capacity"],
+                    "lo": r.get("active_floors_lo"), "hi": r.get("active_floors_hi"),
+                    "stores": (prev["stores"] if prev else 0) + r.get("active", 0),
+                    "area": at.get("com_area_flr") or at.get("com_area") or 0.0}
+
+    out: dict = {}
+    for seg, anchor in (("mid", anchor_mid), ("small", anchor_small), ("mall", None)):
+        items = [d for d in per.values() if d["seg"] == seg]
+        cap = sum(d["cap"] for d in items)
+        if not cap:
+            continue
+        has_floor = [d for d in items if d["hi"] is not None]
+        cap_f = sum(d["cap"] for d in has_floor)
+        blk: dict = {"buildings": len(items),
+                     # 호실(점포 수) 기준 — 하위호환 비교용. 분자·분모 단위가 달라
+                     # 건물별 클램프가 필요하다.
+                     "vacancy_units_pct": round(
+                         (1 - sum(min(d["stores"], d["cap"]) for d in items) / cap) * 100, 1)}
+        if cap_f:
+            lo = sum(d["lo"] for d in has_floor)
+            hi = sum(d["hi"] for d in has_floor)
+            area = sum(d["area"] for d in has_floor if d["area"])
+            blk |= {
+                "buildings_floor": len(has_floor),
+                "vacancy_floor_hi_pct": round((1 - hi / cap_f) * 100, 1),   # 낙관(상한 점유)
+                "vacancy_floor_lo_pct": round((1 - lo / cap_f) * 100, 1),   # 비관(하한 점유)
+                "vacancy_area_pct": round(
+                    sum((1 - d["hi"] / d["cap"]) * d["area"] for d in has_floor if d["area"])
+                    / area * 100, 1) if area else None,
+            }
+        if anchor:
+            rep = blk.get("vacancy_area_pct") or blk.get("vacancy_floor_hi_pct")
+            blk |= {"anchor_pct": round(anchor, 2),
+                    "gap_pp": round(rep - anchor, 1) if rep is not None else None}
+        out[seg] = blk
+    out["note"] = ("R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상"
+                   "(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, "
+                   "mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). "
+                   "대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 "
+                   "flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다.")
+    return out
+
+
 def run(slug: str) -> bool:
     """거점 하나의 calibration.json 산출. 반환: 성공 여부.
 
@@ -191,11 +263,16 @@ def run(slug: str) -> bool:
         primary["coverage_pct"] = round(primary["buildings"] / gross * 100, 1) if gross else None
         primary["excluded_floor_approx"] = sum(
             1 for r in rows if r.get("capacity_method") == "floor_approx")
+    aligned = _rone_aligned(rows, load_attrs(slug), anchor,
+                            _rone_latest("vac_small").get(slug))
     out |= {
+        "rone_aligned": aligned,
         "primary": primary,
         "segments": segments,
         "methods": methods,
-        "note": "primary(v4) = **대표값**. capacity 근거가 정밀한 expos_units(전유부 실측) "
+        "note": "⚠ 대표값은 2026-08-01부터 **rone_aligned** 다(R-ONE 과 같은 모집단·단위). "
+                "아래 primary/segments/methods 는 하위호환용이며 집합건물이 섞여 있어 "
+                "앵커 대조에 쓰면 과대추정된다. primary(v4) = 구 대표값. capacity 근거가 정밀한 expos_units(전유부 실측) "
                 "+ floor_ouln(층별개요 상업층) 만 집계한다. floor_approx 는 분모 과대 편향이 "
                 "커서 제외하며, coverage_pct 가 낮으면 그 거점은 floor_capacity 수집이 "
                 "덜 된 상태다(대표값을 신뢰하기 전에 채울 것). "
@@ -213,6 +290,13 @@ def run(slug: str) -> bool:
     }
     dst = GOLD / slug / "calibration.json"
     dst.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    mid = aligned.get("mid") or {}
+    if mid:
+        print(f"[calibrate:{slug}] rone_aligned(mid): 면적 "
+              f"{mid.get('vacancy_area_pct')}% · 층 "
+              f"{mid.get('vacancy_floor_hi_pct')}~{mid.get('vacancy_floor_lo_pct')}% · "
+              f"호실 {mid.get('vacancy_units_pct')}% vs 앵커 {mid.get('anchor_pct')}% "
+              f"→ gap {mid.get('gap_pp'):+}%p ({mid['buildings']}동)")
     if primary is not None:
         print(f"[calibrate:{slug}] primary: 추정 {primary['estimated_vacancy_pct']:5.1f}% "
               f"vs 앵커 {anchor:5.2f}% → gap {primary['gap_pp']:+6.1f}%p, "
