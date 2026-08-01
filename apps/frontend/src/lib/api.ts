@@ -20,9 +20,13 @@ export async function getBuildingHistory(buildingId: string) {
 }
 
 /* ===== 거점(commercial district) API =====
- * 백엔드(app/api/v1)가 단일 소스로 제공하는 서울 13 Page 거점 데이터
- * (시드: app/data/seoul_pages.py — Gold 교체 TODO).
+ * 백엔드(app/api/v1)가 단일 소스로 제공하는 서울 54 Page 거점 데이터.
+ * 공실 수치는 Gold 실측 우선(13거점) · 나머지는 합성 폴백 — vacancy_source 로 구분한다.
+ * 감성·입점 유닛·행사는 아직 시드(app/data/seoul_pages.py).
  */
+
+/** 공실 수치의 출처 — 합성값을 실측처럼 표시하지 않기 위한 구분자 */
+export type VacancySource = "gold" | "synthetic";
 async function getJSON<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);
   if (!res.ok) throw new Error(`API ${path} failed: ${res.status}`);
@@ -36,6 +40,16 @@ export interface DistrictSummary {
   sentiment: number; reviews: number; risk_zones: number;
   vacancy_rate: number; vacant_units: number; cell_count: number; store_count: number;
   tier_mix: { premium: number; value: number; factory: number };
+  /** 공실 수치 출처. "gold"면 실측 건물 집계, "synthetic"이면 합성 그리드 */
+  vacancy_source: VacancySource;
+  /** Gold 경로에서만 — 집계에 쓰인 건물 수 / 마스터 전체 대비 비율(%) */
+  building_count: number | null;
+  precision_pct: number | null;
+  /** 앵커 대조 — 거점별 R-ONE 중대형상가 공실률과 격차(%p).
+   *  모집단·단위가 달라(우리는 호실·전수, R-ONE 은 면적·표본) 격차 0 이 정상은 아니다.
+   *  절대값이 아니라 거점 간 비교·추세 감시용. */
+  anchor_pct: number | null;
+  anchor_gap_pp: number | null;
   /** Platform·LSTM 다음 분기 예측 — forecast 미배포 시 null */
   predicted_rate: number | null;
   predicted_delta: number | null;
@@ -65,10 +79,16 @@ export interface TierScenario {
   roi_months: number; recommended: boolean;
 }
 
+/** 입력 필드별 출처 — 프록시를 실측으로 오독하지 않기 위한 구분자.
+ *  "rone" R-ONE 임대료 · "flpop+seed" 유동인구+거점 내 서열 · "seed" 손으로 적은 프록시 */
+export type PostingInputSource = Record<"area" | "rent" | "prem" | "foot", string>;
+
 export interface PostingUnit {
   id: string; n: string; grp: string; lat: number; lng: number;
   area: number; rent: number; prem: number; floor: string; was: string;
   rec: string; foot: string; persona: string; note: string;
+  /** rent·foot 은 실데이터, area·prem 은 소스가 없어 시드로 남아 있다 */
+  inputs_source?: PostingInputSource | null;
 }
 
 /** 공실 유닛 + 3-Tier 시나리오 — GET /commercial-districts/{id}/postings */
@@ -76,14 +96,26 @@ export interface Posting extends PostingUnit {
   scenarios: Record<string, TierScenario>;
 }
 
+/** 상권 행사. 실데이터(서울 문화행사)와 시드가 같은 타입으로 흐른다.
+ *  시드에만 있던 k2(효과 지표)·roles·ha 는 근거가 없어 실데이터로 승계하지 않았다. */
 export interface MarketingEvent {
   id: string; n: string; lat: number; lng: number; ic: string; when: string;
-  k2: string; desc: string; roles: string[]; ha: string;
+  /** 시드 전용 — 실데이터에서는 null */
+  k2?: string | null; desc?: string | null; roles?: string[] | null; ha?: string | null;
+  /** 실데이터 전용 — 시드에서는 null */
+  category?: string | null; place?: string | null; org?: string | null;
+  fee?: string | null; target?: string | null; link?: string | null;
+  distance_m?: number | null;
 }
 
 /** 상권 마케팅 — GET /marketing/{id} */
 export interface Marketing {
   district_id: string; events: MarketingEvent[]; online_contents: string[];
+  /** 온라인 콘텐츠 출처 — "llm"(Gold 컨텍스트 기반 생성) | "seed"(폴백) */
+  source?: string;
+  /** 행사 출처 — "seoul-open-data"(실데이터) | "seed". 실데이터인데 0건이면
+   *  그 거점에 예정된 공공 문화행사가 없다는 뜻이다(시드로 채우지 않는다). */
+  events_source?: string;
 }
 
 /** 100m 그리드 공실 셀 — lat/lng 는 셀 남서(SW) 모서리, dlat/dlng 는 셀 크기 */
@@ -91,12 +123,23 @@ export interface HeatCell {
   i: number; j: number; lat: number; lng: number;
   c_lat: number; c_lng: number; v: number; stores: number; vac_n: number;
   dlat: number; dlng: number;
+  /** Gold 경로에서만 — 셀의 총 호실 수(공실률 분모)와 집계된 건물 수 */
+  capacity?: number | null; buildings?: number | null;
 }
 
 /** 거점 공실 히트맵 — GET /heatmap/vacancy?district={id} */
 export interface VacancyHeatmap {
   district_id: string; resolution_m: number;
   cells: HeatCell[]; sum_stores: number; sum_vac: number; avg_vacancy: number;
+  /** 공실 수치 출처 — "gold"면 실측 건물 집계, "synthetic"이면 합성 그리드 */
+  vacancy_source: VacancySource;
+  /** Gold 경로에서만 — 총 호실 수, 집계 건물 수, 마스터 전체 건물 수, 정밀 표본 비율(%),
+   *  집합건물로 제외된 건물 수(분자 미매칭이라 대표 집계에서 뺀다) */
+  capacity: number | null; buildings: number | null;
+  buildings_total: number | null; precision_pct: number | null;
+  excluded_mall: number | null;
+  /** 앵커 대조 — R-ONE 중대형상가 공실률과 격차(%p). DistrictSummary 와 동일 의미 */
+  anchor_pct: number | null; anchor_gap_pp: number | null;
   /** Platform·LSTM 다음 분기 예측 (거점 단위) — forecast 미배포 시 null */
   predicted_rate: number | null;
   predicted_delta: number | null;
@@ -135,7 +178,7 @@ export interface GeoJSONFC {
 }
 /** 거점 공실 유닛 + 3-Tier 시나리오(Posting) */
 export const getPostings = (id: string) => getJSON<Posting[]>(`/commercial-districts/${id}/postings`);
-/** 거점(상권) 마케팅 — TODO: Platform 수집 정보(Gold) 기반 생성으로 교체(Program) */
+/** 거점(상권) 마케팅 — 온라인 콘텐츠는 Gold 기반 생성(Program), 행사는 시드 */
 export const getMarketing = (id: string) => getJSON<Marketing>(`/marketing/${id}`);
 
 async function postJSON<T>(path: string, body: unknown): Promise<T> {

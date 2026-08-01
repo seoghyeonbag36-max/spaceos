@@ -69,6 +69,15 @@ def _load_gold(slug: str) -> dict | None:
     return hit["fc"]
 
 
+def load_master(district: str) -> dict | None:
+    """거점 gold 마스터 GeoJSON 원본 (별칭 해석 포함, 없으면 None).
+
+    같은 파일을 읽는 다른 서비스(gold_vacancy 의 그리드 집계)가 mtime 캐시를
+    공유하도록 공개한다 — 거점당 수백~2천 피처라 중복 로드는 피한다.
+    """
+    return _load_gold(_resolve(district))
+
+
 def _garosu_sample(district: str) -> dict:
     """gold 미생성 환경용 가로수길 샘플 8동 FeatureCollection."""
     features = []

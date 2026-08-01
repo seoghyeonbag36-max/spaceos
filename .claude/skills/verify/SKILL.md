@@ -60,9 +60,14 @@ with sync_playwright() as p:
   `curl.exe -s -w "HTTP:%{http_code}"` 를 쓸 것.
 - **`py -3.11`** 로 부른다. `python`은 다른 버전일 수 있다.
 - **전역 CSS가 로드되는지부터 확인할 것.** `styles/tokens.css` 는 오래 MapShell.tsx
-  (라우팅되지 않는 컴포넌트)에서만 import 돼 있어 리셋이 죽어 있었다 — CSS 를 고쳐도
+  (당시 라우팅되지 않던 컴포넌트)에서만 import 돼 있어 리셋이 죽어 있었다 — CSS 를 고쳐도
   화면이 안 바뀐다. 빌드 산출물에서 규칙이 실제로 나오는지 보는 게 빠르다:
   `grep -o "html,body{[^}]*}" dist/assets/*.css`
+- **네이버 지도 컨테이너는 `inset:0` 만으로 크기가 잡히지 않는다.** SDK 가 초기화하면서
+  컨테이너의 `position` 을 `relative` 로 덮어써 `inset` 이 사이징이 아니라 오프셋으로
+  해석되고, 높이가 0 으로 접혀 지도가 통째로 사라진다(2026-08-01 실측). `width/height:100%`
+  를 같이 준다. 스크린샷만 보면 "지도 키 문제"로 오진하기 쉬우니 DOM 으로 재라:
+  `document.querySelector('.map-canvas').getBoundingClientRect()`
 
 ## 공실 레이어(`/api/v1/heatmap/buildings`) 검증
 
@@ -91,11 +96,34 @@ curl.exe -s "http://localhost:5173/api/v1/heatmap/buildings?district=gangnam-gar
 
 `properties.capacity_method` 는 분모의 근거를 가른다 — 이것도 섞으면 안 된다:
 
-- `expos_units` / `floor_ouln` — 전유부 실측·층별개요 상업층. **대표 집계는 이 둘만** 쓴다
-  (`coverage.json` 의 `reference_vacancy_pct`).
+- `floor_ouln` — 층별개요 상업층. **거점 대표 집계는 이것만** 쓴다.
+- `expos_units` — 전유부 실측(집합건물). **분모는 정밀하지만 분자가 비어 있다** — 상가정보가
+  집합상가 **내부** 점포를 그 건물 bdMgtSn 으로 귀속시키지 못해 공실률이 78~86% 로 나온다.
+  건물 수로는 소수인데 호실이 많아 **분모의 52~82%** 를 차지하는 거점이 있어, 섞으면 거점
+  대표값이 통째로 무너진다(2026-08-01 앵커 대조: seoulsup 19.8% → 67.0%). 층·호 단위
+  매칭(flrNo/hoNo) 전까지 대표 집계에서 뺀다.
 - `floor_approx` — 지상 **전체** 층수 근사. 주거·사무 층까지 상가로 세어 분모가 부푼다.
   `mixed_vacancy_pct` 에만 섞여 있고 앵커 비교에 쓰면 안 된다.
+
+> ⚠ `coverage.json` 의 `reference_vacancy_pct` 는 `expos_units` 를 포함한 구 기준이다.
+> 현재 API 대표값(`services/gold_vacancy.py`)과 다르며, 대표값으로 인용하지 말 것.
 
 앵커는 **거점별 R-ONE 중대형상가 공실률**이다(`calibration.json.anchor_pct`,
 garosugil = 17.6%). 예전에 쓰던 공통 41.6% 는 부동산원 통계가 아니라 가로수길 가두
 1층 실태조사(2024) 값을 잘못 표기한 것이라 2026-07-28 폐기했다.
+API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — 13거점 격차는
+-4.0 ~ +21.5%p 다. 모집단이 달라(우리는 호실·전수, R-ONE 은 면적·표본) 격차 0 은 목표가 아니다.
+
+## 지도 뷰(MapShell) 검증
+
+App.tsx 네비 **"지도"** 탭이 진입점이다(2026-08-01 연결). 거점 선택은 실측 13거점만 나온다.
+
+```python
+pg.get_by_role('button', name='지도').click()
+pg.wait_for_timeout(7000)          # 네이버 SDK + 폴리곤 렌더까지 넉넉히
+pg.locator('.hub-select').select_option('hongdae')
+```
+
+- `.hub-select` 옵션 수 = `vacancy_source === "gold"` 인 거점 수(현재 13)
+- `.b-item` 수 = 그 거점 건물 수(가로수길 836, 홍대 1,329) — 0 이면 API 404 폴백을 탄 것
+- `.map-canvas` 의 높이가 0 이 아닌지 반드시 확인(위 함정 참조)

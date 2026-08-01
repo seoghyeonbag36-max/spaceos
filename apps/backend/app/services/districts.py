@@ -1,15 +1,20 @@
 """거점(commercial district) 도메인 서비스.
 
-정적 시드 데이터(app/data/seoul_pages.py — 서울 13 Page 거점)를 기반으로
-공실 그리드 합성·집계를 수행한다.
-TODO: Gold 레이어(매출·공실·감성) 적재 후 이 서비스의 입력을 DB 조회로 교체.
+공실 집계의 입력은 **Gold 실데이터 우선**이다 (2026-08-01 배선 교체).
+- Gold 보유 거점(data/gold/{slug}/page_building_master.geojson — 13곳): 실측 건물을
+  100m 셀로 집계 (services/gold_vacancy). 응답의 `vacancy_source == "gold"`.
+- 미보유 거점(41곳): 기존 `build_cells()` 합성 그리드로 폴백. `vacancy_source == "synthetic"`.
+  → 해당 거점의 Gold 를 만들면(data/pipelines/build_page_master.py) 자동으로 실데이터로 바뀐다.
+
+아직 시드(app/data/seoul_pages.py)에 남아 있는 것: 감성 zones·입점 units·행사 events.
+TODO: 감성은 리뷰 감성분석, units 의 rent/prem 은 R-ONE 조인으로 교체.
 """
 from __future__ import annotations
 
 import math
 
 from app.data.seoul_pages import DISTRICTS, DISTRICTS_BY_ID
-from app.services import vacancy_forecast
+from app.services import gold_vacancy, posting_inputs, vacancy_forecast
 
 # 입점 3-Tier 정의
 TIER = {
@@ -31,8 +36,20 @@ def _seed(i: int, j: int) -> float:
     return x - math.floor(x)
 
 
+def cells_for(d: dict) -> dict:
+    """거점의 100m 공실 셀 — Gold 실데이터 우선, 없으면 합성 폴백.
+
+    `vacancy_source` 로 어느 쪽인지 항상 밝힌다(추측 최소화 원칙 — 합성값이 실측처럼
+    보이면 안 된다). Gold 경로는 capacity/buildings/precision_pct 메타를 더 얹는다.
+    """
+    gold = gold_vacancy.build_cells(d["id"], d["grid"])
+    if gold is not None:
+        return {**gold, "vacancy_source": "gold"}
+    return {**build_cells(d["grid"]), "vacancy_source": "synthetic"}
+
+
 def build_cells(grid: dict) -> dict:
-    """100m 그리드 공실 셀 합성. 프론트 buildCells와 동일 결과.
+    """100m 그리드 공실 셀 **합성** — Gold 미보유 거점 폴백. 프론트 buildCells와 동일 결과.
 
     반환: {cells: [...], sum_stores, sum_vac, avg_vacancy}
     """
@@ -83,9 +100,15 @@ def tier_scenarios(unit: dict) -> dict:
     base = unit["area"] * f_k
     rent, area, prem = unit["rent"], unit["area"], unit["prem"]
 
-    def roi(invest: float, cost: float, rev: float) -> float:
+    def roi(invest_mn: float, cost: float, rev: float) -> float:
+        """투자 회수기간(개월). invest 는 **백만원**, cost/rev 는 **만원** 단위다.
+
+        2026-08-01 수정: 이전에는 `invest / net` 이라 단위가 섞여(백만원 ÷ 만원)
+        회수기간이 100배 작게 나왔다 — 화면에 "회수 0개월 / 0.1개월"로 찍히고 있었다.
+        1백만원 = 100만원 이므로 invest 를 만원으로 맞춘 뒤 나눈다.
+        """
         net = rev - cost
-        return 99.0 if net <= 0 else round(invest / net, 1)
+        return 99.0 if net <= 0 else round(invest_mn * 100 / net, 1)
 
     out = {}
     specs = {
@@ -123,7 +146,7 @@ def _summary(d: dict) -> dict:
     sum_r = sum(z["r"] for z in d["zones"])
     sent = sum(z["s"] * z["r"] for z in d["zones"]) / sum_r
     risk = sum(1 for z in d["zones"] if z["s"] < 40)
-    ci = build_cells(d["grid"])
+    ci = cells_for(d)
     tiers = {k: sum(1 for u in d["units"] if u["rec"] == k) for k in TIER}
     rec_top = TIER[d["units"][0]["rec"]]["nm"] if d["units"] else ""
     return {
@@ -133,6 +156,11 @@ def _summary(d: dict) -> dict:
         "vacancy_rate": ci["avg_vacancy"], "vacant_units": ci["sum_vac"],
         "cell_count": len(ci["cells"]), "store_count": ci["sum_stores"],
         "tier_mix": tiers,
+        "vacancy_source": ci["vacancy_source"],
+        "building_count": ci.get("buildings"),
+        "precision_pct": ci.get("precision_pct"),
+        "anchor_pct": ci.get("anchor_pct"),
+        "anchor_gap_pp": ci.get("anchor_gap_pp"),
         **_predicted(d["id"], ci["avg_vacancy"]),
     }
 
@@ -161,16 +189,28 @@ def get_vacancy_heatmap(district_id: str) -> dict | None:
     d = DISTRICTS_BY_ID.get(district_id)
     if not d:
         return None
-    ci = build_cells(d["grid"])
+    ci = cells_for(d)
     return {"district_id": district_id, "resolution_m": 100, **ci,
             **_predicted(district_id, ci["avg_vacancy"])}
 
 
-def get_postings(district_id: str) -> list[dict] | None:
+def resolved_units(district_id: str) -> list[dict] | None:
+    """거점의 공실 유닛 — rent·foot 은 실데이터로 덮어쓴 뒤 돌려준다.
+
+    시드 원본(seoul_pages.DISTRICTS)은 건드리지 않는다(프로세스 전역 공유 dict 다).
+    각 유닛의 `inputs_source` 가 필드별 출처(seed/rone/flpop)를 밝힌다.
+    """
     d = DISTRICTS_BY_ID.get(district_id)
     if not d:
         return None
-    return [{**u, "scenarios": tier_scenarios(u)} for u in d["units"]]
+    return posting_inputs.resolve_units(district_id, d["units"])
+
+
+def get_postings(district_id: str) -> list[dict] | None:
+    units = resolved_units(district_id)
+    if units is None:
+        return None
+    return [{**u, "scenarios": tier_scenarios(u)} for u in units]
 
 
 def get_marketing(district_id: str) -> dict | None:

@@ -30,7 +30,10 @@ class IndustryRequest(BaseModel):
 
 @router.post("/predict-vacancy")
 async def predict_vacancy(req: VacancyRequest) -> dict[str, object]:
-    """LSTM 공실 예측 — gold/platform_vacancy_forecast.json 서빙 (홀드아웃 방향정확도 84.6%).
+    """LSTM 공실 예측 — gold/platform_vacancy_forecast.json 서빙.
+
+    홀드아웃 성능은 MAE 1.109 / RMSE 1.494 가 주지표다(2026-07-25 학습분). 방향정확도
+    (현재 72.2%)는 54거점 표본에서 노이즈가 커 게이트 지표에서 뺐다 — 인용하지 말 것.
 
     horizon_months(1~12)는 분기로 환산(올림, 최대 4분기)해 재귀 예측 horizon 을 고른다.
     forecast json 부재 시(신규 클론 등) 스텁 응답으로 폴백, 미지원 거점은 404.

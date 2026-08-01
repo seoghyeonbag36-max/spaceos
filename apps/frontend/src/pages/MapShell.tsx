@@ -4,18 +4,26 @@
 //
 // 공실 레이어: 백엔드 /heatmap/buildings GeoJSON → naver.maps.Polygon 렌더(백엔드 다운 시 로컬 샘플 폴백).
 // 유동인구: HeatMap + 시간 슬라이더. 임대/인구밀도: 코로플레스(데이터 연동 예정).
+//
+// 2026-08-01: App.tsx "지도" 탭에 연결(그전까지 라우팅되지 않아 방치돼 있었다).
+// 거점은 하드코딩(gangnam-garosugil)이 아니라 **실측 거점 목록에서 고른다** —
+// vacancy_source === "gold" 인 거점만 건물 폴리곤이 있고, 합성 거점은 404 라 빈 지도가 된다.
+//
+// ⚠ 이 컴포넌트는 position:absolute·inset:0 이라 **위치 지정된 부모** 안에 있어야 한다
+//   (App.tsx 의 main 이 지도 뷰에서만 position:relative). 지도 캔버스 사이징 함정은
+//   MapShell.css 의 .map-canvas 주석 참조.
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { loadNaverMaps } from "@/lib/naverMap";
-import { getBuildingVacancy, type GeoJSONFC } from "@/lib/api";
+import { getBuildingVacancy, listDistricts, type DistrictSummary, type GeoJSONFC } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
 import "@/styles/tokens.css";
 import "./MapShell.css";
 
 const BuildingTwin = lazy(() => import("@/components/BuildingTwin"));
 
-// 가로수길 코어 (강남구 신사동) — poc-building-vacancy.md §0.5
+// 가로수길 코어 (강남구 신사동) — poc-building-vacancy.md §0.5. 거점 목록이 오기 전 초기 중심.
 const GAROSU = { lat: 37.5205, lng: 127.023 };
-const DISTRICT = "gangnam-garosugil";
+const DEFAULT_DISTRICT = "garosugil";
 
 type Layer = "footfall" | "vacancy" | "rent" | "density";
 type VacStatus = "full" | "partial" | "high" | "empty";
@@ -81,12 +89,12 @@ function fromGeoJSON(fc: GeoJSONFC): Building[] {
 }
 
 // SAMPLE — 유동인구 히트맵용 포인트. TODO: 서울 생활인구 격자로 교체.
-function sampleFootfall() {
+function sampleFootfall(center: { lat: number; lng: number }) {
   const pts: { lat: number; lng: number; w: number }[] = [];
   for (let i = 0; i < 120; i++) {
     const r = Math.pow(Math.random(), 1.6) * 0.004;
     const a = Math.random() * Math.PI * 2;
-    pts.push({ lat: GAROSU.lat + r * Math.cos(a), lng: GAROSU.lng + r * Math.sin(a), w: Math.random() });
+    pts.push({ lat: center.lat + r * Math.cos(a), lng: center.lng + r * Math.sin(a), w: Math.random() });
   }
   return pts;
 }
@@ -104,15 +112,45 @@ export default function MapShell() {
   const [q, setQ] = useState("");
   const [hour, setHour] = useState(18);
   const [twinOpen, setTwinOpen] = useState(false);
+  // 건물 폴리곤이 있는 거점만 고른다 — vacancy_source === "gold" 가 곧 "Gold 마스터 보유"다.
+  // 합성 거점을 열면 /heatmap/buildings 가 404 라 빈 지도가 된다.
+  const [hubs, setHubs] = useState<DistrictSummary[]>([]);
+  const [districtId, setDistrictId] = useState(DEFAULT_DISTRICT);
+
+  const hub = useMemo(() => hubs.find((h) => h.id === districtId), [hubs, districtId]);
+  const center = hub ? { lat: hub.center[0], lng: hub.center[1] } : GAROSU;
+
+  // 실측 거점 목록
+  useEffect(() => {
+    let alive = true;
+    listDistricts()
+      .then((all) => {
+        if (!alive) return;
+        const gold = all.filter((d) => d.vacancy_source === "gold");
+        setHubs(gold);
+        // 기본 거점이 아직 Gold 가 아니면 첫 실측 거점으로 떨어진다
+        if (gold.length && !gold.some((d) => d.id === DEFAULT_DISTRICT)) setDistrictId(gold[0].id);
+      })
+      .catch(() => { /* 목록 실패 시 기본 거점 단독으로 계속 */ });
+    return () => { alive = false; };
+  }, []);
 
   // 건물 공실 데이터: 백엔드 /heatmap/buildings → 실패 시 로컬 샘플
   useEffect(() => {
     let alive = true;
-    getBuildingVacancy(DISTRICT)
+    setSelected(null);
+    getBuildingVacancy(districtId)
       .then((fc) => { if (alive) { setBuildings(fromGeoJSON(fc)); setSrc("api"); } })
       .catch(() => { if (alive) { setBuildings(LOCAL_BUILDINGS); setSrc("local"); } });
     return () => { alive = false; };
-  }, []);
+  }, [districtId]);
+
+  // 거점이 바뀌면 지도도 그 거점으로 옮긴다
+  useEffect(() => {
+    if (!ready || !hub) return;
+    const naver = (window as any).naver;
+    mapRef.current?.setCenter(new naver.maps.LatLng(center.lat, center.lng));
+  }, [ready, hub, center.lat, center.lng]);
 
   // 지도 1회 초기화
   useEffect(() => {
@@ -164,7 +202,7 @@ export default function MapShell() {
       });
     } else if (layer === "footfall") {
       // 유동인구: HeatMap(visualization). 미탑재 시 Circle 폴백.
-      const data = sampleFootfall();
+      const data = sampleFootfall(center);
       if (naver.maps.visualization?.HeatMap) {
         const hm = new naver.maps.visualization.HeatMap({
           map, data: data.map((p) => ({ location: new naver.maps.LatLng(p.lat, p.lng), weight: p.w })),
@@ -182,7 +220,7 @@ export default function MapShell() {
       }
     }
     // rent/density: 구·격자 코로플레스 → 폴리곤 데이터 필요(범례에 안내).
-  }, [layer, ready, buildings]);
+  }, [layer, ready, buildings, center.lat, center.lng]);
 
   const filtered = useMemo(() => buildings.filter((b) => !q || b.name.includes(q)), [buildings, q]);
   const isChoropleth = layer === "rent" || layer === "density";
@@ -202,9 +240,17 @@ export default function MapShell() {
         </div>
       )}
 
-      {/* 상단: 검색 + 레이어 토글 */}
+      {/* 상단: 거점 선택 + 검색 + 레이어 토글 */}
       <div className="overlay overlay-top">
-        <input className="search" placeholder="건물·상호 검색 (가로수길)" value={q} onChange={(e) => setQ(e.target.value)} />
+        {hubs.length > 0 && (
+          <select className="hub-select" value={districtId} onChange={(e) => setDistrictId(e.target.value)}
+            title="건물 폴리곤이 있는 실측 거점만 나온다">
+            {hubs.map((h) => (
+              <option key={h.id} value={h.id}>{h.name} · 공실 {h.vacancy_rate.toFixed(1)}%</option>
+            ))}
+          </select>
+        )}
+        <input className="search" placeholder={`건물 검색 (${hub?.name ?? "가로수길"})`} value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="seg" role="tablist">
           {LAYERS.map((l) => (
             <button key={l.key} className={layer === l.key ? "active" : ""} onClick={() => setLayer(l.key)}>{l.label}</button>
@@ -215,8 +261,16 @@ export default function MapShell() {
       {/* 좌측 리스트 패널 (모바일: 하단 시트) */}
       <div className="overlay side-panel">
         <div className="sp-head">
-          <div className="sp-title">가로수길 · 건물 공실</div>
-          <div className="sp-sub">강남구 신사동 · {filtered.length}개 · {src === "api" ? "API" : "샘플"}(추정)</div>
+          <div className="sp-title">{hub?.name ?? "가로수길"} · 건물 공실</div>
+          <div className="sp-sub">
+            {hub ? `${hub.gu} · ` : ""}{filtered.length.toLocaleString()}동 · {src === "api" ? "실측" : "샘플"}(추정)
+            {hub && ` · 거점 ${hub.vacancy_rate.toFixed(1)}%`}
+          </div>
+          {hub?.anchor_pct != null && hub.anchor_gap_pp != null && (
+            <div className="sp-anchor" title="R-ONE 중대형상가 공실률 대비. 모집단이 달라 격차 0 이 정상은 아니며 거점 간 비교용이다.">
+              앵커 {hub.anchor_pct.toFixed(1)}% {hub.anchor_gap_pp >= 0 ? "+" : ""}{hub.anchor_gap_pp.toFixed(1)}%p
+            </div>
+          )}
         </div>
         <div className="sp-list">
           {filtered.map((b) => (

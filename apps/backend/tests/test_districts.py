@@ -1,4 +1,9 @@
-"""거점 API 테스트 — 서울 54 Page 시드(app/data/seoul_pages.py) 기준."""
+"""거점 API 테스트 — 서울 54 Page 시드(app/data/seoul_pages.py) 기준.
+
+공실 수치는 Gold 실측(data/gold/{slug}/page_building_master.geojson)이 있으면 실측,
+없으면 합성 폴백이다 — 아래 Gold 배선 테스트는 파일 존재를 기준으로 기대값을 정한다.
+"""
+import json
 import re
 from pathlib import Path
 
@@ -103,13 +108,181 @@ def test_building_vacancy_geojson():
 
 
 def test_all_districts_have_heatmap_cells():
-    """전 거점 그리드 합성 셀이 비어 있지 않아야 한다 (hot 스팟 정합 검증)."""
+    """전 거점 그리드 셀이 비어 있지 않아야 한다 (Gold 실측·합성 폴백 무관)."""
     for d in DISTRICTS:
         r = client.get(f"{V1}/heatmap/vacancy", params={"district": d["id"]})
         assert r.status_code == 200, d["id"]
         hm = r.json()
         assert hm["cells"], f"{d['id']} 그리드 셀 없음"
         assert hm["sum_stores"] > 0, d["id"]
+
+
+# ── Gold 실데이터 배선 (2026-08-01) ────────────────────────────────────────────
+GOLD_DIR = Path(__file__).resolve().parents[3] / "data" / "gold"
+# services/gold_vacancy 의 집계 규칙과 동일하게 유지 (분모 근거 · 집합 제외 · 분자 근거)
+COUNTED_METHODS = {"floor_ouln"}
+MALL_METHOD = "expos_units"
+EXCLUDED_SOURCES = {"polygon_only"}
+
+
+def _counted(props: dict) -> bool:
+    """대표 집계에 들어가는 건물인가 — gold_vacancy.build_cells 의 필터와 같은 조건."""
+    return (props.get("capacity_method") in COUNTED_METHODS
+            and bool(props.get("capacity"))
+            and props.get("source") not in EXCLUDED_SOURCES)
+
+
+def _gold_master(slug: str):
+    """거점 Gold 건물 마스터 로드 (없으면 None)."""
+    path = GOLD_DIR / slug / "page_building_master.geojson"
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _gold_slugs() -> list[str]:
+    return [d["id"] for d in DISTRICTS if (GOLD_DIR / d["id"] / "page_building_master.geojson").exists()]
+
+
+def test_vacancy_source_matches_gold_presence():
+    """Gold 마스터가 있는 거점은 실측("gold"), 없으면 합성("synthetic")으로 표기돼야 한다.
+
+    합성값이 실측처럼 읽히면 안 되므로 출처 표기는 두 엔드포인트에서 일치해야 한다.
+    """
+    gold = set(_gold_slugs())
+    assert gold, "Gold 산출물이 하나도 없다 — data/pipelines/build_page_master.py 먼저 실행"
+
+    for s in client.get(f"{V1}/commercial-districts").json():
+        expected = "gold" if s["id"] in gold else "synthetic"
+        assert s["vacancy_source"] == expected, f"{s['id']} 요약 출처 표기"
+        hm = client.get(f"{V1}/heatmap/vacancy", params={"district": s["id"]}).json()
+        assert hm["vacancy_source"] == expected, f"{s['id']} 히트맵 출처 표기"
+
+
+def test_gold_cells_are_internally_consistent():
+    """Gold 거점의 셀 집계가 자기모순이 없어야 한다 — 합이 맞고 공실률이 분모와 정합."""
+    for slug in _gold_slugs():
+        hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
+        assert hm["capacity"] > 0 and hm["buildings"] > 0, slug
+        assert hm["buildings"] <= hm["buildings_total"], slug
+
+        cap = sum(c["capacity"] for c in hm["cells"])
+        act = sum(c["stores"] for c in hm["cells"])
+        bld = sum(c["buildings"] for c in hm["cells"])
+        assert cap == hm["capacity"] and act == hm["sum_stores"] and bld == hm["buildings"], slug
+        assert hm["sum_vac"] == cap - act, slug
+        assert hm["avg_vacancy"] == pytest.approx((cap - act) / cap * 100, abs=0.01), slug
+        # 공실 호실 수가 음수인 셀은 active > capacity 를 뜻한다(파이프라인 규칙 위반)
+        assert all(c["vac_n"] >= 0 for c in hm["cells"]), slug
+
+
+def test_gold_aggregate_excludes_weak_evidence():
+    """거점 대표 공실률은 근거가 약한 건물을 뺀 표본만 집계해야 한다.
+
+    - 분모: floor_approx(지상 전체 층수 근사)를 섞으면 과대추정 — 가로수길 전수 33.1% vs 24.2%.
+    - 집합: expos_units 는 분자가 구조적으로 비어 공실률 78~86% 로 나온다.
+    - 분자: polygon_only(점포 미매칭)는 active=0 이라 공실률 100% 로 고정된다.
+    Gold 파일에서 직접 계산해 API 와 대조한다.
+    """
+    for slug in _gold_slugs():
+        props = [f["properties"] for f in _gold_master(slug)["features"]]
+        counted = [p for p in props if _counted(p)]
+        cap = sum(p["capacity"] for p in counted)
+        act = sum(min(p.get("active") or 0, p["capacity"]) for p in counted)
+
+        hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
+        assert hm["buildings"] == len(counted), f"{slug} 집계 건물 수"
+        assert hm["buildings_total"] == len(props), f"{slug} 전체 건물 수"
+        assert hm["avg_vacancy"] == pytest.approx((cap - act) / cap * 100, abs=0.01), slug
+
+        # 제외된 건물이 실제로 있어야 하고(현 산출물 기준), 전수 집계와 값이 달라야 한다.
+        assert len(counted) < len(props), f"{slug} 제외 규칙이 아무것도 걸러내지 않았다"
+        all_cap = sum(p.get("capacity") or 0 for p in props)
+        all_act = sum(p.get("active") or 0 for p in props)
+        assert hm["avg_vacancy"] != pytest.approx((all_cap - all_act) / all_cap * 100, abs=0.01), slug
+
+
+def test_mall_buildings_never_counted():
+    """집합건물(expos_units)은 집계에서 빠지고, 뺀 개수를 응답에 밝혀야 한다.
+
+    분자가 구조적으로 비어 있다 — 상가정보가 대형 집합상가 내부 점포를 그 건물의
+    bdMgtSn 으로 귀속시키지 못한다. 건물 수로는 소수인데 호실이 많아 분모의 52~82% 를
+    차지하는 거점이 있어, 섞으면 거점 대표값이 무너진다(seoulsup 19.8% → 67.0%).
+    """
+    for slug in _gold_slugs():
+        props = [f["properties"] for f in _gold_master(slug)["features"]]
+        malls = [p for p in props if p.get("capacity_method") == MALL_METHOD]
+        assert malls, f"{slug}: 집합건물이 하나도 없다 — 산출물 구조가 바뀌었는지 확인"
+        assert not any(_counted(p) for p in malls), f"{slug}: 집합건물이 집계에 들어갔다"
+
+        hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
+        assert hm["excluded_mall"] == len(malls), f"{slug} 집합 제외 건물 수"
+
+
+def test_gold_anchor_comparison_attached():
+    """Gold 거점은 R-ONE 앵커와 그 격차를 함께 내려보내야 한다.
+
+    격차가 0 이 되는 것이 정상은 아니다(우리는 호실·전수, R-ONE 은 면적·표본).
+    다만 부호와 크기가 비상식적이면 집계가 깨진 것이므로 느슨한 범위로 가둔다.
+    """
+    for slug in _gold_slugs():
+        hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
+        assert hm["anchor_pct"] is not None, f"{slug}: calibration.json 없음 — calibrate_vacancy 실행 필요"
+        assert 0 < hm["anchor_pct"] < 60, f"{slug} 앵커 범위"
+        assert hm["anchor_gap_pp"] == pytest.approx(hm["avg_vacancy"] - hm["anchor_pct"], abs=0.05), slug
+        # 집합건물을 섞던 시절 격차가 +63%p 까지 벌어졌다. 그 회귀를 막는 상한이다.
+        assert -20 < hm["anchor_gap_pp"] < 30, f"{slug} 앵커 격차 이상 — 집계 규칙 회귀 의심"
+
+        s = client.get(f"{V1}/commercial-districts/{slug}/summary").json()
+        assert s["anchor_pct"] == hm["anchor_pct"] and s["anchor_gap_pp"] == hm["anchor_gap_pp"], slug
+
+
+def test_polygon_only_never_counted():
+    """polygon_only(점포 미매칭·공실률 100% 고정)는 집계에 들어가면 안 된다.
+
+    현 산출물에서는 polygon_only 가 전부 floor_approx 라 분모 규칙만으로도 걸러지지만,
+    두 규칙은 독립이라 재빌드가 조합을 바꿔도 배제되는지 여기서 못 박는다.
+    """
+    seen_polygon_only = False
+    for slug in _gold_slugs():
+        for p in (f["properties"] for f in _gold_master(slug)["features"]):
+            if p.get("source") != "polygon_only":
+                continue
+            seen_polygon_only = True
+            assert not _counted(p), f"{slug}: polygon_only 가 집계 대상에 들어갔다 — {p.get('id')}"
+    assert seen_polygon_only, "polygon_only 건물이 하나도 없다 — 산출물 구조가 바뀌었는지 확인"
+
+
+def test_gold_summary_and_heatmap_agree():
+    """같은 거점의 요약·히트맵 공실 수치가 어긋나면 안 된다 (두 엔드포인트 동일 집계원)."""
+    for slug in _gold_slugs():
+        s = client.get(f"{V1}/commercial-districts/{slug}/summary").json()
+        hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
+        assert s["vacancy_rate"] == hm["avg_vacancy"], slug
+        assert s["vacant_units"] == hm["sum_vac"], slug
+        assert s["store_count"] == hm["sum_stores"], slug
+        assert s["cell_count"] == len(hm["cells"]), slug
+        assert s["building_count"] == hm["buildings"], slug
+
+
+def test_gold_cells_may_extend_beyond_seed_bbox():
+    """수집 반경이 시드 bb 를 벗어난 건물도 버리지 않아야 한다.
+
+    셀 격자 원점·크기는 시드 grid 를 그대로 쓰되 인덱스는 bb 밖으로 나갈 수 있다
+    (services/gold_vacancy 모듈 주석). 실제로 가로수길은 bb 서쪽 밖 건물이 있다.
+    """
+    grid = seoul_pages.DISTRICTS_BY_ID["garosugil"]["grid"]
+    bb, dlat, dlng = grid["bb"], grid["dlat"], grid["dlng"]
+    ni = int((bb["n"] - bb["s"]) / dlat)
+    nj = int((bb["e"] - bb["w"]) / dlng)
+
+    hm = client.get(f"{V1}/heatmap/vacancy", params={"district": "garosugil"}).json()
+    outside = [c for c in hm["cells"] if not (0 <= c["i"] < ni and 0 <= c["j"] < nj)]
+    assert outside, "bb 밖 셀이 하나도 없다 — 격자 확장이 동작하지 않거나 데이터가 바뀌었다"
+    # 셀 좌표는 여전히 같은 격자 위에 정렬돼 있어야 한다
+    for c in hm["cells"]:
+        assert c["lat"] == pytest.approx(bb["s"] + c["i"] * dlat, abs=1e-6)
+        assert c["lng"] == pytest.approx(bb["w"] + c["j"] * dlng, abs=1e-6)
 
 
 def test_postings_and_marketing():
@@ -123,7 +296,12 @@ def test_postings_and_marketing():
 
     r = client.get(f"{V1}/marketing/hongdae")
     assert r.status_code == 200
-    assert len(r.json()["events"]) == 3
+    body = r.json()
+    # 행사는 서울 문화행사 실데이터다 — 건수는 수집 시점에 따라 변하므로 고정하지 않는다.
+    # 실데이터일 때 0건은 정상(그 거점에 예정 공공 문화행사가 없을 수 있다).
+    assert body["events_source"] in {"seoul-open-data", "seed"}
+    if body["events_source"] == "seed":
+        assert len(body["events"]) == 3      # 시드 폴백은 거점당 3건 고정
 
 
 def test_seed_comment_rates_match_gold():

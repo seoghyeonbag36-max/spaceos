@@ -12,9 +12,28 @@ node_modules
 /data/*
 !/data/gold/
 /data/gold/*
-!/data/gold/garosugil/
 !/data/gold/platform_vacancy_forecast.json
 !/data/gold/platform_industry_recommend.json
+# 아래 항목은 서비스가 **런타임에 디스크에서 읽는다** — 빠지면 예외 없이 폴백으로 떨어지고
+# 화면은 멀쩡해 보이므로 눈치채기 어렵다(2026-08-01 발견). 서비스와 함께 유지할 것.
+#   posting_inputs.py → platform_posting_inputs.json (rent·foot 실데이터, ~7KB)
+#   events.py         → platform_events.json         (상권 행사 52거점, ~480KB)
+#   marketing.py      → {거점}/program_content_context.parquet (LLM 컨텍스트, 54거점 174KB)
+#   gold_vacancy.py   → {거점}/page_building_master.geojson (건물 폴리곤)
+#   admin.py          → {거점}/coverage.json
+!/data/gold/platform_posting_inputs.json
+!/data/gold/platform_events.json
+# 거점 디렉토리는 열되 안에서는 서빙에 필요한 파일만 고른다.
+# ⚠ 이 블록보다 **뒤에** garosugil 재포함을 둔다 — /data/gold/*/* 가 뒤에 오면
+#   garosugil 전체 예외가 다시 닫혀 building_vacancy.json·calibration.json 이 빠진다.
+!/data/gold/*/
+/data/gold/*/*
+!/data/gold/*/program_content_context.parquet
+!/data/gold/*/page_building_master.geojson
+!/data/gold/*/coverage.json
+# 가로수길 PoC 는 중간 산출물까지 통째로 서빙한다(~0.8MB)
+!/data/gold/garosugil/
+!/data/gold/garosugil/**
 /html/
 /ml/
 /design/

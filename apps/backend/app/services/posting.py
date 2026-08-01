@@ -4,12 +4,18 @@
 - settings.posting_copilot_url 설정 시 외부 코파일럿 호출 → SimulateResult 로 정규화
 - 미설정·호출 실패 시 내부 3-Tier(고급화/가성비/기능중심) 계산으로 폴백
 
+2026-08-01: 코파일럿 명세가 아직 없어 실제로는 항상 폴백이 돈다. 그래서 **폴백의
+입력**을 실데이터로 올렸다 — 유닛의 rent 는 R-ONE 임대료, foot 은 서울 상권분석
+유동인구에서 온다(services/posting_inputs). area·prem 은 실데이터 소스가 없어
+시드 프록시를 유지하며, 응답의 `inputs_source` 가 필드별 출처를 밝힌다.
+
 외부 코파일럿의 연동 형태(REST/패키지)에 대한 가정은 이 모듈 밖으로 내보내지 않는다.
 """
 from __future__ import annotations
 
 from app.core.config import settings
 from app.services import districts as svc
+from app.services import posting_inputs
 
 
 def _call_copilot(unit: dict, industry_type: str | None) -> dict | None:
@@ -34,10 +40,10 @@ def simulate(district_id: str, unit_id: str | None = None,
     strategy(premium/value/factory) 지정 시 해당 전략만, 미지정 시 3전략 비교 반환.
     반환: SimulateResult 스키마 dict. 거점/유닛을 찾지 못하면 None.
     """
-    d = svc.get_district(district_id)
-    if not d or not d["units"]:
+    units = svc.resolved_units(district_id)
+    if not units:
         return None
-    unit = next((u for u in d["units"] if u["id"] == unit_id), d["units"][0])
+    unit = next((u for u in units if u["id"] == unit_id), units[0])
 
     scenarios = _call_copilot(unit, industry_type)
     source = "copilot"
@@ -52,4 +58,7 @@ def simulate(district_id: str, unit_id: str | None = None,
         "industry_type": industry_type,
         "scenarios": scenarios,
         "source": source,
+        # 시나리오를 만든 입력의 필드별 출처 — 프록시를 실측으로 오독하면 안 된다
+        "inputs_source": unit.get("inputs_source"),
+        "inputs_quarter": posting_inputs.quarter(),
     }

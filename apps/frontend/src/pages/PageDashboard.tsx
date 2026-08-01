@@ -4,6 +4,7 @@ import {
 } from "@/lib/api";
 import type {
   DistrictSummary, DistrictDetail, Posting, Marketing, TierScenario, VacancyHeatmap, GeoJSONFC,
+  VacancySource,
 } from "@/lib/api";
 import { loadNaverMaps } from "@/lib/naverMap";
 import { colors } from "@/design/tokens/colors";
@@ -22,11 +23,23 @@ const B_STATUS: Record<string, { color: string; label: string }> = {
 interface TwinSel { name: string; capacity: number; active: number; status: string; }
 
 /**
- * 서울 Page 거점 대시보드 + 거점 심층 뷰(거점 수는 백엔드 시드에 따라 가변 — 2026-07 기준 27곳).
- * 데이터 출처: 백엔드 단일 소스(/api/v1/commercial-districts — 시드 app/data/seoul_pages.py).
- * 고양 버전(CityDashboard/DistrictPPPP, 정적 모듈)과 달리 서버 API로만 조회한다.
- * TODO: Gold 레이어 적재 후 수치가 실측으로 교체된다(백엔드 TODO와 연동).
+ * 서울 Page 거점 대시보드 + 거점 심층 뷰(거점 수는 백엔드에 따라 가변 — 2026-08 기준 54곳).
+ * 데이터 출처: 백엔드 단일 소스(/api/v1/commercial-districts). 고양 버전(CityDashboard/
+ * DistrictPPPP, 정적 모듈)과 달리 서버 API로만 조회한다.
+ *
+ * 공실 수치는 거점마다 출처가 다르다 — `vacancy_source`("gold" 실측 / "synthetic" 합성)를
+ * 반드시 화면에 드러낸다(SourceBadge). 합성값이 실측처럼 읽히면 안 된다.
+ * TODO: 감성 zones·입점 units 는 아직 시드 — 각각 리뷰 감성분석·R-ONE 조인으로 교체 예정.
  */
+
+// 공실률 색·막대 상한(%). 거점 값과 지도 셀은 분포가 달라 상한을 나눈다(2026-08-01 실측 기준).
+//   거점 54곳: 9.2~30.1%          → 막대는 35 로 재야 거점 간 차이가 보인다
+//   실측 셀 1,066개: p50 13 · p90 42 · max 100 → 색은 50. 한 셀이 건물 몇 동이라
+//     80% 든 100% 든 "거의 비었다"로 같이 읽혀도 되고, 50 을 넘기면 상한을 올릴수록
+//     중간대(10~30%)의 색차가 죽는다.
+// 범례 눈금은 색 상한(VAC_SCALE_MAX)을 따라간다 — 범례와 셀 색이 어긋나면 안 된다.
+export const VAC_SCALE_MAX = 50;
+const VAC_BAR_MAX = 35;
 
 // 감성(높을수록 좋음): 낮음 #E03E36 → 높음 #22B07D
 export function sentHex(s: number): string {
@@ -34,7 +47,7 @@ export function sentHex(s: number): string {
 }
 // 공실률(높을수록 나쁨): 낮음 #22B07D → 높음 #E03E36 (디자인 토큰 vacancy 축과 동일 방향)
 export function vacHex(v: number): string {
-  return lerpHex([34, 176, 125], [224, 62, 54], clamp01(v / 25));
+  return lerpHex([34, 176, 125], [224, 62, 54], clamp01(v / VAC_SCALE_MAX));
 }
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 function lerpHex(a: number[], b: number[], t: number): string {
@@ -85,6 +98,7 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
       vac: avg((s) => s.vacancy_rate),
       vacant: summaries.reduce((a, s) => a + s.vacant_units, 0),
       reviews: summaries.reduce((a, s) => a + s.reviews, 0),
+      gold: summaries.filter((s) => s.vacancy_source === "gold").length,
     };
   }, [summaries]);
 
@@ -94,15 +108,18 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
         <div>
           <div className="ey">SpaceOS · Platform</div>
           <h1>주요 Platform — 서울 {summaries.length}거점</h1>
-          <div className="sub">감성·공실·리뷰·입점 Tier — 백엔드 단일 소스(시드, Gold 교체 예정) · 카드를 누르면 거점 심층으로 이동</div>
+          <div className="sub">
+            공실은 Gold 실측 {kpi.gold}거점 · 합성 {kpi.n - kpi.gold}거점(카드의 실측/합성 배지로 구분).
+            감성·리뷰·입점 Tier 는 아직 시드 · 카드를 누르면 거점 심층으로 이동
+          </div>
         </div>
       </div>
 
       <div className="kpis">
         <div className="kpi"><div className="l">거점</div><div className="v">{kpi.n}<small>곳</small></div><div className="d">Phase 1~2 자치구 핫플 상권</div></div>
-        <div className="kpi"><div className="l">평균 감성지수</div><div className="v" style={{ color: sentHex(kpi.sent) }}>{kpi.sent.toFixed(1)}<small>pt</small></div><div className="d">리뷰·SNS 감성 (시드)</div></div>
-        <div className="kpi"><div className="l">평균 공실률</div><div className="v" style={{ color: vacHex(kpi.vac) }}>{kpi.vac.toFixed(1)}<small>%</small></div><div className="d">100m 그리드 합성</div></div>
-        <div className="kpi"><div className="l">공실 점포 합계</div><div className="v">{kpi.vacant.toLocaleString()}<small>개</small></div><div className="d">리뷰 {kpi.reviews.toLocaleString()}건 기준</div></div>
+        <div className="kpi"><div className="l">평균 감성지수</div><div className="v" style={{ color: sentHex(kpi.sent) }}>{kpi.sent.toFixed(1)}<small>pt</small></div><div className="d">추정치 — 리뷰 수집 미착수</div></div>
+        <div className="kpi"><div className="l">평균 공실률</div><div className="v" style={{ color: vacHex(kpi.vac) }}>{kpi.vac.toFixed(1)}<small>%</small></div><div className="d">100m 그리드 · 실측 {kpi.gold} / 합성 {kpi.n - kpi.gold}</div></div>
+        <div className="kpi"><div className="l">공실 호실 합계</div><div className="v">{kpi.vacant.toLocaleString()}<small>개</small></div><div className="d">실측 거점은 건축물대장 호실 기준</div></div>
       </div>
 
       <div className="grid">
@@ -112,14 +129,16 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
               <div className="dord">{i + 1}</div>
               <div className="dname">{s.name}</div>
               <div className="dpill">{s.gu}</div>
+              <SourceBadge source={s.vacancy_source} />
             </div>
             <div className="dhot">{s.type} · {s.note}</div>
             <Bar k="감성" v={s.sentiment} max={100} color={sentHex(s.sentiment)} text={`${s.sentiment.toFixed(1)}pt`} />
-            <Bar k="공실" v={s.vacancy_rate} max={25} color={vacHex(s.vacancy_rate)} text={`${s.vacancy_rate.toFixed(1)}%`} />
+            <Bar k="공실" v={s.vacancy_rate} max={VAC_BAR_MAX} color={vacHex(s.vacancy_rate)} text={`${s.vacancy_rate.toFixed(1)}%`} />
             <div className="dmeta">
               <span>리뷰 {s.reviews.toLocaleString()}</span>
               <span>공실 {s.vacant_units}개</span>
               <span className={s.risk_zones > 0 ? "risk" : ""}>위험구역 {s.risk_zones}</span>
+              <Anchor pct={s.anchor_pct} gap={s.anchor_gap_pp} />
               <Pred rate={s.predicted_rate} delta={s.predicted_delta} direction={s.predicted_direction} />
             </div>
             <div className="dtiers">
@@ -144,8 +163,50 @@ function Pred({ rate, delta, direction }: { rate: number | null; delta: number |
   const up = direction === "up";
   return (
     <span className="pred" style={{ color: up ? "#c2410c" : "#1d6feb" }}
-      title="Platform·LSTM 다음 분기 공실 예측 (홀드아웃 방향정확도 84.6%)">
+      title="Platform·LSTM 다음 분기 공실 예측 (홀드아웃 MAE 1.109 / RMSE 1.494)">
       예측 {rate.toFixed(1)}% {up ? "▲" : "▼"}{Math.abs(delta).toFixed(1)}
+    </span>
+  );
+}
+
+/** R-ONE 앵커 대조 — 우리 추정과 공식 통계의 격차(%p). 앵커 없는 거점(합성)은 표시하지 않는다 */
+function Anchor({ pct, gap }: { pct: number | null; gap: number | null }) {
+  if (pct == null || gap == null) return null;
+  return (
+    <span className="anchorchip"
+      title={`R-ONE 중대형상가 공실률 ${pct.toFixed(1)}% 대비 ${gap >= 0 ? "+" : ""}${gap.toFixed(1)}%p.`
+        + " 모집단·단위가 달라(우리는 호실·전수, R-ONE 은 면적·표본) 격차 0 이 정상은 아니다."
+        + " 절대값이 아니라 거점 간 비교·추세 감시에 쓴다."}>
+      앵커 {pct.toFixed(1)}% {gap >= 0 ? "+" : ""}{gap.toFixed(1)}%p
+    </span>
+  );
+}
+
+/** Posting 입력 필드의 출처 배지 — 어떤 값이 실측이고 어떤 값이 아직 프록시인지 밝힌다.
+ *  임대료·유동인구는 실데이터로 올라갔지만 면적·권리금은 공개 소스가 없어 시드로 남아 있다. */
+function Src({ src }: { src?: string }) {
+  if (!src) return null;
+  const label = src === "rone" ? "R-ONE"
+    : src === "flpop+seed" ? "유동인구"
+      : src === "seed" ? "추정" : src;
+  const title = src === "rone" ? "한국부동산원 R-ONE 소규모상가 임대료 × 면적 × 층 계수"
+    : src === "flpop+seed" ? "서울 상권분석 유동인구(거점 수준) + 시드의 거점 내 서열"
+      : "실데이터 소스가 없어 손으로 적은 프록시 값이다";
+  return (
+    <span className={`srcbadge ${src === "seed" ? "is-syn" : "is-gold"}`}
+      style={{ marginLeft: 3 }} title={title}>{label}</span>
+  );
+}
+
+/** 공실 수치가 Gold 실측인지 합성인지 알리는 배지 — 합성값을 실측으로 오독하지 않게 항상 표시 */
+function SourceBadge({ source }: { source: VacancySource }) {
+  const gold = source === "gold";
+  return (
+    <span className={`srcbadge ${gold ? "is-gold" : "is-syn"}`}
+      title={gold
+        ? "Gold 실측 — 건축물대장 호실(capacity) 대비 영업 점포(active) 집계"
+        : "합성 — 실측 건물 데이터 미수집 거점. 추세 참고용이며 실측값이 아니다"}>
+      {gold ? "실측" : "합성"}
     </span>
   );
 }
@@ -340,12 +401,19 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
           <>
             <span className="ml-label">공실률</span>
             <span className="ml-grad" />
-            <span className="ml-ticks"><em>0%</em><em>25%+</em></span>
+            <span className="ml-ticks"><em>0%</em><em>{VAC_SCALE_MAX}%+</em></span>
             {hm && (
               <span className="ml-stat">
                 평균 <b style={{ color: vacHex(hm.avg_vacancy) }}>{hm.avg_vacancy.toFixed(1)}%</b>
                 {" "}<Pred rate={hm.predicted_rate} delta={hm.predicted_delta} direction={hm.predicted_direction} />
-                {" "}· 셀 {hm.cells.length} · 점포 {hm.sum_stores.toLocaleString()} · 공실 {hm.sum_vac}
+                {" "}· 셀 {hm.cells.length} · 영업 {hm.sum_stores.toLocaleString()} · 공실 {hm.sum_vac}
+                {" "}<SourceBadge source={hm.vacancy_source} />
+                {hm.vacancy_source === "gold" && hm.buildings != null && (
+                  <> · 건물 {hm.buildings.toLocaleString()}동({hm.precision_pct}%)
+                    {hm.excluded_mall ? ` · 집합 ${hm.excluded_mall}동 제외` : ""}
+                  </>
+                )}
+                {" "}<Anchor pct={hm.anchor_pct} gap={hm.anchor_gap_pp} />
               </span>
             )}
             <span className="ml-hint">셀 클릭 시 상세</span>
@@ -409,18 +477,27 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
 
       {detail && (
         <>
-          <h2 className="sec">공실 히트맵 <small>Page · 100m 그리드 합성 — 건축물대장/영업상태 정합 시 실측 교체</small></h2>
+          <h2 className="sec">공실 히트맵 <small>{summary.vacancy_source === "gold"
+            ? `Page · 100m 그리드 — 건축물대장 호실 대비 영업 점포 실측(건물 ${summary.building_count?.toLocaleString()}동)`
+            : "Page · 100m 그리드 합성 — 건물 데이터 수집 시 실측으로 교체"}</small></h2>
           <VacancyMap detail={detail} />
 
-          <h2 className="sec">감성 구역 <small>Platform · 리뷰/SNS 구역별 감성</small></h2>
+          {/* 감성은 아직 실데이터가 없다 — 리뷰 수집기가 미구현이고(review_crawler),
+              블로그 코퍼스는 거점 단위 광고성 스니펫이라 구역 단위 감성으로 못 내린다.
+              "리뷰/SNS 근거"라고 쓰면 없는 근거를 주장하는 것이라 표기를 바로잡았다. */}
+          <h2 className="sec">감성 구역 <small>
+            Platform · <b>전부 추정치다</b> — 리뷰 수집 미착수라 점수·건수·증감 모두 시드값이다
+          </small></h2>
           <div className="zones">
             {detail.zones.map((z) => (
               <div key={z.id} className="zone" style={{ borderTopColor: sentHex(z.s) }}>
                 <div className="zhead">
                   <span className="zname">{z.n}</span>
                   <span className="zscore" style={{ color: sentHex(z.s) }}>{z.s.toFixed(1)}</span>
+                  <Src src="seed" />
                 </div>
-                <div className="zmeta">{z.grp} · 리뷰 {z.r.toLocaleString()}건 · {z.d >= 0 ? "▲" : "▼"}{Math.abs(z.d).toFixed(1)}</div>
+                {/* "리뷰 N건"으로 쓰면 실제로 센 것처럼 읽힌다 — 센 적이 없다 */}
+                <div className="zmeta">{z.grp} · 가정 표본 {z.r.toLocaleString()}건 · {z.d >= 0 ? "▲" : "▼"}{Math.abs(z.d).toFixed(1)}</div>
                 <div className="zkw">
                   {z.f.map(([label, delta], i) => <span key={i} className="kw">{label} {delta}</span>)}
                 </div>
@@ -430,7 +507,10 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
 
           {postings && (
             <>
-              <h2 className="sec">공실 유닛 · 3-Tier 시나리오 <small>Posting · 비용-효용(월) — 코파일럿 연동 전 폴백</small></h2>
+              <h2 className="sec">공실 유닛 · 3-Tier 시나리오 <small>
+                Posting · 비용-효용(월) — 코파일럿 연동 전 폴백.
+                임대료는 R-ONE 실데이터, 면적·권리금은 아직 추정치다
+              </small></h2>
               <div className="units">
                 {postings.map((p) => (
                   <div key={p.id} className="unit">
@@ -438,7 +518,13 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
                       <span className="uname">{p.n}</span>
                       <span className="upill">{p.floor} · {p.area}평 · 前 {p.was}</span>
                     </div>
-                    <div className="umeta">임대료 {p.rent}만원 · 권리금 {p.prem ? `${p.prem.toLocaleString()}만원` : "없음"} · 유동 {p.foot} · {p.persona}</div>
+                    <div className="umeta">
+                      임대료 {p.rent.toLocaleString()}만원<Src src={p.inputs_source?.rent} />
+                      {" · "}권리금 {p.prem ? `${p.prem.toLocaleString()}만원` : "없음"}
+                      <Src src={p.inputs_source?.prem} />
+                      {" · "}유동 {p.foot}<Src src={p.inputs_source?.foot} />
+                      {" · "}{p.persona}
+                    </div>
                     <div className="unote">{p.note}</div>
                     <div className="tiers">
                       {Object.values(p.scenarios).map((sc: TierScenario) => (
@@ -458,15 +544,44 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
 
           {marketing && (
             <>
-              <h2 className="sec">상권 행사 · 콘텐츠 <small>Program · Humanistic Authority(균형·공생·공감)</small></h2>
+              <h2 className="sec">상권 행사 · 콘텐츠 <small>
+                {marketing.events_source === "seoul-open-data"
+                  ? "Program · 행사는 서울열린데이터광장 문화행사 실데이터 · 콘텐츠는 Gold 기반 생성"
+                  : "Program · Humanistic Authority(균형·공생·공감)"}
+              </small></h2>
+              {/* 실데이터인데 0건이면 그 거점에 예정 공공 문화행사가 없는 것이다.
+                  시드로 채우면 지어낸 행사를 지도에 다시 찍게 되므로 빈 상태를 보여준다. */}
+              {marketing.events_source === "seoul-open-data" && marketing.events.length === 0 && (
+                <div className="loading">
+                  예정된 공공 문화행사 없음 — 이 API 는 공공·문화시설 행사 중심이라
+                  상업 상권의 팝업·마켓은 담기지 않는다
+                </div>
+              )}
               <div className="events">
                 {marketing.events.map((ev) => (
                   <div key={ev.id} className="event">
-                    <div className="ehead"><span className="eic">{ev.ic}</span><span className="ename">{ev.n}</span><span className="ek2">{ev.k2}</span></div>
-                    <div className="ewhen">{ev.when}</div>
-                    <div className="edesc">{ev.desc}</div>
-                    <div className="eroles">{ev.roles.map((r, i) => <span key={i} className="role">{r}</span>)}</div>
-                    <div className="eha">{ev.ha}</div>
+                    <div className="ehead">
+                      <span className="eic">{ev.ic}</span><span className="ename">{ev.n}</span>
+                      {ev.k2 ? <span className="ek2">{ev.k2}</span>
+                        : ev.category ? <span className="ek2">{ev.category}</span> : null}
+                    </div>
+                    <div className="ewhen">
+                      {ev.when}
+                      {ev.distance_m != null && ` · 거점에서 ${ev.distance_m}m`}
+                    </div>
+                    {/* 실데이터는 desc 대신 장소·주최·요금·대상을 준다 */}
+                    <div className="edesc">{ev.desc ?? [ev.place, ev.org].filter(Boolean).join(" · ")}</div>
+                    <div className="eroles">
+                      {ev.roles
+                        ? ev.roles.map((r, i) => <span key={i} className="role">{r}</span>)
+                        : [ev.fee, ev.target].filter(Boolean).map((r, i) =>
+                          <span key={i} className="role">{r}</span>)}
+                    </div>
+                    {ev.ha
+                      ? <div className="eha">{ev.ha}</div>
+                      : ev.link
+                        ? <div className="eha"><a href={ev.link} target="_blank" rel="noreferrer">공식 안내 ↗</a></div>
+                        : null}
                   </div>
                 ))}
               </div>

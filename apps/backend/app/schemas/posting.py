@@ -23,3 +23,8 @@ class SimulateResult(BaseModel):
     industry_type: str | None
     scenarios: dict[str, TierScenario]
     source: str  # "copilot" | "fallback-3tier"
+    # 시나리오를 만든 입력의 **필드별** 출처: area/rent/prem/foot →
+    #   "rone"(R-ONE 임대료) | "flpop"(서울 상권분석 유동인구) | "seed"(손으로 적은 프록시)
+    # source 가 코파일럿이냐 폴백이냐와 별개로, 입력이 실측인지 프록시인지를 밝힌다.
+    inputs_source: dict[str, str] | None = None
+    inputs_quarter: str | None = None   # 실데이터 기준 분기 (예: "20261")
