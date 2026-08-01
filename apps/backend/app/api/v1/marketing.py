@@ -22,7 +22,9 @@ async def generate_store_marketing(profile: StoreProfile) -> dict:
 async def get_marketing(district_id: str) -> dict:
     """상권 단위 마케팅(행사 + 온라인 콘텐츠).
 
-    TODO: Platform 수집 정보(gold/program_content_context) 기반 생성으로 교체.
+    온라인 콘텐츠는 Platform 수집 정보(gold/program_content_context) 기반 생성이며
+    LLM 키 미설정·Gold 미적재 시 시드로 폴백한다(source 필드로 구분).
+    행사(events)는 서울열린데이터광장 문화행사 실데이터 — events_source 로 출처를 밝힌다.
     """
     m = mkt.get_district_marketing(district_id)
     if m is None:

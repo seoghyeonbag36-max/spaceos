@@ -1,10 +1,25 @@
 """Posting(코파일럿 어댑터) / Program(가게 단위 생성) API 테스트."""
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
 
 client = TestClient(app)
 V1 = "/api/v1"
+
+
+@pytest.fixture(autouse=True)
+def _isolate_marketing_cache():
+    """상권 콘텐츠 LLM 캐시를 테스트마다 비운다.
+
+    캐시가 없으면 이 엔드포인트는 호출마다 LLM 을 치므로(실측 12~17초) 캐시는 필요하다.
+    다만 테스트끼리는 격리돼야 한다 — 앞 테스트가 채운 캐시를 폴백 테스트가 물면
+    "LLM 실패 시 시드로 떨어진다"를 검증하지 못한다(2026-08-01 실제로 발생).
+    """
+    from app.services import marketing as mkt
+    mkt.clear_district_cache()
+    yield
+    mkt.clear_district_cache()
 
 
 def test_simulate_revenue_fallback():
@@ -15,7 +30,15 @@ def test_simulate_revenue_fallback():
     assert body["source"] == "fallback-3tier"
     assert set(body["scenarios"].keys()) == {"premium", "value", "factory"}
     for sc in body["scenarios"].values():
-        assert sc["roi_months"] >= 0  # round(invest/net,1)이 0.0일 수 있음(순이익 대비 소액 투자)
+        # 회수기간 = 초기투자(백만원)×100 ÷ 월순익(만원). 단위를 섞으면 100배 작아진다
+        # (2026-08-01 이전 버그 — 화면에 "회수 0개월"로 찍혔다).
+        if sc["month_net"] > 0:
+            assert sc["roi_months"] == pytest.approx(
+                sc["invest_mn"] * 100 / sc["month_net"], abs=0.05)
+            assert sc["roi_months"] >= 0.5, (
+                f"{sc['tier']} 회수 {sc['roi_months']}개월 — 단위 혼용 회귀 의심")
+        else:
+            assert sc["roi_months"] == 99.0   # 적자 시나리오 표기
 
 
 def test_simulate_revenue_strategy_filter():
@@ -28,6 +51,108 @@ def test_simulate_revenue_strategy_filter():
 def test_simulate_revenue_unknown_district_404():
     r = client.post(f"{V1}/ai/simulate-revenue", json={"district_id": "nope"})
     assert r.status_code == 404
+
+
+# ── Posting 폴백 입력의 실데이터 배선 (2026-08-01) ────────────────────────────
+# rent 는 R-ONE 임대료, foot 은 유동인구+시드 혼합. area·prem 은 소스가 없어 시드.
+
+
+def _gold_loaded() -> bool:
+    from app.services import posting_inputs
+    return posting_inputs.is_available()
+
+
+requires_gold = pytest.mark.skipif(
+    not _gold_loaded(),
+    reason="gold/platform_posting_inputs.json 미적재 — build_posting_inputs 실행 필요")
+
+
+@requires_gold
+def test_postings_declare_input_provenance():
+    """유닛마다 필드별 입력 출처를 밝혀야 한다 — 프록시를 실측으로 오독하면 안 된다."""
+    postings = client.get(f"{V1}/commercial-districts/garosugil/postings").json()
+    assert postings
+    for p in postings:
+        src = p["inputs_source"]
+        assert src["rent"] == "rone", "임대료가 R-ONE 실데이터가 아니다"
+        assert src["foot"] == "flpop+seed", "유동인구 등급이 혼합 산출이 아니다"
+        # 실데이터 소스가 없는 둘은 시드로 남아 있어야 한다(있는 척하면 안 된다)
+        assert src["area"] == "seed" and src["prem"] == "seed"
+
+
+@requires_gold
+def test_simulate_carries_input_provenance():
+    """시뮬레이션 응답도 입력 출처·기준분기를 함께 내려보낸다."""
+    body = client.post(f"{V1}/ai/simulate-revenue", json={"district_id": "garosugil"}).json()
+    assert body["inputs_source"]["rent"] == "rone"
+    assert body["inputs_quarter"] and body["inputs_quarter"].isdigit()
+
+
+@requires_gold
+def test_rent_falls_with_floor():
+    """같은 거점에서 상층 유닛의 평당 임대료는 1층보다 싸야 한다.
+
+    R-ONE 소규모상가 임대료는 사실상 1층 기준이라, 층 계수 없이 그대로 곱하면
+    3층이 1층과 같은 단가가 된다(2~8배 과대계상). 그 회귀를 막는다.
+    """
+    from app.services import districts as svc
+
+    checked = 0
+    for did in ("garosugil", "myeongdong", "songridan"):
+        units = svc.resolved_units(did)
+        per_pyeong = {u["floor"]: u["rent"] / u["area"] for u in units}
+        if "1F" in per_pyeong:
+            for floor, v in per_pyeong.items():
+                if floor != "1F" and floor.endswith("F"):
+                    assert v < per_pyeong["1F"], f"{did} {floor} 평당 {v:.1f} >= 1F"
+                    checked += 1
+    assert checked, "상층 유닛이 있는 거점이 없다 — 시드가 바뀌었는지 확인"
+
+
+@requires_gold
+def test_foot_keeps_within_district_structure():
+    """유동인구 등급이 거점 안에서 평탄화되면 안 된다.
+
+    flpop 은 거점 단위라 그대로 내리면 한 거점의 모든 유닛이 같은 등급이 된다
+    (가로수길 고/고/중/저/중 → 전부 중). 시드의 거점 내 서열로 ±1칸 보정하는 이유다.
+    """
+    from app.data.seoul_pages import DISTRICTS_BY_ID
+    from app.services import districts as svc
+
+    seed_feet = [u["foot"] for u in DISTRICTS_BY_ID["garosugil"]["units"]]
+    live_feet = [u["foot"] for u in svc.resolved_units("garosugil")]
+    assert len(set(seed_feet)) > 1, "시드 전제가 깨졌다 — 가로수길 foot 이 원래 균일하다"
+    assert len(set(live_feet)) > 1, f"거점 내 등급이 평탄화됐다: {live_feet}"
+
+
+@requires_gold
+def test_resolve_does_not_mutate_seed():
+    """실데이터 덮어쓰기가 시드 원본을 건드리면 안 된다(프로세스 전역 공유 dict)."""
+    from app.data.seoul_pages import DISTRICTS_BY_ID
+    from app.services import districts as svc
+
+    before = [(u["rent"], u["foot"]) for u in DISTRICTS_BY_ID["garosugil"]["units"]]
+    svc.resolved_units("garosugil")
+    svc.resolved_units("garosugil")
+    after = [(u["rent"], u["foot"]) for u in DISTRICTS_BY_ID["garosugil"]["units"]]
+    assert before == after, "seoul_pages.DISTRICTS 가 변형됐다"
+
+
+def test_falls_back_to_seed_when_gold_missing(monkeypatch):
+    """Gold 미적재 환경(신규 클론 등)에서는 시드 프록시로 조용히 떨어진다."""
+    from app.data.seoul_pages import DISTRICTS_BY_ID
+    from app.services import districts as svc
+    from app.services import posting_inputs
+
+    monkeypatch.setattr(posting_inputs, "_cache", {})
+    monkeypatch.setattr(posting_inputs, "_INPUTS_JSON",
+                        posting_inputs._INPUTS_JSON.with_name("__absent__.json"))
+
+    units = svc.resolved_units("garosugil")
+    seed = DISTRICTS_BY_ID["garosugil"]["units"]
+    assert [u["rent"] for u in units] == [u["rent"] for u in seed]
+    assert all(u["inputs_source"]["rent"] == "seed" for u in units)
+    monkeypatch.setattr(posting_inputs, "_cache", {})   # 뒤 테스트에 캐시 오염 방지
 
 
 def test_generate_store_marketing_stub(monkeypatch):
@@ -111,10 +236,116 @@ def test_district_context_mapping():
         assert "키워드" in ctx or "업종" in ctx or "트렌드" in ctx
 
 
-def test_district_marketing_served():
-    """상권 단위 GET /marketing/{id} — 서울 13 Page 시드 반환 (Gold 교체 TODO)."""
+def test_district_marketing_served(monkeypatch):
+    """상권 단위 GET /marketing/{id} — LLM 키 없으면 시드 콘텐츠 + 시드 행사."""
+    from app.core.config import settings
+
+    # 키를 비워 네트워크 호출 없이 폴백 경로만 태운다(테스트는 외부 API 를 치지 않는다)
+    monkeypatch.setattr(settings, "llm_api_key", "")
+
     r = client.get(f"{V1}/marketing/garosugil")
     assert r.status_code == 200
-    assert len(r.json()["events"]) == 3
+    body = r.json()
+    assert body["source"] == "seed"          # 온라인 콘텐츠는 LLM 키가 없어 시드
+    assert body["online_contents"]
+    # 행사는 별개 소스다 — 온라인 콘텐츠가 시드여도 행사는 실데이터일 수 있다
+    assert body["events_source"] in {"seoul-open-data", "seed"}
 
     assert client.get(f"{V1}/marketing/nope").status_code == 404
+
+
+def test_events_carry_real_fields_not_fabricated_metrics():
+    """행사가 실데이터면 API 가 준 사실만 실려야 한다.
+
+    시드는 좌표·일정과 함께 효과 지표(k2 "유입 +52%")·이해관계자 역할·HA 메모를
+    달고 있었는데 셋 다 근거가 없다. 실데이터로 넘어오면서 버렸는지 확인한다.
+    """
+    from app.services import events as ev
+
+    if not ev.is_available():
+        pytest.skip("gold/platform_events.json 미적재 — build_events 실행 필요")
+
+    body = client.get(f"{V1}/marketing/garosugil").json()
+    assert body["events_source"] == "seoul-open-data"
+    for e in body["events"]:
+        assert e["n"] and e["lat"] and e["lng"] and e["when"], "실물 행사의 필수 필드 누락"
+        assert e["place"], "장소가 없다 — 실데이터라면 있어야 한다"
+        # 지어낸 값들은 넘어오면 안 된다
+        assert e["k2"] is None, f"근거 없는 효과 지표가 실렸다: {e['k2']}"
+        assert e["roles"] is None and e["ha"] is None
+
+
+def test_district_marketing_llm_contents(monkeypatch):
+    """Gold 컨텍스트가 있으면 온라인 콘텐츠는 LLM 생성분으로 교체된다(행사는 시드 유지)."""
+    from app.core.config import settings
+    from app.schemas.marketing import LLMDistrictContents
+    from app.services import marketing as mkt
+
+    monkeypatch.setattr(settings, "llm_api_key", "test-key")
+    monkeypatch.setattr(mkt, "_district_context", lambda d: "블로그 언급 키워드: 팝업(120건)")
+    fake = LLMDistrictContents(
+        online_contents=["가로수길 팝업 지도 #가로수길 #팝업"], ha_check="점검 통과")
+    monkeypatch.setattr(mkt, "_call_district_llm", lambda name, sub, ctx: fake)
+
+    body = client.get(f"{V1}/marketing/garosugil").json()
+    assert body["source"] == "llm"
+    assert body["online_contents"] == ["가로수길 팝업 지도 #가로수길 #팝업"]
+    # 행사는 LLM 이 만들지 않는다 — 좌표·일정이 붙은 실물이라 별도 소스에서만 온다
+    assert body["events_source"] in {"seoul-open-data", "seed"}
+    assert all(e.get("lat") and e.get("lng") for e in body["events"])
+
+
+def test_district_marketing_llm_error_falls_back(monkeypatch):
+    """상권 콘텐츠 LLM 실패 시 시드 콘텐츠로 폴백한다 (요청은 200 유지)."""
+    from app.core.config import settings
+    from app.services import marketing as mkt
+
+    monkeypatch.setattr(settings, "llm_api_key", "test-key")
+    monkeypatch.setattr(mkt, "_district_context", lambda d: "블로그 언급 키워드: 팝업(120건)")
+
+    def boom(name, sub, ctx):
+        raise RuntimeError("api down")
+
+    monkeypatch.setattr(mkt, "_call_district_llm", boom)
+
+    r = client.get(f"{V1}/marketing/garosugil")
+    assert r.status_code == 200
+    assert r.json()["source"] == "seed"
+
+
+def test_district_context_states_trend_direction():
+    """상권 컨텍스트가 트렌드 **방향을 계산해** 넘기는지 — 트렌드 오독 회귀 방지.
+
+    2026-08-01 사고: 컨텍스트가 원시 수치만 주자 LLM 이 하락 시계열을 보고
+    "신사동을 찾는 발걸음이 다시 늘고 있는 요즘"이라고 썼다. 방향 판정을 서비스로
+    옮겼으므로(`marketing._trend_summary`), 컨텍스트 문자열에 방향어가 박혀 있어야 한다.
+    """
+    from app.services import marketing as mkt
+
+    ctx = mkt._district_context("garosugil")
+    if not ctx or "검색 트렌드" not in ctx:
+        pytest.skip("gold/garosugil 트렌드 미적재 — 방향을 검증할 입력이 없다")
+    trend_line = next(ln for ln in ctx.splitlines() if ln.startswith("검색 트렌드"))
+    assert any(w in trend_line for w in ("상승", "보합", "하락")), (
+        f"트렌드에 방향 판정이 없다 — LLM 이 방향을 추측하게 된다: {trend_line!r}"
+    )
+
+
+def test_trend_summary_direction_rule():
+    """방향 판정 규칙 — 최근 3개월 평균 vs 직전 3개월 평균, ±5% 밖이면 방향을 붙인다."""
+    import pandas as pd
+
+    from app.services import marketing as mkt
+
+    def summarize(values: list[float]) -> str | None:
+        return mkt._trend_summary(pd.DataFrame({
+            "kind": ["trend:테스트"] * len(values),
+            "key": [f"2026-{i + 1:02d}-01" for i in range(len(values))],
+            "value": values,
+        }))
+
+    assert "하락" in summarize([100, 100, 100, 50, 50, 50])
+    assert "상승" in summarize([50, 50, 50, 100, 100, 100])
+    assert "보합" in summarize([100, 100, 100, 101, 102, 101])
+    # 6개 점이 없으면 방향을 만들지 않는다 — 근거 없는 방향보다 트렌드 생략이 낫다
+    assert summarize([100, 90, 80, 70, 60]) is None

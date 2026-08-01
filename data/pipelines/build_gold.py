@@ -16,6 +16,8 @@
 """
 from __future__ import annotations
 
+import calendar
+import datetime
 import re
 from collections import Counter
 from pathlib import Path
@@ -291,35 +293,228 @@ def build_posting_cost_benefit() -> None:
     _save(out, _GOLD_DIR, "posting_cost_benefit")
 
 
-def build_program_context() -> None:
-    """콘텐츠 컨텍스트 — 블로그 키워드 빈도 + 검색 트렌드 + 업종 카테고리 분포 (롱 포맷)."""
+# 광역시도·주요 시 지명. 서울 거점 질의에 이 지명이 걸리면 동명이지(同名異地) 글이다.
+# "서울" 언급이 함께 있으면 비교·이동 서술일 수 있어 남긴다(예: "서울 가로수길 vs 창원").
+_OFFSITE_PLACES = frozenset({
+    "부산", "대구", "인천", "광주", "대전", "울산", "세종",
+    "수원", "창원", "고양", "용인", "성남", "청주", "전주", "천안", "김해", "포항", "제주",
+    "강릉", "여수", "경주", "안산", "안양", "평택", "시흥", "파주", "의정부", "춘천", "원주",
+    "목포", "순천", "거제", "양산", "진주", "구미", "경산", "아산", "군산", "익산", "충주",
+    "제천", "속초", "통영",
+})
+
+
+def _is_offsite(text: str, hub_terms: frozenset[str] = frozenset()) -> bool:
+    """서울 거점 컨텍스트에 섞인 타 지역 글인가 (동명이지 필터).
+
+    수집 질의를 "서울 {거점명} …"로 좁힌 것이 1차 방어고(collectors/naver_blog.py),
+    이 함수는 그래도 새는 잔여분을 막는 2차 방어다. 2026-08-01 A/B 실측에서 질의 정제만으로
+    오염이 30~47% → 1~3% 로 떨어졌고, 이 필터가 그 1~3% 를 마저 걷어낸다.
+
+    판정은 두 단계다.
+
+    1. **타지명 + 거점명 인접** — "평택시 장안동", "인천 논현동"처럼 타 시도명이 거점명
+       바로 앞에 붙으면 그 거점명은 같은 이름의 다른 동네다. 동명이지의 정의 그 자체라
+       서울을 함께 언급하더라도 버린다. 이 규칙이 필요한 이유: 평택 분양 광고가 본문에
+       "서울·수도권"을 끼워 넣고 말미에 "평택시 장안동에 위치"를 다는 형태로 2번 규칙을
+       빠져나가, jangan 상위 키워드에 '브레인시티'(평택 개발지구)가 올라와 있었다.
+    2. **타지명 단독** — 거점명과 붙어 있지 않아도 타 시도명이 나오면 타 지역 글로 본다.
+       단 "서울"이 함께 있으면 남긴다. 서울 상호에 지명이 들어간 경우(시청역 '진주회관',
+       여의도 '진주집', 안암 '제주고깃집')를 죽이지 않기 위한 예외다.
+    """
+    for hub in hub_terms:
+        for place in _OFFSITE_PLACES:
+            if re.search(rf"{re.escape(place)}(?:특별시|광역시|시|군|구)?\s*{re.escape(hub)}", text):
+                return True
+    if "서울" in text:
+        return False
+    return any(p in text for p in _OFFSITE_PLACES)
+
+
+# 한 블로거가 한 거점 키워드 집계에 넣을 수 있는 글 수 상한.
+#
+# 상권 프로필은 **여러 사람의 언급이 겹칠 때** 신호가 된다. 한 사람이 같은 템플릿으로 150번
+# 쓴 걸 150으로 세면 그 사람의 광고가 곧 상권 프로필이 된다 — 2026-08-01 nambu 실측에서
+# 한 수거업체 블로거가 386건 중 154건(40%)을 도배해 상위 키워드가 '마트배달·롯데리아배달'
+# (전부 148건 동률)로 채워져 있었다. 동률 빈도는 한 템플릿이 반복됐다는 신호다.
+# 3으로 잡은 이유: 진짜 동네 블로거도 한 상권에 여러 번 쓰지만 그 사람 한 명이 상위 키워드를
+# 좌우해선 안 된다. 상한을 올릴수록 도배가 살아나고, 1로 내리면 표본이 얇아진다.
+# 한계: 체험단처럼 **여러 계정에 분산 발행**된 광고는 이 규칙으로 못 잡는다
+#       (cheongdam '조재범' 37건이 서로 다른 블로거 36명 — _PROGRAM_STOPWORDS 주석 참조).
+_MAX_POSTS_PER_BLOGGER = 3
+
+
+def _hub_terms(posts: list[dict]) -> frozenset[str]:
+    """거점 고유 지명 — `_query`("서울 장안동 맛집")에서 광역·업종어를 뺀 나머지.
+
+    동명이지 인접 판정(`_is_offsite`)의 기준어다. 질의에서 뽑으므로 54거점 지명을
+    따로 유지하지 않는다.
+    """
+    generic = {"서울", "맛집", "카페", "팝업"}
+    return frozenset(t for t in _query_tokens(posts) if t not in generic)
+
+
+def _complete_trend_points(group: dict, end_date: str) -> list[dict]:
+    """검색 트렌드에서 **미완성 마지막 달**을 잘라낸 데이터 포인트.
+
+    데이터랩 월 단위 응답의 마지막 버킷은 수집 시점까지만 집계된 부분합이다. 그걸 그대로
+    실으면 달이 끝나지 않았다는 이유만으로 급락한 것처럼 보인다 — 2026-07-18 수집분에서
+    신사동 63.4→35.6(56%), 가로수길 19.1→9.9(52%)로 찍혔는데 18/31일=58% 라는
+    절단 비율과 거의 같다. 즉 저 급락은 상권 신호가 아니라 집계 아티팩트다.
+    이 절단값이 Program 상권 카피의 트렌드 오독(2026-08-01)의 입력이었다.
+
+    endDate 가 그 달의 말일이면 완성된 달이므로 그대로 둔다.
+    """
+    points = list(group.get("data", []))
+    if not points or not end_date:
+        return points
+    try:
+        end = datetime.date.fromisoformat(end_date[:10])
+    except ValueError:
+        return points
+    last_day = calendar.monthrange(end.year, end.month)[1]
+    if end.day >= last_day:          # 달이 끝난 뒤 수집 — 자를 것 없음
+        return points
+    partial = f"{end.year:04d}-{end.month:02d}"
+    return [p for p in points if not str(p.get("period", "")).startswith(partial)]
+
+
+def _program_context_rows(posts: list[dict], places: list[dict],
+                          trend: dict | None, stop: set[str]) -> list[dict]:
+    """콘텐츠 컨텍스트 롱 포맷 행 생성 — 거점 단위 공통 로직.
+
+    kind: blog_keyword(빈도 상위 50) / trend:{그룹명} / category(상위 30).
+    stop 은 거점 고유 검색어(그 자체로는 신호가 아니다)와 일반 불용어의 합집합.
+
+    블로그 글은 두 번 거른다: 동명이지 글은 `_is_offsite` 로 버리고, 남은 글의 토큰에서
+    불용어를 뺀다. 트렌드는 미완성 달을 잘라낸다(`_complete_trend_points`).
+    """
     rows: list[dict] = []
 
-    posts = load_latest(SLUG, "naver_blog.json") or []
     tokens: Counter = Counter()
-    stop = {"가로수길", "신사동", "신사역", "그리고", "있는", "하는", "정말", "너무"}
+    kept = offsite = flooded = 0
+    hub_terms = _hub_terms(posts)
+    per_blogger: Counter = Counter()
     for p in posts:
         text = re.sub(r"<[^>]+>", "", f"{p.get('title', '')} {p.get('description', '')}")
+        if _is_offsite(text, hub_terms):
+            offsite += 1
+            continue
+        blogger = str(p.get("bloggerlink", ""))
+        per_blogger[blogger] += 1
+        if blogger and per_blogger[blogger] > _MAX_POSTS_PER_BLOGGER:
+            flooded += 1
+            continue
+        kept += 1
         tokens.update(t for t in re.findall(r"[가-힣]{2,}", text) if t not in stop)
+    if offsite or flooded:
+        print(f"       필터: 동명이지 {offsite}건 · 도배 {flooded}건 제외 "
+              f"→ {kept}/{len(posts)}건 집계")
     for kw, cnt in tokens.most_common(50):
         rows.append({"kind": "blog_keyword", "key": kw, "value": cnt})
     # TODO(Program): 감성 점수는 LLM(services/llm.py) 배치 분석으로 별도 컬럼 추가
 
-    trend = load_latest(SLUG, "naver_datalab_trend.json") or {}
-    for group in trend.get("results", []):
-        for point in group.get("data", []):
+    end_date = str((trend or {}).get("endDate", ""))
+    for group in (trend or {}).get("results", []):
+        for point in _complete_trend_points(group, end_date):
             rows.append({"kind": f"trend:{group.get('title', '')}",
                          "key": point.get("period", ""), "value": point.get("ratio", 0)})
 
-    places = load_latest(SLUG, "kakao_places.json") or []
     cats = Counter(str(d.get("category_name", "")).split(" > ")[-1] for d in places)
     for cat, cnt in cats.most_common(30):
         rows.append({"kind": "category", "key": cat, "value": cnt})
+    return rows
 
+
+def build_program_context() -> None:
+    """콘텐츠 컨텍스트 — 블로그 키워드 빈도 + 검색 트렌드 + 업종 카테고리 분포 (롱 포맷).
+
+    불용어는 platform13 경로와 같은 규칙으로 만든다: 일반 불용어 + 그 거점의 검색어 토큰
+    (`_query` 에서 파생). 예전에는 여기만 {"가로수길","신사동",…} 를 손으로 적어 뒀는데,
+    질의가 "서울 가로수길 …"로 바뀌면 그 목록이 조용히 낡는다.
+    """
+    posts = load_latest(SLUG, "naver_blog.json") or []
+    stop = _PROGRAM_STOPWORDS | _query_tokens(posts) | {"신사동", "신사역"}
+    rows = _program_context_rows(
+        posts,
+        load_latest(SLUG, "kakao_places.json") or [],
+        load_latest(SLUG, "naver_datalab_trend.json") or {},
+        stop,
+    )
     if not rows:
         print("[gold] program_content_context: Bronze 없음 — naver_blog/kakao_local 수집 먼저")
         return
     _save(pd.DataFrame(rows), _GOLD_DIR, "program_content_context")
+
+
+# 거점 무관 일반 불용어. 거점 고유어(지명·"맛집"/"카페" 등 검색어)는 하드코딩하지 않고
+# 그 거점의 blog _query 에서 파생한다 — 54거점에 지명 목록을 손으로 유지하지 않기 위해서다.
+#
+# 2026-08-01 확장: 54거점 blog_keyword 전수를 훑어 **어느 상권에 붙여도 뜻이 같은 말**만
+# 추가했다(후기·추천·좋은·실제로·방문…). 업종·분위기·메뉴처럼 상권마다 값이 다른 말은
+# 남긴다 — 그게 컨텍스트의 알맹이다.
+# 한계: 체험단 바이럴로 퍼진 인명·상호(cheongdam '조재범' 37건/36블로거)는 여기서 못 막는다.
+#   문서빈도(11.3%)로도 블로거 집중도(1인 최대 1.8%)로도 걸러지지 않는 분산 발행이라,
+#   자동 규칙을 만들면 진짜 상호명까지 함께 죽는다. 남는 한계로 둔다.
+_PROGRAM_STOPWORDS = {
+    "그리고", "있는", "하는", "정말", "너무",
+    # 후기·추천 상투어
+    "후기", "추천", "리뷰", "솔직", "방문", "다녀온", "다녀왔어요", "가봤어요", "내돈내산",
+    # 평가 형용사
+    "좋은", "좋아요", "맛있는", "맛있게", "괜찮은", "최고", "인생",
+    # 지시·시간 부사
+    "실제로", "요즘", "오늘", "어제", "이번", "여기", "저기", "거기", "그냥", "진짜", "완전",
+    # 무의미 연결어
+    "때문에", "위해", "함께", "같이", "많이", "조금", "다시", "바로", "가장",
+    # 가게 정보 상투어 — 블로그 포스팅 양식에 늘 붙는 항목명이라 상권 변별력이 0 이다.
+    # 정제 전 상위 5 를 이것들이 차지하고 있었다(garosugil '주소'(108)·'영업시간'(98) 등).
+    "주소", "위치", "영업시간", "전화번호", "브레이크타임", "라스트오더", "메뉴판", "가격표",
+    # 광역 지명(질의 접두어) — 서울 거점이라 변별력이 없다
+    "서울",
+}
+
+
+def _query_tokens(posts: list[dict]) -> set[str]:
+    """블로그 글의 `_query`(검색어)에서 나온 토큰 — 신호가 아니라 질의 자체다."""
+    return {t for p in posts for t in re.findall(r"[가-힣]{2,}", str(p.get("_query", "")))}
+
+
+def build_program13_context() -> None:
+    """[Program] 54거점 콘텐츠 컨텍스트 — gold/{거점}/program_content_context.
+
+    소스: bronze/platform13/{naver_blog,kakao_places}.json (행마다 district_id 부가됨).
+    services/marketing.py 가 가게 단위 생성 시 이 파일을 상권 컨텍스트로 결합하는데,
+    지금까지 garosugil 한 곳만 있어 나머지 거점은 컨텍스트 없이 생성됐다 — 그 공백을 푼다.
+
+    ⚠️ garosugil 은 전용 Bronze(검색 트렌드 포함)로 이미 만들어진 PoC 산출물이라 건드리지
+       않는다(덮어쓰기 금지 규칙). platform13 Bronze 에는 datalab 트렌드가 없어 이 경로의
+       산출물에는 trend:* 행이 없다 — 키워드·업종 분포만으로도 프롬프트 컨텍스트는 선다.
+    """
+    posts = load_latest(SLUG13, "naver_blog.json") or []
+    places = load_latest(SLUG13, "kakao_places.json") or []
+    if not posts and not places:
+        print("[gold] program13 context: Bronze 없음 — naver_blog/kakao_local --platform13 먼저")
+        return
+
+    by_posts: dict[str, list[dict]] = {}
+    by_places: dict[str, list[dict]] = {}
+    for src, dst in ((posts, by_posts), (places, by_places)):
+        for row in src:
+            dst.setdefault(str(row.get("district_id", "")), []).append(row)
+
+    built = 0
+    for slug in sorted(set(by_posts) | set(by_places)):
+        if not slug or slug == SLUG:      # garosugil PoC gold 는 보존
+            continue
+        dis_posts = by_posts.get(slug, [])
+        # 그 거점의 검색어 토큰은 신호가 아니라 질의 자체 — 키워드 집계에서 뺀다
+        stop = _PROGRAM_STOPWORDS | _query_tokens(dis_posts)
+        rows = _program_context_rows(dis_posts, by_places.get(slug, []), None, stop)
+        if not rows:
+            continue
+        _save(pd.DataFrame(rows), GOLD / slug, "program_content_context")
+        built += 1
+    print(f"[gold] program13 context: {built}개 거점 생성 (garosugil 은 전용 Bronze 로 별도 유지)")
 
 
 def run() -> None:
@@ -341,6 +536,7 @@ def run_platform13() -> None:
         return
     build_platform13_timeseries()
     build_platform13_store_graph_nodes()
+    build_program13_context()
 
 
 if __name__ == "__main__":

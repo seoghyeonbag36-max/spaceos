@@ -42,6 +42,28 @@ class LLMStoreMarketing(BaseModel):
     ha_check: str                     # 균형·공생·공감 자체 점검 결과 서술
 
 
+class DistrictMarketing(BaseModel):
+    """상권 단위 마케팅 응답 — GET /marketing/{id}.
+
+    `events` 는 서울 문화행사 실데이터(`events_source == "seoul-open-data"`),
+    `online_contents` 는 Gold 컨텍스트 기반 LLM 생성(`source == "llm"`).
+    """
+    district_id: str
+    events: list[dict]
+    online_contents: list[str]
+    source: str = "seed"            # 온라인 콘텐츠 출처: "llm" | "seed"
+    events_source: str = "seed"     # 행사 출처: "seoul-open-data" | "seed"
+
+
+class LLMDistrictContents(BaseModel):
+    """LLM 구조화 출력 계약 — 상권 단위 온라인 콘텐츠(Program 2단계).
+
+    online_contents 는 프론트가 그대로 노출하는 한 줄 카피(해시태그 포함) 목록이다.
+    """
+    online_contents: list[str]
+    ha_check: str
+
+
 class StoreMarketing(BaseModel):
     store_name: str
     category: str

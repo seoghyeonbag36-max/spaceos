@@ -101,10 +101,19 @@ def collect_trend() -> dict:
 
 
 def collect_platform13_blog() -> list[dict]:
-    """[Platform·GNN/Program] 33거점 블로그 리뷰 수집 — 리뷰 유사도 엣지·감성 피처 원천.
+    """[Platform·GNN/Program] 54거점 블로그 리뷰 수집 — Program 상권 컨텍스트 원천.
 
-    거점당 '{명칭} 맛집'·'{명칭} 카페' 2키워드 × 2페이지(최대 400건). 행에 district_id 부가.
-    Bronze: data/bronze/platform13/{날짜}/naver_blog.json
+    거점당 '서울 {명칭} 맛집'·'서울 {명칭} 카페' 2키워드 × 2페이지(최대 400건).
+    행에 district_id 부가. Bronze: data/bronze/platform13/{날짜}/naver_blog.json
+
+    ⚠️ **"서울" 접두어는 동명이지(同名異地) 차단용이다 — 빼지 말 것.**
+    거점명만으로 질의하면 같은 이름의 타 시도 상권 글이 섞인다. 2026-08-01 전수 실측:
+    수집분 17,653건 중 1,295건(7.3%)이 타 시도였고 8개 거점이 10% 이상이었다
+    (jangan 43.6% ← 수원·평택 장안동, cityhall 33.5% ← 수원·대전 시청역,
+     garosugil 31.8% ← 창원 가로수길, nonhyeon 23.1% ← 인천 논현동).
+    A/B 실측(100건 표본)에서 "서울" 접두어가 오염을 36%→2%, 30%→3%, 47%→1% 로 낮췄다.
+    Gold 단계(build_gold._is_offsite)에도 잔여분 필터가 있지만, 필터는 표본을 깎을 뿐
+    좋은 글을 더 가져오지는 못한다 — 질의를 좁히는 쪽이 본 수정이고 필터는 보루다.
     """
     from data.config.platform_places import DISTRICT_PLACES
 
@@ -116,7 +125,7 @@ def collect_platform13_blog() -> list[dict]:
     seen: dict[str, dict] = {}
     for did, (_lat, _lng, _radius, name) in DISTRICT_PLACES.items():
         got = 0
-        for kw in (f"{name} 맛집", f"{name} 카페"):
+        for kw in (f"서울 {name} 맛집", f"서울 {name} 카페"):
             for page in range(2):
                 try:
                     resp = requests.get(
