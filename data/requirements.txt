@@ -8,3 +8,6 @@ requests>=2.31.0
 # playwright>=1.40.0
 # beautifulsoup4>=4.12.0
 pyproj>=3.6            # 인허가 X/Y(중부원점 TM) -> WGS84 변환 (build_page_master licensing PIP)
+pyshp>=2.3             # SGIS 집계구/행정동 경계 shapefile 읽기. 순수 파이썬 —
+                       # geopandas/GDAL 을 쓰지 않는 건 의도적이다(폴리곤 읽기+투영이 전부라
+                       # 무거운 의존성이 불필요하고, 이 환경은 메모리 여유가 빠듯하다)
