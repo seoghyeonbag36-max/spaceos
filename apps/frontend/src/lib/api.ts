@@ -146,6 +146,19 @@ export interface VacancyHeatmap {
   predicted_direction: "up" | "down" | null;
 }
 
+export interface RentCell {
+  i: number; j: number; lat: number; lng: number;
+  c_lat: number; c_lng: number; dlat: number; dlng: number;
+  v: number; rent_per_pyeong: number;
+}
+
+export interface RentHeatmap {
+  district: string;
+  rent_source: "rone";
+  unit: "만원/평";
+  cells: RentCell[];
+}
+
 /** 서울 13 Page 거점 요약(감성·공실·리뷰·Tier) — 거점 대시보드 */
 export const listDistricts = () => getJSON<DistrictSummary[]>("/commercial-districts");
 /** 거점 전체 원천 데이터(zones/units/events/poi/grid) */
@@ -154,6 +167,8 @@ export const getDistrict = (id: string) => getJSON<DistrictDetail>(`/commercial-
 export const getSentiment = (id: string) => getJSON<Zone[]>(`/commercial-districts/${id}/sentiment`);
 /** 거점 100m 공실 히트맵(Page) */
 export const getVacancyHeatmap = (id: string) => getJSON<VacancyHeatmap>(`/heatmap/vacancy?district=${id}`);
+/** 거점 100m 임대시세 레이어(Page) */
+export const getRentHeatmap = (id: string) => getJSON<RentHeatmap>(`/heatmap/rent?district=${id}`);
 /** 건물 단위 공실 GeoJSON(FeatureCollection) — Page 공실 폴리곤 레이어 */
 export const getBuildingVacancy = (district: string) =>
   getJSON<GeoJSONFC>(`/heatmap/buildings?district=${district}`);

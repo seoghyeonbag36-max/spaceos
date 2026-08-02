@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.district import VacancyHeatmap
 from app.services import building_vacancy as bv
 from app.services import districts as svc
+from app.services import rent_layer
 
 router = APIRouter()
 
@@ -31,4 +32,13 @@ async def vacancy_heatmap(district: str) -> dict:
     hm = svc.get_vacancy_heatmap(district)
     if hm is None:
         raise HTTPException(status_code=404, detail=f"unknown district: {district}")
+    return hm
+
+
+@router.get("/rent")
+async def rent_heatmap(district: str) -> dict:
+    """R-ONE rent heatmap on the same 100m grid as /heatmap/vacancy."""
+    hm = rent_layer.rent_heatmap(district)
+    if hm is None:
+        raise HTTPException(status_code=404, detail=f"rent unavailable: {district}")
     return hm

@@ -14,7 +14,7 @@
 //   MapShell.css 의 .map-canvas 주석 참조.
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { loadNaverMaps } from "@/lib/naverMap";
-import { getBuildingVacancy, listDistricts, type DistrictSummary, type GeoJSONFC } from "@/lib/api";
+import { getBuildingVacancy, getRentHeatmap, listDistricts, type DistrictSummary, type GeoJSONFC, type RentHeatmap } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
 import "@/styles/tokens.css";
 import "./MapShell.css";
@@ -99,6 +99,13 @@ function sampleFootfall(center: { lat: number; lng: number }) {
   return pts;
 }
 
+const RENT_COLORS = ["#E6F8EE", "#BEEAD3", "#7DD9AD", "#35BF7C", "#0F8E5E"];
+function rentColor(v: number, min: number, max: number) {
+  const span = Math.max(1, max - min);
+  const idx = Math.max(0, Math.min(RENT_COLORS.length - 1, Math.floor(((v - min) / span) * RENT_COLORS.length)));
+  return RENT_COLORS[idx];
+}
+
 export default function MapShell() {
   const elRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -107,6 +114,7 @@ export default function MapShell() {
   const [err, setErr] = useState<string | null>(null);
   const [layer, setLayer] = useState<Layer>("vacancy");
   const [buildings, setBuildings] = useState<Building[]>(LOCAL_BUILDINGS);
+  const [rentHm, setRentHm] = useState<RentHeatmap | null>(null);
   const [src, setSrc] = useState<"api" | "local">("local");
   const [selected, setSelected] = useState<Building | null>(null);
   const [q, setQ] = useState("");
@@ -142,6 +150,15 @@ export default function MapShell() {
     getBuildingVacancy(districtId)
       .then((fc) => { if (alive) { setBuildings(fromGeoJSON(fc)); setSrc("api"); } })
       .catch(() => { if (alive) { setBuildings(LOCAL_BUILDINGS); setSrc("local"); } });
+    return () => { alive = false; };
+  }, [districtId]);
+
+  useEffect(() => {
+    let alive = true;
+    setRentHm(null);
+    getRentHeatmap(districtId)
+      .then((hm) => { if (alive) setRentHm(hm); })
+      .catch(() => { if (alive) setRentHm(null); });
     return () => { alive = false; };
   }, [districtId]);
 
@@ -218,12 +235,30 @@ export default function MapShell() {
           overlaysRef.current.push(c);
         });
       }
+    } else if (layer === "rent" && rentHm) {
+      const values = rentHm.cells.map((c) => c.v);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      rentHm.cells.forEach((cell) => {
+        const color = rentColor(cell.v, min, max);
+        const paths = [
+          new naver.maps.LatLng(cell.lat, cell.lng),
+          new naver.maps.LatLng(cell.lat, cell.lng + cell.dlng),
+          new naver.maps.LatLng(cell.lat + cell.dlat, cell.lng + cell.dlng),
+          new naver.maps.LatLng(cell.lat + cell.dlat, cell.lng),
+        ];
+        const poly = new naver.maps.Polygon({
+          map, paths, fillColor: color, fillOpacity: 0.52,
+          strokeColor: color, strokeWeight: 1, strokeOpacity: 0.85,
+          clickable: false,
+        });
+        overlaysRef.current.push(poly);
+      });
     }
     // rent/density: 구·격자 코로플레스 → 폴리곤 데이터 필요(범례에 안내).
-  }, [layer, ready, buildings, center.lat, center.lng]);
+  }, [layer, ready, buildings, rentHm, center.lat, center.lng]);
 
   const filtered = useMemo(() => buildings.filter((b) => !q || b.name.includes(q)), [buildings, q]);
-  const isChoropleth = layer === "rent" || layer === "density";
 
   return (
     <div className="mapshell">
@@ -315,7 +350,8 @@ export default function MapShell() {
           <span key={k} className="chip"><span className="sw" style={{ background: STATUS[k].color }} />{STATUS[k].label}</span>
         ))}
         {layer === "footfall" && <span className="note">유동인구 밀도 · 시간대별 (샘플)</span>}
-        {isChoropleth && <span className="note">{layer === "rent" ? "평당 임대시세" : "인구밀도"} · 구/격자 코로플레스 (데이터 연동 예정)</span>}
+        {layer === "rent" && <span className="note">평당 임대시세 · {rentHm?.unit ?? "만원/평"} <span style={{ color: "#0f7a55", background: "#e3f5ee", border: "1px solid #b7e3d2", borderRadius: 5, padding: "1px 5px", fontSize: 10, fontWeight: 800 }}>R-ONE</span></span>}
+        {layer === "density" && <span className="note">인구밀도 · 구/격자 코로플레스 (데이터 연동 예정)</span>}
       </div>
 
       {/* 3D 디지털 트윈 모달 */}
