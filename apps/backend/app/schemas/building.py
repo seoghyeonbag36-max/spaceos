@@ -7,9 +7,11 @@ class HistoryItem(BaseModel):
     end_date: str | None = None
     industry_type: str
     business_name: str
+    source: str | None = None
     closure_reason_summary: str | None = None
 
 
 class BuildingHistory(BaseModel):
     building_id: str
+    history_source: str = "none"
     history: list[HistoryItem]

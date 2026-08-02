@@ -42,6 +42,7 @@ data/gold/*
 !data/gold/*/
 data/gold/*/*
 !data/gold/*/page_building_master.geojson
+!data/gold/*/building_history.json
 # 예외: 커버리지 리포트(거점당 ~600B) — 관리자 API 가 디스크에서 읽으므로 배포에 필요.
 !data/gold/*/coverage.json
 # 예외: Program 상권 컨텍스트(거점당 ~3KB, 54거점 합계 174KB) — services/marketing.py 가
