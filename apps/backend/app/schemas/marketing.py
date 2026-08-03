@@ -17,7 +17,46 @@ class StoreProfile(BaseModel):
     address: str | None = None
     reviews: list[str] = []           # 리뷰·블로그 텍스트 (공식 API 또는 점주 제공)
     image_urls: list[str] = []        # 상가 사진 (점주 제공 원칙) — vision 분석 입력
+    menu: list[str] = []              # 메뉴 한 줄씩 ("대표메뉴 18,000원") — 지도 메뉴탭/점주 제공
     keywords: list[str] = []          # 사전 추출 키워드 (선택)
+
+
+class StorePlace(BaseModel):
+    """카카오 로컬 키워드 검색 후보 1건 — 반자동 채우기의 '어느 가게냐'를 확정하는 단위.
+
+    상호만으로는 가게가 특정되지 않는다(같은 이름이 전국에 있다 — 2026-08-01 블로그
+    코퍼스 오염의 원인이 정확히 이것이었다). 그래서 후보를 **사람이 고르게** 하고,
+    고른 결과의 주소로 리뷰 질의를 좁힌다.
+    """
+    name: str
+    category: str                     # 카카오 category_name 의 말단(예: 카페, 일식>이자카야)
+    address: str | None = None        # 지번
+    road_address: str | None = None
+    phone: str | None = None
+    lat: float | None = None
+    lng: float | None = None
+    place_url: str | None = None      # 카카오맵 상세 — 사람이 눈으로 확인하라고 준다
+    distance_m: int | None = None     # 거점 중심 기준 (district_id 를 준 경우만)
+
+
+class StorePlaceLookup(BaseModel):
+    """GET /marketing/places 응답. `source` 가 "unavailable" 이면 키 미설정·조회 실패다."""
+    query: str
+    places: list[StorePlace]
+    source: str                       # "kakao-local" | "unavailable"
+    note: str | None = None
+
+
+class StoreReviewLookup(BaseModel):
+    """GET /marketing/reviews 응답.
+
+    ⚠ 이건 **네이버 블로그 검색 스니펫**이지 플레이스 방문자 리뷰가 아니다(공식 API 없음).
+    화면에도 그렇게 표기한다 — 방문자 리뷰라고 부르면 없는 근거를 주장하는 것이다.
+    """
+    query: str
+    reviews: list[str]
+    source: str                       # "naver-blog" | "unavailable"
+    note: str | None = None
 
 
 class ChannelPlan(BaseModel):

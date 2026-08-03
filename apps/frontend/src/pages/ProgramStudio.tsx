@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listDistricts, generateStoreMarketing } from "@/lib/api";
-import type { ChannelPlan, DistrictSummary, StoreMarketing } from "@/lib/api";
+import {
+  listDistricts, generateStoreMarketing, lookupStorePlaces, lookupStoreReviews,
+} from "@/lib/api";
+import type {
+  ChannelPlan, DistrictSummary, StoreMarketing, StorePlace,
+} from "@/lib/api";
 import "./ProgramStudio.css";
 
 /**
@@ -10,9 +14,10 @@ import "./ProgramStudio.css";
  * 이걸 부르는 화면이 없어서 기능이 API 로만 존재했다. 이 페이지가 그 표면이다.
  *
  * 입력 원칙 — 화면에도 그대로 드러낸다(docs/feature-program.md §0):
- *   네이버 플레이스의 리뷰·사진·메뉴는 **공식 API 가 없다.** 그래서 자동 수집 버튼을 두지
- *   않고 붙여넣기 입력으로 받는다. 크롤링해 온 원본(특히 사진)은 PoC 내부 검증 한정이고,
- *   상용 경로는 점주 제공(B2B 온보딩 동의) 데이터다.
+ *   네이버 플레이스의 **방문자 리뷰·사진·메뉴에는 공식 API 가 없다.** 그래서 공식 API 로
+ *   얻을 수 있는 것만 자동으로 채운다 — 카카오 로컬(상호·카테고리·주소)과 네이버 블로그
+ *   검색(리뷰성 스니펫). 사진·메뉴는 여전히 붙여넣기다. 크롤링해 온 원본(특히 사진)은
+ *   PoC 내부 검증 한정이고, 상용 경로는 점주 제공(B2B 온보딩 동의) 데이터다.
  */
 
 /** 백엔드가 vision 에 넘기는 사진 수 상한 — services/marketing.py `image_urls[:4]` 와 맞춘다.
@@ -32,12 +37,13 @@ interface FormState {
   address: string;
   reviewsText: string;
   imagesText: string;
+  menuText: string;
   keywordsText: string;
 }
 
 const EMPTY: FormState = {
   name: "", category: "", districtId: "", address: "",
-  reviewsText: "", imagesText: "", keywordsText: "",
+  reviewsText: "", imagesText: "", menuText: "", keywordsText: "",
 };
 
 /** 데모용 예시 입력. **가상의 가게**다 — 실존 상호의 리뷰를 지어내 붙이면
@@ -56,6 +62,11 @@ const SAMPLE: FormState = {
     "인테리어가 차분하고 사진 찍기 좋아요. 조명이 따뜻한 편.",
   ].join("\n"),
   imagesText: "",
+  menuText: [
+    "오늘의 드립 6,000원",
+    "말차 라떼 6,500원",
+    "바스크 치즈케이크 8,000원",
+  ].join("\n"),
   keywordsText: "",
 };
 
@@ -71,6 +82,11 @@ export default function ProgramStudio() {
   const [busy, setBusy] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // 반자동 채우기 — 후보 검색(카카오) → 선택 → 블로그 스니펫 주입(네이버)
+  const [places, setPlaces] = useState<StorePlace[] | null>(null);
+  const [lookupBusy, setLookupBusy] = useState(false);
+  const [lookupNote, setLookupNote] = useState<string | null>(null);
 
   useEffect(() => {
     // 거점 목록은 상권 컨텍스트 결합용(선택)이라 실패해도 생성 자체는 된다. 다만 **조용히**
@@ -90,6 +106,7 @@ export default function ProgramStudio() {
 
   const reviews = useMemo(() => linesOf(form.reviewsText), [form.reviewsText]);
   const images = useMemo(() => linesOf(form.imagesText), [form.imagesText]);
+  const menu = useMemo(() => linesOf(form.menuText), [form.menuText]);
   const keywords = useMemo(() => commaOf(form.keywordsText), [form.keywordsText]);
   const badImages = images.filter((u) => !isHttp(u));
 
@@ -98,6 +115,55 @@ export default function ProgramStudio() {
   const set = <K extends keyof FormState>(k: K) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  /** 상호로 가게 후보를 찾는다. 자동 선택하지 않는다 — 같은 상호가 전국에 있다. */
+  async function searchPlaces() {
+    const q = form.name.trim();
+    if (!q || lookupBusy) return;
+    setLookupBusy(true);
+    setPlaces(null);
+    setLookupNote(null);
+    try {
+      const r = await lookupStorePlaces(q, form.districtId || undefined);
+      setPlaces(r.places);
+      setLookupNote(r.source === "unavailable"
+        ? `가게 검색을 쓸 수 없다 — ${r.note ?? "카카오 로컬 키 확인 필요"}`
+        : r.note);
+    } catch (err) {
+      setPlaces([]);
+      setLookupNote(`가게 검색 실패: ${String(err)}`);
+    } finally {
+      setLookupBusy(false);
+    }
+  }
+
+  /** 후보 선택 → 기본정보를 채우고, 그 주소로 좁힌 블로그 스니펫을 리뷰란에 넣는다.
+   *  기존 리뷰 입력이 있으면 **덮어쓰지 않고 뒤에 잇는다** — 점주가 준 원문이 날아가면 안 된다. */
+  async function applyPlace(p: StorePlace) {
+    setForm((f) => ({
+      ...f,
+      name: p.name,
+      category: p.category || f.category,
+      address: p.road_address || p.address || f.address,
+    }));
+    setPlaces(null);
+    setLookupBusy(true);
+    setLookupNote(null);
+    try {
+      const r = await lookupStoreReviews(p.name, p.address ?? p.road_address);
+      if (r.reviews.length) {
+        setForm((f) => ({
+          ...f,
+          reviewsText: [f.reviewsText.trim(), ...r.reviews].filter(Boolean).join("\n"),
+        }));
+      }
+      setLookupNote(`'${r.query}' 검색 → ${r.reviews.length}건 주입. ${r.note ?? ""}`.trim());
+    } catch (err) {
+      setLookupNote(`리뷰 스니펫 조회 실패: ${String(err)}`);
+    } finally {
+      setLookupBusy(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -112,6 +178,7 @@ export default function ProgramStudio() {
         address: form.address.trim() || undefined,
         reviews,
         image_urls: images.filter(isHttp),
+        menu,
         keywords,
       });
       setResult(r);
@@ -128,7 +195,8 @@ export default function ProgramStudio() {
         <div className="ey">SpaceOS · Program</div>
         <h1>가게 단위 마케팅 솔루션</h1>
         <div className="sub">
-          가게의 리뷰·사진·기본정보를 넣으면 온라인/오프라인 광고 솔루션을 근거와 함께 생성한다.
+          가게의 리뷰·사진·메뉴·기본정보를 넣으면 온라인/오프라인 광고 솔루션을 근거와 함께 생성한다.
+          상호를 검색하면 카카오 로컬(기본정보)과 네이버 블로그(리뷰성 스니펫)로 절반쯤 자동으로 채워진다.
           거점을 고르면 Platform 이 모은 상권 컨텍스트(블로그 키워드·업종 분포·검색 트렌드)가 함께 반영된다.
         </div>
       </div>
@@ -145,8 +213,16 @@ export default function ProgramStudio() {
           </div>
 
           <div className="row2">
-            <Field label="가게명" required>
-              <input value={form.name} onChange={set("name")} placeholder="예: 예시 카페 로우" />
+            <Field label="가게명" required
+              hint="상호를 넣고 검색하면 카카오 로컬에서 후보를 찾아 기본정보·블로그 스니펫을 채운다.">
+              <div className="inputbtn">
+                <input value={form.name} onChange={set("name")} placeholder="예: 맡기다"
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); searchPlaces(); } }} />
+                <button type="button" className="ghost" onClick={searchPlaces}
+                  disabled={!form.name.trim() || lookupBusy}>
+                  {lookupBusy ? "…" : "검색"}
+                </button>
+              </div>
             </Field>
             <Field label="카테고리" required>
               <input value={form.category} onChange={set("category")} list="cat-hints" placeholder="예: 카페" />
@@ -155,6 +231,28 @@ export default function ProgramStudio() {
               </datalist>
             </Field>
           </div>
+
+          {/* 후보를 자동 선택하지 않는다 — 같은 상호가 전국에 있어(2026-08-01 코퍼스 오염의
+              원인) 사람이 골라야 리뷰 질의를 그 동네로 좁힐 수 있다. */}
+          {places && places.length > 0 && (
+            <div className="cands">
+              <div className="candhd">후보 {places.length}곳 — 맞는 가게를 고르면 기본정보와 블로그 스니펫이 채워진다</div>
+              {places.map((p, i) => (
+                <button type="button" key={i} className="cand" onClick={() => applyPlace(p)}>
+                  <span className="cname">{p.name}</span>
+                  <span className="ccat">{p.category}</span>
+                  <span className="caddr">
+                    {p.road_address || p.address}
+                    {p.distance_m != null && ` · ${p.distance_m}m`}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+          {places && places.length === 0 && !lookupBusy && (
+            <div className="warn">검색 결과가 없다. 지도에 표기된 상호 그대로 넣거나, 아래에 직접 입력하라.</div>
+          )}
+          {lookupNote && <div className="note">{lookupNote}</div>}
 
           <Field label="거점(상권 컨텍스트)"
             hint={districtErr
@@ -173,8 +271,8 @@ export default function ProgramStudio() {
             <input value={form.address} onChange={set("address")} placeholder="예: 서울 강남구 신사동 …" />
           </Field>
 
-          <Field label="방문자 리뷰 · 블로그 텍스트"
-            hint="한 줄에 리뷰 하나. 네이버 플레이스는 공식 API 가 없어 붙여넣기로 받는다."
+          <Field label="리뷰 · 블로그 텍스트"
+            hint="한 줄에 하나. 검색으로 채운 것은 네이버 블로그 스니펫이지 플레이스 방문자 리뷰가 아니다(공식 API 없음) — 점주가 준 원문을 직접 붙여넣어도 된다."
             count={reviews.length ? `${reviews.length}건` : undefined}>
             <textarea rows={8} value={form.reviewsText} onChange={set("reviewsText")}
               placeholder={"원두를 매주 바꿔서 소개해주는 게 좋아요.\n2층 창가 자리가 조용해서 작업하기 좋았습니다.\n…"} />
@@ -202,15 +300,22 @@ export default function ProgramStudio() {
             </div>
           )}
 
+          <Field label="메뉴"
+            hint="한 줄에 하나 — 품목과 가격을 적힌 그대로. 지도 메뉴탭도 공식 API 가 없어 붙여넣기다. 없는 품목·가격은 생성기가 지어내지 않는다."
+            count={menu.length ? `${menu.length}개` : undefined}>
+            <textarea rows={4} value={form.menuText} onChange={set("menuText")}
+              placeholder={"오늘의 드립 6,000원\n말차 라떼 6,500원"} />
+          </Field>
+
           <Field label="키워드(선택)"
             hint="쉼표로 구분. 넣으면 리뷰 빈도 추출 대신 이 값이 톤앤매너 키워드로 쓰인다."
             count={keywords.length ? `${keywords.length}개` : undefined}>
             <input value={form.keywordsText} onChange={set("keywordsText")} placeholder="예: 산미, 조용함, 말차" />
           </Field>
 
-          {reviews.length === 0 && images.length === 0 && (
+          {reviews.length === 0 && images.length === 0 && menu.length === 0 && (
             <div className="warn">
-              리뷰·사진이 모두 비어 있다. 근거가 없으면 가게 특성이 빠진 일반론이 나온다.
+              리뷰·사진·메뉴가 모두 비어 있다. 근거가 없으면 가게 특성이 빠진 일반론이 나온다.
             </div>
           )}
 

@@ -46,11 +46,13 @@ _SLUG_RE = re.compile(r"^[a-z0-9-]{1,40}$")
 _GOLD_DIR = Path(__file__).resolve().parents[4] / "data" / "gold"
 
 _SYSTEM_PROMPT = """너는 SpaceOS의 Program(가게 단위 마케팅 자동화) 생성기다.
-입력된 가게 프로필(이름·카테고리·주소·리뷰 텍스트·사진)과 상권 컨텍스트를 근거로,
+입력된 가게 프로필(이름·카테고리·주소·리뷰 텍스트·사진·메뉴)과 상권 컨텍스트를 근거로,
 소상공인이 바로 실행할 수 있는 온라인/오프라인 마케팅 솔루션을 제안한다.
 
 원칙 (Humanistic Authority — 균형·공생·공감):
-- 리뷰·사진에 실제로 나타난 강점만 소구한다. 과장·허위·검증 불가한 최상급 표현 금지.
+- 리뷰·사진·메뉴에 실제로 나타난 강점만 소구한다. 과장·허위·검증 불가한 최상급 표현 금지.
+- 메뉴는 **적힌 품목·가격 그대로만** 쓴다. 없는 메뉴를 만들거나 가격을 지어내지 않는다.
+  가격대를 논할 때는 적힌 가격에서만 끌어낸다.
 - 상권 공동 활성화(공생)를 해치는 제안(이웃 가게 비방·출혈 경쟁 조장) 금지.
 - 특정 플랫폼·자본에 편중되지 않게 채널을 균형 있게 섞는다.
 - 각 제안에는 반드시 근거(rationale)를 리뷰 키워드나 상권 데이터로 명시한다.
@@ -141,10 +143,12 @@ def _call_llm(profile: dict, tone: list[str], district_ctx: str | None) -> LLMSt
     import anthropic
 
     reviews = "\n".join(f"- {t}" for t in profile.get("reviews", [])) or "(리뷰 없음)"
+    menu = "\n".join(f"- {m}" for m in profile.get("menu", [])) or "(메뉴 정보 없음)"
     text = (
         f"가게: {profile['name']} (카테고리: {profile['category']})\n"
         f"주소: {profile.get('address') or '(미상)'}\n"
         f"리뷰/블로그 텍스트:\n{reviews}\n"
+        f"메뉴(적힌 그대로 — 없는 품목·가격을 추가하지 말 것):\n{menu}\n"
         f"사전 추출 키워드: {', '.join(tone) if tone else '(없음)'}"
     )
     if district_ctx:
@@ -210,13 +214,18 @@ def _rule_stub(profile: dict, tone: list[str]) -> dict:
          "content": f"'{profile['name']}' 방문 후기형 포스팅 + 지역 키워드 최적화",
          "rationale": "네이버 지도 유입 동선(검색→플레이스) 강화"},
     ]
+    # 메뉴가 있으면 첫 품목을 그대로 인용한다 — 스텁이라도 입력을 흘리지는 않는다.
+    # 가공하지 않고 적힌 문자열을 그대로 쓴다(가격을 지어내지 않기 위해).
+    lead_menu = (profile.get("menu") or [None])[0]
     offline = [
         {"channel": "지역 행사 참여", "kind": "offline",
          "content": "상권 플리마켓/팝업 부스 참여로 첫 방문 접점 확보",
          "rationale": "상권 공동 활성화 — 공생(Symbiosis) 원칙"},
         {"channel": "매장 앞 프로모션", "kind": "offline",
-         "content": f"{angle} 중심의 입간판·시식(체험) 이벤트",
-         "rationale": "보행 유동객 전환 — 과장 없는 실체 기반 소구"},
+         "content": (f"'{lead_menu}' 중심의 입간판·시식(체험) 이벤트" if lead_menu
+                     else f"{angle} 중심의 입간판·시식(체험) 이벤트"),
+         "rationale": ("메뉴에 적힌 품목을 그대로 소구 — 보행 유동객 전환" if lead_menu
+                       else "보행 유동객 전환 — 과장 없는 실체 기반 소구")},
     ]
     return {
         "store_name": profile["name"],

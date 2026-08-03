@@ -217,8 +217,37 @@ export const simulateRevenue = (req: {
  *  백엔드 schemas/marketing.py::StoreProfile 와 1:1 대응한다. */
 export interface StoreProfileInput {
   name: string; category: string; district_id?: string; address?: string;
-  reviews?: string[]; image_urls?: string[]; keywords?: string[];
+  reviews?: string[]; image_urls?: string[]; menu?: string[]; keywords?: string[];
 }
+
+/** 카카오 로컬 키워드 검색 후보 1건 — 같은 상호가 전국에 있어 사람이 골라야 한다 */
+export interface StorePlace {
+  name: string; category: string;
+  address: string | null; road_address: string | null; phone: string | null;
+  lat: number | null; lng: number | null;
+  place_url: string | null; distance_m: number | null;
+}
+export interface StorePlaceLookup {
+  query: string; places: StorePlace[];
+  /** "kakao-local" 정상 | "unavailable" 키 미설정·조회 실패 */
+  source: string; note: string | null;
+}
+/** ⚠ 플레이스 방문자 리뷰가 아니라 **네이버 블로그 스니펫**이다(공식 API 없음) */
+export interface StoreReviewLookup {
+  query: string; reviews: string[];
+  source: string; note: string | null;
+}
+
+/** 상호로 가게 후보 검색(카카오 로컬) — GET /marketing/places */
+export const lookupStorePlaces = (query: string, districtId?: string) =>
+  getJSON<StorePlaceLookup>(`/marketing/places?query=${encodeURIComponent(query)}`
+    + (districtId ? `&district_id=${encodeURIComponent(districtId)}` : ""));
+
+/** 가게 언급 블로그 스니펫(네이버 블로그) — GET /marketing/reviews.
+ *  address 를 주면 그 동(洞)으로 질의를 좁혀 동명이지 오염을 줄인다. */
+export const lookupStoreReviews = (name: string, address?: string | null) =>
+  getJSON<StoreReviewLookup>(`/marketing/reviews?name=${encodeURIComponent(name)}`
+    + (address ? `&address=${encodeURIComponent(address)}` : ""));
 
 /** 제안 1건 — 채널·실행안·근거. 근거 없는 제안은 만들지 않는 것이 Program 의 원칙이다. */
 export interface ChannelPlan {

@@ -64,15 +64,48 @@ cityhall 33.5%, garosugil 31.8% ← 창원 가로수길, nonhyeon 23.1% ← 인�
 회귀 방지: `data/tests/test_program_context.py`(8건) + `tests/test_posting_marketing.py`
 의 방향 판정 2건.
 
+## 0-2. 화면과 반자동 입력 (2026-08-03)
+
+`POST /marketing/generate` 는 2026-07-18 부터 있었지만 **이걸 부르는 화면이 없어** Program
+1단계가 API 로만 존재했다. 네비에 **Program 탭**(`pages/ProgramStudio.tsx`)을 붙였다.
+
+입력을 어디까지 자동화할 수 있는지는 §0 표가 이미 답을 정해 뒀다 — 플레이스 리뷰·사진·메뉴는
+공식 API 가 없다. 그래서 **공식 API 로 얻히는 것만** 자동으로 채운다.
+
+| 입력 | 자동 채우기 | 근거 |
+|---|---|---|
+| 상호·카테고리·주소·좌표 | ✅ 카카오 로컬 키워드 검색 | `GET /marketing/places` |
+| 리뷰성 텍스트 | ✅ 네이버 블로그 검색 스니펫 | `GET /marketing/reviews` |
+| 사진 | ❌ 붙여넣기 (점주 제공 원칙) | 공식 API 없음 |
+| 메뉴 | ❌ 붙여넣기 (`StoreProfile.menu`) | 공식 API 없음 |
+
+**동명이지 방어를 여기서도 건다** — §0-1 ① 과 같은 실패가 가게 단위에서도 그대로 난다.
+상호만으로 블로그를 치면 타 지역 동명 가게 글이 섞이므로 두 겹으로 막는다:
+
+1. 후보를 **사람이 고른다**(자동 선택 안 함) → 주소가 확정된다
+2. 그 주소의 동(洞)을 질의에 붙인다 → `연남동 맡기다`. 그러고도 **상호가 본문에 없는 글은 버린다**
+
+실측(2026-08-03, 연남동 맡기다): 카카오 후보 1건(60m) → 블로그 15건 주입, 질의 `연남동 맡기다`.
+
+> ⚠ 화면·응답 어디서도 이걸 "방문자 리뷰"라고 부르지 않는다. 블로그 스니펫이고 광고가 섞인다
+> — `source` 필드(`naver-blog` / `kakao-local` / `unavailable`)로 출처를 밝힌다.
+
+**키 위치**: 카카오·네이버 키는 예전부터 `data/.env` 에 산다. 복사해 두 벌로 두면 반드시
+어긋나므로 `core/config.py` 가 `data/.env` 와 `apps/backend/.env` 를 **둘 다** 읽는다
+(뒤가 우선). 배포판에는 `data/.env` 가 올라가지 않으므로 Vercel 환경변수로 따로 넣어야 한다.
+
 ## 1. 담당 코드 영역
 
 ```
 apps/backend/app/services/marketing.py    가게/상권 마케팅 솔루션 생성 서비스 (현존)
-apps/backend/app/schemas/marketing.py     StoreProfile / StoreMarketing 스키마 (현존)
-apps/backend/app/api/v1/marketing.py      GET /{id}(상권) + POST /generate(가게) (현존)
-apps/backend/app/core/config.py           llm_api_key (이미 존재)
-data/collectors/naver_blog.py             블로그 리뷰·트렌드 수집 (공식 API)
-data/crawlers/review_crawler.py           플레이스 리뷰 크롤러 골격 (PoC 한정)
+apps/backend/app/services/store_lookup.py 가게 반자동 조회 — 카카오 로컬 + 네이버 블로그
+apps/backend/app/schemas/marketing.py     StoreProfile(menu 포함) / StoreMarketing 스키마
+apps/backend/app/api/v1/marketing.py      GET /{id}(상권) + POST /generate + GET /places·/reviews
+                                          ⚠ 정적 경로는 /{district_id} 보다 먼저 등록할 것
+apps/backend/app/core/config.py           llm_api_key + kakao/naver 키 (data/.env 병행 로드)
+apps/frontend/src/pages/ProgramStudio.tsx Program 탭 — 입력 폼 + 결과 패널
+data/collectors/naver_blog.py             블로그 리뷰·트렌드 수집 (거점 단위, 공식 API)
+data/crawlers/review_crawler.py           플레이스 리뷰 크롤러 골격 (PoC 한정, 미구현)
 ```
 
 ## 2. 환경 설정

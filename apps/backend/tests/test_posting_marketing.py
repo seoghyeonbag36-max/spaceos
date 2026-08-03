@@ -349,3 +349,129 @@ def test_trend_summary_direction_rule():
     assert "보합" in summarize([100, 100, 100, 101, 102, 101])
     # 6개 점이 없으면 방향을 만들지 않는다 — 근거 없는 방향보다 트렌드 생략이 낫다
     assert summarize([100, 90, 80, 70, 60]) is None
+
+
+# ───────────── 메뉴 입력 + 가게 반자동 조회 (2026-08-03) ─────────────
+
+
+def test_menu_reaches_llm_prompt(monkeypatch):
+    """메뉴가 LLM 프롬프트에 실린다 — 스키마에만 있고 안 쓰이면 죽은 필드다."""
+    from app.core.config import settings
+    from app.services import marketing as mkt
+
+    monkeypatch.setattr(settings, "llm_api_key", "test-key")
+    seen: dict = {}
+
+    import app.services.marketing as m
+
+    def spy(profile, tone, ctx):
+        seen["menu"] = profile.get("menu")
+        seen["prompt"] = m._SYSTEM_PROMPT
+        from app.schemas.marketing import LLMChannelPlan, LLMStoreMarketing
+        return LLMStoreMarketing(
+            tone_keywords=["x"],
+            online=[LLMChannelPlan(channel="a", content="b", rationale="c")],
+            offline=[LLMChannelPlan(channel="d", content="e", rationale="f")],
+            ha_check="ok",
+        )
+
+    monkeypatch.setattr(mkt, "_call_llm", spy)
+    r = client.post(f"{V1}/marketing/generate",
+                    json={**_PROFILE, "menu": ["우니 사시미 32,000원", "맡김술상 55,000원"]})
+    assert r.status_code == 200
+    assert seen["menu"] == ["우니 사시미 32,000원", "맡김술상 55,000원"]
+    assert "메뉴" in seen["prompt"], "시스템 프롬프트가 메뉴를 다루지 않는다"
+
+
+def test_menu_quoted_verbatim_in_stub(monkeypatch):
+    """스텁도 메뉴를 흘리지 않는다 — 첫 품목을 **적힌 그대로** 인용한다."""
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "llm_api_key", "")
+
+    body = client.post(f"{V1}/marketing/generate", json={
+        "name": "맡기다", "category": "이자카야", "menu": ["맡김술상 55,000원"],
+    }).json()
+    offline = " ".join(p["content"] for p in body["offline"])
+    assert "맡김술상 55,000원" in offline
+
+
+def test_lookup_routes_are_not_swallowed_by_district_route(monkeypatch):
+    """/places·/reviews 가 /{district_id} 에 먹히지 않는다 (라우트 등록 순서).
+
+    키를 비워 두는 이유는 네트워크를 타지 않기 위해서다 — 라우팅만 보면 되고,
+    거점 라우트에 먹혔다면 404(unknown district)가 났을 것이다.
+    """
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "kakao_rest_api_key", "")
+    monkeypatch.setattr(settings, "naver_client_id", "")
+
+    r = client.get(f"{V1}/marketing/places", params={"query": "x"})
+    assert r.status_code == 200, r.text
+    assert r.json()["source"] == "unavailable"
+    r2 = client.get(f"{V1}/marketing/reviews", params={"name": "x"})
+    assert r2.status_code == 200, r2.text
+    assert r2.json()["source"] == "unavailable"
+
+
+def test_lookup_unavailable_when_keys_missing(monkeypatch):
+    """키 미설정은 조용한 빈 목록이 아니라 source='unavailable' 로 드러난다."""
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "kakao_rest_api_key", "")
+    monkeypatch.setattr(settings, "naver_client_id", "")
+    monkeypatch.setattr(settings, "naver_client_secret", "")
+
+    b = client.get(f"{V1}/marketing/places", params={"query": "맡기다"}).json()
+    assert b["source"] == "unavailable" and b["note"]
+    b2 = client.get(f"{V1}/marketing/reviews", params={"name": "맡기다"}).json()
+    assert b2["source"] == "unavailable" and b2["note"]
+
+
+def test_review_query_is_narrowed_by_dong(monkeypatch):
+    """리뷰 질의에 주소의 동(洞)이 붙는다 — 동명이지 오염 방어의 1차선."""
+    from app.core.config import settings
+    from app.services import store_lookup as sl
+
+    monkeypatch.setattr(settings, "naver_client_id", "id")
+    monkeypatch.setattr(settings, "naver_client_secret", "secret")
+    captured: dict = {}
+
+    def fake_get(url, params, headers):
+        captured["query"] = params["query"]
+        return {"items": [{"title": "연남동 <b>맡기다</b> 후기",
+                           "description": "오마카세가 좋았습니다 재방문 의사 있어요"}]}
+
+    monkeypatch.setattr(sl, "_get_json", fake_get)
+    out = sl.find_reviews("맡기다", "서울 마포구 연남동 260-2")
+    assert captured["query"] == "연남동 맡기다"
+    assert out["source"] == "naver-blog"
+    # <b> 태그가 남으면 프롬프트에 마크업이 섞인다
+    assert "<b>" not in out["reviews"][0]
+
+    # 주소가 없으면 최소한 '서울'로는 좁힌다
+    sl.find_reviews("맡기다", None)
+    assert captured["query"] == "서울 맡기다"
+
+
+def test_reviews_drop_posts_without_store_name(monkeypatch):
+    """상호가 본문에 없는 글은 버린다 — 목록형 광고·타 지역 글이 이렇게 섞인다."""
+    from app.core.config import settings
+    from app.services import store_lookup as sl
+
+    monkeypatch.setattr(settings, "naver_client_id", "id")
+    monkeypatch.setattr(settings, "naver_client_secret", "secret")
+    monkeypatch.setattr(sl, "_get_json", lambda *a, **k: {"items": [
+        {"title": "연남동 맡기다 방문", "description": "오마카세 코스가 알찼습니다 추천해요"},
+        {"title": "연남동 맛집 총정리", "description": "이번엔 다른 가게들을 모아봤습니다 참고하세요"},
+    ]})
+    out = sl.find_reviews("맡기다", "서울 마포구 연남동 260-2")
+    assert len(out["reviews"]) == 1
+    assert "제외했다" in (out["note"] or "")
+
+
+def test_dong_extraction_handles_numbered_ga():
+    """'을지로3가'처럼 숫자가 낀 주소도 뽑는다 (2026-08-03 회귀)."""
+    from app.services.store_lookup import dong_of
+
+    assert dong_of("서울 마포구 연남동 260-2") == "연남동"
+    assert dong_of("서울 중구 을지로3가 1") == "을지로3가"
+    assert dong_of(None) is None
