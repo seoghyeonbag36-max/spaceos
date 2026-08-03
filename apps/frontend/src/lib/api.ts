@@ -211,8 +211,28 @@ export const simulateRevenue = (req: {
   district_id: string; unit_id?: string; industry_type?: string; strategy?: string;
 }) => postJSON<unknown>("/ai/simulate-revenue", req);
 
-/** 가게 단위 마케팅 광고 솔루션 자동 생성(Program) — 상가 사진·정보·리뷰 기반 */
-export const generateStoreMarketing = (profile: {
+/* ===== 가게 단위 마케팅 솔루션(Program 1단계) — POST /marketing/generate ===== */
+
+/** 가게 프로필. 수집 채널(점주 제공·네이버 지역검색·카카오 로컬)에 무관한 정규화 입력 계약.
+ *  백엔드 schemas/marketing.py::StoreProfile 와 1:1 대응한다. */
+export interface StoreProfileInput {
   name: string; category: string; district_id?: string; address?: string;
   reviews?: string[]; image_urls?: string[]; keywords?: string[];
-}) => postJSON<unknown>("/marketing/generate", profile);
+}
+
+/** 제안 1건 — 채널·실행안·근거. 근거 없는 제안은 만들지 않는 것이 Program 의 원칙이다. */
+export interface ChannelPlan {
+  channel: string; kind: "online" | "offline"; content: string; rationale: string;
+}
+
+/** 생성 결과. `source` 가 "rule-stub" 이면 LLM 을 못 탄 폴백이라 내용이 일반론이다 —
+ *  화면에서 반드시 구분해 보여준다(실호출 결과처럼 읽히면 안 된다). */
+export interface StoreMarketing {
+  store_name: string; category: string; tone_keywords: string[];
+  online: ChannelPlan[]; offline: ChannelPlan[]; ha_check: string;
+  source: "llm" | "rule-stub" | string;
+}
+
+/** 가게 단위 마케팅 광고 솔루션 자동 생성(Program) — 상가 사진·정보·리뷰 기반 */
+export const generateStoreMarketing = (profile: StoreProfileInput) =>
+  postJSON<StoreMarketing>("/marketing/generate", profile);

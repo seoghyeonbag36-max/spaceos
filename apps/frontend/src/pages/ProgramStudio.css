@@ -1,0 +1,88 @@
+/* SpaceOS Program 스튜디오(가게 단위) — 스코프 .progstudio (PageDashboard 톤 계승) */
+.progstudio{--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#2E6FB7;
+ font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);background:#eef1f4;padding:20px;line-height:1.4}
+.progstudio *{box-sizing:border-box}
+.progstudio .wrap{max-width:1240px;margin:0 auto}
+.progstudio .hd{margin-bottom:14px}
+.progstudio .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+.progstudio h1{font-size:27px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
+.progstudio .sub{font-size:13px;color:var(--sub);line-height:1.6;max-width:820px}
+
+/* 2단: 왼쪽 입력 / 오른쪽 결과. 결과는 길어지므로 입력 패널만 sticky 로 붙인다. */
+.progstudio .cols{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:14px;align-items:start}
+.progstudio .panel{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 16px}
+.progstudio .cols>form.panel{position:sticky;top:14px}
+.progstudio .ptitle{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:800;margin-bottom:12px}
+.progstudio .ptools{display:flex;gap:6px}
+
+/* 필드 */
+.progstudio .field{display:block;margin-bottom:11px}
+.progstudio .flabel{display:flex;align-items:baseline;gap:5px;font-size:11.5px;font-weight:700;color:var(--sub);margin-bottom:5px}
+.progstudio .flabel i{font-style:normal;color:#e03e36}
+.progstudio .flabel em{font-style:normal;margin-left:auto;font-size:10.5px;font-weight:800;color:#5a6b85;background:#f1f4f8;border-radius:5px;padding:1px 6px}
+.progstudio .fhint{display:block;font-size:10.5px;color:#9aa3af;margin-top:4px;line-height:1.5}
+.progstudio input,.progstudio textarea,.progstudio select{
+ width:100%;font-family:inherit;font-size:12.5px;color:var(--ink);background:#fafbfc;
+ border:1px solid var(--line);border-radius:9px;padding:8px 10px;line-height:1.5}
+.progstudio textarea{resize:vertical;min-height:60px}
+.progstudio input:focus,.progstudio textarea:focus,.progstudio select:focus{outline:none;border-color:var(--blue);background:#fff}
+.progstudio .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* 버튼 */
+.progstudio button{font-family:inherit;cursor:pointer}
+.progstudio .ghost{font-size:11px;font-weight:700;color:var(--sub);background:#fafbfc;border:1px solid var(--line);border-radius:8px;padding:4px 9px}
+.progstudio .ghost:hover{color:var(--blue);border-color:var(--blue)}
+.progstudio .primary{width:100%;margin-top:4px;font-size:13.5px;font-weight:800;color:#fff;background:#3a5a98;border:1px solid #3a5a98;border-radius:10px;padding:11px 14px}
+.progstudio .primary:hover:not(:disabled){background:#31507f}
+.progstudio .primary:disabled{opacity:.45;cursor:not-allowed}
+
+/* 안내·경고 */
+.progstudio .note{font-size:10.5px;color:#9aa3af;line-height:1.55;margin:6px 0}
+.progstudio .warn{font-size:11.5px;color:#78350f;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 10px;line-height:1.55;margin:6px 0}
+.progstudio .warn code{background:#fff;border:1px solid #fde68a;border-radius:4px;padding:0 4px;font-size:11px}
+.progstudio .err{background:#fef2f2;border:1px solid #fecaca;border-radius:11px;padding:13px 15px;font-size:12.5px;color:#7f1d1d;line-height:1.7}
+.progstudio .err code{background:#fff;border:1px solid #fecaca;border-radius:5px;padding:1px 6px;font-size:11.5px}
+.progstudio .errdetail{font-size:11px;color:#b91c1c;margin-top:6px;word-break:break-all}
+
+/* 사진 미리보기 — vision 상한 밖은 흐리게(넣었는데 안 쓰인 걸 숨기지 않는다) */
+.progstudio .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
+.progstudio .thumb{width:62px;height:62px;border-radius:8px;border:1px solid var(--line);overflow:hidden;background:#f1f4f8;display:flex;align-items:center;justify-content:center}
+.progstudio .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.progstudio .thumb.unused{opacity:.35}
+.progstudio .thumb.failed{border-style:dashed;border-color:#fecaca;background:#fef2f2}
+.progstudio .thumbx{font-size:9px;font-weight:700;color:#b91c1c;text-align:center;padding:0 4px;line-height:1.3}
+
+/* 결과 */
+.progstudio .empty{padding:44px 16px;text-align:center;font-size:13px;color:var(--sub);line-height:1.7}
+.progstudio .empty-sub{font-size:11.5px;color:#9aa3af;margin-top:6px}
+.progstudio .rhead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding-bottom:11px;border-bottom:1px solid var(--line)}
+.progstudio .rname{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.progstudio .rcat{font-size:11.5px;color:var(--sub);margin-top:3px}
+.progstudio .srcbadge{font-size:10px;font-weight:800;border-radius:6px;padding:3px 7px;flex:0 0 auto;letter-spacing:-.2px;white-space:nowrap}
+.progstudio .srcbadge.is-gold{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.progstudio .srcbadge.is-syn{color:#8a6d3b;background:#fdf8ec;border:1px dashed #e6d2a3}
+
+.progstudio .rlabel{font-size:12px;font-weight:800;color:var(--sub);margin:14px 0 7px}
+.progstudio .rlabel em{font-style:normal;font-weight:700;color:#9aa3af;margin-left:5px}
+.progstudio .chips{display:flex;flex-wrap:wrap;gap:5px}
+.progstudio .chip{font-size:11px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:3px 9px}
+
+/* 제안 카드 — 온라인/오프라인을 왼쪽 띠 색으로 구분한다 */
+.progstudio .plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:9px}
+.progstudio .plan{border:1px solid var(--line);border-left:4px solid #d4dde6;border-radius:11px;padding:11px 13px;background:#fafbfc}
+.progstudio .plan.is-online{border-left-color:#2E6FB7}
+.progstudio .plan.is-offline{border-left-color:#EFA50F}
+.progstudio .pchannel{font-size:12.5px;font-weight:800;margin-bottom:5px}
+.progstudio .pcontent{font-size:12.5px;line-height:1.6}
+.progstudio .prationale{font-size:11px;color:var(--sub);line-height:1.55;margin-top:7px;padding-top:7px;border-top:1px solid var(--line)}
+.progstudio .prationale b{font-weight:800;color:#5a6b85;margin-right:4px}
+
+.progstudio .ha{font-size:11.5px;color:#8a6d3b;background:#fdf8ec;border:1px solid #f3e6c4;border-radius:9px;padding:9px 11px;line-height:1.6}
+
+.progstudio .foot{text-align:center;font-size:11px;color:#9aa3af;margin-top:18px;line-height:1.7}
+.progstudio .foot code{background:#fff;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+
+@media(max-width:980px){
+ .progstudio .cols{grid-template-columns:1fr}
+ .progstudio .cols>form.panel{position:static}
+}
