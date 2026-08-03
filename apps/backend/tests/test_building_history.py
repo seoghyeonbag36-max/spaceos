@@ -69,3 +69,20 @@ def test_open_business_has_null_end_date():
     r = client.get(f"{V1}/buildings/{building_id}/history")
     assert r.status_code == 200
     assert any(item["end_date"] is None for item in r.json()["history"])
+
+
+def test_history_covers_all_page_master_districts():
+    master_paths = sorted((ROOT / "data" / "gold").glob("*/page_building_master.geojson"))
+    assert master_paths
+
+    for master_path in master_paths:
+        history_path = master_path.parent / "building_history.json"
+        assert history_path.exists(), f"{history_path} missing"
+
+        histories = json.loads(history_path.read_text(encoding="utf-8"))
+        assert histories, f"{history_path} is empty"
+        assert any(
+            DATE8.match(str(item.get("start_date") or ""))
+            for rows in histories.values()
+            for item in rows
+        ), f"{history_path} has no 8-digit start_date"

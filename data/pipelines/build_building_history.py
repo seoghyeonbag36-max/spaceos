@@ -1,7 +1,7 @@
 """Build Gold building business history from LocalData licensing records.
 
 Input:
-  data/bronze/{slug}/2026-07-19/licensing_biz.json
+  data/bronze/{slug}/{latest}/licensing_biz.json
 
 Output:
   data/gold/{slug}/building_history.json
@@ -12,11 +12,10 @@ import json
 import re
 from collections import Counter, defaultdict
 
-from data.collectors.common import BRONZE, GOLD
+from data.collectors.common import BRONZE, GOLD, latest_bronze
 from data.config.page_hubs import HUBS, PageHub
 from data.pipelines.build_page_master import _addr_pnu, _build_dong_map
 
-_DATE = "2026-07-19"
 _DATE_DIGITS = re.compile(r"\D+")
 
 
@@ -52,15 +51,19 @@ def _sigungu_code(stores: list[dict]) -> str:
     return hit[0][0] if hit else ""
 
 
-def build(slug: str, date: str = _DATE) -> bool:
+def build(slug: str, date: str | None = None) -> bool:
     """Build one district's building_history.json."""
     master_path = GOLD / slug / "page_building_master.geojson"
-    licensing_path = BRONZE / slug / date / "licensing_biz.json"
-    stores_path = BRONZE / slug / date / "stores_raw.json"
+    if date is None:
+        licensing_path = latest_bronze(slug, "licensing_biz.json")
+        stores_path = latest_bronze(slug, "stores_raw.json")
+    else:
+        licensing_path = BRONZE / slug / date / "licensing_biz.json"
+        stores_path = BRONZE / slug / date / "stores_raw.json"
 
     master = _load_json(master_path)
-    rows = _load_json(licensing_path)
-    stores = _load_json(stores_path) or []
+    rows = _load_json(licensing_path) if licensing_path is not None else None
+    stores = (_load_json(stores_path) if stores_path is not None else None) or []
     if master is None:
         print(f"[building-history:{slug}] page_building_master.geojson missing, skipped")
         return False

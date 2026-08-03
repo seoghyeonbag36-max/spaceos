@@ -31,6 +31,7 @@ node_modules
 !/data/gold/*/program_content_context.parquet
 !/data/gold/*/page_building_master.geojson
 !/data/gold/*/coverage.json
+!/data/gold/*/building_history.json
 # 가로수길 PoC 는 중간 산출물까지 통째로 서빙한다(~0.8MB)
 !/data/gold/garosugil/
 !/data/gold/garosugil/**
