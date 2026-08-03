@@ -275,7 +275,8 @@ function Result({ r }: { r: StoreMarketing }) {
       {stub && (
         <div className="warn">
           LLM 을 타지 못해 <b>규칙 기반 스텁</b>이 나왔다 — 리뷰·사진을 읽은 결과가 아니다.
-          <code>apps/backend/.env</code> 의 <code>LLM_API_KEY</code> 와 백엔드 로그를 확인하라.
+          <code>LLM_API_KEY</code>(로컬은 <code>apps/backend/.env</code>, 배포는 Vercel 환경변수),
+          Anthropic 크레딧 잔액, 백엔드 로그를 확인하라.
         </div>
       )}
 
