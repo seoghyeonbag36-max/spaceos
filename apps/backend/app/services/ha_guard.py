@@ -216,7 +216,12 @@ def check_store(parsed: LLMStoreMarketing, profile: dict,
     generated = " ".join(f"{p.content} {p.rationale}" for p in plans)
     generated = f"{generated} {parsed.ha_check or ''}"
     # 금액의 근거는 메뉴가 정본이고, 리뷰에 적힌 가격도 점주 입력에서 온 것이라 인정한다.
-    allowed_text = " ".join([*(profile.get("menu") or []), *(profile.get("reviews") or [])])
+    # **상권 컨텍스트도 근거에 넣는다** — 행사가 컨텍스트에 합류(2026-08-04)하면서 행사
+    # 요금·기간의 숫자가 거기 실린다. 빼면 실린 행사비를 인용한 것이 지어낸 금액으로
+    # 잘못 걸린다. 대가로 컨텍스트의 금액을 가게 가격처럼 쓰는 경우는 못 잡지만,
+    # 정상 인용을 폐기하는 쪽이 더 나쁘다.
+    allowed_text = " ".join([*(profile.get("menu") or []), *(profile.get("reviews") or []),
+                             context or ""])
     source_text = f"{allowed_text} {profile.get('name', '')}"
 
     return [

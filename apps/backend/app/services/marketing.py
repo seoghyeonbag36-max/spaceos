@@ -57,6 +57,9 @@ _SYSTEM_PROMPT = """너는 SpaceOS의 Program(가게 단위 마케팅 자동화)
   얼마를 깎을지는 점주가 정할 몫이다. 할인을 제안하려면 금액 없이 방식만 적는다
   ("재방문 쿠폰" ○ / "3,000원 할인 쿠폰" ✕).
 - 상권 공동 활성화(공생)를 해치는 제안(이웃 가게 비방·출혈 경쟁 조장) 금지.
+- **행사는 컨텍스트에 실린 것만 쓴다.** 목록에 있으면 이름·기간·거리를 그대로 인용하고,
+  "확인된 예정 행사가 없다"고 적혀 있으면 행사 참여·연계를 제안하지 않는다(대신 매장
+  자체 접점을 제안한다). 컨텍스트에 없는 행사를 지어내지 말 것.
 - 특정 플랫폼·자본에 편중되지 않게 채널을 균형 있게 섞는다.
 - 각 제안에는 반드시 근거(rationale)를 리뷰 키워드나 상권 데이터로 명시한다.
 - ha_check 필드에 위 기준으로 자체 점검한 결과를 1~2문장으로 기술한다.
@@ -107,7 +110,53 @@ def _district_context(district_id: str | None) -> str | None:
         summaries = [s for _, g in trend.groupby("kind") if (s := _trend_summary(g))]
         if summaries:
             parts.append("검색 트렌드(최근 6개월, 방향은 계산된 값이다): " + "; ".join(summaries))
+    if (ev := _events_context(district_id)):
+        parts.append(ev)
     return "\n".join(parts) or None
+
+
+# 프롬프트에 실을 행사 수 상한. ikseon 78건처럼 도심 거점은 전부 실으면 컨텍스트를
+# 행사가 잠식한다. 가까운 순으로 이만큼만 준다.
+_MAX_CONTEXT_EVENTS = 5
+
+
+def _events_context(district_id: str | None) -> str | None:
+    """상권 행사를 컨텍스트 문장으로 — 오프라인 제안이 공허해지는 것을 막는다.
+
+    이 함수 이전에는 컨텍스트에 행사가 없었고, 그래서 오프라인 제안이 "상권
+    플리마켓/팝업 부스 참여" 같은 **어느 상권에나 해당하는 말**로 나왔다. 실제 행사
+    785건이 이미 Gold 에 있는데 쓰지 않고 있었다.
+
+    세 경우를 구분한다 — 이 구분이 이 함수의 요점이다:
+
+      None(Gold 미적재)  행사를 아는 바가 없다 → 아무 말도 하지 않는다.
+                         "행사 없음"이라고 쓰면 모르는 것을 안다고 주장하는 것이다.
+      [](예정 행사 없음)  **명시적으로 없다고 말하고 제안을 금지한다.** 침묵하면 LLM 이
+                         일반론으로 행사 참여를 지어낸다 — 고치려던 바로 그 증상이다.
+      목록 있음           가까운 순 상위 N건을 거리와 함께 준다.
+
+    **거리를 반드시 싣는다.** 이 API 는 공공·문화시설 행사 중심이라 가두 상권 커버리지가
+    낮다 — 가로수길 2건은 둘 다 800m 밖이다. 거리를 빼면 LLM 이 남의 동네 행사를
+    "우리 골목 행사"처럼 쓴다.
+    """
+    if not district_id:
+        return None
+    rows = events.for_district(district_id)
+    if rows is None:
+        return None
+    if not rows:
+        return ("상권 행사: 확인된 예정 행사가 없다(공공 문화행사 기준). "
+                "행사 참여·연계를 제안하지 말 것 — 없는 행사를 지어내는 셈이다.")
+
+    near = sorted(rows, key=lambda e: e.get("distance_m") or 10**9)[:_MAX_CONTEXT_EVENTS]
+    items = []
+    for e in near:
+        dist = e.get("distance_m")
+        where = f"{e.get('place') or '장소 미상'}, 거점에서 {dist}m" if dist is not None \
+            else (e.get("place") or "장소 미상")
+        items.append(f"{e.get('n')}({e.get('when')} · {where})")
+    return ("상권 행사(공공 문화행사 실데이터, 가까운 순): " + "; ".join(items)
+            + " — 거리를 확인하고, 거점 밖 행사를 상권 안 행사처럼 쓰지 말 것.")
 
 
 # 트렌드 방향 판정 임계 — 최근 3개월 평균이 직전 3개월 평균 대비 이만큼 벗어나야 방향을 붙인다.
@@ -324,15 +373,22 @@ def clear_district_cache() -> None:
 
 
 def _context_mtime(district_id: str) -> float:
-    """상권 컨텍스트 파일의 mtime. 없으면 0.0 (캐시 키로만 쓴다)."""
+    """상권 컨텍스트의 mtime. 없으면 0.0 (캐시 키로만 쓴다).
+
+    ⚠ 컨텍스트 입력이 **두 파일**이다 — program_content_context 와 행사 Gold. 행사가
+    컨텍스트에 합류(2026-08-04)하면서 앞의 것만 보면 행사 파이프라인만 다시 돌린 경우
+    무효화가 안 돼 낡은 카피가 남는다. 둘을 합쳐 키로 쓴다.
+    """
     slug = _DISTRICT_ALIAS.get(district_id, district_id)
     if not _SLUG_RE.match(slug):
         return 0.0
+    base = 0.0
     for name in ("program_content_context.parquet", "program_content_context.csv"):
         path = _GOLD_DIR / slug / name
         if path.exists():
-            return path.stat().st_mtime
-    return 0.0
+            base = path.stat().st_mtime
+            break
+    return base + events.source_mtime()
 
 
 def get_district_marketing(district_id: str) -> dict | None:

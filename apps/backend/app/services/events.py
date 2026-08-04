@@ -41,6 +41,16 @@ def is_available() -> bool:
     return _load() is not None
 
 
+def source_mtime() -> float:
+    """행사 Gold 파일의 mtime. 없으면 0.0.
+
+    상권 콘텐츠 LLM 캐시가 이 값을 키에 섞는다 — 행사가 상권 컨텍스트에 들어가면서
+    `program_content_context` 만으로는 무효화가 안 되기 때문이다(행사 파이프라인만
+    다시 돌린 경우 mtime 이 그대로여서 낡은 카피가 남는다).
+    """
+    return _EVENTS_JSON.stat().st_mtime if _EVENTS_JSON.exists() else 0.0
+
+
 def for_district(district_id: str) -> list[dict] | None:
     """거점의 실제 행사 목록.
 
