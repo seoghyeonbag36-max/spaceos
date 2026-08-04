@@ -252,7 +252,7 @@ KPI 설명을 "추정치 — 리뷰 수집 미착수"로 바꿨다. `/sentiment`
 
 ### 6-2 결과 — Program LLM 실호출 검증 (2026-08-01)
 크레딧 충전 후 가게 단위·상권 단위 LLM 경로를 처음으로 실호출로 검증했다.
-모델은 `claude-opus-4-8`(config 기본값), `source == "llm"` 확인.
+모델은 `claude-opus-4-8`(검증 당시 config 기본값), `source == "llm"` 확인. 같은 커밋(`09b91b1`)에서 config 기본값은 `claude-sonnet-5`로 바뀌었고, 현재 기본 모델로 실호출 검증을 다시 한 기록은 이 문서에 없다.
 
 **핵심 교훈 — 폴백이 있는 코드에서 "테스트 통과"는 실호출의 증거가 아니다.**
 기존 `test_posting_marketing.py` 는 `_call_llm` / `_call_district_llm` 을 통째로 목킹해
