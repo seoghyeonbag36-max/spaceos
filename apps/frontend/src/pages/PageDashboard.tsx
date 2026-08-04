@@ -449,6 +449,11 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
   const [postings, setPostings] = useState<Posting[] | null>(null);
   const [marketing, setMarketing] = useState<Marketing | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const marketingContentGold = marketing?.source === "llm";
+  const marketingContentSourceLabel = marketingContentGold ? "Gold 생성" : "시드";
+  const marketingContentSourceTitle = marketingContentGold
+    ? "Gold(program_content_context)의 블로그 키워드·업종 분포·검색 트렌드를 근거로 생성"
+    : "LLM 키 미설정·Gold 미적재·호출 실패 시 폴백 — 손으로 적은 예시 카피다";
 
   useEffect(() => {
     let live = true;
@@ -545,9 +550,11 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
           {marketing && (
             <>
               <h2 className="sec">상권 행사 · 콘텐츠 <small>
-                {marketing.events_source === "seoul-open-data"
-                  ? "Program · 행사는 서울열린데이터광장 문화행사 실데이터 · 콘텐츠는 Gold 기반 생성"
-                  : "Program · Humanistic Authority(균형·공생·공감)"}
+                Program · {marketing.events_source === "seoul-open-data"
+                  ? "행사는 서울열린데이터광장 문화행사 실데이터"
+                  : "행사는 시드"} · {marketingContentGold
+                    ? "콘텐츠는 Gold 컨텍스트 기반 생성"
+                    : "콘텐츠는 시드"}
               </small></h2>
               {/* 실데이터인데 0건이면 그 거점에 예정 공공 문화행사가 없는 것이다.
                   시드로 채우면 지어낸 행사를 지도에 다시 찍게 되므로 빈 상태를 보여준다. */}
@@ -584,6 +591,11 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
                         : null}
                   </div>
                 ))}
+              </div>
+              <div>
+                <span>온라인 콘텐츠</span>{" "}
+                <span className={`srcbadge ${marketingContentGold ? "is-gold" : "is-syn"}`}
+                  title={marketingContentSourceTitle}>{marketingContentSourceLabel}</span>
               </div>
               <div className="insta">
                 {marketing.online_contents.map((c, i) => <div key={i} className="ig">📷 {c}</div>)}
