@@ -56,6 +56,12 @@
 .progstudio .note{font-size:10.5px;color:#9aa3af;line-height:1.55;margin:6px 0}
 .progstudio .warn{font-size:11.5px;color:#78350f;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 10px;line-height:1.55;margin:6px 0}
 .progstudio .warn code{background:#fff;border:1px solid #fde68a;border-radius:4px;padding:0 4px;font-size:11px}
+/* HA 검증 경고 — 폐기(.warn, 호박색)와 달리 생성물은 살아 있다. 중립 회색으로 둬
+   "이 결과는 못 쓴다"로 읽히지 않게 한다. 오탐이 섞이는 등급이라 더 그렇다. */
+.progstudio .hawarn{font-size:11.5px;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:8px 10px;line-height:1.55;margin:6px 0}
+.progstudio .hawarn code{background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:0 4px;font-size:11px}
+.progstudio .halist{margin:5px 0 0;padding-left:16px}
+.progstudio .halist li{margin:3px 0}
 .progstudio .err{background:#fef2f2;border:1px solid #fecaca;border-radius:11px;padding:13px 15px;font-size:12.5px;color:#7f1d1d;line-height:1.7}
 .progstudio .err code{background:#fff;border:1px solid #fecaca;border-radius:5px;padding:1px 6px;font-size:11.5px}
 .progstudio .errdetail{font-size:11px;color:#b91c1c;margin-top:6px;word-break:break-all}

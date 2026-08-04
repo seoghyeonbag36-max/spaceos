@@ -362,6 +362,11 @@ export default function ProgramStudio() {
 
 function Result({ r }: { r: StoreMarketing }) {
   const stub = r.source !== "llm";
+  const findings = r.ha_findings ?? [];
+  // 폐기(violation)와 경고(warning)는 성격이 다르다 — 전자는 이 응답이 스텁인 **이유**이고,
+  // 후자는 살아 있는 생성물에 붙은 주석이다. 섞어 보여주면 둘 다 안 읽힌다.
+  const blocked = findings.filter((f) => f.severity === "violation");
+  const warnings = findings.filter((f) => f.severity !== "violation");
   return (
     <div className="result">
       <div className="rhead">
@@ -377,11 +382,44 @@ function Result({ r }: { r: StoreMarketing }) {
         </span>
       </div>
 
-      {stub && (
+      {/* 스텁이 나온 이유가 둘이다. 크레딧·키 문제와 "생성은 됐는데 검증에 걸렸다"를
+          같은 문구로 보여주면 엉뚱한 데를 고치게 된다. */}
+      {stub && blocked.length > 0 && (
+        <div className="warn">
+          LLM 이 생성한 결과가 <b>Humanistic Authority 검증에 걸려 폐기</b>됐다 — 아래는 그
+          대신 나온 규칙 기반 스텁이다. 키·크레딧 문제가 아니다.
+          <ul className="halist">
+            {blocked.map((f, i) => (
+              <li key={i}>
+                <b>{f.message}</b>
+                {f.evidence && <> <code>{f.evidence}</code></>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {stub && blocked.length === 0 && (
         <div className="warn">
           LLM 을 타지 못해 <b>규칙 기반 스텁</b>이 나왔다 — 리뷰·사진을 읽은 결과가 아니다.
           <code>LLM_API_KEY</code>(로컬은 <code>apps/backend/.env</code>, 배포는 Vercel 환경변수),
           Anthropic 크레딧 잔액, 백엔드 로그를 확인하라.
+        </div>
+      )}
+
+      {/* 경고는 사전 매칭이라 오탐이 섞인다. 지우지 않고 근거를 함께 보여 사람이 판단하게 한다. */}
+      {!stub && warnings.length > 0 && (
+        <div className="hawarn">
+          <b>HA 검증 경고 {warnings.length}건</b> — 아래 생성물은 살아 있다. 사전 매칭이라
+          오탐일 수 있으니 근거를 보고 판단하라.
+          <ul className="halist">
+            {warnings.map((f, i) => (
+              <li key={i}>
+                {f.message}
+                {f.evidence && <> <code>{f.evidence}</code></>}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -398,8 +436,13 @@ function Result({ r }: { r: StoreMarketing }) {
       <div className="rlabel">오프라인 <em>{r.offline.length}건</em></div>
       <div className="plans">{r.offline.map((p, i) => <Plan key={i} p={p} />)}</div>
 
-      <div className="rlabel">Humanistic Authority 자체점검</div>
+      {/* 자기신고와 서버 검증을 나란히 두되 섞지 않는다 — 아래 문장은 LLM 이 스스로
+          적은 것이고, 그게 사실인지는 서버(ha_guard)가 따로 판정한다. */}
+      <div className="rlabel">Humanistic Authority 자체점검 <em>LLM 이 적은 문장이다</em></div>
       <div className="ha">{r.ha_check}</div>
+      {!stub && warnings.length === 0 && (
+        <div className="note">서버 후처리 검증(금액·트렌드 방향·최상급·비방·채널 균형) 통과.</div>
+      )}
     </div>
   );
 }

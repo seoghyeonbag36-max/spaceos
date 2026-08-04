@@ -59,6 +59,22 @@ class StoreReviewLookup(BaseModel):
     note: str | None = None
 
 
+class HAFinding(BaseModel):
+    """Humanistic Authority 후처리 검증 결과 1건 (services/ha_guard.py).
+
+    `ha_check` 가 **LLM 의 자기신고**인 것과 달리 이건 서버가 입력과 대조해 낸 판정이다.
+
+    - `severity == "violation"`: 입력 대조로 거짓이 확정된 것(지어낸 금액, 확정된 트렌드
+      방향 역행). 이 findings 가 붙어 있고 `source` 가 `"llm"` 이 아니면 **LLM 응답이
+      폐기되고 폴백으로 내려간 것**이다 — 키 미설정·호출 실패와 구분되는 상태다.
+    - `severity == "warning"`: 사전 매칭이라 오탐이 섞인다. 응답은 살리고 밝히기만 한다.
+    """
+    severity: str                     # "violation" | "warning"
+    code: str                         # fabricated_price | trend_contradiction | ...
+    message: str                      # 사람이 읽을 판정 문장
+    evidence: str | None = None       # 걸린 실제 문자열 (사람이 오탐인지 보게 한다)
+
+
 class ChannelPlan(BaseModel):
     channel: str                      # 예: 인스타그램, 네이버 블로그, 전단
     kind: str                         # online | offline
@@ -81,17 +97,9 @@ class LLMStoreMarketing(BaseModel):
     ha_check: str                     # 균형·공생·공감 자체 점검 결과 서술
 
 
-class DistrictMarketing(BaseModel):
-    """상권 단위 마케팅 응답 — GET /marketing/{id}.
-
-    `events` 는 서울 문화행사 실데이터(`events_source == "seoul-open-data"`),
-    `online_contents` 는 Gold 컨텍스트 기반 LLM 생성(`source == "llm"`).
-    """
-    district_id: str
-    events: list[dict]
-    online_contents: list[str]
-    source: str = "seed"            # 온라인 콘텐츠 출처: "llm" | "seed"
-    events_source: str = "seed"     # 행사 출처: "seoul-open-data" | "seed"
+# 상권 단위 응답 모델(GET /marketing/{id})은 여기가 아니라 `schemas/district.py::Marketing`
+# 이다. 예전에 이 파일에도 같은 뜻의 `DistrictMarketing` 이 있었지만 라우터가 쓰지 않는
+# 죽은 사본이었고, 2026-08-04 실제로 이걸 고치고 응답이 안 바뀌어 한 번 헛짚었다. 지웠다.
 
 
 class LLMDistrictContents(BaseModel):
@@ -109,5 +117,6 @@ class StoreMarketing(BaseModel):
     tone_keywords: list[str]          # 리뷰·이미지에서 추출한 톤앤매너 키워드
     online: list[ChannelPlan]
     offline: list[ChannelPlan]
-    ha_check: str                     # Humanistic Authority(균형·공생·공감) 검증 메모
+    ha_check: str                     # LLM 자기신고 — 이것만으로는 검증이 아니다
     source: str                       # "llm" | "rule-stub"
+    ha_findings: list[HAFinding] = []  # 서버 후처리 검증 결과 (ha_check 와 다르다)

@@ -21,7 +21,7 @@ from app.core.config import settings
 from app.data.seoul_pages import DISTRICTS_BY_ID
 from app.schemas.marketing import LLMDistrictContents, LLMStoreMarketing
 from app.services import districts as svc
-from app.services import events
+from app.services import events, ha_guard
 
 # 규칙 기반 스텁의 카테고리별 강조 포인트 (LLM 폴백)
 _CATEGORY_ANGLE = {
@@ -53,6 +53,9 @@ _SYSTEM_PROMPT = """너는 SpaceOS의 Program(가게 단위 마케팅 자동화)
 - 리뷰·사진·메뉴에 실제로 나타난 강점만 소구한다. 과장·허위·검증 불가한 최상급 표현 금지.
 - 메뉴는 **적힌 품목·가격 그대로만** 쓴다. 없는 메뉴를 만들거나 가격을 지어내지 않는다.
   가격대를 논할 때는 적힌 가격에서만 끌어낸다.
+- **입력에 없는 금액을 쓰지 않는다.** 할인액·쿠폰 금액·객단가를 임의로 정하지 말 것 —
+  얼마를 깎을지는 점주가 정할 몫이다. 할인을 제안하려면 금액 없이 방식만 적는다
+  ("재방문 쿠폰" ○ / "3,000원 할인 쿠폰" ✕).
 - 상권 공동 활성화(공생)를 해치는 제안(이웃 가게 비방·출혈 경쟁 조장) 금지.
 - 특정 플랫폼·자본에 편중되지 않게 채널을 균형 있게 섞는다.
 - 각 제안에는 반드시 근거(rationale)를 리뷰 키워드나 상권 데이터로 명시한다.
@@ -180,13 +183,24 @@ def generate_store_marketing(profile: dict) -> dict:
     """가게 단위 온/오프라인 마케팅 광고 솔루션 생성.
 
     LLM 키(settings.llm_api_key) 설정 시 LLM 생성, 미설정·실패 시 규칙 기반 스텁.
+
+    생성 직후 **HA 후처리 검증**(services/ha_guard.py)을 통과해야 응답이 된다.
+    `ha_check` 는 LLM 이 스스로 통과했다고 적은 문장이라 근거가 아니다 — 입력과 대조해
+    거짓이 확정되는 위반(지어낸 금액, 확정 트렌드 역행)이면 생성물을 버리고 스텁으로
+    내려간다. 경고 등급은 응답을 살리고 `ha_findings` 로 밝힌다.
+
     반환: StoreMarketing 스키마 dict.
     """
     tone = _extract_tone_keywords(profile)
 
     if settings.llm_api_key:
         try:
-            parsed = _call_llm(profile, tone, _district_context(profile.get("district_id")))
+            ctx = _district_context(profile.get("district_id"))
+            parsed = _call_llm(profile, tone, ctx)
+            findings = ha_guard.check_store(parsed, profile, ctx)
+            if ha_guard.has_violation(findings):
+                print(f"[marketing] HA 검증 위반 → 생성물 폐기: {ha_guard.summarize(findings)}")
+                return _rule_stub(profile, tone, findings)
             return {
                 "store_name": profile["name"],
                 "category": profile["category"],
@@ -195,6 +209,7 @@ def generate_store_marketing(profile: dict) -> dict:
                 "offline": [{**p.model_dump(), "kind": "offline"} for p in parsed.offline],
                 "ha_check": parsed.ha_check,
                 "source": "llm",
+                "ha_findings": [f.model_dump() for f in findings],
             }
         except Exception as exc:
             print(f"[marketing] LLM 생성 실패 → 규칙 기반 폴백: {exc}")
@@ -202,8 +217,13 @@ def generate_store_marketing(profile: dict) -> dict:
     return _rule_stub(profile, tone)
 
 
-def _rule_stub(profile: dict, tone: list[str]) -> dict:
-    """규칙 기반 스텁 (LLM 미설정/실패 폴백)."""
+def _rule_stub(profile: dict, tone: list[str],
+               findings: list | None = None) -> dict:
+    """규칙 기반 스텁 (LLM 미설정/실패/**HA 위반 폐기** 폴백).
+
+    findings 를 받으면 그대로 실어 보낸다 — 스텁이 나온 이유가 "키가 없어서"인지
+    "생성물이 검증에 걸려서"인지 화면이 구분할 수 있어야 한다.
+    """
     angle = _CATEGORY_ANGLE.get(profile["category"], _DEFAULT_ANGLE)
     tone_str = "·".join(tone) if tone else "리뷰 데이터 없음"
     online = [
@@ -235,6 +255,7 @@ def _rule_stub(profile: dict, tone: list[str]) -> dict:
         "offline": offline,
         "ha_check": "균형·공생·공감 기준 자체 점검 통과 (규칙 기반 스텁)",
         "source": "rule-stub",
+        "ha_findings": [f.model_dump() for f in (findings or [])],
     }
 
 
@@ -252,6 +273,8 @@ _DISTRICT_SYSTEM_PROMPT = """너는 SpaceOS의 Program(상권 단위 마케팅) 
   이미 있는 강점(키워드·업종)에 소구하거나, 트렌드를 언급하지 않는다.
 - 특정 점포나 자본에 편중하지 않고 상권 전체의 활성화를 향한다.
 - 과장·허위·검증 불가한 최상급 표현을 쓰지 않는다.
+- **금액을 쓰지 않는다.** 상권 컨텍스트에는 가격 정보가 없으므로 어떤 금액을 적든 지어낸
+  값이다("1만원대 점심" 같은 표현 금지).
 - ha_check 에 위 기준으로 자체 점검한 결과를 1~2문장으로 쓴다.
 
 출력: online_contents 2~4건. 한국어로 작성한다."""
@@ -277,14 +300,18 @@ def _call_district_llm(name: str, sub: str, ctx: str) -> LLMDistrictContents:
     return parsed
 
 
-# 상권 콘텐츠 LLM 결과 캐시: district_id → (컨텍스트 파일 mtime, online_contents)
+# 상권 콘텐츠 LLM 결과 캐시: district_id → (컨텍스트 파일 mtime, online_contents, ha_findings)
 #
 # 캐시가 없으면 이 엔드포인트는 **호출마다** LLM 을 친다 — 실측 12~14초 + 매번 크레딧이
 # 나간다(2026-08-01). 거점 심층 뷰가 이 응답을 기다리므로 화면이 그만큼 멈춘다.
 # 입력은 Gold 컨텍스트 파일 하나뿐이라 mtime 이 그대로면 결과도 그대로다. TTL 이 아니라
 # mtime 으로 무효화하는 이유: 파이프라인을 다시 돌리면 즉시 반영돼야 하고, 안 돌렸다면
 # 하루가 지나도 다시 칠 이유가 없다. 프로세스 재시작 시 비므로 코드·시드 변경도 반영된다.
-_district_llm_cache: dict[str, tuple[float, list[str]]] = {}
+#
+# **HA 검증에 걸려 폐기된 결과도 캐시한다** (online_contents 를 빈 리스트로). 안 그러면
+# 같은 컨텍스트로 같은 위반을 반복 생성하며 호출마다 크레딧을 태운다. 컨텍스트가 바뀌거나
+# 프로세스가 재시작되면(프롬프트·검증기 수정이 반영되는 시점) 어차피 다시 친다.
+_district_llm_cache: dict[str, tuple[float, list[str], list[dict]]] = {}
 
 
 def clear_district_cache() -> None:
@@ -336,14 +363,27 @@ def get_district_marketing(district_id: str) -> dict | None:
         mtime = _context_mtime(district_id)
         hit = _district_llm_cache.get(district_id)
         if hit and hit[0] == mtime:
-            return {**base, "online_contents": hit[1], "source": "llm"}
+            # contents 가 비어 있으면 HA 검증에 걸려 폐기된 것이다 — 시드로 내려가되
+            # 폐기 사유(findings)는 그대로 실어 왜 시드인지 밝힌다.
+            if hit[1]:
+                return {**base, "online_contents": hit[1], "source": "llm",
+                        "ha_findings": hit[2]}
+            return {**base, "source": "seed", "ha_findings": hit[2]}
 
         d = DISTRICTS_BY_ID.get(district_id, {})
         try:
             parsed = _call_district_llm(d.get("name", district_id), d.get("sub", ""), ctx)
             if parsed.online_contents:
-                _district_llm_cache[district_id] = (mtime, parsed.online_contents)
-                return {**base, "online_contents": parsed.online_contents, "source": "llm"}
+                findings = ha_guard.check_district(parsed, ctx)
+                dumped = [f.model_dump() for f in findings]
+                if ha_guard.has_violation(findings):
+                    print("[marketing] 상권 콘텐츠 HA 검증 위반 → 생성물 폐기: "
+                          f"{ha_guard.summarize(findings)}")
+                    _district_llm_cache[district_id] = (mtime, [], dumped)
+                    return {**base, "source": "seed", "ha_findings": dumped}
+                _district_llm_cache[district_id] = (mtime, parsed.online_contents, dumped)
+                return {**base, "online_contents": parsed.online_contents,
+                        "source": "llm", "ha_findings": dumped}
         except Exception as exc:
             print(f"[marketing] 상권 콘텐츠 LLM 생성 실패 → 시드 폴백: {exc}")
     return {**base, "source": "seed"}

@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 
+from app.schemas.marketing import HAFinding
+
 
 class DistrictSummary(BaseModel):
     id: str
@@ -163,3 +165,6 @@ class Marketing(BaseModel):
     # 온라인 콘텐츠의 출처 — "llm"(Gold 컨텍스트 기반 생성) | "seed"(시드 폴백).
     # 기본값을 둬 기존 소비자(프론트·테스트)와 호환된다.
     source: str = "seed"
+    # HA 후처리 검증 결과(services/ha_guard.py). violation 이 있는데 source 가 "seed" 면
+    # **LLM 이 생성은 했으나 검증에 걸려 폐기된 것**이다 — 키 미설정·Gold 미적재와 다르다.
+    ha_findings: list[HAFinding] = []

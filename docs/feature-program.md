@@ -94,10 +94,65 @@ cityhall 33.5%, garosugil 31.8% ← 창원 가로수길, nonhyeon 23.1% ← 인�
 어긋나므로 `core/config.py` 가 `data/.env` 와 `apps/backend/.env` 를 **둘 다** 읽는다
 (뒤가 우선). 배포판에는 `data/.env` 가 올라가지 않으므로 Vercel 환경변수로 따로 넣어야 한다.
 
+## 0-3. Humanistic Authority 후처리 검증 (2026-08-04)
+
+§3-4 가 요구한 "프롬프트 **+ 후처리**로 검증" 중 후처리가 없었다. `ha_check` 는 **LLM 이
+스스로 "점검 통과"라고 적은 문장**이고 그게 사실인지 확인하는 코드는 한 줄도 없었다.
+자기신고는 근거가 아니다 — 실측처럼 보이는 추정치를 가장 나쁜 산출물로 보는 것과 같은
+이유다(AGENTS.md §0). `services/ha_guard.py` 가 그 검증을 한다.
+
+### 두 등급으로 가른다
+
+| 등급 | 판정 근거 | 처리 |
+|---|---|---|
+| **violation** | 입력과 대조하면 참·거짓이 갈린다 | **생성물 폐기** → 가게는 rule-stub, 상권은 시드 |
+| **warning** | 사전 매칭이라 오탐이 섞인다 | 응답은 살리고 `ha_findings` 로 밝힌다 |
+
+이 경계가 설계의 핵심이다. 전부 차단하면 최상급 표현 오탐 하나에 생성물 전체가 버려지고
+크레딧을 쓴 호출이 통째로 낭비된다. 전부 표기만 하면 지어낸 가격이 화면까지 나간다.
+2026-08-01 동명이지 정제에서 체험단 필터를 포기한 판단이 그대로 적용된다 — **자동 규칙을
+세게 걸면 진짜 산출물까지 죽는다.**
+
+### 검사 항목
+
+| 코드 | 등급 | 잡는 것 |
+|---|---|---|
+| `fabricated_price` | violation | 입력 메뉴·리뷰에 없는 금액. 할인액·쿠폰액도 포함 — 얼마를 깎을지는 점주 몫이다 |
+| `trend_contradiction` | violation | 서버가 확정한 트렌드 방향(하락·보합)을 뒤집는 유입 증가 주장 |
+| `unsupported_superlative` | warning | 입력에 근거 없는 최상급("최고의") |
+| `competitor_disparagement` | warning | 이웃 비교·출혈 경쟁 암시 — 공생 원칙 |
+| `channel_concentration` | warning | 온라인 제안이 전부 한 플랫폼 계열 — 균형 원칙 |
+| `missing_rationale` | warning | 근거가 비었거나 형식뿐인 제안 |
+
+### 오탐을 어디서 끊었나 (음성 대조로 고정)
+
+규칙마다 **정상 표현이 죽지 않는지**를 테스트가 함께 붙든다. 이게 이 스위트의 절반이다.
+
+- **주장과 목표를 가른다** — "손님이 늘고 있다"(주장)는 걸고 "손님을 **늘리는** 전단"(목표)은
+  안 건다. 후자를 잡으면 정당한 오프라인 제안이 전부 죽는다.
+- 트렌드에 **상승이 하나라도 섞이면** 증가 서술이 정당할 수 있어 판정하지 않는다.
+- 최상급이 **입력에 이미 있으면 면제** — 리뷰에 "최고예요"가 있으면 인용할 근거가 있다.
+- `최대한`은 `최대`가 아니고, `경쟁력`은 비방이 아니다.
+
+### 알려진 한계
+
+- 퍼센트 할인("10% 할인")은 금액 검사에 안 걸린다. 성격은 같지만 정상 표현과 구분이 어렵다.
+- `1만 5천원` 같은 혼합 수 표기는 금액 파싱이 놓친다(`1만원`·`15,000원`은 잡는다).
+- 사전 기반 검사는 우회가 쉽다 — **정직한 생성물을 확인하는 장치이지 적대적 입력을 막는
+  장치가 아니다.**
+
+### 검증 상태
+
+`tests/test_ha_guard.py` 27건(규칙별 양성 + 오탐 음성 대조 + 배선). ⚠ **실제 LLM
+생성물에 물려본 검증은 아직 못 했다** — 2026-08-04 현재 Anthropic 크레딧이 비어 있어
+(400 `credit balance is too low`) LLM 경로 자체가 안 돈다. 충전 후 `SPACEOS_LIVE_LLM=1`
+로 재확인이 필요하다.
+
 ## 1. 담당 코드 영역
 
 ```
 apps/backend/app/services/marketing.py    가게/상권 마케팅 솔루션 생성 서비스 (현존)
+apps/backend/app/services/ha_guard.py     HA 후처리 검증 — 생성물이 지시를 지켰는지 서버가 판정
 apps/backend/app/services/store_lookup.py 가게 반자동 조회 — 카카오 로컬 + 네이버 블로그
 apps/backend/app/schemas/marketing.py     StoreProfile(menu 포함) / StoreMarketing 스키마
 apps/backend/app/api/v1/marketing.py      GET /{id}(상권) + POST /generate + GET /places·/reviews
@@ -121,7 +176,8 @@ echo "LLM_API_KEY=sk-ant-..." >> .env        # .gitignore 로 보호됨
 1. **가게 프로필 입력 계약** (`schemas/marketing.py`) — `StoreProfile`(이름·카테고리·주소·리뷰 텍스트·이미지 URL/설명). 수집 채널이 무엇이든 이 스키마로 정규화해 서비스에 전달.
 2. **가게 단위 생성** (`services/marketing.py::generate_store_marketing`) — 리뷰 키워드·이미지 분석(vision)으로 강점/톤을 추출해 온라인(채널 믹스·SNS 문구)과 오프라인(전단·팝업·행사 참여) 솔루션 생성. LLM 미설정 시 규칙 기반 스텁 + `TODO: 실제 연동`.
 3. **상권 단위 생성** — `GET /marketing/{id}`의 시드 데이터를 Platform Gold(`program_content_context`: 상권분석 시계열 + 감성 + 리뷰 키워드) 기반 생성으로 교체.
-4. **Humanistic Authority 가드레일** — 생성 콘텐츠의 과장·허위·특정 자본 편중을 프롬프트 + 후처리로 검증.
+4. ~~**Humanistic Authority 가드레일**~~ — ✅ 2026-08-04 완료. 프롬프트 + 후처리 검증
+   (`services/ha_guard.py`, 2단 등급). → §0-3
 5. **폐업 사유 요약(연계)** — 건물 히스토리(Page)의 closure_reason LLM 요약은 기존 계획 유지.
 
 ## 4. Claude Code 작업 예시

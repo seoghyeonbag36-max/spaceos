@@ -116,6 +116,9 @@ export interface Marketing {
   /** 행사 출처 — "seoul-open-data"(실데이터) | "seed". 실데이터인데 0건이면
    *  그 거점에 예정된 공공 문화행사가 없다는 뜻이다(시드로 채우지 않는다). */
   events_source?: string;
+  /** HA 후처리 검증 결과. violation 이 있는데 source 가 "seed" 면 LLM 이 생성은 했으나
+   *  검증에 걸려 폐기된 것이다 — 키 미설정·Gold 미적재 폴백과 구분된다. */
+  ha_findings?: HAFinding[];
 }
 
 /** 100m 그리드 공실 셀 — lat/lng 는 셀 남서(SW) 모서리, dlat/dlng 는 셀 크기 */
@@ -254,12 +257,25 @@ export interface ChannelPlan {
   channel: string; kind: "online" | "offline"; content: string; rationale: string;
 }
 
+/** Humanistic Authority 후처리 검증 결과 1건 (백엔드 services/ha_guard.py).
+ *
+ *  `ha_check` 가 **LLM 의 자기신고**인 것과 달리 이건 서버가 입력과 대조해 낸 판정이다.
+ *  - "violation": 거짓이 확정된 것(지어낸 금액·확정 트렌드 역행) → 생성물이 폐기됐다
+ *  - "warning": 사전 매칭이라 오탐이 섞인다 → 응답은 살리고 밝히기만 한다 */
+export interface HAFinding {
+  severity: "violation" | "warning" | string;
+  code: string; message: string; evidence: string | null;
+}
+
 /** 생성 결과. `source` 가 "rule-stub" 이면 LLM 을 못 탄 폴백이라 내용이 일반론이다 —
  *  화면에서 반드시 구분해 보여준다(실호출 결과처럼 읽히면 안 된다). */
 export interface StoreMarketing {
   store_name: string; category: string; tone_keywords: string[];
   online: ChannelPlan[]; offline: ChannelPlan[]; ha_check: string;
   source: "llm" | "rule-stub" | string;
+  /** 서버 후처리 검증 결과. rule-stub 인데 violation 이 있으면 **키가 없어서가 아니라
+   *  생성물이 검증에 걸려 폐기된 것**이다 — 화면이 두 경우를 구분해야 한다. */
+  ha_findings?: HAFinding[];
 }
 
 /** 가게 단위 마케팅 광고 솔루션 자동 생성(Program) — 상가 사진·정보·리뷰 기반 */
