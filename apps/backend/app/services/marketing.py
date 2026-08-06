@@ -376,7 +376,7 @@ def _context_mtime(district_id: str) -> float:
     """상권 컨텍스트의 mtime. 없으면 0.0 (캐시 키로만 쓴다).
 
     ⚠ 컨텍스트 입력이 **두 파일**이다 — program_content_context 와 행사 Gold. 행사가
-    컨텍스트에 합류(2026-08-04)하면서 앞의 것만 보면 행사 파이프라인만 다시 돌린 경우
+    컨텍스트에 합류(2026-08-06)하면서 앞의 것만 보면 행사 파이프라인만 다시 돌린 경우
     무효화가 안 돼 낡은 카피가 남는다. 둘을 합쳐 키로 쓴다.
     """
     slug = _DISTRICT_ALIAS.get(district_id, district_id)

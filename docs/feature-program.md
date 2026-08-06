@@ -94,7 +94,7 @@ cityhall 33.5%, garosugil 31.8% ← 창원 가로수길, nonhyeon 23.1% ← 인�
 어긋나므로 `core/config.py` 가 `data/.env` 와 `apps/backend/.env` 를 **둘 다** 읽는다
 (뒤가 우선). 배포판에는 `data/.env` 가 올라가지 않으므로 Vercel 환경변수로 따로 넣어야 한다.
 
-## 0-3. Humanistic Authority 후처리 검증 (2026-08-04)
+## 0-3. Humanistic Authority 후처리 검증 (2026-08-06)
 
 §3-4 가 요구한 "프롬프트 **+ 후처리**로 검증" 중 후처리가 없었다. `ha_check` 는 **LLM 이
 스스로 "점검 통과"라고 적은 문장**이고 그게 사실인지 확인하는 코드는 한 줄도 없었다.
@@ -144,11 +144,11 @@ cityhall 33.5%, garosugil 31.8% ← 창원 가로수길, nonhyeon 23.1% ← 인�
 ### 검증 상태
 
 `tests/test_ha_guard.py` 27건(규칙별 양성 + 오탐 음성 대조 + 배선). ⚠ **실제 LLM
-생성물에 물려본 검증은 아직 못 했다** — 2026-08-04 현재 Anthropic 크레딧이 비어 있어
+생성물에 물려본 검증은 아직 못 했다** — 2026-08-06 현재 Anthropic 크레딧이 비어 있어
 (400 `credit balance is too low`) LLM 경로 자체가 안 돈다. 충전 후 `SPACEOS_LIVE_LLM=1`
 로 재확인이 필요하다.
 
-## 0-4. 상권 행사를 생성 컨텍스트에 결합 (2026-08-04)
+## 0-4. 상권 행사를 생성 컨텍스트에 결합 (2026-08-06)
 
 행사 785건이 Gold 에 있는데 `_district_context()` 가 blog_keyword·category·trend 만
 싣고 있었다. 그래서 오프라인 제안이 *"상권 플리마켓/팝업 부스 참여"* 같은 **어느
@@ -213,7 +213,7 @@ echo "LLM_API_KEY=sk-ant-..." >> .env        # .gitignore 로 보호됨
 1. **가게 프로필 입력 계약** (`schemas/marketing.py`) — `StoreProfile`(이름·카테고리·주소·리뷰 텍스트·이미지 URL/설명). 수집 채널이 무엇이든 이 스키마로 정규화해 서비스에 전달.
 2. **가게 단위 생성** (`services/marketing.py::generate_store_marketing`) — 리뷰 키워드·이미지 분석(vision)으로 강점/톤을 추출해 온라인(채널 믹스·SNS 문구)과 오프라인(전단·팝업·행사 참여) 솔루션 생성. LLM 미설정 시 규칙 기반 스텁 + `TODO: 실제 연동`.
 3. **상권 단위 생성** — `GET /marketing/{id}`의 시드 데이터를 Platform Gold(`program_content_context`: 상권분석 시계열 + 감성 + 리뷰 키워드) 기반 생성으로 교체.
-4. ~~**Humanistic Authority 가드레일**~~ — ✅ 2026-08-04 완료. 프롬프트 + 후처리 검증
+4. ~~**Humanistic Authority 가드레일**~~ — ✅ 2026-08-06 완료. 프롬프트 + 후처리 검증
    (`services/ha_guard.py`, 2단 등급). → §0-3
 5. **폐업 사유 요약(연계)** — 건물 히스토리(Page)의 closure_reason LLM 요약은 기존 계획 유지.
 

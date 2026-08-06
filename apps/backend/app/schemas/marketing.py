@@ -99,7 +99,7 @@ class LLMStoreMarketing(BaseModel):
 
 # 상권 단위 응답 모델(GET /marketing/{id})은 여기가 아니라 `schemas/district.py::Marketing`
 # 이다. 예전에 이 파일에도 같은 뜻의 `DistrictMarketing` 이 있었지만 라우터가 쓰지 않는
-# 죽은 사본이었고, 2026-08-04 실제로 이걸 고치고 응답이 안 바뀌어 한 번 헛짚었다. 지웠다.
+# 죽은 사본이었고, 2026-08-06 실제로 이걸 고치고 응답이 안 바뀌어 한 번 헛짚었다. 지웠다.
 
 
 class LLMDistrictContents(BaseModel):
