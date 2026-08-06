@@ -332,17 +332,16 @@ def test_district_context_states_trend_direction():
 
 
 def test_trend_summary_direction_rule():
-    """방향 판정 규칙 — 최근 3개월 평균 vs 직전 3개월 평균, ±5% 밖이면 방향을 붙인다."""
-    import pandas as pd
+    """방향 판정 규칙 — 최근 3개월 평균 vs 직전 3개월 평균, ±5% 밖이면 방향을 붙인다.
 
+    2026-08-06: pandas 제거로 시그니처가 (name, [(key, value), …]) 로 바뀌었다.
+    """
     from app.services import marketing as mkt
 
     def summarize(values: list[float]) -> str | None:
-        return mkt._trend_summary(pd.DataFrame({
-            "kind": ["trend:테스트"] * len(values),
-            "key": [f"2026-{i + 1:02d}-01" for i in range(len(values))],
-            "value": values,
-        }))
+        return mkt._trend_summary("테스트", [
+            (f"2026-{i + 1:02d}-01", v) for i, v in enumerate(values)
+        ])
 
     assert "하락" in summarize([100, 100, 100, 50, 50, 50])
     assert "상승" in summarize([50, 50, 50, 100, 100, 100])

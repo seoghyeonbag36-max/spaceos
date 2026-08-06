@@ -18,7 +18,10 @@ node_modules
 # 화면은 멀쩡해 보이므로 눈치채기 어렵다(2026-08-01 발견). 서비스와 함께 유지할 것.
 #   posting_inputs.py → platform_posting_inputs.json (rent·foot 실데이터, ~7KB)
 #   events.py         → platform_events.json         (상권 행사 52거점, ~480KB)
-#   marketing.py      → {거점}/program_content_context.parquet (LLM 컨텍스트, 54거점 174KB)
+#   marketing.py      → {거점}/program_content_context.csv     (LLM 컨텍스트, 54거점 116KB)
+#     ⚠ CSV 다 — 파케이가 아니다. 배포에는 pandas/pyarrow 가 없어서 파케이를 읽으려던
+#       예전 코드가 프로덕션에서 항상 실패했다(2026-08-06). 서빙 산출물은 표준
+#       라이브러리로 읽히는 포맷만 쓴다.
 #   gold_vacancy.py   → {거점}/page_building_master.geojson (건물 폴리곤)
 #   admin.py          → {거점}/coverage.json
 !/data/gold/platform_posting_inputs.json
@@ -28,7 +31,7 @@ node_modules
 #   garosugil 전체 예외가 다시 닫혀 building_vacancy.json·calibration.json 이 빠진다.
 !/data/gold/*/
 /data/gold/*/*
-!/data/gold/*/program_content_context.parquet
+!/data/gold/*/program_content_context.csv
 !/data/gold/*/page_building_master.geojson
 !/data/gold/*/coverage.json
 !/data/gold/*/building_history.json

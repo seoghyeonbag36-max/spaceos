@@ -185,6 +185,34 @@ cityhall 33.5%, garosugil 31.8% ← 창원 가로수길, nonhyeon 23.1% ← 인�
 검증: `tests/test_program_events_context.py` 9건(세 경우 분기 + 거리·상한·정렬 +
 캐시 키 + HA 연계).
 
+## 0-5. 상권 컨텍스트가 프로덕션에서 한 번도 돈 적이 없었다 (2026-08-06)
+
+`_district_context()` 가 `import pandas` 로 시작해 파케이를 읽었다. **배포(Vercel
+서버리스)에는 pandas 도 pyarrow 도 없다.** import 실패가 함수의 `except` 에 삼켜져
+컨텍스트가 **항상 `None`** 이었고, `get_district_marketing` 은 `ctx` 가 없으면 LLM 을
+아예 부르지 않으므로 — **상권 단위 LLM 경로는 프로덕션에서 단 한 번도 실행된 적이 없다.**
+화면은 시드 카피를 보여주고 있었으므로 눈으로는 알 수 없었다. §0-4 에서 붙인 행사
+컨텍스트도 같은 이유로 배포판에선 죽어 있었다.
+
+**저장소는 이미 이 규칙을 알고 있었다** — `services/posting_inputs.py` 가
+*"Vercel 서버리스에 pandas 를 싣지 않는다"* 라고 적어 두고 정적 JSON 만 읽는다.
+런타임에 읽히는 다른 Gold 산출물(행사·입점입력·건물마스터·커버리지)도 전부
+JSON/GeoJSON 이다. **이 산출물 하나만 예외였다.**
+
+### 고친 방향 — 의존성을 넣지 않고 포맷을 바꿨다
+
+pandas+pyarrow 를 배포에 추가하는 선택지도 있었지만 100MB 넘는 의존성을 서버리스
+번들에 얹는 대가가 크다. 대신 산출물을 CSV 로 옮기고 **표준 라이브러리 `csv` 로 읽는다.**
+
+- 3열 80행짜리 표에 파케이는 이득이 없다 — 실측 **174KB → 116KB 로 오히려 작아졌다.**
+- 파케이는 **지웠다.** 두 벌로 두면 반드시 어긋난다(`data/.env` 이중화에서 배운 것과 같다).
+- 파이프라인은 이 산출물만 `_save_csv()` 로 쓴다(다른 산출물은 파케이 유지 — 분석용이고
+  런타임에 읽히지 않는다).
+- `_trend_summary` 도 DataFrame 대신 `(기간키, 값)` 쌍을 받게 바꿨다.
+
+회귀 방지 2건: `test_context_reads_without_pandas`(pandas import 를 막고 배포 환경을
+흉내 낸다) + `test_context_artifact_is_csv_not_parquet`(파케이가 되살아나면 실패).
+
 ## 1. 담당 코드 영역
 
 ```

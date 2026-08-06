@@ -13,6 +13,7 @@
 """
 from __future__ import annotations
 
+import csv
 import re
 from collections import Counter
 from pathlib import Path
@@ -75,6 +76,50 @@ def _extract_tone_keywords(profile: dict) -> list[str]:
     return [w for w, _ in Counter(words).most_common(5)]
 
 
+def _context_path(slug: str) -> Path:
+    """상권 컨텍스트 CSV 경로."""
+    return _GOLD_DIR / slug / "program_content_context.csv"
+
+
+def _load_context_rows(slug: str) -> list[tuple[str, str, float]] | None:
+    """컨텍스트 CSV 를 (kind, key, value) 행 목록으로. 없거나 깨졌으면 None.
+
+    **표준 라이브러리로만 읽는다 — pandas 를 쓰지 않는다.** 예전에는 파케이를
+    `pd.read_parquet` 로 읽었는데, 배포(Vercel 서버리스)에는 pandas 도 pyarrow 도
+    없어서 `import pandas` 가 그대로 실패했다. 그 실패는 아래 호출부의 except 에
+    잡혀 컨텍스트가 **항상 None** 이 됐고, 결과적으로 상권 단위 LLM 경로가
+    프로덕션에서 한 번도 돈 적이 없다(2026-08-06 발견). 화면은 시드 카피를
+    보여주고 있었으므로 눈으로는 알 수 없었다.
+
+    파케이를 되살리는 대신 산출물을 CSV 로 옮겼다 — 3열 80행짜리 표에 파케이는
+    이득이 없고(실측 174KB → 116KB 로 **작아졌다**), 런타임에 읽히는 다른 Gold
+    산출물은 이미 전부 JSON/GeoJSON 이라 이것만 예외였다.
+
+    인코딩은 utf-8-sig 로 읽는다 — BOM 이 있으면 벗기고 없으면 그대로 읽으므로
+    파이프라인이 어느 쪽으로 쓰든 안전하다.
+    """
+    path = _context_path(slug)
+    if not path.exists():
+        return None
+    try:
+        with path.open(encoding="utf-8-sig", newline="") as f:
+            rows = []
+            for r in csv.DictReader(f):
+                try:
+                    rows.append((r["kind"], r["key"], float(r["value"])))
+                except (KeyError, TypeError, ValueError):
+                    continue    # 값이 비거나 깨진 행은 건너뛴다 (전체를 버리지 않는다)
+        return rows or None
+    except OSError:
+        return None
+
+
+def _top_n(rows: list[tuple[str, str, float]], kind: str, n: int = 5) -> list[tuple[str, float]]:
+    """해당 kind 의 상위 n건 (value 내림차순) — 예전 nlargest 대체."""
+    hits = [(k, v) for kd, k, v in rows if kd == kind]
+    return sorted(hits, key=lambda kv: kv[1], reverse=True)[:n]
+
+
 def _district_context(district_id: str | None) -> str | None:
     """Platform Gold(program_content_context)에서 상권 컨텍스트 요약 텍스트 생성.
 
@@ -83,33 +128,28 @@ def _district_context(district_id: str | None) -> str | None:
     slug = _DISTRICT_ALIAS.get(district_id or "", district_id or "")
     if not _SLUG_RE.match(slug):
         return None
-    try:
-        import pandas as pd
-        path = _GOLD_DIR / slug / "program_content_context.parquet"
-        if not path.exists():
-            path = _GOLD_DIR / slug / "program_content_context.csv"
-            if not path.exists():
-                return None
-            df = pd.read_csv(path)
-        else:
-            df = pd.read_parquet(path)
-    except Exception:
+    rows = _load_context_rows(slug)
+    if rows is None:
         return None
 
     parts: list[str] = []
-    kw = df[df["kind"] == "blog_keyword"].nlargest(5, "value")
-    if len(kw):
+    if (kw := _top_n(rows, "blog_keyword")):
         parts.append("블로그 언급 키워드: " + ", ".join(
-            f"{r.key}({int(r.value)}건)" for r in kw.itertuples()))
-    cat = df[df["kind"] == "category"].nlargest(5, "value")
-    if len(cat):
+            f"{k}({int(v)}건)" for k, v in kw))
+    if (cat := _top_n(rows, "category")):
         parts.append("상권 업종 분포: " + ", ".join(
-            f"{r.key} {int(r.value)}곳" for r in cat.itertuples()))
-    trend = df[df["kind"].astype(str).str.startswith("trend:")]
-    if len(trend):
-        summaries = [s for _, g in trend.groupby("kind") if (s := _trend_summary(g))]
-        if summaries:
-            parts.append("검색 트렌드(최근 6개월, 방향은 계산된 값이다): " + "; ".join(summaries))
+            f"{k} {int(v)}곳" for k, v in cat))
+
+    # 트렌드는 kind 가 "trend:{이름}" 이라 이름별로 묶는다(예전 groupby 대체).
+    trends: dict[str, list[tuple[str, float]]] = {}
+    for kd, k, v in rows:
+        if kd.startswith("trend:"):
+            trends.setdefault(kd, []).append((k, v))
+    summaries = [s for kd, pts in trends.items()
+                 if (s := _trend_summary(kd.split(":", 1)[1], pts))]
+    if summaries:
+        parts.append("검색 트렌드(최근 6개월, 방향은 계산된 값이다): " + "; ".join(summaries))
+
     if (ev := _events_context(district_id)):
         parts.append(ev)
     return "\n".join(parts) or None
@@ -164,8 +204,11 @@ def _events_context(district_id: str | None) -> str | None:
 _TREND_FLAT_BAND = 0.05
 
 
-def _trend_summary(group: "pd.DataFrame") -> str | None:
-    """검색 트렌드 한 그룹을 **방향이 붙은 한 문장**으로 요약.
+def _trend_summary(name: str, points: list[tuple[str, float]]) -> str | None:
+    """검색 트렌드 한 계열을 **방향이 붙은 한 문장**으로 요약.
+
+    `points` 는 (기간키, 값) 쌍이고 정렬은 여기서 한다 — 호출부가 순서를 보장하지
+    않아도 되게. (2026-08-06: pandas 제거로 DataFrame 대신 평범한 쌍을 받는다.)
 
     왜 숫자를 그대로 넘기지 않는가 — 2026-08-01 실사고. 이 함수 이전에는 최근 3개월의
     원시 수치만 프롬프트에 실었고(`신사동 2026-05=67.7; …`), LLM 이 하락 시계열을 보고
@@ -177,8 +220,7 @@ def _trend_summary(group: "pd.DataFrame") -> str | None:
     6개 점이 안 되면 방향을 만들지 않고 None — 근거 없는 방향을 주느니 트렌드를 빼는 게 낫다.
     (Gold 단계에서 미완성 달은 이미 잘려 있다 — data/pipelines/build_gold._complete_trend_points)
     """
-    name = str(group["kind"].iloc[0]).split(":", 1)[1]
-    vals = group.sort_values("key")["value"].astype(float).tolist()[-6:]
+    vals = [v for _, v in sorted(points, key=lambda kv: kv[0])][-6:]
     if len(vals) < 6:
         return None
     prior = sum(vals[:3]) / 3
@@ -382,12 +424,8 @@ def _context_mtime(district_id: str) -> float:
     slug = _DISTRICT_ALIAS.get(district_id, district_id)
     if not _SLUG_RE.match(slug):
         return 0.0
-    base = 0.0
-    for name in ("program_content_context.parquet", "program_content_context.csv"):
-        path = _GOLD_DIR / slug / name
-        if path.exists():
-            base = path.stat().st_mtime
-            break
+    path = _context_path(slug)
+    base = path.stat().st_mtime if path.exists() else 0.0
     return base + events.source_mtime()
 
 

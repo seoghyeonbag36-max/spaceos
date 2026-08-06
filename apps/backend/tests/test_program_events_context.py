@@ -128,3 +128,45 @@ def test_event_fee_is_not_fabricated_price():
 
     findings = ha_guard.check_store(parsed, {"name": "가게", "menu": [], "reviews": []}, ctx)
     assert "fabricated_price" not in {f.code for f in findings}
+
+
+def test_context_reads_without_pandas(monkeypatch):
+    """상권 컨텍스트가 **pandas 없이** 읽힌다 — 프로덕션 무동작 회귀 방지.
+
+    2026-08-06 실사고: 서빙 코드가 `import pandas` 로 시작해 파케이를 읽었는데
+    배포(Vercel 서버리스)에는 pandas 도 pyarrow 도 없다. import 실패가 폴백에
+    삼켜져 컨텍스트가 **항상 None** 이었고, 상권 단위 LLM 경로는 프로덕션에서
+    한 번도 돈 적이 없다. 화면은 시드 카피를 보여주므로 눈으로는 알 수 없었다.
+
+    여기서는 pandas import 자체를 막아 배포 환경을 흉내 낸다.
+    """
+    import builtins
+
+    real_import = builtins.__import__
+
+    def no_pandas(name, *args, **kwargs):
+        if name in ("pandas", "pyarrow"):
+            raise ImportError(f"{name} 은 배포 환경에 없다 (테스트가 막았다)")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", no_pandas)
+
+    ctx = mkt._district_context("garosugil")
+    if ctx is None:
+        pytest.skip("gold/garosugil 컨텍스트 CSV 미적재")
+    assert "키워드" in ctx or "업종" in ctx, "pandas 없이 컨텍스트를 못 읽었다"
+
+
+def test_context_artifact_is_csv_not_parquet():
+    """서빙 산출물이 CSV 로 존재한다 — 파케이로 되돌아가면 배포에서 조용히 죽는다."""
+    from pathlib import Path
+
+    gold = Path(__file__).resolve().parents[3] / "data" / "gold"
+    if not (gold / "garosugil").exists():
+        pytest.skip("gold 미적재")
+    csvs = list(gold.glob("*/program_content_context.csv"))
+    parquets = list(gold.glob("*/program_content_context.parquet"))
+    assert csvs, "서빙용 CSV 가 없다"
+    assert not parquets, (
+        f"파케이가 남아 있다({len(parquets)}개) — 서빙 코드는 CSV 만 읽으므로 "
+        "두 벌이 되면 반드시 어긋난다")

@@ -50,6 +50,24 @@ def _save(df: "pd.DataFrame", root: Path, name: str) -> None:
     print(f"[gold] {path.name}: {len(df)}행 × {len(df.columns)}열")
 
 
+def _save_csv(df: "pd.DataFrame", root: Path, name: str) -> None:
+    """**CSV 로만** 저장 — 백엔드가 런타임에 읽는 산출물 전용.
+
+    파케이로 쓰면 안 되는 이유: 배포(Vercel 서버리스)에는 pandas 도 pyarrow 도 없다.
+    서빙 코드가 파케이를 읽으려다 `import pandas` 에서 실패하고, 그 예외가 폴백으로
+    삼켜져 **기능이 조용히 죽는다**(2026-08-06 상권 컨텍스트에서 실제로 발생 —
+    프로덕션에서 한 번도 돈 적이 없었다). 서빙 산출물은 표준 라이브러리로 읽히는
+    포맷이어야 한다.
+
+    이 표는 3열 수십~수백 행이라 파케이가 이득도 없다 — 실측 174KB → 116KB 로
+    오히려 작아졌다.
+    """
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / f"{name}.csv"
+    df.to_csv(path, index=False, encoding="utf-8")
+    print(f"[gold] {path.name}: {len(df)}행 × {len(df.columns)}열 (서빙용 CSV)")
+
+
 def _quarter_of(ymd: str) -> str:
     """'YYYYMMDD…' → 'YYYYQ' (서울 상권분석 STDR_YYQU_CD 형식에 맞춤)."""
     s = re.sub(r"\D", "", str(ymd))
@@ -444,7 +462,7 @@ def build_program_context() -> None:
     if not rows:
         print("[gold] program_content_context: Bronze 없음 — naver_blog/kakao_local 수집 먼저")
         return
-    _save(pd.DataFrame(rows), _GOLD_DIR, "program_content_context")
+    _save_csv(pd.DataFrame(rows), _GOLD_DIR, "program_content_context")
 
 
 # 거점 무관 일반 불용어. 거점 고유어(지명·"맛집"/"카페" 등 검색어)는 하드코딩하지 않고
@@ -512,7 +530,7 @@ def build_program13_context() -> None:
         rows = _program_context_rows(dis_posts, by_places.get(slug, []), None, stop)
         if not rows:
             continue
-        _save(pd.DataFrame(rows), GOLD / slug, "program_content_context")
+        _save_csv(pd.DataFrame(rows), GOLD / slug, "program_content_context")
         built += 1
     print(f"[gold] program13 context: {built}개 거점 생성 (garosugil 은 전용 Bronze 로 별도 유지)")
 
