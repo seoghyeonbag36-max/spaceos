@@ -1,11 +1,16 @@
 # Vercel Python 서버리스 함수(api/index.py) 의존성 — 배포용 최소 셋.
 # 로컬 개발 전체 의존성은 apps/backend/requirements.txt (DB/Redis/Celery 포함) 사용.
 # sqlalchemy/redis/celery 는 앱 기동 시 import 되지 않으므로 제외 (연동 시 추가).
-# anthropic 은 LLM_API_KEY 설정 시에만 지연 import — Vercel 에서 Program LLM 생성을
-# 쓰려면 아래 주석을 해제할 것 (미설치 시 규칙 기반 폴백으로 동작).
+# anthropic 은 LLM_API_KEY 설정 시에만 지연 import 되지만, 미설치면 그 import 가
+# 실패하고 예외가 폴백에 삼켜져 **키를 넣어도 조용히 규칙 기반으로 떨어진다.**
+# Program LLM 생성을 배포에서 쓰려면 설치돼 있어야 한다 → 2026-08-06 주석 해제.
+# cp314 확인(2026-08-06): 의존 트리 전체가 Python 3.14 바이너리 휠로 해결된다.
+#   컴파일 확장은 jiter(0.16.0)·pydantic-core(2.46.4) 둘뿐이고 둘 다 cp314
+#   manylinux2014 휠이 있다. 전체 4.7MB — 서버리스 상한에 영향 없다.
+#   ⚠ 버전을 올릴 때 이 확인을 다시 할 것 (휠이 없으면 소스 빌드 → 빌드 실패).
 # 버전 하한: Vercel 빌드가 Python 3.14 를 쓰므로 cp314 휠이 있는 pydantic 2.12+ 필수
 # (2.9.x 는 소스 빌드 시도 → PyO3 3.14 미지원으로 빌드 실패). fastapi 0.119+ 가 pydantic 2.12 호환.
 fastapi>=0.119,<1
 pydantic>=2.12,<3
 pydantic-settings>=2.8,<3
-# anthropic==0.117.0
+anthropic==0.117.0

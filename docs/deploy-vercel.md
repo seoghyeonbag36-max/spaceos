@@ -37,8 +37,35 @@ vercel env add VITE_NAVER_MAPS_KEY_ID production   # 값: apps/frontend/.env 의
 git commit --allow-empty -m "redeploy"; git push    # env 변경 후 재배포 트리거
 ```
 
-선택(백엔드): `LLM_API_KEY`(Program LLM 생성 — requirements.txt 의 anthropic 주석 해제 필요),
-`POSTING_COPILOT_URL/KEY`(Posting 코파일럿). 미설정 시 각각 규칙 기반/3-Tier 폴백으로 동작한다.
+### Program 백엔드 키 (미등록 — 2026-08-06 현재)
+
+이 넷을 넣어야 Program 이 배포판에서 산다. **`data/.env` 는 업로드에서 제외되므로
+로컬에 있어도 배포에는 없다** — Vercel 에 따로 넣어야 한다.
+
+```powershell
+vercel env add KAKAO_REST_API_KEY production    # 값: data/.env
+vercel env add NAVER_CLIENT_ID production       # 값: data/.env
+vercel env add NAVER_CLIENT_SECRET production   # 값: data/.env
+vercel env add LLM_API_KEY production           # 값: apps/backend/.env
+git commit --allow-empty -m "redeploy"; git push
+```
+
+| 키 | 없으면 | 다른 전제 |
+|---|---|---|
+| `KAKAO_REST_API_KEY` | `/marketing/places` 가 `source:"unavailable"` | 없음 — 표준 라이브러리만 쓴다 |
+| `NAVER_CLIENT_ID/SECRET` | `/marketing/reviews` 가 `source:"unavailable"` | 없음 |
+| `LLM_API_KEY` | 가게·상권 생성이 규칙 기반/시드로 폴백 | `anthropic` 설치(2026-08-06 해제 완료) + **크레딧 잔액** |
+
+앞의 셋은 **의존성도 크레딧도 필요 없다** — 등록·재배포만으로 바로 산다.
+
+확인:
+
+```powershell
+curl.exe -s "https://spaceos-sandy.vercel.app/api/v1/marketing/places?query=%EB%A7%A1%EA%B8%B0%EB%8B%A4"
+# source 가 "kakao-local" 이면 성공, "unavailable" 이면 키 미반영
+```
+
+선택(백엔드): `POSTING_COPILOT_URL/KEY`(Posting 코파일럿) — 미설정 시 3-Tier 폴백.
 
 ## 배포 후 반드시 할 것 — NCP 도메인 등록
 
