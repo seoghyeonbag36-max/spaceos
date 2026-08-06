@@ -131,6 +131,15 @@
 .pagedash .eha{font-size:10.5px;color:#8a6d3b;background:#fdf8ec;border:1px solid #f3e6c4;border-radius:8px;padding:6px 9px;line-height:1.5}
 .pagedash .insta{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:11px;margin-top:11px}
 .pagedash .ig{background:var(--card);border:1px dashed var(--line);border-radius:11px;padding:10px 13px;font-size:12px;color:var(--sub)}
+/* HA 후처리 검증 표기 — 폐기와 경고를 색으로 가른다. 경고를 경고색으로 칠하면
+   살아 있는 카피가 못 쓰는 것으로 읽힌다(오탐이 섞이는 등급이라 더 그렇다).
+   ProgramStudio.css 의 .warn/.hawarn 과 같은 값 — 가게 단위와 상권 단위가 같은 판정을
+   같은 모양으로 보여야 한다. */
+.pagedash .hablock{font-size:11.5px;color:#78350f;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 10px;line-height:1.55;margin:6px 0}
+.pagedash .hawarn{font-size:11.5px;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:8px 10px;line-height:1.55;margin:6px 0}
+.pagedash .hablock code,.pagedash .hawarn code{background:#fff;border-radius:4px;padding:0 4px;font-size:11px}
+.pagedash .halist{margin:5px 0 0;padding-left:16px}
+.pagedash .halist li{margin:3px 0}
 
 @media(max-width:920px){
  .pagedash .kpis{grid-template-columns:repeat(2,1fr)}

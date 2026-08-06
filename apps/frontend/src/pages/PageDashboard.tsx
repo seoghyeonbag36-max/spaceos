@@ -454,6 +454,9 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
   const marketingContentSourceTitle = marketingContentGold
     ? "Gold(program_content_context)의 블로그 키워드·업종 분포·검색 트렌드를 근거로 생성"
     : "LLM 키 미설정·Gold 미적재·호출 실패 시 폴백 — 손으로 적은 예시 카피다";
+  const haFindings = marketing?.ha_findings ?? [];
+  const haBlocked = haFindings.filter((f) => f.severity === "violation");
+  const haWarnings = haFindings.filter((f) => f.severity !== "violation");
 
   useEffect(() => {
     let live = true;
@@ -592,11 +595,42 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
                   </div>
                 ))}
               </div>
-              <div>
+              <div className="ml-label">
                 <span>온라인 콘텐츠</span>{" "}
                 <span className={`srcbadge ${marketingContentGold ? "is-gold" : "is-syn"}`}
                   title={marketingContentSourceTitle}>{marketingContentSourceLabel}</span>
               </div>
+              {/* 폐기와 경고를 섞지 않는다 — 전자는 이 카피가 시드인 **이유**이고
+                  후자는 살아 있는 카피에 붙은 주석이다. ProgramStudio 의 가게 단위 표기와
+                  같은 구조로 맞춘다. */}
+              {haBlocked.length > 0 && (
+                <div className="hablock">
+                  LLM 이 생성한 카피가 <b>Humanistic Authority 검증에 걸려 폐기</b>됐다 — 아래는
+                  시드 카피다. 키·크레딧 문제가 아니다.
+                  <ul className="halist">
+                    {haBlocked.map((f, i) => (
+                      <li key={i}>
+                        <b>{f.message}</b>
+                        {f.evidence && <> <code>{f.evidence}</code></>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {haWarnings.length > 0 && (
+                <div className="hawarn">
+                  <b>HA 검증 경고 {haWarnings.length}건</b> — 아래 카피는 살아 있다. 사전 매칭이라
+                  오탐일 수 있으니 근거를 보고 판단하라.
+                  <ul className="halist">
+                    {haWarnings.map((f, i) => (
+                      <li key={i}>
+                        {f.message}
+                        {f.evidence && <> <code>{f.evidence}</code></>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="insta">
                 {marketing.online_contents.map((c, i) => <div key={i} className="ig">📷 {c}</div>)}
               </div>
