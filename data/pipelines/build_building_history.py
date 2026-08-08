@@ -1,10 +1,35 @@
-"""Build Gold building business history from LocalData licensing records.
+"""Gold 건물 영업이력 빌더 — LocalData 인허가 기록 기반.
 
-Input:
-  data/bronze/{slug}/{latest}/licensing_biz.json
+입력:  data/bronze/{slug}/{latest}/licensing_biz.json
+산출:  data/gold/{slug}/building_history.json
 
-Output:
-  data/gold/{slug}/building_history.json
+## 산출 스키마 v2 (`lot-history/1`) — 2026-08-08 교체
+
+인허가 주소(SITEWHLADDR)가 가리키는 것은 **지번(대지)**이지 동(棟)이 아니다. 한 지번에
+여러 동이 올라간 경우 어느 동의 업소였는지는 원천 데이터에 없다.
+
+v1 은 그 지번의 이력을 **그 지번의 모든 동에 통째로 복제**했다. 두 가지가 잘못이다.
+
+  1. 없는 근거를 주장한다 — 가락시장(PNU 1171010700106000000)은 폴리곤 225개가 한 지번에
+     있어서, 225개 동이 각각 "이 건물에 344개 업소가 있었다"고 말하게 됐다.
+  2. 용량이 폭발한다 — garak 한 거점이 17.9MB, 41거점 합계 66MB. 대부분이 같은 레코드의
+     사본이다(garak: 281동에 서로 다른 리스트가 21종뿐).
+
+  복수 동 지번의 비중은 Tier2 만의 문제가 아니다 — 이미 배포된 13거점도
+  ikseon 29% · myeongdong 23% · euljiro 17% 다. v1 은 처음부터 틀렸고 가락시장에서
+  드러났을 뿐이다.
+
+v2 는 **지번 단위로 한 번만 저장하고 건물은 지번을 가리킨다.**
+
+    {
+      "schema": "lot-history/1",
+      "lots":      {"<pnu 19자리>": [ {레코드}, ... ]},   # 이력 본체 — 지번당 1회
+      "buildings": {"<건물 id>": "<pnu>"}                 # 건물 → 지번 인덱스
+    }
+
+서빙(services/building_history.py)은 건물 id 로 지번을 찾아 그 지번의 이력을 돌려주되,
+같은 지번을 **몇 개 동이 공유하는지**를 함께 내려보내 화면이 "이 건물"과 "이 지번"을
+구분할 수 있게 한다. 정보를 버리지 않으면서 주장만 정확해진다.
 """
 from __future__ import annotations
 
@@ -75,7 +100,7 @@ def build(slug: str, date: str | None = None) -> bool:
     sigungu = _sigungu_code(stores)
     pnu_to_ids = _pnu_to_building_ids(master)
 
-    histories: dict[str, list[dict]] = defaultdict(list)
+    lots: dict[str, list[dict]] = defaultdict(list)
     matched = 0
     for row in rows:
         start_date = _clean_date(row.get("APVPERMYMD"))
@@ -86,24 +111,34 @@ def build(slug: str, date: str | None = None) -> bool:
             continue
 
         end_date = None if _is_open(row) else _clean_date(row.get("DCBYMD"))
-        item = {
+        # 레코드는 **지번에 한 번만** 붙인다. 동 배분은 원천에 근거가 없다(모듈 상단 참조).
+        lots[pnu].append({
             "start_date": start_date,
             "end_date": end_date,
             "industry_type": str(row.get("UPTAENM") or "").strip(),
             "business_name": str(row.get("BPLCNM") or "").strip(),
             "source": "localdata",
             "closure_reason_summary": None,
-        }
-        for building_id in pnu_to_ids[pnu]:
-            histories[building_id].append(item)
+        })
         matched += 1
 
-    out = {k: sorted(v, key=lambda x: (x["start_date"], x["business_name"]))
-           for k, v in sorted(histories.items())}
+    # 이력이 있는 지번에 속한 건물만 인덱스에 넣는다 — 빈 지번을 가리키는 건물은 두지 않는다.
+    buildings = {bid: pnu for pnu in sorted(lots) for bid in sorted(pnu_to_ids[pnu])}
+    out = {
+        "schema": "lot-history/1",
+        "lots": {pnu: sorted(v, key=lambda x: (x["start_date"], x["business_name"]))
+                 for pnu, v in sorted(lots.items())},
+        "buildings": buildings,
+    }
     dst = GOLD / slug / "building_history.json"
     dst.parent.mkdir(parents=True, exist_ok=True)
-    dst.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"[gold:{slug}] building_history.json: {len(out)} buildings, {matched} licensing records")
+    # 들여쓰기 없이 쓴다 — 이 파일은 사람이 읽는 리포트가 아니라 **배포 번들에 실려
+    # 런타임에 읽히는 산출물**이다(.vercelignore 가 포함시킨다). page_building_master
+    # .geojson 과 같은 규약이다. 54거점 합계 실측 40MB → 27MB.
+    dst.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    shared = sum(1 for pnu in lots if len(pnu_to_ids[pnu]) > 1)
+    print(f"[gold:{slug}] building_history.json: 지번 {len(lots)}개(복수동 {shared}) · "
+          f"건물 {len(buildings)}개 · 인허가 {matched}건")
     return True
 
 

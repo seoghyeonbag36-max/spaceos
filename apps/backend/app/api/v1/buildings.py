@@ -12,10 +12,11 @@ async def get_building_history(building_id: str) -> BuildingHistory:
     """Return LocalData licensing history for a building."""
     if not building_id:
         raise HTTPException(status_code=404, detail="Building not found")
-    history, history_source = get_history(building_id)
+    history, history_source, lot_buildings = get_history(building_id)
     return BuildingHistory(
         building_id=building_id,
         history_source=history_source,
+        lot_buildings=lot_buildings,
         history=history,
     )
 
