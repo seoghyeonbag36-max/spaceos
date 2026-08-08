@@ -170,3 +170,48 @@ def test_context_artifact_is_csv_not_parquet():
     assert not parquets, (
         f"파케이가 남아 있다({len(parquets)}개) — 서빙 코드는 CSV 만 읽으므로 "
         "두 벌이 되면 반드시 어긋난다")
+
+
+def test_runtime_gold_artifacts_are_not_gitignored():
+    """Runtime Gold artifacts must stay deployable through git tracking rules."""
+    import subprocess
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parents[3]
+    gold = repo / "data" / "gold"
+    if not gold.exists() or not any(gold.iterdir()):
+        pytest.skip("data/gold is empty")
+
+    patterns = (
+        "*/program_content_context.csv",
+        "*/page_building_master.geojson",
+        "*/building_history.json",
+        "*/coverage.json",
+    )
+    artifacts = [
+        path
+        for pattern in patterns
+        for path in sorted(gold.glob(pattern))
+        if path.is_file()
+    ]
+    if not artifacts:
+        pytest.skip("runtime Gold artifacts are missing")
+
+    for artifact in artifacts:
+        rel = artifact.relative_to(repo).as_posix()
+        try:
+            result = subprocess.run(
+                ["git", "check-ignore", "-q", rel],
+                cwd=repo,
+                check=False,
+                capture_output=True,
+            )
+        except FileNotFoundError:
+            pytest.skip("git is not available")
+
+        if result.returncode == 128:
+            pytest.skip("not a git repository or git check-ignore failed")
+
+        assert result.returncode == 1, (
+            f"{rel} ignore 되면 프로덕션만 조용히 폴백한다"
+        )

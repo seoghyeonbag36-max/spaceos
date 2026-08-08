@@ -48,7 +48,7 @@ data/gold/*/*
 # 예외: Program 상권 컨텍스트(거점당 ~3KB, 54거점 합계 174KB) — services/marketing.py 가
 # LLM 프롬프트 입력으로 디스크에서 읽는다. 빠져 있으면 배포 환경에서 garosugil 만
 # 컨텍스트를 갖고 나머지 53거점은 조용히 시드 카피로 폴백한다(2026-08-01 발견).
-!data/gold/*/program_content_context.parquet
+!data/gold/*/program_content_context.csv
 
 # 수집 로그 — **반드시 제외**. 건축HUB 오류 메시지는 실패한 요청 URL 을 통째로 찍는데
 # 거기에 serviceKey 가 평문으로 들어간다(2026-07-26 bldgvac-stdout.log 에서 103건 확인).
