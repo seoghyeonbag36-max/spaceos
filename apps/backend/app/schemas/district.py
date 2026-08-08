@@ -77,12 +77,18 @@ class VacancyHeatmap(BaseModel):
     avg_vacancy: float
     # "gold"(실측 건물 집계) | "synthetic"(합성 그리드 폴백) — DistrictSummary 와 동일 의미
     vacancy_source: str = "synthetic"
-    # Gold 경로에서만 — 총 호실 수, 집계 건물 수, 마스터 전체 건물 수, 정밀 표본 비율(%),
+    # Gold 경로에서만 — 총 호실 수, 집계·전체 **지번** 수, 정밀 표본 비율(%),
     # 집합건물로 제외된 건물 수. buildings < buildings_total 인 이유는 제외 규칙 3종
     # (floor_approx · expos_units · polygon_only) — services/gold_vacancy 모듈 주석 참조.
+    #
+    # ⚠ buildings·buildings_total 의 단위는 폴리곤이 아니라 **지번(대지)** 이다.
+    # 한 지번에 여러 동이 올라가면 각 폴리곤이 지번 전체의 active·capacity 를 물려받아
+    # 그대로 세면 그 지번이 폴리곤 수만큼 가중된다(가락시장: 지번 1개 = 폴리곤 225개).
+    # 지도에 그리는 폴리곤 총수는 polygons_total 로 따로 본다.
     capacity: int | None = None
     buildings: int | None = None
     buildings_total: int | None = None
+    polygons_total: int | None = None
     precision_pct: float | None = None
     excluded_mall: int | None = None
     # 앵커 대조 — 거점별 R-ONE 중대형상가 공실률과 격차(%p). DistrictSummary 와 동일 의미.

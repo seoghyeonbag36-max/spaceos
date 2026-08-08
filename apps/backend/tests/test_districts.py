@@ -126,6 +126,14 @@ MALL_METHOD = "expos_units"
 EXCLUDED_SOURCES = {"polygon_only"}
 
 
+def _by_lot(props) -> dict:
+    """지번(pnu) → 첫 폴리곤. 서비스의 지번 중복 제거와 같은 규칙(첫 등장 우선)."""
+    out: dict = {}
+    for p in props:
+        out.setdefault(p.get("pnu") or p.get("id"), p)
+    return out
+
+
 def _counted(props: dict) -> bool:
     """대표 집계에 들어가는 건물인가 — gold_vacancy.build_cells 의 필터와 같은 조건."""
     return (props.get("capacity_method") in COUNTED_METHODS
@@ -233,13 +241,15 @@ def test_gold_aggregate_excludes_weak_evidence():
     """
     for slug in _gold_slugs():
         props = [f["properties"] for f in _gold_master(slug)["features"]]
-        counted = [p for p in props if _counted(p)]
+        # 지번당 첫 폴리곤만 — 서비스와 같은 단위로 센다(모듈 gold_vacancy "집계 단위" 참조).
+        counted = list(_by_lot(p for p in props if _counted(p)).values())
         cap = sum(p["capacity"] for p in counted)
         act = sum(min(p.get("active") or 0, p["capacity"]) for p in counted)
 
         hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
-        assert hm["buildings"] == len(counted), f"{slug} 집계 건물 수"
-        assert hm["buildings_total"] == len(props), f"{slug} 전체 건물 수"
+        assert hm["buildings"] == len(counted), f"{slug} 집계 지번 수"
+        assert hm["buildings_total"] == len(_by_lot(props)), f"{slug} 전체 지번 수"
+        assert hm["polygons_total"] == len(props), f"{slug} 전체 폴리곤 수"
         assert hm["avg_vacancy"] == pytest.approx((cap - act) / cap * 100, abs=0.01), slug
 
         # 제외된 건물이 실제로 있어야 하고(현 산출물 기준), 전수 집계와 값이 달라야 한다.
@@ -247,6 +257,27 @@ def test_gold_aggregate_excludes_weak_evidence():
         all_cap = sum(p.get("capacity") or 0 for p in props)
         all_act = sum(p.get("active") or 0 for p in props)
         assert hm["avg_vacancy"] != pytest.approx((all_cap - all_act) / all_cap * 100, abs=0.01), slug
+
+
+def test_lot_polygons_counted_once():
+    """한 지번에 폴리곤이 여럿이어도 집계에는 한 번만 들어가야 한다.
+
+    마스터는 각 폴리곤에 **그 지번 전체의** active·capacity 를 물려준다. 그대로 합산하면
+    그 지번이 폴리곤 수만큼 가중된다 — garak(가락시장)은 지번 1개가 폴리곤 225개라
+    거점 공실률이 3.87% 대신 0.03% 로 나왔다(2026-08-08).
+    """
+    checked = 0
+    for slug in _gold_slugs():
+        props = [p for p in (f["properties"] for f in _gold_master(slug)["features"])
+                 if _counted(p)]
+        lots = _by_lot(props)
+        if len(lots) == len(props):
+            continue                                  # 이 거점에는 복수 폴리곤 지번이 없다
+        hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
+        assert hm["buildings"] == len(lots), f"{slug}: 폴리곤을 세고 있다({len(props)} vs 지번 {len(lots)})"
+        assert hm["capacity"] == sum(p["capacity"] for p in lots.values()), f"{slug} 분모"
+        checked += 1
+    assert checked, "복수 폴리곤 지번을 가진 Gold 거점이 없다 — 산출물 구조 확인"
 
 
 def test_mall_buildings_never_counted():
@@ -276,7 +307,7 @@ def test_gold_anchor_comparison_attached():
         hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
         assert hm["anchor_pct"] is not None, f"{slug}: calibration.json 없음 — calibrate_vacancy 실행 필요"
         assert 0 < hm["anchor_pct"] < 60, f"{slug} 앵커 범위"
-        assert hm["anchor_gap_pp"] == pytest.approx(hm["avg_vacancy"] - hm["anchor_pct"], abs=0.05), slug
+        assert hm["anchor_gap_pp"] == pytest.approx(hm["avg_vacancy"] - hm["anchor_pct"], abs=0.01), slug
         # 집합건물을 섞던 시절 격차가 +63%p 까지 벌어졌다. 그 회귀를 막는 상한이다.
         assert -20 < hm["anchor_gap_pp"] < 30, f"{slug} 앵커 격차 이상 — 집계 규칙 회귀 의심"
 

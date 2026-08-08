@@ -1,33 +1,47 @@
 {
   "slug": "yeouido",
   "hub_name": "여의도",
-  "tier": "Tier2(폴리곤근사)",
-  "built_at": "2026-08-08T12:36:23",
-  "shown": 278,
-  "excluded_total": 66,
-  "excluded_unknown": 0,
-  "excluded_non_commercial": 66,
-  "coverage_pct": 80.8,
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-08T13:41:44",
+  "shown": 250,
+  "excluded_total": 94,
+  "excluded_unknown": 69,
+  "excluded_non_commercial": 25,
+  "coverage_pct": 72.7,
   "status": {
-    "full": 172,
-    "partial": 27,
-    "high": 59,
-    "empty": 20
+    "full": 163,
+    "partial": 45,
+    "high": 29,
+    "empty": 13
   },
   "source": {
-    "pip_only": 258,
-    "polygon_only": 20
+    "stores+ledger": 226,
+    "polygon_only": 13,
+    "pip_only": 9,
+    "stores+ledger+pip": 2
   },
-  "reference_vacancy_pct": null,
-  "reference_buildings": 0,
-  "reference_coverage_pct": 0.0,
-  "mixed_vacancy_pct": 9.9,
+  "reference_vacancy_pct": 26.2,
+  "reference_buildings": 131,
+  "reference_coverage_pct": 98.5,
+  "mixed_vacancy_pct": 11.6,
   "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 71,
+      "active": 664,
+      "capacity": 728,
+      "vacancy_pct": 8.8
+    },
+    "expos_units": {
+      "buildings": 60,
+      "active": 1906,
+      "capacity": 2756,
+      "vacancy_pct": 30.8
+    },
     "floor_approx": {
-      "buildings": 146,
-      "active": 2387,
-      "capacity": 2979,
-      "vacancy_pct": 19.9
+      "buildings": 2,
+      "active": 7,
+      "capacity": 20,
+      "vacancy_pct": 65.0
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

@@ -24,6 +24,26 @@ Gold 가 있는 거점(2026-08-01 기준 13곳)은 실데이터, 나머지는 �
 셋 다 calibrate_vacancy.py / calibration.json 의 규칙과 같다. 규칙끼리는 독립이므로
 (재빌드가 polygon_only 에 floor_ouln 을 붙일 수 있다) 각각 명시한다.
 
+## 집계 단위는 폴리곤이 아니라 **지번(대지)** 이다 — 2026-08-08 교정
+
+같은 지번에 여러 동이 올라가 있으면 V-World 폴리곤이 여러 개 나오는데, 마스터는 각
+폴리곤에 **그 지번 전체의 active·capacity 를 통째로 물려준다**(build_page_master 는
+지번 단위로 공실행을 합산한다). 그래서 폴리곤을 그대로 합산하면 그 지번이 폴리곤 수만큼
+가중된다.
+
+garak(가락시장) 실측: 집계 대상 242동이 실은 지번 16개뿐이고, 한 지번이 폴리곤 225개를
+차지한다(각 active=216 capacity=216). 그대로 합산하면 capacity 가 48,730 으로 부풀어
+거점 공실률이 **0.03%** 가 됐다 — 지번 중복을 제거하면 **3.87%** 다.
+
+배포돼 있던 13거점은 지번이 잘게 나뉘어 있어 영향이 작았고(seoulsup -3.10 · seochon
+-1.62 · myeongdong +1.37 · 나머지 ±1%p 이내) 그래서 지금까지 드러나지 않았다.
+build_page_master 는 자기 리포트에서 이미 같은 이유로 지번 중복을 제거하고 있었다
+(seoulsup "쌍용아파트" 사례) — 서빙 쪽만 빠져 있었다.
+
+→ 집계는 지번당 한 번만 센다. `buildings`·`buildings_total`·셀의 `buildings` 는 모두
+   **지번 수**이고, 폴리곤 총수는 `polygons_total` 로 따로 둔다. 지도(`/heatmap/buildings`)
+   는 영향이 없다 — 거기서는 폴리곤을 동마다 그려야 한다.
+
 건물 폴리곤 레이어(`/heatmap/buildings`)는 제외 대상도 그대로 그린다. 거기서는 건물 한
 동의 표시값이고, 여기서는 거점을 대표하는 **통계**라 기준을 다르게 둔다.
 
@@ -108,9 +128,12 @@ def build_cells(district_id: str, grid: dict) -> dict | None:
 
     bb, dlat, dlng = grid["bb"], grid["dlat"], grid["dlng"]
     agg: dict[tuple[int, int], dict] = {}
-    buildings_total = len(fc["features"])
+    polygons_total = len(fc["features"])
+    buildings_total = len({(f["properties"].get("pnu") or f["properties"].get("id"))
+                           for f in fc["features"]})
     buildings_used = 0
     excluded_mall = 0
+    seen_lots: set[str] = set()         # 지번 중복 제거 — 모듈 상단 "집계 단위" 참조
 
     for feat in fc["features"]:
         props = feat["properties"]
@@ -125,6 +148,16 @@ def build_cells(district_id: str, grid: dict) -> dict | None:
         geom = feat.get("geometry") or {}
         if geom.get("type") != "Polygon" or not geom.get("coordinates"):
             continue
+        # 같은 지번의 두 번째 폴리곤부터는 건너뛴다. 각 폴리곤이 지번 전체의
+        # active·capacity 를 물려받으므로 그대로 더하면 폴리곤 수만큼 가중된다.
+        # pnu 가 없는 산출물은 건물 id 로 떨어뜨려 최소한 자기 자신끼리는 안 겹치게 한다.
+        #
+        # 도형 검사 **뒤에** 소진시킨다 — 앞에 두면 첫 폴리곤의 도형이 깨졌을 때 그 지번이
+        # 통째로 사라진다(멀쩡한 나머지 폴리곤까지 '이미 본 지번'으로 걸린다).
+        lot = props.get("pnu") or props.get("id")
+        if lot in seen_lots:
+            continue
+        seen_lots.add(lot)
         lat, lng = _centroid(geom["coordinates"][0])
         key = (math.floor((lat - bb["s"]) / dlat), math.floor((lng - bb["w"]) / dlng))
         cell = agg.setdefault(key, {"cap": 0, "act": 0, "n": 0})
@@ -165,11 +198,16 @@ def build_cells(district_id: str, grid: dict) -> dict | None:
         # 그것이었지만, 실데이터에서는 영업 점포(active) / 총 호실(capacity) 이 맞다.
         "avg_vacancy": avg,
         "capacity": sum_capacity,
+        # buildings·buildings_total 은 **지번 수**다(모듈 상단 "집계 단위" 참조).
+        # 폴리곤 총수는 지도 렌더 규모라 따로 둔다 — 두 단위를 섞어 비율을 내면 안 된다.
         "buildings": buildings_used,
         "buildings_total": buildings_total,
+        "polygons_total": polygons_total,
         "precision_pct": round(buildings_used / buildings_total * 100, 1),
         "excluded_mall": excluded_mall,
         "anchor_pct": anchor,
-        "anchor_gap_pp": round(avg - anchor, 1) if anchor is not None else None,
+        # 자릿수를 피연산자(avg 2자리 · anchor_pct 2자리)에 맞춘다. 1자리로 줄이면
+        # 격차가 실제 차이와 최대 0.05%p 어긋나 "gap == avg - anchor" 가 성립하지 않는다.
+        "anchor_gap_pp": round(avg - anchor, 2) if anchor is not None else None,
         "source": "gold",
     }
