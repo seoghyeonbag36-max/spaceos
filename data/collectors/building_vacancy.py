@@ -137,7 +137,20 @@ _PACE_STEP = 0.25      # 429 1회당 가산
 _PACE_MAX = 3.0
 _PACE_DECAY = 0.01     # 성공 1회당 감산
 _N429 = [0]            # 429 총 발생 수 (리포트용)
-_LAST_429 = [False]    # 직전 _get_json 실패가 429 때문이었나 (강등 사유 구분용)
+
+# 서버측 일시 장애(5xx, 또는 2xx 인데 본문이 JSON 이 아닌 응답)도 DNS 블립과 다르다.
+# 2026-08-08 실측: 건축HUB 전유부가 503 과 비(非)JSON 응답을 간헐적으로 뱉는 동안
+# 수집 속도가 1.47초/동 → 7.0~9.3초/동(5~6배)으로 무너졌다. 원인은 이 클래스가
+# DNS 용 _BACKOFF(1·3·8·15, 4회 = 건당 최대 27초)를 타고 있었기 때문이다.
+# 서버가 "지금 못 준다"고 즉답하는 상황에 27초를 기다려도 나아질 게 없다 — 짧게 끊는다.
+_RETRIES_5XX = 2
+_BACKOFF_5XX = (2, 6)  # 최대 8초 (기존 27초)
+_N5XX = [0]
+
+# 직전 _get_json 실패가 **재시도 가치가 있는 서버측 사유**였나 (429 · 5xx · 비JSON).
+# 호출부는 이 값으로 '대장이 원래 없음'(no_ledger)과 '수집 실패'(rate_limited)를 가른다.
+# 이 구분이 무너지면 재개 로직이 실패를 완료로 보고 그 건물을 영영 다시 시도하지 않는다.
+_LAST_RETRYABLE = [False]
 
 
 def _resp_of(exc: Exception):
@@ -147,6 +160,19 @@ def _resp_of(exc: Exception):
 def _is_429(exc: Exception) -> bool:
     r = _resp_of(exc)
     return r is not None and getattr(r, "status_code", None) == 429
+
+
+def _is_server_busy(exc: Exception) -> bool:
+    """서버가 지금 못 주는 상태인가 — 5xx, 또는 2xx 인데 본문이 JSON 이 아닌 응답.
+
+    후자는 `r.json()` 이 ValueError(json.JSONDecodeError 는 그 하위)를 던진다.
+    이 try 블록에서 ValueError 를 낼 수 있는 곳은 그 한 줄뿐이라 오탐 여지가 없다.
+    실제 관측 메시지: "Expecting value: line 1 column 1 (char 0)" — 빈 본문이다.
+    """
+    r = _resp_of(exc)
+    if r is not None and 500 <= (getattr(r, "status_code", 0) or 0) < 600:
+        return True
+    return isinstance(exc, ValueError)
 
 
 def _retry_after(exc: Exception) -> float | None:
@@ -164,21 +190,28 @@ def _get_json(url: str, params: dict) -> dict | None:
     """건축HUB GET. 연결/DNS 일시 오류는 백오프 재시도(_FAILS 미가산),
     재시도 소진 시에만 실패로 집계 — DNS 블립에 배치 전체가 죽지 않게 한다.
 
-    429 는 별도 처리: Retry-After 를 우선 존중하고, 없으면 _BACKOFF_429 로 쉰다.
-    동시에 _PACE 를 올려 이후 모든 요청을 전역 감속시킨다(리밋 재유발 방지).
-    실패로 끝나면 _LAST_429 를 세워 호출부가 '대장 없음'과 구분할 수 있게 한다.
+    실패 사유를 **세 갈래**로 나눈다. 기다리는 값이 다르기 때문이다.
+      429(레이트 리밋) Retry-After 우선, 없으면 _BACKOFF_429. _PACE 를 올려 전역 감속
+      5xx·비JSON(서버) _BACKOFF_5XX 로 짧게(최대 8초). _PACE 는 올리지 않는다 —
+                       우리 요청 속도의 문제가 아니라 서버가 지금 못 주는 것이다
+      연결/DNS         _BACKOFF(최대 27초). 블립은 길게 기다리면 실제로 지나간다
+
+    셋 중 앞의 둘은 실패로 끝나도 _LAST_RETRYABLE 을 세운다. 호출부가 '대장이 원래
+    없음'과 '수집 실패'를 갈라 후자를 재수집 대상으로 돌리게 하기 위해서다.
 
     같은 엔드포인트가 429 로 _DEAD_AFTER 회 연속 소진되면 그 엔드포인트를 포기하고
     이후 호출은 **대기 없이 즉시** None 을 돌려준다. 막힌 문을 계속 두드리며 백오프에
-    시간을 태우지 않기 위해서다.
+    시간을 태우지 않기 위해서다. 5xx 는 포기시키지 않는다 — 몇 초 만에 회복되는 일이
+    잦아서, 포기하면 그 실행이 통째로 빈손이 된다.
     """
     ep = _ep(url)
     if ep in _DEAD:
-        _LAST_429[0] = True          # 사유는 여전히 레이트 리밋 → rate_limited 로 기록
+        _LAST_RETRYABLE[0] = True    # 사유는 여전히 레이트 리밋 → rate_limited 로 기록
         return None
 
     last = None
     saw_429 = False
+    saw_busy = False
     for attempt in range(_RETRIES + 1):
         try:
             if _PACE[0]:
@@ -187,7 +220,7 @@ def _get_json(url: str, params: dict) -> dict | None:
             r.raise_for_status()
             data = r.json()
             _FAILS[ep] = 0
-            _LAST_429[0] = False
+            _LAST_RETRYABLE[0] = False
             if _PACE[0]:                      # 성공 누적 시 감속 해제
                 _PACE[0] = max(0.0, _PACE[0] - _PACE_DECAY)
             return data
@@ -201,6 +234,11 @@ def _get_json(url: str, params: dict) -> dict | None:
                 if wait is None:
                     wait = _BACKOFF_429[min(attempt, len(_BACKOFF_429) - 1)]
                 limit = _RETRIES_429          # 429 는 짧게 끊는다
+            elif _is_server_busy(exc):
+                saw_busy = True
+                _N5XX[0] += 1
+                wait = _BACKOFF_5XX[min(attempt, len(_BACKOFF_5XX) - 1)]
+                limit = _RETRIES_5XX          # 서버 장애도 짧게 끊는다
             else:
                 wait = _BACKOFF[min(attempt, len(_BACKOFF) - 1)]
                 limit = _RETRIES
@@ -209,8 +247,13 @@ def _get_json(url: str, params: dict) -> dict | None:
             time.sleep(wait)
 
     _FAILS[ep] += 1
-    _LAST_429[0] = saw_429
-    tag = f"429 x{_N429[0]} · pace {_PACE[0]:.2f}s" if saw_429 else "연결/기타"
+    _LAST_RETRYABLE[0] = saw_429 or saw_busy
+    if saw_429:
+        tag = f"429 x{_N429[0]} · pace {_PACE[0]:.2f}s"
+    elif saw_busy:
+        tag = f"서버 5xx/비JSON x{_N5XX[0]}"
+    else:
+        tag = "연결/기타"
     print(f"  [HTTP 실패 {_FAILS[ep]}연속 | {tag}] {ep} — {last}")
     if saw_429 and _FAILS[ep] >= _DEAD_AFTER:
         _DEAD.add(ep)
@@ -319,11 +362,15 @@ def expos_units(rows: list[dict]) -> set[tuple[str, str, str]]:
 def fetch_capacity(key: str, jibun: dict, raw_store: dict) -> tuple[int | None, str]:
     """(capacity, method). 전유부 상업 호 수 → 없으면 표제부 층수 근사.
 
-    429 로 응답을 못 받은 경우 "rate_limited" 를 돌려준다. 예전에는 이때 "no_ledger"
-    로 떨어져 **대장이 원래 없는 건물과 구분이 불가능**했고, 재개 로직이 완료로
-    간주해 영영 재시도되지 않았다(2026-07-26 을지로에서 확인).
-    전유부만 리밋에 걸리고 표제부는 성공하는 경우도 위험하다 — 실제로는 집합건물인데
+    **서버측 사유(429 · 5xx · 비JSON)로 응답을 못 받으면 "rate_limited"** 를 돌려준다.
+    예전에는 이때 "no_ledger" 로 떨어져 **대장이 원래 없는 건물과 구분이 불가능**했고,
+    재개 로직이 완료로 간주해 영영 재시도되지 않았다(2026-07-26 을지로에서 확인).
+    전유부만 막히고 표제부는 성공하는 경우도 위험하다 — 실제로는 집합건물인데
     floor_approx 로 강등돼 capacity 가 뒤바뀌므로, 이 경우도 재수집 대상으로 돌린다.
+
+    2026-08-08 확장: 이 판정이 429 에만 걸려 있어서 **503·비JSON 으로 전유부를 잃은
+    건물이 조용히 floor_approx / no_ledger 로 굳었다.** 같은 사고를 429 에서 한 번 겪고
+    고쳤는데 5xx 가 같은 구멍으로 새고 있었다. 판정 근거를 _LAST_RETRYABLE 로 넓힌다.
     """
     common = {"serviceKey": key, "_type": "json", "numOfRows": 100, **jibun}
 
@@ -333,7 +380,7 @@ def fetch_capacity(key: str, jibun: dict, raw_store: dict) -> tuple[int | None, 
     throttled = False
     while page <= _MAX_EXPOS_PAGES:
         expos = _get_json(f"{BASE_BLD}/getBrExposPubuseAreaInfo", {**common, "pageNo": page})
-        if expos is None and _LAST_429[0]:
+        if expos is None and _LAST_RETRYABLE[0]:
             throttled = True
         got = _items(expos)
         rows += got
@@ -355,7 +402,7 @@ def fetch_capacity(key: str, jibun: dict, raw_store: dict) -> tuple[int | None, 
 
     time.sleep(_SLEEP)
     title = _get_json(f"{BASE_BLD}/getBrTitleInfo", common)
-    if title is None and _LAST_429[0]:
+    if title is None and _LAST_RETRYABLE[0]:
         return None, "rate_limited"
     rows = _items(title)
     raw_store["title"] = rows
