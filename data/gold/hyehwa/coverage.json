@@ -1,0 +1,34 @@
+{
+  "slug": "hyehwa",
+  "hub_name": "혜화·대학로",
+  "tier": "Tier2(폴리곤근사)",
+  "built_at": "2026-08-08T12:37:38",
+  "shown": 1059,
+  "excluded_total": 1396,
+  "excluded_unknown": 0,
+  "excluded_non_commercial": 1396,
+  "coverage_pct": 43.1,
+  "status": {
+    "full": 473,
+    "partial": 222,
+    "high": 201,
+    "empty": 163
+  },
+  "source": {
+    "polygon_only": 163,
+    "pip_only": 896
+  },
+  "reference_vacancy_pct": null,
+  "reference_buildings": 0,
+  "reference_coverage_pct": 0.0,
+  "mixed_vacancy_pct": 31.0,
+  "by_capacity_method": {
+    "floor_approx": {
+      "buildings": 685,
+      "active": 1519,
+      "capacity": 2312,
+      "vacancy_pct": 34.3
+    }
+  },
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+}

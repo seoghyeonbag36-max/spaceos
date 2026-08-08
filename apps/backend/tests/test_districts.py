@@ -5,6 +5,7 @@
 """
 import json
 import re
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
@@ -132,20 +133,44 @@ def _counted(props: dict) -> bool:
             and props.get("source") not in EXCLUDED_SOURCES)
 
 
+@lru_cache(maxsize=None)
 def _gold_master(slug: str):
-    """거점 Gold 건물 마스터 로드 (없으면 None)."""
+    """거점 Gold 건물 마스터 로드 (없으면 None).
+
+    캐시하는 이유: 54거점 마스터는 합계 수십 MB 이고 아래 테스트들이 거점마다 여러 번
+    읽는다. 캐시 없이는 스위트가 분 단위로 늘어진다(2026-08-08 실측: 120초 초과).
+    테스트 도중 Gold 를 다시 쓰지 않으므로 캐시가 낡을 일은 없다.
+    """
     path = GOLD_DIR / slug / "page_building_master.geojson"
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _gold_slugs() -> list[str]:
-    return [d["id"] for d in DISTRICTS if (GOLD_DIR / d["id"] / "page_building_master.geojson").exists()]
+@lru_cache(maxsize=1)
+def _gold_slugs() -> tuple[str, ...]:
+    """대표 집계가 **실제로 산출되는** 거점 — 응답이 `vacancy_source="gold"` 가 되는 조건.
+
+    2026-08-08 정정: 예전에는 `page_building_master.geojson` 존재만 봤다. 그때는 Gold 를
+    가진 거점이 곧 대장 수집을 마친 13거점이라 파일 존재가 실측의 대리지표로 성립했다.
+    Tier2(폴리곤근사) 41거점이 들어오면서 그 등식이 깨졌다 — 마스터는 있지만 전 건물이
+    `floor_approx` 라 배제 규칙에 모두 걸려 `build_cells` 가 None 을 돌려주고, 응답은
+    합성으로 폴백한다(파이프라인도 거점마다 "정밀 분모 건물 0동" 을 경고한다).
+    파일 존재를 계속 기준으로 두면 41거점이 통째로 오탐이 된다.
+
+    아래 호출자 전부가 "앵커가 붙어 있다 · capacity>0 · 셀이 있다" 를 전제하므로,
+    헬퍼 자체를 집계 가능 여부로 정의한다.
+    """
+    out: list[str] = []
+    for d in DISTRICTS:
+        fc = _gold_master(d["id"])
+        if fc and any(_counted(f["properties"]) for f in fc["features"]):
+            out.append(d["id"])
+    return tuple(out)
 
 
 def test_vacancy_source_matches_gold_presence():
-    """Gold 마스터가 있는 거점은 실측("gold"), 없으면 합성("synthetic")으로 표기돼야 한다.
+    """대표 집계가 산출되는 거점만 실측("gold"), 나머지는 합성("synthetic")으로 표기돼야 한다.
 
     합성값이 실측처럼 읽히면 안 되므로 출처 표기는 두 엔드포인트에서 일치해야 한다.
     """
@@ -157,6 +182,28 @@ def test_vacancy_source_matches_gold_presence():
         assert s["vacancy_source"] == expected, f"{s['id']} 요약 출처 표기"
         hm = client.get(f"{V1}/heatmap/vacancy", params={"district": s["id"]}).json()
         assert hm["vacancy_source"] == expected, f"{s['id']} 히트맵 출처 표기"
+
+
+def test_tier2_master_does_not_claim_measured():
+    """Tier2(대장 미수집) 거점은 Gold 마스터가 있어도 실측을 주장하면 안 된다.
+
+    Tier2 는 폴리곤 지상층수 근사라 분모 근거가 `floor_approx` 뿐이다. 이걸 집계에
+    넣으면 "실측" 배지를 달고 근거 없는 공실률이 나간다 — 실측처럼 보이는 추정치가
+    가장 나쁜 산출물이라는 원칙(AGENTS.md §0)에 정면으로 걸린다.
+    분모 규칙이 느슨해져 floor_approx 가 집계에 새어 들어오면 여기서 걸린다.
+    """
+    aggregatable = set(_gold_slugs())
+    tier2 = [d["id"] for d in DISTRICTS
+             if _gold_master(d["id"]) is not None and d["id"] not in aggregatable]
+    if not tier2:
+        pytest.skip("Tier2 거점 없음 — 전 거점이 대장 수집을 마쳤다면 정상")
+
+    for slug in tier2:
+        props = [f["properties"] for f in _gold_master(slug)["features"]]
+        assert props, f"{slug}: 마스터가 비었다"
+        assert not any(_counted(p) for p in props), f"{slug}: 집계 대상이 생겼는데 Tier2 로 분류됐다"
+        hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
+        assert hm["vacancy_source"] == "synthetic", f"{slug}: 대장 없이 실측을 주장했다"
 
 
 def test_gold_cells_are_internally_consistent():
