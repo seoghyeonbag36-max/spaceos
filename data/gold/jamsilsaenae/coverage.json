@@ -1,33 +1,47 @@
 {
   "slug": "jamsilsaenae",
   "hub_name": "잠실새내",
-  "tier": "Tier2(폴리곤근사)",
-  "built_at": "2026-08-08T12:37:25",
-  "shown": 490,
-  "excluded_total": 372,
-  "excluded_unknown": 0,
-  "excluded_non_commercial": 372,
-  "coverage_pct": 56.8,
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-08T17:02:30",
+  "shown": 418,
+  "excluded_total": 444,
+  "excluded_unknown": 78,
+  "excluded_non_commercial": 366,
+  "coverage_pct": 48.5,
   "status": {
-    "full": 234,
-    "partial": 130,
-    "high": 105,
-    "empty": 21
+    "full": 265,
+    "partial": 69,
+    "high": 66,
+    "empty": 18
   },
   "source": {
-    "pip_only": 469,
-    "polygon_only": 21
+    "stores+ledger": 376,
+    "polygon_only": 18,
+    "pip_only": 21,
+    "stores+ledger+pip": 3
   },
-  "reference_vacancy_pct": null,
-  "reference_buildings": 0,
-  "reference_coverage_pct": 0.0,
-  "mixed_vacancy_pct": 20.6,
+  "reference_vacancy_pct": 37.2,
+  "reference_buildings": 282,
+  "reference_coverage_pct": 95.3,
+  "mixed_vacancy_pct": 40.7,
   "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 232,
+      "active": 926,
+      "capacity": 1035,
+      "vacancy_pct": 10.5
+    },
+    "expos_units": {
+      "buildings": 50,
+      "active": 804,
+      "capacity": 1719,
+      "vacancy_pct": 53.2
+    },
     "floor_approx": {
-      "buildings": 376,
-      "active": 1877,
-      "capacity": 2481,
-      "vacancy_pct": 24.3
+      "buildings": 14,
+      "active": 24,
+      "capacity": 115,
+      "vacancy_pct": 79.1
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
