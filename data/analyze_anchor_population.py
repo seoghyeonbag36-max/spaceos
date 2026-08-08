@@ -43,15 +43,19 @@ import sys
 from collections import defaultdict
 
 from data.collectors.common import GOLD
+from data.config.page_hubs import HUBS
 from data.pipelines.build_building_attrs import load as load_attrs
 from data.pipelines.build_building_attrs import run as build_attrs
 from data.pipelines.calibrate_vacancy import _rone_latest
 
-# 13거점 = Tier1(대장 수집 완료). 나머지 41거점은 대장이 없어 이 진단의 대상이 아니다.
-TIER1 = ["garosugil", "apgujeong-rodeo", "hongdae", "yeonnam", "ikseon", "seochon",
-         "myeongdong", "euljiro", "seongsu", "seoulsup", "itaewon", "hannam", "songridan"]
+# 건축물대장 산출물(building_vacancy.json)이 있는 거점만 이 진단의 대상이다.
 PRIMARY = {"expos_units", "floor_ouln"}
 # 상가 주용도 판정은 사이드카(build_building_attrs.SHOP_PURPS)가 is_shop 으로 넣어 준다.
+
+
+def ledger_hubs() -> list[str]:
+    """HUBS 순서대로 건축물대장 산출물이 있는 거점을 반환."""
+    return [slug for slug in HUBS if (GOLD / slug / "building_vacancy.json").exists()]
 
 
 def load_cache(slug: str, rebuild: bool = False) -> dict:
@@ -157,7 +161,10 @@ def floor_view(per: dict[str, dict]) -> dict:
 def main() -> None:
     args = sys.argv[1:]
     rebuild = "--rebuild" in args
-    slugs = [a for a in args if not a.startswith("-")] or TIER1
+    slugs = [a for a in args if not a.startswith("-")] or ledger_hubs()
+    if not slugs:
+        print("[anchor-diag] building_vacancy.json 없음 — data.collectors.building_vacancy 수집 먼저")
+        return
     mid_a, small_a = _rone_latest("vac_mid"), _rone_latest("vac_small")
 
     agg: dict[str, list] = defaultdict(list)
