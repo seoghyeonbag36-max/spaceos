@@ -214,6 +214,36 @@ export const simulateRevenue = (req: {
   district_id: string; unit_id?: string; industry_type?: string; strategy?: string;
 }) => postJSON<unknown>("/ai/simulate-revenue", req);
 
+/* ===== GNN 업종 추천(Platform 5-2) — POST /ai/recommend-industry ===== */
+
+/** 추천 1건. score 는 그 자리에서 해당 업종일 확률(0~1) */
+export interface IndustryRec { industry: string; score: number; }
+
+/** 업종 추천 응답.
+ *  ⚠ `model === "gnn-stub"` 은 Gold 미적재 폴백이다(HTTP 200 으로 온다).
+ *     실측 추천처럼 그리면 안 된다 — 호출부에서 반드시 구분할 것. */
+export interface IndustryRecommend {
+  district_id: string;
+  model: string;
+  /** 학습 지표. test_top3 만 보면 과대평가된다 — baseline_district_prior_top3 와
+   *  함께 봐야 한다(거점 사전확률 대비 lift 가 실제 기여분). */
+  metrics: Record<string, number> | null;
+  /** "node" = 최근접 점포 자리 기준 · "district" = 거점 전체 노드 평균 */
+  scope: "node" | "district";
+  matched_node_id?: string;
+  matched_distance_m?: number;
+  recommendations: IndustryRec[];
+  building_id?: string | null;
+}
+
+/** GNN 업종 추천 — 좌표를 주면 최근접 노드(400m 내), 없으면 거점 평균.
+ *  ⚠ 백엔드 필드는 `lon` 이다(프론트 Building.center 는 `lng`). 이름이 달라
+ *     그대로 넘기면 조용히 거점 평균으로 떨어진다.
+ *  ⚠ 400m 안에 그래프 노드가 없으면 404 — 호출부에서 잡아 빈 상태로 둔다. */
+export const recommendIndustry = (req: {
+  district_id: string; lat?: number; lon?: number; building_id?: string;
+}) => postJSON<IndustryRecommend>("/ai/recommend-industry", req);
+
 /* ===== 가게 단위 마케팅 솔루션(Program 1단계) — POST /marketing/generate ===== */
 
 /** 가게 프로필. 수집 채널(점주 제공·네이버 지역검색·카카오 로컬)에 무관한 정규화 입력 계약.

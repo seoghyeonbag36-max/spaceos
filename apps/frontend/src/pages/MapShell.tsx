@@ -14,7 +14,7 @@
 //   MapShell.css 의 .map-canvas 주석 참조.
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { loadNaverMaps } from "@/lib/naverMap";
-import { getBuildingVacancy, getRentHeatmap, listDistricts, type DistrictSummary, type GeoJSONFC, type RentHeatmap } from "@/lib/api";
+import { getBuildingVacancy, getRentHeatmap, listDistricts, recommendIndustry, type DistrictSummary, type GeoJSONFC, type IndustryRecommend, type RentHeatmap } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
 import "@/styles/tokens.css";
 import "./MapShell.css";
@@ -117,6 +117,7 @@ export default function MapShell() {
   const [rentHm, setRentHm] = useState<RentHeatmap | null>(null);
   const [src, setSrc] = useState<"api" | "local">("local");
   const [selected, setSelected] = useState<Building | null>(null);
+  const [rec, setRec] = useState<IndustryRecommend | null>(null);
   const [q, setQ] = useState("");
   const [hour, setHour] = useState(18);
   const [twinOpen, setTwinOpen] = useState(false);
@@ -161,6 +162,25 @@ export default function MapShell() {
       .catch(() => { if (alive) setRentHm(null); });
     return () => { alive = false; };
   }, [districtId]);
+
+  // 선택 건물의 GNN 업종 추천 (Platform 5-2)
+  // 그래프 노드는 카카오 점포 자리라 건물 대장 키와 join 되지 않는다 → **좌표**로 묻는다.
+  // src === "local" 은 백엔드 미기동 폴백이라 샘플 좌표다. 그걸로 추천을 물으면
+  // 실제와 무관한 답이 붙으므로 아예 건너뛴다.
+  useEffect(() => {
+    if (!selected || src !== "api") { setRec(null); return; }
+    let alive = true;
+    setRec(null);
+    recommendIndustry({
+      district_id: districtId,
+      lat: selected.center.lat,
+      lon: selected.center.lng,   // 백엔드 필드명은 lon 이다
+      building_id: selected.id,
+    })
+      .then((r) => { if (alive) setRec(r); })
+      .catch(() => { if (alive) setRec(null); });  // 404 = 400m 안에 노드 없음
+    return () => { alive = false; };
+  }, [selected, districtId, src]);
 
   // 거점이 바뀌면 지도도 그 거점으로 옮긴다
   useEffect(() => {
@@ -331,6 +351,31 @@ export default function MapShell() {
             <div className="row"><span>상태</span><span>{STATUS[selected.status].label}</span></div>
             <div className="row"><span>상가 수용 / 영업</span><span>{selected.capacity}호 / {selected.active}호</span></div>
             <div className="row"><span>대표 업종</span><span>{selected.industry}</span></div>
+
+            {/* GNN 업종 추천 — 스텁(Gold 미적재)·빈 추천은 그리지 않는다.
+                합성값을 실측처럼 보이게 하지 않는 vacancy_source 규칙과 같은 원칙이다. */}
+            {rec && rec.model !== "gnn-stub" && rec.recommendations.length > 0 && (
+              <div className="b-rec">
+                <div className="b-rec-h">
+                  이 자리 업종 추천<span className="b-rec-badge">GNN</span>
+                </div>
+                {rec.recommendations.map((r) => (
+                  <div className="row" key={r.industry}>
+                    <span>{r.industry}</span>
+                    <span>{Math.round(r.score * 100)}%</span>
+                  </div>
+                ))}
+                <div className="b-rec-note">
+                  {rec.scope === "node"
+                    ? `가장 가까운 점포 자리 기준 · ${Math.round(rec.matched_distance_m ?? 0)}m`
+                    : "거점 평균 — 이 건물 근처에 그래프 노드가 없다"}
+                  {typeof rec.metrics?.lift_vs_district_prior_pct === "number" && (
+                    <> · 거점 평균 대비 <b>+{rec.metrics.lift_vs_district_prior_pct}%</b></>
+                  )}
+                </div>
+              </div>
+            )}
+
             <button className="b-twin" onClick={() => setTwinOpen(true)}>3D 디지털 트윈 보기</button>
           </div>
         )}

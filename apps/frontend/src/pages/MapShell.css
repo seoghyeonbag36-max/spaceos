@@ -137,6 +137,25 @@
 .mapshell .b-detail .row { display: flex; justify-content: space-between; font-size: 12px; margin-top: 6px; }
 .mapshell .b-detail .row span:first-child { color: var(--muted, #6b7280); }
 .mapshell .b-detail .row span:last-child { font-weight: 700; }
+/* GNN 업종 추천 블록 — 실측 공실 수치와 시각적으로 구분한다(추천은 모델 산출물이다) */
+.mapshell .b-rec {
+  margin-top: 12px; padding-top: 10px;
+  border-top: 1px dashed var(--line, #e3e9f2);
+}
+.mapshell .b-rec-h {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 700; color: var(--ink, #1c2533);
+}
+.mapshell .b-rec-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: .3px;
+  padding: 1px 6px; border-radius: 999px;
+  background: var(--brand-soft, #e6f7f9); color: var(--brand-pressed, #0b8294);
+}
+/* 성능을 정직하게 — Top-3 만 보면 과대평가된다(베이스라인 0.89, lift +3.1%) */
+.mapshell .b-rec-note {
+  margin-top: 8px; font-size: 11px; line-height: 1.5;
+  color: var(--muted, #6b7280);
+}
 .mapshell .b-twin {
   margin-top: 12px; width: 100%; height: 36px; border: 0; border-radius: 9px;
   background: var(--ink, #1c2533); color: #fff; font-weight: 700; font-size: 13px;
