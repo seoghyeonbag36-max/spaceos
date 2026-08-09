@@ -15,7 +15,7 @@ D1 프로브(2026-07-07)로 확정된 실측 필드 기준. 구 BldRgstService_v
     → apps/backend/app/services/building_vacancy.py 의 _GAROSU 더미 대체 소스
 
 쿼터: 건축HUB 일 10,000콜 — **오퍼레이션별로 따로** 걸린다(전유부/표제부/층별개요).
-      지번당 전유부 1콜(집합건물은 100행마다 1콜 추가) + 전유 호가 없을 때만 표제부 1콜.
+      지번당 전유부 1~3콜(_EXPOS_FULL_MAX) + 전유 호가 없을 때만 표제부 1콜.
       19거점 실측으로 거점당 전유부 1,279콜 · 표제부 861콜 → 전유부가 병목이다.
       쿼터를 어디에 쓰고 있는지·왜 지금 구조인지: docs/finding-expos-quota-2026-08-09.md
       LIMIT_BUILDINGS 환경변수로 스모크 테스트 가능 (예: LIMIT_BUILDINGS=8).
@@ -347,10 +347,33 @@ def _items(data: dict | None) -> list[dict]:
 # 페이징은 totalCount 까지만 돌므로 일반 건물(대부분 1페이지)의 콜 수는 늘지 않는다.
 _MAX_EXPOS_PAGES = 80
 
+# 전량 페이징할 totalCount 상한. 이를 넘는 지번은 첫 3페이지만 받고 끊는다.
+#
 # numOfRows 로는 콜을 못 줄인다 — 2026-08-09 프로브: 서버가 100 에서 하드캡한다
 # (요청 10→10행, 99→99, 101→100, 1000→100, 20000→100). 줄일 수 있는 건 페이지 수뿐.
-# 페이지 수를 끊는 안은 같은 날 검토 후 **채택하지 않았다** — 근거는
-# docs/finding-expos-quota-2026-08-09.md (이득 1일 vs 대형 집합건물 516동 표시값 훼손).
+#
+# 왜 끊어도 되는가 — 전유부로 얻은 capacity 는 **대표 집계에 처음부터 쓰이지 않는다.**
+# apps/backend/app/services/gold_vacancy.py 의 _COUNTED_METHODS 는 {"floor_ouln"} 뿐이고
+# capacity_method == "expos_units"(집합건물)는 통째로 뺀다 — 집합상가 **내부** 점포가 그
+# 건물 bdMgtSn 으로 귀속되지 않아 분자가 구조적으로 비기 때문이다. 즉 여기 쓰는 콜은
+# 지도 개별 표시용이지 지표용이 아니다.
+#
+# 판정이 뒤집히지는 않는가 — 300행 초과인데 상업 전유 호가 0인 지번 35개를 전수 확인했다:
+# 공동주택 26 · 공장 1(→ non_commercial) · 업무시설 8(오피스텔 → floor_approx). 셋 다
+# _COUNTED_METHODS 밖이라 **대표 지표 변화 0**. 오피스텔은 애초에 상가 임차 단위가
+# 아니라(§1-2 NON_CAPACITY_PURPS) 빠지는 게 맞다.
+#
+# 값은 2026-08-09 dongdaemun 실측으로 정했다. 코퍼스 평균은 1.37콜/지번이라 캡의 이득이
+# 작아 한 번 기각했는데, **거점 편차가 결정적이었다** — dongdaemun 은 13.86콜/지번으로
+# 한 거점에 3.5일치 쿼터(약 34,600콜)를 요구한다. 전유부 40,854행·18,502행짜리 대형
+# 집합상가가 80페이지씩 먹기 때문이다. T=300 이면 같은 거점이 약 3,900콜(0.4일)이 된다.
+#
+# 대가: 이 지번들의 capacity 가 부분 실측이 된다(지도 표시값). 그리고 **캡 이전에 수집한
+# 거점과 규칙이 다르다** — 배치1·2 와 배치3 앞 5거점(gangnam·hapjeong·mangwon·samcheong
+# ·gwangjang)은 전량 수집분이다. 집합건물 capacity 를 거점 간에 비교하지 말 것.
+# 층·호 단위 매칭이 붙어 집합건물을 집계에 넣게 되면 refetch_truncated_expos
+# --include-capped 로 재수집한다. 경위: docs/finding-expos-quota-2026-08-09.md
+_EXPOS_FULL_MAX = 300
 
 
 def expos_units(rows: list[dict]) -> set[tuple[str, str, str]]:
@@ -387,6 +410,7 @@ def fetch_capacity(key: str, jibun: dict, raw_store: dict) -> tuple[int | None, 
     rows: list[dict] = []
     page, total = 1, None
     throttled = False
+    capped = False
     while page <= _MAX_EXPOS_PAGES:
         expos = _get_json(f"{BASE_BLD}/getBrExposPubuseAreaInfo", {**common, "pageNo": page})
         if expos is None and _LAST_RETRYABLE[0]:
@@ -396,10 +420,20 @@ def fetch_capacity(key: str, jibun: dict, raw_store: dict) -> tuple[int | None, 
         total = int(_body(expos).get("totalCount") or 0)
         if not got or len(rows) >= total:
             break
+        if total > _EXPOS_FULL_MAX and len(rows) >= _EXPOS_FULL_MAX:
+            # 대형 집합건물 — 여기서 끊는다(쿼터 보호). totalCount 가 첫 페이지에 실려
+            # 오므로 판정에 추가 콜이 들지 않는다.
+            capped = True
+            break
         page += 1
         time.sleep(_SLEEP)
     raw_store["expos"] = rows
     raw_store["expos_total"] = total
+    # 의도적 부분 수집 표시 — 서버 장애로 잘린 것(재수집 대상)과 구분해야 한다. 이 표시가
+    # 없으면 refetch_truncated_expos 가 expos_total > len(expos) 만 보고 전부 다시 받아
+    # 절감분을 그대로 되돌린다.
+    if capped:
+        raw_store["expos_capped"] = True
 
     # 상업 전유 호만 capacity 로 카운트 — 오피스텔·주택 호는 제외 (§1-2).
     # 전유부는 세부용도명이므로 NON_CAPACITY_PURPS negative 필터를 쓴다(위 주석 참조).

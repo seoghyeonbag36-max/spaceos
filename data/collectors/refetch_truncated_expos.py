@@ -13,7 +13,12 @@
   python -m data.collectors.refetch_truncated_expos seongsu seoulsup
   python -m data.pipelines.recalc_capacity seongsu seoulsup
 
-실행: python -m data.collectors.refetch_truncated_expos [slug ...] [--dry-run]
+실행: python -m data.collectors.refetch_truncated_expos [slug ...] [--dry-run] [--include-capped]
+
+2026-08-09: 수집기가 대형 지번(totalCount > _EXPOS_FULL_MAX)을 **일부러** 끊고
+`expos_capped` 를 남긴다(쿼터 보호 — dongdaemun 34,600 → 3,900콜). 그 지번은 기본
+대상에서 뺀다. 넣으면 절감분이 그대로 되돌아온다. 집합건물을 대표 집계에 넣게 될 때만
+--include-capped 로 연다.
 """
 from __future__ import annotations
 
@@ -39,11 +44,17 @@ except ImportError:  # pragma: no cover
     requests = None
 
 
-def truncated(raw_all: dict) -> list[str]:
-    """expos_total 보다 실제 저장 행이 적은 지번(lnoCd) 목록."""
+def truncated(raw_all: dict, include_capped: bool = False) -> list[str]:
+    """expos_total 보다 실제 저장 행이 적은 지번(lnoCd) 목록.
+
+    `expos_capped` 가 붙은 지번은 **의도적 부분 수집**이라 기본적으로 제외한다
+    (building_vacancy._EXPOS_FULL_MAX). 이걸 빼지 않으면 쿼터를 아끼려고 끊은 것을
+    이 스크립트가 그대로 되받는다.
+    """
     return [
         lno for lno, v in raw_all.items()
         if (v.get("expos_total") or 0) > len(v.get("expos") or [])
+        and (include_capped or not v.get("expos_capped"))
     ]
 
 
@@ -64,12 +75,12 @@ def fetch_all_expos(key: str, jibun: dict) -> tuple[list[dict], int]:
     return rows, total
 
 
-def run(key: str, slug: str, dry_run: bool) -> tuple[int, int]:
+def run(key: str, slug: str, dry_run: bool, include_capped: bool = False) -> tuple[int, int]:
     """거점 하나. 반환 (대상 건물 수, 복구된 건물 수)."""
     raw_all = load_latest(slug, "bldg_ledger_raw.json")
     if not raw_all:
         return 0, 0
-    targets = truncated(raw_all)
+    targets = truncated(raw_all, include_capped)
     if not targets:
         print(f"[refetch:{slug}] 절단 건물 없음")
         return 0, 0
@@ -105,6 +116,7 @@ def main() -> None:
     key = os.getenv("DATA_GO_KR_SERVICE_KEY")
     argv = sys.argv[1:]
     dry = "--dry-run" in argv
+    include_capped = "--include-capped" in argv
     if (not key or requests is None) and not dry:
         print("[refetch] DATA_GO_KR_SERVICE_KEY 미설정(또는 requests 없음) — 중단")
         return
@@ -115,7 +127,7 @@ def main() -> None:
         if slug not in HUBS:
             print(f"[refetch] 미등록 거점 '{slug}' — 건너뜀")
             continue
-        a, b = run(key or "", slug, dry)
+        a, b = run(key or "", slug, dry, include_capped)
         t += a
         f += b
     print(f"[refetch] 대상 {t}동 / 복구 {f}동"

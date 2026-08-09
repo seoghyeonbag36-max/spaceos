@@ -109,3 +109,68 @@ def test_rate_limited_is_retried_on_resume() -> None:
     """rate_limited 는 재개 시 '완료'로 치지 않아야 한다 — 재수집 경로의 마지막 고리."""
     assert "rate_limited" in bv._RETRY_METHODS
     assert "no_ledger" not in bv._RETRY_METHODS       # 이건 사실이므로 다시 묻지 않는다
+
+
+# ── 3. 전유부 페이지 캡 (2026-08-09) ────────────────────────────────────
+
+def _patch_expos_pages(monkeypatch, total: int, *, commercial_from: int = 0):
+    """전유부가 total 행을 100행/페이지로 돌려주는 대역. 호출된 페이지를 기록한다."""
+    pages: list[int] = []
+
+    def fake(url: str, params: dict):
+        if bv.EP_EXPOS not in url:
+            bv._LAST_RETRYABLE[0] = False
+            return {"response": {"body": {"items": {"item": []}, "totalCount": 0}}}
+        page = int(params["pageNo"])
+        pages.append(page)
+        start = (page - 1) * 100
+        item = [
+            {"exposPubuseGbCdNm": "전유", "mainPurpsCdNm": "소매점",
+             "dongNm": "", "hoNm": str(i), "flrNoNm": "1"}
+            for i in range(start, min(start + 100, total)) if i >= commercial_from
+        ]
+        bv._LAST_RETRYABLE[0] = False
+        return {"response": {"body": {"items": {"item": item}, "totalCount": total}}}
+
+    monkeypatch.setattr(bv, "_get_json", fake)
+    monkeypatch.setattr(bv, "_SLEEP", 0)
+    return pages
+
+
+def test_large_expos_is_capped(monkeypatch) -> None:
+    """대형 집합건물은 _EXPOS_FULL_MAX 에서 끊긴다 — 쿼터가 여기로 새면 거점 하나가
+    하루 쿼터의 3.5배를 먹는다(2026-08-09 dongdaemun 40,854행 실측)."""
+    pages = _patch_expos_pages(monkeypatch, 12418)
+    raw: dict = {}
+    capacity, method = bv.fetch_capacity("KEY", {"sigunguCd": "11680"}, raw)
+
+    assert len(pages) == bv._EXPOS_FULL_MAX // 100, f"{len(pages)}페이지나 돌았다"
+    assert raw["expos_capped"] is True          # refetch 가 되받지 않게 하는 표시
+    assert raw["expos_total"] == 12418          # 원본 규모는 남긴다
+    assert method == "expos_units"              # 집합건물 판정은 유지 — 집계 제외 근거
+    assert capacity == bv._EXPOS_FULL_MAX
+
+
+def test_small_expos_is_not_capped(monkeypatch) -> None:
+    """상한 이하 건물은 종전대로 전량 수집한다 — 캡이 일반 건물까지 자르면 안 된다."""
+    pages = _patch_expos_pages(monkeypatch, 250)
+    raw: dict = {}
+    capacity, method = bv.fetch_capacity("KEY", {"sigunguCd": "11680"}, raw)
+
+    assert len(pages) == 3
+    assert "expos_capped" not in raw
+    assert method == "expos_units"
+    assert capacity == 250
+
+
+def test_capped_jibun_is_excluded_from_refetch() -> None:
+    """의도적 부분 수집은 refetch 대상에서 빠진다 — 안 그러면 절감분이 되돌아온다."""
+    from data.collectors.refetch_truncated_expos import truncated
+
+    raw = {
+        "capped": {"expos_total": 5000, "expos": [1] * 300, "expos_capped": True},
+        "broken": {"expos_total": 900, "expos": [1] * 200},   # 서버 장애로 잘린 것
+        "whole": {"expos_total": 50, "expos": [1] * 50},
+    }
+    assert truncated(raw) == ["broken"]
+    assert truncated(raw, include_capped=True) == ["capped", "broken"]
