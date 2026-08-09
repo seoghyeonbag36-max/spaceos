@@ -14,7 +14,10 @@ D1 프로브(2026-07-07)로 확정된 실측 필드 기준. 구 BldRgstService_v
   gold/{SLUG}/building_vacancy.json           건물별 occupancy/vacancy/status
     → apps/backend/app/services/building_vacancy.py 의 _GAROSU 더미 대체 소스
 
-쿼터: 건축HUB 일 1,000건 가정 — 건물당 전유부 1콜(+일반건물만 표제부 1콜).
+쿼터: 건축HUB 일 10,000콜 — **오퍼레이션별로 따로** 걸린다(전유부/표제부/층별개요).
+      지번당 전유부 1콜(집합건물은 100행마다 1콜 추가) + 전유 호가 없을 때만 표제부 1콜.
+      19거점 실측으로 거점당 전유부 1,279콜 · 표제부 861콜 → 전유부가 병목이다.
+      쿼터를 어디에 쓰고 있는지·왜 지금 구조인지: docs/finding-expos-quota-2026-08-09.md
       LIMIT_BUILDINGS 환경변수로 스모크 테스트 가능 (예: LIMIT_BUILDINGS=8).
 
 다거점: config/page_hubs.py HUBS 를 순회한다. 점포(sdsc2)·폴리곤(V-World)은 쿼터가
@@ -344,6 +347,11 @@ def _items(data: dict | None) -> list[dict]:
 # 페이징은 totalCount 까지만 돌므로 일반 건물(대부분 1페이지)의 콜 수는 늘지 않는다.
 _MAX_EXPOS_PAGES = 80
 
+# numOfRows 로는 콜을 못 줄인다 — 2026-08-09 프로브: 서버가 100 에서 하드캡한다
+# (요청 10→10행, 99→99, 101→100, 1000→100, 20000→100). 줄일 수 있는 건 페이지 수뿐.
+# 페이지 수를 끊는 안은 같은 날 검토 후 **채택하지 않았다** — 근거는
+# docs/finding-expos-quota-2026-08-09.md (이득 1일 vs 대형 집합건물 516동 표시값 훼손).
+
 
 def expos_units(rows: list[dict]) -> set[tuple[str, str, str]]:
     """전유부 응답 → 상업 전유 호 집합 (동/호/층 튜플).
@@ -375,6 +383,7 @@ def fetch_capacity(key: str, jibun: dict, raw_store: dict) -> tuple[int | None, 
     common = {"serviceKey": key, "_type": "json", "numOfRows": 100, **jibun}
 
     # 전유공용면적 — 서버가 페이지당 100행 반환 → totalCount 까지 페이징
+    # (numOfRows 를 키워도 100 에서 잘린다 — _MAX_EXPOS_PAGES 위 주석 참조)
     rows: list[dict] = []
     page, total = 1, None
     throttled = False
