@@ -10,7 +10,7 @@
 | P | 위치 | 상태 | 남은 것 |
 |---|---|---|---|
 | **Page** | Phase 1·4 (수집으로 재진입) | 파이프라인 완성, 거점 확장 중 | Tier1 22/54 · 히트맵 4종 중 2종 · 건축HUB 쿼터가 병목 |
-| **Platform** | Phase 5 | 모델 둘 다 학습·서빙 완료 | **GNN 추천이 프론트에 미배선** |
+| **Platform** | Phase 5 | 모델 둘 다 학습·서빙·**배선 완료**(08-09) | 피처 빈약 — lift +3.1% 개선 |
 | **Posting** | Phase 6-1 | 항상 폴백, 입력 절반 실데이터 | 실유닛 배선이 `prem`·`foot`·`rec` 근거 부재로 정지 |
 | **Program** | Phase 6-2 (가장 앞섬) | 실호출·화면·HA검증 완결 | 감성(수집 막힘) · 현 기본모델 재검증 |
 
@@ -187,7 +187,7 @@ API 는 `anchor_pct` / `anchor_gap_pp` 로 이 대조를 함께 내려보낸다.
 | # | 단계 | 학습·산출 | API | 프론트 | 대상 | 명령 |
 |---|---|---|---|---|---|---|
 | 5-1 | LSTM 공실 예측 | ✅ `gold/platform_vacancy_forecast.json` | ✅ `POST /ai/predict-vacancy` | ✅ 거점 카드 | `ml/models/lstm/vacancy_lstm.py` | `/ml-train` |
-| 5-2 | GNN 업종 추천 | ✅ `gold/platform_industry_recommend.json` (54거점 · 8.4MB) | ✅ `POST /ai/recommend-industry` | **❌ 미배선** | `ml/models/gnn/industry_gnn.py` | `/platform` |
+| 5-2 | GNN 업종 추천 | ✅ `gold/platform_industry_recommend.json` (54거점 · 8.4MB) | ✅ `POST /ai/recommend-industry` | ✅ **2026-08-09** MapShell 건물 패널 | `ml/models/gnn/industry_gnn.py` | `/platform` |
 
 **5-2 는 학습·서빙이 끝났는데 사용자에게 보이지 않는다.** 프론트 전체에
 `recommend-industry` 호출이 0건이다. `feat/gnn-track` 은 main 에 머지돼 있다.
@@ -397,7 +397,7 @@ jangan·kyunghee `수원`). 불용어(`후기`·`추천`·`좋은`)와 인명(ch
 
 | # | 작업 | 트랙 | 비용 | 진입 |
 |---|---|---|---|---|
-| 1 | **GNN 업종추천 프론트 배선** | Platform | 반나절 | `/platform` |
+| ~~1~~ | ~~GNN 업종추천 프론트 배선~~ → **완료 2026-08-09** | Platform | — | — |
 | 2 | **`rec` 추천 기준 정의 + 배선** | Posting | 반나절 | `/posting` |
 | 3 | 유동 레이어(4-2)·시간 슬라이더(4-4) | Page | 각 1일 | `/page` |
 
