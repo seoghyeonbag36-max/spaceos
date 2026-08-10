@@ -11,7 +11,15 @@
 
 산출: building_vacancy.json 의 capacity/capacity_method("floor_ouln") 갱신
       + bronze/{SLUG}/{날짜}/bldg_flr_raw.json
-실행: python -m data.collectors.floor_capacity
+
+실행: python -m data.collectors.floor_capacity <slug ...> [--only-approx]
+  거점을 **반드시 명시한다** — 비우면 garosugil 로 폴백한다(경고를 찍는다).
+  --only-approx : 이미 floor_ouln 인 건물의 재수집을 끄고 floor_approx 만 받는다.
+                  Tier1 거점의 소량 잔여를 회수할 때 쓴다(§run 주석의 46콜/동 참조).
+
+중단됐다면 **--only-approx 로 재개한다.** 150동마다 부분 저장하고 저장된 건물은
+capacity_method 가 floor_ouln 으로 바뀌므로, 이 플래그가 곧 "완료분 건너뛰기"가 된다.
+플래그 없이 재실행하면 이미 받은 것까지 다시 부른다.
 """
 from __future__ import annotations
 
@@ -80,7 +88,26 @@ def capacity_floors(com_nos: set[int], store_nos: set[int], grnd_flr: int = 0) -
     return com_nos | {f for f in store_nos if 0 < f <= cap}
 
 
-def run(key: str, slug: str) -> None:
+_CHECKPOINT = 150   # 이 동수마다 부분 저장 — building_vacancy 와 같은 주기
+
+
+def _persist(slug: str, path, rows: list[dict], raw: dict[str, list]) -> None:
+    """진행분을 bronze·gold 에 쓴다. 중간에도, 끝에서도 같은 경로로 저장한다.
+
+    2026-08-10: 예전에는 거점 하나가 **다 끝나야** 썼다. dongdaemun 1,782동은 그게
+    22분짜리 무저장 구간이라, 그 사이 재부팅으로 1,450콜을 통째로 잃었다(실제로 잃었다).
+    쿼터가 하루 10,000 인 자원이라 이 구멍은 감당이 안 된다.
+
+    gold 를 먼저 임시파일에 쓰고 교체한다 — 저장 도중 죽어도 기존 파일이 남는다.
+    building_vacancy.json 에는 대장 수집 결과가 들어 있어 깨지면 손해가 크다.
+    """
+    save_json(raw, slug, "bldg_flr_raw.json")
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(path)
+
+
+def run(key: str, slug: str, only_approx: bool = False) -> None:
     path = GOLD / slug / "building_vacancy.json"
     if not path.exists():
         print(f"[flr-cap:{slug}] building_vacancy.json 없음 — 건너뜀")
@@ -88,8 +115,17 @@ def run(key: str, slug: str) -> None:
     rows = json.loads(path.read_text(encoding="utf-8"))
     # floor_ouln 도 대상에 넣는다 — 2026-07-19 수집분은 pageNo 누락으로 층 1개만 받아
     # 산출된 아티팩트라 재수집 대상이다(공실률이 0%/50% 두 값으로 고정돼 있었다).
-    targets = [r for r in rows if r.get("capacity_method") in ("floor_approx", "floor_ouln")]
-    print(f"[flr-cap:{slug}] 대상 {len(targets)}동 (floor_approx + 기존 floor_ouln 재수집)")
+    #
+    # 2026-08-10: 그 재수집이 이제는 대부분 낭비다. pageNo 는 07-26 에 고쳤고 Tier1
+    # 거점은 08-01 에 재수집을 끝냈으므로, 남은 floor_approx 를 마저 받으려고 멀쩡한
+    # floor_ouln 을 통째로 다시 부르게 된다 — 21거점 실측으로 263동 회수에 12,108콜
+    # (동당 46콜)이다. 일일 쿼터가 10,000 인 상황에서 감당할 수 없다.
+    # --only-approx 는 그 조항만 끈다. 기본값은 바꾸지 않는다 — 07-19 이전 산출물이
+    # 남아 있을 수 있는 거점에서 조용히 낡은 값을 남기는 쪽이 더 나쁘다.
+    wanted = ("floor_approx",) if only_approx else ("floor_approx", "floor_ouln")
+    targets = [r for r in rows if r.get("capacity_method") in wanted]
+    label = "floor_approx 만" if only_approx else "floor_approx + 기존 floor_ouln 재수집"
+    print(f"[flr-cap:{slug}] 대상 {len(targets)}동 ({label})")
 
     raw: dict[str, list] = {}
     updated = failed = skipped = 0
@@ -138,10 +174,12 @@ def run(key: str, slug: str) -> None:
         if i % 50 == 0 or i == len(targets):
             print(f"[{_ts()}] [flr-cap:{slug}] {i}/{len(targets)}동 "
                   f"(갱신 {updated}, 상업층0 유지 {skipped}, 응답없음 {failed})")
+        if updated and i % _CHECKPOINT == 0:
+            _persist(slug, path, rows, raw)
+            print(f"[flr-cap:{slug}] 체크포인트 저장 — {i}/{len(targets)}동까지")
         time.sleep(_SLEEP)
 
-    save_json(raw, slug, "bldg_flr_raw.json")
-    path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    _persist(slug, path, rows, raw)
     cm = Counter(r.get("capacity_method") for r in rows)
     print(f"[flr-cap:{slug}] building_vacancy.json 갱신 — capacity_method: {dict(cm)}")
 
@@ -152,12 +190,20 @@ def main() -> None:
     if not key:
         print("[flr-cap] DATA_GO_KR_SERVICE_KEY 미설정 — 건너뜀")
         return
-    slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or ["garosugil"]
+    argv = sys.argv[1:]
+    only_approx = "--only-approx" in argv
+    slugs = [a for a in argv if not a.startswith("-")]
+    if not slugs:
+        # 조용히 garosugil 로 떨어지면 안 된다 — 다른 거점을 받으려고 실행한 사람이
+        # 로그를 안 보면 하루치 쿼터를 엉뚱한 데 쓴 걸 모른다(2026-08-10).
+        slugs = ["garosugil"]
+        print("[flr-cap] ⚠ 거점 미지정 — garosugil 로 폴백합니다. "
+              "의도한 게 아니면 지금 중단하고 거점을 명시하십시오.")
     for s in slugs:
         if s not in HUBS:
             print(f"[flr-cap] 미등록 거점 '{s}' — 건너뜀")
             continue
-        run(key, s)
+        run(key, s, only_approx)
 
 
 if __name__ == "__main__":
