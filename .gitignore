@@ -14,6 +14,8 @@ mlruns/
 /pyproject.toml
 /uv.lock
 .vercel/
+# CLI 가 설치해 두는 패키지 사본(1,612파일 19MB) — sys.path 에 없어 런타임과 무관하다
+.vercel_python_packages/
 
 # Node
 node_modules/

@@ -69,3 +69,5 @@ node_modules
 /pyproject.toml
 /uv.lock
 /.vercel
+# 패키지 사본 19MB — 함수는 requirements.txt 로 따로 설치하므로 올릴 이유가 없다
+/.vercel_python_packages
