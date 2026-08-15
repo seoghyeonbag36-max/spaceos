@@ -23,6 +23,7 @@ node_modules
 #       예전 코드가 프로덕션에서 항상 실패했다(2026-08-06). 서빙 산출물은 표준
 #       라이브러리로 읽히는 포맷만 쓴다.
 #   gold_vacancy.py   → {거점}/page_building_master.geojson (건물 폴리곤)
+#   gold_vacancy.py   → {거점}/calibration.json  (R-ONE 앵커 — 빠지면 anchor_pct 가 None)
 #   admin.py          → {거점}/coverage.json
 !/data/gold/platform_posting_inputs.json
 !/data/gold/platform_events.json
@@ -35,6 +36,7 @@ node_modules
 !/data/gold/*/page_building_master.geojson
 !/data/gold/*/coverage.json
 !/data/gold/*/building_history.json
+!/data/gold/*/calibration.json
 # 가로수길 PoC 는 중간 산출물까지 통째로 서빙한다(~0.8MB)
 !/data/gold/garosugil/
 !/data/gold/garosugil/**

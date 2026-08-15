@@ -187,6 +187,9 @@ def test_runtime_gold_artifacts_are_not_gitignored():
         "*/page_building_master.geojson",
         "*/building_history.json",
         "*/coverage.json",
+        # 2026-08-15 추가 — gold_vacancy.anchor_of 가 읽는데 목록에 없어서, 앵커가
+        # 프로덕션에서 garosugil 말고는 전부 None 이던 것을 이 테스트가 놓쳤다.
+        "*/calibration.json",
     )
     artifacts = [
         path
