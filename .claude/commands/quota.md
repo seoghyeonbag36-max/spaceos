@@ -121,24 +121,44 @@ python -m data.analyze_anchor_population        # 앵커 대조
 `build_page_master` 가 `coverage.json` 의 `tier` 를 `Tier1(대장)` 로 올린다 —
 승격은 코드 변경이 아니라 산출물 갱신이다.
 
-그래서 **대장을 받아두고 파이프라인을 안 돌린 거점은 라벨만 낡아 있다.** 08-15 에 9거점이
+그래서 **대장을 받아두고 파이프라인을 안 돌린 거점은 산출물이 낡아 있다.** 08-15 에 9거점이
 그 상태였다(gangnam·dongdaemun·gwangjang·mangwon·konkuk·samcheong·hapjeong·jamsil·mullae —
 `coverage.json` 은 08-08, `building_vacancy.json` 은 08-09~15). 쿼터가 소진돼 더 받을 게
-없는 날에도 이 재실행은 할 수 있다. 찾는 법:
+없는 날에도 이 재실행은 할 수 있다.
+
+찾을 때 **`tier` 라벨로 거르지 말 것.** 낡음은 두 종류이고 라벨은 그중 하나만 드러낸다:
+
+1. 라벨이 `Tier2` 로 남은 거점 — 눈에 보인다
+2. **이미 `Tier1` 이라 라벨로는 멀쩡해 보이고 숫자만 낡은 거점** — 08-15 `nambu` 가 그랬다.
+   대장 506동이 16:12 에 채워졌는데 지도·커버리지는 08-08 자 그대로였다(공실률 68.0%,
+   실제 63.3%). tier 로 거르는 판정은 이걸 통째로 놓친다
+
+그래서 라벨이 아니라 **mtime 을 비교한다** — 대장이 산출물보다 새로우면 재실행 대상이다:
 
 ```
 python -c "
 import json,datetime; from pathlib import Path
 from data.config.page_hubs import HUBS
+f=lambda t: datetime.datetime.fromtimestamp(t).strftime('%m-%d %H:%M')
+stale=[]
 for s in HUBS:
-    v=Path('data/gold')/s/'building_vacancy.json'; c=Path('data/gold')/s/'coverage.json'
-    if not (v.exists() and c.exists()): continue
-    d=json.loads(c.read_text(encoding='utf-8'))
-    if d.get('tier','').startswith('Tier1'): continue
+    d=Path('data/gold')/s
+    v,g,c=d/'building_vacancy.json',d/'page_building_master.geojson',d/'coverage.json'
+    if not v.exists(): continue
     n=len(json.loads(v.read_text(encoding='utf-8')))
-    if n: print(f'{s:<14}{n:>5}동  coverage {d.get(\"built_at\")}')
+    if not n: continue                    # 0동 = 미수집. 돌려도 올릴 게 없다(쿼터 대기)
+    vm=v.stat().st_mtime
+    gm=g.stat().st_mtime if g.exists() else 0
+    cm=c.stat().st_mtime if c.exists() else 0
+    if gm<vm or cm<vm:
+        stale.append(s); print(f'{s:<14}{n:>5}동  대장 {f(vm)} > 산출물 {f(gm) if gm else \"없음\"}')
+print('재실행 대상:', ' '.join(stale) or '없음')
 "
 ```
+
+`floor_capacity` 도 `building_vacancy.json` 을 제자리 갱신하므로, **층별개요를 받은 날은
+그 거점도 여기 걸린다** — 층별개요 뒤에 파이프라인을 안 돌리면 받아온 `floor_ouln` 이
+서빙되는 숫자에 반영되지 않는다.
 
 앵커 대조 시 **두 숫자를 섞어 읽지 말 것**: 파이프라인이 찍는 "대표 집계 공실률"은
 `expos_units`(집합건물)를 포함해 60%대로 뜨지만, 백엔드가 서빙하는 값은 `floor_ouln` 만

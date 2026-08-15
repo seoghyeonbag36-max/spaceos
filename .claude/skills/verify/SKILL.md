@@ -111,12 +111,16 @@ curl.exe -s "http://localhost:5173/api/v1/heatmap/buildings?district=gangnam-gar
 앵커는 **거점별 R-ONE 중대형상가 공실률**이다(`calibration.json.anchor_pct`,
 garosugil = 17.6%). 예전에 쓰던 공통 41.6% 는 부동산원 통계가 아니라 가로수길 가두
 1층 실태조사(2024) 값을 잘못 표기한 것이라 2026-07-28 폐기했다.
-API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — 13거점 격차는
--4.0 ~ +21.5%p 다. 모집단이 달라(우리는 호실·전수, R-ONE 은 면적·표본) 격차 0 은 목표가 아니다.
+API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — 실측 40거점 중 **앵커를 가진
+22거점**의 격차는 **-7.3 ~ +21.1%p** 다(2026-08-15 `services/districts.cells_for` 실측.
+최소 garak -7.3 / 최대 ikseon +21.1). 나머지 18거점은 `calibration.json` 이 없어 대조 자체가
+안 된다 — 격차가 0 이라는 뜻이 아니다. 모집단이 달라(우리는 호실·전수, R-ONE 은 면적·표본)
+격차 0 은 목표가 아니다.
 
 ## 지도 뷰(MapShell) 검증
 
-App.tsx 네비 **"지도"** 탭이 진입점이다(2026-08-01 연결). 거점 선택은 실측 13거점만 나온다.
+App.tsx 네비 **"지도"** 탭이 진입점이다(2026-08-01 연결). 거점 선택은 실측 거점만 나온다
+(2026-08-15 기준 40곳 — 대장 미수집 14곳은 목록에 없다).
 
 ```python
 pg.get_by_role('button', name='지도').click()
@@ -124,6 +128,6 @@ pg.wait_for_timeout(7000)          # 네이버 SDK + 폴리곤 렌더까지 넉�
 pg.locator('.hub-select').select_option('hongdae')
 ```
 
-- `.hub-select` 옵션 수 = `vacancy_source === "gold"` 인 거점 수(현재 13)
+- `.hub-select` 옵션 수 = `vacancy_source === "gold"` 인 거점 수(2026-08-15 현재 40)
 - `.b-item` 수 = 그 거점 건물 수(가로수길 836, 홍대 1,329) — 0 이면 API 404 폴백을 탄 것
 - `.map-canvas` 의 높이가 0 이 아닌지 반드시 확인(위 함정 참조)

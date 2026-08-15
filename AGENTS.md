@@ -30,7 +30,7 @@ Platform(상권 AI 추천) · Page(공실 히트맵·3D 트윈) · Posting(입�
 ### 출처 표기는 응답 계약이다
 합성값·시드값은 반드시 그렇다고 밝힌다. 프론트가 이 필드로 배지를 그린다.
 
-- `vacancy_source`: `"gold"`(실측) / `"synthetic"`(합성) — 54거점 중 13곳만 실측
+- `vacancy_source`: `"gold"`(실측) / `"synthetic"`(합성) — 54거점 중 40곳 실측(2026-08-15)
 - `inputs_source`: 필드별 `"rone"` / `"flpop+seed"` / `"seed"`
 - 더미 데이터에는 `TODO` 주석으로 실제 연동 지점을 명시한다
 
@@ -85,6 +85,10 @@ $env:SPACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v
 - **Gold 산출물 배포 누락**: 런타임에 읽는 Gold 파일은 `.gitignore` 예외에 넣어야 한다.
   안 넣으면 로컬은 되고 **프로덕션만 조용히 폴백**한다. 확인은 출력이 아니라 **종료코드**로:
   `git check-ignore <path>; echo $?` → `0` 이면 무시되는 중(= 배포 안 됨)
+  단 `check-ignore` 는 **이미 추적 중인 파일을 무시 대상으로 보고하지 않는다.** 그래서 이
+  종료코드는 "지금 배포되는가"에는 맞지만 **"규칙이 실제로 적용되는가"에는 답하지 않는다.**
+  규칙 자체를 검증할 때는 `--no-index` 를 붙인다 — 이 차이가 `.gitignore` 의 garosugil
+  전체 예외가 `data/gold/*/*` 에 덮여 죽은 것을 2026-08-15 까지 가렸다
 - **대장 수집은 AC 전원 필수**: 배터리 구동 시 약 7배 느려지고 덮개를 닫으면 절전으로 멈춘다
 - **pytest가 트레이스백 없이 죽으면** 코드 문제가 아니라 메모리(OpenBLAS 할당 실패)다
 

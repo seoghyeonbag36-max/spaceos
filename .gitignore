@@ -24,8 +24,15 @@ data/gold/*
 !data/gold/.gitkeep
 *.parquet
 *.glb
-# 예외: 가로수길 gold 실데이터 (~0.8MB) — Vercel git 배포에서 서빙하므로 추적.
-# *.parquet 전역 제외보다 뒤에 있어야 parquet 재포함이 유효하다.
+# 가로수길 gold 실데이터(~0.8MB) 전체 예외 — **지금은 실효가 없다(2026-08-15 확인).**
+# 뒤따르는 43번 `data/gold/*/*` 가 마지막 매치 우선 규칙으로 이 두 줄을 덮는다.
+#   git check-ignore -v --no-index data/gold/garosugil/building_vacancy.json
+#   → .gitignore:43:data/gold/*/*
+# 지금 추적 중인 8개 파일(building_vacancy.json·parquet 2개 포함)이 git 에 남아 있는 것은
+# 이 예외가 살아서가 아니라 **이미 추적 중인 파일에는 gitignore 가 적용되지 않기 때문**이다.
+# 그래서 이 디렉터리에 새로 생기는 산출물은 조용히 빠진다(calibration.json·vacant_units.json
+# 이 그 상태). 넣으려면 `git add -f` 하거나, 예외를 되살리려면 이 두 줄을 43번 **뒤로**
+# 옮긴다 — .vercelignore 39~40 줄이 정확히 그렇게 배치돼 있다(거기서는 유효하다).
 !data/gold/garosugil/
 !data/gold/garosugil/**
 # 예외: Platform LSTM 분기 예측(수 KB) — 백엔드 predict-vacancy 가 정적 서빙.

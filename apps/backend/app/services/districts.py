@@ -1,10 +1,16 @@
 """거점(commercial district) 도메인 서비스.
 
 공실 집계의 입력은 **Gold 실데이터 우선**이다 (2026-08-01 배선 교체).
-- Gold 보유 거점(data/gold/{slug}/page_building_master.geojson — 13곳): 실측 건물을
-  100m 셀로 집계 (services/gold_vacancy). 응답의 `vacancy_source == "gold"`.
-- 미보유 거점(41곳): 기존 `build_cells()` 합성 그리드로 폴백. `vacancy_source == "synthetic"`.
-  → 해당 거점의 Gold 를 만들면(data/pipelines/build_page_master.py) 자동으로 실데이터로 바뀐다.
+- 실측 거점(40곳 — 2026-08-15 실측): 실측 건물을 100m 셀로 집계 (services/gold_vacancy).
+  응답의 `vacancy_source == "gold"`.
+- 나머지 14곳: 기존 `build_cells()` 합성 그리드로 폴백. `vacancy_source == "synthetic"`.
+  → 해당 거점의 대장을 받아 파이프라인을 돌리면 자동으로 실데이터로 바뀐다.
+
+갈림길은 **파일 존재가 아니다.** `page_building_master.geojson` 은 이제 54거점 전부에 있다
+(대장 없는 거점도 폴리곤 근사로 만든다 — Tier2). `gold_vacancy.build_cells()` 가 셀을 만들려면
+`_COUNTED_METHODS = {"floor_ouln"}` 인 건물이 있어야 하므로, 실질 조건은 **층별개요까지 받았는가**
+다. 파일 존재를 실측의 대리지표로 쓰면 Tier2 거점을 실측으로 오분류한다(13거점 시절엔 둘이
+일치해서 성립했던 가정).
 
 아직 시드(app/data/seoul_pages.py)에 남아 있는 것: 감성 zones·입점 units·행사 events.
 TODO: 감성은 리뷰 감성분석, units 의 rent/prem 은 R-ONE 조인으로 교체.

@@ -91,6 +91,12 @@ curl.exe -s https://<프로젝트>.vercel.app/api/v1/commercial-districts   # 33
 
 - `data/gold/garosugil/` 은 포함(2026-07-19, ~0.8MB) → `/api/v1/heatmap/buildings` 가 실데이터 응답.
   그 외 `data/` 는 미포함. git 자동 배포는 **GitHub 저장소 기준**이므로 `.vercelignore` 예외만으로는
-  부족하고 `.gitignore` 에도 `!data/gold/garosugil/**` 예외가 있어야 한다 (둘 다 적용됨, 2026-07-19).
+  부족하고 파일이 실제로 git 에 들어 있어야 한다.
+  ⚠ **2026-08-15 정정** — "`.gitignore` 에도 예외가 있어 둘 다 적용됨" 이라고 적어 뒀던 것은 틀렸다.
+  `.gitignore` 의 `!data/gold/garosugil/**`(29~30줄)은 뒤따르는 `data/gold/*/*`(43줄)에 덮여
+  **실효가 없다**(`git check-ignore --no-index` 로 확인). 지금 8개 파일이 배포되는 것은 규칙이
+  살아서가 아니라 **이미 추적 중이라 gitignore 가 적용되지 않기 때문**이다. 결과가 같아 보여도
+  차이는 실재한다 — garosugil 에 **새 산출물을 추가하면 조용히 빠진다.** 넣을 때는 `git add -f`
+  로 확인하고, 커밋 후 `git ls-files data/gold/garosugil/` 로 들어갔는지 본다.
 - `html/` 미포함 → `/maps` 정적 대시보드는 서빙되지 않음 (main.py 가 존재 시에만 mount — 에러 없음).
 - DB/Redis 미연동 (로컬과 동일 — 시드 데이터 서빙).
