@@ -7,39 +7,40 @@ node_modules
 **/.env
 
 # 대용량·배포 무관 루트 디렉토리
-# data 는 gold/garosugil(실데이터 서빙, ~0.8MB)만 예외 포함 — 디렉토리 통째 제외 시
-# 하위 ! 재포함이 무시되므로 단계적으로 연다 (gitignore 의미론).
-/data/*
-!/data/gold/
-/data/gold/*
-!/data/gold/platform_vacancy_forecast.json
-!/data/gold/platform_industry_recommend.json
+#
+# ⚠ 2026-08-15 전면 재작성 — 예전 방식(`/data/*` 로 전부 닫고 `!` 로 되열기)은
+#   **작동하지 않았다.** 업로드 단계에서 `!` 재포함이 무시돼 data/ 가 통째로 빠졌고,
+#   그 결과 프로덕션은 gold 를 한 파일도 읽지 못했다(garosugil 건물 836동 → 샘플 8동,
+#   vacancy_source 전 거점 synthetic, predict-vacancy 가 lstm-stub, anchor_pct 전부 None).
+#   화면은 멀쩡해 보여서 07-19 부터 아무도 눈치채지 못했다.
+#   그래서 **닫고 되열지 않는다 — 무거운 것만 지목해 닫는다.**
+#
 # 아래 항목은 서비스가 **런타임에 디스크에서 읽는다** — 빠지면 예외 없이 폴백으로 떨어지고
 # 화면은 멀쩡해 보이므로 눈치채기 어렵다(2026-08-01 발견). 서비스와 함께 유지할 것.
-#   posting_inputs.py → platform_posting_inputs.json (rent·foot 실데이터, ~7KB)
-#   events.py         → platform_events.json         (상권 행사 52거점, ~480KB)
-#   marketing.py      → {거점}/program_content_context.csv     (LLM 컨텍스트, 54거점 116KB)
+#   vacancy_forecast.py  → platform_vacancy_forecast.json  (LSTM 분기 예측)
+#   industry_recommend.py→ platform_industry_recommend.json (GNN 추천, ~4.8MB)
+#   posting_inputs.py    → platform_posting_inputs.json (rent·foot 실데이터, ~7KB)
+#   events.py            → platform_events.json         (상권 행사 52거점, ~480KB)
+#   marketing.py         → {거점}/program_content_context.csv     (LLM 컨텍스트, 54거점 116KB)
 #     ⚠ CSV 다 — 파케이가 아니다. 배포에는 pandas/pyarrow 가 없어서 파케이를 읽으려던
 #       예전 코드가 프로덕션에서 항상 실패했다(2026-08-06). 서빙 산출물은 표준
 #       라이브러리로 읽히는 포맷만 쓴다.
-#   gold_vacancy.py   → {거점}/page_building_master.geojson (건물 폴리곤)
-#   gold_vacancy.py   → {거점}/calibration.json  (R-ONE 앵커 — 빠지면 anchor_pct 가 None)
-#   admin.py          → {거점}/coverage.json
-!/data/gold/platform_posting_inputs.json
-!/data/gold/platform_events.json
-# 거점 디렉토리는 열되 안에서는 서빙에 필요한 파일만 고른다.
-# ⚠ 이 블록보다 **뒤에** garosugil 재포함을 둔다 — /data/gold/*/* 가 뒤에 오면
-#   garosugil 전체 예외가 다시 닫혀 building_vacancy.json·calibration.json 이 빠진다.
-!/data/gold/*/
-/data/gold/*/*
-!/data/gold/*/program_content_context.csv
-!/data/gold/*/page_building_master.geojson
-!/data/gold/*/coverage.json
-!/data/gold/*/building_history.json
-!/data/gold/*/calibration.json
-# 가로수길 PoC 는 중간 산출물까지 통째로 서빙한다(~0.8MB)
-!/data/gold/garosugil/
-!/data/gold/garosugil/**
+#   gold_vacancy.py      → {거점}/page_building_master.geojson (건물 폴리곤, 54거점 29.7MB)
+#   gold_vacancy.py      → {거점}/calibration.json  (R-ONE 앵커 — 빠지면 anchor_pct 가 None)
+#   admin.py             → {거점}/coverage.json
+#   building_history.py  → {거점}/building_history.json
+/data/bronze
+/data/silver
+/data/validation
+/data/logs
+/data/config
+/data/tests
+/data/.env
+# gold 중 서빙하지 않는 중간·원본 산출물 (합계 ~20MB) — 지목해서 닫는다
+/data/gold/*/building_vacancy.json
+/data/gold/*/vacant_units.json
+/data/gold/*/rate_limited.json
+**/*.parquet
 /html/
 /ml/
 /design/
@@ -60,3 +61,11 @@ node_modules
 /apps/frontend/dist
 /apps/backend/tests
 /apps/frontend/.storybook
+
+# 로컬 `vercel build` 가 만들어 두는 스캐폴드 — **올리면 원격 빌드가 깨진다.**
+# uv 가 pyproject.toml 을 보면 requirements.txt 대신 프로젝트 모드로 가는데, 이 파일의
+# requires-python 은 로컬 파이썬(3.11)을 따라 적히고 Vercel 런타임은 3.12+ 라 충돌한다
+# (2026-08-16 실제로 배포 1건 실패). 서버리스 의존성의 단일 출처는 requirements.txt 다.
+/pyproject.toml
+/uv.lock
+/.vercel

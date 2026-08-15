@@ -9,6 +9,12 @@ venv/
 .mlruns/
 mlruns/
 
+# 로컬 `vercel build` 스캐폴드 — 커밋도 배포도 하지 않는다(.vercelignore 도 같이 막는다).
+# requires-python 이 로컬 파이썬을 따라 적혀 원격 빌드(3.12+)를 깨뜨린다(2026-08-16).
+/pyproject.toml
+/uv.lock
+.vercel/
+
 # Node
 node_modules/
 dist/
