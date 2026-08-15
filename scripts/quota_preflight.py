@@ -156,6 +156,17 @@ def report_remaining() -> None:
         print("  429 강등이 남은 거점(재실행하면 자동 재수집): "
               + " ".join(f"{s}({n})" for s, n in partial))
 
+    # 붙여 쓸 명령줄까지 찍는다 — 층별개요만 찍고 전유부는 슬러그만 나열하던 것을 맞춘다
+    # (2026-08-15). 429 강등 거점도 같은 실행에서 자동 재수집되므로 뒤에 붙인다.
+    todo = missing + [s for s, _ in partial]
+    if todo:
+        print("      → powershell -ExecutionPolicy Bypass -File "
+              "scripts\\run_bldgvac_until_done.ps1 -MaxPasses 20 " + " ".join(todo))
+        print("        (쿼터가 먼저 끊기면 '진행 0동' 으로 멈춘다 — 정상이다. "
+              "150동마다 체크포인트라 내일 같은 줄을 다시 돌리면 완료분을 건너뛴다)")
+    else:
+        print("  전유부 잔여 없음 — 오늘은 층별개요부터 돈다.")
+
     rows_out = []
     for slug in HUBS:
         rows = _gold(slug)

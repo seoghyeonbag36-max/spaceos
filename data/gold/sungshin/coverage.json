@@ -1,33 +1,47 @@
 {
   "slug": "sungshin",
   "hub_name": "성신여대·돈암",
-  "tier": "Tier2(폴리곤근사)",
-  "built_at": "2026-08-08T12:37:04",
-  "shown": 905,
-  "excluded_total": 791,
-  "excluded_unknown": 0,
-  "excluded_non_commercial": 791,
-  "coverage_pct": 53.4,
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-15T17:20:03",
+  "shown": 717,
+  "excluded_total": 979,
+  "excluded_unknown": 209,
+  "excluded_non_commercial": 770,
+  "coverage_pct": 42.3,
   "status": {
-    "full": 467,
-    "partial": 158,
-    "high": 142,
-    "empty": 138
+    "full": 391,
+    "partial": 121,
+    "high": 76,
+    "empty": 129
   },
   "source": {
-    "pip_only": 767,
-    "polygon_only": 138
+    "stores+ledger": 555,
+    "polygon_only": 129,
+    "stores+ledger+pip": 13,
+    "pip_only": 20
   },
-  "reference_vacancy_pct": null,
-  "reference_buildings": 0,
-  "reference_coverage_pct": 0.0,
-  "mixed_vacancy_pct": 25.7,
+  "reference_vacancy_pct": 26.2,
+  "reference_buildings": 362,
+  "reference_coverage_pct": 94.8,
+  "mixed_vacancy_pct": 27.7,
   "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 341,
+      "active": 944,
+      "capacity": 1142,
+      "vacancy_pct": 17.3
+    },
+    "expos_units": {
+      "buildings": 21,
+      "active": 141,
+      "capacity": 328,
+      "vacancy_pct": 57.0
+    },
     "floor_approx": {
-      "buildings": 513,
-      "active": 1338,
-      "capacity": 1958,
-      "vacancy_pct": 31.7
+      "buildings": 20,
+      "active": 31,
+      "capacity": 96,
+      "vacancy_pct": 67.7
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

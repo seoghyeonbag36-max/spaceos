@@ -1,33 +1,47 @@
 {
   "slug": "sharosugil",
   "hub_name": "샤로수길·서울대입구",
-  "tier": "Tier2(폴리곤근사)",
-  "built_at": "2026-08-08T12:36:52",
-  "shown": 777,
-  "excluded_total": 970,
-  "excluded_unknown": 0,
-  "excluded_non_commercial": 970,
-  "coverage_pct": 44.5,
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-15T17:20:22",
+  "shown": 571,
+  "excluded_total": 1176,
+  "excluded_unknown": 213,
+  "excluded_non_commercial": 963,
+  "coverage_pct": 32.7,
   "status": {
-    "full": 285,
-    "partial": 180,
-    "high": 189,
-    "empty": 123
+    "full": 283,
+    "partial": 95,
+    "high": 73,
+    "empty": 120
   },
   "source": {
-    "polygon_only": 123,
-    "pip_only": 654
+    "polygon_only": 120,
+    "stores+ledger": 421,
+    "pip_only": 20,
+    "stores+ledger+pip": 10
   },
-  "reference_vacancy_pct": null,
-  "reference_buildings": 0,
-  "reference_coverage_pct": 0.0,
-  "mixed_vacancy_pct": 34.1,
+  "reference_vacancy_pct": 19.1,
+  "reference_buildings": 338,
+  "reference_coverage_pct": 93.6,
+  "mixed_vacancy_pct": 20.2,
   "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 287,
+      "active": 940,
+      "capacity": 1172,
+      "vacancy_pct": 19.8
+    },
+    "expos_units": {
+      "buildings": 51,
+      "active": 347,
+      "capacity": 418,
+      "vacancy_pct": 17.0
+    },
     "floor_approx": {
-      "buildings": 544,
-      "active": 1624,
-      "capacity": 2636,
-      "vacancy_pct": 38.4
+      "buildings": 23,
+      "active": 42,
+      "capacity": 149,
+      "vacancy_pct": 71.8
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

@@ -62,7 +62,14 @@ powershell -ExecutionPolicy Bypass -File scripts\run_bldgvac_until_done.ps1 -Max
 
 `getBrExposPubuseAreaInfo` 가 소진돼도 `getBrFlrOulnInfo` 는 별도 10,000콜이 남아 있다.
 그리고 **대표 집계를 만드는 건 이쪽뿐이다** — `services/gold_vacancy.py` 의
-`_COUNTED_METHODS = {"floor_ouln"}` 이라, 전유부를 다 받아도 이 단계 없이는 Tier1 승격이 안 된다.
+`_COUNTED_METHODS = {"floor_ouln"}` 이라, 전유부를 다 받아도 이 단계 없이는 **백엔드가 서빙하는
+공실률에 그 거점이 한 동도 기여하지 않는다.**
+
+⚠ 이걸 "Tier1 승격이 안 된다" 로 적어 뒀던 것은 틀렸다(2026-08-15 정정). `tier` 라벨은
+`build_page_master.py` 가 `tier = "Tier1(대장)" if vac else "Tier2(폴리곤근사)"` 로,
+**`building_vacancy.json` 존재만으로** 정한다. 그래서 대장만 받아둔 거점은 층별개요 없이
+파이프라인 재실행만으로 라벨이 오른다 — 콜 0. 층별개요가 좌우하는 것은 라벨이 아니라
+**서빙되는 숫자**다. 둘을 섞어 읽으면 "Tier1 인데 공실률이 비어 있는" 거점을 오진하게 된다.
 
 ```
 python -m data.collectors.floor_capacity <slug ...> [--only-approx]
@@ -113,6 +120,25 @@ python -m data.analyze_anchor_population        # 앵커 대조
 ⚠ 두 파이프라인은 인자가 없으면 **54거점 전부**를 돈다. 거점을 명시한다.
 `build_page_master` 가 `coverage.json` 의 `tier` 를 `Tier1(대장)` 로 올린다 —
 승격은 코드 변경이 아니라 산출물 갱신이다.
+
+그래서 **대장을 받아두고 파이프라인을 안 돌린 거점은 라벨만 낡아 있다.** 08-15 에 9거점이
+그 상태였다(gangnam·dongdaemun·gwangjang·mangwon·konkuk·samcheong·hapjeong·jamsil·mullae —
+`coverage.json` 은 08-08, `building_vacancy.json` 은 08-09~15). 쿼터가 소진돼 더 받을 게
+없는 날에도 이 재실행은 할 수 있다. 찾는 법:
+
+```
+python -c "
+import json,datetime; from pathlib import Path
+from data.config.page_hubs import HUBS
+for s in HUBS:
+    v=Path('data/gold')/s/'building_vacancy.json'; c=Path('data/gold')/s/'coverage.json'
+    if not (v.exists() and c.exists()): continue
+    d=json.loads(c.read_text(encoding='utf-8'))
+    if d.get('tier','').startswith('Tier1'): continue
+    n=len(json.loads(v.read_text(encoding='utf-8')))
+    if n: print(f'{s:<14}{n:>5}동  coverage {d.get(\"built_at\")}')
+"
+```
 
 앵커 대조 시 **두 숫자를 섞어 읽지 말 것**: 파이프라인이 찍는 "대표 집계 공실률"은
 `expos_units`(집합건물)를 포함해 60%대로 뜨지만, 백엔드가 서빙하는 값은 `floor_ouln` 만

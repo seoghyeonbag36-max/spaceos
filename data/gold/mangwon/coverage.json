@@ -1,33 +1,47 @@
 {
   "slug": "mangwon",
   "hub_name": "망원동·망리단길",
-  "tier": "Tier2(폴리곤근사)",
-  "built_at": "2026-08-08T12:35:24",
-  "shown": 1298,
-  "excluded_total": 1790,
-  "excluded_unknown": 0,
-  "excluded_non_commercial": 1790,
-  "coverage_pct": 42.0,
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-15T17:18:54",
+  "shown": 957,
+  "excluded_total": 2131,
+  "excluded_unknown": 353,
+  "excluded_non_commercial": 1778,
+  "coverage_pct": 31.0,
   "status": {
-    "full": 384,
-    "partial": 331,
-    "high": 406,
-    "empty": 177
+    "full": 517,
+    "partial": 149,
+    "high": 121,
+    "empty": 170
   },
   "source": {
-    "pip_only": 1121,
-    "polygon_only": 177
+    "stores+ledger": 737,
+    "pip_only": 48,
+    "polygon_only": 170,
+    "stores+ledger+pip": 2
   },
-  "reference_vacancy_pct": null,
-  "reference_buildings": 0,
-  "reference_coverage_pct": 0.0,
-  "mixed_vacancy_pct": 40.7,
+  "reference_vacancy_pct": 19.0,
+  "reference_buildings": 610,
+  "reference_coverage_pct": 93.3,
+  "mixed_vacancy_pct": 28.9,
   "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 545,
+      "active": 1479,
+      "capacity": 1726,
+      "vacancy_pct": 14.3
+    },
+    "expos_units": {
+      "buildings": 65,
+      "active": 172,
+      "capacity": 313,
+      "vacancy_pct": 45.0
+    },
     "floor_approx": {
-      "buildings": 1002,
-      "active": 2282,
-      "capacity": 4059,
-      "vacancy_pct": 43.8
+      "buildings": 44,
+      "active": 78,
+      "capacity": 141,
+      "vacancy_pct": 44.7
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

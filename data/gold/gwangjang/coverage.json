@@ -1,33 +1,47 @@
 {
   "slug": "gwangjang",
   "hub_name": "광장시장·종로4가",
-  "tier": "Tier2(폴리곤근사)",
-  "built_at": "2026-08-08T12:35:35",
-  "shown": 1966,
-  "excluded_total": 858,
-  "excluded_unknown": 0,
-  "excluded_non_commercial": 858,
-  "coverage_pct": 69.6,
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-15T17:17:12",
+  "shown": 1751,
+  "excluded_total": 1073,
+  "excluded_unknown": 234,
+  "excluded_non_commercial": 839,
+  "coverage_pct": 62.0,
   "status": {
-    "full": 563,
-    "partial": 234,
-    "high": 298,
-    "empty": 871
+    "full": 463,
+    "partial": 230,
+    "high": 212,
+    "empty": 846
   },
   "source": {
-    "pip_only": 1095,
-    "polygon_only": 871
+    "stores+ledger": 685,
+    "stores+ledger+pip": 63,
+    "polygon_only": 846,
+    "pip_only": 157
   },
-  "reference_vacancy_pct": null,
-  "reference_buildings": 0,
-  "reference_coverage_pct": 0.0,
-  "mixed_vacancy_pct": 31.2,
+  "reference_vacancy_pct": 64.8,
+  "reference_buildings": 598,
+  "reference_coverage_pct": 95.1,
+  "mixed_vacancy_pct": 63.9,
   "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 543,
+      "active": 1402,
+      "capacity": 1876,
+      "vacancy_pct": 25.3
+    },
+    "expos_units": {
+      "buildings": 55,
+      "active": 533,
+      "capacity": 3614,
+      "vacancy_pct": 85.3
+    },
     "floor_approx": {
-      "buildings": 827,
-      "active": 2245,
-      "capacity": 3538,
-      "vacancy_pct": 36.5
+      "buildings": 31,
+      "active": 40,
+      "capacity": 125,
+      "vacancy_pct": 68.0
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
