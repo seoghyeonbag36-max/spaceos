@@ -1,33 +1,47 @@
 {
   "slug": "namdaemun",
   "hub_name": "남대문시장",
-  "tier": "Tier2(폴리곤근사)",
-  "built_at": "2026-08-08T12:37:22",
-  "shown": 459,
-  "excluded_total": 328,
-  "excluded_unknown": 0,
-  "excluded_non_commercial": 328,
-  "coverage_pct": 58.3,
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-16T12:02:29",
+  "shown": 384,
+  "excluded_total": 403,
+  "excluded_unknown": 90,
+  "excluded_non_commercial": 313,
+  "coverage_pct": 48.8,
   "status": {
-    "full": 194,
-    "partial": 94,
-    "high": 70,
-    "empty": 101
+    "full": 172,
+    "partial": 68,
+    "high": 41,
+    "empty": 103
   },
   "source": {
-    "pip_only": 358,
-    "polygon_only": 101
+    "stores+ledger": 213,
+    "polygon_only": 103,
+    "pip_only": 43,
+    "stores+ledger+pip": 25
   },
-  "reference_vacancy_pct": null,
-  "reference_buildings": 0,
-  "reference_coverage_pct": 0.0,
-  "mixed_vacancy_pct": 9.5,
+  "reference_vacancy_pct": 14.4,
+  "reference_buildings": 185,
+  "reference_coverage_pct": 94.9,
+  "mixed_vacancy_pct": 9.6,
   "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 161,
+      "active": 833,
+      "capacity": 930,
+      "vacancy_pct": 10.4
+    },
+    "expos_units": {
+      "buildings": 24,
+      "active": 947,
+      "capacity": 1149,
+      "vacancy_pct": 17.6
+    },
     "floor_approx": {
-      "buildings": 296,
-      "active": 2318,
-      "capacity": 2703,
-      "vacancy_pct": 14.2
+      "buildings": 10,
+      "active": 42,
+      "capacity": 86,
+      "vacancy_pct": 51.2
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

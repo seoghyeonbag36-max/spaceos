@@ -2,22 +2,22 @@
   "slug": "anam",
   "hub_name": "안암·고려대",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-15T17:21:50",
-  "shown": 976,
-  "excluded_total": 1895,
-  "excluded_unknown": 108,
+  "built_at": "2026-08-16T12:01:30",
+  "shown": 985,
+  "excluded_total": 1886,
+  "excluded_unknown": 99,
   "excluded_non_commercial": 1787,
-  "coverage_pct": 34.0,
+  "coverage_pct": 34.3,
   "status": {
-    "full": 323,
-    "partial": 138,
-    "high": 268,
+    "full": 327,
+    "partial": 142,
+    "high": 269,
     "empty": 247
   },
   "source": {
     "stores+ledger": 163,
     "polygon_only": 247,
-    "pip_only": 566
+    "pip_only": 575
   },
   "reference_vacancy_pct": 10.2,
   "reference_buildings": 122,
