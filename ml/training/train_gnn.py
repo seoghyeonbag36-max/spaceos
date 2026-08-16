@@ -58,6 +58,7 @@ from ml.models.gnn.industry_gnn import IndustryGNN  # noqa: E402
 _GOLD = _REPO / "data" / "gold"
 _ARTIFACT = _REPO / "ml" / "artifacts" / "industry_gnn.pt"
 _RECOMMEND_JSON = _GOLD / "platform_industry_recommend.json"
+_TRDAR_DEMAND = _GOLD / "features" / "trdar_demand.parquet"
 _MLRUNS = _REPO / "ml" / "mlruns"
 
 MIN_CLASS_NODES = 10   # 이보다 작은 업종 대분류는 '기타'로 병합
@@ -66,6 +67,30 @@ SEED = 42
 
 _M_PER_DEG_LAT = 111000.0
 _M_PER_DEG_LON = 88300.0
+
+# TRDAR 상권 단위 공공 수요신호 — build_trdar_demand 산출물에서 쓸 컬럼.
+# 명시 목록으로 고정한다: 파케이 컬럼이 늘어도 피처 차원이 조용히 바뀌지 않도록
+# (체크포인트의 in_dim 과 어긋나면 서빙이 깨진다).
+_DEMAND_COLS: list[str] = [
+    # 규모(로그) — 상권이 얼마나 큰가
+    "log_flpop", "log_selng", "log_stor", "log_trdar_area",
+    # 밀도(로그) — 얼마나 빽빽한 자리인가. 규모와 다른 축이다
+    "log_flpop_density", "log_selng_density", "log_stor_density",
+    # 상권 성격
+    "flpop_fml_share", "flpop_wkend_share", "selng_wkend_share",
+    "stor_frc_share", "stor_opbiz_rt", "stor_clsbiz_rt", "has_selng",
+    # 연령 구성비 (6)
+    "flpop_agrde_10_share", "flpop_agrde_20_share", "flpop_agrde_30_share",
+    "flpop_agrde_40_share", "flpop_agrde_50_share", "flpop_agrde_60_above_share",
+    # 유동인구 시간대 구성비 (6) — 카페/음식점/편의점의 체류 시간대가 다르다
+    "flpop_tmzon_00_06_share", "flpop_tmzon_06_11_share", "flpop_tmzon_11_14_share",
+    "flpop_tmzon_14_17_share", "flpop_tmzon_17_21_share", "flpop_tmzon_21_24_share",
+    # 매출 시간대 구성비 (6) — 유동인구보다 거점 내 변동이 크다(within 비율 0.44~0.56)
+    "selng_tmzon_00_06_share", "selng_tmzon_06_11_share", "selng_tmzon_11_14_share",
+    "selng_tmzon_14_17_share", "selng_tmzon_17_21_share", "selng_tmzon_21_24_share",
+    # 상권 유형 원핫 — 골목/발달/전통시장/관광특구
+    "se_golmok", "se_baldal", "se_market", "se_tourist",
+]
 
 
 def load_graph() -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -100,7 +125,72 @@ def _labels(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]]:
     return merged.map(idx).to_numpy(), classes
 
 
-def _features(nodes: pd.DataFrame, edges: pd.DataFrame) -> tuple[np.ndarray, list[str]]:
+def _demand_block(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]] | None:
+    """노드 → 소속 TRDAR 상권의 공공 수요신호 블록.
+
+    **왜 거점이 아니라 상권 단위인가**: 아래 _features 는 이미 거점 원핫을 넣는다. 거점
+    안에서 상수인 값은 원핫이 완전히 표현하므로 붙여도 정보가 0 이다. 서울 상권분석의
+    TRDAR 상권은 54거점을 190개로 쪼개므로(거점당 3.5개) 거점 내 변동이 생긴다 —
+    실측 within-district 분산 비율 평균 0.46 (build_trdar_demand 참조).
+
+    귀속 규칙: **같은 거점 안에서** 상권 중심좌표가 가장 가까운 상권. 상권 폴리곤이 아니라
+    중심점 기준이므로 근사다 — 정확한 PIP 는 폴리곤(TbgisTrdarRelm geometry) 확보 후 과제.
+    거점을 넘어선 매칭은 막는다(거점 경계가 상권 경계보다 제품상 우선이다).
+
+    스케일: 이 블록만 z-score 표준화한다. 기존 피처(dx/dy·log_bld_size…)는 건드리지
+    않으므로 --no-demand 가 종전 파이프라인을 그대로 재현하고 ablation 이 깨끗해진다.
+
+    반환 None = 수요 테이블 부재(신규 클론 등) → 학습은 종전 피처로 계속한다.
+    """
+    if not _TRDAR_DEMAND.exists():
+        print(f"[gnn] 수요 테이블 없음({_TRDAR_DEMAND.name}) — "
+              f"python -m data.pipelines.build_trdar_demand 먼저. 수요 피처 없이 진행")
+        return None
+    dem = pd.read_parquet(_TRDAR_DEMAND)
+    missing = [c for c in _DEMAND_COLS if c not in dem.columns]
+    if missing:
+        print(f"[gnn] 수요 테이블에 컬럼 없음 {missing} — 수요 피처 없이 진행")
+        return None
+
+    lat = pd.to_numeric(nodes["lat"], errors="coerce").fillna(0.0).to_numpy()
+    lon = pd.to_numeric(nodes["lon"], errors="coerce").fillna(0.0).to_numpy()
+    did = nodes["district_id"].fillna("").astype(str).to_numpy()
+
+    vals = dem[_DEMAND_COLS].astype(float).to_numpy()
+    block = np.zeros((len(nodes), len(_DEMAND_COLS)), dtype=np.float64)
+    dist_m = np.zeros(len(nodes), dtype=np.float64)
+    matched = np.zeros(len(nodes), dtype=bool)
+
+    for d, grp in dem.groupby("district_id"):
+        sel = np.flatnonzero(did == str(d))
+        if sel.size == 0:
+            continue
+        # 등장방형 근사 — services/districts.py _dist_m 과 동일 계수(서울 위도 37.5°)
+        gy = (lat[sel][:, None] - grp["trdar_lat"].to_numpy()[None, :]) * _M_PER_DEG_LAT
+        gx = (lon[sel][:, None] - grp["trdar_lon"].to_numpy()[None, :]) * _M_PER_DEG_LON
+        dd = np.hypot(gx, gy)
+        near = dd.argmin(axis=1)
+        block[sel] = vals[grp.index.to_numpy()[near]]
+        dist_m[sel] = dd[np.arange(sel.size), near]
+        matched[sel] = True
+
+    if not matched.all():
+        lost = sorted(set(did[~matched]))
+        print(f"[gnn] ⚠️ 수요 테이블에 없는 거점 {len(lost)}곳 → 0 채움: {lost[:5]}")
+
+    # 상권 중심까지의 거리 = '상권 코어에서 얼마나 벗어난 자리인가'. 거점 원핫이 못 주는
+    # 자리 단위 신호라 함께 넣는다.
+    block = np.column_stack([block, np.log1p(dist_m)])
+    names = list(_DEMAND_COLS) + ["log_dist_to_trdar_m"]
+
+    mu = block.mean(axis=0)
+    sd = block.std(axis=0)
+    sd[sd == 0] = 1.0
+    return np.nan_to_num((block - mu) / sd), names
+
+
+def _features(nodes: pd.DataFrame, edges: pd.DataFrame,
+              use_demand: bool = True) -> tuple[np.ndarray, list[str]]:
     """공실 상태에서도 관측 가능한 입지 피처만 구성한다."""
     lat = pd.to_numeric(nodes["lat"], errors="coerce").to_numpy()
     lon = pd.to_numeric(nodes["lon"], errors="coerce").to_numpy()
@@ -126,6 +216,13 @@ def _features(nodes: pd.DataFrame, edges: pd.DataFrame) -> tuple[np.ndarray, lis
     x = np.column_stack([dx, dy, np.log1p(bld_size), np.log1p(knn_deg),
                          dist_oh.to_numpy()])
     names = ["dx_km", "dy_km", "log_bld_size", "log_knn_deg"] + list(dist_oh.columns)
+
+    if use_demand:
+        block = _demand_block(nodes)
+        if block is not None:
+            x = np.column_stack([x, block[0]])
+            names += block[1]
+            print(f"[gnn] 수요 피처 {len(block[1])}열 결합 → 총 {len(names)}열")
     return np.nan_to_num(x).astype(np.float32), names
 
 
@@ -231,14 +328,14 @@ def quality_report() -> dict:
 
 def train(edge_types: set[str] | None = None, epochs: int = 400,
           hidden: int = 128, lr: float = 0.01, weight_decay: float = 5e-4,
-          patience: int = 50, save: bool = True) -> dict:
+          patience: int = 50, save: bool = True, use_demand: bool = True) -> dict:
     torch.manual_seed(SEED)
     rng = np.random.default_rng(SEED)
 
     nodes, edges = load_graph()
     nodes = nodes.reset_index(drop=True)
     y_np, classes = _labels(nodes)
-    x_np, feat_names = _features(nodes, edges)
+    x_np, feat_names = _features(nodes, edges, use_demand=use_demand)
     ei = _edge_index(nodes, edges, edge_types)
     did = nodes["district_id"].fillna("").astype(str).to_numpy()
 
@@ -292,7 +389,8 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
     metrics["lift_vs_district_prior_pct"] = (
         round((metrics["test_top1"] - base) / base * 100, 1) if base else None)
     metrics.update({"nodes": len(nodes), "edges_used": int(ei.shape[1] // 2),
-                    "classes": len(classes),
+                    "classes": len(classes), "features": len(feat_names),
+                    "demand_features": int(any(n in feat_names for n in _DEMAND_COLS)),
                     "edge_types": ",".join(sorted(edge_types)) if edge_types else "all"})
     print("[gnn·metrics]", metrics)
 
@@ -354,9 +452,12 @@ if __name__ == "__main__":
     ap.add_argument("--epochs", type=int, default=400)
     ap.add_argument("--hidden", type=int, default=128)
     ap.add_argument("--no-save", action="store_true")
+    ap.add_argument("--no-demand", action="store_true",
+                    help="TRDAR 공공 수요신호 제외 — 종전 파이프라인 재현(ablation 기준선)")
     a = ap.parse_args()
     if a.report:
         quality_report()
     else:
         types = set(a.edge_types.split(",")) if a.edge_types else None
-        train(edge_types=types, epochs=a.epochs, hidden=a.hidden, save=not a.no_save)
+        train(edge_types=types, epochs=a.epochs, hidden=a.hidden,
+              save=not a.no_save, use_demand=not a.no_demand)

@@ -64,6 +64,11 @@ data/gold/*/*
 # 디스크에서 읽어 `anchor_pct`/`anchor_gap_pp` 로 내려보낸다. 2026-08-15 까지 빠져 있어
 # **프로덕션에서는 garosugil(디렉터리 통째 추적)만 앵커가 붙고 나머지는 조용히 None** 이었다.
 !data/gold/*/calibration.json
+# 예외: TRDAR 상권 수요신호(190행 96KB) — ml/training/train_gnn.py 가 GNN 노드 피처로 읽는다.
+# 빠지면 재학습이 조용히 수요 피처 없이(58열) 돌아 lift 가 +4.4% → +3.1% 로 되돌아간다.
+# 서빙(recommend json)은 영향 없지만 **재현이 불가능해진다**.
+!data/gold/features/
+!data/gold/features/trdar_demand.parquet
 # 예외: Program 상권 컨텍스트(거점당 ~3KB, 54거점 합계 174KB) — services/marketing.py 가
 # LLM 프롬프트 입력으로 디스크에서 읽는다. 빠져 있으면 배포 환경에서 garosugil 만
 # 컨텍스트를 갖고 나머지 53거점은 조용히 시드 카피로 폴백한다(2026-08-01 발견).

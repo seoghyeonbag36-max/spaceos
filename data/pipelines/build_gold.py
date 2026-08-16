@@ -122,6 +122,10 @@ def build_platform_timeseries() -> None:
         out["closure_cnt"] = out["STDR_YYQU_CD"].map(closures).fillna(0).astype(int)
 
     # TODO(§9): 생활인구(§2)·부동산원 공실률/임대료(§4)·SGIS 인구밀도(§3) 조인
+    # ※ 거점(LSTM)용은 build_platform13_timeseries 에서 R-ONE·flpop 조인 완료.
+    #   GNN 용 수요신호는 거점이 아니라 **TRDAR 상권 단위**로 따로 만든다 —
+    #   거점 원핫이 이미 거점 상수를 표현하므로 거점 단위로 붙이면 정보가 0 이다.
+    #   → data/pipelines/build_trdar_demand.py (gold/features/trdar_demand.parquet)
     _save(out, _GOLD_DIR, "platform_district_timeseries")
 
 
