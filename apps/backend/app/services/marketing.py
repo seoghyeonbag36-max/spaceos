@@ -153,7 +153,8 @@ def _district_context(district_id: str | None) -> str | None:
     if (dm := _demand_context(rows)):
         parts.append(dm)
 
-    if (ev := _events_context(district_id)):
+    # 행사는 수요신호의 **빈 시간대**를 알아야 고를 수 있다 — 두 축을 같은 눈금으로 맞춘다.
+    if (ev := _events_context(district_id, _gap_band(rows))):
         parts.append(ev)
     return "\n".join(parts) or None
 
@@ -165,6 +166,17 @@ def _district_context(district_id: str | None) -> str | None:
 _ACTIONABLE_TMZONS = ["06_11", "11_14", "14_17", "17_21", "21_24"]
 _TMZON_LABEL = {"00_06": "0~6시", "06_11": "6~11시", "11_14": "11~14시",
                 "14_17": "14~17시", "17_21": "17~21시", "21_24": "21~24시"}
+
+
+def _gap_band(rows: list[tuple[str, str, float]]) -> str | None:
+    """유동 대비 매출이 가장 빈 시간대(= 오프라인 유입 확대가 겨냥할 구간).
+
+    매출이 결측인 거점은 격차를 만들 수 없으므로 None — 없는 근거를 지어내지 않는다.
+    """
+    d = {k: v for kd, k, v in rows if kd == "demand"}
+    gaps = [(d[f"flpop_tmzon_{t}"] - d[f"selng_tmzon_{t}"], t) for t in _ACTIONABLE_TMZONS
+            if f"flpop_tmzon_{t}" in d and f"selng_tmzon_{t}" in d]
+    return max(gaps)[1] if gaps else None
 
 
 def _demand_context(rows: list[tuple[str, str, float]]) -> str | None:
@@ -234,8 +246,13 @@ def _demand_context(rows: list[tuple[str, str, float]]) -> str | None:
 # 행사가 잠식한다. 가까운 순으로 이만큼만 준다.
 _MAX_CONTEXT_EVENTS = 5
 
+# 관람객이 걸어서 넘어올 만한 거리. 이 밖의 행사는 "연계"의 근거가 되지 못한다 —
+# 785건의 거리 중앙값이 989m 이고, 500m 안에 행사가 있는 거점은 54곳 중 28곳뿐이다.
+# 남은 26곳에 먼 행사를 실으면 LLM 이 남의 동네 행사를 우리 골목 것처럼 쓴다.
+_WALKABLE_M = 500
 
-def _events_context(district_id: str | None) -> str | None:
+
+def _events_context(district_id: str | None, gap_band: str | None = None) -> str | None:
     """상권 행사를 컨텍스트 문장으로 — 오프라인 제안이 공허해지는 것을 막는다.
 
     이 함수 이전에는 컨텍스트에 행사가 없었고, 그래서 오프라인 제안이 "상권
@@ -248,11 +265,23 @@ def _events_context(district_id: str | None) -> str | None:
                          "행사 없음"이라고 쓰면 모르는 것을 안다고 주장하는 것이다.
       [](예정 행사 없음)  **명시적으로 없다고 말하고 제안을 금지한다.** 침묵하면 LLM 이
                          일반론으로 행사 참여를 지어낸다 — 고치려던 바로 그 증상이다.
-      목록 있음           가까운 순 상위 N건을 거리와 함께 준다.
+      목록 있음           걸어갈 거리(_WALKABLE_M) 안의 것만, 가까운 순 상위 N건.
 
     **거리를 반드시 싣는다.** 이 API 는 공공·문화시설 행사 중심이라 가두 상권 커버리지가
     낮다 — 가로수길 2건은 둘 다 800m 밖이다. 거리를 빼면 LLM 이 남의 동네 행사를
-    "우리 골목 행사"처럼 쓴다.
+    "우리 골목 행사"처럼 쓴다. 걸어갈 거리 안에 하나도 없으면 그 사실을 말하고
+    연계 제안을 금지한다(네 번째 경우 — 2026-08-16 추가).
+
+    ## 빈 시간대와의 교집합 (2026-08-16)
+
+    `gap_band` 는 수요신호에서 온 "유동 대비 매출이 가장 빈 시간대"다. 그 시간에 실제로
+    열리는 행사가 연계 후보이므로 먼저 보여주고, 하나도 없으면 **없다고 밝힌다** —
+    시간대를 맞춘 것처럼 쓰는 것을 막는다.
+
+    한때 "문화행사라 상권 상업이벤트와 종류가 다르다"고 판단해 외부 소스를 찾으려 했는데,
+    거리로 걸러 열어보니 서울아트위크(59m)·DDP 뮤직페스티벌(107m)·서울야외도서관(158m)
+    처럼 광장 활성화 그 자체인 행사들이었다. 종류가 아니라 **필터와 속성이 없던 것**이다.
+    시각(`PRO_TIME`)도 원천에 785/785 있었는데 Gold 로 넘기지 않고 있었다.
     """
     if not district_id:
         return None
@@ -263,15 +292,47 @@ def _events_context(district_id: str | None) -> str | None:
         return ("상권 행사: 확인된 예정 행사가 없다(공공 문화행사 기준). "
                 "행사 참여·연계를 제안하지 말 것 — 없는 행사를 지어내는 셈이다.")
 
-    near = sorted(rows, key=lambda e: e.get("distance_m") or 10**9)[:_MAX_CONTEXT_EVENTS]
+    # 거리 미상(시드 잔재)은 '멀다'도 '가깝다'도 아니다. 걸러내되 버리지는 않는다 —
+    # 거리가 있는 것이 하나도 없을 때는 이들이라도 실어야 정보가 사라지지 않는다.
+    known = [e for e in rows if e.get("distance_m") is not None]
+    unknown = [e for e in rows if e.get("distance_m") is None]
+    walkable = [e for e in known if e["distance_m"] <= _WALKABLE_M]
+
+    if not walkable and not unknown:
+        nearest = min(e["distance_m"] for e in known) if known else None
+        far = f"(가장 가까운 것이 {nearest}m)" if nearest is not None else ""
+        return (f"상권 행사: {_WALKABLE_M}m 안에 예정 행사가 없다{far}. "
+                "걸어갈 거리가 아니므로 관람객 유입을 전제한 연계 제안을 하지 말 것 — "
+                "매장 자체 접점을 제안한다.")
+    if not walkable:
+        items = "; ".join(f"{e.get('n')}({e.get('when')} · {e.get('place') or '장소 미상'})"
+                          for e in unknown[:_MAX_CONTEXT_EVENTS])
+        return ("상권 행사(거리 미상 — 걸어갈 거리인지 확인되지 않았다): " + items
+                + " — 거리를 모르므로 관람객 유입 규모를 단정하지 말 것.")
+
+    # 빈 시간대에 실제로 열리는 행사가 연계 후보다. 그 교집합을 먼저 보여준다.
+    hit = [e for e in walkable if gap_band and gap_band in (e.get("tm") or [])]
+    pick = (hit or walkable)
+    pick = sorted(pick, key=lambda e: e.get("distance_m") or 10**9)[:_MAX_CONTEXT_EVENTS]
+
     items = []
-    for e in near:
+    for e in pick:
         dist = e.get("distance_m")
-        where = f"{e.get('place') or '장소 미상'}, 거점에서 {dist}m" if dist is not None \
+        where = f"{e.get('place') or '장소 미상'}, {dist}m" if dist is not None \
             else (e.get("place") or "장소 미상")
-        items.append(f"{e.get('n')}({e.get('when')} · {where})")
-    return ("상권 행사(공공 문화행사 실데이터, 가까운 순): " + "; ".join(items)
-            + " — 거리를 확인하고, 거점 밖 행사를 상권 안 행사처럼 쓰지 말 것.")
+        when = e.get("when")
+        if e.get("time"):
+            when = f"{when} {e['time']}"
+        items.append(f"{e.get('n')}({when} · {where})")
+
+    head = "상권 행사(공공 문화행사 실데이터, 걸어갈 거리 안)"
+    if hit:
+        head += f" — 아래는 **빈 시간대({_TMZON_LABEL.get(gap_band, gap_band)})에 열리는** 행사다"
+    elif gap_band:
+        head += (f" — 빈 시간대({_TMZON_LABEL.get(gap_band, gap_band)})에 열리는 행사는 없다. "
+                 "시간대를 맞춰 연계했다고 쓰지 말 것")
+    return (head + ": " + "; ".join(items)
+            + " — 거리와 시각을 확인하고, 거점 밖 행사를 상권 안 행사처럼 쓰지 말 것.")
 
 
 # 트렌드 방향 판정 임계 — 최근 3개월 평균이 직전 3개월 평균 대비 이만큼 벗어나야 방향을 붙인다.

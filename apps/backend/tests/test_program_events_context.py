@@ -49,8 +49,13 @@ def test_none_from_service_is_silent(monkeypatch):
     assert mkt._events_context("garosugil") is None
 
 
-def test_events_carry_distance(monkeypatch):
-    """거리를 반드시 싣는다 — 800m 밖 행사를 상권 안 행사로 쓰지 못하게."""
+def test_far_events_are_excluded_not_just_labelled(monkeypatch):
+    """걸어갈 거리 밖 행사는 **싣지 않는다** — 거리만 붙여 싣던 것을 2026-08-16 에 바꿨다.
+
+    예전에는 957m 행사를 거리와 함께 실었지만, 그래도 LLM 이 "우리 골목 행사"처럼 썼다.
+    이제는 목록에서 빼고 "걸어갈 거리가 아니다"를 명시한다 — 없는 근거로 제안하는 것을
+    막는 쪽이 정보를 조금 잃는 것보다 낫다.
+    """
     from app.services import events
     monkeypatch.setattr(events, "for_district", lambda d: [
         {"n": "재즈 공연", "when": "2026-08-06~2026-08-20",
@@ -58,8 +63,9 @@ def test_events_carry_distance(monkeypatch):
     ])
 
     ctx = mkt._events_context("garosugil")
-    assert "957m" in ctx
-    assert "재즈 공연" in ctx and "재즈클럽그루브" in ctx
+    assert "재즈 공연" not in ctx, "걸어갈 거리 밖 행사가 목록에 실렸다"
+    assert "957m" in ctx, "가장 가까운 거리는 밝혀야 한다"
+    assert "제안을 하지 말 것" in ctx
 
 
 def test_nearest_events_first_and_capped(monkeypatch):
@@ -218,3 +224,40 @@ def test_runtime_gold_artifacts_are_not_gitignored():
         assert result.returncode == 1, (
             f"{rel} ignore 되면 프로덕션만 조용히 폴백한다"
         )
+
+
+def test_gap_band_events_are_surfaced_first(monkeypatch):
+    """빈 시간대에 열리는 행사가 있으면 그것만 싣고, 그 사실을 밝힌다.
+
+    수요신호(유동-매출 격차)와 행사 시각이 맞물리는 것이 오프라인 제안의 근거다.
+    교집합을 못 내면 "상권 플리마켓 참여" 같은 어느 상권에나 해당하는 말로 돌아간다.
+    """
+    from app.services import events
+    monkeypatch.setattr(events, "for_district", lambda d: [
+        {"n": "아침전시", "when": "2026-08-01~2026-08-31", "place": "A",
+         "distance_m": 200, "time": "10:00 ~ 12:00", "tm": ["06_11", "11_14"]},
+        {"n": "저녁공연", "when": "2026-08-01~2026-08-31", "place": "B",
+         "distance_m": 100, "time": "19:30", "tm": ["17_21"]},
+    ])
+
+    ctx = mkt._events_context("garosugil", gap_band="06_11")
+    assert "아침전시" in ctx
+    assert "저녁공연" not in ctx, "빈 시간대와 무관한 행사가 섞였다"
+    assert "6~11시" in ctx and "열리는" in ctx
+    assert "10:00 ~ 12:00" in ctx, "운영 시각을 실어야 시간대 근거가 검증된다"
+
+
+def test_no_gap_band_match_says_so(monkeypatch):
+    """근처에 행사가 있어도 빈 시간대에 없으면 **없다고 밝힌다**.
+
+    침묵하면 LLM 이 시간대를 맞춘 것처럼 쓴다 — 없는 근거를 주장하는 셈이다.
+    """
+    from app.services import events
+    monkeypatch.setattr(events, "for_district", lambda d: [
+        {"n": "저녁공연", "when": "2026-08-01~2026-08-31", "place": "B",
+         "distance_m": 100, "time": "19:30", "tm": ["17_21"]},
+    ])
+
+    ctx = mkt._events_context("garosugil", gap_band="06_11")
+    assert "저녁공연" in ctx, "가까운 행사는 실어야 한다"
+    assert "열리는 행사는 없다" in ctx
