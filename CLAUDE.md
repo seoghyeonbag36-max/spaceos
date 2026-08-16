@@ -12,7 +12,7 @@
 | **Platform** | Place → Platform | 상권 AI 추천 엔진 (각 상권을 하나의 플랫폼화) |
 | **Page** | Product/Price → Page | 공실 히트맵 + 3D 디지털 트윈 (어떤 업장이 어디에) |
 | **Posting** | Promotion → Posting | 입점 솔루션 — **외부 AI 창업 코파일럿 연동**(어댑터) + 3-Tier 비용-효용 폴백 |
-| **Program** | Promotion → Program | 마케팅 자동화 — **가게 단위**(상가 사진·정보·리뷰 기반 온/오프라인 광고 솔루션) → **상권 단위**(Platform 수집 정보 기반) |
+| **Program** | Promotion → Program | 마케팅 자동화 — **대상은 Platform(상권) 내 빈 Page(공실 건물)에 Posting(창업)할 기업**이다. 그 기업에게 온/오프라인으로 어떻게 마케팅·홍보할지 알려준다 (2026-08-16 대상 재정의) |
 
 ## Active Projects
 | 이름 | 내용 |

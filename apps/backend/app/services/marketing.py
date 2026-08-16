@@ -150,8 +150,83 @@ def _district_context(district_id: str | None) -> str | None:
     if summaries:
         parts.append("검색 트렌드(최근 6개월, 방향은 계산된 값이다): " + "; ".join(summaries))
 
+    if (dm := _demand_context(rows)):
+        parts.append(dm)
+
     if (ev := _events_context(district_id)):
         parts.append(ev)
+    return "\n".join(parts) or None
+
+
+# 오프라인 제안이 겨냥할 수 있는 시간대 — 00~06 은 뺀다.
+# 심야에 유동이 매출을 앞서는 건 상권의 빈틈이 아니라 가게가 닫혀 있어서다. 빼지 않으면
+# 대다수 거점에서 00~06 이 '최대 격차'로 뽑히고 새벽 플리마켓 같은 제안이 나온다.
+# data/pipelines/build_program_demand.ACTIONABLE_TMZONS 와 같은 값을 유지할 것.
+_ACTIONABLE_TMZONS = ["06_11", "11_14", "14_17", "17_21", "21_24"]
+_TMZON_LABEL = {"00_06": "0~6시", "06_11": "6~11시", "11_14": "11~14시",
+                "14_17": "14~17시", "17_21": "17~21시", "21_24": "21~24시"}
+
+
+def _demand_context(rows: list[tuple[str, str, float]]) -> str | None:
+    """TRDAR 상권 수요신호를 컨텍스트 문장으로 (build_program_demand 산출 `demand` 행).
+
+    Program 의 대상이 **공실에 창업할 기업**이라 리뷰가 없다. 제안의 근거를 리뷰 대신
+    이 수치가 맡는다 — 없으면 "상권 플리마켓 참여" 같은 어느 상권에나 해당하는 말이 된다.
+
+    두 출력이 같은 표에서 갈린다:
+      - 매출이 유동을 앞서는 시간대 = **전환 구간** → 온라인(퍼포먼스) 광고를 태울 곳
+      - 유동이 매출을 앞서는 시간대 = **빈 구간** → 오프라인(유동인구 확대) 이벤트가 칠 곳
+    """
+    d = {k: v for kd, k, v in rows if kd == "demand"}
+    if not d:
+        return None
+
+    parts: list[str] = []
+
+    pairs = [(t, d[f"flpop_tmzon_{t}"], d[f"selng_tmzon_{t}"]) for t in _ACTIONABLE_TMZONS
+             if f"flpop_tmzon_{t}" in d and f"selng_tmzon_{t}" in d]
+    if pairs:
+        parts.append("시간대별 유동/매출 구성비(%): " + ", ".join(
+            f"{_TMZON_LABEL[t]} 유동 {f:.1f}/매출 {s:.1f}" for t, f, s in pairs))
+        gap = max(pairs, key=lambda p: p[1] - p[2])
+        conv = min(pairs, key=lambda p: p[1] - p[2])
+        parts.append(
+            f"유동 대비 매출이 가장 빈 시간대는 {_TMZON_LABEL[gap[0]]}"
+            f"(+{gap[1] - gap[2]:.1f}%p) — 오프라인 유입 확대 제안은 이 구간을 겨냥한다. "
+            f"매출이 가장 앞서는 시간대는 {_TMZON_LABEL[conv[0]]}"
+            f"({conv[1] - conv[2]:+.1f}%p) — 온라인 퍼포먼스 노출은 이 구간에 둔다.")
+    elif any(k.startswith("flpop_tmzon") for k in d):
+        # 유동만 있고 매출이 결측인 거점 — 격차를 지어내지 않는다.
+        parts.append("시간대별 매출 구성비는 이 상권에서 결측이다 — 유동·매출 격차를 근거로 쓰지 말 것.")
+
+    ages = [(a, d[f"agrde_{a}"]) for a in ("10", "20", "30", "40", "50", "60_above")
+            if f"agrde_{a}" in d]
+    if ages:
+        top = sorted(ages, key=lambda x: -x[1])[:3]
+        lab = {"60_above": "60대+"}
+        parts.append("유동인구 구성: " + ", ".join(
+            f"{lab.get(a, a + '대')} {v:.1f}%" for a, v in top)
+            + (f", 여성 {d['fml_share']:.1f}%" if "fml_share" in d else ""))
+
+    if "flpop_wkend" in d and "selng_wkend" in d:
+        parts.append(f"주말 비중: 유동 {d['flpop_wkend']:.1f}% / 매출 {d['selng_wkend']:.1f}%")
+
+    biz = []
+    if "stor_co" in d:
+        biz.append(f"점포 {int(d['stor_co'])}곳")
+    if "frc_share" in d:
+        biz.append(f"프랜차이즈 {d['frc_share']:.1f}%")
+    if "clsbiz_rt" in d:
+        biz.append(f"폐업률 {d['clsbiz_rt']:.2f}%")
+    if biz:
+        parts.append("상권 구성: " + " · ".join(biz))
+
+    if "trdar_n" in d:
+        n, sn = int(d["trdar_n"]), int(d.get("trdar_selng_n", d["trdar_n"]))
+        note = f"(TRDAR 상권 {n}개 유동 가중평균"
+        note += f", 매출은 {sn}개" if sn != n else ""
+        parts.append(note + ")")
+
     return "\n".join(parts) or None
 
 
