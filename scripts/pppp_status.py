@@ -1,0 +1,313 @@
+"""[PPPP] 전 트랙 진행률 — 손으로 세지 않고 산출물에서 계산한다.
+
+`/pppp-status` 슬래시 커맨드가 부르는 스크립트다.
+
+## 왜 스크립트인가
+
+진행률을 문서에 손으로 적으면 **쿼터를 소진한 날마다 낡는다.** 실제로
+`docs/spaceos-vibe-build-sequence.md` 는 두 번 낡았다 — 08-02 에 멈춰 Tier1 을 13거점으로,
+08-09 에 멈춰 22거점으로 적고 있었다(실제 49). 숫자 하나가 아니라 **그 숫자에 기대는
+진술이 같이** 낡는다는 게 문제라, 세는 일을 코드로 내렸다.
+
+## 진행률을 정직하게 만드는 법
+
+이 저장소는 추정치를 실측처럼 보이게 하는 것을 가장 나쁜 산출물로 본다(AGENTS.md §0).
+진행률도 예외가 아니다 — "대충 70%" 는 근거가 없다. 그래서:
+
+- 트랙 진행률 = **게이트 여러 개의 평균**이고, 게이트마다 값과 근거를 함께 찍는다.
+  평균이 마음에 안 들면 게이트를 보고 직접 판단하면 된다.
+- 게이트는 두 종류다. `[자동]` 은 산출물을 세어 계산한 값이고, `[선언]` 은 사람이
+  적어 둔 값이다. **선언은 근거 경로를 반드시 달고, 화면에서 자동과 구분해 보인다.**
+  선언 게이트가 늘어나면 그만큼 이 숫자를 믿을 이유가 줄어든다는 뜻이다.
+- 가중치는 두지 않는다(전부 동일 가중). 가중치는 그 자체가 판단이라, 숨기느니
+  균등하게 두고 게이트 목록을 드러내는 편이 낫다.
+
+읽기만 한다. 네트워크를 타지 않고 아무 파일도 쓰지 않는다 — 언제 돌려도 안전하다.
+
+실행: python scripts/pppp_status.py          (저장소 루트 spaceos/ 에서)
+      python scripts/pppp_status.py --json   기계 판독용
+"""
+from __future__ import annotations
+
+import json
+import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+GOLD = ROOT / "data" / "gold"
+
+# Windows 콘솔 기본 코드페이지(cp949)에서 한글·기호가 깨진다. 와이어가 아니라 표시만
+# 깨지는 것이라 결과를 오독하기 쉬워서(2026-08-16 실제로 두 번 헛읽음) 여기서 고정한다.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+
+@dataclass
+class Gate:
+    """진행률 한 칸. value 는 0.0~1.0."""
+
+    name: str
+    value: float
+    detail: str
+    auto: bool = True          # False = 선언(사람이 적은 값)
+    evidence: str = ""         # 선언 게이트의 근거 경로 — 자동이면 비워 둔다
+
+
+@dataclass
+class Track:
+    name: str
+    phase: str
+    gates: list[Gate] = field(default_factory=list)
+
+    @property
+    def pct(self) -> float:
+        if not self.gates:
+            return 0.0
+        return 100.0 * sum(g.value for g in self.gates) / len(self.gates)
+
+    @property
+    def declared(self) -> int:
+        return sum(1 for g in self.gates if not g.auto)
+
+
+# ─────────────────────────── 공통 로더 ───────────────────────────
+
+def _load(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _hubs() -> int:
+    """전체 거점 수. page_hubs 를 못 읽으면 gold 디렉토리 수로 떨어진다."""
+    try:
+        sys.path.insert(0, str(ROOT))
+        from data.config.page_hubs import HUBS
+
+        return len(HUBS)
+    except Exception:
+        return sum(1 for p in GOLD.iterdir() if p.is_dir() and (p / "coverage.json").exists())
+
+
+def _coverages() -> list[dict]:
+    out = []
+    for p in sorted(GOLD.glob("*/coverage.json")):
+        j = _load(p)
+        if j:
+            j["_slug"] = p.parent.name
+            out.append(j)
+    return out
+
+
+# ─────────────────────────── Page ───────────────────────────
+
+def page_track(total: int) -> Track:
+    t = Track("Page", "Phase 1·4 (수집으로 재진입)")
+    cov = _coverages()
+    tier1 = [c for c in cov if str(c.get("tier", "")).startswith("Tier1")]
+    t.gates.append(Gate(
+        "Tier1 대장 실측 거점",
+        len(tier1) / total if total else 0.0,
+        f"{len(tier1)}/{total}거점 — 잔여 "
+        + (", ".join(sorted(c["_slug"] for c in cov if c not in tier1)) or "없음"),
+    ))
+
+    # 티어는 통과/미통과이지 품질 등급이 아니다 — 대표 집계 커버리지를 따로 센다.
+    good = [c for c in tier1 if (c.get("reference_coverage_pct") or 0) >= 90]
+    low = sorted(((c.get("reference_coverage_pct") or 0), c["_slug"]) for c in tier1)[:3]
+    t.gates.append(Gate(
+        "대표 집계 커버리지 ≥90%",
+        len(good) / total if total else 0.0,
+        f"{len(good)}/{total}거점 — 최저 " + " · ".join(f"{s} {v:.1f}%" for v, s in low),
+    ))
+
+    anchored = [p for p in GOLD.glob("*/calibration.json")]
+    t.gates.append(Gate(
+        "R-ONE 앵커 대조 보유",
+        len(anchored) / total if total else 0.0,
+        f"{len(anchored)}/{total}거점 — 없으면 앵커 대조 자체가 불가(격차 0 이란 뜻이 아니다)",
+    ))
+
+    # 4대 레이어는 엔드포인트 유무로는 판정이 안 된다 — 유동인구는 라우트가 있어도
+    # 프론트가 SAMPLE 상수를 그린다. 그래서 실데이터 여부는 선언으로 둔다.
+    t.gates.append(Gate(
+        "4대 히트맵 레이어 실데이터", 2 / 4,
+        "공실 ✅ · 임대 ✅(R-ONE) · 유동 ⬜ 샘플 · 밀도 ⬜ 미연동",
+        auto=False,
+        evidence="apps/frontend/src/pages/MapShell.tsx:91 (SAMPLE 상수) · api/v1/heatmap.py",
+    ))
+    t.gates.append(Gate(
+        "지도·건물상세·3D 트윈 표면", 1.0,
+        "MapShell 지도 + 건물 클릭 패널 + BuildingTwin 동작",
+        auto=False,
+        evidence="apps/frontend/src/pages/MapShell.tsx",
+    ))
+    return t
+
+
+# ─────────────────────────── Platform ───────────────────────────
+
+def platform_track() -> Track:
+    t = Track("Platform", "Phase 5 (ML)")
+    fc = _load(GOLD / "platform_vacancy_forecast.json")
+    t.gates.append(Gate(
+        "LSTM 공실예측 학습·서빙",
+        1.0 if fc else 0.0,
+        f"model={fc.get('model')} · 학습 {str(fc.get('trained_at'))[:10]}" if fc
+        else "platform_vacancy_forecast.json 없음 → API 가 lstm-stub 으로 떨어진다",
+    ))
+
+    rec = _load(GOLD / "platform_industry_recommend.json")
+    m = (rec or {}).get("metrics", {})
+    t.gates.append(Gate(
+        "GNN 업종추천 학습·서빙",
+        1.0 if rec else 0.0,
+        f"노드 {m.get('nodes')} · 피처 {m.get('features')} · "
+        f"수요신호 {'반영' if m.get('demand_features') else '없음(58열로 되돌아감)'}"
+        if rec else "platform_industry_recommend.json 없음",
+    ))
+
+    # KPI 는 목표 대비 비율로 부분점수를 준다 — 달성/미달만 찍으면 얼마나 남았는지 사라진다.
+    top3, top1 = m.get("test_top3"), m.get("test_top1")
+    if top3 is not None:
+        t.gates.append(Gate(
+            "KPI 업종추천 Top-3 ≥70%", min(1.0, top3 / 0.70),
+            f"{top3:.1%} — 달성. 단 거점 사전분포가 이미 "
+            f"{m.get('baseline_district_prior_top3', 0):.1%} 라 lift 는 "
+            f"{m.get('lift_vs_district_prior_pct')}% 다",
+        ))
+    if top1 is not None:
+        t.gates.append(Gate(
+            "KPI 업종추천 Top-1 ≥70%", min(1.0, top1 / 0.70),
+            f"{top1:.1%} — 미달. 천장은 피처가 아니라 태스크 재설계(세분 라벨) 쪽이다",
+        ))
+    return t
+
+
+# ─────────────────────────── Posting ───────────────────────────
+
+def posting_track(total: int) -> Track:
+    t = Track("Posting", "Phase 6-1 (입점 솔루션)")
+    inp = _load(GOLD / "platform_posting_inputs.json") or {}
+    # 거점은 최상위가 아니라 "districts" 아래에 있다. 최상위를 훑으면 조용히 0/54 가
+    # 나오고 "아직 안 붙였구나"로 오독된다 — 실제로 이 스크립트가 그렇게 틀렸다.
+    hubs = {k: v for k, v in (inp.get("districts") or {}).items() if isinstance(v, dict)}
+
+    t.gates.append(Gate(
+        "3-Tier 폴백 계산", 1.0,
+        "고급화/가성비/기능중심 3전략 + roi_months 산출",
+        auto=False, evidence="apps/backend/app/services/districts.tier_scenarios",
+    ))
+
+    # 4입력(rent·foot·area·prem) 중 실데이터가 몇 개인가 — 거점별로 세어 평균낸다.
+    # foot 은 절대수준만 실데이터(flpop)이고 거점 내 서열은 시드라 0.5 로 센다.
+    rent = sum(1 for v in hubs.values() if v.get("rent_per_m2_krw_thousand"))
+    foot = sum(1 for v in hubs.values() if v.get("flpop"))
+    per_hub = (rent + 0.5 * foot) / (4 * total) if total else 0.0
+    t.gates.append(Gate(
+        "3-Tier 입력 4종 실데이터화", per_hub,
+        f"rent {rent}/{total} ✅(R-ONE) · foot {foot}/{total} ◐(flpop+seed, 서열은 시드) · "
+        f"area 0/{total} ⬜ · prem 0/{total} ⬜(표본 밀도 부족)",
+    ))
+
+    # 주석 문구로 판정하면 주석만 고쳐도 "연동됨"이 된다. 어댑터라면 반드시 밖으로
+    # 나가는 호출이 있어야 하므로, HTTP 클라이언트 사용 여부를 신호로 쓴다.
+    posting_py = (ROOT / "apps/backend/app/services/posting.py").read_text(encoding="utf-8")
+    wired = any(s in posting_py for s in ("requests.", "httpx.", "urllib.request"))
+    t.gates.append(Gate(
+        "외부 AI 창업 코파일럿 어댑터", 1.0 if wired else 0.0,
+        "미연동 — `_call_copilot` 이 항상 None 을 반환해 폴백만 돈다(입출력 명세 부재)"
+        if not wired else "연동됨",
+    ))
+
+    t.gates.append(Gate(
+        "`rec` 추천 기준 정의", 0.0,
+        "미정 — 지금은 손으로 적은 값이 54거점 카드의 tier_mix·rec_top 에 노출된다. "
+        "외부 의존이 0 이라 착수 가능(roi_months 로 '회수 최단' 파생 가능)",
+        auto=False, evidence="apps/backend/app/services/districts.py:156",
+    ))
+    return t
+
+
+# ─────────────────────────── Program ───────────────────────────
+
+def program_track(total: int) -> Track:
+    t = Track("Program", "Phase 6-2 (마케팅 자동화)")
+
+    t.gates.append(Gate(
+        "가게 단위 — LLM 실호출 + 화면", 1.0,
+        "POST /marketing/generate + ProgramStudio 화면 + 규칙기반 폴백",
+        auto=False, evidence="apps/backend/app/services/marketing.py · pages/ProgramStudio.tsx",
+    ))
+
+    ctx = list(GOLD.glob("*/program_content_context.csv"))
+    t.gates.append(Gate(
+        "상권 단위 — 콘텐츠 컨텍스트",
+        len(ctx) / total if total else 0.0,
+        f"{len(ctx)}/{total}거점 program_content_context.csv "
+        "(⚠ CSV 다 — 배포에 pandas 가 없어 파케이는 프로덕션에서 못 읽는다)",
+    ))
+
+    ha = (ROOT / "apps/backend/app/services/ha_guard.py").exists()
+    t.gates.append(Gate(
+        "Humanistic Authority 후처리 검증", 1.0 if ha else 0.0,
+        "ha_guard 가동 — LLM 자기신고('점검 통과')를 서버가 대조한다" if ha
+        else "ha_guard.py 없음 — 자기신고를 그대로 믿게 된다",
+    ))
+
+    t.gates.append(Gate(
+        "구역 단위 감성 실데이터", 0.0,
+        "막힘 — 리뷰 원문 수집 채널이 없다. 블로그 검색 API 는 스니펫이라 구역 좌표가 "
+        "없고, 시드가 요구하는 건 324개 구역(54×6) 단위다. 현재 값은 전부 추정",
+        auto=False, evidence="docs/spaceos-vibe-build-sequence.md §5번(감성 프록시 제거)",
+    ))
+    return t
+
+
+# ─────────────────────────── 출력 ───────────────────────────
+
+def _bar(pct: float, width: int = 20) -> str:
+    fill = round(pct / 100 * width)
+    return "█" * fill + "·" * (width - fill)
+
+
+def main() -> int:
+    total = _hubs()
+    tracks = [page_track(total), platform_track(), posting_track(total), program_track(total)]
+
+    if "--json" in sys.argv:
+        print(json.dumps({
+            "hubs": total,
+            "tracks": [{
+                "name": t.name, "phase": t.phase, "pct": round(t.pct, 1),
+                "gates": [{"name": g.name, "value": round(g.value, 3), "auto": g.auto,
+                           "detail": g.detail, "evidence": g.evidence} for g in t.gates],
+            } for t in tracks],
+        }, ensure_ascii=False, indent=1))
+        return 0
+
+    print("PPPP 진행률 — 산출물에서 계산 (거점 %d)" % total)
+    print("=" * 78)
+    for t in tracks:
+        print(f"\n{t.name}  {t.pct:5.1f}%  {_bar(t.pct)}   {t.phase}")
+        for g in t.gates:
+            tag = "자동" if g.auto else "선언"
+            print(f"   [{tag}] {g.value:5.1%}  {g.name}")
+            print(f"          └ {g.detail}")
+            if g.evidence:
+                print(f"            근거: {g.evidence}")
+
+    print("\n" + "=" * 78)
+    order = " > ".join(t.name for t in sorted(tracks, key=lambda x: -x.pct))
+    print(f"진행 순서: {order}")
+    dec = sum(t.declared for t in tracks)
+    tot = sum(len(t.gates) for t in tracks)
+    print(f"게이트 {tot}개 중 선언 {dec}개 — 선언이 많을수록 이 숫자를 믿을 이유가 줄어든다.")
+    print("가중치는 두지 않았다(전부 동일 가중). 평균이 아니라 게이트를 보고 판단할 것.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
