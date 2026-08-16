@@ -233,35 +233,69 @@ def posting_track(total: int) -> Track:
 
 # ─────────────────────────── Program ───────────────────────────
 
+def _context_kinds() -> dict[str, int]:
+    """program_content_context.csv 의 kind 접두별 보유 거점 수."""
+    import csv
+
+    out: dict[str, int] = {}
+    for p in GOLD.glob("*/program_content_context.csv"):
+        try:
+            with p.open(encoding="utf-8-sig", newline="") as f:
+                kinds = {(r.get("kind") or "").split(":")[0] for r in csv.DictReader(f)}
+        except OSError:
+            continue
+        for k in kinds:
+            out[k] = out.get(k, 0) + 1
+    return out
+
+
 def program_track(total: int) -> Track:
-    t = Track("Program", "Phase 6-2 (마케팅 자동화)")
+    """대상 재정의(2026-08-16) 기준.
+
+    Program 의 대상은 **공실에 창업할 기업**이다. 게이트도 그 기준으로 센다 —
+    옛 정의(영업 중 점주 / 324개 구역 감성)로 재면 이미 끝난 것처럼 보인다.
+    """
+    t = Track("Program", "Phase 6-2 (공실 창업 기업 대상)")
+    kinds = _context_kinds()
 
     t.gates.append(Gate(
-        "가게 단위 — LLM 실호출 + 화면", 1.0,
-        "POST /marketing/generate + ProgramStudio 화면 + 규칙기반 폴백",
-        auto=False, evidence="apps/backend/app/services/marketing.py · pages/ProgramStudio.tsx",
+        "생성 엔진 · 화면 · HA 검증", 1.0,
+        "POST /marketing/generate + ProgramStudio + ha_guard 후처리 — 기반은 서 있다",
+        auto=False, evidence="services/marketing.py · services/ha_guard.py · pages/ProgramStudio.tsx",
     ))
 
-    ctx = list(GOLD.glob("*/program_content_context.csv"))
+    ctx = kinds.get("blog_keyword", 0)
     t.gates.append(Gate(
-        "상권 단위 — 콘텐츠 컨텍스트",
-        len(ctx) / total if total else 0.0,
-        f"{len(ctx)}/{total}거점 program_content_context.csv "
-        "(⚠ CSV 다 — 배포에 pandas 가 없어 파케이는 프로덕션에서 못 읽는다)",
+        "상권 콘텐츠 컨텍스트", ctx / total if total else 0.0,
+        f"{ctx}/{total}거점 — 블로그 키워드·업종 분포 (CSV·표준라이브러리 서빙)",
     ))
 
-    ha = (ROOT / "apps/backend/app/services/ha_guard.py").exists()
+    dem = kinds.get("demand", 0)
     t.gates.append(Gate(
-        "Humanistic Authority 후처리 검증", 1.0 if ha else 0.0,
-        "ha_guard 가동 — LLM 자기신고('점검 통과')를 서버가 대조한다" if ha
-        else "ha_guard.py 없음 — 자기신고를 그대로 믿게 된다",
+        "상권 수요신호 결합", dem / total if total else 0.0,
+        f"{dem}/{total}거점 — TRDAR 시간대·연령·성별. 리뷰가 없는 대상에게 근거를 대는 "
+        "자리이자, 온라인(전환 구간)·오프라인(빈 구간) 두 출력이 갈리는 표다",
+    ))
+
+    tr = kinds.get("trend", 0)
+    t.gates.append(Gate(
+        "검색 트렌드 라벨 (HA 안전장치)", tr / total if total else 0.0,
+        f"{tr}/{total}거점 — 라벨이 없으면 ha_guard 의 트렌드 역행 검사가 **조용히 통과**한다. "
+        "수집기가 자치구 단위라 거점 키워드 설계가 필요",
     ))
 
     t.gates.append(Gate(
-        "구역 단위 감성 실데이터", 0.0,
-        "막힘 — 리뷰 원문 수집 채널이 없다. 블로그 검색 API 는 스니펫이라 구역 좌표가 "
-        "없고, 시드가 요구하는 건 324개 구역(54×6) 단위다. 현재 값은 전부 추정",
-        auto=False, evidence="docs/spaceos-vibe-build-sequence.md §5번(감성 프록시 제거)",
+        "입력 계약 3층 (자리·상권·창업계획)", 1 / 3,
+        "상권층만 있다. 자리층(공실 유닛 13/54)과 창업계획층(기업 입력)은 미구현 — "
+        "StoreProfile 은 영업 중 전제라 공실을 넣으면 '방문 후기형 포스팅'이 나온다",
+        auto=False, evidence="docs/feature-program.md §0-B",
+    ))
+
+    t.gates.append(Gate(
+        "출력 분리 (퍼포먼스 / 상권활성화)", 0.0,
+        "미착수 — ChannelPlan 4필드로는 타겟·예산배분·협업주체를 못 담는다. "
+        "프롬프트의 신규 행사 제안 금지 조항도 새 출력과 충돌",
+        auto=False, evidence="apps/backend/app/schemas/marketing.py::ChannelPlan",
     ))
     return t
 
