@@ -281,7 +281,7 @@ def program_track(total: int) -> Track:
     t.gates.append(Gate(
         "검색 트렌드 라벨 (HA 안전장치)", tr / total if total else 0.0,
         f"{tr}/{total}거점 — 라벨이 없으면 ha_guard 의 트렌드 역행 검사가 **조용히 통과**한다. "
-        "수집기가 자치구 단위라 거점 키워드 설계가 필요",
+        "거점 단위 수집(naver_datalab --hubs) + build_program_trend 로 켰다",
     ))
 
     t.gates.append(Gate(
