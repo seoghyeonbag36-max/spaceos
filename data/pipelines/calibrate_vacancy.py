@@ -292,11 +292,17 @@ def run(slug: str) -> bool:
     dst.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
     mid = aligned.get("mid") or {}
     if mid:
+        # gap_pp 는 면적 기준 공실률이 있어야 나온다 — 없는 거점이 있다(2026-08-16 실측:
+        # 08-16 승격 9거점). 예전에는 `{...:+}` 로 바로 포맷해 **로그 한 줄이 파이프라인을
+        # 통째로 세웠다**. calibration.json 은 이미 쓰인 뒤라 첫 거점만 산출되고 나머지가
+        # 조용히 빠졌다. 값이 없으면 없다고 찍고 넘어간다.
+        gap = mid.get("gap_pp")
+        gap_s = f"{gap:+}%p" if isinstance(gap, (int, float)) else "gap 산출 불가(면적 기준 결측)"
         print(f"[calibrate:{slug}] rone_aligned(mid): 면적 "
               f"{mid.get('vacancy_area_pct')}% · 층 "
               f"{mid.get('vacancy_floor_hi_pct')}~{mid.get('vacancy_floor_lo_pct')}% · "
               f"호실 {mid.get('vacancy_units_pct')}% vs 앵커 {mid.get('anchor_pct')}% "
-              f"→ gap {mid.get('gap_pp'):+}%p ({mid['buildings']}동)")
+              f"→ {gap_s} ({mid['buildings']}동)")
     if primary is not None:
         print(f"[calibrate:{slug}] primary: 추정 {primary['estimated_vacancy_pct']:5.1f}% "
               f"vs 앵커 {anchor:5.2f}% → gap {primary['gap_pp']:+6.1f}%p, "

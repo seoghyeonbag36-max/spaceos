@@ -223,10 +223,25 @@ def posting_track(total: int) -> Track:
     ))
 
     t.gates.append(Gate(
-        "`rec` 추천 기준 정의", 0.0,
-        "미정 — 지금은 손으로 적은 값이 54거점 카드의 tier_mix·rec_top 에 노출된다. "
-        "외부 의존이 0 이라 착수 가능(roi_months 로 '회수 최단' 파생 가능)",
-        auto=False, evidence="apps/backend/app/services/districts.py:156",
+        "`rec` 추천 기준 정의", 1.0,
+        "회수 최단으로 정의·계산(recommend_tier). 손으로 적은 값이 카드에 노출되던 것을 "
+        "걷어냈고, rec 필드가 없는 실제 건물 유닛도 통과한다",
+        auto=False, evidence="apps/backend/app/services/districts.recommend_tier",
+    ))
+
+    vu = list(GOLD.glob("*/vacant_units.json"))
+    t.gates.append(Gate(
+        "실제 공실 유닛 인벤토리", len(vu) / total if total else 0.0,
+        f"{len(vu)}/{total}거점 — 미산출 5곳은 Tier2(대장 없음)라 상업면적을 못 얻는다. "
+        "Page 의 건축HUB 쿼터 병목과 같은 5곳이다",
+    ))
+
+    t.gates.append(Gate(
+        "3-Tier 비용 모델 보정", 0.0,
+        "month_cost 에 원가·인건비가 없다 — 마진 51~73%(실제 외식업 10~20%), 회수 "
+        "0.5~1.6개월. factory 는 전수 실측에서 한 번도 1위가 못 된다. rec 을 정의하자 "
+        "병목이 여기로 옮겨왔다",
+        auto=False, evidence="apps/backend/app/services/districts.tier_scenarios",
     ))
     return t
 

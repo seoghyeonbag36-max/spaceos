@@ -100,6 +100,38 @@ def build_cells(grid: dict) -> dict:
     return {"cells": cells, "sum_stores": sum_stores, "sum_vac": sum_vac, "avg_vacancy": round(avg, 2)}
 
 
+def recommend_tier(scenarios: dict) -> str | None:
+    """추천 전략 = **회수 최단**. 순익이 0 이하인(회수 불가) 전략은 후보에서 뺀다.
+
+    ## 기준을 이것으로 정한 이유 (2026-08-16 제품 정의)
+
+    `rec` 은 여태 시드에 손으로 적혀 있었고 기준이 정의된 적이 없었다. 그 값이
+    54거점 카드의 `tier_mix`·`rec_top` 으로 그대로 노출되고 있었다.
+
+    후보는 셋이었다 — 회수 최단 / 순익 최대 / 리스크 최소. **회수 최단**을 고른 것은
+    `roi_months` 가 이미 계산돼 추가 데이터가 필요 없고, 공실에 새로 들어가는 기업에게
+    "언제 본전을 찾는가"가 가장 직결되는 질문이기 때문이다. 리스크 최소는 리스크를
+    잴 지표가 없고, 순익 최대는 투자 규모를 무시해 항상 최상위 전략을 고른다.
+
+    동률이면 순익이 큰 쪽을 고른다 — 같은 기간에 회수한다면 더 버는 쪽이 낫다.
+
+    ## ⚠ 이 값이 기대는 계산은 아직 보정되지 않았다
+
+    `tier_scenarios` 의 `month_cost` 에 **원가·인건비가 없다.** 그래서 마진이 51~73%로
+    나오고(실제 외식업 영업이익률은 통상 10~20%) 회수기간이 0.5~1.6개월로 찍힌다.
+    실측 결과 `factory` 는 **어떤 입력 조합에서도 1위가 되지 못한다**(면적 10~80평 ·
+    임대료 100~2000만원 · 유동 저/고 전수). 즉 지금 이 추천은 순위가 셋 중 둘로만
+    갈린다 — 기준이 아니라 **비용 모델이 병목**이다.
+
+    그럼에도 손으로 적은 값보다는 낫다: 계산이 드러나 있고 재현되며, 비용 모델이
+    보정되면 추천이 자동으로 따라온다. 응답의 `roi_basis` 가 이 한계를 함께 내려보낸다.
+    """
+    viable = [s for s in scenarios.values() if s["month_net"] > 0]
+    if not viable:
+        return None
+    return min(viable, key=lambda s: (s["roi_months"], -s["month_net"]))["tier"]
+
+
 def tier_scenarios(unit: dict) -> dict:
     """공실 유닛의 3-Tier 비용-효용 시나리오(월 단위, 만원/백만원)."""
     f_k = _FOOT_K[unit["foot"]]
@@ -127,8 +159,13 @@ def tier_scenarios(unit: dict) -> dict:
             "tier": k, "name": TIER[k]["nm"], "sub": TIER[k]["sub"],
             "invest_mn": inv, "month_cost": cost, "month_rev": rev,
             "month_net": rev - cost, "roi_months": roi(inv, cost, rev),
-            "recommended": k == unit["rec"],
         }
+    # 추천은 **계산한다** — 시드의 `unit["rec"]` 을 읽지 않는다. 그래야 실제 건물에서
+    # 뽑은 유닛(gold/{거점}/vacant_units.json)에도 그대로 쓸 수 있다. 그 유닛들에는
+    # 서술 필드인 rec 이 아예 없어서, 이 의존이 배선을 막고 있었다.
+    best = recommend_tier(out)
+    for k, s in out.items():
+        s["recommended"] = k == best
     return out
 
 
@@ -153,8 +190,11 @@ def _summary(d: dict) -> dict:
     sent = sum(z["s"] * z["r"] for z in d["zones"]) / sum_r
     risk = sum(1 for z in d["zones"] if z["s"] < 40)
     ci = cells_for(d)
-    tiers = {k: sum(1 for u in d["units"] if u["rec"] == k) for k in TIER}
-    rec_top = TIER[d["units"][0]["rec"]]["nm"] if d["units"] else ""
+    # 추천은 계산한다(recommend_tier). 예전에는 시드에 손으로 적은 `u["rec"]` 를 그대로
+    # 세어 카드에 노출했다 — 기준이 정의된 적이 없는 값이었다.
+    recs = [recommend_tier(tier_scenarios(u)) for u in resolved_units(d["id"]) or []]
+    tiers = {k: sum(1 for r in recs if r == k) for k in TIER}
+    rec_top = TIER[recs[0]]["nm"] if recs and recs[0] else ""
     return {
         "id": d["id"], "name": d["name"], "gu": d["gu"], "type": d["type"],
         "center": d["center"], "note": d["sub"], "rec_top": rec_top,
