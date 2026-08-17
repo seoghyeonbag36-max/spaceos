@@ -20,7 +20,12 @@ const B_STATUS: Record<string, { color: string; label: string }> = {
   empty: { color: colors.vacancy[4], label: "공실의심" },
 };
 
-interface TwinSel { name: string; capacity: number; active: number; status: string; }
+interface TwinSel {
+  name: string; capacity: number; active: number; status: string;
+  floors?: number;
+  // 층 실배치 — 층 근거가 있는 건물에만 실린다(없으면 트윈이 근사로 폴백).
+  comFloors?: number[]; occFloors?: number[]; unknownN?: number;
+}
 
 /**
  * 서울 Page 거점 대시보드 + 거점 심층 뷰(거점 수는 백엔드에 따라 가변 — 2026-08 기준 54곳).
@@ -335,7 +340,12 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
             + `${p.industry ? " · " + p.industry : ""}</span></div>`,
           );
           info.open(map, c);
-          setSel({ name: p.name || "건물", capacity: p.capacity, active: p.active, status: p.status });
+          setSel({
+            name: p.name || "건물", capacity: p.capacity, active: p.active, status: p.status,
+            floors: p.floors,
+            comFloors: p.com_floors ?? undefined, occFloors: p.occ_floors ?? undefined,
+            unknownN: p.unknown_n ?? undefined,
+          });
         });
         overlaysRef.current.push(dot);
       });
@@ -431,11 +441,27 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
             </div>
             <div className="twincanvas">
               <Suspense fallback={<div className="twinload">3D 로딩…</div>}>
-                <BuildingTwin b={{ name: sel.name, capacity: sel.capacity, active: sel.active, statusColor: B_STATUS[sel.status]?.color ?? colors.vacancy[4] }} />
+                <BuildingTwin b={{
+                  name: sel.name, capacity: sel.capacity, active: sel.active, floors: sel.floors,
+                  statusColor: B_STATUS[sel.status]?.color ?? colors.vacancy[4],
+                  comFloors: sel.comFloors, occFloors: sel.occFloors, unknownN: sel.unknownN,
+                }} />
               </Suspense>
             </div>
             <div className="twinfoot">
-              녹색 = 영업 층 · {B_STATUS[sel.status]?.label ?? ""}색 = 공실(추정) · {sel.active}/{sel.capacity}호
+              {sel.comFloors?.length ? (
+                <>
+                  녹색 = 영업 확인 층({sel.occFloors?.join("·") || "없음"})
+                  {sel.unknownN ? ` · 노란색 = 층 미상 점포 ${sel.unknownN}곳이 앉을 수 있는 층` : ""}
+                  {" · "}{B_STATUS[sel.status]?.label ?? ""}색 = 공실 · 회색 = 비상업 층
+                  {" · "}상업 {sel.comFloors.length}개 층 중 {sel.active}개 영업
+                </>
+              ) : (
+                <>
+                  녹색 = 영업 층(점유율 환산) · {B_STATUS[sel.status]?.label ?? ""}색 = 공실(추정) · {sel.active}/{sel.capacity}호
+                  <span style={{ opacity: 0.75 }}> · 층 근거가 없어 아래부터 채운 근사다</span>
+                </>
+              )}
             </div>
           </div>
         </div>

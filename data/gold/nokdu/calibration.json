@@ -3,11 +3,31 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>신림역",
   "anchor_vac_small_pct": 4.98247919404293,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 33.9,
-  "alpha_street": 0.166,
-  "gap_pp": 28.3,
+  "estimated_vacancy_pct": 39.2,
+  "alpha_street": 0.144,
+  "gap_pp": 33.6,
   "buildings_used": 226,
   "rone_aligned": {
+    "mid": {
+      "buildings": 370,
+      "vacancy_units_pct": 52.0,
+      "buildings_floor": 356,
+      "vacancy_floor_hi_pct": 50.7,
+      "vacancy_floor_lo_pct": 73.2,
+      "vacancy_area_pct": 49.7,
+      "anchor_pct": 5.63,
+      "gap_pp": 44.1
+    },
+    "small": {
+      "buildings": 17,
+      "vacancy_units_pct": 22.2,
+      "buildings_floor": 17,
+      "vacancy_floor_hi_pct": 22.2,
+      "vacancy_floor_lo_pct": 44.4,
+      "vacancy_area_pct": 25.2,
+      "anchor_pct": 4.98,
+      "gap_pp": 20.2
+    },
     "mall": {
       "buildings": 21,
       "vacancy_units_pct": 64.6
@@ -15,20 +35,20 @@
     "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
   },
   "primary": {
-    "estimated_vacancy_pct": 47.2,
-    "buildings": 389,
+    "estimated_vacancy_pct": 46.5,
+    "buildings": 402,
     "anchor_pct": 5.63,
-    "alpha": 0.119,
-    "gap_pp": 41.6,
-    "coverage_pct": 93.5,
-    "excluded_floor_approx": 27
+    "alpha": 0.121,
+    "gap_pp": 40.9,
+    "coverage_pct": 96.6,
+    "excluded_floor_approx": 14
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 45.8,
+      "estimated_vacancy_pct": 45.7,
       "anchor_pct": 5.63,
       "alpha": 0.123,
-      "gap_pp": 40.2,
+      "gap_pp": 40.1,
       "buildings": 395
     },
     "mall": {
@@ -48,18 +68,18 @@
       "gap_pp": 57.2
     },
     "floor_approx": {
-      "estimated_vacancy_pct": 53.1,
-      "buildings": 27,
+      "estimated_vacancy_pct": 74.6,
+      "buildings": 14,
       "anchor_pct": 5.63,
-      "alpha": 0.106,
-      "gap_pp": 47.5
+      "alpha": 0.076,
+      "gap_pp": 69.0
     },
     "floor_ouln": {
-      "estimated_vacancy_pct": 45.2,
-      "buildings": 368,
+      "estimated_vacancy_pct": 44.5,
+      "buildings": 381,
       "anchor_pct": 5.63,
-      "alpha": 0.125,
-      "gap_pp": 39.6
+      "alpha": 0.127,
+      "gap_pp": 38.9
     }
   },
   "note": "⚠ 대표값은 2026-08-01부터 **rone_aligned** 다(R-ONE 과 같은 모집단·단위). 아래 primary/segments/methods 는 하위호환용이며 집합건물이 섞여 있어 앵커 대조에 쓰면 과대추정된다. primary(v4) = 구 대표값. capacity 근거가 정밀한 expos_units(전유부 실측) + floor_ouln(층별개요 상업층) 만 집계한다. floor_approx 는 분모 과대 편향이 커서 제외하며, coverage_pct 가 낮으면 그 거점은 floor_capacity 수집이 덜 된 상태다(대표값을 신뢰하기 전에 채울 것). combined(v1) = 방법 혼합 — 하위호환용이며 방법 구성비에 흔들리므로 앵커 비교에 쓰지 말 것. segments(v2) = 가두/집합 분리. methods(v3) = capacity_method 단위. 앵커는 거점별 R-ONE 중대형 공실률이다 (2026-07-28 이전의 전 거점 공통 41.6% 는 가로수길 가두 1층 실태조사 값을 부동산원 통계로 잘못 표기한 것이라 폐기). ⚠ 알려진 한계: expos_units(집합건물) 세그먼트는 **분자**가 구조적으로 부족하다 — 상가정보가 대형 집합상가 내부 점포를 그 건물의 bdMgtSn 으로 귀속시키지 못한다. 11거점 실측(2026-07-28) 결과 floor_ouln 의 앵커 격차는 +4~+19%p 인데 expos_units 는 +21~+72%p 로 갈린다(예: 익선 피카디리플러스 capacity 1,031 / active 57). 집합건물 공실률은 아직 신뢰 구간 밖이며, 층·호 단위 매칭(flrNo/hoNo) 을 붙이기 전까지 단독 인용하지 말 것."

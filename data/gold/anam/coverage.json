@@ -2,16 +2,16 @@
   "slug": "anam",
   "hub_name": "안암·고려대",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-16T12:01:30",
+  "built_at": "2026-08-17T15:56:40",
   "shown": 985,
   "excluded_total": 1886,
   "excluded_unknown": 99,
   "excluded_non_commercial": 1787,
   "coverage_pct": 34.3,
   "status": {
-    "full": 327,
-    "partial": 142,
-    "high": 269,
+    "full": 328,
+    "partial": 139,
+    "high": 271,
     "empty": 247
   },
   "source": {
@@ -19,16 +19,16 @@
     "polygon_only": 247,
     "pip_only": 575
   },
-  "reference_vacancy_pct": 10.2,
-  "reference_buildings": 122,
-  "reference_coverage_pct": 98.4,
-  "mixed_vacancy_pct": 11.2,
+  "reference_vacancy_pct": 13.5,
+  "reference_buildings": 123,
+  "reference_coverage_pct": 99.2,
+  "mixed_vacancy_pct": 15.0,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 112,
-      "active": 438,
-      "capacity": 477,
-      "vacancy_pct": 8.2
+      "buildings": 113,
+      "active": 343,
+      "capacity": 388,
+      "vacancy_pct": 11.6
     },
     "expos_units": {
       "buildings": 10,
@@ -37,10 +37,10 @@
       "vacancy_pct": 25.0
     },
     "floor_approx": {
-      "buildings": 2,
-      "active": 5,
-      "capacity": 9,
-      "vacancy_pct": 44.4
+      "buildings": 1,
+      "active": 3,
+      "capacity": 6,
+      "vacancy_pct": 50.0
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

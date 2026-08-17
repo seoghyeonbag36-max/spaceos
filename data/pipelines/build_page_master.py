@@ -335,12 +335,18 @@ def _aggregate(rows: list[dict], extra: int = 0, fresh: int | None = None,
         lic = lic or {}
         # 분자 = 점포(상가정보 flrNo) ∪ 인허가(주소 층 표기) 로 확인된 층
         known = set(at.get("store_flr_nos") or []) | set(lic.get("floors") or [])
-        lo = len(floors & known)
+        occ_floors = sorted(floors & known)
+        lo = len(occ_floors)
         # 층을 모르는 것만 빈 층에 배정(상한): 상가정보 공란 + 인허가 무표기 + PIP 점포.
         spare = ((at.get("store_flr_unknown") or 0) + (lic.get("unknown") or 0) + extra)
         hi = min(len(floors), lo + spare)
         return base | {"active": hi, "capacity": len(floors),
                        "active_floors_lo": lo, "active_floors_hi": hi,
+                       # 층 **번호** 자체 — 3D 트윈이 '몇 층이 비었나'를 실배치로 그리는 근거.
+                       # 개수(lo/hi)만 남기면 프론트는 아래부터 채우는 근사밖에 못 한다.
+                       "com_floors": sorted(floors),   # 분모: 상업 용도 층
+                       "occ_floors": occ_floors,       # 분자 하한: 점포·인허가로 확인된 층
+                       "unknown_n": hi - lo,           # 층 미상 점포로 배정된 층 수(상한−하한)
                        "stores": active,                    # 점포 수(참고·하위호환)
                        "occupancy": hi / len(floors)}
 
@@ -427,6 +433,11 @@ def run(hub: PageHub) -> bool:
                 "source": "stores+ledger" + ("+pip" if pip_n else ""),
                 "capacity_method": agg["capacity_method"],
                 "active_pip": pip_n, "licensed": lic_n,
+                # 층 실배치(BuildingTwin) — 층 근거가 있는 행에만 실린다.
+                # 없는 건물은 프론트가 종전 근사(아래부터 채우기)로 폴백한다.
+                "com_floors": agg.get("com_floors"),
+                "occ_floors": agg.get("occ_floors"),
+                "unknown_n": agg.get("unknown_n"),
             }
         elif pip_n > 0 or lic_n > 0:
             # 지번 매칭은 없지만 점포(PIP)·인허가가 귀속된 건물 — 층수 근사 분모로 재분류

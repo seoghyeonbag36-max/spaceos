@@ -39,7 +39,7 @@ import statistics
 from collections import Counter
 
 from data.collectors.building_vacancy import STORES_PER_FLOOR, classify
-from data.collectors.common import GOLD, load_latest
+from data.collectors.common import BRONZE, GOLD
 from data.collectors.floor_capacity import (
     _commercial_floors, capacity_floors, commercial_floor_nos, ground_floors,
 )
@@ -79,8 +79,34 @@ def _truncated(flr: dict) -> float:
     return sum(1 for v in flr.values() if len(v) <= 1) / len(flr)
 
 
+def _load_flr(slug: str) -> dict | None:
+    """bronze 층별개요를 **전 스냅샷 병합**해 읽는다.
+
+    `load_latest` 를 쓰면 안 된다 — 층별개요는 건축HUB 일일 쿼터 때문에 날짜를 나눠
+    조금씩 모으므로, 최신 폴더가 그날 받은 **일부**만 담고 있는 게 정상이다.
+    최신 하나만 집으면 앞서 모은 대부분이 사라지고, 분모(상업층)가 비어 레거시
+    폴백으로 떨어져 occupancy 가 1.0 으로 포화된다 → 공실률 0% 아티팩트.
+    (2026-08-17 실측: dangsan 최신 18지번 vs 직전 160지번 → 평균 공실 19.5% → 0.0%)
+
+    병합 규칙은 build_building_attrs 와 같다 — 같은 지번은 **층 레코드가 많은 쪽**을
+    남긴다(부분 수집본이 완전본을 덮어쓰지 않게).
+    """
+    merged: dict = {}
+    for p in sorted((BRONZE / slug).glob("*/bldg_flr_raw.json")):
+        try:
+            snap = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if not isinstance(snap, dict):
+            continue
+        for pnu, rows in snap.items():
+            if len(rows or []) >= len(merged.get(pnu) or []):
+                merged[pnu] = rows
+    return merged or None
+
+
 def run(slug: str, apply: bool, legacy: bool = False) -> dict | None:
-    flr = load_latest(slug, "bldg_flr_raw.json")
+    flr = _load_flr(slug)
     if not flr:
         return None
     path = GOLD / slug / "building_vacancy.json"

@@ -2,17 +2,17 @@
   "slug": "cityhall",
   "hub_name": "시청역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-16T12:02:37",
+  "built_at": "2026-08-17T15:58:21",
   "shown": 635,
   "excluded_total": 293,
   "excluded_unknown": 92,
   "excluded_non_commercial": 201,
   "coverage_pct": 68.4,
   "status": {
-    "full": 395,
-    "partial": 87,
-    "high": 76,
-    "empty": 77
+    "full": 441,
+    "partial": 59,
+    "high": 57,
+    "empty": 78
   },
   "source": {
     "stores+ledger": 439,
@@ -20,16 +20,16 @@
     "stores+ledger+pip": 48,
     "pip_only": 71
   },
-  "reference_vacancy_pct": 12.1,
-  "reference_buildings": 327,
-  "reference_coverage_pct": 93.7,
-  "mixed_vacancy_pct": 11.1,
+  "reference_vacancy_pct": 13.2,
+  "reference_buildings": 343,
+  "reference_coverage_pct": 98.3,
+  "mixed_vacancy_pct": 9.6,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 289,
-      "active": 1789,
-      "capacity": 1951,
-      "vacancy_pct": 8.3
+      "buildings": 305,
+      "active": 1036,
+      "capacity": 1127,
+      "vacancy_pct": 8.1
     },
     "expos_units": {
       "buildings": 38,
@@ -38,10 +38,10 @@
       "vacancy_pct": 17.1
     },
     "floor_approx": {
-      "buildings": 22,
-      "active": 64,
-      "capacity": 191,
-      "vacancy_pct": 66.5
+      "buildings": 6,
+      "active": 8,
+      "capacity": 28,
+      "vacancy_pct": 71.4
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

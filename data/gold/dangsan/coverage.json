@@ -2,16 +2,16 @@
   "slug": "dangsan",
   "hub_name": "당산",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T10:11:39",
+  "built_at": "2026-08-17T16:00:05",
   "shown": 246,
   "excluded_total": 244,
   "excluded_unknown": 25,
   "excluded_non_commercial": 219,
   "coverage_pct": 50.2,
   "status": {
-    "full": 113,
-    "partial": 52,
-    "high": 38,
+    "full": 114,
+    "partial": 59,
+    "high": 30,
     "empty": 43
   },
   "source": {
@@ -19,16 +19,16 @@
     "polygon_only": 43,
     "pip_only": 7
   },
-  "reference_vacancy_pct": 37.1,
-  "reference_buildings": 132,
-  "reference_coverage_pct": 90.4,
-  "mixed_vacancy_pct": 33.8,
+  "reference_vacancy_pct": 39.1,
+  "reference_buildings": 141,
+  "reference_coverage_pct": 96.6,
+  "mixed_vacancy_pct": 34.7,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 107,
-      "active": 357,
-      "capacity": 419,
-      "vacancy_pct": 14.8
+      "buildings": 116,
+      "active": 299,
+      "capacity": 359,
+      "vacancy_pct": 16.7
     },
     "expos_units": {
       "buildings": 25,
@@ -37,10 +37,10 @@
       "vacancy_pct": 51.0
     },
     "floor_approx": {
-      "buildings": 14,
-      "active": 18,
-      "capacity": 46,
-      "vacancy_pct": 60.9
+      "buildings": 5,
+      "active": 6,
+      "capacity": 26,
+      "vacancy_pct": 76.9
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

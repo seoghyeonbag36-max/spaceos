@@ -46,6 +46,8 @@ const STATUS: Record<VacStatus, { color: string; label: string }> = {
 interface Building {
   id: string; name: string; status: VacStatus; capacity: number; active: number; industry: string;
   floors?: number;   // 대장 지상 층수 — 3D 트윈 층 스택용. capacity(호 수)와 단위가 다르다.
+  // 층 실배치 — 층 근거(건축물대장 층별개요 + 상가정보 flrNo)가 있는 건물에만 실린다.
+  comFloors?: number[]; occFloors?: number[]; unknownN?: number;
   center: { lat: number; lng: number };
   ring: [number, number][]; // [lng, lat] (GeoJSON 순서)
 }
@@ -83,6 +85,8 @@ function fromGeoJSON(fc: GeoJSONFC): Building[] {
     return {
       id: p.id, name: p.name, status: p.status, capacity: p.capacity, active: p.active,
       industry: p.industry, floors: p.floors, ring,
+      comFloors: p.com_floors ?? undefined, occFloors: p.occ_floors ?? undefined,
+      unknownN: p.unknown_n ?? undefined,
       center: { lat: (Math.min(...lats) + Math.max(...lats)) / 2, lng: (Math.min(...lngs) + Math.max(...lngs)) / 2 },
     };
   });
@@ -409,12 +413,37 @@ export default function MapShell() {
             </div>
             <div className="twin-canvas">
               <Suspense fallback={<div className="twin-load">3D 로딩…</div>}>
-                <BuildingTwin b={{ name: selected.name, capacity: selected.capacity, active: selected.active, floors: selected.floors, statusColor: STATUS[selected.status].color }} />
+                <BuildingTwin b={{
+                  name: selected.name, capacity: selected.capacity, active: selected.active,
+                  floors: selected.floors, statusColor: STATUS[selected.status].color,
+                  comFloors: selected.comFloors, occFloors: selected.occFloors,
+                  unknownN: selected.unknownN,
+                }} />
               </Suspense>
             </div>
             <div className="twin-foot">
-              녹색 = 영업 층(점유율 환산) · {STATUS[selected.status].label}색 = 공실(추정) · {selected.active}/{selected.capacity}호
-              {selected.floors ? ` · 지상 ${selected.floors}층` : ""}
+              {selected.comFloors?.length ? (
+                <>
+                  녹색 = 영업 확인 층({selected.occFloors?.join("·") || "없음"})
+                  {selected.unknownN ? ` · 노란색 = 층 미상 점포 ${selected.unknownN}곳이 앉을 수 있는 층` : ""}
+                  {" · "}{STATUS[selected.status].label}색 = 공실 · 회색 = 비상업 층(공실률 분모 밖)
+                  {" · "}상업 {selected.comFloors.length}개 층 중 {selected.active}개 영업
+                  {selected.floors ? ` · 지상 ${selected.floors}층` : ""}
+                  <br />
+                  <span style={{ opacity: 0.75 }}>
+                    근거: 건축물대장 층별개요 + 상가정보 층 표기 — 층 배치는 실측이다
+                  </span>
+                </>
+              ) : (
+                <>
+                  녹색 = 영업 층(점유율 환산) · {STATUS[selected.status].label}색 = 공실(추정) · {selected.active}/{selected.capacity}호
+                  {selected.floors ? ` · 지상 ${selected.floors}층` : ""}
+                  <br />
+                  <span style={{ opacity: 0.75 }}>
+                    이 건물은 층 근거가 없어 <b>아래부터 채운 근사</b>다 — 실제 공실 층과 다를 수 있다
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>

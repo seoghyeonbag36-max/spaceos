@@ -2,17 +2,17 @@
   "slug": "sukmyung",
   "hub_name": "숙대입구",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T10:11:07",
+  "built_at": "2026-08-17T15:59:53",
   "shown": 604,
   "excluded_total": 1415,
   "excluded_unknown": 200,
   "excluded_non_commercial": 1215,
   "coverage_pct": 29.9,
   "status": {
-    "full": 281,
-    "partial": 120,
-    "high": 47,
-    "empty": 156
+    "full": 310,
+    "partial": 91,
+    "high": 44,
+    "empty": 159
   },
   "source": {
     "polygon_only": 156,
@@ -20,16 +20,16 @@
     "pip_only": 56,
     "stores+ledger+pip": 26
   },
-  "reference_vacancy_pct": 20.5,
-  "reference_buildings": 319,
-  "reference_coverage_pct": 94.1,
-  "mixed_vacancy_pct": 20.6,
+  "reference_vacancy_pct": 20.8,
+  "reference_buildings": 332,
+  "reference_coverage_pct": 97.9,
+  "mixed_vacancy_pct": 21.2,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 288,
-      "active": 681,
-      "capacity": 830,
-      "vacancy_pct": 18.0
+      "buildings": 301,
+      "active": 561,
+      "capacity": 682,
+      "vacancy_pct": 17.7
     },
     "expos_units": {
       "buildings": 31,
@@ -38,10 +38,10 @@
       "vacancy_pct": 32.2
     },
     "floor_approx": {
-      "buildings": 20,
-      "active": 53,
-      "capacity": 77,
-      "vacancy_pct": 31.2
+      "buildings": 7,
+      "active": 7,
+      "capacity": 24,
+      "vacancy_pct": 70.8
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
