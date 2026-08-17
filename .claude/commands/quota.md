@@ -100,6 +100,28 @@ for n,s,o in out: print(f'{s:<16}approx {n:>5}  ouln {o:>5}')
 - **`floor_ouln` 이 이미 큰 거점**의 소량 잔여 → **`--only-approx`** 로만 받는다
 - 대장을 아직 수집 중인 거점은 **끝난 뒤에 뽑는다** — `floor_approx` 가 계속 는다
 
+⚠ **잔여 동수로 대상을 고르지 말 것 — 회수율을 정하는 건 "아직 시도하지 않았는가"
+하나다.** 08-17 에 같은 `--only-approx` 를 돌렸는데 결과가 둘로 쪼개졌다:
+
+| 거점 상태 | 회수율 |
+|---|---|
+| 미시도 (kyunghee·wangsimni·sadang·sukmyung·hyehwa) | 94.3~96.2% |
+| 부분 시도 (chungmuro — 그날 받은 대장 201동분만 새것) | 54.5% |
+| **이미 완주 (dangsan·mullae·samcheong)** | **0.0%** |
+
+완주한 거점에 남은 `floor_approx` 는 **응답이 없는 게 아니라 층별개요에 상업 층이
+0 인 건물**이다(mullae 60동 재호출 → bronze 233KB 정상 수신, 갱신 0). 몇 번을
+호출해도 안 바뀐다. 위 세 번째 줄에 그날 129콜을 써서 3동을 받았다.
+
+그래서 **바로 윗줄의 "소량 잔여 → --only-approx" 는 그 거점이 아직 층별개요를 한 번도
+안 돌린 경우에만 맞다.** 이미 돌린 거점이면 잔여가 몇 동이든 기대 회수는 0 이다.
+판단 순서: ① `bronze/<slug>/*/bldg_flr_raw.json` 이 있는가(=돌린 적 있는가) →
+② 있다면 그 뒤에 대장을 새로 받았는가 → 둘 다 아니면 **넣지 않는다.**
+
+회수율은 이제 로그에 무조건 찍힌다(`결과 N동 중 갱신 … 회수율 …%`). 종전에는 진행
+출력이 갱신 경로 뒤에 있어 **회수 0 인 거점은 한 줄도 안 찍혔고**, "돌고 성과 0" 과
+"아예 안 돎" 이 구분되지 않았다. 다음 실행 대상을 고르기 전에 이 줄을 먼저 본다.
+
 ## 하지 말 것
 
 1. **두 수집기 동시 실행 금지.** 429 는 오퍼레이션이 아니라 **키** 단위 트래픽 제한이라
@@ -115,11 +137,23 @@ for n,s,o in out: print(f'{s:<16}approx {n:>5}  ouln {o:>5}')
 ```
 python -m data.pipelines.recalc_capacity <slug ...>
 python -m data.pipelines.build_page_master <slug ...>
-python -m data.analyze_anchor_population        # 앵커 대조
+python -m data.analyze_anchor_population --rebuild <slug ...>   # 앵커 대조
 ```
 ⚠ 두 파이프라인은 인자가 없으면 **54거점 전부**를 돈다. 거점을 명시한다.
 `build_page_master` 가 `coverage.json` 의 `tier` 를 `Tier1(대장)` 로 올린다 —
 승격은 코드 변경이 아니라 산출물 갱신이다.
+
+⚠ **앵커에 `--rebuild` 를 빼지 말 것.** `analyze_anchor_population` 은 건물 속성을
+`silver/<slug>/building_attrs.json` 사이드카에서 읽는데, `load_cache` 가 **파일이
+있으면 그냥 쓴다**. 대장을 새로 받아도 사이드카는 옛날 것이라 `rone_size`·`is_shop`
+이 비고, 그 결과 **표 1 의 B·C·D·E 열이 전부 `0.0%( 0)` 으로 나온다**(08-17 신규
+5거점에서 발생 — 사이드카가 08-16 자였다). A열만 채워져 있으면 이걸 의심한다.
+재생성은 bronze 재파싱이라 **API 콜 0** 이지만 거점당 수 분 걸린다.
+
+앵커를 읽을 때 **A현행 열을 R-ONE 과 비교하지 말 것.** A는 집합상가를 포함해 부풀고
+(08-17 dongdaemun A 83.7% vs C용도 36.7% · 앵커중 15.3%), 집합건물은 내부 점포가
+`bdMgtSn` 으로 귀속되지 않아 분자가 구조적으로 빈다(finding-expos-quota §2).
+대조는 **C(용도 정렬)** 로 한다.
 
 그래서 **대장을 받아두고 파이프라인을 안 돌린 거점은 산출물이 낡아 있다.** 08-15 에 9거점이
 그 상태였다(gangnam·dongdaemun·gwangjang·mangwon·konkuk·samcheong·hapjeong·jamsil·mullae —

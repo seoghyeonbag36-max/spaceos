@@ -105,14 +105,23 @@ def load_graph() -> tuple[pd.DataFrame, pd.DataFrame]:
         "그래프 gold 없음 — build_gold + build_store_graph_edges 먼저 실행")
 
 
-def _labels(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]]:
-    """업종 대분류 라벨 — 수집 기준인 category_group(7종)을 쓴다.
+def _labels(nodes: pd.DataFrame, level: str = "group") -> tuple[np.ndarray, list[str]]:
+    """업종 라벨. `level` 로 태스크 입도를 고른다.
 
-    category_group_name = 음식점/카페/편의점/병원/약국/숙박/문화시설. 이게 없는 옛
-    노드(garosugil 단일 거점 gold)는 category 2단계로 폴백한다 — category 1단계는
-    카카오의 다른 분류체계(카페가 음식점 하위)라 음식점 78% 로 degenerate 하다.
+    - `group`(기본) — 수집 기준인 category_group(7종). 서빙이 쓰는 라벨 체계다.
+      category_group_name = 음식점/카페/편의점/병원/약국/숙박/문화시설. 이게 없는 옛
+      노드(garosugil 단일 거점 gold)는 category 2단계로 폴백한다 — category 1단계는
+      카카오의 다른 분류체계(카페가 음식점 하위)라 음식점 78% 로 degenerate 하다.
+    - `category2` — category 2단계(≈30클래스) 세분 라벨. Top-1 천장이 피처가 아니라
+      태스크 입도 때문이라는 가설을 재는 자리다(feature-platform.md §0). 라벨 체계가
+      바뀌므로 **산출물을 저장하지 않는다** — `train()` 이 강제로 save 를 끈다.
     """
-    if "category_group" in nodes and nodes["category_group"].fillna("").str.len().gt(0).any():
+    if level not in ("group", "category2"):
+        raise ValueError(f"label level 은 group|category2 — 받은 값 {level!r}")
+    use_group = (level == "group"
+                 and "category_group" in nodes
+                 and nodes["category_group"].fillna("").str.len().gt(0).any())
+    if use_group:
         raw = nodes["category_group"].fillna("").replace("", "미분류")
     else:
         raw = nodes["category"].fillna("").map(
@@ -328,13 +337,25 @@ def quality_report() -> dict:
 
 def train(edge_types: set[str] | None = None, epochs: int = 400,
           hidden: int = 128, lr: float = 0.01, weight_decay: float = 5e-4,
-          patience: int = 50, save: bool = True, use_demand: bool = True) -> dict:
+          patience: int = 50, save: bool = True, use_demand: bool = True,
+          label_level: str = "group", class_weight: bool = False) -> dict:
     torch.manual_seed(SEED)
     rng = np.random.default_rng(SEED)
 
+    if save and class_weight:
+        # 균형 손실은 다수 클래스(음식점 61%)를 일부러 덜 맞히는 대신 희소 업종을
+        # 살린다 — top-1 과 macro-F1 이 반대로 움직이므로 서빙 산출물과 섞지 않는다.
+        print("[gnn] class_weight=True — 실험 런이므로 산출물 저장을 끈다")
+        save = False
+    if save and label_level != "group":
+        # 서빙(json·체크포인트)은 7종 대분류 어휘를 전제한다. 세분 라벨 런이 그걸
+        # 덮어쓰면 /recommend-industry 응답의 업종명이 조용히 바뀐다.
+        print(f"[gnn] label_level={label_level} — 실험 런이므로 산출물 저장을 끈다")
+        save = False
+
     nodes, edges = load_graph()
     nodes = nodes.reset_index(drop=True)
-    y_np, classes = _labels(nodes)
+    y_np, classes = _labels(nodes, level=label_level)
     x_np, feat_names = _features(nodes, edges, use_demand=use_demand)
     ei = _edge_index(nodes, edges, edge_types)
     did = nodes["district_id"].fillna("").astype(str).to_numpy()
@@ -347,12 +368,20 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
     model = IndustryGNN(x.shape[1], len(classes), hidden=hidden)
     opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
+    # 균형 손실 가중치 — 학습셋 빈도의 역수(정규화). train 마스크로만 세서 누출을 막는다.
+    w = None
+    if class_weight:
+        cnt = np.bincount(y_np[tr], minlength=len(classes)).astype(np.float64)
+        inv = np.divide(1.0, cnt, out=np.zeros_like(cnt), where=cnt > 0)
+        w = torch.tensor((inv / inv.sum() * len(classes)), dtype=torch.float32)
+        print(f"[gnn] class_weight: {dict(zip(classes, w.round(decimals=2).tolist()))}")
+
     best_val, best_state, bad = -1.0, None, 0
     for ep in range(1, epochs + 1):
         model.train()
         opt.zero_grad()
         out = model(x, ei)
-        loss = F.nll_loss(out[m_tr], y[m_tr])
+        loss = F.nll_loss(out[m_tr], y[m_tr], weight=w)
         loss.backward()
         opt.step()
 
@@ -390,6 +419,8 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
         round((metrics["test_top1"] - base) / base * 100, 1) if base else None)
     metrics.update({"nodes": len(nodes), "edges_used": int(ei.shape[1] // 2),
                     "classes": len(classes), "features": len(feat_names),
+                    "label_level": label_level,
+                    "class_weight": int(class_weight),
                     "demand_features": int(any(n in feat_names for n in _DEMAND_COLS)),
                     "edge_types": ",".join(sorted(edge_types)) if edge_types else "all"})
     print("[gnn·metrics]", metrics)
@@ -454,10 +485,17 @@ if __name__ == "__main__":
     ap.add_argument("--no-save", action="store_true")
     ap.add_argument("--no-demand", action="store_true",
                     help="TRDAR 공공 수요신호 제외 — 종전 파이프라인 재현(ablation 기준선)")
+    ap.add_argument("--label-level", default="group", choices=("group", "category2"),
+                    help="라벨 입도. category2 는 세분 업종 실험(산출물 저장 안 함)")
+    ap.add_argument("--patience", type=int, default=50)
+    ap.add_argument("--class-weight", action="store_true",
+                    help="빈도 역수 균형 손실 — 희소 업종 회수(macro-F1)용, 산출물 저장 안 함")
     a = ap.parse_args()
     if a.report:
         quality_report()
     else:
         types = set(a.edge_types.split(",")) if a.edge_types else None
         train(edge_types=types, epochs=a.epochs, hidden=a.hidden,
-              save=not a.no_save, use_demand=not a.no_demand)
+              save=not a.no_save, use_demand=not a.no_demand,
+              label_level=a.label_level, patience=a.patience,
+              class_weight=a.class_weight)
