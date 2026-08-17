@@ -170,18 +170,60 @@ def platform_track() -> Track:
     ))
 
     # KPI 는 목표 대비 비율로 부분점수를 준다 — 달성/미달만 찍으면 얼마나 남았는지 사라진다.
+    #
+    # 2026-08-17 KPI 재정의: **Top-1 게이트를 폐기하고 Top-3 + macro-F1 로 간다.**
+    # Top-1 70% 는 가진 레버를 다 써서 못 닿는 것이 실측으로 확인됐다 —
+    #   ① 세분 라벨(32클래스): Top-1 30.0% / Top-3 58.4% (Top-3 KPI 붕괴)
+    #   ② 균형 손실(빈도 역수): Top-1 28.3% / lift -53.7% (사전분포 아래)
+    # 게이트로 남겨두면 진행률이 '닿을 수 없는 목표에 대한 거리'가 되어 매번 오독된다.
+    # 제품이 파는 것도 자리 하나당 업종 하나가 아니라 공실 유닛의 Top-3 후보다.
     top3, top1 = m.get("test_top3"), m.get("test_top1")
+    f1 = m.get("test_macro_f1")
     if top3 is not None:
+        # lift 는 Top-1 기준값이다. Top-3 사전분포 옆에 그냥 붙이면 'Top-3 의 lift'로
+        # 읽히므로 어느 지표의 lift 인지 명시한다.
         t.gates.append(Gate(
             "KPI 업종추천 Top-3 ≥70%", min(1.0, top3 / 0.70),
             f"{top3:.1%} — 달성. 단 거점 사전분포가 이미 "
-            f"{m.get('baseline_district_prior_top3', 0):.1%} 라 lift 는 "
-            f"{m.get('lift_vs_district_prior_pct')}% 다",
+            f"{m.get('baseline_district_prior_top3', 0):.1%} 라 "
+            f"Top-1 lift 는 {m.get('lift_vs_district_prior_pct')}% 다"
+            + (f" · Top-1 {top1:.1%}(게이트 폐기, 관측만)" if top1 is not None else ""),
         ))
-    if top1 is not None:
+    # off-prior Top-3 회수율 — 거점 사전분포가 **원리적으로 못 맞히는** 자리에서의 회수율.
+    # 이걸 게이트로 쓰는 이유(2026-08-17 분석):
+    #   피처 95개 중 자리마다 값이 달라지는 것은 5개뿐이고 나머지 90개는 거점 상수라
+    #   (원핫 54 + TRDAR 36), 집계 지표는 거의 전부 거점 평균으로 설명된다. 지표값 중
+    #   거점 사전분포가 아닌 몫('순도')을 재면 Top-3 정확도 2.3% · macro-F1 50.3% ·
+    #   off-prior 100% 다. 순도가 낮은 지표를 게이트로 걸면 Platform·Page 에 무엇을
+    #   넣어도 숫자가 안 움직인다 — Top-1 70% 가 실패한 구조가 그것이다.
+    #
+    # 목표 0.50 은 **도출된 값**이다(macro-F1 0.50 이 잠정치였던 것과 다르다):
+    #   방어 게이트(전체 Top-3 ≥70%)를 통과하면서 자리를 전혀 안 보는 값싼 규칙
+    #   — 거점 순위 (1,2,4) 를 Top-3 으로 내놓기 — 이 off-prior 42.42% 를 낸다.
+    #   따라서 목표는 42.42% 위여야 한다. 표본 877자리에서 표준오차 ≈1.7%p 이므로
+    #   0.45 는 1.5σ, 0.50 은 4.5σ 로 잡아 0.50 을 택했다. 이론 천장은 75%
+    #   ('off-prior 임을 알고' 남은 4종 중 3종을 고를 때)다.
+    off = m.get("test_offprior_top3")
+    obs = 0.2645   # 2026-08-17 저장 체크포인트로 test 분할 재측정(재학습 없음)
+    if off is None:
+        # 아직 학습 산출물에 이 필드가 없다(train_gnn 에 08-17 추가 → 다음 학습부터 채워짐).
+        # 그때까지는 손으로 잰 값을 **선언**으로 둔다. 자동인 척하면 안 되는 자리다.
         t.gates.append(Gate(
-            "KPI 업종추천 Top-1 ≥70%", min(1.0, top1 / 0.70),
-            f"{top1:.1%} — 미달. 천장은 피처가 아니라 태스크 재설계(세분 라벨) 쪽이다",
+            "KPI 업종추천 off-prior Top-3 ≥50%", min(1.0, obs / 0.50),
+            f"{obs:.1%} — 서빙 체크포인트(95열) 실측. 값싼 규칙(거점 순위 1·2·4)이 "
+            f"42.4% 라 **아직 그보다 낮다**. Page 건물 피처 10열을 넣은 105열은 "
+            f"**35.9%** 로 올랐다(동일조건 ablation 28.05% → 35.92%, +28.1%) — "
+            f"save 런 한 번이면 이 게이트가 자동 전환된다",
+            auto=False,
+            evidence="docs/finding-sequence-and-accuracy-2026-08-17.md §9 · "
+                     "ml/training/train_gnn.py::_offprior_top3",
+        ))
+    else:
+        t.gates.append(Gate(
+            "KPI 업종추천 off-prior Top-3 ≥50%", min(1.0, off / 0.50),
+            f"{off:.1%} — 거점 사전분포로는 정의상 0% 인 자리 "
+            f"{m.get('offprior_nodes', '?')}개 기준. 값싼 규칙 하한 42.4%"
+            + (f" · macro-F1 {f1:.4f}(관측)" if f1 is not None else ""),
         ))
     return t
 
@@ -350,8 +392,17 @@ def main() -> int:
                 print(f"            근거: {g.evidence}")
 
     print("\n" + "=" * 78)
-    order = " > ".join(t.name for t in sorted(tracks, key=lambda x: -x.pct))
-    print(f"진행 순서: {order}")
+    # 이 줄은 진행률 내림차순일 뿐인데 "진행 순서"로 적혀 있어서 **작업 순서로 오독**된다
+    # (2026-08-17 실제로 그렇게 읽혔다). 진행률이 높은 트랙을 먼저 하라는 뜻이 아니다 —
+    # 오히려 뒤처진 트랙이 다음 차례인 경우가 많다. 그래서 이름을 사실대로 바꾸고,
+    # 작업 순서는 의존 방향으로 결정된 값을 따로 적는다.
+    rank = " > ".join(f"{t.name} {t.pct:.0f}%" for t in sorted(tracks, key=lambda x: -x.pct))
+    print(f"진행률 순위: {rank}")
+    # 의존 방향: Page 의 공실 유닛이 Posting·Program 의 재료이고, Program 의 대상은
+    # 'Posting(창업)할 기업'이라 Posting 이 앞선다. Co.I(공실에 어떤 업종이 들어와야
+    # 하는지)는 별도 단계가 아니라 Platform 의 업종추천 그 자체다 — 독립 트랙으로 세면
+    # 이미 서빙 중인 것을 새로 만들려 하게 된다.
+    print("작업 순서: Platform > Page > Posting > Program  (의존 방향 · 진행률과 무관)")
     dec = sum(t.declared for t in tracks)
     tot = sum(len(t.gates) for t in tracks)
     print(f"게이트 {tot}개 중 선언 {dec}개 — 선언이 많을수록 이 숫자를 믿을 이유가 줄어든다.")
