@@ -2,17 +2,17 @@
   "slug": "dongdaemun",
   "hub_name": "동대문·DDP",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T10:27:54",
+  "built_at": "2026-08-17T15:53:24",
   "shown": 2842,
   "excluded_total": 3291,
   "excluded_unknown": 538,
   "excluded_non_commercial": 2753,
   "coverage_pct": 46.3,
   "status": {
-    "full": 1060,
-    "partial": 449,
-    "high": 364,
-    "empty": 969
+    "full": 1162,
+    "partial": 408,
+    "high": 302,
+    "empty": 970
   },
   "source": {
     "pip_only": 252,
@@ -20,16 +20,16 @@
     "stores+ledger": 1560,
     "stores+ledger+pip": 61
   },
-  "reference_vacancy_pct": 81.6,
-  "reference_buildings": 1210,
-  "reference_coverage_pct": 93.3,
-  "mixed_vacancy_pct": 80.9,
+  "reference_vacancy_pct": 83.4,
+  "reference_buildings": 1264,
+  "reference_coverage_pct": 97.5,
+  "mixed_vacancy_pct": 84.9,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 1098,
-      "active": 2723,
-      "capacity": 3453,
-      "vacancy_pct": 21.1
+      "buildings": 1152,
+      "active": 2227,
+      "capacity": 2826,
+      "vacancy_pct": 21.2
     },
     "expos_units": {
       "buildings": 112,
@@ -38,10 +38,10 @@
       "vacancy_pct": 92.9
     },
     "floor_approx": {
-      "buildings": 87,
-      "active": 141,
-      "capacity": 342,
-      "vacancy_pct": 58.8
+      "buildings": 33,
+      "active": 39,
+      "capacity": 118,
+      "vacancy_pct": 66.9
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

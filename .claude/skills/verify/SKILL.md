@@ -111,16 +111,23 @@ curl.exe -s "http://localhost:5173/api/v1/heatmap/buildings?district=gangnam-gar
 앵커는 **거점별 R-ONE 중대형상가 공실률**이다(`calibration.json.anchor_pct`,
 garosugil = 17.6%). 예전에 쓰던 공통 41.6% 는 부동산원 통계가 아니라 가로수길 가두
 1층 실태조사(2024) 값을 잘못 표기한 것이라 2026-07-28 폐기했다.
-API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — 실측 40거점 중 **앵커를 가진
-22거점**의 격차는 **-7.3 ~ +21.1%p** 다(2026-08-15 `services/districts.cells_for` 실측.
-최소 garak -7.3 / 최대 ikseon +21.1). 나머지 18거점은 `calibration.json` 이 없어 대조 자체가
-안 된다 — 격차가 0 이라는 뜻이 아니다. 모집단이 달라(우리는 호실·전수, R-ONE 은 면적·표본)
-격차 0 은 목표가 아니다.
+API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — **54/54 전 거점**이 앵커를
+가지며(2026-08-17 `calibrate_vacancy` 재산출) 격차는 **-5.16 ~ +34.55%p** 다
+(`GET /heatmap/vacancy` 전수 실측. 최소 cheongdam -5.16 / 최대 nokdu +34.55 /
+garosugil +2.88). 대조가 안 되던 거점은 이제 없다. 모집단이 달라(우리는 호실·전수,
+R-ONE 은 면적·표본) 격차 0 은 목표가 아니다.
+
+🔴 **nokdu +34.55%p 는 가드레일(30%p)을 넘어 `test_gold_anchor_comparison_attached` 가
+실패 중이다.** 검증에서 이 실패를 만나면 "환경 문제"가 아니라 **알려진 미해결 이상치**다
+(2위 sharosugil 23.00p 와 11.5%p 벌어진 단독 이상치). → [docs/feature-page.md §0](../../../docs/feature-page.md)
+
+⚠ `calibration.json` 의 `gap_pp` 필드를 인용하지 말 것 — 그건 집합건물을 포함한 혼합
+추정(`estimated_vacancy_pct`) 기준이라 값이 훨씬 크다. 대표 집계 기준 격차는 API 가 준다.
 
 ## 지도 뷰(MapShell) 검증
 
 App.tsx 네비 **"지도"** 탭이 진입점이다(2026-08-01 연결). 거점 선택은 실측 거점만 나온다
-(2026-08-15 기준 40곳 — 대장 미수집 14곳은 목록에 없다).
+— **2026-08-17 대장 완주로 54곳 전부**가 목록에 뜬다(종전에는 미수집분이 빠져 있었다).
 
 ```python
 pg.get_by_role('button', name='지도').click()

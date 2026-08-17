@@ -2,17 +2,17 @@
   "slug": "sillim",
   "hub_name": "신림역·별빛거리",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-15T17:19:13",
+  "built_at": "2026-08-17T15:56:02",
   "shown": 1208,
   "excluded_total": 2101,
   "excluded_unknown": 280,
   "excluded_non_commercial": 1821,
   "coverage_pct": 36.5,
   "status": {
-    "full": 480,
-    "partial": 117,
-    "high": 185,
-    "empty": 426
+    "full": 481,
+    "partial": 137,
+    "high": 163,
+    "empty": 427
   },
   "source": {
     "stores+ledger": 730,
@@ -20,16 +20,16 @@
     "pip_only": 40,
     "stores+ledger+pip": 12
   },
-  "reference_vacancy_pct": 19.3,
-  "reference_buildings": 601,
-  "reference_coverage_pct": 90.8,
-  "mixed_vacancy_pct": 22.3,
+  "reference_vacancy_pct": 23.4,
+  "reference_buildings": 624,
+  "reference_coverage_pct": 94.3,
+  "mixed_vacancy_pct": 28.3,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 526,
-      "active": 1720,
-      "capacity": 2131,
-      "vacancy_pct": 19.3
+      "buildings": 549,
+      "active": 1216,
+      "capacity": 1627,
+      "vacancy_pct": 25.3
     },
     "expos_units": {
       "buildings": 75,
@@ -38,10 +38,10 @@
       "vacancy_pct": 19.2
     },
     "floor_approx": {
-      "buildings": 61,
-      "active": 94,
-      "capacity": 360,
-      "vacancy_pct": 73.9
+      "buildings": 38,
+      "active": 41,
+      "capacity": 246,
+      "vacancy_pct": 83.3
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

@@ -185,6 +185,13 @@ export interface BuildingProps {
   floors?: number;
   /** 건물 높이(m). 미사용 시 무시 가능. */
   height?: number;
+  /** 상업 용도 층 번호 — 공실률의 분모가 되는 층. 층 근거(건축물대장 층별개요)가
+   *  있는 건물에만 실린다. 없으면 3D 트윈이 '아래부터 채우기' 근사로 폴백한다. */
+  com_floors?: number[] | null;
+  /** 점포(상가정보 flrNo)·인허가로 **확인된** 영업 층 번호 — 분자의 하한. */
+  occ_floors?: number[] | null;
+  /** 층 미상 점포로 빈 상업층에 배정된 층 수(상한 − 하한). 트윈의 '불확실' 층. */
+  unknown_n?: number | null;
 }
 export interface GeoJSONFC {
   type: "FeatureCollection";

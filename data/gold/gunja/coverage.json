@@ -2,16 +2,16 @@
   "slug": "gunja",
   "hub_name": "군자역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-16T12:02:47",
+  "built_at": "2026-08-17T15:58:53",
   "shown": 426,
   "excluded_total": 1629,
   "excluded_unknown": 208,
   "excluded_non_commercial": 1421,
   "coverage_pct": 20.7,
   "status": {
-    "full": 216,
-    "partial": 81,
-    "high": 58,
+    "full": 232,
+    "partial": 77,
+    "high": 46,
     "empty": 71
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 20,
     "stores+ledger+pip": 2
   },
-  "reference_vacancy_pct": 18.8,
-  "reference_buildings": 306,
-  "reference_coverage_pct": 96.5,
-  "mixed_vacancy_pct": 21.3,
+  "reference_vacancy_pct": 20.9,
+  "reference_buildings": 315,
+  "reference_coverage_pct": 99.4,
+  "mixed_vacancy_pct": 22.4,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 278,
-      "active": 824,
-      "capacity": 999,
-      "vacancy_pct": 17.5
+      "buildings": 287,
+      "active": 638,
+      "capacity": 794,
+      "vacancy_pct": 19.6
     },
     "expos_units": {
       "buildings": 28,
@@ -38,10 +38,10 @@
       "vacancy_pct": 31.9
     },
     "floor_approx": {
-      "buildings": 11,
-      "active": 21,
-      "capacity": 51,
-      "vacancy_pct": 58.8
+      "buildings": 2,
+      "active": 2,
+      "capacity": 8,
+      "vacancy_pct": 75.0
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

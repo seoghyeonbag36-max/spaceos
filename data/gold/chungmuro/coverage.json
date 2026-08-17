@@ -2,17 +2,17 @@
   "slug": "chungmuro",
   "hub_name": "충무로",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T11:12:22",
+  "built_at": "2026-08-17T15:59:10",
   "shown": 2054,
   "excluded_total": 1399,
   "excluded_unknown": 254,
   "excluded_non_commercial": 1145,
   "coverage_pct": 59.5,
   "status": {
-    "full": 642,
-    "partial": 327,
-    "high": 256,
-    "empty": 829
+    "full": 832,
+    "partial": 227,
+    "high": 163,
+    "empty": 832
   },
   "source": {
     "polygon_only": 829,
@@ -20,28 +20,28 @@
     "stores+ledger": 937,
     "stores+ledger+pip": 64
   },
-  "reference_vacancy_pct": 26.4,
-  "reference_buildings": 714,
-  "reference_coverage_pct": 90.8,
-  "mixed_vacancy_pct": 28.2,
+  "reference_vacancy_pct": 18.6,
+  "reference_buildings": 770,
+  "reference_coverage_pct": 98.0,
+  "mixed_vacancy_pct": 19.1,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 683,
-      "active": 1680,
-      "capacity": 2244,
-      "vacancy_pct": 25.1
-    },
-    "floor_approx": {
-      "buildings": 72,
-      "active": 143,
-      "capacity": 300,
-      "vacancy_pct": 52.3
+      "buildings": 739,
+      "active": 1749,
+      "capacity": 2067,
+      "vacancy_pct": 15.4
     },
     "expos_units": {
       "buildings": 31,
       "active": 317,
       "capacity": 471,
       "vacancy_pct": 32.7
+    },
+    "floor_approx": {
+      "buildings": 16,
+      "active": 20,
+      "capacity": 78,
+      "vacancy_pct": 74.4
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

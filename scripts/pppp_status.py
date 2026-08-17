@@ -232,8 +232,8 @@ def posting_track(total: int) -> Track:
     vu = list(GOLD.glob("*/vacant_units.json"))
     t.gates.append(Gate(
         "실제 공실 유닛 인벤토리", len(vu) / total if total else 0.0,
-        f"{len(vu)}/{total}거점 — 미산출 5곳은 Tier2(대장 없음)라 상업면적을 못 얻는다. "
-        "Page 의 건축HUB 쿼터 병목과 같은 5곳이다",
+        f"{len(vu)}/{total}거점 — 잔여 5곳은 **막힘이 아니라 재실행 대기**다(08-17 확인). "
+        "종전 사유 'Tier2라 대장이 없다'는 대장 완주로 무효가 됐고, 상업면적이 실재한다",
     ))
 
     t.gates.append(Gate(
@@ -301,7 +301,8 @@ def program_track(total: int) -> Track:
 
     t.gates.append(Gate(
         "입력 계약 3층 (자리·상권·창업계획)", 1 / 3,
-        "상권층만 있다. 자리층(공실 유닛 13/54)과 창업계획층(기업 입력)은 미구현 — "
+        "상권층만 있다. 자리층은 재료(공실 유닛 49/54)가 있는데 Program 이 읽지 않는다 — "
+        "수집이 아니라 배선 과제다. 창업계획층(기업 입력)은 미구현이고, "
         "StoreProfile 은 영업 중 전제라 공실을 넣으면 '방문 후기형 포스팅'이 나온다",
         auto=False, evidence="docs/feature-program.md §0-B",
     ))
