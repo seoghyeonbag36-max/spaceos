@@ -12,6 +12,18 @@ Claude Code(CLI) 기반 SpaceOS 개발 가이드. PPPP 프레임워크 4기능�
 | [feature-page.md](feature-page.md) | **Page** — 공실 히트맵 + 3D 디지털 트윈 |
 | [feature-posting.md](feature-posting.md) | **Posting** — 입점 솔루션 (전략별 비용-효용·ROI 분석) |
 | [feature-program.md](feature-program.md) | **Program** — LLM 마케팅 자동화 + 행사 추천 |
+| [spaceos-vibe-build-sequence.md](spaceos-vibe-build-sequence.md) | **빌드 순서 + 현재 위치** — Phase 0~6 의존 순서, 막힌 것의 종류 구분 |
+
+## 진행률은 문서에서 읽지 않는다
+
+```bash
+python scripts/pppp_status.py
+```
+
+산출물을 세어 트랙별 진행률과 게이트를 찍는다. 문서의 거점 수·정확도는 **적은 날의
+값**이라 낡는다(이 저장소에서 실제로 두 번 낡았다 — Tier1 을 13, 그 다음 22 로 적고
+있었다). 위 스크립트가 `[자동]` 으로 표시하는 값이 단일 기준이고, `[선언]` 은 근거
+경로를 확인한 뒤 인용한다.
 
 ## 권장 진행 순서
 
