@@ -72,6 +72,7 @@ _GOLD = _REPO / "data" / "gold"
 _ARTIFACT = _REPO / "ml" / "artifacts" / "industry_gnn.pt"
 _RECOMMEND_JSON = _GOLD / "platform_industry_recommend.json"
 _TRDAR_DEMAND = _GOLD / "features" / "trdar_demand.parquet"
+_PAGE_BUILDING = _GOLD / "features" / "page_building.parquet"
 _MLRUNS = _REPO / "ml" / "mlruns"
 
 MIN_CLASS_NODES = 10   # 이보다 작은 업종 대분류는 '기타'로 병합
@@ -103,6 +104,17 @@ _DEMAND_COLS: list[str] = [
     "selng_tmzon_14_17_share", "selng_tmzon_17_21_share", "selng_tmzon_21_24_share",
     # 상권 유형 원핫 — 골목/발달/전통시장/관광특구
     "se_golmok", "se_baldal", "se_market", "se_tourist",
+]
+
+# Page 건물 마스터에서 온 자리 단위 물리·대장 피처 — build_page_building_features 산출.
+# 수요 컬럼과 같은 이유로 명시 목록으로 고정한다(차원이 조용히 바뀌면 서빙이 깨진다).
+_BUILDING_COLS: list[str] = [
+    "bld_vacancy_rate",       # 건물 공실률 (Page 핵심 산출)
+    "log_bld_capacity",       # 수용 호수
+    "bld_floors", "bld_height",
+    "bld_com_floor_n", "bld_com_floor_max", "bld_has_ground_floor",
+    "bld_licensed", "log_bld_unknown_n",
+    "bld_matched",            # 조인 지시자 — 미조인을 0 으로 채우므로 필요하다
 ]
 
 
@@ -211,8 +223,52 @@ def _demand_block(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]] | None:
     return np.nan_to_num((block - mu) / sd), names
 
 
+def _building_block(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]] | None:
+    """노드 → 자리가 속한 **건물의 물리·대장 특성** 블록 (Page 산출).
+
+    **왜 이 블록인가**: 종전 95피처 중 자리마다 값이 달라지는 것은 5개뿐이고
+    (dx·dy·상권중심거리·주변밀집도·건물규모) 나머지 90개는 거점 상수다. 그래서 거점
+    사전분포가 원리적으로 못 맞히는 자리의 Top-3 회수율(off-prior)이 26.45% 로, 자리를
+    전혀 안 보는 값싼 규칙(42.42%)보다 **낮았다**. 이 블록은 거점 안에서 건물마다 변하는
+    첫 실데이터다 — 편의점 노면·저층, 병원 층수 많은 건물 같은 구분을 줄 후보.
+    → docs/finding-sequence-and-accuracy-2026-08-17.md §9
+
+    누출 방지: 건물 마스터의 `industry`(대표 업종)·`occ_floors`·`active`·`stores` 는
+    **쓰지 않는다** — 현재 입주 업종에서 파생된 값이라 라벨이다. 남기는 것은 그 자리가
+    공실이어도 관측 가능한 대장·물리 속성뿐이다(build_page_building_features docstring).
+
+    스케일: 이 블록만 z-score 표준화한다(수요 블록과 같은 방식) — `--no-building` 이
+    종전 파이프라인을 그대로 재현해 ablation 이 깨끗해진다.
+
+    반환 None = 피처 테이블 부재 → 학습은 종전 피처로 계속한다.
+    """
+    if not _PAGE_BUILDING.exists():
+        print(f"[gnn] 건물 피처 테이블 없음({_PAGE_BUILDING.name}) — "
+              f"python -m data.pipelines.build_page_building_features 먼저. "
+              f"건물 피처 없이 진행")
+        return None
+    tbl = pd.read_parquet(_PAGE_BUILDING)
+    missing = [c for c in _BUILDING_COLS if c not in tbl.columns]
+    if missing:
+        print(f"[gnn] 건물 테이블에 컬럼 없음 {missing} — 건물 피처 없이 진행")
+        return None
+
+    # node_id 로 정렬 결합한다. 좌표 재조인이 아니라 키 조인이라 순서가 어긋날 수 없다.
+    m = tbl.set_index("node_id").reindex(nodes["node_id"].to_numpy())
+    block = m[_BUILDING_COLS].astype(float).to_numpy()
+    block = np.nan_to_num(block)          # 테이블에 없는 노드 = 미조인(전부 0)
+
+    hit = float(block[:, _BUILDING_COLS.index("bld_matched")].mean())
+    sd = block.std(axis=0)
+    sd[sd == 0] = 1.0
+    block = (block - block.mean(axis=0)) / sd
+    print(f"[gnn] 건물 피처 {len(_BUILDING_COLS)}열 결합 · 건물 조인율 {hit:.1%}")
+    return block, list(_BUILDING_COLS)
+
+
 def _features(nodes: pd.DataFrame, edges: pd.DataFrame,
-              use_demand: bool = True) -> tuple[np.ndarray, list[str]]:
+              use_demand: bool = True,
+              use_building: bool = True) -> tuple[np.ndarray, list[str]]:
     """공실 상태에서도 관측 가능한 입지 피처만 구성한다."""
     lat = pd.to_numeric(nodes["lat"], errors="coerce").to_numpy()
     lon = pd.to_numeric(nodes["lon"], errors="coerce").to_numpy()
@@ -245,6 +301,12 @@ def _features(nodes: pd.DataFrame, edges: pd.DataFrame,
             x = np.column_stack([x, block[0]])
             names += block[1]
             print(f"[gnn] 수요 피처 {len(block[1])}열 결합 → 총 {len(names)}열")
+    if use_building:
+        block = _building_block(nodes)
+        if block is not None:
+            x = np.column_stack([x, block[0]])
+            names += block[1]
+            print(f"[gnn] 건물 피처 결합 → 총 {len(names)}열")
     return np.nan_to_num(x).astype(np.float32), names
 
 
@@ -296,33 +358,73 @@ def _macro_f1(pred: np.ndarray, y: np.ndarray, n_cls: int) -> float:
     return float(np.mean(f1s)) if f1s else 0.0
 
 
+def _district_top3(y: np.ndarray, did: np.ndarray,
+                   train: np.ndarray) -> tuple[dict[str, list[int]], int]:
+    """거점별 상위 TOP_K 업종 — **train 으로만** 센다(누출 방지).
+
+    `_baselines` 와 `_offprior_top3` 가 같은 표를 쓴다. 두 곳에서 따로 세면 한쪽만
+    고쳐졌을 때 '기준선은 0 인데 off-prior 는 0 이 아닌' 모순이 조용히 생긴다.
+    반환: (거점→업종코드 상위 K, 전역 최빈 업종코드)
+    """
+    major = Counter(y[train]).most_common(1)[0][0]
+    out: dict[str, list[int]] = {}
+    for d in np.unique(did):
+        m = train & (did == d)
+        out[d] = [c for c, _ in Counter(y[m]).most_common(TOP_K)] if m.any() else [major]
+    return out, major
+
+
 def _baselines(y: np.ndarray, did: np.ndarray, train: np.ndarray,
                test: np.ndarray, n_cls: int) -> dict[str, float]:
     """모델 없이 얻는 점수 — '20% 향상' 을 재는 기준선."""
+    top3, major = _district_top3(y, did, train)
+
     # ① 전역 최빈 클래스
-    major = Counter(y[train]).most_common(1)[0][0]
     acc_major = float((y[test] == major).mean())
 
     # ② 거점별 최빈 클래스(거점 사전분포) — 실질적인 '모델 없음' 답안
-    per: dict[str, int] = {}
-    for d in np.unique(did):
-        m = train & (did == d)
-        if m.any():
-            per[d] = Counter(y[m]).most_common(1)[0][0]
-    pred_prior = np.array([per.get(d, major) for d in did[test]])
+    pred_prior = np.array([top3.get(d, [major])[0] for d in did[test]])
     acc_prior = float((pred_prior == y[test]).mean())
 
     # ③ 거점 사전분포 Top-3
-    top3: dict[str, list[int]] = {}
-    for d in np.unique(did):
-        m = train & (did == d)
-        top3[d] = [c for c, _ in Counter(y[m]).most_common(TOP_K)] if m.any() else [major]
     acc_prior_top3 = float(np.mean([
         yt in top3.get(d, [major]) for yt, d in zip(y[test], did[test])]))
 
     return {"baseline_major_top1": round(acc_major, 4),
             "baseline_district_prior_top1": round(acc_prior, 4),
             "baseline_district_prior_top3": round(acc_prior_top3, 4)}
+
+
+def _offprior_top3(logits: torch.Tensor, y: np.ndarray, did: np.ndarray,
+                   train: np.ndarray, test: np.ndarray) -> dict[str, float | int]:
+    """거점 사전분포가 **원리적으로 못 맞히는** 자리에서의 Top-3 회수율.
+
+    test 자리 중 실제 업종이 그 거점의 상위 TOP_K 밖인 것만 남겨서 Top-3 회수율을 잰다.
+    거점 사전분포의 이 부분집합 점수는 **정의상 0** 이므로, 값 전부가 '자리별 신호'에서
+    온다 — 지표에서 거점 평균의 몫을 제거한 것이다.
+
+    왜 이 지표인가 (2026-08-17 분석):
+      피처 95개 중 자리마다 값이 달라지는 것은 **5개**뿐이고(dx·dy·상권중심거리·주변밀집도
+      ·건물규모) 나머지 90개는 거점 상수다(원핫 54 + TRDAR 36). 그래서 집계 지표는 거의
+      전부 거점 평균으로 설명된다 — Top-3 정확도는 값의 **97.7%** 가 거점 사전분포
+      몫이어서, Platform·Page 에 무엇을 넣어도 숫자가 안 움직인다. Top-1 70% 가 실패한
+      구조와 같다. 이 지표는 그 몫이 0 이라 두 트랙의 배선 성과만 잡아낸다.
+      → docs/finding-sequence-and-accuracy-2026-08-17.md
+
+    ⚠ 단독으로 게이트에 쓰면 안 된다. 희소 업종을 무조건 Top-3 에 밀어 넣어 올릴 수
+      있으므로, 방어용으로 `test_top3`(≥70%) 게이트를 반드시 함께 유지한다.
+    """
+    top3, major = _district_top3(y, did, train)
+    off = np.array([yt not in top3.get(d, [major])
+                    for yt, d in zip(y, did)]) & test
+    n = int(off.sum())
+    if n == 0:
+        # 모든 test 자리가 거점 top-3 안 — 라벨 입도가 낮으면 실제로 일어난다.
+        return {"test_offprior_top3": None, "offprior_nodes": 0}
+    k = min(TOP_K, logits.shape[1])
+    hit = (logits[torch.tensor(off)].topk(k, dim=1).indices
+           == torch.tensor(y[off]).unsqueeze(1)).any(dim=1).float().mean()
+    return {"test_offprior_top3": round(float(hit), 4), "offprior_nodes": n}
 
 
 def quality_report() -> dict:
@@ -351,6 +453,7 @@ def quality_report() -> dict:
 def train(edge_types: set[str] | None = None, epochs: int = 400,
           hidden: int = 128, lr: float = 0.01, weight_decay: float = 5e-4,
           patience: int = 50, save: bool = True, use_demand: bool = True,
+          use_building: bool = True,
           label_level: str = "group", class_weight: bool = False) -> dict:
     torch.manual_seed(SEED)
     rng = np.random.default_rng(SEED)
@@ -361,6 +464,16 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
         # 진단용 런이므로 서빙 산출물과 섞지 않는다.
         print("[gnn] class_weight=True — 실험 런이므로 산출물 저장을 끈다")
         save = False
+    if save and use_building:
+        # 건물 피처(105열)는 **test 지표가 아직 미측정**이다 — 2026-08-17 학습이 스레드
+        # 오버서브스크립션 세그폴트로 6회 연속 완주 실패했다(95열도 같은 증상이라 이 블록
+        # 탓이 아니다. OMP_NUM_THREADS=1 은 통과하지만 너무 느리다).
+        # 부분 궤적은 95열보다 확실히 낫다(ep150 val top1 0.6464 vs 0.6313). 그래도 검증
+        # 전에 서빙 산출물을 덮으면 /recommend-industry 가 조용히 미검증 모델로 바뀌므로
+        # save 를 끈다. **완주 실측 후 이 가드를 제거하고 기본 경로로 승격한다.**
+        print("[gnn] use_building=True — test 지표 미측정이라 산출물 저장을 끈다 "
+              "(--no-building 으로 검증된 95열 경로 사용)")
+        save = False
     if save and label_level != "group":
         # 서빙(json·체크포인트)은 7종 대분류 어휘를 전제한다. 세분 라벨 런이 그걸
         # 덮어쓰면 /recommend-industry 응답의 업종명이 조용히 바뀐다.
@@ -370,7 +483,8 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
     nodes, edges = load_graph()
     nodes = nodes.reset_index(drop=True)
     y_np, classes = _labels(nodes, level=label_level)
-    x_np, feat_names = _features(nodes, edges, use_demand=use_demand)
+    x_np, feat_names = _features(nodes, edges, use_demand=use_demand,
+                                 use_building=use_building)
     ei = _edge_index(nodes, edges, edge_types)
     did = nodes["district_id"].fillna("").astype(str).to_numpy()
 
@@ -427,6 +541,7 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
         "test_macro_f1": round(_macro_f1(pred[te], y_np[te], len(classes)), 4),
         "val_top1": round(best_val, 4),
         **_baselines(y_np, did, tr, te, len(classes)),
+        **_offprior_top3(logits, y_np, did, tr, te),
     }
     base = metrics["baseline_district_prior_top1"]
     metrics["lift_vs_district_prior_pct"] = (
@@ -436,6 +551,8 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
                     "label_level": label_level,
                     "class_weight": int(class_weight),
                     "demand_features": int(any(n in feat_names for n in _DEMAND_COLS)),
+                    "building_features": int(any(n in feat_names
+                                                 for n in _BUILDING_COLS)),
                     "edge_types": ",".join(sorted(edge_types)) if edge_types else "all"})
     print("[gnn·metrics]", metrics)
 
@@ -499,6 +616,8 @@ if __name__ == "__main__":
     ap.add_argument("--no-save", action="store_true")
     ap.add_argument("--no-demand", action="store_true",
                     help="TRDAR 공공 수요신호 제외 — 종전 파이프라인 재현(ablation 기준선)")
+    ap.add_argument("--no-building", action="store_true",
+                    help="Page 건물 물리·대장 피처 제외 — 08-17 이전 95피처 재현(ablation)")
     ap.add_argument("--label-level", default="group", choices=("group", "category2"),
                     help="라벨 입도. category2 는 세분 업종 실험(산출물 저장 안 함)")
     ap.add_argument("--patience", type=int, default=50)
@@ -513,5 +632,6 @@ if __name__ == "__main__":
         types = set(a.edge_types.split(",")) if a.edge_types else None
         train(edge_types=types, epochs=a.epochs, hidden=a.hidden,
               save=not a.no_save, use_demand=not a.no_demand,
+              use_building=not a.no_building,
               label_level=a.label_level, patience=a.patience,
               class_weight=a.class_weight)
