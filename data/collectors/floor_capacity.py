@@ -180,6 +180,14 @@ def run(key: str, slug: str, only_approx: bool = False) -> None:
         time.sleep(_SLEEP)
 
     _persist(slug, path, rows, raw)
+    # 루프 안의 진행 출력은 '갱신' 경로 뒤에 있어서, 한 동도 회수하지 못한 거점은
+    # 아무것도 찍지 않았다 — 돌고 성과가 0 인 것과 아예 안 돈 것이 구분되지 않아
+    # 다음 실행 대상을 잘못 고르게 된다(2026-08-17 dangsan·mullae 18·60동 전량 무회수).
+    # 회수율은 쿼터를 어디에 쓸지 정하는 값이므로 무조건 찍는다.
+    print(f"[flr-cap:{slug}] 결과 {len(targets)}동 중 갱신 {updated} · "
+          f"상업층0 유지 {skipped} · 응답없음 {failed} "
+          f"(회수율 {updated / len(targets) * 100:.1f}%)" if targets else
+          f"[flr-cap:{slug}] 대상 0동")
     cm = Counter(r.get("capacity_method") for r in rows)
     print(f"[flr-cap:{slug}] building_vacancy.json 갱신 — capacity_method: {dict(cm)}")
 

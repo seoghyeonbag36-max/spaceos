@@ -1,33 +1,47 @@
 {
   "slug": "kyunghee",
   "hub_name": "경희대",
-  "tier": "Tier2(폴리곤근사)",
-  "built_at": "2026-08-08T12:37:33",
-  "shown": 660,
-  "excluded_total": 1110,
-  "excluded_unknown": 0,
-  "excluded_non_commercial": 1110,
-  "coverage_pct": 37.3,
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-17T10:09:23",
+  "shown": 514,
+  "excluded_total": 1256,
+  "excluded_unknown": 179,
+  "excluded_non_commercial": 1077,
+  "coverage_pct": 29.0,
   "status": {
-    "full": 219,
-    "partial": 165,
-    "high": 177,
-    "empty": 99
+    "full": 256,
+    "partial": 102,
+    "high": 66,
+    "empty": 90
   },
   "source": {
-    "polygon_only": 99,
-    "pip_only": 561
+    "polygon_only": 90,
+    "stores+ledger": 389,
+    "pip_only": 23,
+    "stores+ledger+pip": 12
   },
-  "reference_vacancy_pct": null,
-  "reference_buildings": 0,
-  "reference_coverage_pct": 0.0,
-  "mixed_vacancy_pct": 39.7,
+  "reference_vacancy_pct": 20.4,
+  "reference_buildings": 325,
+  "reference_coverage_pct": 95.3,
+  "mixed_vacancy_pct": 23.4,
   "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 294,
+      "active": 775,
+      "capacity": 955,
+      "vacancy_pct": 18.8
+    },
+    "expos_units": {
+      "buildings": 31,
+      "active": 101,
+      "capacity": 146,
+      "vacancy_pct": 30.8
+    },
     "floor_approx": {
-      "buildings": 489,
-      "active": 1105,
-      "capacity": 1830,
-      "vacancy_pct": 39.6
+      "buildings": 16,
+      "active": 31,
+      "capacity": 73,
+      "vacancy_pct": 57.5
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

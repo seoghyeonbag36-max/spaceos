@@ -1,33 +1,47 @@
 {
   "slug": "wangsimni",
   "hub_name": "왕십리",
-  "tier": "Tier2(폴리곤근사)",
-  "built_at": "2026-08-08T12:37:35",
-  "shown": 1372,
-  "excluded_total": 1718,
-  "excluded_unknown": 0,
-  "excluded_non_commercial": 1718,
-  "coverage_pct": 44.4,
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-17T10:10:09",
+  "shown": 1001,
+  "excluded_total": 2089,
+  "excluded_unknown": 388,
+  "excluded_non_commercial": 1701,
+  "coverage_pct": 32.4,
   "status": {
-    "full": 662,
-    "partial": 237,
-    "high": 299,
-    "empty": 174
+    "full": 542,
+    "partial": 192,
+    "high": 111,
+    "empty": 156
   },
   "source": {
-    "pip_only": 1198,
-    "polygon_only": 174
+    "pip_only": 50,
+    "stores+ledger": 765,
+    "stores+ledger+pip": 30,
+    "polygon_only": 156
   },
-  "reference_vacancy_pct": null,
-  "reference_buildings": 0,
-  "reference_coverage_pct": 0.0,
-  "mixed_vacancy_pct": 25.1,
+  "reference_vacancy_pct": 19.9,
+  "reference_buildings": 512,
+  "reference_coverage_pct": 95.0,
+  "mixed_vacancy_pct": 24.9,
   "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 462,
+      "active": 1274,
+      "capacity": 1521,
+      "vacancy_pct": 16.2
+    },
+    "expos_units": {
+      "buildings": 50,
+      "active": 320,
+      "capacity": 469,
+      "vacancy_pct": 31.8
+    },
     "floor_approx": {
-      "buildings": 770,
-      "active": 1990,
-      "capacity": 3134,
-      "vacancy_pct": 36.5
+      "buildings": 27,
+      "active": 34,
+      "capacity": 137,
+      "vacancy_pct": 75.2
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

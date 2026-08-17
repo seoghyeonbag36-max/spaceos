@@ -2,15 +2,15 @@
   "slug": "yongsan",
   "hub_name": "용산역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-08T17:02:33",
+  "built_at": "2026-08-17T10:11:53",
   "shown": 410,
   "excluded_total": 643,
   "excluded_unknown": 86,
   "excluded_non_commercial": 557,
   "coverage_pct": 38.9,
   "status": {
-    "full": 235,
-    "partial": 59,
+    "full": 236,
+    "partial": 58,
     "high": 31,
     "empty": 85
   },
@@ -20,22 +20,22 @@
     "pip_only": 57,
     "stores+ledger+pip": 3
   },
-  "reference_vacancy_pct": 65.6,
-  "reference_buildings": 136,
-  "reference_coverage_pct": 81.0,
+  "reference_vacancy_pct": 65.5,
+  "reference_buildings": 138,
+  "reference_coverage_pct": 82.1,
   "mixed_vacancy_pct": 55.9,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 121,
-      "active": 488,
-      "capacity": 526,
+      "buildings": 123,
+      "active": 491,
+      "capacity": 529,
       "vacancy_pct": 7.2
     },
     "floor_approx": {
-      "buildings": 32,
-      "active": 41,
-      "capacity": 78,
-      "vacancy_pct": 47.4
+      "buildings": 30,
+      "active": 38,
+      "capacity": 74,
+      "vacancy_pct": 48.6
     },
     "expos_units": {
       "buildings": 15,
