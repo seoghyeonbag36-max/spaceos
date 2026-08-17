@@ -210,9 +210,10 @@ def platform_track() -> Track:
         # 그때까지는 손으로 잰 값을 **선언**으로 둔다. 자동인 척하면 안 되는 자리다.
         t.gates.append(Gate(
             "KPI 업종추천 off-prior Top-3 ≥50%", min(1.0, obs / 0.50),
-            f"{obs:.1%} — 미달. 자리를 안 보는 값싼 규칙(거점 순위 1·2·4)이 42.4% 라 "
-            f"**모델이 그보다 낮다** — 미구축이지 '거의 다 된' 게 아니다. "
-            f"다음 학습 때 자동 전환된다",
+            f"{obs:.1%} — 서빙 체크포인트(95열) 실측. 값싼 규칙(거점 순위 1·2·4)이 "
+            f"42.4% 라 **아직 그보다 낮다**. Page 건물 피처 10열을 넣은 105열은 "
+            f"**35.9%** 로 올랐다(동일조건 ablation 28.05% → 35.92%, +28.1%) — "
+            f"save 런 한 번이면 이 게이트가 자동 전환된다",
             auto=False,
             evidence="docs/finding-sequence-and-accuracy-2026-08-17.md §9 · "
                      "ml/training/train_gnn.py::_offprior_top3",
