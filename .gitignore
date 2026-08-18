@@ -113,3 +113,8 @@ sedJOtKwK
 
 # 로드뷰 캡처 산출물 (로컬 검증 전용)
 data/validation/panorama/shots/
+
+# 학습 재개 체크포인트 — 크래시 내성용 임시 상태(완주하면 자동 삭제된다).
+# 산출물이 아니라 진행 중 상태라 추적하지 않는다.
+ml/artifacts/.train_gnn_resume.pt
+ml/artifacts/.train_gnn_resume.tmp

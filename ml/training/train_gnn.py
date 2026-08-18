@@ -70,6 +70,7 @@ from ml.models.gnn.industry_gnn import IndustryGNN  # noqa: E402
 
 _GOLD = _REPO / "data" / "gold"
 _ARTIFACT = _REPO / "ml" / "artifacts" / "industry_gnn.pt"
+_RESUME = _REPO / "ml" / "artifacts" / ".train_gnn_resume.pt"
 _RECOMMEND_JSON = _GOLD / "platform_industry_recommend.json"
 _TRDAR_DEMAND = _GOLD / "features" / "trdar_demand.parquet"
 _PAGE_BUILDING = _GOLD / "features" / "page_building.parquet"
@@ -469,6 +470,7 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
           hidden: int = 128, lr: float = 0.01, weight_decay: float = 5e-4,
           patience: int = 50, save: bool = True, use_demand: bool = True,
           use_building: bool = True,
+          resume: bool = True, ckpt_every: int = 25,
           label_level: str = "group", class_weight: bool = False) -> dict:
     torch.manual_seed(SEED)
     rng = np.random.default_rng(SEED)
@@ -509,8 +511,38 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
         w = torch.tensor((inv / inv.sum() * len(classes)), dtype=torch.float32)
         print(f"[gnn] class_weight: {dict(zip(classes, w.round(decimals=2).tolist()))}")
 
-    best_val, best_state, bad = -1.0, None, 0
-    for ep in range(1, epochs + 1):
+    # ── 크래시 내성: 주기적 체크포인트 + 재개 ──────────────────────────
+    # 이 머신에서 학습이 무작위 지점(ep0~300)에서 세그폴트한다 — 105열·95열 양쪽에서
+    # 나고 스레드 변수를 전부 1로 묶어도 재현된다(2026-08-17 기준 105열 11회 중 1회 완주).
+    # 원인 규명 전까지는 **진행이 날아가지 않게** 하는 것이 우선이라, ckpt_every 에포크마다
+    # 상태를 떨어뜨리고 다음 실행이 이어받는다. 모델에 dropout 이 있으므로 torch RNG 상태도
+    # 같이 저장해야 재개 궤적이 연속 실행과 어긋나지 않는다.
+    # sig 가 다르면 이어붙이지 않는다 — 피처 수·라벨 입도가 바뀐 재개 파일을 물면
+    # 엉뚱한 모델을 학습하면서 조용히 성공한 것처럼 보인다.
+    sig = {"in_dim": int(x.shape[1]), "classes": len(classes),
+           "label_level": label_level, "class_weight": int(class_weight),
+           "hidden": hidden, "epochs": epochs, "patience": patience}
+    start_ep, best_val, best_state, bad = 1, -1.0, None, 0
+    if resume and _RESUME.exists():
+        # 저장 도중 죽으면 파일이 깨진다 — 무인 재시도 루프에서 그게 매 회 예외가 되면
+        # 크래시 내성을 넣은 의미가 사라지므로, 못 읽으면 버리고 처음부터 간다.
+        try:
+            ck = torch.load(_RESUME, map_location="cpu", weights_only=False)
+        except Exception as e:
+            print(f"[gnn] 재개 파일이 손상됐다({type(e).__name__}) — 버리고 처음부터 학습")
+            _RESUME.unlink(missing_ok=True)
+            ck = {}
+        if ck.get("sig") == sig:
+            model.load_state_dict(ck["model"])
+            opt.load_state_dict(ck["opt"])
+            torch.set_rng_state(ck["rng"])
+            start_ep, best_val, bad = ck["ep"] + 1, ck["best_val"], ck["bad"]
+            best_state = ck["best_state"]
+            print(f"[gnn] 재개 — ep{ck['ep']} 다음부터 (best val {best_val:.4f})")
+        else:
+            print("[gnn] 재개 파일이 현재 설정과 달라 무시한다 — 처음부터 학습")
+
+    for ep in range(start_ep, epochs + 1):
         model.train()
         opt.zero_grad()
         out = model(x, ei)
@@ -530,9 +562,20 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
             if bad >= patience:
                 print(f"  조기 종료 ep{ep} (val top1 {best_val:.4f})")
                 break
+        if ckpt_every and ep % ckpt_every == 0:
+            # 임시 파일에 쓰고 원자적으로 바꿔친다 — 저장 중 죽어도 직전 체크포인트는 산다
+            _RESUME.parent.mkdir(parents=True, exist_ok=True)
+            tmp = _RESUME.with_suffix(".tmp")
+            torch.save({"sig": sig, "ep": ep, "model": model.state_dict(),
+                        "opt": opt.state_dict(), "rng": torch.get_rng_state(),
+                        "best_val": best_val, "bad": bad,
+                        "best_state": best_state}, tmp)
+            tmp.replace(_RESUME)
         if ep % 50 == 0:
             print(f"  ep{ep:4d} loss {float(loss.detach()):.4f} · val top1 {v:.4f}")
 
+    # 여기 왔으면 완주(또는 조기 종료)다 — 재개 파일은 다음 학습을 오염시키므로 지운다
+    _RESUME.unlink(missing_ok=True)
     if best_state:
         model.load_state_dict(best_state)
     model.eval()
@@ -621,6 +664,10 @@ if __name__ == "__main__":
     ap.add_argument("--no-save", action="store_true")
     ap.add_argument("--no-demand", action="store_true",
                     help="TRDAR 공공 수요신호 제외 — 종전 파이프라인 재현(ablation 기준선)")
+    ap.add_argument("--no-resume", action="store_true",
+                    help="재개 파일을 무시하고 처음부터 학습(기본은 이어받는다)")
+    ap.add_argument("--ckpt-every", type=int, default=25,
+                    help="N에포크마다 재개 체크포인트 저장. 0 이면 끈다")
     ap.add_argument("--no-building", action="store_true",
                     help="Page 건물 물리·대장 피처 제외 — 08-17 이전 95피처 재현(ablation)")
     ap.add_argument("--label-level", default="group", choices=("group", "category2"),
@@ -638,5 +685,6 @@ if __name__ == "__main__":
         train(edge_types=types, epochs=a.epochs, hidden=a.hidden,
               save=not a.no_save, use_demand=not a.no_demand,
               use_building=not a.no_building,
+              resume=not a.no_resume, ckpt_every=a.ckpt_every,
               label_level=a.label_level, patience=a.patience,
               class_weight=a.class_weight)
