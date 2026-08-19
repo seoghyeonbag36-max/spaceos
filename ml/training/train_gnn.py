@@ -66,6 +66,17 @@ import torch.nn.functional as F
 _REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO))
 
+# 출력이 파이프·파일로 가면 Windows 기본 인코딩이 cp949 로 잡혀 로그의 '—' 하나에
+# UnicodeEncodeError 로 죽는다 — train_lstm 이 2026-07-22 에 같은 이유로 고친 자리다.
+# 여기만 빠져 있어서, 로그를 파일로 남기는 무인 재시도 루프가 **재개 안내 줄에서**
+# 매 회 같은 지점에 걸렸다(2026-08-19, 6회 연속). 재개 경로에서만 실행되는 줄이라
+# 콘솔로 돌리던 동안에는 드러나지 않았다.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):  # 재설정 불가 스트림이면 그대로 둔다
+    pass
+
 from ml.models.gnn.industry_gnn import IndustryGNN  # noqa: E402
 
 _GOLD = _REPO / "data" / "gold"
