@@ -2,7 +2,7 @@
   "slug": "gongdeok",
   "hub_name": "공덕역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:58:45",
+  "built_at": "2026-08-19T22:27:06",
   "shown": 423,
   "excluded_total": 514,
   "excluded_unknown": 87,
@@ -20,28 +20,22 @@
     "stores+ledger+pip": 1,
     "pip_only": 8
   },
-  "reference_vacancy_pct": 50.8,
-  "reference_buildings": 223,
-  "reference_coverage_pct": 98.7,
+  "reference_vacancy_pct": 50.4,
+  "reference_buildings": 226,
+  "reference_coverage_pct": 100.0,
   "mixed_vacancy_pct": 70.1,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 184,
-      "active": 419,
-      "capacity": 476,
+      "buildings": 187,
+      "active": 426,
+      "capacity": 484,
       "vacancy_pct": 12.0
     },
     "expos_units": {
       "buildings": 39,
       "active": 795,
-      "capacity": 1989,
-      "vacancy_pct": 60.0
-    },
-    "floor_approx": {
-      "buildings": 3,
-      "active": 7,
-      "capacity": 8,
-      "vacancy_pct": 12.5
+      "capacity": 1980,
+      "vacancy_pct": 59.8
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
