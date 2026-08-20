@@ -9,7 +9,10 @@
   2. 전원 — 배터리면 느려진다. 기전은 CPU가 아니라 무선 어댑터 절전(AC 0 / DC 2)이고
      이 작업은 네트워크 바운드라 정확히 거기서 아프다. 덮개를 닫으면 아예 언다
   3. 커밋 여유 — 1~2GB 면 회색 화면·무증상 크래시가 온다. 재부팅만 듣는다
-  4. 잔여 — 전유부(대장) 미수집 거점과, 층별개요 대상 동수
+  4. 잔여 — 전유부(대장) 미수집 거점과, 층별개요 **미시도** 동수.
+     층별개요 잔여는 '미시도'와 '판정완료(상업층 0 확정)'로 갈라서 찍는다.
+     붙여 쓸 명령줄에는 미시도가 있는 거점만 넣는다 — 잔여 동수로 고르면
+     회수율 0 인 거점에 콜을 태운다(2026-08-19 에 672콜/22동으로 겪었다).
 
 읽기만 한다. 프로브 1콜 말고는 아무것도 호출하지 않고 아무 파일도 쓰지 않는다.
 
@@ -32,6 +35,7 @@ from data.collectors.common import load_env  # noqa: E402
 from data.config.page_hubs import HUBS  # noqa: E402
 
 GOLD = ROOT / "data" / "gold"
+BRONZE = ROOT / "data" / "bronze"
 _EXPOS = "http://apis.data.go.kr/1613000/BldRgstHubService/getBrExposPubuseAreaInfo"
 
 OK, WARN, BAD = "OK  ", "주의", "중단"
@@ -128,6 +132,28 @@ def check_commit() -> tuple[str, str]:
     return OK, s
 
 
+def _tried(slug: str) -> set[str]:
+    """이 거점에서 층별개요를 **이미 호출해 본** 건물 lnoCd 집합.
+
+    수집기는 실행마다 `bronze/<slug>/<날짜>/bldg_flr_raw.json` 에 그 회차가 응답을
+    받은 건물만 쓴다. 날짜별 파일을 전부 합치면 "지금까지 시도해 본 것" 이 된다.
+
+    **왜 mtime 으로 판정하지 않는가**: quota.md 의 판단 순서 ②는 "bronze 가 있다면
+    그 뒤에 대장을 새로 받았는가" 인데, 이걸 `building_vacancy.json` 의 mtime 으로
+    재면 **항상 참이 된다.** floor_capacity 자신이 bronze 를 쓴 직후 같은 실행에서
+    gold 를 제자리 갱신하기 때문이다(회수가 0 인 거점도 `_persist` 를 탄다).
+    2026-08-19 에 이 오탐으로 50거점을 전부 넣어 672콜을 태우고 22동을 받았다.
+    시도 여부는 추정하지 말고 **raw 에 그 건물이 있는지로 직접** 본다.
+    """
+    out: set[str] = set()
+    for f in sorted((BRONZE / slug).glob("*/bldg_flr_raw.json")):
+        try:
+            out |= set(json.loads(f.read_text(encoding="utf-8")))
+        except Exception:  # noqa: BLE001  깨진 회차 하나가 판정을 막지 않게
+            continue
+    return out
+
+
 def _gold(slug: str) -> list | None:
     p = GOLD / slug / "building_vacancy.json"
     if not p.exists():
@@ -167,33 +193,61 @@ def report_remaining() -> None:
     else:
         print("  전유부 잔여 없음 — 오늘은 층별개요부터 돈다.")
 
+    # 잔여를 **미시도 / 판정완료** 로 가른다. 둘을 합쳐 "잔여 N동" 으로 찍으면
+    # 회수 가능한 작업처럼 읽히는데, 판정완료분은 몇 번을 호출해도 안 바뀐다
+    # (층별개요를 정상 수신했고 그 응답에 상업 층이 0 인 건물 — 07-26 교정 조항).
+    # bronze raw 를 전부 읽으므로 이 구간만 십수 초 걸린다. 수천 콜을 가르는
+    # 판단이라 그 값은 한다.
+    print("\n■ 층별개요 — 시도 이력 대조 중(bronze raw 스캔, 십수 초)…")
     rows_out = []
     for slug in HUBS:
         rows = _gold(slug)
         if not rows:
             continue
-        c = Counter(r.get("capacity_method") for r in rows)
-        if c["floor_approx"]:
-            rows_out.append((c["floor_approx"], slug, c["floor_ouln"]))
+        appr = [r for r in rows if r.get("capacity_method") == "floor_approx"]
+        if not appr:
+            continue
+        tried = _tried(slug)
+        n_untried = sum(1 for r in appr if r.get("lnoCd") not in tried)
+        n_judged = len(appr) - n_untried
+        n_ouln = sum(1 for r in rows if r.get("capacity_method") == "floor_ouln")
+        rows_out.append((n_untried, n_judged, slug, n_ouln))
     rows_out.sort(reverse=True)
 
-    fresh = [r for r in rows_out if r[2] == 0]      # floor_ouln 0 — 재수집 낭비 없음
-    stale = [r for r in rows_out if r[2] > 0]       # 이미 ouln 보유 — --only-approx 로
-    print(f"\n■ 층별개요 — floor_approx 잔여 {sum(r[0] for r in rows_out):,}동 "
-          f"/ {len(rows_out)}거점")
-    if fresh:
-        print(f"  [그냥 넣는다] ouln 0 인 {len(fresh)}거점 — {sum(r[0] for r in fresh):,}콜")
-        for n, s, _ in fresh:
-            print(f"      {s:<18}{n:>6}동")
-        print("      → python -m data.collectors.floor_capacity "
-              + " ".join(s for _, s, _ in fresh))
-    if stale:
-        cost_full = sum(r[0] + r[2] for r in stale)
-        cost_only = sum(r[0] for r in stale)
-        print(f"  [--only-approx 로만] ouln 보유 {len(stale)}거점 — "
-              f"{cost_only:,}동 회수에 플래그 없이는 {cost_full:,}콜")
-        print("      → python -m data.collectors.floor_capacity --only-approx "
-              + " ".join(s for _, s, _ in stale))
+    tot_untried = sum(r[0] for r in rows_out)
+    tot_judged = sum(r[1] for r in rows_out)
+    print(f"  floor_approx 잔여 {tot_untried + tot_judged:,}동 / {len(rows_out)}거점")
+    print(f"    미시도   {tot_untried:>6,}동  ← 회수 가능성이 있는 것은 이것뿐이다")
+    print(f"    판정완료 {tot_judged:>6,}동  (상업층 0 확정 — 재호출해도 안 바뀐다)")
+
+    # **명령줄에는 미시도가 있는 거점만 넣는다.** 잔여 동수로 고르면 안 된다 —
+    # 회수율을 정하는 건 '미시도 비율' 하나다(quota.md §회수율 표, 커밋 ac3566a).
+    worth = [r for r in rows_out if r[0] > 0]
+    if not worth:
+        print("\n  ▶ 시도할 가치가 있는 거점 없음 — 오늘 층별개요로 받을 것이 없다.")
+        print("    잔여가 남아 있어도 전부 판정완료분이다. 새 거점을 넣거나 대장을")
+        print("    새로 받기 전까지는 여기서 늘어날 회수가 없다.")
+    else:
+        fresh = [r for r in worth if r[3] == 0]     # floor_ouln 0 — 재수집 낭비 없음
+        stale = [r for r in worth if r[3] > 0]      # 이미 ouln 보유 — --only-approx 로
+        print(f"\n  ▶ 시도할 가치가 있는 거점 {len(worth)} · 미시도 {tot_untried:,}동")
+        if fresh:
+            print(f"  [그냥 넣는다] ouln 0 인 {len(fresh)}거점 — "
+                  f"{sum(r[0] for r in fresh):,}콜")
+            for u, j, s, _ in fresh:
+                print(f"      {s:<18}미시도 {u:>5}  판정완료 {j:>5}")
+            print("      → python -m data.collectors.floor_capacity "
+                  + " ".join(r[2] for r in fresh))
+        if stale:
+            cost_full = sum(r[0] + r[3] for r in stale)
+            cost_only = sum(r[0] for r in stale)
+            print(f"  [--only-approx 로만] ouln 보유 {len(stale)}거점 — "
+                  f"미시도 {cost_only:,}동, 플래그 없이는 {cost_full:,}콜")
+            for u, j, s, _ in stale:
+                print(f"      {s:<18}미시도 {u:>5}  판정완료 {j:>5}")
+            print("      → python -m data.collectors.floor_capacity --only-approx "
+                  + " ".join(r[2] for r in stale))
+
     print("\n  ⚠ 대장을 아직 수집 중인 거점은 끝난 뒤에 다시 뽑을 것 — floor_approx 가 계속 는다.")
     print("  ⚠ 전유부와 층별개요를 동시에 돌리지 말 것 — 429 는 키 단위라 서로를 죽인다.")
 
