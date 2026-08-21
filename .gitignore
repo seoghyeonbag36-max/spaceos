@@ -118,3 +118,6 @@ data/validation/panorama/shots/
 # 산출물이 아니라 진행 중 상태라 추적하지 않는다.
 ml/artifacts/.train_gnn_resume.pt
 ml/artifacts/.train_gnn_resume.tmp
+
+# MCP 서버가 만드는 로컬 상태 — 코드가 참조하지 않는다(0바이트로 남는다)
+sqlite_mcp_server.db

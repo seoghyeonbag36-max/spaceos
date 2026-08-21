@@ -13,6 +13,18 @@ Claude Code(CLI) 기반 SpaceOS 개발 가이드. PPPP 프레임워크 4기능�
 | [feature-posting.md](feature-posting.md) | **Posting** — 입점 솔루션 (전략별 비용-효용·ROI 분석) |
 | [feature-program.md](feature-program.md) | **Program** — LLM 마케팅 자동화 + 행사 추천 |
 | [spaceos-vibe-build-sequence.md](spaceos-vibe-build-sequence.md) | **빌드 순서 + 현재 위치** — Phase 0~6 의존 순서, 막힌 것의 종류 구분 |
+| [deploy-vercel.md](deploy-vercel.md) | 배포 — 프론트 정적 + FastAPI 서버리스 단일 Vercel 프로젝트 |
+| [api-keys-and-specs.md](api-keys-and-specs.md) · [api-key-checklist.md](api-key-checklist.md) | 인증키 5종과 응답 필드 스펙 |
+| [poc-building-vacancy.md](poc-building-vacancy.md) | 건물 단위 공실 PoC 설계 (D1 스키마) |
+
+### 실측 기록 (finding-*) — 판단의 근거가 남은 곳
+
+| 문서 | 무엇을 결론지었나 |
+|------|------|
+| [finding-sequence-and-accuracy-2026-08-17.md](finding-sequence-and-accuracy-2026-08-17.md) | 작업 순서·정확도 목표 재설정, Top-1 게이트 폐기와 off-prior 게이트 신설 |
+| [finding-anchor-population.md](finding-anchor-population.md) | R-ONE 앵커 대조 — 격차를 어떻게 읽나 |
+| [finding-expos-quota-2026-08-09.md](finding-expos-quota-2026-08-09.md) | 건축HUB 전유부 쿼터가 확장 속도를 정한 기록 (해소 08-17) |
+| [finding-foot-traffic-resolution.md](finding-foot-traffic-resolution.md) | 유동인구 해상도 — `foot` 만 집계구를 기다린다 |
 
 ## 진행률은 문서에서 읽지 않는다
 
@@ -25,10 +37,13 @@ python scripts/pppp_status.py
 있었다). 위 스크립트가 `[자동]` 으로 표시하는 값이 단일 기준이고, `[선언]` 은 근거
 경로를 확인한 뒤 인용한다.
 
+`[선언]` 게이트는 줄이는 것이 목표다 — 2026-08-19 에 Platform off-prior 게이트가
+학습 체크포인트에서 직접 읽히면서 `[선언]` 9 → 8 이 됐다.
+
 ## 권장 진행 순서
 
 1. **00 설치/설정** → git init + Claude Code 로그인 + 슬래시 커맨드 확인
-2. **데이터 기반 마련** — `data/`의 Bronze→Silver→Gold 파이프라인 (거점: 신사동 가로수길→성수동)
+2. **데이터 기반 마련** — `data/`의 Bronze→Silver→Gold 파이프라인 (거점: 신사동 가로수길에서 시작해 현재 **서울 54거점 전부 Tier1**)
 3. **Platform** — AI 모델이 다른 기능의 입력이 되므로 우선 구축
 4. **Page** — 모델 결과를 히트맵·3D로 시각화
 5. **Posting / Program** — 분석 결과를 입점 솔루션·마케팅으로 확장

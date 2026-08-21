@@ -18,13 +18,14 @@
 | 이름 | 내용 |
 |------|------|
 | **PPPP 6개월 로드맵** | 2026-05-20 완성. MVP + M1~M6 로드맵 + 바이브 코딩 방법론 |
-| **MVP 거점** | 서울 강남구 신사동 가로수길 (건물 단위 공실 PoC) — 2순위 후보 홍대·연남동 |
+| **거점** | **서울 54거점 전부 Tier1**(건축물대장 실측, 08-17 완주). PoC 출발점은 신사동 가로수길 — 거점 수는 `data/gold/*/coverage.json` 의 `tier` 를 세는 것이 단일 기준이다 |
 | **B2B 파일럿** | 6개월차 5~10건 목표 (프랜차이즈 본사·자산운용사·지자체) |
 
 → 상세: memory/projects/
 
 ## Tech Stack (확정)
-- **FE**: React + TypeScript + Three.js/@react-three/fiber + Mapbox GL + Tailwind
+- **FE**: React + TypeScript + Three.js/@react-three/fiber + **네이버 지도**(`lib/naverMap.ts`) + Tailwind
+  - ⚠ `mapbox-gl` 은 package.json 에 남아 있으나 **소스에서 import 0건**이다(베이스맵은 네이버). 제거 판단 대기
 - **BE**: FastAPI + PostgreSQL/PostGIS + Redis + Celery
 - **ML**: PyTorch + PyTorch Geometric (GNN) + LSTM + MLflow + LangChain
 - **Data**: Airflow + Selenium/Playwright + Bronze/Silver/Gold 3계층
@@ -115,7 +116,19 @@ cd spaceos && vercel --prod
 
 # ML 골격 확인
 cd ml && python models/lstm/vacancy_lstm.py
+
+# GNN 재학습 (체크포인트 재개 내장) — 스레드 1개 · UTF-8 필수
+OMP_NUM_THREADS=1 PYTHONIOENCODING=utf-8 python -u -m ml.training.train_gnn --epochs 600 --patience 80
+
+# 진행률·게이트 — 문서가 아니라 산출물을 센다
+python scripts/pppp_status.py
+
+# 건축HUB 수집 전 프리플라이트 (쿼터·전원·시도이력)
+python scripts/quota_preflight.py
 ```
+
+⚠ **로그를 파일로 리다이렉트할 때 `PYTHONIOENCODING=utf-8`** — Windows 기본 cp949 에는
+`—`(em dash) 가 없어 학습·수집 스크립트가 UnicodeEncodeError 로 죽는다(08-19 실측).
 
 ### 코드 작성 규칙
 - **언어**: 응답·주석·문서는 한국어, 기술 용어는 영문 병기.
