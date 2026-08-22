@@ -110,6 +110,11 @@ class TierScenario(BaseModel):
     month_net: int
     roi_months: float
     recommended: bool
+    # 순익이 0 이하면 False — 회수 자체가 성립하지 않는다. roi_months 의 99.0 은
+    # "매우 김"이 아니라 "불가"의 표식이었는데 구분이 안 됐다.
+    viable: bool = True
+    # 이 회수기간이 **어떤 비용 항목까지** 넣고 계산됐는지. services/districts.COST_BASIS.
+    basis: str | None = None
 
 
 class Posting(BaseModel):

@@ -28,3 +28,6 @@ class SimulateResult(BaseModel):
     # source 가 코파일럿이냐 폴백이냐와 별개로, 입력이 실측인지 프록시인지를 밝힌다.
     inputs_source: dict[str, str] | None = None
     inputs_quarter: str | None = None   # 실데이터 기준 분기 (예: "20261")
+    # 세 전략 모두 회수 불가일 때만 채워진다 — "추천이 없다"와 "이 자리는 회수가
+    # 안 된다"를 구분한다. 예전에는 둘 다 빈 값으로 조용히 같아 보였다.
+    unviable_note: str | None = None
