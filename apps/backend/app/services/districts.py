@@ -117,48 +117,78 @@ def recommend_tier(scenarios: dict) -> str | None:
 
     ## ⚠ 이 값이 기대는 계산은 아직 보정되지 않았다
 
-    `tier_scenarios` 의 `month_cost` 에 **원가·인건비가 없다.** 그래서 마진이 51~73%로
-    나오고(실제 외식업 영업이익률은 통상 10~20%) 회수기간이 0.5~1.6개월로 찍힌다.
-    실측 결과 `factory` 는 **어떤 입력 조합에서도 1위가 되지 못한다**(면적 10~80평 ·
-    임대료 100~2000만원 · 유동 저/고 전수). 즉 지금 이 추천은 순위가 셋 중 둘로만
-    갈린다 — 기준이 아니라 **비용 모델이 병목**이다.
+    `tier_scenarios` 의 `month_cost` 에 **원가·인건비가 없다.** 2026-08-22 실 유닛
+    270건 전수 재측정: 마진 중앙 70.1%(premium) / 63.5%(value) / 45.9%(factory),
+    회수 중앙 1.8개월, `factory` 1위 **0건**. 37,800 조합 스윕에서도 factory 는 8건
+    (0.02%)만 이기고 그나마 전부 `prem=0` · `rent≤150만원` 이라 실 인벤토리(최저
+    임대료 195만원) 밖이다. 즉 추천이 셋 중 둘로만 갈린다 — 기준이 아니라 **비용
+    모델이 병목**이다.
 
     그럼에도 손으로 적은 값보다는 낫다: 계산이 드러나 있고 재현되며, 비용 모델이
-    보정되면 추천이 자동으로 따라온다. 응답의 `roi_basis` 가 이 한계를 함께 내려보낸다.
+    보정되면 추천이 자동으로 따라온다. 한계는 각 시나리오의 `basis` 가 함께 내려간다.
+
+    ## 비교는 반올림 전 값으로 한다 (2026-08-22)
+
+    예전에는 `roi_months`(소수 1자리)와 `invest_mn`(정수)을 **반올림한 뒤** 비교했다.
+    반올림이 인위적 동률을 만들고, 동률이면 순익 큰 쪽으로 가므로 그 표가 전부
+    premium 에 쏠렸다 — 실 유닛 270건 중 **14건(5.2%)이 반올림 때문에** premium 으로
+    넘어가 있었다(199/71 → 185/85). `invest_mn` 은 백만원 단위 정수라 factory 의
+    9백만원에서는 눈금이 11% 나 된다. 그래서 `_raw` 원값으로 고르고 표시만 반올림한다.
     """
-    viable = [s for s in scenarios.values() if s["month_net"] > 0]
+    def raw(s: dict) -> dict:
+        # `_raw` 는 tier_scenarios 가 반환 직전에 떼어 낸다. 밖에서 이미 완성된
+        # 시나리오를 넘겨 온 경우(표시값만 남은 dict)에도 동작하도록 되돌린다.
+        return s.get("_raw") or {"roi": s["roi_months"], "net": s["month_net"]}
+
+    viable = [s for s in scenarios.values() if raw(s)["net"] > 0]
     if not viable:
         return None
-    return min(viable, key=lambda s: (s["roi_months"], -s["month_net"]))["tier"]
+    return min(viable, key=lambda s: (raw(s)["roi"], -raw(s)["net"]))["tier"]
+
+
+# 계산에 실제로 들어간 비용 항목. 마진·회수기간을 읽는 쪽이 무엇이 빠졌는지 알아야
+# 한다 — 이 문자열이 응답의 `basis` 로 내려간다(예전 docstring 이 `roi_basis` 라는
+# 필드가 있다고 적어 뒀으나 그런 필드는 구현된 적이 없다. 2026-08-22 실제로 만든다).
+COST_BASIS = "rent+fitout"
+COST_BASIS_NOTE = ("월비용 = 임대료 + 면적비례 관리비 + 고정비. **원가(매출비례)와 "
+                   "인건비가 빠져 있어 마진이 과대, 회수기간이 과소하게 나온다.**")
 
 
 def tier_scenarios(unit: dict) -> dict:
-    """공실 유닛의 3-Tier 비용-효용 시나리오(월 단위, 만원/백만원)."""
+    """공실 유닛의 3-Tier 비용-효용 시나리오(월 단위, 만원/백만원).
+
+    표시값(`invest_mn`·`month_cost`·`month_rev`·`roi_months`)은 반올림하되, 추천
+    비교에 쓰는 값은 `_raw` 에 원값으로 함께 싣는다 — 반올림이 추천을 뒤집던 것을
+    막는다(경위는 `recommend_tier` docstring).
+    """
     f_k = _FOOT_K[unit["foot"]]
     base = unit["area"] * f_k
     rent, area, prem = unit["rent"], unit["area"], unit["prem"]
 
-    def roi(invest_mn: float, cost: float, rev: float) -> float:
-        """투자 회수기간(개월). invest 는 **백만원**, cost/rev 는 **만원** 단위다.
-
-        2026-08-01 수정: 이전에는 `invest / net` 이라 단위가 섞여(백만원 ÷ 만원)
-        회수기간이 100배 작게 나왔다 — 화면에 "회수 0개월 / 0.1개월"로 찍히고 있었다.
-        1백만원 = 100만원 이므로 invest 를 만원으로 맞춘 뒤 나눈다.
-        """
-        net = rev - cost
-        return 99.0 if net <= 0 else round(invest_mn * 100 / net, 1)
-
-    out = {}
+    # (투자계수·투자고정, 비용계수·비용고정, 매출계수·매출고정)
+    # ⚠ 매출계수 41/30/18 은 근거 없는 손으로 적은 값이다. 실측 대역은
+    #    gold/platform_posting_revenue.json (상권×업종 점포당 월매출) 참조.
     specs = {
-        "premium": (round(prem / 100 + area * 0.55 + 4), round(rent + area * 1.8 + 180), round(base * 41 + 1150)),
-        "value": (round(prem / 100 + area * 0.32 + 2.2), round(rent + area * 1.1 + 95), round(base * 30 + 760)),
-        "factory": (round(prem / 100 + area * 0.2 + 1.1), round(rent + area * 0.45 + 25), round(base * 18 + 430)),
+        "premium": (0.55, 4, 1.8, 180, 41, 1150),
+        "value": (0.32, 2.2, 1.1, 95, 30, 760),
+        "factory": (0.2, 1.1, 0.45, 25, 18, 430),
     }
-    for k, (inv, cost, rev) in specs.items():
+    out = {}
+    for k, (i_a, i_c, c_a, c_f, r_a, r_f) in specs.items():
+        inv = prem / 100 + area * i_a + i_c        # 백만원
+        cost = rent + area * c_a + c_f             # 만원/월
+        rev = base * r_a + r_f                     # 만원/월
+        net = rev - cost
+        # 회수기간(개월). invest 는 백만원, net 은 만원이라 ×100 으로 단위를 맞춘다
+        # (2026-08-01 교정 — 이전에는 100배 작게 나와 "0.1개월"로 찍혔다).
+        roi = float("inf") if net <= 0 else inv * 100 / net
         out[k] = {
             "tier": k, "name": TIER[k]["nm"], "sub": TIER[k]["sub"],
-            "invest_mn": inv, "month_cost": cost, "month_rev": rev,
-            "month_net": rev - cost, "roi_months": roi(inv, cost, rev),
+            "invest_mn": round(inv), "month_cost": round(cost), "month_rev": round(rev),
+            "month_net": round(net), "roi_months": 99.0 if net <= 0 else round(roi, 1),
+            "viable": net > 0,
+            "basis": COST_BASIS,
+            "_raw": {"invest_mn": inv, "cost": cost, "rev": rev, "net": net, "roi": roi},
         }
     # 추천은 **계산한다** — 시드의 `unit["rec"]` 을 읽지 않는다. 그래야 실제 건물에서
     # 뽑은 유닛(gold/{거점}/vacant_units.json)에도 그대로 쓸 수 있다. 그 유닛들에는
@@ -166,7 +196,25 @@ def tier_scenarios(unit: dict) -> dict:
     best = recommend_tier(out)
     for k, s in out.items():
         s["recommended"] = k == best
+        s.pop("_raw")
     return out
+
+
+def unviable_note(scenarios: dict) -> str | None:
+    """세 전략 모두 순익이 0 이하면 그 사실을 문장으로 돌려준다(아니면 None).
+
+    2026-08-22 이전에는 이 경우 `rec_top` 이 빈 문자열이 되어 **카드가 조용히 비었다**.
+    "추천이 없다"와 "이 자리는 회수가 안 된다"는 전혀 다른 정보인데 구분되지 않았다.
+
+    ⚠ 비용 모델을 보정하면 이 경우가 소수가 아니라 다수가 된다(임시값 실험에서 실
+    유닛의 34~53%). 그래서 문구는 **계산의 한계를 함께 밝히는** 형태로 둔다 — 지금
+    비용에 원가·인건비가 없는데도 회수가 안 된다면 그건 더 확실한 신호이지만,
+    반대로 보정 후 늘어날 회수불가는 계산 탓일 수 있다.
+    """
+    if any(s["viable"] for s in scenarios.values()):
+        return None
+    return ("이 자리는 지금 계산으로는 회수 불가 — 세 전략 모두 월 순익이 0 이하다. "
+            f"({COST_BASIS_NOTE})")
 
 
 def _predicted(district_id: str, current_rate: float) -> dict:
@@ -192,7 +240,10 @@ def _summary(d: dict) -> dict:
     ci = cells_for(d)
     # 추천은 계산한다(recommend_tier). 예전에는 시드에 손으로 적은 `u["rec"]` 를 그대로
     # 세어 카드에 노출했다 — 기준이 정의된 적이 없는 값이었다.
-    recs = [recommend_tier(tier_scenarios(u)) for u in resolved_units(d["id"]) or []]
+    # `recommended` 플래그를 그대로 읽는다 — 여기서 recommend_tier 를 다시 부르면
+    # 반올림된 표시값으로 재판정하게 되어 유닛 상세와 카드가 어긋난다.
+    recs = [next((k for k, s in sc.items() if s["recommended"]), None)
+            for sc in (tier_scenarios(u) for u in resolved_units(d["id"]) or [])]
     tiers = {k: sum(1 for r in recs if r == k) for k in TIER}
     rec_top = TIER[recs[0]]["nm"] if recs and recs[0] else ""
     return {

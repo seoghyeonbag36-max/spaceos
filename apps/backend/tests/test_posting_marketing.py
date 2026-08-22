@@ -32,13 +32,22 @@ def test_simulate_revenue_fallback():
     for sc in body["scenarios"].values():
         # 회수기간 = 초기투자(백만원)×100 ÷ 월순익(만원). 단위를 섞으면 100배 작아진다
         # (2026-08-01 이전 버그 — 화면에 "회수 0개월"로 찍혔다).
+        #
+        # 2026-08-22: roi 는 **반올림 전 원값**으로 계산하고 표시값만 반올림한다
+        # (반올림이 추천을 뒤집던 것을 막는다 — districts.recommend_tier 참조).
+        # 그래서 반올림된 invest_mn·month_net 으로 되짚으면 정확히 일치하지 않는다.
+        # 여기서 지킬 불변식은 "단위가 맞는가"이므로 반올림 오차폭까지 허용한다.
         if sc["month_net"] > 0:
-            assert sc["roi_months"] == pytest.approx(
-                sc["invest_mn"] * 100 / sc["month_net"], abs=0.05)
+            approx = sc["invest_mn"] * 100 / sc["month_net"]
+            assert sc["roi_months"] == pytest.approx(approx, rel=0.05), (
+                f"{sc['tier']} roi {sc['roi_months']} vs 표시값 재계산 {approx:.2f}")
             assert sc["roi_months"] >= 0.5, (
                 f"{sc['tier']} 회수 {sc['roi_months']}개월 — 단위 혼용 회귀 의심")
+            assert sc["viable"] is True
         else:
             assert sc["roi_months"] == 99.0   # 적자 시나리오 표기
+            assert sc["viable"] is False
+        assert sc["basis"], "회수기간이 어떤 비용까지 넣고 계산됐는지 밝혀야 한다"
 
 
 def test_simulate_revenue_strategy_filter():

@@ -274,16 +274,21 @@ def posting_track(total: int) -> Track:
     vu = list(GOLD.glob("*/vacant_units.json"))
     t.gates.append(Gate(
         "실제 공실 유닛 인벤토리", len(vu) / total if total else 0.0,
-        f"{len(vu)}/{total}거점 — 잔여 5곳은 **막힘이 아니라 재실행 대기**다(08-17 확인). "
-        "종전 사유 'Tier2라 대장이 없다'는 대장 완주로 무효가 됐고, 상업면적이 실재한다",
+        f"{len(vu)}/{total}거점 — 08-22 재실행으로 완주(580유닛). 종전 잔여 5곳"
+        "(hyehwa·kyunghee·sadang·sukmyung·wangsimni)은 막힘이 아니라 대기였고, 대장 완주로 "
+        "상업면적이 채워져 그대로 풀렸다. ⚠ 산출물은 .gitignore 로 **추적되지 않는다** — "
+        "배선하려면 추적 예외가 먼저다(calibration.json 과 같은 실패 양식)",
     ))
 
     t.gates.append(Gate(
         "3-Tier 비용 모델 보정", 0.0,
-        "month_cost 에 원가·인건비가 없다 — 마진 51~73%(실제 외식업 10~20%), 회수 "
-        "0.5~1.6개월. factory 는 전수 실측에서 한 번도 1위가 못 된다. rec 을 정의하자 "
-        "병목이 여기로 옮겨왔다",
-        auto=False, evidence="apps/backend/app/services/districts.tier_scenarios",
+        "month_cost 에 원가·인건비가 없다 — 08-22 전수 재측정으로 수치 갱신: 마진 중앙 "
+        "70.2/63.4/45.8%, 회수 중앙 1.8개월, factory 1위 0/270. 근거는 08-22 에 절반 "
+        "깔렸다(tier↔업종 대표군 정의 + 매출 실측 — 현행이 premium 매출을 58% 과대평가). "
+        "남은 구멍 둘: **원가율**(KOSIS 키 미발급) · **필요인원**(공개 통계 없음). "
+        "32조합 감도표상 **비용만 고쳐서는 통과 불가** — 매출계수를 같이 옮겨야 한다",
+        auto=False,
+        evidence="docs/feature-posting.md §0-A~0-E · scripts/posting_cost_sensitivity.py",
     ))
     return t
 

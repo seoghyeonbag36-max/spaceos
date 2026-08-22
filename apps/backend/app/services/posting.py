@@ -50,6 +50,9 @@ def simulate(district_id: str, unit_id: str | None = None,
     if scenarios is None:
         scenarios = svc.tier_scenarios(unit)
         source = "fallback-3tier"
+    # 전략 필터 **전에** 판정한다 — 한 전략만 뽑고 나서 보면 "그 전략이 안 된다"와
+    # "이 자리가 안 된다"가 뒤섞인다.
+    note = svc.unviable_note(scenarios)
     if strategy in scenarios:
         scenarios = {strategy: scenarios[strategy]}
     return {
@@ -61,4 +64,5 @@ def simulate(district_id: str, unit_id: str | None = None,
         # 시나리오를 만든 입력의 필드별 출처 — 프록시를 실측으로 오독하면 안 된다
         "inputs_source": unit.get("inputs_source"),
         "inputs_quarter": posting_inputs.quarter(),
+        "unviable_note": note,
     }

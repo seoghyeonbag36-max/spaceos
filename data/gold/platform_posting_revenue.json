@@ -1,0 +1,1357 @@
+{
+  "source": "서울 열린데이터 상권분석 추정매출(VwsmTrdarSelngQq) ÷ 점포수(VwsmTrdarStorQq) ÷ 3개월. 단위 만원/월, 점포당.",
+  "quarter": "20261",
+  "built_at": "2026-08-22T14:21:59+00:00",
+  "min_stores": 5,
+  "tier_induty": {
+    "premium": {
+      "CS100003": "일식음식점",
+      "CS100004": "양식음식점",
+      "CS100002": "중식음식점"
+    },
+    "value": {
+      "CS100001": "한식음식점",
+      "CS100008": "분식전문점",
+      "CS100007": "치킨전문점",
+      "CS100009": "호프-간이주점"
+    },
+    "factory": {
+      "CS100010": "커피-음료",
+      "CS100006": "패스트푸드점",
+      "CS100005": "제과점"
+    }
+  },
+  "caveat": "상권 평균이라 면적·층·가맹여부를 구분하지 않는다. 따라서 매출의 **수준**은 이 값으로 고정할 수 있으나 면적 **기울기**는 정할 수 없다.",
+  "seoul": {
+    "value": {
+      "n_obs": 393,
+      "stores": 18226,
+      "median": 2078.3,
+      "p25": 1150.9,
+      "p75": 3254.6
+    },
+    "premium": {
+      "n_obs": 253,
+      "stores": 5967,
+      "median": 1697.9,
+      "p25": 862.2,
+      "p75": 2848.9
+    },
+    "factory": {
+      "n_obs": 264,
+      "stores": 7035,
+      "median": 1317.2,
+      "p25": 554.1,
+      "p75": 2410.5
+    }
+  },
+  "by_induty": {
+    "한식음식점": {
+      "n_obs": 166,
+      "stores": 166,
+      "median": 2770.6,
+      "p25": 1747.2,
+      "p75": 3853.5
+    },
+    "중식음식점": {
+      "n_obs": 74,
+      "stores": 74,
+      "median": 2115.4,
+      "p25": 1294.6,
+      "p75": 3108.7
+    },
+    "일식음식점": {
+      "n_obs": 84,
+      "stores": 84,
+      "median": 1943.5,
+      "p25": 1155.9,
+      "p75": 3166.7
+    },
+    "양식음식점": {
+      "n_obs": 95,
+      "stores": 95,
+      "median": 1185.1,
+      "p25": 506.4,
+      "p75": 2200.7
+    },
+    "제과점": {
+      "n_obs": 68,
+      "stores": 68,
+      "median": 1310.8,
+      "p25": 554.1,
+      "p75": 2451.1
+    },
+    "패스트푸드점": {
+      "n_obs": 54,
+      "stores": 54,
+      "median": 1944.4,
+      "p25": 689.5,
+      "p75": 3234.4
+    },
+    "치킨전문점": {
+      "n_obs": 17,
+      "stores": 17,
+      "median": 3376.2,
+      "p25": 1611.7,
+      "p75": 4354.1
+    },
+    "분식전문점": {
+      "n_obs": 95,
+      "stores": 95,
+      "median": 1296.1,
+      "p25": 767.5,
+      "p75": 2216.5
+    },
+    "호프-간이주점": {
+      "n_obs": 115,
+      "stores": 115,
+      "median": 1897.1,
+      "p25": 1017.9,
+      "p75": 3023.8
+    },
+    "커피-음료": {
+      "n_obs": 142,
+      "stores": 142,
+      "median": 1263.8,
+      "p25": 525.9,
+      "p75": 2169.4
+    }
+  },
+  "districts": {
+    "hyehwa": {
+      "value": {
+        "n_obs": 7,
+        "stores": 299,
+        "median": 2400.5,
+        "p25": 558.5,
+        "p75": 3853.5
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 130,
+        "median": 1941.0,
+        "p25": 1472.6,
+        "p75": 3842.3
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 150,
+        "median": 885.4,
+        "p25": 467.5,
+        "p75": 2639.7
+      }
+    },
+    "namdaemun": {
+      "value": {
+        "n_obs": 6,
+        "stores": 169,
+        "median": 2480.1,
+        "p25": 1311.8,
+        "p75": 2880.0
+      },
+      "premium": {
+        "n_obs": 2,
+        "stores": 11,
+        "median": 3333.5,
+        "p25": 1842.9,
+        "p75": 4824.2
+      },
+      "factory": {
+        "n_obs": 2,
+        "stores": 58,
+        "median": 1805.4,
+        "p25": 1430.1,
+        "p75": 2180.7
+      }
+    },
+    "chungmuro": {
+      "value": {
+        "n_obs": 7,
+        "stores": 379,
+        "median": 1460.1,
+        "p25": 1348.8,
+        "p75": 1981.2
+      },
+      "premium": {
+        "n_obs": 6,
+        "stores": 95,
+        "median": 1596.2,
+        "p25": 576.1,
+        "p75": 1985.3
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 127,
+        "median": 1508.2,
+        "p25": 641.8,
+        "p75": 1619.3
+      }
+    },
+    "dongdaemun": {
+      "value": {
+        "n_obs": 8,
+        "stores": 362,
+        "median": 2600.4,
+        "p25": 2323.2,
+        "p75": 3267.9
+      },
+      "premium": {
+        "n_obs": 7,
+        "stores": 129,
+        "median": 1950.5,
+        "p25": 778.5,
+        "p75": 2879.1
+      },
+      "factory": {
+        "n_obs": 7,
+        "stores": 151,
+        "median": 1935.9,
+        "p25": 972.5,
+        "p75": 3417.4
+      }
+    },
+    "yongsan": {
+      "value": {
+        "n_obs": 5,
+        "stores": 336,
+        "median": 2344.2,
+        "p25": 730.3,
+        "p75": 4373.1
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 129,
+        "median": 385.2,
+        "p25": 292.7,
+        "p75": 1272.9
+      },
+      "factory": {
+        "n_obs": 4,
+        "stores": 198,
+        "median": 603.0,
+        "p25": 481.7,
+        "p75": 927.2
+      }
+    },
+    "sukmyung": {
+      "value": {
+        "n_obs": 9,
+        "stores": 241,
+        "median": 2366.2,
+        "p25": 1216.9,
+        "p75": 2664.0
+      },
+      "premium": {
+        "n_obs": 7,
+        "stores": 76,
+        "median": 1934.2,
+        "p25": 1200.6,
+        "p75": 2901.2
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 98,
+        "median": 1845.2,
+        "p25": 1413.4,
+        "p75": 2362.0
+      }
+    },
+    "itaewon": {
+      "factory": {
+        "n_obs": 7,
+        "stores": 248,
+        "median": 1601.4,
+        "p25": 1275.1,
+        "p75": 5407.9
+      },
+      "value": {
+        "n_obs": 6,
+        "stores": 563,
+        "median": 3158.2,
+        "p25": 702.6,
+        "p75": 3184.6
+      },
+      "premium": {
+        "n_obs": 7,
+        "stores": 488,
+        "median": 2389.0,
+        "p25": 496.4,
+        "p75": 3218.2
+      }
+    },
+    "hannam": {
+      "value": {
+        "n_obs": 5,
+        "stores": 129,
+        "median": 3852.7,
+        "p25": 1474.7,
+        "p75": 5207.5
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 94,
+        "median": 2646.6,
+        "p25": 2263.3,
+        "p75": 4582.1
+      },
+      "factory": {
+        "n_obs": 4,
+        "stores": 73,
+        "median": 562.6,
+        "p25": 330.3,
+        "p75": 2451.1
+      }
+    },
+    "wangsimni": {
+      "value": {
+        "n_obs": 13,
+        "stores": 421,
+        "median": 2124.0,
+        "p25": 1692.9,
+        "p75": 2510.3
+      },
+      "premium": {
+        "n_obs": 7,
+        "stores": 56,
+        "median": 994.3,
+        "p25": 538.2,
+        "p75": 1260.0
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 70,
+        "median": 820.4,
+        "p25": 580.3,
+        "p75": 1022.0
+      }
+    },
+    "seoulsup": {
+      "factory": {
+        "n_obs": 8,
+        "stores": 177,
+        "median": 745.0,
+        "p25": 537.5,
+        "p75": 1408.5
+      },
+      "value": {
+        "n_obs": 8,
+        "stores": 224,
+        "median": 1461.4,
+        "p25": 1416.8,
+        "p75": 3156.7
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 62,
+        "median": 536.2,
+        "p25": 506.4,
+        "p75": 1830.2
+      }
+    },
+    "seongsu": {
+      "value": {
+        "n_obs": 7,
+        "stores": 268,
+        "median": 2691.4,
+        "p25": 763.5,
+        "p75": 3719.6
+      },
+      "premium": {
+        "n_obs": 5,
+        "stores": 79,
+        "median": 1085.5,
+        "p25": 1001.6,
+        "p75": 1824.0
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 141,
+        "median": 1438.1,
+        "p25": 503.0,
+        "p75": 2267.3
+      }
+    },
+    "konkuk": {
+      "value": {
+        "n_obs": 10,
+        "stores": 434,
+        "median": 1532.0,
+        "p25": 1003.1,
+        "p75": 1868.6
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 176,
+        "median": 2015.8,
+        "p25": 1936.4,
+        "p75": 2295.4
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 141,
+        "median": 1691.7,
+        "p25": 345.7,
+        "p75": 2308.6
+      }
+    },
+    "gunja": {
+      "value": {
+        "n_obs": 6,
+        "stores": 217,
+        "median": 2154.0,
+        "p25": 633.7,
+        "p75": 2880.6
+      },
+      "factory": {
+        "n_obs": 3,
+        "stores": 50,
+        "median": 1191.4,
+        "p25": 110.8,
+        "p75": 2013.9
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 50,
+        "median": 576.1,
+        "p25": 312.2,
+        "p75": 1452.9
+      }
+    },
+    "kyunghee": {
+      "value": {
+        "n_obs": 7,
+        "stores": 175,
+        "median": 1747.2,
+        "p25": 879.1,
+        "p75": 2189.8
+      },
+      "premium": {
+        "n_obs": 6,
+        "stores": 86,
+        "median": 478.3,
+        "p25": 190.5,
+        "p75": 890.5
+      },
+      "factory": {
+        "n_obs": 7,
+        "stores": 92,
+        "median": 1308.2,
+        "p25": 128.7,
+        "p75": 2331.2
+      }
+    },
+    "jangan": {
+      "value": {
+        "n_obs": 5,
+        "stores": 180,
+        "median": 1898.4,
+        "p25": 1897.1,
+        "p75": 1943.7
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 21,
+        "median": 2224.8,
+        "p25": 635.8,
+        "p75": 2407.3
+      },
+      "factory": {
+        "n_obs": 1,
+        "stores": 18,
+        "median": 1554.6,
+        "p25": 1554.6,
+        "p75": 1554.6
+      }
+    },
+    "sungshin": {
+      "value": {
+        "n_obs": 9,
+        "stores": 340,
+        "median": 1913.2,
+        "p25": 998.9,
+        "p75": 2188.0
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 122,
+        "median": 1319.9,
+        "p25": 1022.6,
+        "p75": 2667.9
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 70,
+        "median": 1294.6,
+        "p25": 977.7,
+        "p75": 2219.3
+      }
+    },
+    "anam": {
+      "value": {
+        "n_obs": 9,
+        "stores": 194,
+        "median": 1727.9,
+        "p25": 1519.2,
+        "p75": 2442.0
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 69,
+        "median": 965.4,
+        "p25": 140.0,
+        "p75": 2563.0
+      },
+      "premium": {
+        "n_obs": 6,
+        "stores": 46,
+        "median": 1373.0,
+        "p25": 1127.7,
+        "p75": 1402.6
+      }
+    },
+    "yeonhui": {
+      "value": {
+        "n_obs": 5,
+        "stores": 112,
+        "median": 1535.8,
+        "p25": 662.1,
+        "p75": 4038.6
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 91,
+        "median": 739.8,
+        "p25": 482.5,
+        "p75": 996.0
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 47,
+        "median": 1792.8,
+        "p25": 1666.2,
+        "p75": 5701.1
+      }
+    },
+    "mangwon": {
+      "value": {
+        "n_obs": 9,
+        "stores": 156,
+        "median": 2216.8,
+        "p25": 762.4,
+        "p75": 3023.8
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 81,
+        "median": 341.6,
+        "p25": 208.0,
+        "p75": 518.3
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 28,
+        "median": 550.9,
+        "p25": 206.7,
+        "p75": 1584.8
+      }
+    },
+    "hapjeong": {
+      "value": {
+        "n_obs": 6,
+        "stores": 240,
+        "median": 2101.1,
+        "p25": 807.2,
+        "p75": 2355.0
+      },
+      "premium": {
+        "n_obs": 5,
+        "stores": 92,
+        "median": 1698.1,
+        "p25": 1007.6,
+        "p75": 1865.1
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 129,
+        "median": 1616.8,
+        "p25": 552.5,
+        "p75": 2373.2
+      }
+    },
+    "yeonnam": {
+      "value": {
+        "n_obs": 6,
+        "stores": 412,
+        "median": 1022.3,
+        "p25": 789.2,
+        "p75": 1465.5
+      },
+      "premium": {
+        "n_obs": 5,
+        "stores": 260,
+        "median": 1055.4,
+        "p25": 994.5,
+        "p75": 1800.8
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 360,
+        "median": 465.8,
+        "p25": 231.3,
+        "p75": 667.8
+      }
+    },
+    "hongdae": {
+      "value": {
+        "n_obs": 16,
+        "stores": 943,
+        "median": 1795.2,
+        "p25": 1087.4,
+        "p75": 3734.0
+      },
+      "premium": {
+        "n_obs": 14,
+        "stores": 404,
+        "median": 1782.4,
+        "p25": 1385.2,
+        "p75": 3375.3
+      },
+      "factory": {
+        "n_obs": 9,
+        "stores": 470,
+        "median": 1486.8,
+        "p25": 554.1,
+        "p75": 1830.0
+      }
+    },
+    "mullae": {
+      "value": {
+        "n_obs": 7,
+        "stores": 266,
+        "median": 2780.1,
+        "p25": 933.5,
+        "p75": 5786.6
+      },
+      "premium": {
+        "n_obs": 5,
+        "stores": 74,
+        "median": 829.0,
+        "p25": 329.8,
+        "p75": 1697.9
+      },
+      "factory": {
+        "n_obs": 2,
+        "stores": 81,
+        "median": 1386.7,
+        "p25": 630.6,
+        "p75": 2142.9
+      }
+    },
+    "dangsan": {
+      "value": {
+        "n_obs": 4,
+        "stores": 147,
+        "median": 2272.0,
+        "p25": 2170.7,
+        "p75": 4272.4
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 27,
+        "median": 1643.2,
+        "p25": 37.4,
+        "p75": 1924.9
+      },
+      "factory": {
+        "n_obs": 1,
+        "stores": 19,
+        "median": 5367.2,
+        "p25": 5367.2,
+        "p75": 5367.2
+      }
+    },
+    "noryangjin": {
+      "value": {
+        "n_obs": 11,
+        "stores": 276,
+        "median": 1266.9,
+        "p25": 901.2,
+        "p75": 2935.6
+      },
+      "factory": {
+        "n_obs": 4,
+        "stores": 59,
+        "median": 2432.9,
+        "p25": 1220.9,
+        "p75": 6828.6
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 27,
+        "median": 1315.3,
+        "p25": 468.0,
+        "p75": 1437.3
+      }
+    },
+    "sillim": {
+      "value": {
+        "n_obs": 9,
+        "stores": 284,
+        "median": 1690.8,
+        "p25": 1318.9,
+        "p75": 3050.2
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 74,
+        "median": 1576.5,
+        "p25": 453.9,
+        "p75": 2306.2
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 37,
+        "median": 2268.8,
+        "p25": 1179.9,
+        "p75": 2276.5
+      }
+    },
+    "sharosugil": {
+      "value": {
+        "n_obs": 8,
+        "stores": 386,
+        "median": 1193.6,
+        "p25": 648.0,
+        "p75": 2081.8
+      },
+      "premium": {
+        "n_obs": 6,
+        "stores": 135,
+        "median": 1806.2,
+        "p25": 1220.4,
+        "p75": 2589.9
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 92,
+        "median": 1831.5,
+        "p25": 786.5,
+        "p75": 3286.6
+      }
+    },
+    "nambu": {
+      "value": {
+        "n_obs": 4,
+        "stores": 113,
+        "median": 1634.0,
+        "p25": 1301.7,
+        "p75": 2577.2
+      },
+      "factory": {
+        "n_obs": 3,
+        "stores": 53,
+        "median": 1886.9,
+        "p25": 9.3,
+        "p75": 6771.8
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 29,
+        "median": 2801.4,
+        "p25": 285.8,
+        "p75": 3512.5
+      }
+    },
+    "teheran": {
+      "value": {
+        "n_obs": 6,
+        "stores": 463,
+        "median": 3100.6,
+        "p25": 1761.7,
+        "p75": 4505.5
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 199,
+        "median": 712.2,
+        "p25": 543.6,
+        "p75": 2313.4
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 179,
+        "median": 2214.6,
+        "p25": 1720.9,
+        "p75": 3431.8
+      }
+    },
+    "dosan": {
+      "value": {
+        "n_obs": 3,
+        "stores": 91,
+        "median": 6595.7,
+        "p25": 3229.8,
+        "p75": 23369.8
+      },
+      "premium": {
+        "n_obs": 2,
+        "stores": 31,
+        "median": 1204.7,
+        "p25": 753.1,
+        "p75": 1656.3
+      },
+      "factory": {
+        "n_obs": 3,
+        "stores": 23,
+        "median": 322.4,
+        "p25": 74.9,
+        "p75": 921.5
+      }
+    },
+    "cheongdam": {
+      "value": {
+        "n_obs": 4,
+        "stores": 145,
+        "median": 1669.9,
+        "p25": 1005.8,
+        "p75": 3454.4
+      },
+      "factory": {
+        "n_obs": 3,
+        "stores": 49,
+        "median": 1449.5,
+        "p25": 249.7,
+        "p75": 3496.8
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 99,
+        "median": 3470.4,
+        "p25": 3007.5,
+        "p75": 4867.3
+      }
+    },
+    "jamsil": {
+      "value": {
+        "n_obs": 4,
+        "stores": 196,
+        "median": 1496.4,
+        "p25": 475.4,
+        "p75": 3354.9
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 115,
+        "median": 2396.8,
+        "p25": 2135.6,
+        "p75": 2782.4
+      },
+      "factory": {
+        "n_obs": 3,
+        "stores": 146,
+        "median": 8287.8,
+        "p25": 3057.3,
+        "p75": 8445.8
+      }
+    },
+    "songridan": {
+      "value": {
+        "n_obs": 12,
+        "stores": 289,
+        "median": 1937.0,
+        "p25": 1086.7,
+        "p75": 3880.6
+      },
+      "premium": {
+        "n_obs": 6,
+        "stores": 111,
+        "median": 804.7,
+        "p25": 537.8,
+        "p75": 1449.8
+      },
+      "factory": {
+        "n_obs": 8,
+        "stores": 203,
+        "median": 948.5,
+        "p25": 552.9,
+        "p75": 1812.2
+      }
+    },
+    "seochon": {
+      "value": {
+        "n_obs": 5,
+        "stores": 142,
+        "median": 1328.4,
+        "p25": 956.0,
+        "p75": 1979.4
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 68,
+        "median": 1955.1,
+        "p25": 1468.4,
+        "p75": 3822.7
+      },
+      "factory": {
+        "n_obs": 3,
+        "stores": 122,
+        "median": 1903.8,
+        "p25": 1085.7,
+        "p75": 1914.9
+      }
+    },
+    "samcheong": {
+      "value": {
+        "n_obs": 5,
+        "stores": 175,
+        "median": 2902.8,
+        "p25": 2761.0,
+        "p75": 4377.2
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 66,
+        "median": 3377.7,
+        "p25": 2484.1,
+        "p75": 5182.2
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 167,
+        "median": 2106.4,
+        "p25": 1565.4,
+        "p75": 3789.0
+      }
+    },
+    "ikseon": {
+      "value": {
+        "n_obs": 4,
+        "stores": 599,
+        "median": 2412.6,
+        "p25": 1836.1,
+        "p75": 3112.7
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 90,
+        "median": 1383.2,
+        "p25": 716.1,
+        "p75": 2416.6
+      },
+      "factory": {
+        "n_obs": 3,
+        "stores": 148,
+        "median": 1764.1,
+        "p25": 1206.4,
+        "p75": 2434.5
+      }
+    },
+    "gwangjang": {
+      "value": {
+        "n_obs": 8,
+        "stores": 232,
+        "median": 2153.7,
+        "p25": 1867.4,
+        "p75": 3370.5
+      },
+      "factory": {
+        "n_obs": 3,
+        "stores": 48,
+        "median": 1653.0,
+        "p25": 1205.4,
+        "p75": 1792.5
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 16,
+        "median": 554.8,
+        "p25": 395.9,
+        "p75": 1761.1
+      }
+    },
+    "cityhall": {
+      "value": {
+        "n_obs": 11,
+        "stores": 314,
+        "median": 5855.9,
+        "p25": 4251.7,
+        "p75": 9535.7
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 115,
+        "median": 3127.7,
+        "p25": 549.1,
+        "p75": 3359.0
+      },
+      "premium": {
+        "n_obs": 8,
+        "stores": 80,
+        "median": 2522.2,
+        "p25": 2301.9,
+        "p75": 5070.0
+      }
+    },
+    "euljiro": {
+      "value": {
+        "n_obs": 9,
+        "stores": 448,
+        "median": 2441.0,
+        "p25": 951.6,
+        "p75": 4542.3
+      },
+      "premium": {
+        "n_obs": 7,
+        "stores": 136,
+        "median": 1740.1,
+        "p25": 914.3,
+        "p75": 6609.5
+      },
+      "factory": {
+        "n_obs": 7,
+        "stores": 169,
+        "median": 1313.7,
+        "p25": 665.3,
+        "p75": 3504.4
+      }
+    },
+    "myeongdong": {
+      "value": {
+        "n_obs": 10,
+        "stores": 1195,
+        "median": 2411.8,
+        "p25": 1316.4,
+        "p75": 4457.2
+      },
+      "premium": {
+        "n_obs": 9,
+        "stores": 349,
+        "median": 1944.8,
+        "p25": 464.3,
+        "p75": 3379.0
+      },
+      "factory": {
+        "n_obs": 7,
+        "stores": 421,
+        "median": 2423.2,
+        "p25": 1720.2,
+        "p75": 5083.6
+      }
+    },
+    "cheongnyangni": {
+      "value": {
+        "n_obs": 14,
+        "stores": 379,
+        "median": 1047.3,
+        "p25": 659.5,
+        "p75": 2356.6
+      },
+      "premium": {
+        "n_obs": 2,
+        "stores": 25,
+        "median": 830.2,
+        "p25": 26.7,
+        "p75": 1633.7
+      },
+      "factory": {
+        "n_obs": 4,
+        "stores": 54,
+        "median": 579.3,
+        "p25": 520.6,
+        "p75": 981.9
+      }
+    },
+    "sinchon": {
+      "value": {
+        "n_obs": 11,
+        "stores": 626,
+        "median": 1436.7,
+        "p25": 563.5,
+        "p75": 2052.3
+      },
+      "premium": {
+        "n_obs": 9,
+        "stores": 215,
+        "median": 1029.7,
+        "p25": 675.3,
+        "p75": 1557.9
+      },
+      "factory": {
+        "n_obs": 11,
+        "stores": 242,
+        "median": 913.9,
+        "p25": 694.5,
+        "p75": 1333.1
+      }
+    },
+    "gongdeok": {
+      "value": {
+        "n_obs": 11,
+        "stores": 343,
+        "median": 2477.2,
+        "p25": 1354.3,
+        "p75": 4415.4
+      },
+      "premium": {
+        "n_obs": 5,
+        "stores": 61,
+        "median": 1409.4,
+        "p25": 1131.4,
+        "p75": 4525.9
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 59,
+        "median": 2158.3,
+        "p25": 979.0,
+        "p75": 2375.2
+      }
+    },
+    "yeouido": {
+      "value": {
+        "n_obs": 8,
+        "stores": 875,
+        "median": 3760.7,
+        "p25": 3573.2,
+        "p75": 4095.1
+      },
+      "premium": {
+        "n_obs": 6,
+        "stores": 272,
+        "median": 4313.9,
+        "p25": 3578.1,
+        "p75": 5524.6
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 303,
+        "median": 2595.4,
+        "p25": 2085.9,
+        "p75": 3322.0
+      }
+    },
+    "nokdu": {
+      "value": {
+        "n_obs": 3,
+        "stores": 84,
+        "median": 1645.2,
+        "p25": 1012.1,
+        "p75": 1752.7
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 21,
+        "median": 538.0,
+        "p25": 68.2,
+        "p75": 2490.5
+      },
+      "factory": {
+        "n_obs": 3,
+        "stores": 33,
+        "median": 3073.6,
+        "p25": 1252.5,
+        "p75": 3988.7
+      }
+    },
+    "sadang": {
+      "value": {
+        "n_obs": 5,
+        "stores": 285,
+        "median": 3146.7,
+        "p25": 964.8,
+        "p75": 3967.9
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 57,
+        "median": 4126.0,
+        "p25": 2738.8,
+        "p75": 5903.0
+      },
+      "factory": {
+        "n_obs": 4,
+        "stores": 87,
+        "median": 1034.7,
+        "p25": 682.6,
+        "p75": 1904.2
+      }
+    },
+    "banpo": {
+      "value": {
+        "n_obs": 5,
+        "stores": 120,
+        "median": 2555.1,
+        "p25": 1654.0,
+        "p75": 4623.1
+      },
+      "premium": {
+        "n_obs": 3,
+        "stores": 44,
+        "median": 243.1,
+        "p25": 31.0,
+        "p75": 5570.3
+      },
+      "factory": {
+        "n_obs": 4,
+        "stores": 69,
+        "median": 546.3,
+        "p25": 157.8,
+        "p75": 6474.5
+      }
+    },
+    "nonhyeon": {
+      "value": {
+        "n_obs": 9,
+        "stores": 320,
+        "median": 1872.0,
+        "p25": 1469.7,
+        "p75": 3276.7
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 84,
+        "median": 2344.5,
+        "p25": 253.7,
+        "p75": 2868.7
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 67,
+        "median": 1746.1,
+        "p25": 630.2,
+        "p75": 2956.7
+      }
+    },
+    "garosugil": {
+      "value": {
+        "n_obs": 6,
+        "stores": 407,
+        "median": 2818.3,
+        "p25": 1302.1,
+        "p75": 3429.7
+      },
+      "premium": {
+        "n_obs": 6,
+        "stores": 204,
+        "median": 2660.0,
+        "p25": 1584.6,
+        "p75": 3933.2
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 171,
+        "median": 1165.2,
+        "p25": 944.1,
+        "p75": 1828.7
+      }
+    },
+    "gangnam": {
+      "value": {
+        "n_obs": 8,
+        "stores": 952,
+        "median": 3788.7,
+        "p25": 3091.5,
+        "p75": 5355.9
+      },
+      "premium": {
+        "n_obs": 6,
+        "stores": 302,
+        "median": 3085.0,
+        "p25": 2848.9,
+        "p75": 3467.4
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 267,
+        "median": 2977.5,
+        "p25": 570.7,
+        "p75": 3827.0
+      }
+    },
+    "apgujeong-rodeo": {
+      "value": {
+        "n_obs": 6,
+        "stores": 392,
+        "median": 2237.9,
+        "p25": 1857.2,
+        "p75": 2839.4
+      },
+      "premium": {
+        "n_obs": 6,
+        "stores": 209,
+        "median": 3181.3,
+        "p25": 2600.9,
+        "p75": 3352.8
+      },
+      "factory": {
+        "n_obs": 6,
+        "stores": 157,
+        "median": 1426.3,
+        "p25": 161.6,
+        "p75": 2169.6
+      }
+    },
+    "seolleung": {
+      "value": {
+        "n_obs": 5,
+        "stores": 383,
+        "median": 2883.6,
+        "p25": 2252.9,
+        "p75": 3390.9
+      },
+      "premium": {
+        "n_obs": 5,
+        "stores": 121,
+        "median": 2333.3,
+        "p25": 2200.7,
+        "p75": 2691.7
+      },
+      "factory": {
+        "n_obs": 4,
+        "stores": 106,
+        "median": 2890.5,
+        "p25": 2076.7,
+        "p75": 7827.2
+      }
+    },
+    "jamsilsaenae": {
+      "value": {
+        "n_obs": 7,
+        "stores": 426,
+        "median": 2683.0,
+        "p25": 1920.5,
+        "p75": 3286.1
+      },
+      "premium": {
+        "n_obs": 4,
+        "stores": 71,
+        "median": 2457.9,
+        "p25": 1807.1,
+        "p75": 4335.5
+      },
+      "factory": {
+        "n_obs": 5,
+        "stores": 96,
+        "median": 2599.9,
+        "p25": 713.0,
+        "p75": 3609.2
+      }
+    },
+    "garak": {
+      "value": {
+        "n_obs": 2,
+        "stores": 79,
+        "median": 5867.6,
+        "p25": 5720.0,
+        "p75": 6015.2
+      },
+      "factory": {
+        "n_obs": 1,
+        "stores": 5,
+        "median": 5791.5,
+        "p25": 5791.5,
+        "p75": 5791.5
+      }
+    }
+  }
+}

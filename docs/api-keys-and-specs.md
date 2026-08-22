@@ -267,6 +267,39 @@ NAVER_MAPS_CLIENT_SECRET=
 - 신청: data.go.kr에서 "공정거래위원회 가맹정보" 검색 → 활용신청(자동승인). 원자료: [franchise.ftc.go.kr](https://franchise.ftc.go.kr).
 - 제공: 브랜드별 **가맹금·보증금·인테리어 비용·기준면적, 가맹점 평균 매출** → `posting.py`의 전략별(고급화/가성비/기능중심) 초기 투자비·객단가 가정을 실데이터로 치환하는 소스. 더미 상수의 `TODO` 해소 지점.
 
+### 8-C-2. KOSIS `KOSIS_API_KEY` — Posting 원가율 (신규, 2026-08-22)
+
+3-Tier 비용 모델의 마지막 구멍 둘 중 **원가율**의 후보 소스다(다른 하나인 '필요인원'은
+공개 통계가 없다 — `docs/feature-posting.md` §0-E).
+
+- 발급: [kosis.kr](https://kosis.kr) 회원가입 → 로그인 → **[공유서비스] → OPEN API
+  인증키 신청**(자동승인). `data/.env` 의 `KOSIS_API_KEY=` 에 붙인다.
+- ⚠ **data.go.kr 의 기존 `DATA_GO_KR_SERVICE_KEY` 로는 안 된다.** 거기 올라온 KOSIS
+  서비스(15127752 통계표설명 · 15127766 목록별 지표)는 전부 **메타데이터 전용**이고
+  실제 수치를 안 준다. 수치는 kosis.kr 자체 OpenAPI 로만 나온다.
+- 엔드포인트 2종 — 2026-08-22 에 살아 있음을 확인했다(키 없이 부르면
+  `{"err":"11","errMsg":"유효하지않은 인증KEY입니다."}`). **막는 것은 키뿐이다.**
+
+  | 용도 | URL |
+  |---|---|
+  | 통계목록 | `https://kosis.kr/openapi/statisticsList.do?method=getList&apiKey=…&vwCd=MT_ZTITLE&parentListId=…&format=json&jsonVD=Y` |
+  | 통계자료 | `https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&apiKey=…&orgId=…&tblId=…&prdSe=Y&newEstPrdCnt=1&format=json&jsonVD=Y` |
+
+- **키가 오면 먼저 수집기가 아니라 탐색기를 돌린다** — `scripts/kosis_probe.py`.
+  아직 모르는 것이 둘이라 응답 구조를 보기 전에 파서를 쓰면 가정 위에 파서를 얹게 된다:
+  1. 서비스업조사가 **음식점업을 어느 수준까지 세분**해 공표하는가(tier 대표군이
+     일식·양식·중식 / 한식·분식·치킨·호프 / 커피·패스트푸드·제과 로 갈리므로 그만큼 필요)
+  2. 영업비용을 **항목별로**(급여·원재료비·임차료) 주는가, 총액만 주는가
+
+  ```bash
+  python scripts/kosis_probe.py search 서비스업조사   # 후보 통계표 찾기
+  python scripts/kosis_probe.py meta <orgId> <tblId>  # 세분류 깊이·비용 항목 확인
+  python scripts/kosis_probe.py data <orgId> <tblId>  # 실제 값 몇 줄
+  ```
+
+- 대안(이미 확인한 부적합): **소상공인실태조사**는 업종이 11개 대분류라 숙박·음식점업이
+  통합돼 tier 수준으로 못 내린다.
+
 ### 8-D. LLM `LLM_API_KEY` — Program 콘텐츠 생성 (backend, 유일한 유료 키)
 - 권장: **Anthropic Claude** — [console.anthropic.com](https://console.anthropic.com) 가입 → API Keys 발급 → `apps/backend/.env`의 `LLM_API_KEY`. ([config.py](../apps/backend/app/core/config.py) `llm_api_key` 이미 존재)
 - 모델: 품질 우선 `claude-sonnet-5`, 대량·저비용 생성 `claude-haiku-4-5-20251001`. **vision 내장**이라 상가 이미지 분석(Program의 이미지 정보 활용)에 별도 Vision API가 불필요.
