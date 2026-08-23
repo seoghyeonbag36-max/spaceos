@@ -2,45 +2,45 @@
   "slug": "itaewon",
   "hub_name": "이태원",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:42:20",
-  "shown": 844,
-  "excluded_total": 2657,
+  "built_at": "2026-08-23T19:43:46",
+  "shown": 848,
+  "excluded_total": 2653,
   "excluded_unknown": 365,
-  "excluded_non_commercial": 2292,
-  "coverage_pct": 24.1,
+  "excluded_non_commercial": 2288,
+  "coverage_pct": 24.2,
   "status": {
-    "full": 456,
-    "partial": 126,
-    "high": 59,
-    "empty": 203
+    "full": 465,
+    "partial": 122,
+    "high": 63,
+    "empty": 198
   },
   "source": {
     "stores+ledger": 521,
-    "polygon_only": 199,
-    "pip_only": 106,
+    "polygon_only": 195,
+    "pip_only": 114,
     "stores+ledger+pip": 18
   },
-  "reference_vacancy_pct": 18.6,
-  "reference_buildings": 417,
-  "reference_coverage_pct": 99.0,
-  "mixed_vacancy_pct": 18.1,
+  "reference_vacancy_pct": 17.7,
+  "reference_buildings": 418,
+  "reference_coverage_pct": 99.3,
+  "mixed_vacancy_pct": 17.3,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 399,
-      "active": 862,
-      "capacity": 993,
-      "vacancy_pct": 13.2
+      "buildings": 400,
+      "active": 867,
+      "capacity": 990,
+      "vacancy_pct": 12.4
     },
     "expos_units": {
       "buildings": 18,
-      "active": 48,
+      "active": 51,
       "capacity": 125,
-      "vacancy_pct": 61.6
+      "vacancy_pct": 59.2
     },
     "floor_approx": {
-      "buildings": 4,
-      "active": 11,
-      "capacity": 22,
+      "buildings": 3,
+      "active": 8,
+      "capacity": 16,
       "vacancy_pct": 50.0
     }
   },

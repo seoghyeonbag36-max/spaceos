@@ -3,34 +3,34 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>강남>테헤란로",
   "anchor_vac_small_pct": 1.02678444048604,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 15.8,
-  "alpha_street": 0.573,
-  "gap_pp": 6.8,
+  "estimated_vacancy_pct": 14.4,
+  "alpha_street": 0.628,
+  "gap_pp": 5.4,
   "buildings_used": 630,
   "rone_aligned": {
     "mid": {
       "buildings": 536,
-      "vacancy_units_pct": 28.9,
+      "vacancy_units_pct": 29.0,
       "buildings_floor": 533,
-      "vacancy_floor_hi_pct": 18.3,
-      "vacancy_floor_lo_pct": 33.2,
-      "vacancy_area_pct": 19.6,
+      "vacancy_floor_hi_pct": 16.7,
+      "vacancy_floor_lo_pct": 31.8,
+      "vacancy_area_pct": 17.9,
       "anchor_pct": 9.05,
-      "gap_pp": 10.6
+      "gap_pp": 8.9
     },
     "small": {
       "buildings": 46,
       "vacancy_units_pct": 29.3,
       "buildings_floor": 46,
-      "vacancy_floor_hi_pct": 22.0,
-      "vacancy_floor_lo_pct": 40.2,
-      "vacancy_area_pct": 22.7,
+      "vacancy_floor_hi_pct": 20.7,
+      "vacancy_floor_lo_pct": 39.0,
+      "vacancy_area_pct": 21.2,
       "anchor_pct": 1.03,
-      "gap_pp": 21.7
+      "gap_pp": 20.2
     },
     "mall": {
-      "buildings": 107,
-      "vacancy_units_pct": 22.7,
+      "buildings": 106,
+      "vacancy_units_pct": 18.8,
       "buildings_floor": 9,
       "vacancy_floor_hi_pct": 0.0,
       "vacancy_floor_lo_pct": 5.0,
@@ -39,11 +39,11 @@
     "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
   },
   "primary": {
-    "estimated_vacancy_pct": 21.8,
-    "buildings": 904,
+    "estimated_vacancy_pct": 21.5,
+    "buildings": 903,
     "anchor_pct": 9.05,
-    "alpha": 0.415,
-    "gap_pp": 12.8,
+    "alpha": 0.421,
+    "gap_pp": 12.5,
     "coverage_pct": 97.4,
     "excluded_floor_approx": 24
   },
@@ -56,20 +56,20 @@
       "buildings": 830
     },
     "mall": {
-      "estimated_vacancy_pct": 12.1,
+      "estimated_vacancy_pct": 9.7,
       "anchor_pct": 9.05,
-      "alpha": 0.748,
-      "gap_pp": 3.1,
-      "buildings": 98
+      "alpha": 0.933,
+      "gap_pp": 0.7,
+      "buildings": 97
     }
   },
   "methods": {
     "expos_units": {
-      "estimated_vacancy_pct": 12.1,
-      "buildings": 98,
+      "estimated_vacancy_pct": 9.7,
+      "buildings": 97,
       "anchor_pct": 9.05,
-      "alpha": 0.748,
-      "gap_pp": 3.1
+      "alpha": 0.933,
+      "gap_pp": 0.7
     },
     "floor_approx": {
       "estimated_vacancy_pct": 87.9,

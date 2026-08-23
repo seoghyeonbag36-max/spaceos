@@ -2,39 +2,39 @@
   "slug": "nokdu",
   "hub_name": "녹두거리",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:21",
-  "shown": 281,
-  "excluded_total": 219,
+  "built_at": "2026-08-23T19:54:02",
+  "shown": 284,
+  "excluded_total": 216,
   "excluded_unknown": 89,
-  "excluded_non_commercial": 130,
-  "coverage_pct": 56.2,
+  "excluded_non_commercial": 127,
+  "coverage_pct": 56.8,
   "status": {
-    "full": 148,
-    "partial": 41,
-    "high": 44,
+    "full": 161,
+    "partial": 35,
+    "high": 40,
     "empty": 48
   },
   "source": {
     "polygon_only": 48,
     "stores+ledger": 226,
-    "pip_only": 7
+    "pip_only": 10
   },
-  "reference_vacancy_pct": 31.2,
+  "reference_vacancy_pct": 27.6,
   "reference_buildings": 179,
   "reference_coverage_pct": 98.9,
-  "mixed_vacancy_pct": 31.4,
+  "mixed_vacancy_pct": 27.6,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 173,
-      "active": 304,
-      "capacity": 433,
-      "vacancy_pct": 29.8
+      "active": 318,
+      "capacity": 438,
+      "vacancy_pct": 27.4
     },
     "expos_units": {
       "buildings": 6,
-      "active": 35,
-      "capacity": 60,
-      "vacancy_pct": 41.7
+      "active": 38,
+      "capacity": 54,
+      "vacancy_pct": 29.6
     },
     "floor_approx": {
       "buildings": 2,

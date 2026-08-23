@@ -2,40 +2,40 @@
   "slug": "sadang",
   "hub_name": "사당역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:44:04",
-  "shown": 348,
-  "excluded_total": 480,
+  "built_at": "2026-08-23T20:02:36",
+  "shown": 350,
+  "excluded_total": 478,
   "excluded_unknown": 95,
-  "excluded_non_commercial": 385,
-  "coverage_pct": 42.0,
+  "excluded_non_commercial": 383,
+  "coverage_pct": 42.3,
   "status": {
-    "full": 242,
-    "partial": 51,
-    "high": 17,
-    "empty": 38
+    "full": 249,
+    "partial": 45,
+    "high": 19,
+    "empty": 37
   },
   "source": {
     "stores+ledger": 297,
-    "polygon_only": 37,
+    "polygon_only": 36,
     "stores+ledger+pip": 2,
-    "pip_only": 12
+    "pip_only": 15
   },
-  "reference_vacancy_pct": 10.5,
+  "reference_vacancy_pct": 9.6,
   "reference_buildings": 262,
   "reference_coverage_pct": 99.6,
-  "mixed_vacancy_pct": 10.9,
+  "mixed_vacancy_pct": 10.2,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 238,
-      "active": 650,
-      "capacity": 704,
-      "vacancy_pct": 7.7
+      "active": 660,
+      "capacity": 708,
+      "vacancy_pct": 6.8
     },
     "expos_units": {
       "buildings": 24,
-      "active": 111,
-      "capacity": 146,
-      "vacancy_pct": 24.0
+      "active": 113,
+      "capacity": 147,
+      "vacancy_pct": 23.1
     },
     "floor_approx": {
       "buildings": 1,

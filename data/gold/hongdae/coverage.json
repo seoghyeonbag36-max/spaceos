@@ -2,40 +2,40 @@
   "slug": "hongdae",
   "hub_name": "홍대",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:41:52",
-  "shown": 1329,
-  "excluded_total": 875,
+  "built_at": "2026-08-23T19:40:20",
+  "shown": 1331,
+  "excluded_total": 873,
   "excluded_unknown": 299,
-  "excluded_non_commercial": 576,
-  "coverage_pct": 60.3,
+  "excluded_non_commercial": 574,
+  "coverage_pct": 60.4,
   "status": {
-    "full": 736,
-    "partial": 283,
-    "high": 109,
-    "empty": 201
+    "full": 766,
+    "partial": 266,
+    "high": 107,
+    "empty": 192
   },
   "source": {
     "stores+ledger": 1086,
-    "pip_only": 41,
-    "polygon_only": 197,
+    "pip_only": 51,
+    "polygon_only": 189,
     "stores+ledger+pip": 5
   },
-  "reference_vacancy_pct": 33.8,
+  "reference_vacancy_pct": 32.2,
   "reference_buildings": 1010,
   "reference_coverage_pct": 99.4,
-  "mixed_vacancy_pct": 32.8,
+  "mixed_vacancy_pct": 31.3,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 959,
-      "active": 2478,
-      "capacity": 2979,
-      "vacancy_pct": 16.8
+      "active": 2557,
+      "capacity": 3007,
+      "vacancy_pct": 15.0
     },
     "expos_units": {
       "buildings": 51,
-      "active": 459,
-      "capacity": 1460,
-      "vacancy_pct": 68.6
+      "active": 463,
+      "capacity": 1450,
+      "vacancy_pct": 68.1
     },
     "floor_approx": {
       "buildings": 6,

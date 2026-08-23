@@ -2,40 +2,40 @@
   "slug": "apgujeong-rodeo",
   "hub_name": "압구정로데오",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:41:47",
-  "shown": 771,
-  "excluded_total": 201,
+  "built_at": "2026-08-23T19:39:49",
+  "shown": 773,
+  "excluded_total": 199,
   "excluded_unknown": 63,
-  "excluded_non_commercial": 138,
-  "coverage_pct": 79.3,
+  "excluded_non_commercial": 136,
+  "coverage_pct": 79.5,
   "status": {
-    "full": 380,
-    "partial": 220,
-    "high": 99,
-    "empty": 72
+    "full": 414,
+    "partial": 201,
+    "high": 92,
+    "empty": 66
   },
   "source": {
-    "pip_only": 39,
+    "pip_only": 47,
     "stores+ledger": 655,
-    "polygon_only": 71,
+    "polygon_only": 65,
     "stores+ledger+pip": 6
   },
-  "reference_vacancy_pct": 23.0,
+  "reference_vacancy_pct": 19.9,
   "reference_buildings": 617,
   "reference_coverage_pct": 99.4,
-  "mixed_vacancy_pct": 26.6,
+  "mixed_vacancy_pct": 23.8,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 583,
-      "active": 1765,
-      "capacity": 2206,
-      "vacancy_pct": 20.0
+      "active": 1850,
+      "capacity": 2225,
+      "vacancy_pct": 16.9
     },
     "expos_units": {
       "buildings": 34,
-      "active": 337,
+      "active": 350,
       "capacity": 523,
-      "vacancy_pct": 35.6
+      "vacancy_pct": 33.1
     },
     "floor_approx": {
       "buildings": 4,

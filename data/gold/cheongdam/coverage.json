@@ -2,46 +2,46 @@
   "slug": "cheongdam",
   "hub_name": "청담동 명품거리",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:33",
-  "shown": 640,
-  "excluded_total": 585,
+  "built_at": "2026-08-23T19:56:20",
+  "shown": 646,
+  "excluded_total": 579,
   "excluded_unknown": 101,
-  "excluded_non_commercial": 484,
-  "coverage_pct": 52.2,
+  "excluded_non_commercial": 478,
+  "coverage_pct": 52.7,
   "status": {
-    "full": 287,
-    "partial": 169,
-    "high": 80,
-    "empty": 104
+    "full": 321,
+    "partial": 157,
+    "high": 73,
+    "empty": 95
   },
   "source": {
     "stores+ledger": 492,
-    "polygon_only": 103,
-    "pip_only": 44,
+    "polygon_only": 94,
+    "pip_only": 59,
     "stores+ledger+pip": 1
   },
-  "reference_vacancy_pct": 23.1,
-  "reference_buildings": 428,
-  "reference_coverage_pct": 97.9,
-  "mixed_vacancy_pct": 22.8,
+  "reference_vacancy_pct": 19.0,
+  "reference_buildings": 430,
+  "reference_coverage_pct": 98.4,
+  "mixed_vacancy_pct": 19.0,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 391,
-      "active": 1049,
-      "capacity": 1377,
-      "vacancy_pct": 23.8
+      "buildings": 393,
+      "active": 1130,
+      "capacity": 1399,
+      "vacancy_pct": 19.2
     },
     "expos_units": {
       "buildings": 37,
-      "active": 249,
-      "capacity": 310,
-      "vacancy_pct": 19.7
+      "active": 260,
+      "capacity": 318,
+      "vacancy_pct": 18.2
     },
     "floor_approx": {
-      "buildings": 9,
-      "active": 10,
-      "capacity": 28,
-      "vacancy_pct": 64.3
+      "buildings": 7,
+      "active": 8,
+      "capacity": 24,
+      "vacancy_pct": 66.7
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

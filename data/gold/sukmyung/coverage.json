@@ -2,40 +2,40 @@
   "slug": "sukmyung",
   "hub_name": "숙대입구",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:44:05",
-  "shown": 604,
-  "excluded_total": 1415,
+  "built_at": "2026-08-23T20:02:48",
+  "shown": 607,
+  "excluded_total": 1412,
   "excluded_unknown": 200,
-  "excluded_non_commercial": 1215,
-  "coverage_pct": 29.9,
+  "excluded_non_commercial": 1212,
+  "coverage_pct": 30.1,
   "status": {
-    "full": 314,
-    "partial": 89,
-    "high": 42,
-    "empty": 159
+    "full": 320,
+    "partial": 93,
+    "high": 40,
+    "empty": 154
   },
   "source": {
-    "polygon_only": 156,
+    "polygon_only": 151,
     "stores+ledger": 366,
-    "pip_only": 56,
+    "pip_only": 64,
     "stores+ledger+pip": 26
   },
-  "reference_vacancy_pct": 20.0,
+  "reference_vacancy_pct": 18.6,
   "reference_buildings": 332,
   "reference_coverage_pct": 97.9,
-  "mixed_vacancy_pct": 20.6,
+  "mixed_vacancy_pct": 19.1,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 301,
-      "active": 559,
-      "capacity": 671,
-      "vacancy_pct": 16.7
+      "active": 569,
+      "capacity": 673,
+      "vacancy_pct": 15.5
     },
     "expos_units": {
       "buildings": 31,
       "active": 122,
-      "capacity": 180,
-      "vacancy_pct": 32.2
+      "capacity": 176,
+      "vacancy_pct": 30.7
     },
     "floor_approx": {
       "buildings": 7,

@@ -2,40 +2,40 @@
   "slug": "kyunghee",
   "hub_name": "경희대",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:44:01",
-  "shown": 514,
-  "excluded_total": 1256,
+  "built_at": "2026-08-23T20:01:29",
+  "shown": 516,
+  "excluded_total": 1254,
   "excluded_unknown": 179,
-  "excluded_non_commercial": 1077,
-  "coverage_pct": 29.0,
+  "excluded_non_commercial": 1075,
+  "coverage_pct": 29.2,
   "status": {
-    "full": 306,
-    "partial": 81,
-    "high": 37,
+    "full": 313,
+    "partial": 82,
+    "high": 31,
     "empty": 90
   },
   "source": {
     "polygon_only": 90,
     "stores+ledger": 389,
-    "pip_only": 23,
+    "pip_only": 25,
     "stores+ledger+pip": 12
   },
-  "reference_vacancy_pct": 16.3,
+  "reference_vacancy_pct": 13.6,
   "reference_buildings": 338,
   "reference_coverage_pct": 99.1,
-  "mixed_vacancy_pct": 19.2,
+  "mixed_vacancy_pct": 16.7,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 307,
-      "active": 577,
+      "active": 588,
       "capacity": 664,
-      "vacancy_pct": 13.1
+      "vacancy_pct": 11.4
     },
     "expos_units": {
       "buildings": 31,
-      "active": 101,
-      "capacity": 146,
-      "vacancy_pct": 30.8
+      "active": 107,
+      "capacity": 140,
+      "vacancy_pct": 23.6
     },
     "floor_approx": {
       "buildings": 3,

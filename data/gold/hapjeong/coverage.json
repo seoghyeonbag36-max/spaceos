@@ -2,46 +2,46 @@
   "slug": "hapjeong",
   "hub_name": "합정",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:42:36",
-  "shown": 292,
-  "excluded_total": 433,
+  "built_at": "2026-08-23T19:45:20",
+  "shown": 297,
+  "excluded_total": 428,
   "excluded_unknown": 77,
-  "excluded_non_commercial": 356,
-  "coverage_pct": 40.3,
+  "excluded_non_commercial": 351,
+  "coverage_pct": 41.0,
   "status": {
-    "full": 167,
-    "partial": 40,
-    "high": 37,
-    "empty": 48
+    "full": 176,
+    "partial": 37,
+    "high": 38,
+    "empty": 46
   },
   "source": {
     "stores+ledger": 222,
-    "pip_only": 21,
-    "polygon_only": 48,
+    "pip_only": 28,
+    "polygon_only": 46,
     "stores+ledger+pip": 1
   },
-  "reference_vacancy_pct": 43.3,
-  "reference_buildings": 172,
-  "reference_coverage_pct": 97.2,
-  "mixed_vacancy_pct": 66.0,
+  "reference_vacancy_pct": 41.7,
+  "reference_buildings": 173,
+  "reference_coverage_pct": 97.7,
+  "mixed_vacancy_pct": 65.4,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 148,
-      "active": 331,
-      "capacity": 377,
-      "vacancy_pct": 12.2
+      "buildings": 149,
+      "active": 342,
+      "capacity": 383,
+      "vacancy_pct": 10.7
     },
     "expos_units": {
       "buildings": 24,
-      "active": 257,
-      "capacity": 660,
-      "vacancy_pct": 61.1
+      "active": 267,
+      "capacity": 662,
+      "vacancy_pct": 59.7
     },
     "floor_approx": {
-      "buildings": 5,
-      "active": 6,
-      "capacity": 28,
-      "vacancy_pct": 78.6
+      "buildings": 4,
+      "active": 5,
+      "capacity": 26,
+      "vacancy_pct": 80.8
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

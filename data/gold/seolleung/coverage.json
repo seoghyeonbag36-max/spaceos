@@ -2,46 +2,46 @@
   "slug": "seolleung",
   "hub_name": "선릉",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:47",
-  "shown": 852,
-  "excluded_total": 934,
-  "excluded_unknown": 164,
-  "excluded_non_commercial": 770,
-  "coverage_pct": 47.7,
+  "built_at": "2026-08-23T19:58:43",
+  "shown": 860,
+  "excluded_total": 926,
+  "excluded_unknown": 165,
+  "excluded_non_commercial": 761,
+  "coverage_pct": 48.2,
   "status": {
-    "full": 476,
-    "partial": 182,
-    "high": 88,
-    "empty": 106
+    "full": 499,
+    "partial": 175,
+    "high": 83,
+    "empty": 103
   },
   "source": {
-    "stores+ledger": 699,
-    "polygon_only": 106,
-    "pip_only": 40,
+    "stores+ledger": 698,
+    "polygon_only": 103,
+    "pip_only": 52,
     "stores+ledger+pip": 7
   },
-  "reference_vacancy_pct": 16.1,
-  "reference_buildings": 653,
+  "reference_vacancy_pct": 13.6,
+  "reference_buildings": 652,
   "reference_coverage_pct": 98.2,
-  "mixed_vacancy_pct": 17.5,
+  "mixed_vacancy_pct": 15.1,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 520,
-      "active": 1802,
-      "capacity": 2110,
-      "vacancy_pct": 14.6
+      "active": 1863,
+      "capacity": 2104,
+      "vacancy_pct": 11.5
     },
     "expos_units": {
-      "buildings": 133,
-      "active": 967,
-      "capacity": 1189,
-      "vacancy_pct": 18.7
+      "buildings": 132,
+      "active": 986,
+      "capacity": 1192,
+      "vacancy_pct": 17.3
     },
     "floor_approx": {
       "buildings": 12,
-      "active": 16,
-      "capacity": 88,
-      "vacancy_pct": 81.8
+      "active": 17,
+      "capacity": 89,
+      "vacancy_pct": 80.9
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

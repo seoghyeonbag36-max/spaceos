@@ -2,40 +2,40 @@
   "slug": "dosan",
   "hub_name": "도산공원",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:37",
-  "shown": 1098,
-  "excluded_total": 476,
+  "built_at": "2026-08-23T19:56:43",
+  "shown": 1102,
+  "excluded_total": 472,
   "excluded_unknown": 102,
-  "excluded_non_commercial": 374,
-  "coverage_pct": 69.8,
+  "excluded_non_commercial": 370,
+  "coverage_pct": 70.0,
   "status": {
-    "full": 536,
-    "partial": 266,
-    "high": 123,
-    "empty": 173
+    "full": 576,
+    "partial": 256,
+    "high": 111,
+    "empty": 159
   },
   "source": {
-    "polygon_only": 171,
+    "polygon_only": 157,
     "stores+ledger": 867,
-    "pip_only": 55,
+    "pip_only": 73,
     "stores+ledger+pip": 5
   },
-  "reference_vacancy_pct": 19.8,
+  "reference_vacancy_pct": 16.6,
   "reference_buildings": 805,
   "reference_coverage_pct": 99.3,
-  "mixed_vacancy_pct": 20.6,
+  "mixed_vacancy_pct": 17.1,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 757,
-      "active": 2199,
-      "capacity": 2722,
-      "vacancy_pct": 19.2
+      "active": 2307,
+      "capacity": 2744,
+      "vacancy_pct": 15.9
     },
     "expos_units": {
       "buildings": 48,
-      "active": 407,
-      "capacity": 528,
-      "vacancy_pct": 22.9
+      "active": 420,
+      "capacity": 527,
+      "vacancy_pct": 20.3
     },
     "floor_approx": {
       "buildings": 6,

@@ -2,39 +2,39 @@
   "slug": "konkuk",
   "hub_name": "건대입구·화양동",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:02",
-  "shown": 584,
-  "excluded_total": 1480,
+  "built_at": "2026-08-23T19:48:21",
+  "shown": 588,
+  "excluded_total": 1476,
   "excluded_unknown": 214,
-  "excluded_non_commercial": 1266,
-  "coverage_pct": 28.3,
+  "excluded_non_commercial": 1262,
+  "coverage_pct": 28.5,
   "status": {
-    "full": 389,
-    "partial": 77,
-    "high": 32,
+    "full": 406,
+    "partial": 70,
+    "high": 26,
     "empty": 86
   },
   "source": {
     "stores+ledger": 480,
     "polygon_only": 86,
-    "pip_only": 18
+    "pip_only": 22
   },
-  "reference_vacancy_pct": 11.3,
+  "reference_vacancy_pct": 9.1,
   "reference_buildings": 436,
   "reference_coverage_pct": 99.5,
-  "mixed_vacancy_pct": 12.2,
+  "mixed_vacancy_pct": 10.0,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 411,
-      "active": 923,
-      "capacity": 1028,
-      "vacancy_pct": 10.2
+      "active": 953,
+      "capacity": 1034,
+      "vacancy_pct": 7.8
     },
     "expos_units": {
       "buildings": 25,
-      "active": 126,
-      "capacity": 155,
-      "vacancy_pct": 18.7
+      "active": 132,
+      "capacity": 160,
+      "vacancy_pct": 17.5
     },
     "floor_approx": {
       "buildings": 2,

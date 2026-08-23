@@ -2,40 +2,40 @@
   "slug": "wangsimni",
   "hub_name": "왕십리",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:44:03",
-  "shown": 1001,
-  "excluded_total": 2089,
+  "built_at": "2026-08-23T20:02:13",
+  "shown": 1016,
+  "excluded_total": 2074,
   "excluded_unknown": 388,
-  "excluded_non_commercial": 1701,
-  "coverage_pct": 32.4,
+  "excluded_non_commercial": 1686,
+  "coverage_pct": 32.9,
   "status": {
-    "full": 575,
-    "partial": 175,
-    "high": 95,
-    "empty": 156
+    "full": 605,
+    "partial": 167,
+    "high": 96,
+    "empty": 148
   },
   "source": {
-    "pip_only": 50,
+    "pip_only": 73,
     "stores+ledger": 765,
     "stores+ledger+pip": 30,
-    "polygon_only": 156
+    "polygon_only": 148
   },
-  "reference_vacancy_pct": 20.6,
+  "reference_vacancy_pct": 18.2,
   "reference_buildings": 519,
   "reference_coverage_pct": 96.3,
-  "mixed_vacancy_pct": 26.4,
+  "mixed_vacancy_pct": 24.8,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 469,
-      "active": 904,
-      "capacity": 1073,
-      "vacancy_pct": 15.8
+      "active": 929,
+      "capacity": 1072,
+      "vacancy_pct": 13.3
     },
     "expos_units": {
       "buildings": 50,
-      "active": 320,
+      "active": 332,
       "capacity": 469,
-      "vacancy_pct": 31.8
+      "vacancy_pct": 29.2
     },
     "floor_approx": {
       "buildings": 20,

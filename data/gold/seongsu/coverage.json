@@ -2,40 +2,40 @@
   "slug": "seongsu",
   "hub_name": "성수동 카페거리",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:42:15",
-  "shown": 833,
-  "excluded_total": 896,
+  "built_at": "2026-08-23T19:43:23",
+  "shown": 836,
+  "excluded_total": 893,
   "excluded_unknown": 301,
-  "excluded_non_commercial": 595,
-  "coverage_pct": 48.2,
+  "excluded_non_commercial": 592,
+  "coverage_pct": 48.4,
   "status": {
-    "full": 470,
-    "partial": 137,
-    "high": 95,
-    "empty": 131
+    "full": 473,
+    "partial": 135,
+    "high": 99,
+    "empty": 129
   },
   "source": {
     "stores+ledger": 626,
-    "pip_only": 60,
-    "polygon_only": 130,
+    "pip_only": 65,
+    "polygon_only": 128,
     "stores+ledger+pip": 17
   },
-  "reference_vacancy_pct": 20.8,
+  "reference_vacancy_pct": 20.0,
   "reference_buildings": 377,
   "reference_coverage_pct": 99.2,
-  "mixed_vacancy_pct": 30.1,
+  "mixed_vacancy_pct": 29.6,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 324,
-      "active": 740,
-      "capacity": 841,
-      "vacancy_pct": 12.0
+      "active": 757,
+      "capacity": 852,
+      "vacancy_pct": 11.2
     },
     "expos_units": {
       "buildings": 53,
       "active": 485,
-      "capacity": 706,
-      "vacancy_pct": 31.3
+      "capacity": 701,
+      "vacancy_pct": 30.8
     },
     "floor_approx": {
       "buildings": 3,

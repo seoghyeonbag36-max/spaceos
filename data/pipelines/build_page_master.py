@@ -208,6 +208,13 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
     """
     rows = load_latest(slug, "licensing_biz.json") or []
     alive = []
+    # 같은 점포가 업종 수만큼 세어지는 것을 막는다(2026-08-23, 5종→27종 확장).
+    # 편의점 한 곳이 담배소매업 + 안전상비의약품판매 + 휴게음식점으로 3장을 갖는다 —
+    # 3거점 실측 중복률 0.6%(5종) → **3.8%**(27종). 층은 합집합이라 중복이 무해하지만
+    # `unknown`(층 미상)은 상한 산정에서 빈 층을 채우므로 그대로 두면 공실이 과소추정된다.
+    # 키는 (업소명, 지번주소) — 중복 행끼리 주소가 같아 층 표기도 같으므로 정보 손실이 없다.
+    seen: set[tuple[str, str]] = set()
+    dup = 0
     for r in rows:
         if str(r.get("DCBYMD") or "").strip():
             continue
@@ -217,8 +224,16 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
             x, y = float(str(r.get("X", "")).strip()), float(str(r.get("Y", "")).strip())
         except ValueError:
             continue
-        alive.append((x, y, str(r.get("SITEWHLADDR", "")),
-                      str(r.get("RDNWHLADDR", ""))))
+        addr = str(r.get("SITEWHLADDR", ""))
+        key = (re.sub(r"\s+", "", str(r.get("BPLCNM") or "")), re.sub(r"\s+", "", addr))
+        if key in seen:
+            dup += 1
+            continue
+        seen.add(key)
+        alive.append((x, y, addr, str(r.get("RDNWHLADDR", ""))))
+    if dup:
+        print(f"[page-master] licensing: 동일 점포 중복 인허가 {dup}건 제외 "
+              f"(업종 여러 장을 가진 점포 — 남은 {len(alive)}건)")
     if not alive:
         if rows:
             print("[page-master] licensing: 영업·좌표 유효 행 0 — 건너뜀")

@@ -2,45 +2,45 @@
   "slug": "jamsil",
   "hub_name": "잠실·롯데월드타워",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:42:59",
-  "shown": 593,
-  "excluded_total": 671,
+  "built_at": "2026-08-23T19:48:02",
+  "shown": 595,
+  "excluded_total": 669,
   "excluded_unknown": 168,
-  "excluded_non_commercial": 503,
-  "coverage_pct": 46.9,
+  "excluded_non_commercial": 501,
+  "coverage_pct": 47.1,
   "status": {
-    "full": 390,
-    "partial": 57,
-    "high": 102,
-    "empty": 44
+    "full": 402,
+    "partial": 52,
+    "high": 103,
+    "empty": 38
   },
   "source": {
-    "pip_only": 127,
+    "pip_only": 135,
     "stores+ledger": 422,
-    "polygon_only": 44
+    "polygon_only": 38
   },
-  "reference_vacancy_pct": 17.1,
-  "reference_buildings": 318,
-  "reference_coverage_pct": 94.9,
-  "mixed_vacancy_pct": 8.6,
+  "reference_vacancy_pct": 15.5,
+  "reference_buildings": 319,
+  "reference_coverage_pct": 95.2,
+  "mixed_vacancy_pct": 8.3,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 254,
-      "active": 700,
-      "capacity": 801,
-      "vacancy_pct": 12.6
+      "buildings": 255,
+      "active": 725,
+      "capacity": 811,
+      "vacancy_pct": 10.6
     },
     "expos_units": {
       "buildings": 64,
-      "active": 1225,
-      "capacity": 1521,
-      "vacancy_pct": 19.5
+      "active": 1254,
+      "capacity": 1531,
+      "vacancy_pct": 18.1
     },
     "floor_approx": {
-      "buildings": 17,
-      "active": 19,
-      "capacity": 133,
-      "vacancy_pct": 85.7
+      "buildings": 16,
+      "active": 18,
+      "capacity": 130,
+      "vacancy_pct": 86.2
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

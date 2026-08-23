@@ -2,40 +2,40 @@
   "slug": "yeonhui",
   "hub_name": "연희동",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:13",
-  "shown": 477,
-  "excluded_total": 1390,
-  "excluded_unknown": 127,
-  "excluded_non_commercial": 1263,
-  "coverage_pct": 25.5,
+  "built_at": "2026-08-23T19:51:19",
+  "shown": 480,
+  "excluded_total": 1387,
+  "excluded_unknown": 128,
+  "excluded_non_commercial": 1259,
+  "coverage_pct": 25.7,
   "status": {
-    "full": 219,
-    "partial": 77,
-    "high": 51,
-    "empty": 130
+    "full": 223,
+    "partial": 78,
+    "high": 52,
+    "empty": 127
   },
   "source": {
-    "pip_only": 31,
-    "stores+ledger": 313,
-    "polygon_only": 130,
+    "pip_only": 38,
+    "stores+ledger": 312,
+    "polygon_only": 127,
     "stores+ledger+pip": 3
   },
-  "reference_vacancy_pct": 17.9,
-  "reference_buildings": 273,
+  "reference_vacancy_pct": 16.4,
+  "reference_buildings": 272,
   "reference_coverage_pct": 98.9,
-  "mixed_vacancy_pct": 21.0,
+  "mixed_vacancy_pct": 19.7,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 240,
-      "active": 515,
-      "capacity": 611,
-      "vacancy_pct": 15.7
+      "active": 525,
+      "capacity": 613,
+      "vacancy_pct": 14.4
     },
     "expos_units": {
-      "buildings": 33,
-      "active": 78,
+      "buildings": 32,
+      "active": 80,
       "capacity": 111,
-      "vacancy_pct": 29.7
+      "vacancy_pct": 27.9
     },
     "floor_approx": {
       "buildings": 3,

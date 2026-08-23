@@ -2,40 +2,40 @@
   "slug": "dongdaemun",
   "hub_name": "동대문·DDP",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:42:57",
-  "shown": 2842,
-  "excluded_total": 3291,
-  "excluded_unknown": 538,
-  "excluded_non_commercial": 2753,
-  "coverage_pct": 46.3,
+  "built_at": "2026-08-23T19:47:48",
+  "shown": 2854,
+  "excluded_total": 3279,
+  "excluded_unknown": 540,
+  "excluded_non_commercial": 2739,
+  "coverage_pct": 46.5,
   "status": {
-    "full": 1184,
-    "partial": 398,
-    "high": 290,
-    "empty": 970
+    "full": 1263,
+    "partial": 380,
+    "high": 279,
+    "empty": 932
   },
   "source": {
-    "pip_only": 252,
-    "polygon_only": 969,
-    "stores+ledger": 1560,
+    "pip_only": 304,
+    "polygon_only": 931,
+    "stores+ledger": 1558,
     "stores+ledger+pip": 61
   },
-  "reference_vacancy_pct": 83.5,
-  "reference_buildings": 1264,
+  "reference_vacancy_pct": 82.9,
+  "reference_buildings": 1262,
   "reference_coverage_pct": 97.5,
-  "mixed_vacancy_pct": 84.9,
+  "mixed_vacancy_pct": 84.5,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 1152,
-      "active": 2209,
-      "capacity": 2760,
-      "vacancy_pct": 20.0
+      "active": 2275,
+      "capacity": 2737,
+      "vacancy_pct": 16.9
     },
     "expos_units": {
-      "buildings": 112,
-      "active": 1307,
-      "capacity": 18508,
-      "vacancy_pct": 92.9
+      "buildings": 110,
+      "active": 1311,
+      "capacity": 18219,
+      "vacancy_pct": 92.8
     },
     "floor_approx": {
       "buildings": 33,

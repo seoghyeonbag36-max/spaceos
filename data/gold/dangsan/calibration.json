@@ -3,20 +3,20 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>영등포신촌>당산역",
   "anchor_vac_small_pct": 0.0,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 34.4,
-  "alpha_street": 0.213,
-  "gap_pp": 27.1,
+  "estimated_vacancy_pct": 33.9,
+  "alpha_street": 0.216,
+  "gap_pp": 26.6,
   "buildings_used": 196,
   "rone_aligned": {
     "mid": {
       "buildings": 115,
-      "vacancy_units_pct": 25.3,
+      "vacancy_units_pct": 25.5,
       "buildings_floor": 114,
-      "vacancy_floor_hi_pct": 16.7,
-      "vacancy_floor_lo_pct": 35.5,
-      "vacancy_area_pct": 13.4,
+      "vacancy_floor_hi_pct": 15.2,
+      "vacancy_floor_lo_pct": 33.4,
+      "vacancy_area_pct": 12.1,
       "anchor_pct": 7.34,
-      "gap_pp": 6.1
+      "gap_pp": 4.8
     },
     "small": {
       "buildings": 23,
@@ -28,7 +28,7 @@
     },
     "mall": {
       "buildings": 39,
-      "vacancy_units_pct": 58.0,
+      "vacancy_units_pct": 57.8,
       "buildings_floor": 1,
       "vacancy_floor_hi_pct": 0.0,
       "vacancy_floor_lo_pct": 0.0,
@@ -37,11 +37,11 @@
     "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
   },
   "primary": {
-    "estimated_vacancy_pct": 41.2,
+    "estimated_vacancy_pct": 41.1,
     "buildings": 191,
     "anchor_pct": 7.34,
-    "alpha": 0.178,
-    "gap_pp": 33.9,
+    "alpha": 0.179,
+    "gap_pp": 33.8,
     "coverage_pct": 96.5,
     "excluded_floor_approx": 7
   },
@@ -54,20 +54,20 @@
       "buildings": 161
     },
     "mall": {
-      "estimated_vacancy_pct": 56.4,
+      "estimated_vacancy_pct": 56.3,
       "anchor_pct": 7.34,
       "alpha": 0.13,
-      "gap_pp": 49.1,
+      "gap_pp": 49.0,
       "buildings": 37
     }
   },
   "methods": {
     "expos_units": {
-      "estimated_vacancy_pct": 56.4,
+      "estimated_vacancy_pct": 56.3,
       "buildings": 37,
       "anchor_pct": 7.34,
       "alpha": 0.13,
-      "gap_pp": 49.1
+      "gap_pp": 49.0
     },
     "floor_approx": {
       "estimated_vacancy_pct": 78.1,
