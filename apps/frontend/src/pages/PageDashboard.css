@@ -108,6 +108,8 @@
 .pagedash .upill{font-size:10.5px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:2px 8px;flex:0 0 auto}
 .pagedash .umeta{font-size:11px;color:var(--sub);margin:5px 0 2px}
 .pagedash .unote{font-size:11px;color:var(--blue);font-weight:700;margin-bottom:9px}
+/* 회수 불가 안내 — 숫자만 비워 두면 '데이터가 없다'로 읽힌다(2026-08-23). */
+.pagedash .unote.neg{color:#c2410c;background:#fff4ed;border:1px solid #fed7aa;border-radius:6px;padding:6px 8px;line-height:1.5}
 .pagedash .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .pagedash .tier{border:1px solid var(--line);border-radius:10px;padding:8px 9px;background:#fafbfc}
 .pagedash .tier.rec{background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
