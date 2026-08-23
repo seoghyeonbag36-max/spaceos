@@ -2,15 +2,15 @@
   "slug": "cityhall",
   "hub_name": "시청역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:58:21",
+  "built_at": "2026-08-23T16:43:51",
   "shown": 635,
   "excluded_total": 293,
   "excluded_unknown": 92,
   "excluded_non_commercial": 201,
   "coverage_pct": 68.4,
   "status": {
-    "full": 441,
-    "partial": 59,
+    "full": 442,
+    "partial": 58,
     "high": 57,
     "empty": 78
   },
@@ -20,16 +20,16 @@
     "stores+ledger+pip": 48,
     "pip_only": 71
   },
-  "reference_vacancy_pct": 13.2,
+  "reference_vacancy_pct": 13.1,
   "reference_buildings": 343,
   "reference_coverage_pct": 98.3,
   "mixed_vacancy_pct": 9.6,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 305,
-      "active": 1036,
-      "capacity": 1127,
-      "vacancy_pct": 8.1
+      "active": 1035,
+      "capacity": 1125,
+      "vacancy_pct": 8.0
     },
     "expos_units": {
       "buildings": 38,

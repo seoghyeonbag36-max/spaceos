@@ -2,16 +2,16 @@
   "slug": "dosan",
   "hub_name": "도산공원",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:57:07",
+  "built_at": "2026-08-23T16:43:37",
   "shown": 1098,
   "excluded_total": 476,
   "excluded_unknown": 102,
   "excluded_non_commercial": 374,
   "coverage_pct": 69.8,
   "status": {
-    "full": 524,
-    "partial": 273,
-    "high": 128,
+    "full": 536,
+    "partial": 266,
+    "high": 123,
     "empty": 173
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 55,
     "stores+ledger+pip": 5
   },
-  "reference_vacancy_pct": 20.4,
+  "reference_vacancy_pct": 19.8,
   "reference_buildings": 805,
   "reference_coverage_pct": 99.3,
-  "mixed_vacancy_pct": 21.1,
+  "mixed_vacancy_pct": 20.6,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 757,
-      "active": 2214,
-      "capacity": 2763,
-      "vacancy_pct": 19.9
+      "active": 2199,
+      "capacity": 2722,
+      "vacancy_pct": 19.2
     },
     "expos_units": {
       "buildings": 48,

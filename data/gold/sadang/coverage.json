@@ -2,16 +2,16 @@
   "slug": "sadang",
   "hub_name": "사당역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:59:46",
+  "built_at": "2026-08-23T16:44:04",
   "shown": 348,
   "excluded_total": 480,
   "excluded_unknown": 95,
   "excluded_non_commercial": 385,
   "coverage_pct": 42.0,
   "status": {
-    "full": 234,
-    "partial": 56,
-    "high": 20,
+    "full": 242,
+    "partial": 51,
+    "high": 17,
     "empty": 38
   },
   "source": {
@@ -20,16 +20,16 @@
     "stores+ledger+pip": 2,
     "pip_only": 12
   },
-  "reference_vacancy_pct": 11.9,
+  "reference_vacancy_pct": 10.5,
   "reference_buildings": 262,
   "reference_coverage_pct": 99.6,
-  "mixed_vacancy_pct": 12.1,
+  "mixed_vacancy_pct": 10.9,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 238,
-      "active": 657,
-      "capacity": 726,
-      "vacancy_pct": 9.5
+      "active": 650,
+      "capacity": 704,
+      "vacancy_pct": 7.7
     },
     "expos_units": {
       "buildings": 24,

@@ -2,16 +2,16 @@
   "slug": "noryangjin",
   "hub_name": "노량진",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:56:19",
+  "built_at": "2026-08-23T16:43:28",
   "shown": 499,
   "excluded_total": 2249,
   "excluded_unknown": 249,
   "excluded_non_commercial": 2000,
   "coverage_pct": 18.2,
   "status": {
-    "full": 198,
-    "partial": 111,
-    "high": 81,
+    "full": 241,
+    "partial": 78,
+    "high": 71,
     "empty": 109
   },
   "source": {
@@ -20,16 +20,16 @@
     "stores+ledger": 335,
     "stores+ledger+pip": 3
   },
-  "reference_vacancy_pct": 34.8,
+  "reference_vacancy_pct": 29.6,
   "reference_buildings": 255,
   "reference_coverage_pct": 98.1,
-  "mixed_vacancy_pct": 36.7,
+  "mixed_vacancy_pct": 32.7,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 235,
-      "active": 488,
-      "capacity": 710,
-      "vacancy_pct": 31.3
+      "active": 450,
+      "capacity": 584,
+      "vacancy_pct": 22.9
     },
     "expos_units": {
       "buildings": 20,
