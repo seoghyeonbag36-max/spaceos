@@ -2,16 +2,16 @@
   "slug": "yeonhui",
   "hub_name": "연희동",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:54:56",
+  "built_at": "2026-08-23T16:43:13",
   "shown": 477,
   "excluded_total": 1390,
   "excluded_unknown": 127,
   "excluded_non_commercial": 1263,
   "coverage_pct": 25.5,
   "status": {
-    "full": 206,
-    "partial": 86,
-    "high": 55,
+    "full": 219,
+    "partial": 77,
+    "high": 51,
     "empty": 130
   },
   "source": {
@@ -20,16 +20,16 @@
     "polygon_only": 130,
     "stores+ledger+pip": 3
   },
-  "reference_vacancy_pct": 20.3,
+  "reference_vacancy_pct": 17.9,
   "reference_buildings": 273,
   "reference_coverage_pct": 98.9,
-  "mixed_vacancy_pct": 22.9,
+  "mixed_vacancy_pct": 21.0,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 240,
-      "active": 528,
-      "capacity": 649,
-      "vacancy_pct": 18.6
+      "active": 515,
+      "capacity": 611,
+      "vacancy_pct": 15.7
     },
     "expos_units": {
       "buildings": 33,

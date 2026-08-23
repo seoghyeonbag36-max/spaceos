@@ -2,16 +2,16 @@
   "slug": "seolleung",
   "hub_name": "선릉",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:58:00",
+  "built_at": "2026-08-23T16:43:47",
   "shown": 852,
   "excluded_total": 934,
   "excluded_unknown": 164,
   "excluded_non_commercial": 770,
   "coverage_pct": 47.7,
   "status": {
-    "full": 449,
-    "partial": 199,
-    "high": 98,
+    "full": 476,
+    "partial": 182,
+    "high": 88,
     "empty": 106
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 40,
     "stores+ledger+pip": 7
   },
-  "reference_vacancy_pct": 17.5,
+  "reference_vacancy_pct": 16.1,
   "reference_buildings": 653,
   "reference_coverage_pct": 98.2,
-  "mixed_vacancy_pct": 18.8,
+  "mixed_vacancy_pct": 17.5,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 520,
-      "active": 1839,
-      "capacity": 2214,
-      "vacancy_pct": 16.9
+      "active": 1802,
+      "capacity": 2110,
+      "vacancy_pct": 14.6
     },
     "expos_units": {
       "buildings": 133,

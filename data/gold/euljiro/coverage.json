@@ -2,15 +2,15 @@
   "slug": "euljiro",
   "hub_name": "을지로(힙지로)",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:50:26",
+  "built_at": "2026-08-23T16:42:13",
   "shown": 1970,
   "excluded_total": 1114,
   "excluded_unknown": 172,
   "excluded_non_commercial": 942,
   "coverage_pct": 63.9,
   "status": {
-    "full": 779,
-    "partial": 217,
+    "full": 785,
+    "partial": 211,
     "high": 136,
     "empty": 838
   },
@@ -23,13 +23,13 @@
   "reference_vacancy_pct": 52.7,
   "reference_buildings": 734,
   "reference_coverage_pct": 99.2,
-  "mixed_vacancy_pct": 51.4,
+  "mixed_vacancy_pct": 51.5,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 697,
-      "active": 1863,
-      "capacity": 2290,
-      "vacancy_pct": 18.6
+      "active": 1849,
+      "capacity": 2263,
+      "vacancy_pct": 18.3
     },
     "expos_units": {
       "buildings": 37,

@@ -2,16 +2,16 @@
   "slug": "ikseon",
   "hub_name": "익선동",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:49:53",
+  "built_at": "2026-08-23T16:42:02",
   "shown": 1751,
   "excluded_total": 657,
   "excluded_unknown": 203,
   "excluded_non_commercial": 454,
   "coverage_pct": 72.7,
   "status": {
-    "full": 1038,
-    "partial": 220,
-    "high": 158,
+    "full": 1048,
+    "partial": 214,
+    "high": 154,
     "empty": 335
   },
   "source": {
@@ -23,13 +23,13 @@
   "reference_vacancy_pct": 58.6,
   "reference_buildings": 972,
   "reference_coverage_pct": 99.0,
-  "mixed_vacancy_pct": 57.2,
+  "mixed_vacancy_pct": 57.1,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 927,
-      "active": 1835,
-      "capacity": 2606,
-      "vacancy_pct": 29.6
+      "active": 1825,
+      "capacity": 2573,
+      "vacancy_pct": 29.1
     },
     "expos_units": {
       "buildings": 45,

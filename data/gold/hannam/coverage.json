@@ -2,16 +2,16 @@
   "slug": "hannam",
   "hub_name": "한남동·용리단길",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:50:59",
+  "built_at": "2026-08-23T16:42:23",
   "shown": 714,
   "excluded_total": 2359,
   "excluded_unknown": 266,
   "excluded_non_commercial": 2093,
   "coverage_pct": 23.2,
   "status": {
-    "full": 345,
-    "partial": 119,
-    "high": 64,
+    "full": 354,
+    "partial": 115,
+    "high": 59,
     "empty": 186
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 87,
     "polygon_only": 184
   },
-  "reference_vacancy_pct": 23.7,
+  "reference_vacancy_pct": 22.6,
   "reference_buildings": 357,
   "reference_coverage_pct": 98.9,
-  "mixed_vacancy_pct": 23.2,
+  "mixed_vacancy_pct": 22.2,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 339,
-      "active": 734,
-      "capacity": 875,
-      "vacancy_pct": 16.1
+      "active": 728,
+      "capacity": 852,
+      "vacancy_pct": 14.6
     },
     "expos_units": {
       "buildings": 18,

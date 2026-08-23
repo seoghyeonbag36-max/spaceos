@@ -2,15 +2,15 @@
   "slug": "garak",
   "hub_name": "가락시장",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:58:33",
+  "built_at": "2026-08-23T16:43:52",
   "shown": 284,
   "excluded_total": 54,
   "excluded_unknown": 7,
   "excluded_non_commercial": 47,
   "coverage_pct": 84.0,
   "status": {
-    "full": 256,
-    "partial": 8,
+    "full": 257,
+    "partial": 7,
     "high": 14,
     "empty": 6
   },
@@ -18,7 +18,7 @@
     "stores+ledger": 278,
     "polygon_only": 6
   },
-  "reference_vacancy_pct": 38.3,
+  "reference_vacancy_pct": 37.6,
   "reference_buildings": 20,
   "reference_coverage_pct": 100.0,
   "mixed_vacancy_pct": 7.0,
@@ -26,8 +26,8 @@
     "floor_ouln": {
       "buildings": 16,
       "active": 75,
-      "capacity": 90,
-      "vacancy_pct": 16.7
+      "capacity": 86,
+      "vacancy_pct": 12.8
     },
     "expos_units": {
       "buildings": 4,

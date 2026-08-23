@@ -2,16 +2,16 @@
   "slug": "dongdaemun",
   "hub_name": "동대문·DDP",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:53:24",
+  "built_at": "2026-08-23T16:42:57",
   "shown": 2842,
   "excluded_total": 3291,
   "excluded_unknown": 538,
   "excluded_non_commercial": 2753,
   "coverage_pct": 46.3,
   "status": {
-    "full": 1162,
-    "partial": 408,
-    "high": 302,
+    "full": 1184,
+    "partial": 398,
+    "high": 290,
     "empty": 970
   },
   "source": {
@@ -20,16 +20,16 @@
     "stores+ledger": 1560,
     "stores+ledger+pip": 61
   },
-  "reference_vacancy_pct": 83.4,
+  "reference_vacancy_pct": 83.5,
   "reference_buildings": 1264,
   "reference_coverage_pct": 97.5,
   "mixed_vacancy_pct": 84.9,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 1152,
-      "active": 2227,
-      "capacity": 2826,
-      "vacancy_pct": 21.2
+      "active": 2209,
+      "capacity": 2760,
+      "vacancy_pct": 20.0
     },
     "expos_units": {
       "buildings": 112,

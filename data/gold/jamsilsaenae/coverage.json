@@ -2,16 +2,16 @@
   "slug": "jamsilsaenae",
   "hub_name": "잠실새내",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-19T22:27:06",
+  "built_at": "2026-08-23T16:43:52",
   "shown": 418,
   "excluded_total": 444,
   "excluded_unknown": 78,
   "excluded_non_commercial": 366,
   "coverage_pct": 48.5,
   "status": {
-    "full": 250,
-    "partial": 84,
-    "high": 66,
+    "full": 271,
+    "partial": 71,
+    "high": 58,
     "empty": 18
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 21,
     "stores+ledger+pip": 3
   },
-  "reference_vacancy_pct": 41.1,
+  "reference_vacancy_pct": 40.5,
   "reference_buildings": 286,
   "reference_coverage_pct": 96.6,
-  "mixed_vacancy_pct": 45.7,
+  "mixed_vacancy_pct": 45.4,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 236,
-      "active": 680,
-      "capacity": 802,
-      "vacancy_pct": 15.2
+      "active": 653,
+      "capacity": 731,
+      "vacancy_pct": 10.7
     },
     "expos_units": {
       "buildings": 50,

@@ -2,16 +2,16 @@
   "slug": "kyunghee",
   "hub_name": "경희대",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:59:27",
+  "built_at": "2026-08-23T16:44:01",
   "shown": 514,
   "excluded_total": 1256,
   "excluded_unknown": 179,
   "excluded_non_commercial": 1077,
   "coverage_pct": 29.0,
   "status": {
-    "full": 269,
-    "partial": 99,
-    "high": 56,
+    "full": 306,
+    "partial": 81,
+    "high": 37,
     "empty": 90
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 23,
     "stores+ledger+pip": 12
   },
-  "reference_vacancy_pct": 23.7,
+  "reference_vacancy_pct": 16.3,
   "reference_buildings": 338,
   "reference_coverage_pct": 99.1,
-  "mixed_vacancy_pct": 25.5,
+  "mixed_vacancy_pct": 19.2,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 307,
-      "active": 598,
-      "capacity": 770,
-      "vacancy_pct": 22.3
+      "active": 577,
+      "capacity": 664,
+      "vacancy_pct": 13.1
     },
     "expos_units": {
       "buildings": 31,

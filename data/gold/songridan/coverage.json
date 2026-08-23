@@ -2,16 +2,16 @@
   "slug": "songridan",
   "hub_name": "송리단길",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:51:10",
+  "built_at": "2026-08-23T16:42:26",
   "shown": 450,
   "excluded_total": 1172,
   "excluded_unknown": 129,
   "excluded_non_commercial": 1043,
   "coverage_pct": 27.7,
   "status": {
-    "full": 270,
-    "partial": 82,
-    "high": 55,
+    "full": 291,
+    "partial": 64,
+    "high": 52,
     "empty": 43
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 27,
     "stores+ledger+pip": 3
   },
-  "reference_vacancy_pct": 20.2,
+  "reference_vacancy_pct": 18.4,
   "reference_buildings": 351,
   "reference_coverage_pct": 99.7,
-  "mixed_vacancy_pct": 22.0,
+  "mixed_vacancy_pct": 20.5,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 300,
-      "active": 794,
-      "capacity": 920,
-      "vacancy_pct": 13.7
+      "active": 762,
+      "capacity": 854,
+      "vacancy_pct": 10.8
     },
     "expos_units": {
       "buildings": 51,

@@ -2,16 +2,16 @@
   "slug": "cheongdam",
   "hub_name": "청담동 명품거리",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:56:50",
+  "built_at": "2026-08-23T16:43:33",
   "shown": 640,
   "excluded_total": 585,
   "excluded_unknown": 101,
   "excluded_non_commercial": 484,
   "coverage_pct": 52.2,
   "status": {
-    "full": 278,
-    "partial": 176,
-    "high": 82,
+    "full": 287,
+    "partial": 169,
+    "high": 80,
     "empty": 104
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 44,
     "stores+ledger+pip": 1
   },
-  "reference_vacancy_pct": 23.8,
+  "reference_vacancy_pct": 23.1,
   "reference_buildings": 428,
   "reference_coverage_pct": 97.9,
-  "mixed_vacancy_pct": 23.4,
+  "mixed_vacancy_pct": 22.8,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 391,
-      "active": 1056,
-      "capacity": 1403,
-      "vacancy_pct": 24.7
+      "active": 1049,
+      "capacity": 1377,
+      "vacancy_pct": 23.8
     },
     "expos_units": {
       "buildings": 37,

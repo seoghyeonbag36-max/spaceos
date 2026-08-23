@@ -2,16 +2,16 @@
   "slug": "namdaemun",
   "hub_name": "남대문시장",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:58:14",
+  "built_at": "2026-08-23T16:43:48",
   "shown": 384,
   "excluded_total": 403,
   "excluded_unknown": 90,
   "excluded_non_commercial": 313,
   "coverage_pct": 48.8,
   "status": {
-    "full": 188,
-    "partial": 56,
-    "high": 36,
+    "full": 191,
+    "partial": 55,
+    "high": 34,
     "empty": 104
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 43,
     "stores+ledger+pip": 25
   },
-  "reference_vacancy_pct": 17.6,
+  "reference_vacancy_pct": 17.3,
   "reference_buildings": 193,
   "reference_coverage_pct": 99.0,
-  "mixed_vacancy_pct": 9.9,
+  "mixed_vacancy_pct": 9.7,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 169,
-      "active": 421,
-      "capacity": 511,
-      "vacancy_pct": 17.6
+      "active": 420,
+      "capacity": 503,
+      "vacancy_pct": 16.5
     },
     "expos_units": {
       "buildings": 24,

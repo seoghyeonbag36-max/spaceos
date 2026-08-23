@@ -2,16 +2,16 @@
   "slug": "samcheong",
   "hub_name": "삼청동·북촌",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:52:21",
+  "built_at": "2026-08-23T16:42:42",
   "shown": 636,
   "excluded_total": 1029,
   "excluded_unknown": 189,
   "excluded_non_commercial": 840,
   "coverage_pct": 38.2,
   "status": {
-    "full": 299,
-    "partial": 87,
-    "high": 13,
+    "full": 301,
+    "partial": 86,
+    "high": 12,
     "empty": 237
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 43,
     "stores+ledger+pip": 12
   },
-  "reference_vacancy_pct": 13.4,
+  "reference_vacancy_pct": 12.9,
   "reference_buildings": 283,
   "reference_coverage_pct": 92.8,
-  "mixed_vacancy_pct": 15.0,
+  "mixed_vacancy_pct": 14.6,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 278,
-      "active": 416,
-      "capacity": 478,
-      "vacancy_pct": 13.0
+      "active": 414,
+      "capacity": 473,
+      "vacancy_pct": 12.5
     },
     "floor_approx": {
       "buildings": 22,

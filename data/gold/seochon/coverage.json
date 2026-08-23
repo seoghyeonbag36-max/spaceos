@@ -2,16 +2,16 @@
   "slug": "seochon",
   "hub_name": "서촌",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:49:57",
+  "built_at": "2026-08-23T16:42:03",
   "shown": 859,
   "excluded_total": 1769,
   "excluded_unknown": 316,
   "excluded_non_commercial": 1453,
   "coverage_pct": 32.7,
   "status": {
-    "full": 484,
-    "partial": 131,
-    "high": 36,
+    "full": 490,
+    "partial": 127,
+    "high": 34,
     "empty": 208
   },
   "source": {
@@ -20,16 +20,16 @@
     "pip_only": 60,
     "stores+ledger+pip": 15
   },
-  "reference_vacancy_pct": 25.8,
+  "reference_vacancy_pct": 25.3,
   "reference_buildings": 461,
   "reference_coverage_pct": 96.4,
-  "mixed_vacancy_pct": 26.9,
+  "mixed_vacancy_pct": 26.5,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 441,
-      "active": 759,
-      "capacity": 877,
-      "vacancy_pct": 13.5
+      "active": 751,
+      "capacity": 859,
+      "vacancy_pct": 12.6
     },
     "expos_units": {
       "buildings": 20,

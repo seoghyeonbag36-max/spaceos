@@ -2,16 +2,16 @@
   "slug": "cheongnyangni",
   "hub_name": "청량리·경동시장",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-17T15:55:20",
+  "built_at": "2026-08-23T16:43:18",
   "shown": 2074,
   "excluded_total": 3782,
   "excluded_unknown": 594,
   "excluded_non_commercial": 3188,
   "coverage_pct": 35.4,
   "status": {
-    "full": 949,
-    "partial": 233,
-    "high": 126,
+    "full": 974,
+    "partial": 221,
+    "high": 113,
     "empty": 766
   },
   "source": {
@@ -20,16 +20,16 @@
     "polygon_only": 764,
     "stores+ledger+pip": 41
   },
-  "reference_vacancy_pct": 25.6,
+  "reference_vacancy_pct": 24.1,
   "reference_buildings": 692,
   "reference_coverage_pct": 96.5,
-  "mixed_vacancy_pct": 21.9,
+  "mixed_vacancy_pct": 20.9,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 642,
-      "active": 1023,
-      "capacity": 1322,
-      "vacancy_pct": 22.6
+      "active": 1002,
+      "capacity": 1249,
+      "vacancy_pct": 19.8
     },
     "expos_units": {
       "buildings": 50,

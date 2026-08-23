@@ -2,16 +2,16 @@
   "slug": "gongdeok",
   "hub_name": "공덕역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-19T22:27:06",
+  "built_at": "2026-08-23T16:43:53",
   "shown": 423,
   "excluded_total": 514,
   "excluded_unknown": 87,
   "excluded_non_commercial": 427,
   "coverage_pct": 45.1,
   "status": {
-    "full": 203,
-    "partial": 58,
-    "high": 110,
+    "full": 206,
+    "partial": 56,
+    "high": 109,
     "empty": 52
   },
   "source": {
@@ -27,9 +27,9 @@
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 187,
-      "active": 426,
-      "capacity": 484,
-      "vacancy_pct": 12.0
+      "active": 422,
+      "capacity": 473,
+      "vacancy_pct": 10.8
     },
     "expos_units": {
       "buildings": 39,
