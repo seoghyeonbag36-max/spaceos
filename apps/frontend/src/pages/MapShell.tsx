@@ -14,7 +14,8 @@
 //   MapShell.css 의 .map-canvas 주석 참조.
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { loadNaverMaps } from "@/lib/naverMap";
-import { getBuildingVacancy, getRentHeatmap, listDistricts, recommendIndustry, type DistrictSummary, type GeoJSONFC, type IndustryRecommend, type RentHeatmap } from "@/lib/api";
+import { getBuildingVacancy, getDensityHeatmap, getFootfallHeatmap, getRentHeatmap, listDistricts, recommendIndustry,
+  type DensityHeatmap, type DistrictSummary, type FootfallHeatmap, type GeoJSONFC, type IndustryRecommend, type RentHeatmap } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
 import "@/styles/tokens.css";
 import "./MapShell.css";
@@ -92,15 +93,20 @@ function fromGeoJSON(fc: GeoJSONFC): Building[] {
   });
 }
 
-// SAMPLE — 유동인구 히트맵용 포인트. TODO: 서울 생활인구 격자로 교체.
-function sampleFootfall(center: { lat: number; lng: number }) {
-  const pts: { lat: number; lng: number; w: number }[] = [];
-  for (let i = 0; i < 120; i++) {
-    const r = Math.pow(Math.random(), 1.6) * 0.004;
-    const a = Math.random() * Math.PI * 2;
-    pts.push({ lat: center.lat + r * Math.cos(a), lng: center.lng + r * Math.sin(a), w: Math.random() });
-  }
-  return pts;
+// 유동·밀도 레이어는 TRDAR 상권 실측(services/footfall_layer)에서 온다.
+// 2026-08-23 이전에는 여기서 `Math.random()` 으로 점 120개를 만들어 그렸고, 시간
+// 슬라이더는 그 난수를 건드리지도 않아 **장식**이었다. 지금은 hour 가 API 질의에 들어간다.
+// "상권단위" 배지 — 값이 **격자 실측이 아니라** 상권 집계라는 표시다. R-ONE 배지와
+// 같은 역할: 화면에서 출처와 해상도를 숨기지 않는다.
+const TRDAR_BADGE: React.CSSProperties = {
+  color: "#3730a3", background: "#eef2ff", border: "1px solid #c7d2fe",
+  borderRadius: 5, padding: "1px 5px", fontSize: 10, fontWeight: 800,
+};
+const DENSITY_COLORS = ["#EEF2FF", "#C7D2FE", "#A5B4FC", "#818CF8", "#4F46E5"];
+function rampColor(v: number, min: number, max: number, ramp: string[]) {
+  const span = Math.max(1e-9, max - min);
+  const idx = Math.max(0, Math.min(ramp.length - 1, Math.floor(((v - min) / span) * ramp.length)));
+  return ramp[idx];
 }
 
 const RENT_COLORS = ["#E6F8EE", "#BEEAD3", "#7DD9AD", "#35BF7C", "#0F8E5E"];
@@ -119,6 +125,8 @@ export default function MapShell() {
   const [layer, setLayer] = useState<Layer>("vacancy");
   const [buildings, setBuildings] = useState<Building[]>(LOCAL_BUILDINGS);
   const [rentHm, setRentHm] = useState<RentHeatmap | null>(null);
+  const [footHm, setFootHm] = useState<FootfallHeatmap | null>(null);
+  const [densHm, setDensHm] = useState<DensityHeatmap | null>(null);
   const [src, setSrc] = useState<"api" | "local">("local");
   const [selected, setSelected] = useState<Building | null>(null);
   const [rec, setRec] = useState<IndustryRecommend | null>(null);
@@ -166,6 +174,30 @@ export default function MapShell() {
       .catch(() => { if (alive) setRentHm(null); });
     return () => { alive = false; };
   }, [districtId]);
+
+  // 유동 레이어는 **hour 에도 의존한다** — 슬라이더가 실제 질의를 바꾼다.
+  // 레이어를 보고 있지 않을 때는 부르지 않는다(거점 전환마다 3번 호출할 이유가 없다).
+  useEffect(() => {
+    if (layer !== "footfall") return;
+    let alive = true;
+    getFootfallHeatmap(districtId, hour)
+      .then((hm) => { if (alive) setFootHm(hm); })
+      .catch(() => { if (alive) setFootHm(null); });
+    return () => { alive = false; };
+  }, [districtId, hour, layer]);
+
+  useEffect(() => {
+    if (layer !== "density") return;
+    let alive = true;
+    getDensityHeatmap(districtId)
+      .then((hm) => { if (alive) setDensHm(hm); })
+      .catch(() => { if (alive) setDensHm(null); });
+    return () => { alive = false; };
+  }, [districtId, layer]);
+
+  // 거점이 바뀌면 이전 거점의 값을 그대로 두지 않는다 — 남으면 다른 상권의 수치가
+  // 새 지도 위에 잠깐 겹쳐 보인다.
+  useEffect(() => { setFootHm(null); setDensHm(null); }, [districtId]);
 
   // 선택 건물의 GNN 업종 추천 (Platform 5-2)
   // 그래프 노드는 카카오 점포 자리라 건물 대장 키와 join 되지 않는다 → **좌표**로 묻는다.
@@ -241,24 +273,43 @@ export default function MapShell() {
         naver.maps.Event.addListener(poly, "click", () => focus(b));
         overlaysRef.current.push(poly);
       });
-    } else if (layer === "footfall") {
-      // 유동인구: HeatMap(visualization). 미탑재 시 Circle 폴백.
-      const data = sampleFootfall(center);
+    } else if (layer === "footfall" && footHm) {
+      // 유동인구: 셀 중심을 가중 포인트로 넘긴다. 값은 상권 단위라 셀들이 같은 값을
+      // 공유하는데, 그게 실제 해상도다 — 매끄럽게 보이려고 난수를 섞지 않는다.
+      const span = Math.max(1e-9, footHm.max - footHm.min);
+      const pts = footHm.cells.map((c) => ({
+        lat: c.c_lat, lng: c.c_lng, w: (c.v - footHm.min) / span,
+      }));
       if (naver.maps.visualization?.HeatMap) {
         const hm = new naver.maps.visualization.HeatMap({
-          map, data: data.map((p) => ({ location: new naver.maps.LatLng(p.lat, p.lng), weight: p.w })),
-          radius: 24, opacity: 0.7,
+          map, data: pts.map((p) => ({ location: new naver.maps.LatLng(p.lat, p.lng), weight: p.w })),
+          radius: 30, opacity: 0.7,
         });
         overlaysRef.current.push(hm);
       } else {
-        data.forEach((p) => {
+        pts.forEach((p) => {
           const c = new naver.maps.Circle({
-            map, center: new naver.maps.LatLng(p.lat, p.lng), radius: 14,
-            fillColor: colors.brand.primary, fillOpacity: 0.25 + p.w * 0.4, strokeWeight: 0,
+            map, center: new naver.maps.LatLng(p.lat, p.lng), radius: 32,
+            fillColor: colors.brand.primary, fillOpacity: 0.2 + p.w * 0.45, strokeWeight: 0,
           });
           overlaysRef.current.push(c);
         });
       }
+    } else if (layer === "density" && densHm) {
+      densHm.cells.forEach((cell) => {
+        const color = rampColor(cell.v, densHm.min, densHm.max, DENSITY_COLORS);
+        const paths = [
+          new naver.maps.LatLng(cell.lat, cell.lng),
+          new naver.maps.LatLng(cell.lat, cell.lng + cell.dlng),
+          new naver.maps.LatLng(cell.lat + cell.dlat, cell.lng + cell.dlng),
+          new naver.maps.LatLng(cell.lat + cell.dlat, cell.lng),
+        ];
+        const poly = new naver.maps.Polygon({
+          map, paths, fillColor: color, fillOpacity: 0.5,
+          strokeColor: color, strokeWeight: 1, strokeOpacity: 0.8, clickable: false,
+        });
+        overlaysRef.current.push(poly);
+      });
     } else if (layer === "rent" && rentHm) {
       const values = rentHm.cells.map((c) => c.v);
       const min = Math.min(...values);
@@ -279,8 +330,7 @@ export default function MapShell() {
         overlaysRef.current.push(poly);
       });
     }
-    // rent/density: 구·격자 코로플레스 → 폴리곤 데이터 필요(범례에 안내).
-  }, [layer, ready, buildings, rentHm, center.lat, center.lng]);
+  }, [layer, ready, buildings, rentHm, footHm, densHm, center.lat, center.lng]);
 
   const filtered = useMemo(() => buildings.filter((b) => !q || b.name.includes(q)), [buildings, q]);
 
@@ -398,9 +448,21 @@ export default function MapShell() {
         {layer === "vacancy" && (Object.keys(STATUS) as VacStatus[]).map((k) => (
           <span key={k} className="chip"><span className="sw" style={{ background: STATUS[k].color }} />{STATUS[k].label}</span>
         ))}
-        {layer === "footfall" && <span className="note">유동인구 밀도 · 시간대별 (샘플)</span>}
+        {layer === "footfall" && (
+          <span className="note">
+            {footHm
+              ? <>유동인구 · {footHm.band_label} · 상권 {footHm.trdar_count}곳 <span style={TRDAR_BADGE}>TRDAR 상권단위</span></>
+              : "유동인구 · 불러오는 중"}
+          </span>
+        )}
         {layer === "rent" && <span className="note">평당 임대시세 · {rentHm?.unit ?? "만원/평"} <span style={{ color: "#0f7a55", background: "#e3f5ee", border: "1px solid #b7e3d2", borderRadius: 5, padding: "1px 5px", fontSize: 10, fontWeight: 800 }}>R-ONE</span></span>}
-        {layer === "density" && <span className="note">인구밀도 · 구/격자 코로플레스 (데이터 연동 예정)</span>}
+        {layer === "density" && (
+          <span className="note">
+            {densHm
+              ? <>{densHm.label} · {densHm.unit} · 상권 {densHm.trdar_count}곳 <span style={TRDAR_BADGE}>TRDAR 상권단위</span></>
+              : "밀도 · 불러오는 중"}
+          </span>
+        )}
       </div>
 
       {/* 3D 디지털 트윈 모달 */}

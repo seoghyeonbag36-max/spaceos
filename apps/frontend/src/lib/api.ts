@@ -77,7 +77,20 @@ export interface TierScenario {
   tier: string; name: string; sub: string;
   invest_mn: number; month_cost: number; month_rev: number; month_net: number;
   roi_months: number; recommended: boolean;
+  /** 월 순익이 0 이하면 false — 회수기간이 정의되지 않는다.
+   *  "모른다"와 "안 된다"는 다른 정보다. 화면이 둘 다 "—"로 뭉개면 안 된다. */
+  viable: boolean;
+  /** 이 회수기간이 **어떤 비용까지** 넣고 계산됐는지.
+   *  "kosis-opex+measured-revenue" = KOSIS 영업비용률 + 거점별 실측 평당매출(2026-08-23~)
+   *  "rent+fitout"                 = 원가·인건비가 빠진 낡은 폴백 */
+  basis: string;
 }
+
+/** basis 문자열 → 화면에 붙일 짧은 배지 라벨. 모르는 값은 그대로 노출한다. */
+export const BASIS_LABEL: Record<string, string> = {
+  "kosis-opex+measured-revenue": "KOSIS 실측비용",
+  "rent+fitout": "비용 일부 미반영",
+};
 
 /** 입력 필드별 출처 — 프록시를 실측으로 오독하지 않기 위한 구분자.
  *  "rone" R-ONE 임대료 · "flpop+seed" 유동인구+거점 내 서열 · "seed" 손으로 적은 프록시 */
@@ -172,6 +185,57 @@ export const getSentiment = (id: string) => getJSON<Zone[]>(`/commercial-distric
 export const getVacancyHeatmap = (id: string) => getJSON<VacancyHeatmap>(`/heatmap/vacancy?district=${id}`);
 /** 거점 100m 임대시세 레이어(Page) */
 export const getRentHeatmap = (id: string) => getJSON<RentHeatmap>(`/heatmap/rent?district=${id}`);
+/** 유동·밀도 레이어의 셀 (공실·임대와 같은 100m 격자) */
+export interface TrdarCell {
+  i: number; j: number;
+  lat: number; lng: number; c_lat: number; c_lng: number;
+  dlat: number; dlng: number;
+  v: number;
+  /** 이 셀이 값을 가져온 상권 이름 — 값의 출처를 셀 단위로 밝힌다 */
+  trdar: string;
+}
+
+/**
+ * 시간대별 유동인구 레이어(Page).
+ *
+ * ⚠ `resolution: "trdar"` 는 값이 **상권 단위 집계**라는 뜻이다. 셀 값은 그 셀의
+ * 실측이 아니라 **최근접 상권의 값**이다 — 범례에 반드시 함께 노출한다.
+ * 2026-08-23 이전에는 이 레이어가 `Math.random()` 이었다.
+ */
+export interface FootfallHeatmap {
+  district: string;
+  footfall_source: "trdar";
+  resolution: "trdar";
+  trdar_count: number;
+  hour: number;
+  band: string;
+  band_label: string;
+  unit: string;
+  min: number; max: number;
+  note: string;
+  cells: TrdarCell[];
+}
+
+/** 상권 밀도 레이어(Page). `metric="flpop"` 은 **유동인구** 밀도다(상주인구 아님). */
+export interface DensityHeatmap {
+  district: string;
+  density_source: "trdar";
+  resolution: "trdar";
+  trdar_count: number;
+  metric: "flpop" | "stor";
+  unit: string;
+  label: string;
+  min: number; max: number;
+  note: string;
+  cells: TrdarCell[];
+}
+
+/** 거점 시간대별 유동인구 레이어(Page) — hour 0~23 */
+export const getFootfallHeatmap = (id: string, hour: number) =>
+  getJSON<FootfallHeatmap>(`/heatmap/footfall?district=${id}&hour=${hour}`);
+/** 거점 상권 밀도 레이어(Page) */
+export const getDensityHeatmap = (id: string, metric: "flpop" | "stor" = "flpop") =>
+  getJSON<DensityHeatmap>(`/heatmap/density?district=${id}&metric=${metric}`);
 /** 건물 단위 공실 GeoJSON(FeatureCollection) — Page 공실 폴리곤 레이어 */
 export const getBuildingVacancy = (district: string) =>
   getJSON<GeoJSONFC>(`/heatmap/buildings?district=${district}`);

@@ -67,7 +67,7 @@ def simulate(district_id: str, unit_id: str | None = None,
     source = "copilot"
     source_note = None
     if scenarios is None:
-        scenarios = svc.tier_scenarios(unit)
+        scenarios = svc.tier_scenarios(unit, district_id)
         source = "fallback-3tier"
         source_note = fail
     else:

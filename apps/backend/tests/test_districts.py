@@ -59,7 +59,24 @@ def test_list_districts():
     for d in data:
         assert 0 <= d["sentiment"] <= 100
         assert 0 <= d["vacancy_rate"] <= 100
-        assert d["tier_mix"]["premium"] + d["tier_mix"]["value"] + d["tier_mix"]["factory"] == 5
+        # 합이 5 **이하**다. 2026-08-23 실측 비용 모델부터 회수불가 유닛이 실제로
+        # 생긴다(세 전략 모두 순익 0 이하 → 추천 없음). 예전에는 마진이 70%대라 늘 5였다.
+        assert 0 <= sum(d["tier_mix"].values()) <= 5
+
+
+def test_recommendations_do_not_silently_vanish():
+    """회수불가는 있을 수 있지만 **드물어야** 한다.
+
+    추천이 대량으로 사라지면 카드가 조용히 비는데, 그건 비용 모델이 깨진 신호다
+    (2026-08-23 실측 모델 기준 7/270 = 2.6%, 임대료/매출이 높은 명동·연남에 몰린다).
+    """
+    data = client.get(f"{V1}/commercial-districts").json()
+    total = sum(sum(d["tier_mix"].values()) for d in data)
+    assert total >= len(data) * 5 * 0.9, f"추천이 사라진 유닛이 10%를 넘는다: {total}"
+    # 추천이 하나라도 있으면 rec_top 이 비면 안 된다 — 첫 유닛만 보던 결함의 회귀 방지
+    for d in data:
+        if sum(d["tier_mix"].values()):
+            assert d["rec_top"], d["id"]
 
 
 def test_district_summary_and_detail():

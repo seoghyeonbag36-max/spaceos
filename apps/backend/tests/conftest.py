@@ -33,3 +33,26 @@ def _no_network_llm(monkeypatch):
         return
     from app.core.config import settings
     monkeypatch.setattr(settings, "llm_api_key", "", raising=False)
+
+
+# ── 출력 계약 헬퍼 (2026-08-23) ──────────────────────────────────────────────
+# 온라인(퍼포먼스)과 오프라인(상권활성화)은 대칭이 아니라 필요한 속성이 다르다
+# (schemas/marketing.py::ChannelPlan). 테스트들이 검증하는 것은 대개 ha_guard 의
+# **규칙**이지 계약 자체가 아니므로, 계약이 요구하는 필드는 여기서 기본값으로 채워
+# 본문이 규칙에만 집중하게 한다. 계약 자체는 test_program_output_split.py 가 본다.
+
+def _perf(channel, content, rationale, target="20~30대 직장인",
+          budget_share=100, kpi="저장 수"):
+    from app.schemas.marketing import LLMPerformancePlan
+    return LLMPerformancePlan(channel=channel, content=content, rationale=rationale,
+                              target=target, budget_share=budget_share, kpi=kpi)
+
+
+def _act(channel, content, rationale, timing="주말 오전",
+         actors=None, mode="own"):
+    from app.schemas.marketing import LLMActivationPlan
+    return LLMActivationPlan(channel=channel, content=content, rationale=rationale,
+                             # `or` 를 쓰면 actors=[] 를 기본값이 덮어써서 "주체 없음"을
+                             # 검증할 수 없다. None 만 기본값으로 친다.
+                             timing=timing,
+                             actors=["상인회"] if actors is None else actors, mode=mode)

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
+  BASIS_LABEL,
   listDistricts, getDistrict, getPostings, getMarketing, getVacancyHeatmap, getBuildingVacancy,
 } from "@/lib/api";
 import type {
@@ -566,9 +567,28 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
                           <div className="tname" style={{ color: TIER_COLOR[sc.tier] }}>{sc.name}{sc.recommended && <em> 추천</em>}</div>
                           <div className="trow"><span>초기투자</span><b>{sc.invest_mn}백만</b></div>
                           <div className="trow"><span>월 순익</span><b className={sc.month_net >= 0 ? "" : "neg"}>{sc.month_net.toLocaleString()}만</b></div>
-                          <div className="trow"><span>회수</span><b>{sc.roi_months >= 99 ? "—" : `${sc.roi_months}개월`}</b></div>
+                          {/* "모른다"(—)와 "안 된다"(회수 불가)는 다른 정보다. 예전에는 둘 다 "—" 였고,
+                              비용 모델이 낙관적이라 회수불가가 거의 안 나와 잠복해 있었다. 2026-08-23
+                              실측 모델부터 실제로 뜬다(연남·명동처럼 임대료/매출이 높은 거점). */}
+                          <div className="trow"><span>회수</span>
+                            <b className={sc.viable ? "" : "neg"}>
+                              {sc.viable ? `${sc.roi_months}개월` : "회수 불가"}
+                            </b>
+                          </div>
                         </div>
                       ))}
+                    </div>
+                    {/* 세 전략 모두 회수불가면 그 사실과 계산의 한계를 함께 밝힌다.
+                        숫자만 비워 두면 "데이터가 없다"로 읽힌다. */}
+                    {!Object.values(p.scenarios).some((sc: TierScenario) => sc.viable) && (
+                      <div className="unote neg">
+                        이 자리는 지금 계산으로는 <b>회수 불가</b> — 세 전략 모두 월 순익이 0 이하다.
+                        {" "}임대료가 이 면적이 낼 수 있는 매출에 비해 높다.
+                      </div>
+                    )}
+                    <div className="unote">
+                      비용 기준: {BASIS_LABEL[Object.values(p.scenarios)[0]?.basis]
+                        ?? Object.values(p.scenarios)[0]?.basis ?? "미상"}
                     </div>
                   </div>
                 ))}

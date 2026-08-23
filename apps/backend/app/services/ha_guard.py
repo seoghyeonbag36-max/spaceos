@@ -209,6 +209,96 @@ def _check_rationales(plans: list) -> list[HAFinding]:
         evidence=", ".join(bare[:5]))]
 
 
+# ── 새 출력 계약(2026-08-23) 검증 ────────────────────────────────────────────
+# 스키마가 필드의 **존재**를 강제해도 내용이 규칙을 지켰는지는 서버가 봐야 한다.
+# `ha_check` 가 자기신고라 근거가 아닌 것과 같은 이유다(§0-3).
+
+# 컨텍스트가 "인용할 행사가 없다"고 못 박는 문구. 이게 실려 있는데도 mode="cite" 가
+# 나오면 지어낸 것이 확정된다 — 이름 대조 없이 판정되므로 오탐이 없다.
+_NO_EVENT_MARKS = ("확인된 예정 행사가 없다", "안에 예정 행사가 없다",
+                   "행사 참여·연계를 제안하지 말 것", "연계를 제안하지 말 것")
+# 신규 제안의 근거로 인정하는 수치 표기. 빈 시간대 격차(%p)나 유동/매출 수치.
+_GAP_FIGURE_RE = re.compile(r"\d+(?:\.\d+)?\s*(?:%p|%|시)")
+
+
+def _check_cited_events(offline: list, context: str | None) -> list[HAFinding]:
+    """컨텍스트가 '인용할 행사가 없다'고 했는데 기존 행사를 인용한 제안 — violation.
+
+    2026-08-06 에는 신규 행사 제안을 **통째로 금지**해서 막았다. 그런데 대상이 공실
+    창업 기업으로 바뀌면서 신규 제안이 이 출력의 목적이 됐다(§0-B 원칙 3). 금지를
+    없애는 대신 **인용(cite)과 제안(propose)을 갈라** 인용만 사실 검증을 건다.
+    """
+    if not context or not any(m in context for m in _NO_EVENT_MARKS):
+        return []
+    cited = [p for p in offline if (getattr(p, "mode", None) or "") == "cite"]
+    if not cited:
+        return []
+    return [HAFinding(
+        severity="violation", code="fabricated_event",
+        message="컨텍스트에 인용할 예정 행사가 없다고 적혀 있는데 기존 행사를 연계"
+                f"(mode=cite)한 제안이 {len(cited)}건 있다 — 없는 행사를 사실로 주장한다. "
+                "새로 열자는 제안이라면 mode=propose 로 적어야 한다.",
+        evidence=", ".join(p.channel for p in cited[:5]))]
+
+
+def _check_proposed_events(offline: list) -> list[HAFinding]:
+    """신규 행사 제안(propose)에 빈 시간대 격차 수치가 없으면 경고.
+
+    수치 없는 제안은 "상권 플리마켓 참여"처럼 어느 상권에나 해당하는 말이 된다 —
+    2026-08-06 에 고치려던 바로 그 증상이다. 다만 표기 방식이 다양해 오탐이 섞이므로
+    폐기하지 않고 밝히기만 한다.
+    """
+    bare = [p for p in offline
+            if (getattr(p, "mode", None) or "") == "propose"
+            and not _GAP_FIGURE_RE.search(p.rationale or "")]
+    if not bare:
+        return []
+    return [HAFinding(
+        severity="warning", code="unsupported_event_proposal",
+        message=f"신규 행사 제안 {len(bare)}건의 근거에 빈 시간대 격차 수치가 없다 — "
+                "수치가 없으면 어느 상권에나 해당하는 일반론이 된다.",
+        evidence=", ".join(p.channel for p in bare[:5]))]
+
+
+def _check_actors(offline: list) -> list[HAFinding]:
+    """오프라인 제안에 협업 주체가 없으면 경고 — 공생(Symbiosis) 원칙의 실행 형태.
+
+    신규 창업자가 혼자 축제를 열 수는 없다. 실측으로 상권 행사 785건 중 57%가
+    공공·준공공 주최다. 주체가 비면 "당신이 알아서 하세요"가 된다.
+    """
+    # mode="own"(매장 자체 접점 — 입간판·시식)은 애초에 협업이 필요 없다. 여기까지
+    # 주체를 요구하면 정당한 제안이 죽는다.
+    solo = [p for p in offline
+            if (getattr(p, "mode", None) or "") != "own"
+            and not (getattr(p, "actors", None) or [])]
+    if not solo:
+        return []
+    return [HAFinding(
+        severity="warning", code="missing_actors",
+        message=f"오프라인(상권 활성화) 제안 {len(solo)}건에 협업 주체가 비어 있다 — "
+                "상권 활성화는 기업 단독으로 실행할 수 없다.",
+        evidence=", ".join(p.channel for p in solo[:5]))]
+
+
+def _check_budget_shares(online: list) -> list[HAFinding]:
+    """온라인 예산 배분 비율의 합이 100% 에서 벗어나면 경고.
+
+    비율로만 제안하는 것은 "얼마를 쓸지는 기업 몫"이라는 원칙의 구현이다(§0-B 원칙 2).
+    합이 안 맞으면 배분표로 쓸 수 없다.
+    """
+    shares = [getattr(p, "budget_share", None) for p in online]
+    vals = [v for v in shares if isinstance(v, int)]
+    if not vals or len(vals) != len(shares):
+        return []
+    total = sum(vals)
+    if 95 <= total <= 105:
+        return []
+    return [HAFinding(
+        severity="warning", code="budget_share_mismatch",
+        message=f"온라인 예산 배분 비율의 합이 {total}% 다 — 100% 가 되어야 배분표로 쓸 수 있다.",
+        evidence=" + ".join(f"{p.channel} {p.budget_share}%" for p in online[:5]))]
+
+
 def check_store(parsed: LLMStoreMarketing, profile: dict,
                 context: str | None) -> list[HAFinding]:
     """가게 단위 생성물 검증. violation 이 하나라도 있으면 호출부가 응답을 버린다."""
@@ -231,6 +321,10 @@ def check_store(parsed: LLMStoreMarketing, profile: dict,
         *_check_disparagement(generated),
         *_check_channel_balance(list(parsed.online)),
         *_check_rationales(plans),
+        *_check_cited_events(list(parsed.offline), context),
+        *_check_proposed_events(list(parsed.offline)),
+        *_check_actors(list(parsed.offline)),
+        *_check_budget_shares(list(parsed.online)),
     ]
 
 

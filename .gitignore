@@ -53,9 +53,18 @@ data/gold/*
 # scripts/posting_cost_sensitivity.py 가 읽어 R1(실측수준정렬) 축을 만든다. 빠지면
 # 그 축이 **조용히 통째로 빠진 채** 감도표가 찍혀 "통과 조합 없음"으로 뒤집힌다.
 !data/gold/platform_posting_revenue.json
+# 예외: Posting 비용 모델의 실측 근거(~4KB) — KOSIS 서비스업조사 서울 2024 tier별
+# 영업비용률. districts.tier_scenarios 가 month_cost 를 여기서 읽는다. 빠지면
+# 배포에서 비용률이 없어 조용히 **원가·인건비 없는 옛 모델**로 되돌아간다.
+!data/gold/platform_posting_cost_rates.json
 # 예외: Program 상권 행사(~480KB, 52거점 785건) — services/events.py 가 정적 서빙.
 # 빠지면 배포 환경에서 events_source 가 "seed" 로 떨어져 지어낸 행사가 지도에 다시 찍힌다.
 !data/gold/platform_events.json
+# 예외: Page 유동·밀도 레이어(81KB, 54거점 190상권) — services/footfall_layer 가
+# 정적 서빙한다. 원천은 features/trdar_demand.parquet 이지만 **파케이는 배포에
+# 없다**(pandas·pyarrow 미탑재). 빠지면 유동 레이어가 조용히 비고, 예전처럼
+# Math.random() 샘플로 되돌아간 것과 구분이 안 된다.
+!data/gold/platform_page_footfall.json
 # 예외: Page 다거점 red dot 실데이터 — 각 거점 page_building_master.geojson 만 추적(Vercel 서빙).
 # building_vacancy.json·대장 원본·parquet 등 중간·원본 산출물은 계속 제외.
 !data/gold/*/

@@ -133,10 +133,20 @@ def page_track(total: int) -> Track:
     # 4대 레이어는 엔드포인트 유무로는 판정이 안 된다 — 유동인구는 라우트가 있어도
     # 프론트가 SAMPLE 상수를 그린다. 그래서 실데이터 여부는 선언으로 둔다.
     t.gates.append(Gate(
-        "4대 히트맵 레이어 실데이터", 2 / 4,
-        "공실 ✅ · 임대 ✅(R-ONE) · 유동 ⬜ 샘플 · 밀도 ⬜ 미연동",
+        "4대 히트맵 레이어 실데이터", 4 / 4,
+        "공실 ✅ · 임대 ✅(R-ONE) · 유동 ✅ · 밀도 ✅ — 네 레이어가 같은 100m 격자 "
+        "위에 선다. 유동·밀도는 08-23 배선(TRDAR 상권 190곳, 54/54거점). 재료는 "
+        "`features/trdar_demand.parquet` 에 이미 있었다 — 문서가 '좌표가 없어 못 쓴다'고 "
+        "적어 둔 것이 틀렸고(좌표 결측 0), 저장소 안의 재료를 못 찾고 있던 것이다. "
+        "예전 유동 레이어는 Math.random() 점 120개였고 시간 슬라이더는 오버레이 "
+        "effect 의존성에 hour 가 없어 **드래그해도 아무것도 안 바뀌는 장식**이었다. "
+        "⚠ 100% 는 '네 레이어가 실데이터를 쓴다'는 뜻이지 격자 실측이라는 뜻이 아니다 — "
+        "유동·밀도 값은 **상권 단위 집계**를 셀에 얹은 것이고(거점당 상권 1~9, 중앙 3) "
+        "시간은 6구간으로 접힌다. 응답 `resolution:\"trdar\"` 와 범례 배지가 이걸 "
+        "밝힌다. 24시간 실측은 생활인구(행정동)로 시간 축만 갈아끼우면 된다",
         auto=False,
-        evidence="apps/frontend/src/pages/MapShell.tsx:91 (SAMPLE 상수) · api/v1/heatmap.py",
+        evidence=("docs/feature-page.md §유동·밀도 · services/footfall_layer.py · "
+                  "apps/backend/tests/test_footfall_layer.py (13건)"),
     ))
     t.gates.append(Gate(
         "지도·건물상세·3D 트윈 표면", 1.0,
@@ -286,23 +296,35 @@ def posting_track(total: int) -> Track:
         "실제 공실 유닛 인벤토리", len(vu) / total if total else 0.0,
         f"{len(vu)}/{total}거점 — 08-22 재실행으로 완주(580유닛). 종전 잔여 5곳"
         "(hyehwa·kyunghee·sadang·sukmyung·wangsimni)은 막힘이 아니라 대기였고, 대장 완주로 "
-        "상업면적이 채워져 그대로 풀렸다. ⚠ 산출물은 .gitignore 로 **추적되지 않는다** — "
-        "배선하려면 추적 예외가 먼저다(calibration.json 과 같은 실패 양식)",
+        "상업면적이 채워져 그대로 풀렸다. 추적 예외(!data/gold/*/vacant_units.json)까지 "
+        "걸려 54/54 가 git 에 올라가 있다 — 배선을 막는 것은 이제 없다",
     ))
 
     t.gates.append(Gate(
-        "3-Tier 비용 모델 보정", 0.0,
-        "month_cost 에 원가·인건비가 없다 — 08-22 전수 재측정으로 수치 갱신: 마진 중앙 "
-        "70.2/63.4/45.8%, 회수 중앙 1.8개월, factory 1위 0/270. 근거는 08-22 에 절반 "
-        "깔렸다(tier↔업종 대표군 정의 + 매출 실측 — 현행이 premium 매출을 58% 과대평가). "
-        "**08-23: 자료 구멍 둘이 다 닫혔다** — KOSIS 키 발급으로 서비스업조사 "
-        "DT_3KB9001 에서 서울 2024 업종별 영업비용률 실측(89.5~96.5%, 즉 영업이익률 "
-        "3.5~10.5%). 필요인원은 인건비를 매출 대비 비율로 직접 얻어 질문 자체가 소멸. "
-        "이제 막는 것은 자료가 아니라 **구현**이다: month_cost 를 매출비례로 재정의 + "
-        "매출계수 이동 + 감도표 재실행. 비용만 고쳐서는 여전히 통과 불가 "
-        "(업종 간 비용률 차이가 7%p 뿐이라 tier 를 가르는 것은 매출이다)",
+        "3-Tier 비용 모델 보정", 2 / 3,
+        "배선 완료 2026-08-23 — 통과 조건 셋 중 **둘**. 08-23 오전에 KOSIS 비용률을 "
+        "정직하게 넣었더니 회수불가 96% 가 나왔고, 원인이 비용이 아니라 **매출의 면적 "
+        "기울기**였다(임대료는 면적에 비례하는데 매출은 안 그래서 임대료/매출이 6배 "
+        "부풀었다). 고정항을 없애고 매출을 면적에 온전히 비례시켰다: rev = area × "
+        "foot_k_norm × 거점별 실측 평당매출, cost = rent + rev × 비임차 영업비용률. "
+        "미지수가 여섯에서 **A(평균 점포 면적) 셋**으로 줄었고, A 는 마진이 아니라 "
+        "**임차료에서 독립 유도**한다(premium 12.6 · value 7.1 · factory 7.1평) — "
+        "마진에 맞추면 KOSIS 대조가 정의상 참이 되어 검증이 순환한다. "
+        "결과: 회수불가 **2.6%** ✅ · factory **90승/270** ✅(死문항 해소) · "
+        "마진 중앙 premium −1.2 / value 6.9 / factory 4.9% ↔ KOSIS 실측 5.8/7.0/8.8 — "
+        "**value·factory 는 대역 안, premium 은 밖** ❌. premium 이 낮은 것은 버그가 "
+        "아니라 §0-B 실측과 같은 방향이다(서울에서 고급화=고매출이 성립하지 않는다). "
+        "⚠ 마진 기준을 10~20% → 3.5~10.5% 로 내렸다 — KOSIS 실측 영업이익률이 그 "
+        "대역이라 **실측이 기준을 반증했다**. 낮춰서 통과시킨 것이 아니라 반대다"
+        "(이 변경으로 기존 통과 조합 4개가 탈락했다). "
+        "⚠ A 는 **하한**이다(분모가 서울 전체가 아니라 프라임 54거점 임대료라) — "
+        "실제 A 는 더 크고 그러면 마진은 더 나빠진다. 공정위 가맹정보 기준면적을 "
+        "확보하면 avg_store_pyeong() 하나만 갈아끼우면 된다. "
+        "폴백은 garak 1곳 5유닛뿐이고 `basis` 로 어느 모델이 돌았는지 드러난다",
         auto=False,
-        evidence="docs/feature-posting.md §0-A~0-F · scripts/posting_cost_sensitivity.py",
+        evidence=("docs/feature-posting.md §0-H · services/posting_revenue.py · "
+                  "apps/backend/tests/test_posting_revenue.py (12건) · "
+                  "scripts/posting_cost_sensitivity.py::_shipped"),
     ))
     return t
 
@@ -388,10 +410,22 @@ def program_track(total: int) -> Track:
     ))
 
     t.gates.append(Gate(
-        "출력 분리 (퍼포먼스 / 상권활성화)", 0.0,
-        "미착수 — ChannelPlan 4필드로는 타겟·예산배분·협업주체를 못 담는다. "
-        "프롬프트의 신규 행사 제안 금지 조항도 새 출력과 충돌",
-        auto=False, evidence="apps/backend/app/schemas/marketing.py::ChannelPlan",
+        "출력 분리 (퍼포먼스 / 상권활성화)", 1.0,
+        "배선 완료 2026-08-23. ChannelPlan 에 자리를 냈다 — 온라인은 target·"
+        "budget_share·kpi, 오프라인은 timing·actors·mode. LLM 계약은 둘로 갈랐고"
+        "(LLMPerformancePlan / LLMActivationPlan) API 응답은 한 모양을 유지해 프론트가 "
+        "안 깨진다. 예산은 **int 퍼센트**라 '월 30만원' 같은 절대액이 구조적으로 못 "
+        "들어간다 — 원칙을 문구가 아니라 타입으로 강제한다. 충돌하던 신규 행사 제안 "
+        "금지 조항은 없애지 않고 mode 로 갈랐다: cite(기존 인용, 사실 주장) · "
+        "propose(신규 공동 행사, 빈 시간대 수치 요구) · own(매장 자체 접점, 행사 아님). "
+        "서버 검증 4종 신설(fabricated_event violation + unsupported_event_proposal · "
+        "missing_actors · budget_share_mismatch warning). own 은 오탐 대조 테스트가 "
+        "찾아낸 것이다 — 없으면 입간판 제안이 '수치 없는 행사 제안'으로 잘못 걸린다. "
+        "곁가지로 리뷰 없는 입력(=공실)에 '방문 후기형 포스팅'을 제안하던 스텁을 고쳤다. "
+        "⚠ 근본 해소는 아니다 — 입력 계약 ③층(창업계획)은 여전히 미구현이다",
+        auto=False,
+        evidence=("docs/feature-program.md §0-F · apps/backend/tests/"
+                  "test_program_output_split.py (14건) · services/ha_guard.py"),
     ))
     return t
 

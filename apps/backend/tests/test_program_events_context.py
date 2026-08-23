@@ -19,6 +19,8 @@
 """
 from __future__ import annotations
 
+from tests.conftest import _act, _perf
+
 import pytest
 
 from app.services import marketing as mkt
@@ -120,15 +122,16 @@ def test_event_fee_is_not_fabricated_price():
     행사가 컨텍스트에 들어오면서 요금·기간의 숫자가 거기 실린다. 이걸 근거에서 빼면
     정상 인용이 violation 으로 폐기된다.
     """
-    from app.schemas.marketing import LLMChannelPlan, LLMStoreMarketing
+    from app.schemas.marketing import (LLMActivationPlan, LLMPerformancePlan,
+                                       LLMStoreMarketing)
     from app.services import ha_guard
 
     ctx = "상권 행사(공공 문화행사 실데이터, 가까운 순): 재즈 공연(참가비 5,000원, 거점에서 957m)"
     parsed = LLMStoreMarketing(
         tone_keywords=["재즈"],
-        online=[LLMChannelPlan(channel="인스타그램", content="공연 연계 게시",
+        online=[_perf(channel="인스타그램", content="공연 연계 게시",
                                rationale="인근 행사와 시간대를 맞춘다")],
-        offline=[LLMChannelPlan(channel="입간판", content="참가비 5,000원 공연 안내 병기",
+        offline=[_act(channel="입간판", content="참가비 5,000원 공연 안내 병기",
                                 rationale="행사 관람객 동선을 잡는다")],
         ha_check="점검 통과")
 

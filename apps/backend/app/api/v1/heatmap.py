@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.district import VacancyHeatmap
 from app.services import building_vacancy as bv
 from app.services import districts as svc
-from app.services import rent_layer
+from app.services import footfall_layer, rent_layer
 
 router = APIRouter()
 
@@ -41,4 +41,34 @@ async def rent_heatmap(district: str) -> dict:
     hm = rent_layer.rent_heatmap(district)
     if hm is None:
         raise HTTPException(status_code=404, detail=f"rent unavailable: {district}")
+    return hm
+
+
+@router.get("/footfall")
+async def footfall_heatmap(district: str, hour: int = 12) -> dict:
+    """시간대별 유동인구 히트맵 — 공실/임대와 같은 100m 격자. 쿼리: ?district=..&hour=0~23
+
+    2026-08-23 이전에는 이 엔드포인트가 없었고 프론트가 `Math.random()` 으로 점 120개를
+    만들어 그렸다(슬라이더가 입력을 보지 않아 장식이었다). 실데이터는 TRDAR 상권 190곳
+    — services/footfall_layer 참조.
+
+    ⚠ 값은 **상권 단위 집계**를 격자에 얹은 것이다. 응답의 `resolution`·`note` 를 화면에
+    함께 노출할 것 — 빼면 격자 단위 실측처럼 읽힌다.
+    """
+    hm = footfall_layer.footfall_heatmap(district, hour)
+    if hm is None:
+        raise HTTPException(status_code=404, detail=f"footfall unavailable: {district}")
+    return hm
+
+
+@router.get("/density")
+async def density_heatmap(district: str, metric: str = "flpop") -> dict:
+    """상권 밀도 히트맵. 쿼리: ?district=..&metric=flpop|stor
+
+    `flpop` 은 **유동인구** 밀도다(상주인구가 아니다 — 화면 라벨이 '인구밀도'였지만
+    우리가 가진 것은 유동인구다). `stor` 는 점포 밀도.
+    """
+    hm = footfall_layer.density_heatmap(district, metric)
+    if hm is None:
+        raise HTTPException(status_code=404, detail=f"density unavailable: {district}")
     return hm

@@ -20,7 +20,8 @@ from __future__ import annotations
 import math
 
 from app.data.seoul_pages import DISTRICTS, DISTRICTS_BY_ID
-from app.services import gold_vacancy, posting_inputs, vacancy_forecast
+from app.services import (gold_vacancy, posting_inputs, posting_revenue,
+                          vacancy_forecast)
 
 # 입점 3-Tier 정의
 TIER = {
@@ -149,13 +150,37 @@ def recommend_tier(scenarios: dict) -> str | None:
 # 계산에 실제로 들어간 비용 항목. 마진·회수기간을 읽는 쪽이 무엇이 빠졌는지 알아야
 # 한다 — 이 문자열이 응답의 `basis` 로 내려간다(예전 docstring 이 `roi_basis` 라는
 # 필드가 있다고 적어 뒀으나 그런 필드는 구현된 적이 없다. 2026-08-22 실제로 만든다).
-COST_BASIS = "rent+fitout"
-COST_BASIS_NOTE = ("월비용 = 임대료 + 면적비례 관리비 + 고정비. **원가(매출비례)와 "
-                   "인건비가 빠져 있어 마진이 과대, 회수기간이 과소하게 나온다.**")
+# 계산에 실제로 들어간 항목을 밝히는 문자열. 응답의 `basis` 로 내려간다.
+# 두 모델이 공존한다 — 실측 재료가 있는 거점은 measured, 없으면 legacy 로 폴백하고
+# **어느 쪽이 돌았는지 카드가 구분할 수 있어야 한다.** 조용히 폴백하면 근거 없는 값이
+# 실측처럼 읽힌다(calibration.json 이 40거점에서 None 이던 것과 같은 실패 양식).
+COST_BASIS = "kosis-opex+measured-revenue"
+COST_BASIS_NOTE = ("월비용 = 임대료(R-ONE 실측) + 매출 × 비임차 영업비용률"
+                   "(KOSIS 서울 2024). 매출은 거점별 실측 평당매출 × 면적 — 고정항 "
+                   "없이 면적에 비례한다. ⚠ 평균 점포 면적 A 가 **하한**이라 마진이 "
+                   "낙관 쪽으로 치우친다(docs/feature-posting.md §0-H).")
+
+COST_BASIS_LEGACY = "rent+fitout"
+COST_BASIS_LEGACY_NOTE = ("월비용 = 임대료 + 면적비례 관리비 + 고정비. **원가(매출비례)와 "
+                          "인건비가 빠져 있어 마진이 과대, 회수기간이 과소하게 나온다.** "
+                          "실측 재료(거점 매출·KOSIS 비용률)가 없어 폴백한 결과다.")
 
 
-def tier_scenarios(unit: dict) -> dict:
+def basis_note(basis: str) -> str:
+    """`basis` 문자열에 맞는 한계 설명. 카드가 두 모델을 구분해 보여주게 한다."""
+    return COST_BASIS_NOTE if basis == COST_BASIS else COST_BASIS_LEGACY_NOTE
+
+
+def tier_scenarios(unit: dict, district_id: str | None = None) -> dict:
     """공실 유닛의 3-Tier 비용-효용 시나리오(월 단위, 만원/백만원).
+
+    `district_id` 를 주면 **실측 모델**로 계산한다(2026-08-23):
+
+        rev  = area × foot_k_norm × 거점별 실측 평당매출[tier]
+        cost = rent + rev × 비임차 영업비용률[tier]        # KOSIS 서울 2024
+
+    안 주거나 그 거점에 재료가 없으면 낡은 계수 모델로 폴백한다. 어느 쪽이 돌았는지는
+    각 시나리오의 `basis` 에 실린다 — **폴백을 조용히 하지 않는 것**이 요점이다.
 
     표시값(`invest_mn`·`month_cost`·`month_rev`·`roi_months`)은 반올림하되, 추천
     비교에 쓰는 값은 `_raw` 에 원값으로 함께 싣는다 — 반올림이 추천을 뒤집던 것을
@@ -164,10 +189,11 @@ def tier_scenarios(unit: dict) -> dict:
     f_k = _FOOT_K[unit["foot"]]
     base = unit["area"] * f_k
     rent, area, prem = unit["rent"], unit["area"], unit["prem"]
+    measured = posting_revenue.available(district_id)
 
     # (투자계수·투자고정, 비용계수·비용고정, 매출계수·매출고정)
-    # ⚠ 매출계수 41/30/18 은 근거 없는 손으로 적은 값이다. 실측 대역은
-    #    gold/platform_posting_revenue.json (상권×업종 점포당 월매출) 참조.
+    # ⚠ 매출계수 41/30/18 과 비용계수는 근거 없는 손으로 적은 값이다. 실측 모델이
+    #    설 수 없는 거점에서만 쓰인다(services/posting_revenue).
     specs = {
         "premium": (0.55, 4, 1.8, 180, 41, 1150),
         "value": (0.32, 2.2, 1.1, 95, 30, 760),
@@ -176,8 +202,14 @@ def tier_scenarios(unit: dict) -> dict:
     out = {}
     for k, (i_a, i_c, c_a, c_f, r_a, r_f) in specs.items():
         inv = prem / 100 + area * i_a + i_c        # 백만원
-        cost = rent + area * c_a + c_f             # 만원/월
-        rev = base * r_a + r_f                     # 만원/월
+        if measured:
+            rev = posting_revenue.revenue_of(unit, district_id, k)   # 만원/월
+            cost = rent + rev * posting_revenue.opex_rate(k)         # 만원/월
+            basis = COST_BASIS
+        else:
+            cost = rent + area * c_a + c_f         # 만원/월
+            rev = base * r_a + r_f                 # 만원/월
+            basis = COST_BASIS_LEGACY
         net = rev - cost
         # 회수기간(개월). invest 는 백만원, net 은 만원이라 ×100 으로 단위를 맞춘다
         # (2026-08-01 교정 — 이전에는 100배 작게 나와 "0.1개월"로 찍혔다).
@@ -187,7 +219,7 @@ def tier_scenarios(unit: dict) -> dict:
             "invest_mn": round(inv), "month_cost": round(cost), "month_rev": round(rev),
             "month_net": round(net), "roi_months": 99.0 if net <= 0 else round(roi, 1),
             "viable": net > 0,
-            "basis": COST_BASIS,
+            "basis": basis,
             "_raw": {"invest_mn": inv, "cost": cost, "rev": rev, "net": net, "roi": roi},
         }
     # 추천은 **계산한다** — 시드의 `unit["rec"]` 을 읽지 않는다. 그래야 실제 건물에서
@@ -206,15 +238,15 @@ def unviable_note(scenarios: dict) -> str | None:
     2026-08-22 이전에는 이 경우 `rec_top` 이 빈 문자열이 되어 **카드가 조용히 비었다**.
     "추천이 없다"와 "이 자리는 회수가 안 된다"는 전혀 다른 정보인데 구분되지 않았다.
 
-    ⚠ 비용 모델을 보정하면 이 경우가 소수가 아니라 다수가 된다(임시값 실험에서 실
-    유닛의 34~53%). 그래서 문구는 **계산의 한계를 함께 밝히는** 형태로 둔다 — 지금
-    비용에 원가·인건비가 없는데도 회수가 안 된다면 그건 더 확실한 신호이지만,
-    반대로 보정 후 늘어날 회수불가는 계산 탓일 수 있다.
+    문구는 **계산의 한계를 함께 밝히는** 형태다. 2026-08-23 부터 두 모델이 공존하므로
+    한계 설명도 실제로 돈 모델의 것을 붙인다 — 폴백으로 계산해 놓고 실측 모델의 한계를
+    적으면 그 자체가 거짓 근거가 된다.
     """
     if any(s["viable"] for s in scenarios.values()):
         return None
+    basis = next(iter(scenarios.values())).get("basis", COST_BASIS)
     return ("이 자리는 지금 계산으로는 회수 불가 — 세 전략 모두 월 순익이 0 이하다. "
-            f"({COST_BASIS_NOTE})")
+            f"({basis_note(basis)})")
 
 
 def _predicted(district_id: str, current_rate: float) -> dict:
@@ -243,9 +275,16 @@ def _summary(d: dict) -> dict:
     # `recommended` 플래그를 그대로 읽는다 — 여기서 recommend_tier 를 다시 부르면
     # 반올림된 표시값으로 재판정하게 되어 유닛 상세와 카드가 어긋난다.
     recs = [next((k for k, s in sc.items() if s["recommended"]), None)
-            for sc in (tier_scenarios(u) for u in resolved_units(d["id"]) or [])]
+            for sc in (tier_scenarios(u, d["id"]) for u in resolved_units(d["id"]) or [])]
     tiers = {k: sum(1 for r in recs if r == k) for k in TIER}
-    rec_top = TIER[recs[0]]["nm"] if recs and recs[0] else ""
+    # rec_top 은 **가장 많이 추천된 전략**이다. 예전에는 `recs[0]` — 즉 첫 유닛의 추천을
+    # 그대로 썼는데, 그러면 첫 유닛이 회수불가일 때 다른 넷이 멀쩡해도 카드가 조용히
+    # 빈다. 비용 모델을 실측으로 바꾸면서 회수불가가 실제로 생겼고(2026-08-23, 명동·
+    # 연남처럼 임대료/매출이 높은 거점) 이 결함이 드러났다. `unviable_note` 가 유닛
+    # 상세에서 고쳤던 것과 같은 실패 양식이다 — 카드에서도 같게 고친다.
+    # 세 전략 모두 회수불가인 거점에서만 빈 문자열이 된다.
+    top = max(TIER, key=lambda k: tiers[k]) if any(tiers.values()) else None
+    rec_top = TIER[top]["nm"] if top else ""
     return {
         "id": d["id"], "name": d["name"], "gu": d["gu"], "type": d["type"],
         "center": d["center"], "note": d["sub"], "rec_top": rec_top,
@@ -307,7 +346,7 @@ def get_postings(district_id: str) -> list[dict] | None:
     units = resolved_units(district_id)
     if units is None:
         return None
-    return [{**u, "scenarios": tier_scenarios(u)} for u in units]
+    return [{**u, "scenarios": tier_scenarios(u, district_id)} for u in units]
 
 
 def get_marketing(district_id: str) -> dict | None:

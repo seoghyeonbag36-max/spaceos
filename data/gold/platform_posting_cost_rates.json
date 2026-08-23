@@ -1,0 +1,201 @@
+{
+  "source": {
+    "org_id": "101",
+    "tbl_id": "DT_3KB9001",
+    "name": "통계청 서비스업조사 시도/산업별 총괄",
+    "region": "서울특별시(11)",
+    "period": "2024",
+    "unit": "백만원"
+  },
+  "note": "opex_rate_ex_rent = (영업비용 − 임차료) / 매출액. 임차료를 뺀 것은 month_cost 가 유닛별 임대료(R-ONE)를 따로 갖고 있어 이중계상이 되기 때문이다. 매출원가(T051)는 음식점업 미공표라 기타경비에 흡수돼 있다.",
+  "tiers": {
+    "premium": {
+      "ksic": [
+        "56121",
+        "56122",
+        "56123"
+      ],
+      "estab": 15962,
+      "sales_mn": 7759145.0,
+      "opex_rate": 0.9424,
+      "rent_rate": 0.0593,
+      "opex_rate_ex_rent": 0.8831,
+      "labor_rate": 0.1798,
+      "profit_rate": 0.0576
+    },
+    "value": {
+      "ksic": [
+        "56111",
+        "56162",
+        "56213"
+      ],
+      "estab": 36092,
+      "sales_mn": 12380516.0,
+      "opex_rate": 0.9304,
+      "rent_rate": 0.0517,
+      "opex_rate_ex_rent": 0.8787,
+      "labor_rate": 0.1298,
+      "profit_rate": 0.0696
+    },
+    "factory": {
+      "ksic": [
+        "56150",
+        "56161",
+        "56221"
+      ],
+      "estab": 31107,
+      "sales_mn": 10560976.0,
+      "opex_rate": 0.9122,
+      "rent_rate": 0.0426,
+      "opex_rate_ex_rent": 0.8696,
+      "labor_rate": 0.1516,
+      "profit_rate": 0.0878
+    }
+  },
+  "industries": {
+    "56122": {
+      "name": "일식",
+      "tier": "premium",
+      "period": "2024",
+      "estab": 5831.0,
+      "sales_mn": 2575358.0,
+      "opex_mn": 2420957.0,
+      "labor_mn": 455559.0,
+      "rent_mn": 150732.0,
+      "other_mn": 1814665.0,
+      "cogs_mn": null,
+      "opex_rate": 0.94,
+      "rent_rate": 0.0585,
+      "opex_rate_ex_rent": 0.8815,
+      "identity_residual_mn": 1.0
+    },
+    "56123": {
+      "name": "양식",
+      "tier": "premium",
+      "period": "2024",
+      "estab": 4698.0,
+      "sales_mn": 2319888.0,
+      "opex_mn": 2238196.0,
+      "labor_mn": 411541.0,
+      "rent_mn": 160409.0,
+      "other_mn": 1666247.0,
+      "cogs_mn": null,
+      "opex_rate": 0.9648,
+      "rent_rate": 0.0691,
+      "opex_rate_ex_rent": 0.8956,
+      "identity_residual_mn": -1.0
+    },
+    "56121": {
+      "name": "중식",
+      "tier": "premium",
+      "period": "2024",
+      "estab": 5433.0,
+      "sales_mn": 2863899.0,
+      "opex_mn": 2653009.0,
+      "labor_mn": 527906.0,
+      "rent_mn": 148898.0,
+      "other_mn": 1976206.0,
+      "cogs_mn": null,
+      "opex_rate": 0.9264,
+      "rent_rate": 0.052,
+      "opex_rate_ex_rent": 0.8744,
+      "identity_residual_mn": -1.0
+    },
+    "56111": {
+      "name": "한식일반",
+      "tier": "value",
+      "period": "2024",
+      "estab": 28582.0,
+      "sales_mn": 9849921.0,
+      "opex_mn": 9175481.0,
+      "labor_mn": 1396936.0,
+      "rent_mn": 529960.0,
+      "other_mn": 7248585.0,
+      "cogs_mn": null,
+      "opex_rate": 0.9315,
+      "rent_rate": 0.0538,
+      "opex_rate_ex_rent": 0.8777,
+      "identity_residual_mn": 0.0
+    },
+    "56162": {
+      "name": "치킨",
+      "tier": "value",
+      "period": "2024",
+      "estab": 5298.0,
+      "sales_mn": 2026746.0,
+      "opex_mn": 1876639.0,
+      "labor_mn": 148264.0,
+      "rent_mn": 72769.0,
+      "other_mn": 1655606.0,
+      "cogs_mn": null,
+      "opex_rate": 0.9259,
+      "rent_rate": 0.0359,
+      "opex_rate_ex_rent": 0.89,
+      "identity_residual_mn": 0.0
+    },
+    "56213": {
+      "name": "생맥주",
+      "tier": "value",
+      "period": "2024",
+      "estab": 2212.0,
+      "sales_mn": 503849.0,
+      "opex_mn": 466615.0,
+      "labor_mn": 62019.0,
+      "rent_mn": 37244.0,
+      "other_mn": 367352.0,
+      "cogs_mn": null,
+      "opex_rate": 0.9261,
+      "rent_rate": 0.0739,
+      "opex_rate_ex_rent": 0.8522,
+      "identity_residual_mn": 0.0
+    },
+    "56221": {
+      "name": "커피",
+      "tier": "factory",
+      "period": "2024",
+      "estab": 20180.0,
+      "sales_mn": 5362751.0,
+      "opex_mn": 4799252.0,
+      "labor_mn": 741045.0,
+      "rent_mn": 248144.0,
+      "other_mn": 3810064.0,
+      "cogs_mn": null,
+      "opex_rate": 0.8949,
+      "rent_rate": 0.0463,
+      "opex_rate_ex_rent": 0.8487,
+      "identity_residual_mn": -1.0
+    },
+    "56161": {
+      "name": "패스트푸드",
+      "tier": "factory",
+      "period": "2024",
+      "estab": 5346.0,
+      "sales_mn": 2975513.0,
+      "opex_mn": 2711608.0,
+      "labor_mn": 453898.0,
+      "rent_mn": 87806.0,
+      "other_mn": 2169904.0,
+      "cogs_mn": null,
+      "opex_rate": 0.9113,
+      "rent_rate": 0.0295,
+      "opex_rate_ex_rent": 0.8818,
+      "identity_residual_mn": 0.0
+    },
+    "56150": {
+      "name": "제과",
+      "tier": "factory",
+      "period": "2024",
+      "estab": 5581.0,
+      "sales_mn": 2222712.0,
+      "opex_mn": 2123163.0,
+      "labor_mn": 405928.0,
+      "rent_mn": 114036.0,
+      "other_mn": 1603199.0,
+      "cogs_mn": null,
+      "opex_rate": 0.9552,
+      "rent_rate": 0.0513,
+      "opex_rate_ex_rent": 0.9039,
+      "identity_residual_mn": 0.0
+    }
+  }
+}

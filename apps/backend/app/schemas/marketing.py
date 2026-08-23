@@ -116,24 +116,72 @@ class VacantSiteList(BaseModel):
 
 
 class ChannelPlan(BaseModel):
-    channel: str                      # 예: 인스타그램, 네이버 블로그, 전단
+    """제안 1건. **온라인과 오프라인은 대칭이 아니다 — 주체가 다르다**(§0-B).
+
+    온라인은 창업 기업이 **단독 실행**하는 퍼포먼스 마케팅이고, 오프라인은 기업 혼자
+    할 수 없는 **상권 활성화**다(행사 785건 중 57%가 공공·준공공 주최). 그래서 필요한
+    속성이 갈린다. 하나의 모델에 담되 `kind` 로 어느 쪽 필드가 유효한지 가른다 —
+    프론트가 online/offline 두 목록을 같은 모양으로 받던 것을 깨지 않기 위해서다.
+
+    ⚠ 2026-08-23 이전에는 아래 네 필드(channel·kind·content·rationale)뿐이라
+    타겟·예산배분·협업주체를 담을 자리가 없었다. 그래서 오프라인 제안이 "누가
+    함께하는지" 없이 나왔고, 그건 신규 창업자가 혼자 축제를 열라는 말이 된다.
+    """
+    channel: str                      # 온라인=채널명 / 오프라인=행사 형식(플리마켓·공동 프로모션)
     kind: str                         # online | offline
     content: str                      # 제안 문구/실행안
-    rationale: str                    # 근거 (리뷰 키워드·상권 특성)
+    rationale: str                    # 근거 (수치·상권 데이터. 리뷰가 아니어도 된다)
+
+    # ── 온라인(퍼포먼스) 전용 ─────────────────────────────────────────
+    target: str | None = None         # 목표 고객 세그먼트 (TRDAR 연령·성별·시간대에서)
+    # 예산 **배분 비율(%)**. 절대액을 담지 않는 것이 핵심이다 — "얼마를 쓸지는 기업 몫"
+    # 이라는 §0-B 원칙 2 를, 값을 int 퍼센트로 못 박아 **구조적으로** 강제한다.
+    # 문자열이면 LLM 이 "월 30만원" 을 넣을 수 있지만 int 에는 넣을 수 없다.
+    budget_share: int | None = None
+    kpi: str | None = None            # 목표 지표 (도달·저장·방문 전환 등)
+
+    # ── 오프라인(상권활성화) 전용 ─────────────────────────────────────
+    timing: str | None = None         # 시기 — 빈 시간대(TRDAR 격차)·계절
+    actors: list[str] = []            # 협업 주체 (상인회·구청·건물주·인근 점포)
+    # 오프라인 제안의 성격. 셋을 가르는 이유는 규칙이 서로 다르기 때문이다.
+    #   cite    = 컨텍스트에 실린 **기존 행사** 연계 → 사실 주장이라 인용만 허용
+    #   propose = **신규 공동 행사** 제안 → 계획이라 허용하되 빈 시간대 수치 인용을 강제
+    #   own     = 매장 자체 접점(입간판·시식·외관) → 행사가 아니다. 협업 주체도 필수가 아니다
+    # own 이 없으면 입간판 같은 평범한 제안이 '수치 없는 행사 제안'으로 잘못 걸린다
+    # (2026-08-23 오탐 대조 테스트가 잡았다).
+    mode: str | None = None
 
 
-class LLMChannelPlan(BaseModel):
-    """LLM 구조화 출력용 채널 플랜 (kind 는 서버가 부여)."""
+class LLMPerformancePlan(BaseModel):
+    """LLM 구조화 출력 — 온라인(퍼포먼스). 창업 기업 단독 실행."""
     channel: str
     content: str
     rationale: str
+    target: str
+    budget_share: int                 # % — 온라인 제안들의 합이 100 이 되게 한다
+    kpi: str
+
+
+class LLMActivationPlan(BaseModel):
+    """LLM 구조화 출력 — 오프라인(상권활성화). 기업 + 상권 주체 협업.
+
+    `channel` 은 채널이 아니라 **형식**이다(플리마켓·공동 프로모션·야외 팝업).
+    `mode` 가 이 출력의 안전장치다 — 기존 행사 인용과 신규 제안을 가르지 않으면
+    지어낸 행사가 사실처럼 나간다(2026-08-06 에 금지 조항으로 막아 둔 것).
+    """
+    channel: str
+    content: str
+    rationale: str
+    timing: str
+    actors: list[str]
+    mode: str                         # "cite" | "propose" | "own" — ChannelPlan 주석 참조
 
 
 class LLMStoreMarketing(BaseModel):
     """LLM 구조화 출력 계약 — generate_store_marketing 의 llm 경로 응답 스키마."""
     tone_keywords: list[str]
-    online: list[LLMChannelPlan]
-    offline: list[LLMChannelPlan]
+    online: list[LLMPerformancePlan]
+    offline: list[LLMActivationPlan]
     ha_check: str                     # 균형·공생·공감 자체 점검 결과 서술
 
 

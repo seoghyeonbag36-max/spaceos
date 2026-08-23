@@ -3,6 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from tests.conftest import _act, _perf
 
 client = TestClient(app)
 V1 = "/api/v1"
@@ -196,14 +197,15 @@ _PROFILE = {
 def test_generate_store_marketing_llm(monkeypatch):
     """LLM 키 설정 시 _call_llm 결과가 StoreMarketing(source=llm)으로 매핑된다."""
     from app.core.config import settings
-    from app.schemas.marketing import LLMChannelPlan, LLMStoreMarketing
+    from app.schemas.marketing import (LLMActivationPlan, LLMPerformancePlan,
+                                       LLMStoreMarketing)
     from app.services import marketing as mkt
 
     monkeypatch.setattr(settings, "llm_api_key", "test-key")
     fake = LLMStoreMarketing(
         tone_keywords=["특제소스", "사시미"],
-        online=[LLMChannelPlan(channel="인스타그램", content="릴스 게시", rationale="리뷰 근거")],
-        offline=[LLMChannelPlan(channel="전단", content="시식 이벤트", rationale="유동객 근거")],
+        online=[_perf(channel="인스타그램", content="릴스 게시", rationale="리뷰 근거")],
+        offline=[_act(channel="전단", content="시식 이벤트", rationale="유동객 근거")],
         ha_check="균형·공생·공감 점검 통과",
     )
     monkeypatch.setattr(mkt, "_call_llm", lambda profile, tone, ctx, site=None: fake)
@@ -375,11 +377,12 @@ def test_menu_reaches_llm_prompt(monkeypatch):
     def spy(profile, tone, ctx, site=None):
         seen["menu"] = profile.get("menu")
         seen["prompt"] = m._SYSTEM_PROMPT
-        from app.schemas.marketing import LLMChannelPlan, LLMStoreMarketing
+        from app.schemas.marketing import (LLMActivationPlan, LLMPerformancePlan,
+                                       LLMStoreMarketing)
         return LLMStoreMarketing(
             tone_keywords=["x"],
-            online=[LLMChannelPlan(channel="a", content="b", rationale="c")],
-            offline=[LLMChannelPlan(channel="d", content="e", rationale="f")],
+            online=[_perf(channel="a", content="b", rationale="c")],
+            offline=[_act(channel="d", content="e", rationale="f")],
             ha_check="ok",
         )
 
