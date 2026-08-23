@@ -365,6 +365,62 @@ def _split(y: np.ndarray, rng: np.random.Generator) -> tuple[np.ndarray, ...]:
     return train, val, test
 
 
+def _neighbor_label_block(ei: torch.Tensor, y: np.ndarray, train_mask: np.ndarray,
+                          n_cls: int, n_nodes: int) -> tuple[np.ndarray, list[str]]:
+    """이웃의 업종 분포 — **학습 라벨만** 집계한다 (2026-08-23).
+
+    §9 순도 분석이 남긴 레버 중 하나가 "약국↔병원 인접 구조"였다. 지금 피처 105개 중
+    자리마다 값이 달라지는 것은 입지·건물 15개뿐이고 나머지 90개는 거점 상수라
+    (원핫 54 + TRDAR 36), off-prior 자리에서 모델이 기댈 것이 거의 없다.
+    이웃이 무슨 업종인가는 **자리마다 다르고 거점 원핫이 표현할 수 없는** 신호다.
+
+    ## 누출을 막는 두 가지
+
+    1. **train 마스크의 라벨만 센다.** val/test 노드의 업종을 이웃으로 세면 평가
+       대상의 정답이 입력에 흘러든다. 여기서 트인 구멍은 지표가 조용히 좋아지는
+       쪽이라 눈치채기 어렵다.
+    2. **자기 자신을 뺀다.** self-loop 가 섞이면 자기 라벨이 그대로 입력이 되어
+       off-prior 가 100% 로 튄다 — 그건 학습이 아니라 정답 복사다.
+
+    GNN 의 message passing 과 겹치지 않는가: 겹치지 않는다. 컨볼루션은 이웃의
+    **피처**를 섞지 라벨을 섞지 않는다. 라벨 전파는 여기서만 들어온다.
+
+    ## 실측 결과 (2026-08-23) — **개선 없음. 기본값 off.**
+
+    | 지표 | 105열(기존) | 113열(+이웃) | |
+    |---|---|---|---|
+    | off-prior Top-3 | 37.63% | **36.49%** | −1.14%p |
+    | Top-3 | 91.86% | 91.40% | −0.46%p |
+    | macro-F1 | 0.2622 | **0.2803** | +6.9% |
+
+    off-prior 표본 877 에서 표준오차 ≈1.63%p 이므로 −1.14%p 는 **1σ 이내 — 유의하지
+    않다.** 올리지도 내리지도 못했다는 것이 정직한 결론이고, 게이트 지표가 나아지지
+    않았으므로 산출물은 되돌렸다.
+
+    왜 안 올랐는가에 대한 가설 둘(둘 다 미검증):
+    ① GNN 의 message passing 이 이미 같은 정보를 쓰고 있어 입력단 라벨 전파가
+       중복이다. 그렇다면 이 피처로는 영영 안 오른다.
+    ② **조기 종료 기준이 이 지표에 안 맞는다.** val top1 로 멈추는데(ep113 종료)
+       top1 은 거점 사전분포에 지배되는 지표다 — off-prior 가 최적화되기 전에 멈췄을
+       수 있다. 이쪽이면 `--neighbor` 에 off-prior 기준 조기종료를 붙여 재시도할 값이
+       있다. macro-F1 만 +6.9% 오른 것이 ②를 약하게 지지한다.
+
+    반환: (n_nodes × (n_cls+1)) 블록 — 클래스별 비율 + 이웃 수 log.
+    """
+    src = ei[0].numpy()
+    dst = ei[1].numpy()
+    keep = train_mask[src] & (src != dst)
+    counts = np.zeros((n_nodes, n_cls), dtype=np.float64)
+    np.add.at(counts, (dst[keep], y[src[keep]]), 1.0)
+    total = counts.sum(axis=1, keepdims=True)
+    frac = counts / np.maximum(total, 1.0)     # 이웃 0 이면 전부 0 — "모른다"로 남는다
+    block = np.hstack([frac, np.log1p(total)])
+    names = [f"nb_frac_{c}" for c in range(n_cls)] + ["log_nb_n"]
+    print(f"[gnn] 이웃 라벨 피처 {len(names)}열 결합 · 이웃 있는 노드 "
+          f"{float((total > 0).mean()):.1%} (train 라벨만, self 제외)")
+    return block, names
+
+
 def _topk_acc(logits: torch.Tensor, y: torch.Tensor, k: int) -> float:
     k = min(k, logits.shape[1])
     top = logits.topk(k, dim=1).indices
@@ -480,7 +536,7 @@ def quality_report() -> dict:
 def train(edge_types: set[str] | None = None, epochs: int = 400,
           hidden: int = 128, lr: float = 0.01, weight_decay: float = 5e-4,
           patience: int = 50, save: bool = True, use_demand: bool = True,
-          use_building: bool = True,
+          use_building: bool = True, use_neighbor: bool = False,
           resume: bool = True, ckpt_every: int = 25,
           label_level: str = "group", class_weight: bool = False) -> dict:
     torch.manual_seed(SEED)
@@ -506,9 +562,15 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
     ei = _edge_index(nodes, edges, edge_types)
     did = nodes["district_id"].fillna("").astype(str).to_numpy()
 
-    x = torch.tensor(x_np)
     y = torch.tensor(y_np, dtype=torch.long)
     tr, va, te = _split(y_np, rng)
+    # 이웃 라벨 블록은 **분할을 안 뒤에야** 만들 수 있다(train 라벨만 쓰므로).
+    # 그래서 _features 안이 아니라 여기서 붙인다.
+    if use_neighbor:
+        nb, nb_names = _neighbor_label_block(ei, y_np, tr, len(classes), len(nodes))
+        x_np = np.hstack([x_np, nb]).astype(np.float32)
+        feat_names = feat_names + nb_names
+    x = torch.tensor(x_np)
     m_tr, m_va, m_te = (torch.tensor(m) for m in (tr, va, te))
 
     model = IndustryGNN(x.shape[1], len(classes), hidden=hidden)
@@ -612,6 +674,8 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
                     "demand_features": int(any(n in feat_names for n in _DEMAND_COLS)),
                     "building_features": int(any(n in feat_names
                                                  for n in _BUILDING_COLS)),
+                    "neighbor_label_features": int(any(n.startswith("nb_frac_")
+                                                       for n in feat_names)),
                     "edge_types": ",".join(sorted(edge_types)) if edge_types else "all"})
     print("[gnn·metrics]", metrics)
 
@@ -673,6 +737,9 @@ if __name__ == "__main__":
     ap.add_argument("--epochs", type=int, default=400)
     ap.add_argument("--hidden", type=int, default=128)
     ap.add_argument("--no-save", action="store_true")
+    ap.add_argument("--neighbor", action="store_true",
+                    help="이웃 업종 분포 피처를 켠다(실험 — 08-23 실측에서 off-prior "
+                         "37.63%%→36.49%% 로 유의한 개선 없음. _neighbor_label_block 참조)")
     ap.add_argument("--no-demand", action="store_true",
                     help="TRDAR 공공 수요신호 제외 — 종전 파이프라인 재현(ablation 기준선)")
     ap.add_argument("--no-resume", action="store_true",
@@ -695,6 +762,7 @@ if __name__ == "__main__":
         types = set(a.edge_types.split(",")) if a.edge_types else None
         train(edge_types=types, epochs=a.epochs, hidden=a.hidden,
               save=not a.no_save, use_demand=not a.no_demand,
+              use_neighbor=a.neighbor,
               use_building=not a.no_building,
               resume=not a.no_resume, ckpt_every=a.ckpt_every,
               label_level=a.label_level, patience=a.patience,

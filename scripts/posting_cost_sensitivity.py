@@ -315,7 +315,9 @@ def main() -> None:
         m, w = r["margin_median"], r["win"]
         print()
         print("=== 배선된 실측 모델 (districts.tier_scenarios 실호출) ===")
-        print(f"  평균 점포 면적 A(임차료에서 독립 유도 · **하한**): {diag['avg_store_pyeong']}")
+        print(f"  평균 점포 면적 A({diag['area_basis']}): {diag['avg_store_pyeong']}"
+              f"   ← 역산폴백이면 {diag['avg_store_pyeong_from_rent']}")
+        print(f"  매출 절대수준: {diag['revenue_basis']} · KOSIS 점포당 {diag['kosis_store_sales']}")
         print(f"  평당매출 중앙(만원/평·월): {diag['per_pyeong_median']}")
         print("  비임차 영업비용률: " + " · ".join(
             f"{t} {v*100:.1f}%" for t, v in diag["opex_rate_ex_rent"].items()))

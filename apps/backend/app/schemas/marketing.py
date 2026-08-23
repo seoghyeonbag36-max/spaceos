@@ -7,7 +7,31 @@ StoreProfile 은 수집 채널(네이버 지역검색·카카오 로컬·블로�
 """
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+class VenturePlan(BaseModel):
+    """입력 계약 ③층 — 창업 계획(Venture). **기업이 직접 넣는 유일한 층이다.**
+
+    ①자리·②상권은 우리가 가진 데이터에서 자동으로 나오지만, 아직 없는 가게의 강점과
+    의도는 데이터에서 나올 수 없다(docs/feature-program.md §0-B). 그래서 이 층이
+    **리뷰를 대신하는 근거의 원천**이고 HA 의 `allowed_text` 에 합류한다.
+
+    ⚠ `strengths` 는 검증된 사실이 아니라 **기업의 주장**이다. 점주가 제공한 리뷰·메뉴와
+    같은 등급으로 다루되(그래서 allowed_text 에 들어간다), 우리가 확인한 수치와
+    같은 자리에 두지 않는다.
+    """
+    industry: str                          # 업종 — StoreProfile.category 보다 구체적일 수 있다
+    target_customer: str                   # 목표 고객 (예: "30대 직장인 점심 수요")
+    # 예산은 **구간**으로 받는다. 출력의 budget_share 는 int 퍼센트라 절대액이 구조적으로
+    # 못 들어가고(§0-F), 실제 금액은 이 구간에서 파생한다 — "얼마를 쓸지는 기업 몫".
+    budget_krw_min: int = Field(gt=0)      # 월 마케팅 예산 하한(원)
+    budget_krw_max: int = Field(gt=0)      # 월 마케팅 예산 상한(원)
+    open_date: str                         # 개업 예정일 YYYY-MM-DD
+    strengths: list[str] = []              # 내세울 강점 — 기업 주장
+    # Posting 3-Tier 시나리오와의 연결(premium/value/factory). 주면 그 전략의
+    # 회수 가정과 어긋나는 제안을 사람이 대조할 수 있다.
+    tier: str | None = None
 
 
 class StoreProfile(BaseModel):
@@ -17,10 +41,12 @@ class StoreProfile(BaseModel):
     # 입력 계약 ①층(자리) — `gold/{거점}/vacant_units.json` 의 유닛 id.
     # 주면 그 공실의 면적·층·직전 업종·건물 공실률이 생성 근거에 합류한다
     # (services/program_site · docs/feature-program.md §0-B).
-    # ⚠ 이 모델은 본래 **영업 중인 가게** 전제로 만들어졌다. 공실 대상 입력이 3층으로
-    # 완성되려면 ③층(창업계획: 업종·목표고객·예산·개업일·강점)이 더 필요하다 —
-    # 아직 미구현이라, unit_id 만으로는 '방문 후기형 포스팅' 문제가 다 풀리지 않는다.
+    # ⚠ 이 모델은 본래 **영업 중인 가게** 전제로 만들어졌다. 공실 대상 입력은
+    # ③층(venture)까지 채워야 완성된다 — 그때 비로소 "아직 개업 전"이 추정이 아니라
+    # **확정**이 되어 '방문 후기형 포스팅' 문제가 닫힌다(services/program_venture).
     unit_id: str | None = None
+    # 입력 계약 ③층(창업계획). 공실 대상이면 이걸 채운다.
+    venture: VenturePlan | None = None
     address: str | None = None
     reviews: list[str] = []           # 리뷰·블로그 텍스트 (공식 API 또는 점주 제공)
     image_urls: list[str] = []        # 상가 사진 (점주 제공 원칙) — vision 분석 입력
