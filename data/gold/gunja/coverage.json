@@ -2,40 +2,40 @@
   "slug": "gunja",
   "hub_name": "군자역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:54",
-  "shown": 426,
-  "excluded_total": 1629,
+  "built_at": "2026-08-23T19:59:43",
+  "shown": 437,
+  "excluded_total": 1618,
   "excluded_unknown": 208,
-  "excluded_non_commercial": 1421,
-  "coverage_pct": 20.7,
+  "excluded_non_commercial": 1410,
+  "coverage_pct": 21.3,
   "status": {
-    "full": 249,
-    "partial": 66,
-    "high": 40,
-    "empty": 71
+    "full": 273,
+    "partial": 54,
+    "high": 42,
+    "empty": 68
   },
   "source": {
     "stores+ledger": 333,
-    "polygon_only": 71,
-    "pip_only": 20,
+    "polygon_only": 68,
+    "pip_only": 34,
     "stores+ledger+pip": 2
   },
-  "reference_vacancy_pct": 17.1,
+  "reference_vacancy_pct": 13.3,
   "reference_buildings": 315,
   "reference_coverage_pct": 99.4,
-  "mixed_vacancy_pct": 18.8,
+  "mixed_vacancy_pct": 13.7,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 287,
-      "active": 621,
-      "capacity": 732,
-      "vacancy_pct": 15.2
+      "active": 654,
+      "capacity": 741,
+      "vacancy_pct": 11.7
     },
     "expos_units": {
       "buildings": 28,
-      "active": 64,
+      "active": 70,
       "capacity": 94,
-      "vacancy_pct": 31.9
+      "vacancy_pct": 25.5
     },
     "floor_approx": {
       "buildings": 2,

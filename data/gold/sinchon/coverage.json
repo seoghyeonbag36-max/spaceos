@@ -2,40 +2,40 @@
   "slug": "sinchon",
   "hub_name": "신촌·이대",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:12",
-  "shown": 1466,
-  "excluded_total": 2234,
-  "excluded_unknown": 306,
-  "excluded_non_commercial": 1928,
-  "coverage_pct": 39.6,
+  "built_at": "2026-08-23T19:51:04",
+  "shown": 1474,
+  "excluded_total": 2226,
+  "excluded_unknown": 307,
+  "excluded_non_commercial": 1919,
+  "coverage_pct": 39.8,
   "status": {
-    "full": 758,
-    "partial": 290,
-    "high": 156,
-    "empty": 262
+    "full": 795,
+    "partial": 273,
+    "high": 150,
+    "empty": 256
   },
   "source": {
-    "stores+ledger": 1080,
-    "pip_only": 105,
-    "polygon_only": 260,
+    "stores+ledger": 1079,
+    "pip_only": 120,
+    "polygon_only": 254,
     "stores+ledger+pip": 21
   },
-  "reference_vacancy_pct": 26.2,
-  "reference_buildings": 794,
+  "reference_vacancy_pct": 23.6,
+  "reference_buildings": 793,
   "reference_coverage_pct": 96.6,
-  "mixed_vacancy_pct": 28.6,
+  "mixed_vacancy_pct": 26.4,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 690,
-      "active": 1580,
-      "capacity": 1977,
-      "vacancy_pct": 20.1
+      "active": 1633,
+      "capacity": 1972,
+      "vacancy_pct": 17.2
     },
     "expos_units": {
-      "buildings": 104,
-      "active": 723,
-      "capacity": 1145,
-      "vacancy_pct": 36.9
+      "buildings": 103,
+      "active": 727,
+      "capacity": 1119,
+      "vacancy_pct": 35.0
     },
     "floor_approx": {
       "buildings": 28,

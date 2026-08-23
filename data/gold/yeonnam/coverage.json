@@ -2,40 +2,40 @@
   "slug": "yeonnam",
   "hub_name": "연남동",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:41:59",
-  "shown": 1134,
-  "excluded_total": 1586,
+  "built_at": "2026-08-23T19:41:49",
+  "shown": 1137,
+  "excluded_total": 1583,
   "excluded_unknown": 380,
-  "excluded_non_commercial": 1206,
-  "coverage_pct": 41.7,
+  "excluded_non_commercial": 1203,
+  "coverage_pct": 41.8,
   "status": {
-    "full": 654,
-    "partial": 212,
-    "high": 108,
-    "empty": 160
+    "full": 681,
+    "partial": 199,
+    "high": 104,
+    "empty": 153
   },
   "source": {
     "stores+ledger": 909,
-    "polygon_only": 156,
-    "pip_only": 67,
+    "polygon_only": 151,
+    "pip_only": 75,
     "stores+ledger+pip": 2
   },
-  "reference_vacancy_pct": 22.9,
+  "reference_vacancy_pct": 20.7,
   "reference_buildings": 827,
   "reference_coverage_pct": 99.5,
-  "mixed_vacancy_pct": 52.1,
+  "mixed_vacancy_pct": 50.5,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 770,
-      "active": 1773,
-      "capacity": 2077,
-      "vacancy_pct": 14.6
+      "active": 1857,
+      "capacity": 2123,
+      "vacancy_pct": 12.5
     },
     "expos_units": {
       "buildings": 57,
-      "active": 152,
-      "capacity": 419,
-      "vacancy_pct": 63.7
+      "active": 162,
+      "capacity": 422,
+      "vacancy_pct": 61.6
     },
     "floor_approx": {
       "buildings": 4,

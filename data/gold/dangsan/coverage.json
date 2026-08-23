@@ -2,39 +2,39 @@
   "slug": "dangsan",
   "hub_name": "당산",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:44:06",
-  "shown": 246,
-  "excluded_total": 244,
+  "built_at": "2026-08-23T20:02:59",
+  "shown": 249,
+  "excluded_total": 241,
   "excluded_unknown": 25,
-  "excluded_non_commercial": 219,
-  "coverage_pct": 50.2,
+  "excluded_non_commercial": 216,
+  "coverage_pct": 50.8,
   "status": {
-    "full": 122,
-    "partial": 55,
-    "high": 26,
-    "empty": 43
+    "full": 125,
+    "partial": 54,
+    "high": 29,
+    "empty": 41
   },
   "source": {
     "stores+ledger": 196,
-    "polygon_only": 43,
-    "pip_only": 7
+    "polygon_only": 41,
+    "pip_only": 12
   },
-  "reference_vacancy_pct": 38.4,
+  "reference_vacancy_pct": 37.1,
   "reference_buildings": 141,
   "reference_coverage_pct": 96.6,
-  "mixed_vacancy_pct": 34.4,
+  "mixed_vacancy_pct": 33.9,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 116,
-      "active": 293,
-      "capacity": 337,
-      "vacancy_pct": 13.1
+      "active": 300,
+      "capacity": 339,
+      "vacancy_pct": 11.5
     },
     "expos_units": {
       "buildings": 25,
-      "active": 329,
-      "capacity": 672,
-      "vacancy_pct": 51.0
+      "active": 335,
+      "capacity": 671,
+      "vacancy_pct": 50.1
     },
     "floor_approx": {
       "buildings": 5,

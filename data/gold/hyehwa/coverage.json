@@ -2,40 +2,40 @@
   "slug": "hyehwa",
   "hub_name": "혜화·대학로",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:44:06",
-  "shown": 864,
-  "excluded_total": 1591,
+  "built_at": "2026-08-23T20:02:55",
+  "shown": 871,
+  "excluded_total": 1584,
   "excluded_unknown": 221,
-  "excluded_non_commercial": 1370,
-  "coverage_pct": 35.2,
+  "excluded_non_commercial": 1363,
+  "coverage_pct": 35.5,
   "status": {
-    "full": 503,
-    "partial": 140,
-    "high": 70,
-    "empty": 151
+    "full": 516,
+    "partial": 136,
+    "high": 72,
+    "empty": 147
   },
   "source": {
-    "polygon_only": 149,
+    "polygon_only": 145,
     "stores+ledger": 617,
-    "pip_only": 90,
+    "pip_only": 101,
     "stores+ledger+pip": 8
   },
-  "reference_vacancy_pct": 24.0,
+  "reference_vacancy_pct": 22.8,
   "reference_buildings": 498,
   "reference_coverage_pct": 99.0,
-  "mixed_vacancy_pct": 28.0,
+  "mixed_vacancy_pct": 27.1,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 459,
-      "active": 970,
+      "active": 985,
       "capacity": 1141,
-      "vacancy_pct": 15.0
+      "vacancy_pct": 13.7
     },
     "expos_units": {
       "buildings": 39,
-      "active": 141,
-      "capacity": 320,
-      "vacancy_pct": 55.9
+      "active": 142,
+      "capacity": 318,
+      "vacancy_pct": 55.3
     },
     "floor_approx": {
       "buildings": 5,

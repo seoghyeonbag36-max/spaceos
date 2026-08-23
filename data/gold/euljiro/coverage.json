@@ -2,40 +2,40 @@
   "slug": "euljiro",
   "hub_name": "을지로(힙지로)",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:42:13",
-  "shown": 1970,
-  "excluded_total": 1114,
+  "built_at": "2026-08-23T19:43:13",
+  "shown": 1978,
+  "excluded_total": 1106,
   "excluded_unknown": 172,
-  "excluded_non_commercial": 942,
-  "coverage_pct": 63.9,
+  "excluded_non_commercial": 934,
+  "coverage_pct": 64.1,
   "status": {
-    "full": 785,
-    "partial": 211,
-    "high": 136,
-    "empty": 838
+    "full": 820,
+    "partial": 196,
+    "high": 145,
+    "empty": 817
   },
   "source": {
     "stores+ledger": 837,
-    "polygon_only": 837,
+    "polygon_only": 816,
     "stores+ledger+pip": 71,
-    "pip_only": 225
+    "pip_only": 254
   },
-  "reference_vacancy_pct": 52.7,
+  "reference_vacancy_pct": 51.3,
   "reference_buildings": 734,
   "reference_coverage_pct": 99.2,
-  "mixed_vacancy_pct": 51.5,
+  "mixed_vacancy_pct": 50.3,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 697,
-      "active": 1849,
-      "capacity": 2263,
-      "vacancy_pct": 18.3
+      "active": 1871,
+      "capacity": 2251,
+      "vacancy_pct": 16.9
     },
     "expos_units": {
       "buildings": 37,
-      "active": 467,
-      "capacity": 2633,
-      "vacancy_pct": 82.3
+      "active": 500,
+      "capacity": 2618,
+      "vacancy_pct": 80.9
     },
     "floor_approx": {
       "buildings": 6,

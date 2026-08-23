@@ -2,40 +2,40 @@
   "slug": "sungshin",
   "hub_name": "성신여대·돈암",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:29",
-  "shown": 717,
-  "excluded_total": 979,
+  "built_at": "2026-08-23T19:55:38",
+  "shown": 723,
+  "excluded_total": 973,
   "excluded_unknown": 209,
-  "excluded_non_commercial": 770,
-  "coverage_pct": 42.3,
+  "excluded_non_commercial": 764,
+  "coverage_pct": 42.6,
   "status": {
-    "full": 439,
-    "partial": 90,
-    "high": 59,
-    "empty": 129
+    "full": 459,
+    "partial": 84,
+    "high": 54,
+    "empty": 126
   },
   "source": {
     "stores+ledger": 555,
-    "polygon_only": 129,
+    "polygon_only": 126,
     "stores+ledger+pip": 13,
-    "pip_only": 20
+    "pip_only": 29
   },
-  "reference_vacancy_pct": 26.8,
+  "reference_vacancy_pct": 24.0,
   "reference_buildings": 374,
   "reference_coverage_pct": 97.9,
-  "mixed_vacancy_pct": 28.9,
+  "mixed_vacancy_pct": 26.3,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 353,
-      "active": 735,
-      "capacity": 868,
-      "vacancy_pct": 15.3
+      "active": 765,
+      "capacity": 876,
+      "vacancy_pct": 12.7
     },
     "expos_units": {
       "buildings": 21,
-      "active": 141,
-      "capacity": 328,
-      "vacancy_pct": 57.0
+      "active": 147,
+      "capacity": 324,
+      "vacancy_pct": 54.6
     },
     "floor_approx": {
       "buildings": 8,

@@ -2,40 +2,40 @@
   "slug": "nambu",
   "hub_name": "남부터미널",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:44:00",
-  "shown": 492,
-  "excluded_total": 574,
+  "built_at": "2026-08-23T20:00:46",
+  "shown": 493,
+  "excluded_total": 573,
   "excluded_unknown": 82,
-  "excluded_non_commercial": 492,
+  "excluded_non_commercial": 491,
   "coverage_pct": 46.2,
   "status": {
-    "full": 232,
-    "partial": 64,
-    "high": 79,
-    "empty": 117
+    "full": 238,
+    "partial": 69,
+    "high": 72,
+    "empty": 114
   },
   "source": {
     "stores+ledger": 315,
-    "polygon_only": 117,
-    "pip_only": 59,
+    "polygon_only": 114,
+    "pip_only": 63,
     "stores+ledger+pip": 1
   },
-  "reference_vacancy_pct": 62.7,
+  "reference_vacancy_pct": 61.9,
   "reference_buildings": 269,
   "reference_coverage_pct": 98.9,
-  "mixed_vacancy_pct": 75.5,
+  "mixed_vacancy_pct": 75.1,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 220,
-      "active": 580,
-      "capacity": 672,
-      "vacancy_pct": 13.7
+      "active": 586,
+      "capacity": 670,
+      "vacancy_pct": 12.5
     },
     "expos_units": {
       "buildings": 49,
-      "active": 623,
-      "capacity": 2554,
-      "vacancy_pct": 75.6
+      "active": 636,
+      "capacity": 2534,
+      "vacancy_pct": 74.9
     },
     "floor_approx": {
       "buildings": 3,

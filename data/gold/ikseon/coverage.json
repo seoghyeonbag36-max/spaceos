@@ -2,40 +2,40 @@
   "slug": "ikseon",
   "hub_name": "익선동",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:42:02",
-  "shown": 1751,
-  "excluded_total": 657,
+  "built_at": "2026-08-23T19:42:11",
+  "shown": 1759,
+  "excluded_total": 649,
   "excluded_unknown": 203,
-  "excluded_non_commercial": 454,
-  "coverage_pct": 72.7,
+  "excluded_non_commercial": 446,
+  "coverage_pct": 73.0,
   "status": {
-    "full": 1048,
-    "partial": 214,
-    "high": 154,
-    "empty": 335
+    "full": 1075,
+    "partial": 208,
+    "high": 155,
+    "empty": 321
   },
   "source": {
     "stores+ledger": 1187,
-    "pip_only": 167,
-    "polygon_only": 332,
+    "pip_only": 186,
+    "polygon_only": 321,
     "stores+ledger+pip": 65
   },
-  "reference_vacancy_pct": 58.6,
+  "reference_vacancy_pct": 58.0,
   "reference_buildings": 972,
   "reference_coverage_pct": 99.0,
-  "mixed_vacancy_pct": 57.1,
+  "mixed_vacancy_pct": 56.4,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 927,
-      "active": 1825,
-      "capacity": 2573,
-      "vacancy_pct": 29.1
+      "active": 1850,
+      "capacity": 2568,
+      "vacancy_pct": 28.0
     },
     "expos_units": {
       "buildings": 45,
-      "active": 560,
-      "capacity": 3184,
-      "vacancy_pct": 82.4
+      "active": 561,
+      "capacity": 3169,
+      "vacancy_pct": 82.3
     },
     "floor_approx": {
       "buildings": 10,

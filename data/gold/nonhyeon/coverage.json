@@ -2,46 +2,46 @@
   "slug": "nonhyeon",
   "hub_name": "논현동",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:40",
-  "shown": 835,
-  "excluded_total": 1080,
+  "built_at": "2026-08-23T19:57:18",
+  "shown": 845,
+  "excluded_total": 1070,
   "excluded_unknown": 178,
-  "excluded_non_commercial": 902,
-  "coverage_pct": 43.6,
+  "excluded_non_commercial": 892,
+  "coverage_pct": 44.1,
   "status": {
-    "full": 452,
-    "partial": 149,
-    "high": 81,
-    "empty": 153
+    "full": 486,
+    "partial": 135,
+    "high": 85,
+    "empty": 139
   },
   "source": {
     "stores+ledger": 631,
     "stores+ledger+pip": 5,
-    "polygon_only": 152,
-    "pip_only": 47
+    "polygon_only": 139,
+    "pip_only": 70
   },
-  "reference_vacancy_pct": 20.3,
-  "reference_buildings": 607,
-  "reference_coverage_pct": 99.3,
-  "mixed_vacancy_pct": 22.3,
+  "reference_vacancy_pct": 15.8,
+  "reference_buildings": 609,
+  "reference_coverage_pct": 99.7,
+  "mixed_vacancy_pct": 17.8,
   "by_capacity_method": {
     "floor_ouln": {
-      "buildings": 547,
-      "active": 1490,
-      "capacity": 1780,
-      "vacancy_pct": 16.3
+      "buildings": 549,
+      "active": 1569,
+      "capacity": 1796,
+      "vacancy_pct": 12.6
     },
     "expos_units": {
       "buildings": 60,
-      "active": 235,
-      "capacity": 385,
-      "vacancy_pct": 39.0
+      "active": 280,
+      "capacity": 399,
+      "vacancy_pct": 29.8
     },
     "floor_approx": {
-      "buildings": 4,
-      "active": 4,
-      "capacity": 13,
-      "vacancy_pct": 69.2
+      "buildings": 2,
+      "active": 2,
+      "capacity": 7,
+      "vacancy_pct": 71.4
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

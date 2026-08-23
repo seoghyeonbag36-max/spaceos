@@ -2,39 +2,39 @@
   "slug": "anam",
   "hub_name": "안암·고려대",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:32",
-  "shown": 985,
-  "excluded_total": 1886,
+  "built_at": "2026-08-23T19:56:12",
+  "shown": 989,
+  "excluded_total": 1882,
   "excluded_unknown": 99,
-  "excluded_non_commercial": 1787,
-  "coverage_pct": 34.3,
+  "excluded_non_commercial": 1783,
+  "coverage_pct": 34.4,
   "status": {
-    "full": 345,
-    "partial": 124,
-    "high": 269,
-    "empty": 247
+    "full": 359,
+    "partial": 127,
+    "high": 265,
+    "empty": 238
   },
   "source": {
     "stores+ledger": 163,
-    "polygon_only": 247,
-    "pip_only": 575
+    "polygon_only": 238,
+    "pip_only": 588
   },
-  "reference_vacancy_pct": 8.5,
+  "reference_vacancy_pct": 6.9,
   "reference_buildings": 123,
   "reference_coverage_pct": 99.2,
-  "mixed_vacancy_pct": 10.7,
+  "mixed_vacancy_pct": 9.2,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 113,
-      "active": 320,
-      "capacity": 338,
-      "vacancy_pct": 5.3
+      "active": 330,
+      "capacity": 343,
+      "vacancy_pct": 3.8
     },
     "expos_units": {
       "buildings": 10,
-      "active": 48,
-      "capacity": 64,
-      "vacancy_pct": 25.0
+      "active": 50,
+      "capacity": 65,
+      "vacancy_pct": 23.1
     },
     "floor_approx": {
       "buildings": 1,

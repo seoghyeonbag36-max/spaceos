@@ -2,40 +2,40 @@
   "slug": "namdaemun",
   "hub_name": "남대문시장",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:48",
-  "shown": 384,
-  "excluded_total": 403,
+  "built_at": "2026-08-23T19:58:55",
+  "shown": 387,
+  "excluded_total": 400,
   "excluded_unknown": 90,
-  "excluded_non_commercial": 313,
-  "coverage_pct": 48.8,
+  "excluded_non_commercial": 310,
+  "coverage_pct": 49.2,
   "status": {
-    "full": 191,
-    "partial": 55,
-    "high": 34,
-    "empty": 104
+    "full": 197,
+    "partial": 57,
+    "high": 33,
+    "empty": 100
   },
   "source": {
     "stores+ledger": 213,
-    "polygon_only": 103,
-    "pip_only": 43,
+    "polygon_only": 99,
+    "pip_only": 50,
     "stores+ledger+pip": 25
   },
-  "reference_vacancy_pct": 17.3,
+  "reference_vacancy_pct": 16.4,
   "reference_buildings": 193,
   "reference_coverage_pct": 99.0,
-  "mixed_vacancy_pct": 9.7,
+  "mixed_vacancy_pct": 9.2,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 169,
-      "active": 420,
-      "capacity": 503,
-      "vacancy_pct": 16.5
+      "active": 428,
+      "capacity": 499,
+      "vacancy_pct": 14.2
     },
     "expos_units": {
       "buildings": 24,
-      "active": 947,
-      "capacity": 1149,
-      "vacancy_pct": 17.6
+      "active": 949,
+      "capacity": 1148,
+      "vacancy_pct": 17.3
     },
     "floor_approx": {
       "buildings": 2,

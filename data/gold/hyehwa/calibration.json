@@ -3,34 +3,34 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>혜화동",
   "anchor_vac_small_pct": 0.561011702300988,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 28.0,
-  "alpha_street": 0.044,
-  "gap_pp": 26.8,
+  "estimated_vacancy_pct": 27.1,
+  "alpha_street": 0.045,
+  "gap_pp": 25.9,
   "buildings_used": 625,
   "rone_aligned": {
     "mid": {
       "buildings": 357,
-      "vacancy_units_pct": 27.1,
+      "vacancy_units_pct": 27.2,
       "buildings_floor": 355,
-      "vacancy_floor_hi_pct": 19.1,
-      "vacancy_floor_lo_pct": 38.1,
-      "vacancy_area_pct": 20.1,
+      "vacancy_floor_hi_pct": 17.7,
+      "vacancy_floor_lo_pct": 35.8,
+      "vacancy_area_pct": 18.6,
       "anchor_pct": 1.23,
-      "gap_pp": 18.9
+      "gap_pp": 17.4
     },
     "small": {
       "buildings": 187,
-      "vacancy_units_pct": 15.2,
+      "vacancy_units_pct": 15.5,
       "buildings_floor": 183,
       "vacancy_floor_hi_pct": 9.3,
-      "vacancy_floor_lo_pct": 37.0,
+      "vacancy_floor_lo_pct": 34.9,
       "vacancy_area_pct": 7.2,
       "anchor_pct": 0.56,
       "gap_pp": 6.6
     },
     "mall": {
       "buildings": 50,
-      "vacancy_units_pct": 57.9
+      "vacancy_units_pct": 57.8
     },
     "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
   },
@@ -52,20 +52,20 @@
       "buildings": 559
     },
     "mall": {
-      "estimated_vacancy_pct": 54.9,
+      "estimated_vacancy_pct": 54.6,
       "anchor_pct": 1.23,
-      "alpha": 0.022,
-      "gap_pp": 53.7,
+      "alpha": 0.023,
+      "gap_pp": 53.4,
       "buildings": 52
     }
   },
   "methods": {
     "expos_units": {
-      "estimated_vacancy_pct": 54.9,
+      "estimated_vacancy_pct": 54.6,
       "buildings": 52,
       "anchor_pct": 1.23,
-      "alpha": 0.022,
-      "gap_pp": 53.7
+      "alpha": 0.023,
+      "gap_pp": 53.4
     },
     "floor_approx": {
       "estimated_vacancy_pct": 57.1,

@@ -2,40 +2,40 @@
   "slug": "gongdeok",
   "hub_name": "공덕역",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:43:53",
-  "shown": 423,
-  "excluded_total": 514,
+  "built_at": "2026-08-23T19:59:32",
+  "shown": 426,
+  "excluded_total": 511,
   "excluded_unknown": 87,
-  "excluded_non_commercial": 427,
-  "coverage_pct": 45.1,
+  "excluded_non_commercial": 424,
+  "coverage_pct": 45.5,
   "status": {
-    "full": 206,
-    "partial": 56,
-    "high": 109,
-    "empty": 52
+    "full": 214,
+    "partial": 54,
+    "high": 110,
+    "empty": 48
   },
   "source": {
     "stores+ledger": 362,
-    "polygon_only": 52,
-    "stores+ledger+pip": 1,
-    "pip_only": 8
+    "pip_only": 15,
+    "polygon_only": 48,
+    "stores+ledger+pip": 1
   },
-  "reference_vacancy_pct": 50.4,
+  "reference_vacancy_pct": 49.3,
   "reference_buildings": 226,
   "reference_coverage_pct": 100.0,
-  "mixed_vacancy_pct": 70.1,
+  "mixed_vacancy_pct": 69.9,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 187,
-      "active": 422,
-      "capacity": 473,
-      "vacancy_pct": 10.8
+      "active": 431,
+      "capacity": 474,
+      "vacancy_pct": 9.1
     },
     "expos_units": {
       "buildings": 39,
-      "active": 795,
-      "capacity": 1980,
-      "vacancy_pct": 59.8
+      "active": 800,
+      "capacity": 1956,
+      "vacancy_pct": 59.1
     }
   },
   "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."

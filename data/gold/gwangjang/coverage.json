@@ -2,40 +2,40 @@
   "slug": "gwangjang",
   "hub_name": "광장시장·종로4가",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T16:42:45",
-  "shown": 1751,
-  "excluded_total": 1073,
+  "built_at": "2026-08-23T19:46:36",
+  "shown": 1760,
+  "excluded_total": 1064,
   "excluded_unknown": 234,
-  "excluded_non_commercial": 839,
-  "coverage_pct": 62.0,
+  "excluded_non_commercial": 830,
+  "coverage_pct": 62.3,
   "status": {
-    "full": 503,
-    "partial": 240,
-    "high": 159,
-    "empty": 849
+    "full": 549,
+    "partial": 235,
+    "high": 143,
+    "empty": 833
   },
   "source": {
     "stores+ledger": 685,
     "stores+ledger+pip": 63,
-    "polygon_only": 846,
-    "pip_only": 157
+    "polygon_only": 832,
+    "pip_only": 180
   },
-  "reference_vacancy_pct": 68.3,
+  "reference_vacancy_pct": 66.6,
   "reference_buildings": 615,
   "reference_coverage_pct": 97.8,
-  "mixed_vacancy_pct": 70.2,
+  "mixed_vacancy_pct": 68.8,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 560,
-      "active": 1076,
-      "capacity": 1461,
-      "vacancy_pct": 26.4
+      "active": 1119,
+      "capacity": 1434,
+      "vacancy_pct": 22.0
     },
     "expos_units": {
       "buildings": 55,
-      "active": 533,
-      "capacity": 3614,
-      "vacancy_pct": 85.3
+      "active": 565,
+      "capacity": 3602,
+      "vacancy_pct": 84.3
     },
     "floor_approx": {
       "buildings": 14,
