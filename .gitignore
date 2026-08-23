@@ -68,6 +68,11 @@ data/gold/*/*
 # 디스크에서 읽어 `anchor_pct`/`anchor_gap_pp` 로 내려보낸다. 2026-08-15 까지 빠져 있어
 # **프로덕션에서는 garosugil(디렉터리 통째 추적)만 앵커가 붙고 나머지는 조용히 None** 이었다.
 !data/gold/*/calibration.json
+# 예외: 실제 공실 유닛 인벤토리(54거점 580유닛, 합계 388KB) — Posting 시뮬레이션과
+# Program 자리층의 재료다. 08-22 에 54/54 를 채워 놓고도 추적 밖이라 배선이 막혀
+# 있었다(calibration.json 이 40거점에서 조용히 None 이던 것과 똑같은 실패 양식).
+# 빠지면 배포 환경에서 자리층이 통째로 비고, 화면은 "공실이 없다"처럼 보인다.
+!data/gold/*/vacant_units.json
 # 예외: TRDAR 상권 수요신호(190행 96KB) — ml/training/train_gnn.py 가 GNN 노드 피처로 읽는다.
 # 빠지면 재학습이 조용히 수요 피처 없이(58열) 돌아 lift 가 +4.4% → +3.1% 로 되돌아간다.
 # 서빙(recommend json)은 영향 없지만 **재현이 불가능해진다**.

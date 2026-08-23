@@ -7,10 +7,10 @@ from fastapi import APIRouter, HTTPException, Query
 
 from app.schemas.district import Marketing
 from app.schemas.marketing import (
-    StoreMarketing, StorePlaceLookup, StoreProfile, StoreReviewLookup,
+    StoreMarketing, StorePlaceLookup, StoreProfile, StoreReviewLookup, VacantSiteList,
 )
 from app.services import marketing as mkt
-from app.services import store_lookup
+from app.services import program_site, store_lookup
 
 router = APIRouter()
 
@@ -51,6 +51,25 @@ async def find_reviews(
     address 를 주면 그 동(洞)으로 질의를 좁혀 동명이지 오염을 줄인다.
     """
     return store_lookup.find_reviews(name, address, limit)
+
+
+@router.get("/sites", response_model=VacantSiteList)
+async def list_vacant_sites(
+    district_id: str = Query(..., min_length=1, max_length=40, description="거점 id"),
+    limit: int = Query(50, ge=1, le=200),
+) -> dict:
+    """거점의 공실 유닛 목록 — Program 입력 계약 ①층(자리)의 후보다.
+
+    영업 중인 가게를 고르는 `/places` 와 목적이 정반대다: 저기는 이미 있는 가게를
+    특정하고, 여기는 **아직 아무도 없는 자리**를 고른다. 대상이 '공실에 창업할 기업'
+    으로 재정의되면서(docs/feature-program.md §0-B) 필요해진 표면이다.
+
+    Gold 미적재면 `site_source == "unavailable"` 로 빈 목록을 준다 — 404 가 아니다.
+    "이 거점을 모른다"와 "이 거점에 공실 산출물이 없다"는 다른 상태다.
+    """
+    sites = program_site.units(district_id)[:limit]
+    return {"district_id": district_id, "sites": sites,
+            **program_site.provenance(district_id)}
 
 
 @router.get("/{district_id}", response_model=Marketing)

@@ -206,7 +206,7 @@ def test_generate_store_marketing_llm(monkeypatch):
         offline=[LLMChannelPlan(channel="전단", content="시식 이벤트", rationale="유동객 근거")],
         ha_check="균형·공생·공감 점검 통과",
     )
-    monkeypatch.setattr(mkt, "_call_llm", lambda profile, tone, ctx: fake)
+    monkeypatch.setattr(mkt, "_call_llm", lambda profile, tone, ctx, site=None: fake)
 
     r = client.post(f"{V1}/marketing/generate", json=_PROFILE)
     assert r.status_code == 200
@@ -372,7 +372,7 @@ def test_menu_reaches_llm_prompt(monkeypatch):
 
     import app.services.marketing as m
 
-    def spy(profile, tone, ctx):
+    def spy(profile, tone, ctx, site=None):
         seen["menu"] = profile.get("menu")
         seen["prompt"] = m._SYSTEM_PROMPT
         from app.schemas.marketing import LLMChannelPlan, LLMStoreMarketing

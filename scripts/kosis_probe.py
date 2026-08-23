@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -63,24 +64,58 @@ def _key() -> str:
         "  발급된 키를 data/.env 의 KOSIS_API_KEY= 뒤에 붙인다.")
 
 
+# KOSIS 오류코드 30 = "데이터가 존재하지 않습니다". 목록 트리를 훑을 때 **잎 노드는
+# 반드시 이걸 낸다** — 자식이 없다는 뜻이지 실패가 아니다. 2026-08-23 이전에는 이걸
+# 치명 오류로 올려서 첫 잎에서 탐색 전체가 죽었다(루트 호출은 멀쩡히 30건을 준다).
+_ERR_EMPTY = "30"
+# 오류코드 40 = "1분간 호출가능건수(200건) 초과". 트리 순회는 호출이 수백 건이라
+# 반드시 걸린다(2026-08-23 실측). 한도는 **분당**이므로 기다리면 풀린다.
+_ERR_RATE = "40"
+_RATE_MIN_GAP_S = 0.32      # 200건/분 = 0.3초 간격. 조금 여유를 둔다.
+_RATE_BACKOFF_S = 62        # 걸렸을 때 창이 넘어갈 때까지
+
+_last_call = 0.0
+
+
 def _get(url: str, **params) -> object:
+    global _last_call
     params["apiKey"] = _key()
     params.setdefault("format", "json")
     params.setdefault("jsonVD", "Y")
     q = f"{url}?{urllib.parse.urlencode(params)}"
-    raw = urllib.request.urlopen(
-        urllib.request.Request(q, headers=_UA), timeout=40).read()
-    body = json.loads(raw.decode("utf-8", errors="replace"))
-    if isinstance(body, dict) and body.get("err"):
-        raise SystemExit(f"KOSIS 오류 {body['err']}: {body.get('errMsg')}")
-    return body
+    for attempt in range(3):
+        gap = time.monotonic() - _last_call
+        if gap < _RATE_MIN_GAP_S:
+            time.sleep(_RATE_MIN_GAP_S - gap)
+        _last_call = time.monotonic()
+        raw = urllib.request.urlopen(
+            urllib.request.Request(q, headers=_UA), timeout=40).read()
+        body = json.loads(raw.decode("utf-8", errors="replace"))
+        if not (isinstance(body, dict) and body.get("err")):
+            return body
+        err = str(body["err"])
+        if err == _ERR_EMPTY:
+            return []          # 빈 노드 — 순회를 계속한다
+        if err == _ERR_RATE and attempt < 2:
+            print(f"    [한도] 분당 200건 초과 — {_RATE_BACKOFF_S}초 대기 후 재시도",
+                  file=sys.stderr, flush=True)
+            time.sleep(_RATE_BACKOFF_S)
+            continue
+        raise SystemExit(f"KOSIS 오류 {err}: {body.get('errMsg')}")
+    raise SystemExit("KOSIS 호출 한도를 계속 넘는다 — 잠시 뒤 다시 시도할 것")
 
 
-def _walk(parent: str, depth: int, needle: str, seen: set, out: list) -> None:
-    """통계목록 트리를 훑어 이름에 needle 이 든 통계표를 모은다.
+def _walk(parent: str, depth: int, needle: str, seen: set, out: list,
+          under: str | None = None) -> None:
+    """통계목록 트리를 훑어 needle 에 걸리는 통계표를 모은다.
 
-    KOSIS 목록은 대주제→중주제→통계표 계층이라 한 번의 호출로는 안 나온다.
+    KOSIS 목록은 대주제→조사명→통계표 계층이라 한 번의 호출로는 안 나온다.
     깊이 제한을 두는 이유는 전체 트리가 1,000여 통계에 달해서다.
+
+    `under` 는 **이미 이름이 걸린 상위 분류**다. 이게 필요한 이유: 통계표 이름에는
+    조사명이 안 들어간다("서비스업조사" 아래의 표는 "시도별 …" 식이다). 그래서
+    통계표 이름만 보고 매칭하면 조사를 찾아 놓고도 표를 하나도 못 담는다
+    (2026-08-23 실측 — 이것과 err 30 두 개가 겹쳐 탐색이 항상 빈손이었다).
     """
     if depth > 3:
         return
@@ -97,25 +132,40 @@ def _walk(parent: str, depth: int, needle: str, seen: set, out: list) -> None:
         name = r.get("LIST_NM") or r.get("TBL_NM") or ""
         tbl = r.get("TBL_ID")
         lid = r.get("LIST_ID")
-        if tbl and needle in name and tbl not in seen:
+        hit = needle in name
+        if tbl and (hit or under) and tbl not in seen:
             seen.add(tbl)
-            out.append((r.get("ORG_ID"), tbl, name))
+            out.append((r.get("ORG_ID"), tbl, name, under or name))
         if lid and lid not in seen:
             seen.add(lid)
-            if needle in name or depth < 2:
-                _walk(lid, depth + 1, needle, seen, out)
+            # 이름이 걸린 분류 아래는 전부 담고, 아직 못 걸렸으면 두 단계까지 더 판다.
+            if under or hit:
+                _walk(lid, depth + 1, needle, seen, out, under or name)
+            elif depth < 2:
+                _walk(lid, depth + 1, needle, seen, out, None)
 
 
-def cmd_search(needle: str) -> None:
+def cmd_roots() -> None:
+    """대주제 30건. 여기서 LIST_ID 를 골라 `search <낱말> <루트>` 로 범위를 좁힌다.
+
+    전체 순회는 호출이 수백 건이라 분당 한도(200)에 걸려 몇 분씩 기다린다.
+    찾는 조사가 어느 주제인지 알면 십수 건으로 끝난다.
+    """
+    rows = _get(LIST_URL, method="getList", vwCd="MT_ZTITLE", parentListId="")
+    for r in rows if isinstance(rows, list) else []:
+        print(f"  {r.get('LIST_ID'):8s} {r.get('LIST_NM')}")
+
+
+def cmd_search(needle: str, root: str = "") -> None:
     out: list = []
-    _walk("", 0, needle, set(), out)
+    _walk(root, 0, needle, set(), out)
     if not out:
         print(f"'{needle}' 로 찾은 통계표 없음 — 다른 낱말로 시도하거나 "
               f"kosis.kr 통합검색에서 tblId 를 직접 확인할 것")
         return
     print(f"'{needle}' 통계표 {len(out)}건")
-    for org, tbl, nm in out:
-        print(f"  orgId={org:6s} tblId={tbl:22s} {nm}")
+    for org, tbl, nm, cat in out:
+        print(f"  orgId={org or '?':6s} tblId={tbl:22s} [{cat}] {nm}")
 
 
 def cmd_meta(org: str, tbl: str) -> None:
@@ -144,8 +194,10 @@ def main() -> None:
     a = sys.argv[1:]
     if not a:
         raise SystemExit(__doc__)
-    if a[0] == "search" and len(a) == 2:
-        cmd_search(a[1])
+    if a[0] == "roots" and len(a) == 1:
+        cmd_roots()
+    elif a[0] == "search" and len(a) in (2, 3):
+        cmd_search(a[1], a[2] if len(a) == 3 else "")
     elif a[0] == "meta" and len(a) == 3:
         cmd_meta(a[1], a[2])
     elif a[0] == "data" and len(a) == 3:

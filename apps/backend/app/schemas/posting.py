@@ -23,6 +23,10 @@ class SimulateResult(BaseModel):
     industry_type: str | None
     scenarios: dict[str, TierScenario]
     source: str  # "copilot" | "fallback-3tier"
+    # 폴백으로 떨어진 **이유**. 코파일럿 미설정이면 None(폴백이 정상 동작이다),
+    # 설정돼 있는데 실패했으면 계약 위반·연결 실패 사유가 들어간다.
+    # 이 둘을 구분하지 않으면 코파일럿이 죽어 있어도 화면이 똑같아 아무도 모른다.
+    source_note: str | None = None
     # 시나리오를 만든 입력의 **필드별** 출처: area/rent/prem/foot →
     #   "rone"(R-ONE 임대료) | "flpop"(서울 상권분석 유동인구) | "seed"(손으로 적은 프록시)
     # source 가 코파일럿이냐 폴백이냐와 별개로, 입력이 실측인지 프록시인지를 밝힌다.
