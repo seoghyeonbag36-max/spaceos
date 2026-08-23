@@ -268,7 +268,7 @@ def test_violation_falls_back_to_stub(monkeypatch):
     monkeypatch.setattr(settings, "llm_api_key", "test-key")
     bad = _store(offline=[_act(
         channel="전단", content="런치 세트 12,000원", rationale="점심 수요")])
-    monkeypatch.setattr(mkt, "_call_llm", lambda profile, tone, ctx, site=None: bad)
+    monkeypatch.setattr(mkt, "_call_llm", lambda profile, tone, ctx, site=None, venture=None: bad)
 
     body = client.post(f"{V1}/marketing/generate", json=_PROFILE).json()
     assert body["source"] == "rule-stub", "위반인데 생성물이 그대로 나갔다"
@@ -286,7 +286,7 @@ def test_warning_keeps_llm_output(monkeypatch):
     monkeypatch.setattr(settings, "llm_api_key", "test-key")
     warn = _store(online=[_perf(
         channel="인스타그램", content="강남 최고의 이자카야", rationale="분위기가 좋다는 리뷰")])
-    monkeypatch.setattr(mkt, "_call_llm", lambda profile, tone, ctx, site=None: warn)
+    monkeypatch.setattr(mkt, "_call_llm", lambda profile, tone, ctx, site=None, venture=None: warn)
 
     body = client.post(f"{V1}/marketing/generate", json=_PROFILE).json()
     assert body["source"] == "llm", "경고인데 응답을 버렸다"

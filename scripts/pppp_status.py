@@ -233,7 +233,20 @@ def platform_track() -> Track:
             "KPI 업종추천 off-prior Top-3 ≥50%", min(1.0, off / 0.50),
             f"{off:.1%} — 거점 사전분포로는 정의상 0% 인 자리 "
             f"{m.get('offprior_nodes', '?')}개 기준. 값싼 규칙 하한 42.4%"
-            + (f" · macro-F1 {f1:.4f}(관측)" if f1 is not None else ""),
+            + (f" · macro-F1 {f1:.4f}(관측)" if f1 is not None else "")
+            + ". ⚠ 2026-08-23 **이웃 업종 분포 피처(8열) 시도 — 개선 없음.** "
+              "§9 가 남긴 레버('약국↔병원 인접')를 `_neighbor_label_block` 으로 "
+              "구현해 113열로 재학습했다(train 라벨만 집계·self 제외로 누출 차단). "
+              "결과 off-prior 37.63% → **36.49%** · Top-3 91.86% → 91.40% · "
+              "macro-F1 0.2622 → **0.2803**. 표본 877 에서 표준오차 ≈1.63%p 라 "
+              "−1.14%p 는 **1σ 이내 — 유의하지 않다**(올리지도 내리지도 못했다). "
+              "게이트 지표가 나아지지 않았으므로 산출물은 되돌렸고 피처는 기본 off "
+              "(`--neighbor` 로만 켜진다). 코드와 음성 결과는 남겼다 — 지우면 다음 "
+              "사람이 같은 것을 다시 시도한다. "
+              "다음 후보는 **조기 종료 기준**이다: val top1 로 멈추는데(ep113 종료) "
+              "top1 은 거점 사전분포에 지배되는 지표라 off-prior 가 최적화되기 전에 "
+              "멈췄을 수 있다 — macro-F1 만 +6.9% 오른 것이 이를 약하게 지지한다. "
+              "그 밖의 레버는 Platform 감성(막힘 6번)",
         ))
     return t
 
@@ -257,11 +270,25 @@ def posting_track(total: int) -> Track:
     # foot 은 절대수준만 실데이터(flpop)이고 거점 내 서열은 시드라 0.5 로 센다.
     rent = sum(1 for v in hubs.values() if v.get("rent_per_m2_krw_thousand"))
     foot = sum(1 for v in hubs.values() if v.get("flpop"))
-    per_hub = (rent + 0.5 * foot) / (4 * total) if total else 0.0
+    # area 는 오랫동안 "0/54" 로 **하드코딩**돼 있었다(08-23 발견). 실제로는
+    # vacant_units.json 의 모든 유닛에 채워져 있고, tier_scenarios 가 unit["area"] 로
+    # 그걸 그대로 쓴다 — 게이트만 몰랐고 Posting 진행률을 과소평가했다.
+    # 단 1.0 은 아니다: 값은 건축물대장 상업면적 ÷ capacity 라 **건물 단위는 실측,
+    # 건물 안 유닛 간 서열은 균등분할**이다(build_vacant_units.area_pyeong).
+    # foot 과 같은 성격이므로 같은 0.5 로 센다. 상가정보 flrNo 로 유닛별
+    # 실면적을 특정하면 그때 1.0 이다.
+    area = 0
+    for d in sorted(GOLD.glob("*/vacant_units.json")):
+        raw = _load(d)
+        units = raw.get("units") if isinstance(raw, dict) else raw
+        if units and all(u.get("area") for u in units):
+            area += 1
+    per_hub = (rent + 0.5 * foot + 0.5 * area) / (4 * total) if total else 0.0
     t.gates.append(Gate(
         "3-Tier 입력 4종 실데이터화", per_hub,
         f"rent {rent}/{total} ✅(R-ONE) · foot {foot}/{total} ◐(flpop+seed, 서열은 시드) · "
-        f"area 0/{total} ⬜ · prem 0/{total} ⬜(표본 밀도 부족)",
+        f"area {area}/{total} ◐(대장 상업면적÷capacity — 건물 실측, 유닛 서열은 균등분할) · "
+        f"prem 0/{total} ⬜(표본 밀도 부족)",
     ))
 
     # 주석 문구로 판정하면 주석만 고쳐도 "연동됨"이 된다. 어댑터라면 반드시 밖으로
@@ -301,29 +328,36 @@ def posting_track(total: int) -> Track:
     ))
 
     t.gates.append(Gate(
-        "3-Tier 비용 모델 보정", 2 / 3,
-        "배선 완료 2026-08-23 — 통과 조건 셋 중 **둘**. 08-23 오전에 KOSIS 비용률을 "
-        "정직하게 넣었더니 회수불가 96% 가 나왔고, 원인이 비용이 아니라 **매출의 면적 "
-        "기울기**였다(임대료는 면적에 비례하는데 매출은 안 그래서 임대료/매출이 6배 "
-        "부풀었다). 고정항을 없애고 매출을 면적에 온전히 비례시켰다: rev = area × "
-        "foot_k_norm × 거점별 실측 평당매출, cost = rent + rev × 비임차 영업비용률. "
-        "미지수가 여섯에서 **A(평균 점포 면적) 셋**으로 줄었고, A 는 마진이 아니라 "
-        "**임차료에서 독립 유도**한다(premium 12.6 · value 7.1 · factory 7.1평) — "
-        "마진에 맞추면 KOSIS 대조가 정의상 참이 되어 검증이 순환한다. "
-        "결과: 회수불가 **2.6%** ✅ · factory **90승/270** ✅(死문항 해소) · "
-        "마진 중앙 premium −1.2 / value 6.9 / factory 4.9% ↔ KOSIS 실측 5.8/7.0/8.8 — "
-        "**value·factory 는 대역 안, premium 은 밖** ❌. premium 이 낮은 것은 버그가 "
-        "아니라 §0-B 실측과 같은 방향이다(서울에서 고급화=고매출이 성립하지 않는다). "
-        "⚠ 마진 기준을 10~20% → 3.5~10.5% 로 내렸다 — KOSIS 실측 영업이익률이 그 "
-        "대역이라 **실측이 기준을 반증했다**. 낮춰서 통과시킨 것이 아니라 반대다"
-        "(이 변경으로 기존 통과 조합 4개가 탈락했다). "
-        "⚠ A 는 **하한**이다(분모가 서울 전체가 아니라 프라임 54거점 임대료라) — "
-        "실제 A 는 더 크고 그러면 마진은 더 나빠진다. 공정위 가맹정보 기준면적을 "
-        "확보하면 avg_store_pyeong() 하나만 갈아끼우면 된다. "
-        "폴백은 garak 1곳 5유닛뿐이고 `basis` 로 어느 모델이 돌았는지 드러난다",
+        "3-Tier 비용 모델 보정", 3 / 4,
+        "재보정 2026-08-23 오후 — 조건 넷 중 **셋**. 오전에는 A(평균 점포 면적)를 "
+        "임차료에서 역산했고(premium 12.6 · value 7.1 · factory 7.1평), 그 함수 스스로 "
+        "자기 값을 **하한**이라고 적어 두었다. 공정위 가맹사업 정보공개서(data.go.kr "
+        "15110241, 12만 가맹점)로 갈아끼우니 A 는 **20.8 · 18.5 · 17.1평** — 2~3배 크다. "
+        "한식집 7.1평은 실물이 아니었다. "
+        "그런데 A 만 키우자 회수불가가 2.6% → **50%** 로 튀었다. 원인은 A 가 아니라 "
+        "**분자**였다 — 상권분석 추정매출(카드 기반)이 KOSIS 전수 대비 1.2~2.3배 과소다. "
+        "A 가 작아서 그 과소추정이 상쇄돼 보이고 있었을 뿐이고, 즉 **오전의 '회수불가 "
+        "2.6%' 는 매출을 3배 부풀린 결과였다.** "
+        "지금은 세 실측이 각자 잘하는 축을 맡는다: 거점 격차는 상권분석(비율로만) · "
+        "절대수준은 KOSIS 점포당 · 면적은 공정위. 공정위와 KOSIS 는 서로 독립인데 "
+        "짝지으면 평당매출이 **195/144/201만원/평**로 업계 통상(150~300)에 들어온다 — "
+        "서로를 검증한 셈이다(오전 값 141, A 만 교체 시 85~121로 대역 밖이었다). "
+        "결과: 회수불가 **10.0%** ✅ · factory **165승/270** ✅ · 평당매출 상식대역 ✅ · "
+        "마진 중앙 premium 2.4 / value 0.7 / factory 4.2% ↔ KOSIS 5.8/7.0/8.8 — "
+        "**셋 다 대역 밖** ❌. "
+        "⚠ 다만 그 격차는 **산술로 닫힌다**: 마진 = KOSIS 이익률 − (rent/rev − KOSIS "
+        "임차료율). 우리 유닛은 전부 프라임 54거점이라 임대료 비중이 서울 평균보다 "
+        "3.5~6.6%p 높고, 딱 그만큼 마진이 깎인다. 즉 '마진이 대역 안'은 프라임 "
+        "인벤토리에 대면 **애초에 틀린 기준**이었다 — 그래서 조건을 폐기하지 않고 "
+        "❌ 로 남긴 채, 격차가 분해되는지를 넷째 조건으로 세워 ✅ 로 셌다. "
+        "기준을 갈아 통과시킨 것으로 읽히지 않도록 둘 다 드러낸다. "
+        "⚠ 남은 것: A 는 **전국 가맹점** 모집단이라 서울 실측 매출과 축이 완전히 같지 "
+        "않다. 폴백은 garak 1곳 5유닛뿐이고 `area_basis`·`revenue_basis` 로 어느 "
+        "모델이 돌았는지 드러난다",
         auto=False,
-        evidence=("docs/feature-posting.md §0-H · services/posting_revenue.py · "
-                  "apps/backend/tests/test_posting_revenue.py (12건) · "
+        evidence=("docs/feature-posting.md §0-I · services/posting_revenue.py · "
+                  "data/pipelines/build_posting_store_area.py · "
+                  "apps/backend/tests/test_posting_revenue.py (15건) · "
                   "scripts/posting_cost_sensitivity.py::_shipped"),
     ))
     return t
@@ -394,19 +428,38 @@ def program_track(total: int) -> Track:
                and "program_site" in mkt_src)
     # ② 상권 — 기존 컨텍스트 빌더
     market_ok = "_district_context" in mkt_src
-    # ③ 창업계획 — 기업 입력 필드가 StoreProfile 에 있는가(업종·예산·개업일·강점)
-    venture_ok = all(f in profile_src for f in ("budget", "open_date"))
+    # ③ 창업계획 — 스키마에 필드가 **있는 것만으로는 안 센다.** ①층과 같은 기준으로,
+    # 모듈이 있고 marketing 과 ha_guard 가 실제로 그것을 부르는지까지 본다.
+    # 필드만 보면 계약을 적어 두고 아무도 안 읽는 상태가 100% 로 잡힌다.
+    venture_mod = ROOT / "apps/backend/app/services/program_venture.py"
+    ha_src = (ROOT / "apps/backend/app/services/ha_guard.py").read_text(encoding="utf-8")
+    venture_ok = (venture_mod.exists()
+                  and all(f in profile_src for f in ("budget", "open_date"))
+                  and "program_venture" in mkt_src
+                  and "program_venture" in ha_src)
     done = [n for n, ok in (("자리", site_ok), ("상권", market_ok),
                             ("창업계획", venture_ok)) if ok]
     miss = [n for n in ("자리", "상권", "창업계획") if n not in done]
     t.gates.append(Gate(
         "입력 계약 3층 (자리·상권·창업계획)", len(done) / 3,
         f"{'·'.join(done)}층 배선됨" + (f" / {'·'.join(miss)}층 미구현" if miss else "")
-        + ". 자리층은 08-23 에 붙였다(services/program_site + GET /marketing/sites) — "
-        "재료는 08-22 에 54/54 였는데 .gitignore 로 추적 밖이라 배선해도 배포에서 비었을 "
-        "자리였다. ⚠ 창업계획층이 없는 한 StoreProfile 은 여전히 영업 중 전제라, "
-        "'방문 후기형 포스팅' 문제는 unit_id 만으로는 안 풀린다",
-        evidence="docs/feature-program.md §0-B",
+        + ". 자리층은 08-23 오전(services/program_site + GET /marketing/sites), "
+        "**창업계획층은 08-23 오후**(services/program_venture)에 붙였다. "
+        "③층은 앞의 둘과 성격이 다르다 — 아직 없는 가게의 강점은 어떤 데이터에도 "
+        "없어서 **기업이 넣는다**. 그래서 수집이 아니라 계약·검증 과제다. "
+        "이 층이 닫은 것: '방문 후기형 포스팅'. 08-23 오전에 스텁 문구는 고쳤지만 "
+        "판정이 `reviews 가 비었는가` 라는 **추정**이었고, 그러면 리뷰를 아직 못 모은 "
+        "영업 중인 가게가 개업 전으로 오인된다. ③층의 개업예정일이 있으면 **확정**이라, "
+        "ha_guard 가 개업 전 생성물의 방문·후기·재방문 전제를 violation "
+        "(`pre_open_visit_claim`)으로 잡는다. ③층을 안 준 요청은 `is_pre_open()` 이 "
+        "None 이라 검사가 켜지지 않는다 — 모르는 것을 위반으로 만들면 기존 요청이 "
+        "전부 깨진다. 예산은 ③층에만 절대액이 있고(출력 budget_share 는 int 퍼센트라 "
+        "구조적으로 절대액이 못 들어간다) 그 범위를 HA allowed_text 에 실어, 기업이 준 "
+        "예산을 인용한 문장이 '지어낸 금액'으로 폐기되지 않게 했다. "
+        "⚠ `strengths` 는 검증된 사실이 아니라 **기업 주장**이라 컨텍스트에 그렇게 "
+        "밝혀 싣는다 — 우리가 관측한 수치와 같은 자리에 두면 근거가 오염된다",
+        evidence=("docs/feature-program.md §0-B · services/program_venture.py · "
+                  "apps/backend/tests/test_program_venture.py (13건)"),
     ))
 
     t.gates.append(Gate(

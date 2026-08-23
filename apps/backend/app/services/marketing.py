@@ -22,7 +22,7 @@ from app.core.config import settings
 from app.data.seoul_pages import DISTRICTS_BY_ID
 from app.schemas.marketing import LLMDistrictContents, LLMStoreMarketing
 from app.services import districts as svc
-from app.services import events, ha_guard, program_site
+from app.services import events, ha_guard, program_site, program_venture
 
 # 규칙 기반 스텁의 카테고리별 강조 포인트 (LLM 폴백)
 _CATEGORY_ANGLE = {
@@ -408,8 +408,18 @@ def _site_context(profile: dict) -> str | None:
     return program_site.site_context(profile.get("district_id"), profile["unit_id"])
 
 
+def _venture_context(profile: dict) -> str | None:
+    """입력 계약 ③층(창업계획) — `venture` 를 준 요청에만 붙는다.
+
+    ①자리와 달리 이 층은 **기업이 넣은 주장**이라 사실 등급이 다르다. 그래서 컨텍스트
+    안에서도 "기업 주장, 검증된 사실 아님"이라고 밝혀 싣는다(services/program_venture).
+    """
+    return program_venture.venture_context(profile.get("venture"))
+
+
 def _call_llm(profile: dict, tone: list[str], district_ctx: str | None,
-              site_ctx: str | None = None) -> LLMStoreMarketing:
+              site_ctx: str | None = None,
+              venture_ctx: str | None = None) -> LLMStoreMarketing:
     """Claude 실호출 — 리뷰 텍스트 + 사진 URL(vision) → 구조화 마케팅 솔루션."""
     import anthropic
 
@@ -470,7 +480,8 @@ def generate_store_marketing(profile: dict) -> dict:
         try:
             ctx = _district_context(profile.get("district_id"))
             site_ctx = _site_context(profile)
-            parsed = _call_llm(profile, tone, ctx, site_ctx)
+            venture_ctx = _venture_context(profile)
+            parsed = _call_llm(profile, tone, ctx, site_ctx, venture_ctx)
             # HA 검증에도 **자리층을 넣는다.** 빼면 자리의 수치(면적·공실률·직전 업종)를
             # 정상 인용한 문장이 근거 없는 주장으로 걸린다 — 행사 요금을 컨텍스트에
             # 넣어야 했던 것(2026-08-06)과 같은 이유다.
@@ -495,6 +506,14 @@ def generate_store_marketing(profile: dict) -> dict:
     return _rule_stub(profile, tone)
 
 
+def _venture_rationale(venture: dict | None) -> str | None:
+    """③층이 있으면 근거를 **기업이 낸 강점**에서 만든다 — 리뷰를 대신하는 원천이다."""
+    xs = (venture or {}).get("strengths") or []
+    if not xs:
+        return None
+    return "기업이 제출한 강점(" + " · ".join(str(x) for x in xs[:3]) + ") 기반 — 기업 주장"
+
+
 def _rule_stub(profile: dict, tone: list[str],
                findings: list | None = None) -> dict:
     """규칙 기반 스텁 (LLM 미설정/실패/**HA 위반 폐기** 폴백).
@@ -504,18 +523,25 @@ def _rule_stub(profile: dict, tone: list[str],
     """
     angle = _CATEGORY_ANGLE.get(profile["category"], _DEFAULT_ANGLE)
     tone_str = "·".join(tone) if tone else "리뷰 데이터 없음"
-    # 리뷰가 없으면 **아직 영업하지 않는 자리**다. 그 경우 "방문 후기형 포스팅"은
-    # 있지도 않은 방문을 전제하는 거짓 제안이 된다(2026-08-16 실측한 증상 그 자체).
-    # 근거도 리뷰가 아니라 자리·상권 수치로 바꾼다(§0-B 원칙 1).
-    pre_open = not (profile.get("reviews") or [])
+    # 개업 전인가. ③층(창업계획)의 개업예정일이 있으면 **확정**이고, 없으면 리뷰
+    # 유무로 **추정**한다 — 추정은 리뷰를 아직 못 모은 영업 중인 가게를 개업 전으로
+    # 오인하므로, ③층이 있을 때 그 값을 우선한다(services/program_venture).
+    # "방문 후기형 포스팅"은 있지도 않은 방문을 전제하는 거짓 제안이 된다
+    # (2026-08-16 실측한 증상 그 자체). 근거도 리뷰가 아니라 자리·상권·계획 수치로
+    # 바꾼다(§0-B 원칙 1).
+    venture = profile.get("venture") or None
+    confirmed = program_venture.is_pre_open(venture)
+    pre_open = confirmed if confirmed is not None else not (profile.get("reviews") or [])
     online = [
         {"channel": "인스타그램", "kind": "online",
          "content": (f"{profile['name']} — 개업 준비 과정을 기록하는 릴스/피드 주 2회 게시"
                      if pre_open else
                      f"{profile['name']} — {angle}을 담은 릴스/피드 주 2회 게시"),
-         "rationale": ("개업 전이라 리뷰가 없다 — 공간·준비 과정 자체를 소재로 삼는다"
-                       if pre_open else f"리뷰 키워드({tone_str}) 기반 톤앤매너"),
-         "target": "상권 주 이용 연령대", "budget_share": 60, "kpi": "저장·팔로우 수"},
+         "rationale": (_venture_rationale(venture)
+                       or ("개업 전이라 리뷰가 없다 — 공간·준비 과정 자체를 소재로 삼는다"
+                           if pre_open else f"리뷰 키워드({tone_str}) 기반 톤앤매너")),
+         "target": ((venture or {}).get("target_customer") or "상권 주 이용 연령대"),
+         "budget_share": 60, "kpi": "저장·팔로우 수"},
         {"channel": "네이버 블로그", "kind": "online",
          "content": (f"'{profile['name']}' 개업 예고 + 지역 키워드 최적화"
                      if pre_open else

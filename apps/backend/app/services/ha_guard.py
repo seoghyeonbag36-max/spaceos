@@ -37,6 +37,8 @@ from __future__ import annotations
 import re
 
 from app.schemas.marketing import HAFinding, LLMDistrictContents, LLMStoreMarketing
+from app.services import program_venture
+from app.services.program_venture import PRE_OPEN_FORBIDDEN
 
 # ── 금액 ─────────────────────────────────────────────────────────────────────
 # "6,000원" / "6000 원" / "1만원". 앞의 숫자만 잡고 콤마는 지운다.
@@ -104,6 +106,29 @@ def _prices(text: str) -> set[int]:
 
 def _sentences(text: str) -> list[str]:
     return [s.strip() for s in _SENTENCE_RE.split(text or "") if s.strip()]
+
+
+def _check_pre_open(generated: str, pre_open: bool | None) -> list[HAFinding]:
+    """개업 전인데 방문·후기·재방문을 전제하는가 (입력 계약 ③층, services/program_venture).
+
+    §0-B 설계원칙 1 이 지적한 '방문 후기형 포스팅' 의 근본 해소 지점이다. 08-23 오전에
+    스텁 문구는 고쳤지만 판정 근거가 `reviews 가 비었는가` 라는 **추정**이었다 —
+    리뷰를 아직 못 모은 영업 중인 가게도 개업 전으로 오인된다. ③층의 개업예정일이
+    있으면 확정이므로, 그때만 이 검사를 켠다.
+
+    `pre_open` 이 None(③층 없음)이면 **아무것도 하지 않는다.** 모르는 것을 위반으로
+    만들면 기존 요청이 전부 깨진다.
+    """
+    if not pre_open:
+        return []
+    hit = sorted({w for w in PRE_OPEN_FORBIDDEN if w in generated})
+    if not hit:
+        return []
+    return [HAFinding(
+        severity="violation", code="pre_open_visit_claim",
+        message=("아직 문을 열지 않은 자리에 방문·후기·재방문을 전제하는 제안을 한다 — "
+                 "있지도 않은 경험을 근거로 삼는 것이라 그대로 거짓이 된다."),
+        evidence=", ".join(hit[:5]))]
 
 
 def _check_prices(generated: str, allowed_text: str) -> list[HAFinding]:
@@ -310,11 +335,18 @@ def check_store(parsed: LLMStoreMarketing, profile: dict,
     # 요금·기간의 숫자가 거기 실린다. 빼면 실린 행사비를 인용한 것이 지어낸 금액으로
     # 잘못 걸린다. 대가로 컨텍스트의 금액을 가게 가격처럼 쓰는 경우는 못 잡지만,
     # 정상 인용을 폐기하는 쪽이 더 나쁘다.
+    # ③층(창업계획)도 근거에 넣는다 — 기업이 제출한 강점과 예산 범위는 점주가 준
+    # 메뉴·리뷰와 같은 등급이다. 빼면 기업이 준 예산을 인용한 문장이 '지어낸 금액'으로
+    # 폐기된다(행사 요금을 컨텍스트에 넣어야 했던 2026-08-06 과 같은 이유).
+    venture = profile.get("venture") or None
     allowed_text = " ".join([*(profile.get("menu") or []), *(profile.get("reviews") or []),
+                             program_venture.strengths_text(venture),
+                             program_venture.allowed_prices_text(venture),
                              context or ""])
     source_text = f"{allowed_text} {profile.get('name', '')}"
 
     return [
+        *_check_pre_open(generated, program_venture.is_pre_open(venture)),
         *_check_prices(generated, allowed_text),
         *_check_trend(generated, context),
         *_check_superlatives(generated, source_text),
