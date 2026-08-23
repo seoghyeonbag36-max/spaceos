@@ -22,7 +22,7 @@ from app.core.config import settings
 from app.data.seoul_pages import DISTRICTS_BY_ID
 from app.schemas.marketing import LLMDistrictContents, LLMStoreMarketing
 from app.services import districts as svc
-from app.services import events, ha_guard
+from app.services import events, ha_guard, program_site
 
 # 규칙 기반 스텁의 카테고리별 강조 포인트 (LLM 폴백)
 _CATEGORY_ANGLE = {
@@ -368,7 +368,20 @@ def _trend_summary(name: str, points: list[tuple[str, float]]) -> str | None:
     return f"{name} {label}({prior:.1f}→{recent:.1f}, {change * 100:+.1f}%)"
 
 
-def _call_llm(profile: dict, tone: list[str], district_ctx: str | None) -> LLMStoreMarketing:
+def _site_context(profile: dict) -> str | None:
+    """입력 계약 ①층(자리) — `unit_id` 를 준 요청에만 붙는다 (services/program_site).
+
+    `unit_id` 가 없으면 None 이다. **거점만 주고 대표 유닛을 자동으로 끼워 넣지
+    않는다** — 영업 중인 가게에 대한 요청(현행 다수)에 엉뚱한 공실의 면적·직전 업종이
+    섞이면, 생성물이 그 자리를 이 가게의 사실인 양 인용한다.
+    """
+    if not profile.get("unit_id"):
+        return None
+    return program_site.site_context(profile.get("district_id"), profile["unit_id"])
+
+
+def _call_llm(profile: dict, tone: list[str], district_ctx: str | None,
+              site_ctx: str | None = None) -> LLMStoreMarketing:
     """Claude 실호출 — 리뷰 텍스트 + 사진 URL(vision) → 구조화 마케팅 솔루션."""
     import anthropic
 
@@ -383,6 +396,11 @@ def _call_llm(profile: dict, tone: list[str], district_ctx: str | None) -> LLMSt
     )
     if district_ctx:
         text += f"\n\n[상권 컨텍스트 — Platform 수집 데이터]\n{district_ctx}"
+    # 자리층(①) — 공실 유닛을 지정한 요청에만 붙는다. 상권층과 **따로** 싣는 이유는
+    # 둘의 사실 범위가 다르기 때문이다: 상권층은 주변의 관측, 자리층은 이 자리의 대장
+    # 사실이다. 한 덩어리로 합치면 생성물이 근거를 뒤섞어 인용한다.
+    if site_ctx:
+        text += f"\n\n{site_ctx}"
 
     content: list[dict] = [
         {"type": "image", "source": {"type": "url", "url": u}}
@@ -423,8 +441,13 @@ def generate_store_marketing(profile: dict) -> dict:
     if settings.llm_api_key:
         try:
             ctx = _district_context(profile.get("district_id"))
-            parsed = _call_llm(profile, tone, ctx)
-            findings = ha_guard.check_store(parsed, profile, ctx)
+            site_ctx = _site_context(profile)
+            parsed = _call_llm(profile, tone, ctx, site_ctx)
+            # HA 검증에도 **자리층을 넣는다.** 빼면 자리의 수치(면적·공실률·직전 업종)를
+            # 정상 인용한 문장이 근거 없는 주장으로 걸린다 — 행사 요금을 컨텍스트에
+            # 넣어야 했던 것(2026-08-06)과 같은 이유다.
+            findings = ha_guard.check_store(
+                parsed, profile, "\n".join(c for c in (ctx, site_ctx) if c) or None)
             if ha_guard.has_violation(findings):
                 print(f"[marketing] HA 검증 위반 → 생성물 폐기: {ha_guard.summarize(findings)}")
                 return _rule_stub(profile, tone, findings)

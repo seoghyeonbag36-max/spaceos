@@ -14,6 +14,13 @@ class StoreProfile(BaseModel):
     name: str
     category: str                     # 예: 카페, 의류
     district_id: str | None = None    # 상권 컨텍스트 결합용 (선택)
+    # 입력 계약 ①층(자리) — `gold/{거점}/vacant_units.json` 의 유닛 id.
+    # 주면 그 공실의 면적·층·직전 업종·건물 공실률이 생성 근거에 합류한다
+    # (services/program_site · docs/feature-program.md §0-B).
+    # ⚠ 이 모델은 본래 **영업 중인 가게** 전제로 만들어졌다. 공실 대상 입력이 3층으로
+    # 완성되려면 ③층(창업계획: 업종·목표고객·예산·개업일·강점)이 더 필요하다 —
+    # 아직 미구현이라, unit_id 만으로는 '방문 후기형 포스팅' 문제가 다 풀리지 않는다.
+    unit_id: str | None = None
     address: str | None = None
     reviews: list[str] = []           # 리뷰·블로그 텍스트 (공식 API 또는 점주 제공)
     image_urls: list[str] = []        # 상가 사진 (점주 제공 원칙) — vision 분석 입력
@@ -73,6 +80,39 @@ class HAFinding(BaseModel):
     code: str                         # fabricated_price | trend_contradiction | ...
     message: str                      # 사람이 읽을 판정 문장
     evidence: str | None = None       # 걸린 실제 문자열 (사람이 오탐인지 보게 한다)
+
+
+class VacantSite(BaseModel):
+    """입력 계약 ①층(자리) 1건 — `gold/{거점}/vacant_units.json` 의 공실 유닛.
+
+    아직 아무도 장사하지 않는 자리라 리뷰·평점·매출 실적이 존재하지 않는다. 여기 있는
+    것은 전부 건축물대장과 건물 마스터에서 온 **사실**이다(services/program_site).
+    """
+    id: str
+    n: str | None = None              # 소재 표기(지번 + 건물 용도/명칭)
+    lat: float | None = None
+    lng: float | None = None
+    area: int | None = None           # 평 — 건물 상업면적 ÷ 호실 수(호실당 평균)
+    floor: str | None = None          # 상가정보 flrNo 매칭 전이라 1F 가정
+    was: str | None = None            # 직전 업종
+    capacity: int | None = None       # 건물 호실 수
+    active: int | None = None         # 그중 영업 중
+    vacancy_rate: float | None = None  # 건물 공실률(%)
+    bld_floors: int | None = None
+    com_area_m2: float | None = None
+
+
+class VacantSiteList(BaseModel):
+    """GET /marketing/sites 응답. `site_source == "unavailable"` 이면 Gold 미적재다.
+
+    `site_note` 를 반드시 함께 노출한다 — 면적이 호실당 평균이고 층이 1F 가정이라는
+    한계가 빠지면 그 위에 얹힌 제안이 실측처럼 읽힌다.
+    """
+    district_id: str
+    sites: list[VacantSite]
+    site_source: str
+    site_note: str | None = None
+    site_built_at: str | None = None
 
 
 class ChannelPlan(BaseModel):

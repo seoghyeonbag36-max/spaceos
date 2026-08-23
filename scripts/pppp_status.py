@@ -256,12 +256,22 @@ def posting_track(total: int) -> Track:
 
     # 주석 문구로 판정하면 주석만 고쳐도 "연동됨"이 된다. 어댑터라면 반드시 밖으로
     # 나가는 호출이 있어야 하므로, HTTP 클라이언트 사용 여부를 신호로 쓴다.
+    # 2026-08-23: 호출이 services/posting_copilot 로 분리돼서 posting.py 만 보면
+    # 영영 0% 로 남는다. **어댑터 모듈**을 보고, posting.py 가 실제로 그걸 부르는지도
+    # 같이 본다 — 모듈만 있고 아무도 안 쓰면 연동이 아니다.
+    cop = ROOT / "apps/backend/app/services/posting_copilot.py"
     posting_py = (ROOT / "apps/backend/app/services/posting.py").read_text(encoding="utf-8")
-    wired = any(s in posting_py for s in ("requests.", "httpx.", "urllib.request"))
+    cop_src = cop.read_text(encoding="utf-8") if cop.exists() else ""
+    wired = (any(s in cop_src for s in ("requests.", "httpx.", "urllib.request"))
+             and "posting_copilot" in posting_py)
     t.gates.append(Gate(
         "외부 AI 창업 코파일럿 어댑터", 1.0 if wired else 0.0,
-        "미연동 — `_call_copilot` 이 항상 None 을 반환해 폴백만 돈다(입출력 명세 부재)"
-        if not wired else "연동됨",
+        "계약 `spaceos.posting/1` 을 **우리가 발행**하고 어댑터를 그에 맞춰 구현했다 "
+        "(services/posting_copilot). 공급자 미정이라 명세를 기다리는 동안 0% 로 남아 "
+        "있던 자리다 — 이제 `POSTING_COPILOT_URL` 만 채우면 붙는다. 파생값(net·roi·"
+        "recommended)은 공급자가 아니라 우리가 계산하고, 계약 위반 응답은 통째로 폴백한다"
+        if wired else
+        "미연동 — `_call_copilot` 이 항상 None 을 반환해 폴백만 돈다(입출력 명세 부재)",
     ))
 
     t.gates.append(Gate(
@@ -285,10 +295,14 @@ def posting_track(total: int) -> Track:
         "month_cost 에 원가·인건비가 없다 — 08-22 전수 재측정으로 수치 갱신: 마진 중앙 "
         "70.2/63.4/45.8%, 회수 중앙 1.8개월, factory 1위 0/270. 근거는 08-22 에 절반 "
         "깔렸다(tier↔업종 대표군 정의 + 매출 실측 — 현행이 premium 매출을 58% 과대평가). "
-        "남은 구멍 둘: **원가율**(KOSIS 키 미발급) · **필요인원**(공개 통계 없음). "
-        "32조합 감도표상 **비용만 고쳐서는 통과 불가** — 매출계수를 같이 옮겨야 한다",
+        "**08-23: 자료 구멍 둘이 다 닫혔다** — KOSIS 키 발급으로 서비스업조사 "
+        "DT_3KB9001 에서 서울 2024 업종별 영업비용률 실측(89.5~96.5%, 즉 영업이익률 "
+        "3.5~10.5%). 필요인원은 인건비를 매출 대비 비율로 직접 얻어 질문 자체가 소멸. "
+        "이제 막는 것은 자료가 아니라 **구현**이다: month_cost 를 매출비례로 재정의 + "
+        "매출계수 이동 + 감도표 재실행. 비용만 고쳐서는 여전히 통과 불가 "
+        "(업종 간 비용률 차이가 7%p 뿐이라 tier 를 가르는 것은 매출이다)",
         auto=False,
-        evidence="docs/feature-posting.md §0-A~0-E · scripts/posting_cost_sensitivity.py",
+        evidence="docs/feature-posting.md §0-A~0-F · scripts/posting_cost_sensitivity.py",
     ))
     return t
 
@@ -346,12 +360,31 @@ def program_track(total: int) -> Track:
         "거점 단위 수집(naver_datalab --hubs) + build_program_trend 로 켰다",
     ))
 
+    # 이 게이트는 2026-08-23 까지 **선언**이었고, 그래서 "공실 유닛 49/54" 라고 적힌 채
+    # 08-22 의 54/54 완주를 두 번의 상태 점검 동안 놓쳤다. 층마다 배선의 흔적을
+    # 코드에서 직접 센다 — 문구만 고쳐서는 올라가지 않게.
+    mkt_src = (ROOT / "apps/backend/app/services/marketing.py").read_text(encoding="utf-8")
+    profile_src = (ROOT / "apps/backend/app/schemas/marketing.py").read_text(encoding="utf-8")
+    site_mod = ROOT / "apps/backend/app/services/program_site.py"
+    # ① 자리 — 모듈이 산출물을 읽고, marketing 이 실제로 그 모듈을 부른다
+    site_ok = (site_mod.exists()
+               and "vacant_units.json" in site_mod.read_text(encoding="utf-8")
+               and "program_site" in mkt_src)
+    # ② 상권 — 기존 컨텍스트 빌더
+    market_ok = "_district_context" in mkt_src
+    # ③ 창업계획 — 기업 입력 필드가 StoreProfile 에 있는가(업종·예산·개업일·강점)
+    venture_ok = all(f in profile_src for f in ("budget", "open_date"))
+    done = [n for n, ok in (("자리", site_ok), ("상권", market_ok),
+                            ("창업계획", venture_ok)) if ok]
+    miss = [n for n in ("자리", "상권", "창업계획") if n not in done]
     t.gates.append(Gate(
-        "입력 계약 3층 (자리·상권·창업계획)", 1 / 3,
-        "상권층만 있다. 자리층은 재료(공실 유닛 49/54)가 있는데 Program 이 읽지 않는다 — "
-        "수집이 아니라 배선 과제다. 창업계획층(기업 입력)은 미구현이고, "
-        "StoreProfile 은 영업 중 전제라 공실을 넣으면 '방문 후기형 포스팅'이 나온다",
-        auto=False, evidence="docs/feature-program.md §0-B",
+        "입력 계약 3층 (자리·상권·창업계획)", len(done) / 3,
+        f"{'·'.join(done)}층 배선됨" + (f" / {'·'.join(miss)}층 미구현" if miss else "")
+        + ". 자리층은 08-23 에 붙였다(services/program_site + GET /marketing/sites) — "
+        "재료는 08-22 에 54/54 였는데 .gitignore 로 추적 밖이라 배선해도 배포에서 비었을 "
+        "자리였다. ⚠ 창업계획층이 없는 한 StoreProfile 은 여전히 영업 중 전제라, "
+        "'방문 후기형 포스팅' 문제는 unit_id 만으로는 안 풀린다",
+        evidence="docs/feature-program.md §0-B",
     ))
 
     t.gates.append(Gate(

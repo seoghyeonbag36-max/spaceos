@@ -269,8 +269,12 @@ NAVER_MAPS_CLIENT_SECRET=
 
 ### 8-C-2. KOSIS `KOSIS_API_KEY` — Posting 원가율 (신규, 2026-08-22)
 
-3-Tier 비용 모델의 마지막 구멍 둘 중 **원가율**의 후보 소스다(다른 하나인 '필요인원'은
-공개 통계가 없다 — `docs/feature-posting.md` §0-E).
+3-Tier 비용 모델의 마지막 구멍 둘을 메우는 소스다.
+**2026-08-23 발급·검증 완료 — 둘 다 닫혔다**(실측표는 `docs/feature-posting.md` §0-F).
+쓰는 통계표는 `orgId=101` · `tblId=DT_3KB9001`(서비스업조사 시도/산업별 총괄).
+
+⚠ **키는 `data/.env` 에 넣는다. `data/.env.example` 이 아니다** — example 은 git 에
+추적되는 템플릿이라 거기 적으면 커밋 시 키가 공개된다(08-23 실제로 한 번 들어갔다).
 
 - 발급: [kosis.kr](https://kosis.kr) 회원가입 → 로그인 → **[공유서비스] → OPEN API
   인증키 신청**(자동승인). `data/.env` 의 `KOSIS_API_KEY=` 에 붙인다.
@@ -285,14 +289,20 @@ NAVER_MAPS_CLIENT_SECRET=
   | 통계목록 | `https://kosis.kr/openapi/statisticsList.do?method=getList&apiKey=…&vwCd=MT_ZTITLE&parentListId=…&format=json&jsonVD=Y` |
   | 통계자료 | `https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&apiKey=…&orgId=…&tblId=…&prdSe=Y&newEstPrdCnt=1&format=json&jsonVD=Y` |
 
-- **키가 오면 먼저 수집기가 아니라 탐색기를 돌린다** — `scripts/kosis_probe.py`.
-  아직 모르는 것이 둘이라 응답 구조를 보기 전에 파서를 쓰면 가정 위에 파서를 얹게 된다:
-  1. 서비스업조사가 **음식점업을 어느 수준까지 세분**해 공표하는가(tier 대표군이
-     일식·양식·중식 / 한식·분식·치킨·호프 / 커피·패스트푸드·제과 로 갈리므로 그만큼 필요)
-  2. 영업비용을 **항목별로**(급여·원재료비·임차료) 주는가, 총액만 주는가
+- **수집기가 아니라 탐색기를 먼저 돌렸다** — `scripts/kosis_probe.py`. 08-22 에
+  모르던 것 둘의 답(2026-08-23):
+  1. 음식점업 세분 수준 → **KSIC 5자리까지.** tier 대표군 9종이 전부 개별 코드
+  2. 영업비용 항목별 여부 → **항목별로 준다.** 단 **매출원가는 음식점업 미공표**이고
+     `영업비용 = 인건비 + 임차료 + 기타경비` 항등식이 성립한다(잔차 ≤1백만원)
+
+  ⚠ **분당 200건 호출 제한**(오류코드 40)이 있다. 루트를 안 주면 트리 순회가 수백
+  건이라 반드시 걸리므로 `search` 에 루트를 붙인다. 그리고 목록 트리의 **잎 노드는
+  오류코드 30(데이터 없음)을 내는 것이 정상**이다 — 이걸 치명 오류로 보면 첫 잎에서
+  탐색 전체가 죽는다(08-23 에 고쳤다).
 
   ```bash
-  python scripts/kosis_probe.py search 서비스업조사   # 후보 통계표 찾기
+  python scripts/kosis_probe.py roots                 # 대주제 30건 → O(도소매ㆍ서비스)
+  python scripts/kosis_probe.py search 서비스업조사 O  # 통계표 212건
   python scripts/kosis_probe.py meta <orgId> <tblId>  # 세분류 깊이·비용 항목 확인
   python scripts/kosis_probe.py data <orgId> <tblId>  # 실제 값 몇 줄
   ```
