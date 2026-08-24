@@ -358,18 +358,57 @@ def posting_track(total: int) -> Track:
     # 못 세면(None) 종전 0.5 가중으로 물러난다.
     foot_measured = _count_measured_foot_hubs()
     foot_score = foot_measured if foot_measured is not None else 0.5 * foot
-    per_hub = ((rent + foot_score + 0.5 * area) / (4 * total)
+    # 분모가 4 → **3** 이다(2026-08-24 결정, docs/feature-posting.md §0-K).
+    # `prem`(권리금)은 공개 통계가 없고 실제로도 임대인·기존 임차인과의 협상값이라
+    # **수집으로는 영영 안 채워진다.** 0/54 를 계속 세면 "언젠가 수집하면 된다"로
+    # 읽히는데 그게 사실이 아니다. 아래 '입력 계약' 게이트로 옮겼다.
+    per_hub = ((rent + foot_score + 0.5 * area) / (3 * total)
                if total else 0.0)
     t.gates.append(Gate(
-        "3-Tier 입력 4종 실데이터화", per_hub,
+        "3-Tier 입력 3종 실데이터화 (수집 가능한 것)", per_hub,
         f"rent {rent}/{total} ✅(R-ONE) · foot {foot}/{total} "
         + (f"(거점 내 서열까지 실측 {foot_measured}/{total} ✅ — 최근접 상권 "
            f"유동총량. 나머지는 유닛이 전부 같은 상권에 배정돼 **원리적으로** 못 "
            f"가른다: nokdu·garak 은 상권 1곳, euljiro 는 유닛 5개가 300m 안) · "
            if foot_measured is not None else
            "◐(절대수준만 실측 — 서열 판정을 못 셌다) · ")
-        + f"area {area}/{total} ◐(대장 상업면적÷capacity — 건물 실측, 유닛 서열은 균등분할) · "
-        f"prem 0/{total} ⬜(표본 밀도 부족)",
+        + f"area {area}/{total} ◐(대장 상업면적÷capacity — 건물 실측, 유닛 서열은 "
+        f"균등분할). ⚠ 2026-08-24 실 인벤토리 배선(§0-J): 이 셋이 이제 **시드 270유닛이 "
+        f"아니라 실측 528유닛** 위에서 돈다. 그전까지 resolved_units 가 시드만 읽어 "
+        f"Posting 화면이 손으로 적은 예시 위에서 돌고 있었다 — 수집이 아니라 배선 "
+        f"문제였고, 게이트 문구의 '배선을 막는 것은 이제 없다'가 곧 '아직 안 했다'였다. "
+        f"⚠ 실 인벤토리는 층이 **전부 1F 가정**이라 임대료가 계통적 상한이다(마진 중앙 "
+        f"premium 0.4 / value −1.7 / factory 2.1% · 회수불가 13.6% — 시드 기준 §0-I 의 "
+        f"2.4/0.7/4.2% · 10.0% 를 대체한다). 분해식 검증은 그대로 통과하므로 모델 고장이 "
+        f"아니라 층 가정의 결과다. `prem` 은 분모에서 빠졌다 → 아래 입력 계약 게이트",
+    ))
+
+    # 권리금은 '못 얻는 데이터'가 아니라 '기업이 주는 값'이다. 수집 게이트로 세면
+    # 영영 0% 이므로 계약 게이트로 옮겨 실제로 열렸는지를 센다.
+    sim = (ROOT / "apps/backend/app/schemas/posting.py").read_text(encoding="utf-8")
+    posting_svc = (ROOT / "apps/backend/app/services/posting.py").read_text(encoding="utf-8")
+    # 스키마에 필드가 있는 것만으로는 부족하다 — 라우터가 서비스로 넘기고 서비스가
+    # 유닛에 얹어야 실제로 계약이 열린 것이다. 세 지점을 모두 본다.
+    router = (ROOT / "apps/backend/app/api/v1/ai.py").read_text(encoding="utf-8")
+    prem_wired = ("prem: int | None" in sim
+                  and "req.prem" in router
+                  and '"prem": "contract"' in posting_svc)
+    t.gates.append(Gate(
+        "`prem` 입력 계약 (기업이 넣는다)", 1.0 if prem_wired else 0.0,
+        "권리금은 공개 통계가 없고(bronze 전수 확인) 실제로도 임대인·기존 임차인과의 "
+        "**협상값**이라 그 자리에 들어갈 기업만 안다 — Program 입력 계약 ③층(창업계획)과 "
+        "같은 성격이라, 수집 과제가 아니라 계약 과제로 옮겼다(2026-08-24 결정 · 막힘 7). "
+        "`POST /ai/simulate-revenue` 의 `prem`(만원)으로 받고, 안 주면 0 을 전제로 "
+        "계산하며 `inputs_source['prem']` 이 `absent`(전제)/`contract`(받았다)를 밝힌다. "
+        "⚠ 정하기 전에 감도를 쟀다(시드 270유닛 전수): prem→0 이면 **추천 5.2% 뒤집힘 · "
+        "roi 중앙 1.6개월(p90 15.5) · 회수가부 변화 0건**. 무시할 수 없지만 제품의 핵심 "
+        "판정은 안 건드린다 — 즉 §0-I 의 '회수불가' 결론은 prem 과 무관하게 성립한다"
+        if prem_wired else
+        "미배선 — SimulateRequest 에 prem 이 없다",
+        auto=False,
+        evidence="docs/feature-posting.md §0-K · apps/backend/app/schemas/posting.py · "
+                 "apps/backend/tests/test_posting_marketing.py::"
+                 "test_prem_is_an_input_contract_not_a_collected_field",
     ))
 
     # 주석 문구로 판정하면 주석만 고쳐도 "연동됨"이 된다. 어댑터라면 반드시 밖으로
@@ -400,12 +439,24 @@ def posting_track(total: int) -> Track:
     ))
 
     vu = list(GOLD.glob("*/vacant_units.json"))
+    # 유닛 수는 **세어서** 적는다. 종전에는 "580유닛"이 문구에 박혀 있었는데 실측은
+    # 528 이었다 — 선언이 낡는 이 저장소의 주된 실패 양식이 게이트 문구에서 났다.
+    n_units = 0
+    for _f in vu:
+        _raw = _load(_f)
+        _us = _raw.get("units") if isinstance(_raw, dict) else _raw
+        n_units += len(_us or [])
     t.gates.append(Gate(
         "실제 공실 유닛 인벤토리", len(vu) / total if total else 0.0,
-        f"{len(vu)}/{total}거점 — 08-22 재실행으로 완주(580유닛). 종전 잔여 5곳"
+        f"{len(vu)}/{total}거점 · **{n_units}유닛** — 08-22 재실행으로 완주. 종전 잔여 5곳"
         "(hyehwa·kyunghee·sadang·sukmyung·wangsimni)은 막힘이 아니라 대기였고, 대장 완주로 "
         "상업면적이 채워져 그대로 풀렸다. 추적 예외(!data/gold/*/vacant_units.json)까지 "
-        "걸려 54/54 가 git 에 올라가 있다 — 배선을 막는 것은 이제 없다",
+        "걸려 54/54 가 git 에 올라가 있다. ⚠ **2026-08-24 배선 완료** — 그전까지 "
+        "`districts.resolved_units` 가 시드 270유닛만 읽어 Posting API·화면이 손으로 적은 "
+        "예시 위에서 돌았다. 이 게이트의 종전 문구 '배선을 막는 것은 이제 없다'가 정확히 "
+        "'아직 안 했다'는 뜻이었는데 그렇게 읽히지 않았다 — 게이트가 100% 인 것과 그 "
+        "산출물이 제품에 닿는 것은 다른 일이다. services/vacant_inventory 로 로더를 한 벌 "
+        "두고 Program ①층과 함께 본다 → docs/feature-posting.md §0-J",
     ))
 
     t.gates.append(Gate(
@@ -433,8 +484,13 @@ def posting_track(total: int) -> Track:
         "❌ 로 남긴 채, 격차가 분해되는지를 넷째 조건으로 세워 ✅ 로 셌다. "
         "기준을 갈아 통과시킨 것으로 읽히지 않도록 둘 다 드러낸다. "
         "⚠ 남은 것: A 는 **전국 가맹점** 모집단이라 서울 실측 매출과 축이 완전히 같지 "
-        "않다. 폴백은 garak 1곳 5유닛뿐이고 `area_basis`·`revenue_basis` 로 어느 "
-        "모델이 돌았는지 드러난다",
+        "않다. ⚠ **위 수치는 전부 시드 270유닛 기준이다** — 08-24 실 인벤토리 배선 후 "
+        "실측 528유닛에서는 회수불가 **13.6%** · factory **314승/528** · 마진 중앙 "
+        "**0.4 / −1.7 / 2.1%** 다. value 가 0 을 넘어 내려간 것은 실 인벤토리의 층이 "
+        "**전부 1F 가정**이라 임대료가 계통적 상한이기 때문이고, 분해식 검증은 그대로 "
+        "통과하므로 모델 고장이 아니다(§0-J). 이 게이트를 실 인벤토리 기준으로 다시 "
+        "세우는 것이 남은 일이다. 폴백은 garak 1곳 5유닛뿐이고 "
+        "`area_basis`·`revenue_basis` 로 어느 모델이 돌았는지 드러난다",
         auto=False,
         evidence=("docs/feature-posting.md §0-I · services/posting_revenue.py · "
                   "data/pipelines/build_posting_store_area.py · "

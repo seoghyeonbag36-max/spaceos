@@ -558,9 +558,12 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
                       {" · "}권리금 {p.prem ? `${p.prem.toLocaleString()}만원` : "없음"}
                       <Src src={p.inputs_source?.prem} />
                       {" · "}유동 {p.foot}<Src src={p.inputs_source?.foot} />
-                      {" · "}{p.persona}
+                      {/* persona·note 는 시드에만 있던 서술 문구다. 실 인벤토리 유닛에는
+                          없으므로 자리를 비운다 — 없는 문장을 지어내면 실측 카드가
+                          손으로 적은 카드처럼 읽힌다(2026-08-24 배선). */}
+                      {p.persona ? <>{" · "}{p.persona}</> : null}
                     </div>
-                    <div className="unote">{p.note}</div>
+                    {p.note ? <div className="unote">{p.note}</div> : null}
                     <div className="tiers">
                       {Object.values(p.scenarios).map((sc: TierScenario) => (
                         <div key={sc.tier} className={"tier" + (sc.recommended ? " rec" : "")} style={{ borderColor: sc.recommended ? TIER_COLOR[sc.tier] : undefined }}>

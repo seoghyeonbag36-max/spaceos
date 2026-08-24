@@ -128,13 +128,19 @@ class Posting(BaseModel):
     prem: int
     floor: str
     was: str
-    rec: str
     foot: str
-    # 필드별 입력 출처: "rone" | "flpop" | "seed" — services/posting_inputs 참조.
-    # rent·foot 은 실데이터, area·prem 은 소스가 없어 시드 프록시로 남아 있다.
+    # 필드별 입력 출처 — services/posting_inputs 참조:
+    #   "rone"(R-ONE 임대료) · "flpop"/"flpop+trdar"(상권 유동) ·
+    #   "gold-ledger"(건축물대장 상업면적÷capacity) · "seed"(손으로 적은 프록시) ·
+    #   "absent"(값이 없어 0 을 전제로 계산했다 — prem 이 그렇다)
     inputs_source: dict[str, str] | None = None
-    persona: str
-    note: str
+    # 아래 셋은 **시드에만 있던 서술 필드**다. 실 인벤토리(건축물대장 실측)에는 없어서
+    # 2026-08-24 배선 때 선택 필드가 됐다. 지어내지 않고 비운 채 내보낸다 —
+    # `rec` 은 이미 계산으로 대체됐고(services/districts.recommend_tier),
+    # `persona`·`note` 는 근거 없이 적은 문구라 실측 자리에 얹으면 실측처럼 읽힌다.
+    rec: str | None = None
+    persona: str | None = None
+    note: str | None = None
     scenarios: dict[str, TierScenario]
 
 

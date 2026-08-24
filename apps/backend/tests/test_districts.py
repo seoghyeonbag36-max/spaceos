@@ -59,9 +59,13 @@ def test_list_districts():
     for d in data:
         assert 0 <= d["sentiment"] <= 100
         assert 0 <= d["vacancy_rate"] <= 100
-        # 합이 5 **이하**다. 2026-08-23 실측 비용 모델부터 회수불가 유닛이 실제로
-        # 생긴다(세 전략 모두 순익 0 이하 → 추천 없음). 예전에는 마진이 70%대라 늘 5였다.
-        assert 0 <= sum(d["tier_mix"].values()) <= 5
+        # 추천 합계는 **유닛 수 이하**다. 상수 5 를 박아 두었다가 2026-08-24 실
+        # 인벤토리 배선에서 깨졌다 — 5 는 시드 거점의 유닛 수였고, 실 인벤토리는
+        # 거점당 1~30 유닛이다. 지켜야 할 성질은 "유닛 수를 넘지 않는다"이지
+        # "5 를 넘지 않는다"가 아니었다.
+        # 상한 미만인 것은 회수불가 유닛이 있다는 뜻이다(세 전략 모두 순익 0 이하
+        # → 추천 없음). 2026-08-23 실측 비용 모델부터 실제로 생긴다.
+        assert 0 <= sum(d["tier_mix"].values()) <= d["vacant_units"]
 
 
 def test_recommendations_do_not_silently_vanish():
@@ -385,7 +389,10 @@ def test_postings_and_marketing():
     r = client.get(f"{V1}/commercial-districts/hongdae/postings")
     assert r.status_code == 200
     postings = r.json()
-    assert len(postings) == 5
+    # 건수를 고정하지 않는다 — 2026-08-24 부터 실 인벤토리(건축물대장 실측)를 읽어
+    # 거점마다 다르고, 대장을 다시 돌리면 또 변한다. 고정하면 수집이 진전될 때마다
+    # 테스트가 깨지면서 "무엇이 깨졌는지"는 알려주지 못한다.
+    assert postings, "공실 유닛이 하나도 없다"
     sc = postings[0]["scenarios"]
     assert set(sc.keys()) == {"premium", "value", "factory"}
     assert any(v["recommended"] for v in sc.values())

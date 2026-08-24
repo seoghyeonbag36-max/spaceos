@@ -85,6 +85,8 @@ _RESUME = _REPO / "ml" / "artifacts" / ".train_gnn_resume.pt"
 _RECOMMEND_JSON = _GOLD / "platform_industry_recommend.json"
 _TRDAR_DEMAND = _GOLD / "features" / "trdar_demand.parquet"
 _PAGE_BUILDING = _GOLD / "features" / "page_building.parquet"
+_ADONG_HOURLY = _GOLD / "features" / "adong_hourly.parquet"
+_COORD_ADONG = _REPO / "data" / "silver" / "coord_adong_cache.json"
 _MLRUNS = _REPO / "ml" / "mlruns"
 
 MIN_CLASS_NODES = 10   # 이보다 작은 업종 대분류는 '기타'로 병합
@@ -293,9 +295,113 @@ def _building_block(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]] | None:
     return block, list(_BUILDING_COLS)
 
 
+# 행정동 24시간 프로필 중 **거점 안에서 값이 변하는** 것만 고른다. 15개 후보를 실측해
+# within-district 분산 비율 0.15 미만은 뺐다 — 거점 원핫이 이미 완전히 표현하는 값이라
+# 붙여도 정보가 0이고, 열만 늘어 z-score 후 희석된다. 근거표는
+# data/pipelines/build_adong_hourly_features 독스트링(2026-08-24 실측).
+_ADONG_COLS = [
+    "wd_peak_hour", "we_peak_hour",              # 0.439 / 0.389 — 가장 크게 갈리는 축
+    "wd_share_evening", "we_share_evening",      # 0.337 / 0.305
+    "wd_log_total", "we_log_total",              # 0.228 / 0.213
+    "we_share_morning", "we_share_night",        # 0.218 / 0.197
+    "wd_share_night", "we_peakiness",            # 0.169 / 0.169
+]
+_ADONG_GRID = 0.001   # build_hub_adong._GRID 와 같은 격자여야 캐시가 맞는다
+
+
+def _adong_hour_block(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]] | None:
+    """노드 → 소속 **행정동**의 24시간 생활인구 프로필 블록 (Page 산출).
+
+    **왜 이 블록인가**: 08-24 조기종료 ablation 이 현행 105열의 천장을 37%대로 확정했다
+    (top1 35.92 / macro_f1 37.17 / offprior3 37.17 — 게이트 지표를 val 에서 직접
+    최적화해도 같은 값에 멈췄다). 남은 레버는 **거점 안에서 값이 변하는 피처**이고,
+    105개 중 그런 것은 5개뿐이다. Page 가 08-24 에 24시간 축을 실측하면서 그 다섯을
+    늘릴 첫 재료가 생겼다.
+
+    **왜 거점이 아니라 행정동인가**: `_demand_block` 과 같은 이유다 — 거점 원핫이 이미
+    있으므로 거점 안에서 상수인 값은 정보가 0이다. `gold/page_footfall_hourly.json` 은
+    거점 단위라 그대로는 못 쓰고, 그 앞단인 행정동 표를 따로 낸다
+    (`build_adong_hourly_features`). 54거점이 행정동 206개에 걸치고 52거점이 2개 이상이다.
+
+    **실측 귀속률 95.1%** (노드 40,597 중 38,592). 나머지는 좌표 캐시에 없는 셀이다 —
+    0 으로 채우지 않고 **같은 거점에서 귀속된 노드의 평균**으로 채운다. 0(=표준화 후
+    전체 평균)으로 채우면 그 거점에만 없는 가짜 대비가 생겨, 이 블록이 노리는 것과
+    정확히 반대 방향의 신호를 넣게 된다.
+
+    귀속 규칙: 좌표를 0.001° 격자로 뭉쳐 `silver/coord_adong_cache.json` 을 조회한다.
+    `build_hub_adong` 이 카카오 coord2regioncode 로 채워 둔 캐시이고 격자도 같다.
+    **네트워크를 타지 않는다** — 캐시에 없으면 못 맞힌 것으로 두고 위 폴백으로 간다.
+
+    코드 자릿수: 캐시는 10자리(행정표준), 생활인구는 8자리다. `adong8` 로 맞추지 않으면
+    조인이 **한 건도 안 맞으면서 오류도 안 난다**(2026-08-24 실측, 최초 시도 0/40,597).
+
+    스케일: 이 블록만 z-score 표준화한다(수요·건물 블록과 같은 방식) — 기본값이 off 라
+    종전 105열 파이프라인이 그대로 재현되고 ablation 이 깨끗해진다.
+
+    반환 None = 표·캐시 부재 → 학습은 종전 피처로 계속한다.
+    """
+    if not _ADONG_HOURLY.exists():
+        print(f"[gnn] 행정동 시간 테이블 없음({_ADONG_HOURLY.name}) — "
+              f"python -m data.pipelines.build_adong_hourly_features 먼저. "
+              f"행정동 피처 없이 진행")
+        return None
+    if not _COORD_ADONG.exists():
+        print(f"[gnn] 좌표→행정동 캐시 없음({_COORD_ADONG.name}) — 행정동 피처 없이 진행")
+        return None
+    try:
+        # 자릿수 정규화 규칙은 수집기에 한 벌만 둔다 — 여기서 복사하면 규칙이 갈라진다
+        from data.collectors.living_population_hourly import adong8
+    except ImportError as e:
+        print(f"[gnn] adong8 임포트 실패({e}) — 행정동 피처 없이 진행")
+        return None
+
+    tbl = pd.read_parquet(_ADONG_HOURLY)
+    missing = [c for c in _ADONG_COLS if c not in tbl.columns]
+    if missing:
+        print(f"[gnn] 행정동 테이블에 컬럼 없음 {missing} — 행정동 피처 없이 진행")
+        return None
+    tbl = tbl.set_index(tbl["adm8"].astype(str))
+
+    cache = json.loads(_COORD_ADONG.read_text(encoding="utf-8"))
+    lat = pd.to_numeric(nodes["lat"], errors="coerce").fillna(0.0).to_numpy()
+    lon = pd.to_numeric(nodes["lon"], errors="coerce").fillna(0.0).to_numpy()
+    adm = np.array([
+        adong8((cache.get(f"{round(lo / _ADONG_GRID):d}_{round(la / _ADONG_GRID):d}")
+                or {}).get("adm_cd") or "")
+        for lo, la in zip(lon, lat)
+    ])
+
+    m = tbl.reindex(adm)
+    block = m[_ADONG_COLS].astype(float).to_numpy()
+    matched = ~np.isnan(block).any(axis=1)
+    if not matched.any():
+        print("[gnn] ⚠️ 행정동 귀속 0건 — 좌표 캐시와 생활인구 코드가 안 맞는다. 건너뜀")
+        return None
+
+    # 미귀속 폴백: 같은 거점에서 귀속된 노드의 평균 → 없으면 전체 평균
+    did = nodes["district_id"].fillna("").astype(str).to_numpy()
+    frame = pd.DataFrame(block, columns=_ADONG_COLS)
+    frame["_d"] = did
+    hub_mean = frame[matched].groupby("_d")[_ADONG_COLS].mean()
+    fill = hub_mean.reindex(did).to_numpy()
+    glob = np.nanmean(block[matched], axis=0)
+    fill = np.where(np.isnan(fill), glob, fill)
+    block = np.where(np.isnan(block), fill, block)
+
+    sd = block.std(axis=0)
+    sd[sd == 0] = 1.0
+    block = (block - block.mean(axis=0)) / sd
+    n_hub = len(set(did[matched]))
+    print(f"[gnn] 행정동 시간 피처 {len(_ADONG_COLS)}열 결합 · 귀속률 "
+          f"{matched.mean():.1%} · 귀속 거점 {n_hub} · "
+          f"행정동 {len(set(adm[matched]))}곳")
+    return np.nan_to_num(block), [f"adong_{c}" for c in _ADONG_COLS]
+
+
 def _features(nodes: pd.DataFrame, edges: pd.DataFrame,
               use_demand: bool = True,
-              use_building: bool = True) -> tuple[np.ndarray, list[str]]:
+              use_building: bool = True,
+              use_adong: bool = False) -> tuple[np.ndarray, list[str]]:
     """공실 상태에서도 관측 가능한 입지 피처만 구성한다."""
     lat = pd.to_numeric(nodes["lat"], errors="coerce").to_numpy()
     lon = pd.to_numeric(nodes["lon"], errors="coerce").to_numpy()
@@ -334,6 +440,12 @@ def _features(nodes: pd.DataFrame, edges: pd.DataFrame,
             x = np.column_stack([x, block[0]])
             names += block[1]
             print(f"[gnn] 건물 피처 결합 → 총 {len(names)}열")
+    if use_adong:
+        block = _adong_hour_block(nodes)
+        if block is not None:
+            x = np.column_stack([x, block[0]])
+            names += block[1]
+            print(f"[gnn] 행정동 시간 피처 결합 → 총 {len(names)}열")
     return np.nan_to_num(x).astype(np.float32), names
 
 
@@ -602,6 +714,7 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
           hidden: int = 128, lr: float = 0.01, weight_decay: float = 5e-4,
           patience: int = 50, save: bool = True, use_demand: bool = True,
           use_building: bool = True, use_neighbor: bool = False,
+          use_adong: bool = False,
           resume: bool = True, ckpt_every: int = 25,
           label_level: str = "group", class_weight: bool = False,
           select_by: str = "top1") -> dict:
@@ -624,7 +737,8 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
     nodes = nodes.reset_index(drop=True)
     y_np, classes = _labels(nodes, level=label_level)
     x_np, feat_names = _features(nodes, edges, use_demand=use_demand,
-                                 use_building=use_building)
+                                 use_building=use_building,
+                                 use_adong=use_adong)
     ei = _edge_index(nodes, edges, edge_types)
     did = nodes["district_id"].fillna("").astype(str).to_numpy()
 
@@ -750,6 +864,8 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
                                                  for n in _BUILDING_COLS)),
                     "neighbor_label_features": int(any(n.startswith("nb_frac_")
                                                        for n in feat_names)),
+                    "adong_hour_features": int(any(n.startswith("adong_")
+                                                   for n in feat_names)),
                     "edge_types": ",".join(sorted(edge_types)) if edge_types else "all"})
     print("[gnn·metrics]", metrics)
 
@@ -822,6 +938,9 @@ if __name__ == "__main__":
                     help="N에포크마다 재개 체크포인트 저장. 0 이면 끈다")
     ap.add_argument("--no-building", action="store_true",
                     help="Page 건물 물리·대장 피처 제외 — 08-17 이전 95피처 재현(ablation)")
+    ap.add_argument("--adong", action="store_true",
+                    help="Page 행정동 24시간 생활인구 피처 10열을 켠다(105→115열). "
+                         "기본 off — 종전 105열 재현이 기준선이다. _adong_hour_block 참조")
     ap.add_argument("--label-level", default="group", choices=("group", "category2"),
                     help="라벨 입도. category2 는 세분 업종 실험(산출물 저장 안 함)")
     ap.add_argument("--patience", type=int, default=50)
@@ -843,6 +962,7 @@ if __name__ == "__main__":
         train(edge_types=types, epochs=a.epochs, hidden=a.hidden,
               save=not a.no_save, use_demand=not a.no_demand,
               use_neighbor=a.neighbor,
+              use_adong=a.adong,
               use_building=not a.no_building,
               resume=not a.no_resume, ckpt_every=a.ckpt_every,
               label_level=a.label_level, patience=a.patience,

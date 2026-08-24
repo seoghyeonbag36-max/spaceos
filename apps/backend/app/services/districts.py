@@ -21,7 +21,7 @@ import math
 
 from app.data.seoul_pages import DISTRICTS, DISTRICTS_BY_ID
 from app.services import (gold_vacancy, posting_inputs, posting_revenue,
-                          vacancy_forecast)
+                          vacancy_forecast, vacant_inventory)
 
 # 입점 3-Tier 정의
 TIER = {
@@ -188,7 +188,10 @@ def tier_scenarios(unit: dict, district_id: str | None = None) -> dict:
     """
     f_k = _FOOT_K[unit["foot"]]
     base = unit["area"] * f_k
-    rent, area, prem = unit["rent"], unit["area"], unit["prem"]
+    # `prem`(권리금)은 공개 통계가 없어 **입력 계약**으로 받는다(2026-08-24 결정).
+    # 안 주면 0 전제로 돈다 — 실측 감도는 추천 5.2% 뒤집힘 · roi 중앙 1.6개월이고
+    # 회수가부 판정은 전혀 안 바뀐다(270유닛 전수, docs/feature-posting.md §0-K).
+    rent, area, prem = unit["rent"], unit["area"], unit.get("prem") or 0
     measured = posting_revenue.available(district_id)
 
     # (투자계수·투자고정, 비용계수·비용고정, 매출계수·매출고정)
@@ -331,15 +334,31 @@ def get_vacancy_heatmap(district_id: str) -> dict | None:
 
 
 def resolved_units(district_id: str) -> list[dict] | None:
-    """거점의 공실 유닛 — rent·foot 은 실데이터로 덮어쓴 뒤 돌려준다.
+    """거점의 공실 유닛 — **실 인벤토리 우선**, 없으면 시드. rent·foot 은 실데이터로 덮는다.
 
-    시드 원본(seoul_pages.DISTRICTS)은 건드리지 않는다(프로세스 전역 공유 dict 다).
-    각 유닛의 `inputs_source` 가 필드별 출처(seed/rone/flpop)를 밝힌다.
+    2026-08-24 배선. 그전까지 이 함수는 시드(`seoul_pages.DISTRICTS`, 270유닛)만
+    읽었다. 실제 공실 인벤토리는 08-22 에 54/54거점 528유닛으로 완주해 있었는데
+    **아무도 읽지 않아서**, Posting 화면이 계속 손으로 적은 예시 위에서 돌았다
+    (Program ①층이 08-23 에 겪은 것과 똑같은 실패 양식 — 수집이 아니라 배선이었다).
+
+    실 인벤토리는 건축물대장 실측이라 시드에 있던 서술 필드(`rec`·`persona`·`note`)가
+    없다. 지어내지 않고 **비운 채로** 내보낸다 — `rec` 은 이미 계산으로 대체됐고
+    (`recommend_tier`), 나머지 둘은 근거 없이 적은 문구다. 스키마에서 선택 필드다.
+
+    시드 원본은 건드리지 않는다(프로세스 전역 공유 dict 다).
+    각 유닛의 `inputs_source` 가 필드별 출처(seed/rone/flpop/gold-ledger/absent)를 밝힌다.
     """
-    d = DISTRICTS_BY_ID.get(district_id)
-    if not d:
+    if district_id not in DISTRICTS_BY_ID:
         return None
-    return posting_inputs.resolve_units(district_id, d["units"])
+    # 실 인벤토리 유닛에는 `rent` 가 **없다** — R-ONE 으로 계산해서 넣는 값이다.
+    # 그래서 R-ONE 입력(gold/platform_posting_inputs.json)이 미적재면 임대료가 빈
+    # 유닛이 나가고 `tier_scenarios` 가 KeyError 로 죽는다. 신규 클론에서 실제로
+    # 그렇게 된다 → 둘이 **함께** 있을 때만 실 인벤토리를 쓰고, 아니면 시드로 물러난다.
+    real = (vacant_inventory.units(district_id)
+            if posting_inputs.for_district(district_id) else [])
+    if real:
+        return posting_inputs.resolve_units(district_id, real)
+    return posting_inputs.resolve_units(district_id, DISTRICTS_BY_ID[district_id]["units"])
 
 
 def get_postings(district_id: str) -> list[dict] | None:

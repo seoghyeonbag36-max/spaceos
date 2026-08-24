@@ -15,6 +15,13 @@ class SimulateRequest(BaseModel):
     unit_id: str | None = None       # 거점 내 공실 유닛 (없으면 대표 유닛)
     industry_type: str | None = None  # GNN 업종 추천(Platform) 결과를 전달 가능
     strategy: str | None = None       # premium | value | factory (없으면 3전략 비교)
+    # 권리금(만원) — **기업이 넣는다**. 공개 통계가 없어(bronze 전수 확인) 수집으로는
+    # 못 채우고, 실제로도 임대인·기존 임차인과의 협상값이라 그 기업만 안다.
+    # Program 입력 계약 ③층(창업계획)과 같은 성격이다: 수집 과제가 아니라 계약 과제.
+    # 안 주면 0 을 전제로 계산하고 `inputs_source["prem"]="absent"` 로 밝힌다.
+    # 실측 감도(270유닛 전수): 추천 5.2% 뒤집힘 · roi 중앙 1.6개월(p90 15.5) ·
+    # 회수가부 판정은 0건 변화. → docs/feature-posting.md §0-K
+    prem: int | None = None
 
 
 class SimulateResult(BaseModel):

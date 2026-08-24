@@ -91,8 +91,12 @@ def test_postings_declare_input_provenance():
         # (거점별로 어느 쪽이 맞는지는 test_seed_fallback_only_where_trdar_
         #  cannot_differentiate 가 전 거점에 대해 지킨다.)
         assert src["foot"] == "flpop+trdar", f"거점 내 서열이 실측이 아니다: {src['foot']}"
-        # 실데이터 소스가 없는 둘은 시드로 남아 있어야 한다(있는 척하면 안 된다)
-        assert src["area"] == "seed" and src["prem"] == "seed"
+        # 2026-08-24 실 인벤토리 배선: area 는 건축물대장(상업면적÷capacity),
+        # prem 은 **값이 없다**. 둘 다 "있는 척"하면 안 되는 것은 그대로다 —
+        # 다만 밝히는 내용이 달라졌다. "absent" 는 권리금 0 이 관측이 아니라
+        # 전제라는 뜻이다(입력 계약으로 받으면 "contract" 가 된다).
+        assert src["area"] == "gold-ledger", "면적이 대장 실측이 아니다"
+        assert src["prem"] == "absent", "권리금 0 이 전제임을 밝히지 않는다"
 
 
 @requires_gold
@@ -112,16 +116,28 @@ def test_rent_falls_with_floor():
     """
     from app.services import districts as svc
 
+    # ⚠ 실 인벤토리(2026-08-24 배선)는 **528유닛 전부 `1F`** 다 — build_vacant_units
+    #   가 층을 1F 로 가정하기 때문이다. 그래서 resolved_units 로는 층 계수가 한 번도
+    #   안 밟히고, 이 회귀 테스트가 조용히 0건 검사로 비어 버렸다. 계수 자체를
+    #   직접 검사한다 — 인벤토리에 상층이 생기면 위 경로로도 자동으로 걸린다.
+    from app.services.posting_inputs import _floor_factor
+
+    base = _floor_factor("1F", None)
     checked = 0
+    for floor in ("2F", "3F", "4F", "5F", "B1"):
+        assert _floor_factor(floor, None) < base, f"{floor} 계수가 1F 이상이다"
+        checked += 1
+    assert checked == 5
+
+    # 인벤토리에 상층이 실제로 있으면 응답에서도 지켜져야 한다(지금은 없다).
     for did in ("garosugil", "myeongdong", "songridan"):
-        units = svc.resolved_units(did)
-        per_pyeong = {u["floor"]: u["rent"] / u["area"] for u in units}
-        if "1F" in per_pyeong:
-            for floor, v in per_pyeong.items():
-                if floor != "1F" and floor.endswith("F"):
-                    assert v < per_pyeong["1F"], f"{did} {floor} 평당 {v:.1f} >= 1F"
-                    checked += 1
-    assert checked, "상층 유닛이 있는 거점이 없다 — 시드가 바뀌었는지 확인"
+        per_pyeong = {u["floor"]: u["rent"] / u["area"]
+                      for u in (svc.resolved_units(did) or [])}
+        if "1F" not in per_pyeong:
+            continue
+        for floor, v in per_pyeong.items():
+            if floor != "1F" and floor.endswith("F"):
+                assert v < per_pyeong["1F"], f"{did} {floor} 평당 {v:.1f} >= 1F"
 
 
 @requires_gold
@@ -581,3 +597,75 @@ def test_units_without_coords_do_not_crash():
     assert vals[0] is None
     out = pi.resolve_units("garosugil", units)
     assert len(out) == 2 and all("foot" in u for u in out)
+
+
+# ── 실 인벤토리 배선 (2026-08-24) ────────────────────────────────────────────
+# 08-22 에 54/54거점 528유닛이 채워졌는데 resolved_units 가 시드만 읽어서 Posting
+# 화면이 계속 손으로 적은 예시 위에서 돌았다. 배선 자체를 지키는 자리다.
+
+
+@requires_gold
+def test_postings_come_from_real_inventory_not_seed():
+    """공실 유닛이 시드가 아니라 건축물대장 실측 인벤토리에서 와야 한다.
+
+    유닛 id 로 판정한다 — 실 인벤토리는 `vu-{PNU 19자리}-{n}` 이고 시드는 그렇지
+    않다. 건수·좌표로 보면 시드가 우연히 비슷해질 수 있지만 id 규칙은 안 겹친다.
+    """
+    from app.services import districts as svc
+
+    units = svc.resolved_units("garosugil")
+    assert units
+    assert all(u["id"].startswith("vu-") for u in units), (
+        f"시드 유닛이 섞였다: {[u['id'] for u in units if not u['id'].startswith('vu-')]}")
+
+
+@requires_gold
+def test_inventory_units_survive_tier_scenarios():
+    """실 인벤토리 유닛에는 `prem` 이 **없다**(528/528 결측) — 계산이 죽으면 안 된다.
+
+    `tier_scenarios` 가 `unit["prem"]` 을 첨자로 읽던 동안에는 배선하는 순간
+    KeyError 였다. 0 을 전제로 돌되 그 사실이 출처에 드러나야 한다.
+    """
+    from app.services import districts as svc
+
+    for did in ("garosugil", "myeongdong", "hongdae"):
+        for u in (svc.resolved_units(did) or []):
+            sc = svc.tier_scenarios(u, did)
+            assert set(sc) == {"premium", "value", "factory"}
+            assert u["inputs_source"]["prem"] == "absent"
+
+
+@requires_gold
+def test_prem_is_an_input_contract_not_a_collected_field():
+    """권리금은 기업이 넣는다 — 주면 반영되고, 안 주면 0 전제임을 밝힌다.
+
+    공개 통계가 없어(bronze 전수 확인) 수집으로 못 채우는 값이라, Program 입력
+    계약 ③층(창업계획)과 같이 **계약**으로 받기로 했다(2026-08-24 결정).
+    """
+    base = client.post(f"{V1}/ai/simulate-revenue",
+                       json={"district_id": "garosugil"}).json()
+    assert base["inputs_source"]["prem"] == "absent"
+
+    given = client.post(f"{V1}/ai/simulate-revenue",
+                        json={"district_id": "garosugil", "unit_id": base["unit_id"],
+                              "prem": 30000}).json()
+    assert given["inputs_source"]["prem"] == "contract"
+    # 권리금이 들어가면 초기투자가 커진다(prem/100 백만원). 세 전략 모두 오른다.
+    for t in ("premium", "value", "factory"):
+        assert given["scenarios"][t]["invest_mn"] > base["scenarios"][t]["invest_mn"], t
+
+    # 음수는 0 으로 눕힌다 — 이 경로의 계약은 어떤 입력에도 같은 스키마를 주는 것이다.
+    neg = client.post(f"{V1}/ai/simulate-revenue",
+                      json={"district_id": "garosugil", "unit_id": base["unit_id"],
+                            "prem": -5000}).json()
+    assert neg["scenarios"]["value"]["invest_mn"] == base["scenarios"]["value"]["invest_mn"]
+
+
+@requires_gold
+def test_narrative_fields_are_absent_not_invented():
+    """실 인벤토리 유닛에 시드 서술 문구(persona·note)를 지어 넣으면 안 된다."""
+    postings = client.get(f"{V1}/commercial-districts/garosugil/postings").json()
+    assert postings
+    for p in postings:
+        assert p.get("persona") in (None, ""), "실측 자리에 시드 페르소나가 붙었다"
+        assert p.get("note") in (None, ""), "실측 자리에 시드 문구가 붙었다"

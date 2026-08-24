@@ -99,8 +99,10 @@ export type PostingInputSource = Record<"area" | "rent" | "prem" | "foot", strin
 export interface PostingUnit {
   id: string; n: string; grp: string; lat: number; lng: number;
   area: number; rent: number; prem: number; floor: string; was: string;
-  rec: string; foot: string; persona: string; note: string;
-  /** rent·foot 은 실데이터, area·prem 은 소스가 없어 시드로 남아 있다 */
+  foot: string;
+  /** 시드에만 있던 서술 필드 — 실 인벤토리(건축물대장 실측)에는 없다(2026-08-24 배선) */
+  rec?: string | null; persona?: string | null; note?: string | null;
+  /** rent·foot 은 실데이터, area 는 대장, prem 은 입력 계약(없으면 "absent") */
   inputs_source?: PostingInputSource | null;
 }
 
