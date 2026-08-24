@@ -71,7 +71,8 @@ async def simulate_revenue(req: SimulateRequest) -> dict:
 
     코파일럿(settings.posting_copilot_url) 미설정 시 내부 3-Tier 폴백으로 응답한다.
     """
-    result = posting_svc.simulate(req.district_id, req.unit_id, req.industry_type, req.strategy)
+    result = posting_svc.simulate(req.district_id, req.unit_id,
+                                  req.industry_type, req.strategy, req.prem)
     if result is None:
         raise HTTPException(status_code=404, detail=f"unknown district: {req.district_id}")
     return result

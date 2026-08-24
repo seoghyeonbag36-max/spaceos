@@ -29,34 +29,30 @@
 """
 from __future__ import annotations
 
-import json
-import re
 from pathlib import Path
 
-_GOLD_DIR = Path(__file__).resolve().parents[4] / "data" / "gold"
+from app.services import vacant_inventory
 
-# 슬러그 화이트리스트 — 경로 조작 방어. marketing._SLUG_RE 와 같은 규칙을 쓴다.
-_SLUG_RE = re.compile(r"^[a-z0-9-]{1,40}$")
-
-# 거점 id 별칭. marketing._DISTRICT_ALIAS 와 어긋나면 같은 요청이 층마다 다른 거점을
-# 가리키므로, 늘릴 때는 양쪽을 같이 고친다.
-_DISTRICT_ALIAS: dict[str, str] = {}
-
-_cache: dict[str, dict | None] = {}
+# 파일 로딩은 services/vacant_inventory 한 곳에만 둔다 — 인벤토리는 Posting 의
+# 산출물이고 이 층이 빌려 쓰는 것이라, 로더가 여기에 있으면 Posting 이 Program 을
+# 임포트해야 하는 역전이 생긴다(2026-08-24). 아래 이름들은 종전 호출부·테스트가
+# 그대로 돌도록 남긴 얇은 위임이다.
+_GOLD_DIR = vacant_inventory._GOLD_DIR
+_SLUG_RE = vacant_inventory._SLUG_RE
+_DISTRICT_ALIAS = vacant_inventory._DISTRICT_ALIAS
 
 
 def _path(slug: str) -> Path:
-    return _GOLD_DIR / slug / "vacant_units.json"
+    return vacant_inventory.path(slug)
 
 
 def _slug(district_id: str | None) -> str | None:
-    s = _DISTRICT_ALIAS.get(district_id or "", district_id or "")
-    return s if _SLUG_RE.match(s) else None
+    return vacant_inventory.slug_of(district_id)
 
 
 def clear_cache() -> None:
     """테스트·재적재용. 프로세스 전역 캐시를 비운다."""
-    _cache.clear()
+    vacant_inventory.clear_cache()
 
 
 def _load(district_id: str | None) -> dict | None:
@@ -66,22 +62,7 @@ def _load(district_id: str | None) -> dict | None:
     올리지 않고 None 을 주어 호출부가 자리층 없이 진행하게 한다 — 다만 그 사실이
     응답에 드러나야 한다(`site_source`).
     """
-    slug = _slug(district_id)
-    if slug is None:
-        return None
-    if slug in _cache:
-        return _cache[slug]
-    path = _path(slug)
-    data: dict | None = None
-    if path.exists():
-        try:
-            loaded = json.loads(path.read_text(encoding="utf-8"))
-            if isinstance(loaded, dict) and isinstance(loaded.get("units"), list):
-                data = loaded
-        except (OSError, ValueError):
-            data = None
-    _cache[slug] = data
-    return data
+    return vacant_inventory.load(district_id)
 
 
 def units(district_id: str | None) -> list[dict]:

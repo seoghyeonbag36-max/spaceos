@@ -97,6 +97,11 @@ data/gold/*/*
 # 소스는 gold/*/page_building_master.geojson(추적 중)이므로 재생성은 가능하지만,
 # 재생성 없이 학습을 돌리면 '조용히 이전 피처'가 되는 게 문제다.
 !data/gold/features/page_building.parquet
+# 예외: 행정동 24시간 생활인구 피처(136행 ~20KB) — train_gnn._adong_hour_block 이
+# `--adong` 으로 읽는다. 08-24 실측에서 off-prior 를 못 올려 **기본 off** 이고 서빙에도
+# 안 쓰이지만, 빠지면 음성결과를 재현할 수 없다. 안 올랐다는 사실 자체가 산출물이라
+# (지우면 다음 사람이 같은 것을 다시 시도한다 — docs/feature-platform.md §0-J) 남긴다.
+!data/gold/features/adong_hourly.parquet
 # 예외: Program 상권 컨텍스트(거점당 ~3KB, 54거점 합계 174KB) — services/marketing.py 가
 # LLM 프롬프트 입력으로 디스크에서 읽는다. 빠져 있으면 배포 환경에서 garosugil 만
 # 컨텍스트를 갖고 나머지 53거점은 조용히 시드 카피로 폴백한다(2026-08-01 발견).

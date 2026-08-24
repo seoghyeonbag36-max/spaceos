@@ -52,16 +52,24 @@ def _call_copilot(district_id: str, unit: dict,
 
 
 def simulate(district_id: str, unit_id: str | None = None,
-             industry_type: str | None = None, strategy: str | None = None) -> dict | None:
+             industry_type: str | None = None, strategy: str | None = None,
+             prem: int | None = None) -> dict | None:
     """공실 유닛의 입점 시뮬레이션. 코파일럿 우선, 실패 시 3-Tier 폴백.
 
     strategy(premium/value/factory) 지정 시 해당 전략만, 미지정 시 3전략 비교 반환.
+    `prem`(권리금)은 **입력 계약**이다 — 기업이 주면 그 값으로, 안 주면 0 전제로
+    계산하고 `inputs_source["prem"]` 이 어느 쪽인지 밝힌다(2026-08-24 결정).
     반환: SimulateResult 스키마 dict. 거점/유닛을 찾지 못하면 None.
     """
     units = svc.resolved_units(district_id)
     if not units:
         return None
     unit = next((u for u in units if u["id"] == unit_id), units[0])
+    if prem is not None:
+        # 음수 권리금은 계약 위반이다 — 0 으로 잘라 내리지 않고 거부하면 400 이 필요한데,
+        # 이 경로는 어떤 입력에도 같은 스키마를 돌려주는 것이 계약이라 0 으로 눕힌다.
+        unit = {**unit, "prem": max(0, prem)}
+        unit["inputs_source"] = {**(unit.get("inputs_source") or {}), "prem": "contract"}
 
     scenarios, fail = _call_copilot(district_id, unit, industry_type)
     source = "copilot"

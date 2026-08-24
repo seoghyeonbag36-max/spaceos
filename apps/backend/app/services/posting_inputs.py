@@ -187,6 +187,37 @@ def _blend_foot(district_grade: str, seed_foot: str, seed_feet: list[str]) -> st
     return _GRADES[max(0, min(len(_GRADES) - 1, base + offset))]
 
 
+# 실 인벤토리(gold/{거점}/vacant_units.json)에 없는 필드의 기본값.
+# 시드에만 있던 것들이라, 배선하면서 여기서 한 번에 메운다.
+_INVENTORY_DEFAULTS = {"prem": 0, "foot": "", "was": "", "grp": ""}
+
+
+def _normalize(unit: dict) -> dict:
+    """유닛에 계산이 요구하는 키를 채운다(없는 것만).
+
+    `tier_scenarios` 는 `unit["prem"]` 을 첨자로 읽는다. 실 인벤토리 유닛에는 그 키가
+    **하나도 없어서**(528/528 결측) 배선하는 순간 KeyError 로 죽는다. 0 으로 채우되
+    `_origin_src` 가 그것이 관측이 아니라 전제임을 밝힌다.
+    """
+    if all(k in unit for k in _INVENTORY_DEFAULTS):
+        return unit
+    return {**_INVENTORY_DEFAULTS, **unit}
+
+
+def _origin_src(unit: dict) -> dict[str, str]:
+    """유닛의 출처를 필드별로 밝힌다 — 실 인벤토리에서 온 것과 시드를 가른다.
+
+    `area` 는 실 인벤토리에서 오면 건축물대장 상업면적÷capacity 다(건물 실측 · 유닛
+    서열은 균등분할). `prem` 은 어느 쪽에서 오든 **관측이 아니다** — 실 인벤토리에는
+    필드 자체가 없고(권리금은 공개 통계가 없다), 시드 값은 손으로 적은 것이다.
+    권리금은 임대인·기존 임차인과의 협상값이라 수집 과제가 아니라 **입력 계약**이다
+    (2026-08-24 결정, docs/feature-posting.md §0-K).
+    """
+    if not str(unit.get("id", "")).startswith("vu-"):
+        return {}
+    return {"area": "gold-ledger", "prem": "absent"}
+
+
 def resolve_units(district_id: str, units: list[dict]) -> list[dict]:
     """거점 유닛들의 3-Tier 입력을 실데이터로 덮어쓴다. 미적재면 시드 그대로.
 
@@ -197,10 +228,11 @@ def resolve_units(district_id: str, units: list[dict]) -> list[dict]:
     건드리지 않는다 — seoul_pages.DISTRICTS 는 프로세스 전역에서 공유된다).
     `inputs_source` 로 필드별 출처를 함께 싣는다: 프록시를 실측으로 오독하면 안 된다.
     """
+    units = [_normalize(u) for u in units]
     seed_src = {"area": "seed", "rent": "seed", "prem": "seed", "foot": "seed"}
     row = for_district(district_id)
     if not row:
-        return [{**u, "inputs_source": dict(seed_src)} for u in units]
+        return [{**u, "inputs_source": {**seed_src, **_origin_src(u)}} for u in units]
 
     data = _load() or {}
     rent_per_m2 = row.get("rent_per_m2_krw_thousand")
@@ -213,7 +245,7 @@ def resolve_units(district_id: str, units: list[dict]) -> list[dict]:
 
     out: list[dict] = []
     for i, unit in enumerate(units):
-        resolved = {**unit, "inputs_source": dict(seed_src)}
+        resolved = {**unit, "inputs_source": {**seed_src, **_origin_src(unit)}}
         if rent_per_m2:
             factor = _floor_factor(unit.get("floor", "1F"), data.get("floor_factor"))
             # 시드 rent 와 같은 단위(만원/월): 천원/㎡ × ㎡ ÷ 10
@@ -224,9 +256,15 @@ def resolve_units(district_id: str, units: list[dict]) -> list[dict]:
             if offsets is not None:
                 resolved["foot"] = _apply_offset(district_grade, offsets[i])
                 resolved["inputs_source"]["foot"] = "flpop+trdar"
-            else:
+            elif unit.get("foot"):
                 resolved["foot"] = _blend_foot(
                     district_grade, unit.get("foot", ""), seed_feet)
                 resolved["inputs_source"]["foot"] = "flpop+seed"
+            else:
+                # 실 인벤토리 유닛에는 시드 `foot` 이 없다. 서열을 지어내지 않고
+                # **거점 등급 그대로** 준다 — 같은 거점 유닛이 전부 같은 등급이 되지만,
+                # 없는 서열을 만들어 내는 것보다 낫다. 출처가 그 사실을 밝힌다.
+                resolved["foot"] = district_grade
+                resolved["inputs_source"]["foot"] = "flpop"
         out.append(resolved)
     return out
