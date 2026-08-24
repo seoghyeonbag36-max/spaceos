@@ -451,7 +451,16 @@ export default function MapShell() {
         {layer === "footfall" && (
           <span className="note">
             {footHm
-              ? <>유동인구 · {footHm.band_label} · 상권 {footHm.trdar_count}곳 <span style={TRDAR_BADGE}>TRDAR 상권단위</span></>
+              ? <>
+                  유동인구 · {footHm.time_source === "adong_hourly"
+                    ? `${String(footHm.hour).padStart(2, "0")}시 (${footHm.daytype === "weekend" ? "주말" : "평일"})`
+                    : footHm.band_label} · 상권 {footHm.trdar_count}곳{" "}
+                  <span style={TRDAR_BADGE}>TRDAR 상권단위</span>{" "}
+                  {/* 시간 눈금을 밝힌다 — 24시간과 6구간은 값의 스케일이 다르다 */}
+                  <span style={TRDAR_BADGE}>
+                    {footHm.time_source === "adong_hourly" ? "생활인구 24h" : "TRDAR 6구간"}
+                  </span>
+                </>
               : "유동인구 · 불러오는 중"}
           </span>
         )}

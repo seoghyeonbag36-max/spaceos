@@ -45,17 +45,26 @@ async def rent_heatmap(district: str) -> dict:
 
 
 @router.get("/footfall")
-async def footfall_heatmap(district: str, hour: int = 12) -> dict:
-    """시간대별 유동인구 히트맵 — 공실/임대와 같은 100m 격자. 쿼리: ?district=..&hour=0~23
+async def footfall_heatmap(district: str, hour: int = 12,
+                           daytype: str = "weekday") -> dict:
+    """시간대별 유동인구 히트맵 — 공실/임대와 같은 100m 격자.
+
+    쿼리: `?district=..&hour=0~23&daytype=weekday|weekend`
 
     2026-08-23 이전에는 이 엔드포인트가 없었고 프론트가 `Math.random()` 으로 점 120개를
     만들어 그렸다(슬라이더가 입력을 보지 않아 장식이었다). 실데이터는 TRDAR 상권 190곳
     — services/footfall_layer 참조.
 
+    2026-08-24 부터 **시간 축**은 생활인구(행정동 × 24시간)로 갈아끼운다. 산출물이 그
+    거점을 담고 있으면 `time_source: "adong_hourly"`, 아니면 종전 TRDAR 6구간
+    (`"trdar_band"`) 으로 물러난다. `daytype` 은 생활인구 경로에서만 뜻이 있다 —
+    업무지구와 상업지구는 평일·주말 곡선이 뒤집힌다.
+
     ⚠ 값은 **상권 단위 집계**를 격자에 얹은 것이다. 응답의 `resolution`·`note` 를 화면에
-    함께 노출할 것 — 빼면 격자 단위 실측처럼 읽힌다.
+    함께 노출할 것 — 빼면 격자 단위 실측처럼 읽힌다. `share_basis` 가 다른 두 응답의
+    셀 값은 서로 비교하면 안 된다(눈금이 24시간이냐 6구간이냐로 갈린다).
     """
-    hm = footfall_layer.footfall_heatmap(district, hour)
+    hm = footfall_layer.footfall_heatmap(district, hour, daytype)
     if hm is None:
         raise HTTPException(status_code=404, detail=f"footfall unavailable: {district}")
     return hm

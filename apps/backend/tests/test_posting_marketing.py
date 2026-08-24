@@ -85,7 +85,12 @@ def test_postings_declare_input_provenance():
     for p in postings:
         src = p["inputs_source"]
         assert src["rent"] == "rone", "임대료가 R-ONE 실데이터가 아니다"
-        assert src["foot"] == "flpop+seed", "유동인구 등급이 혼합 산출이 아니다"
+        # 2026-08-24: 거점 내 서열이 시드 → 최근접 상권 실측으로 바뀌었다.
+        # 가로수길은 상권 3곳(신사·논현1·잠원)이라 실측으로 갈린다 — 여기가
+        # `flpop+seed` 로 돌아갔다면 조용히 프록시로 후퇴한 것이다.
+        # (거점별로 어느 쪽이 맞는지는 test_seed_fallback_only_where_trdar_
+        #  cannot_differentiate 가 전 거점에 대해 지킨다.)
+        assert src["foot"] == "flpop+trdar", f"거점 내 서열이 실측이 아니다: {src['foot']}"
         # 실데이터 소스가 없는 둘은 시드로 남아 있어야 한다(있는 척하면 안 된다)
         assert src["area"] == "seed" and src["prem"] == "seed"
 
@@ -124,7 +129,12 @@ def test_foot_keeps_within_district_structure():
     """유동인구 등급이 거점 안에서 평탄화되면 안 된다.
 
     flpop 은 거점 단위라 그대로 내리면 한 거점의 모든 유닛이 같은 등급이 된다
-    (가로수길 고/고/중/저/중 → 전부 중). 시드의 거점 내 서열로 ±1칸 보정하는 이유다.
+    (가로수길 고/고/중/저/중 → 전부 중). 그래서 ±1칸 보정을 한다.
+
+    ⚠ 2026-08-24: 그 보정의 근거가 **시드 서열 → 최근접 상권 유동총량 실측** 으로
+      바뀌었다. 거점당 상권이 1~9곳(중앙 3곳)이라 유닛 좌표로 상권을 잡으면 거점
+      내부에서도 값이 갈린다. 아래 test_foot_ordering_is_measured_not_seeded 가
+      그 전환을 지킨다.
     """
     from app.data.seoul_pages import DISTRICTS_BY_ID
     from app.services import districts as svc
@@ -486,3 +496,88 @@ def test_dong_extraction_handles_numbered_ga():
     assert dong_of("서울 마포구 연남동 260-2") == "연남동"
     assert dong_of("서울 중구 을지로3가 1") == "을지로3가"
     assert dong_of(None) is None
+
+
+# ── foot 거점 내 서열: 시드 → 최근접 상권 실측 (2026-08-24) ─────────────────
+#
+# `foot` 의 거점 **등급**은 처음부터 flpop 실측이었지만, 거점 **내부 서열**은 손으로
+# 적은 시드였다(`_blend_foot` 의 seed_feet). 거점당 상권이 1~9곳이라 유닛 좌표에서
+# 최근접 상권을 잡으면 그 서열도 실측으로 낼 수 있다. 이 묶음이 지키는 것:
+#   1. 실측으로 가를 수 있으면 시드를 쓰지 않는다.
+#   2. 못 가르면 **억지로 갈라 놓지 않고** 시드로 물러난다(없는 구조를 만들지 않는다).
+#   3. 출처를 항상 밝힌다 — 프록시를 실측으로 오독하면 안 된다.
+
+@requires_gold
+def test_foot_ordering_is_measured_not_seeded():
+    """대다수 유닛은 `flpop+trdar` 이어야 한다 — 시드가 기본이면 전환이 안 된 것이다."""
+    from collections import Counter
+
+    from app.services import districts as svc
+
+    src = Counter()
+    for d in svc.DISTRICTS:
+        for u in svc.resolved_units(d["id"]) or []:
+            src[u["inputs_source"]["foot"]] += 1
+    assert src["flpop+trdar"] > src["flpop+seed"], dict(src)
+    # 시드 잔존은 '상권으로 못 가르는 거점' 에 국한돼야 한다.
+    assert src["flpop+seed"] / max(1, sum(src.values())) < 0.15, dict(src)
+
+
+@requires_gold
+def test_seed_fallback_only_where_trdar_cannot_differentiate():
+    """시드로 물러난 거점은 **실제로** 최근접 상권이 하나여야 한다.
+
+    이게 깨지면 가를 수 있는데도 시드를 쓰고 있다는 뜻이다 — 조용히 프록시로
+    되돌아간 상태이므로 눈으로는 안 보인다.
+    """
+    from app.services import districts as svc
+    from app.services import posting_inputs as pi
+
+    for d in svc.DISTRICTS:
+        units = svc.resolved_units(d["id"]) or []
+        if not units or units[0]["inputs_source"]["foot"] != "flpop+seed":
+            continue
+        vals = pi._unit_trdar_flpop(d["id"], svc.DISTRICTS_BY_ID[d["id"]]["units"])
+        known = {v for v in vals if v is not None}
+        assert len(known) < 2, f"{d['id']}: 상권이 {len(known)}종인데 시드로 물러났다"
+
+
+def test_measured_offsets_needs_two_distinct_values():
+    """가를 수 없으면 None — 호출부가 시드로 물러나는 신호다."""
+    from app.services import posting_inputs as pi
+
+    assert pi._measured_offsets([]) is None
+    assert pi._measured_offsets([100.0]) is None
+    assert pi._measured_offsets([100.0, 100.0, 100.0]) is None   # 상권 1곳짜리 거점
+    assert pi._measured_offsets([None, None]) is None
+
+
+def test_measured_offsets_signs_follow_the_mean():
+    """평균에서 ±15% 밖이면 한 칸, 안이면 제자리. 좌표 없는 유닛은 0(제자리)."""
+    from app.services import posting_inputs as pi
+
+    # 평균 200 → 100 은 -1, 300 은 +1, 205 는 밴드 안이라 0
+    assert pi._measured_offsets([100.0, 300.0, 205.0, None]) == [-1, 1, 0, 0]
+
+
+def test_apply_offset_clamps_at_grade_boundaries():
+    """'고' 에서 +1, '저' 에서 -1 로 등급 밖으로 넘어가지 않는다."""
+    from app.services import posting_inputs as pi
+
+    assert pi._apply_offset("고", 1) == "고"
+    assert pi._apply_offset("저", -1) == "저"
+    assert pi._apply_offset("중", 1) == "고"
+    assert pi._apply_offset("중", -1) == "저"
+
+
+@requires_gold
+def test_units_without_coords_do_not_crash():
+    """좌표 결측 유닛이 섞여도 나머지 서열은 살아 있어야 한다."""
+    from app.services import posting_inputs as pi
+
+    units = [{"id": "a", "lat": None, "lng": None, "area": 10, "floor": "1F", "foot": "중"},
+             {"id": "b", "lat": 37.5172, "lng": 127.0286, "area": 10, "floor": "1F", "foot": "고"}]
+    vals = pi._unit_trdar_flpop("garosugil", units)
+    assert vals[0] is None
+    out = pi.resolve_units("garosugil", units)
+    assert len(out) == 2 and all("foot" in u for u in out)

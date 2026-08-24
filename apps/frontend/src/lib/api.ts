@@ -210,6 +210,17 @@ export interface FootfallHeatmap {
   hour: number;
   band: string;
   band_label: string;
+  /**
+   * 2026-08-24: **시간 축**은 생활인구(행정동 x 24시간)로 갈아끼웠다.
+   * `resolution`/`footfall_source` 는 여전히 공간 해상도(상권)를 뜻하고 바뀌지 않는다.
+   * - `adong_hourly` : 24시간 눈금. `daytype` 으로 평일/주말이 갈린다.
+   * - `trdar_band`   : 산출물이 그 거점을 못 담을 때의 종전 6구간 폴백.
+   * `share_basis` 가 다른 두 응답의 셀 값은 **눈금이 달라 직접 비교할 수 없다**.
+   */
+  time_source?: "adong_hourly" | "trdar_band";
+  daytype?: "weekday" | "weekend";
+  share_basis?: "hour24" | "band6";
+  hour_share?: number | null;
   unit: string;
   min: number; max: number;
   note: string;
@@ -231,8 +242,11 @@ export interface DensityHeatmap {
 }
 
 /** 거점 시간대별 유동인구 레이어(Page) — hour 0~23 */
-export const getFootfallHeatmap = (id: string, hour: number) =>
-  getJSON<FootfallHeatmap>(`/heatmap/footfall?district=${id}&hour=${hour}`);
+export const getFootfallHeatmap = (
+  id: string, hour: number, daytype: "weekday" | "weekend" = "weekday",
+) =>
+  getJSON<FootfallHeatmap>(
+    `/heatmap/footfall?district=${id}&hour=${hour}&daytype=${daytype}`);
 /** 거점 상권 밀도 레이어(Page) */
 export const getDensityHeatmap = (id: string, metric: "flpop" | "stor" = "flpop") =>
   getJSON<DensityHeatmap>(`/heatmap/density?district=${id}&metric=${metric}`);
