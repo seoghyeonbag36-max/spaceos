@@ -533,12 +533,78 @@ def quality_report() -> dict:
     return rep
 
 
+SELECT_BY = ("top1", "macro_f1", "offprior3")
+
+# offprior3 로 고를 때 지켜야 할 val Top-3 하한. 게이트가 `off-prior ≥50%` 를
+# **`test_top3 ≥70%` 와 함께** 두는 것과 같은 이유다 — off-prior 만 보고 고르면
+# 희소 업종을 Top-3 에 밀어 넣어 지표를 올리면서 본 지표를 무너뜨릴 수 있다.
+# 하한 밑의 에포크는 후보에서 아예 뺀다(점수를 깎는 게 아니라 배제한다).
+OFFPRIOR_TOP3_FLOOR = 0.70
+
+
+def _make_val_scorer(select_by: str, y: torch.Tensor, y_np: np.ndarray,
+                     did: np.ndarray, tr: np.ndarray, va: np.ndarray,
+                     m_va: torch.Tensor, n_cls: int):
+    """에포크마다 부를 **검증 점수 함수**를 만든다 — 상수는 여기서 한 번만 계산한다.
+
+    왜 팩토리인가 (2026-08-24 실측): 처음엔 매 에포크 `_offprior_top3()` 를 그대로
+    불렀다. 그런데 그 안의 `_district_top3()` 는 거점 54개마다 train 라벨 Counter 를
+    다시 세고, off 마스크는 노드 40,388개를 파이썬 컴프리헨션으로 훑는다. **둘 다
+    `y[train]` 에만 의존해서 학습 내내 값이 안 바뀐다.** 그걸 600번 반복한 결과가
+    에포크당 **91초**(top1 은 2.9초 — 32배)였고, 600에포크 = 15시간이 됐다.
+
+    지금은 마스크·정답 텐서를 루프 밖에서 만들고, 에포크마다 하는 일은 off 자리
+    877개에 대한 topk 하나뿐이다.
+
+    ⚠ 어느 기준이든 거점 사전분포는 **train 마스크로만** 세고 점수는 val 에서 잰다.
+      test 는 여기서 절대 안 쓴다 — 쓰면 조기 종료가 곧 test 누출이 된다.
+    """
+    if select_by == "top1":
+        return lambda logits: _topk_acc(logits[m_va], y[m_va], 1)
+
+    if select_by == "macro_f1":
+        y_va = y_np[va]
+        # logits.argmax(1)[va] 와 logits[m_va].argmax(1) 은 같다 — 뒤엣것이 싸다.
+        return lambda logits: _macro_f1(
+            logits[m_va].argmax(1).numpy(), y_va, n_cls)
+
+    if select_by == "offprior3":
+        top3, major = _district_top3(y_np, did, tr)      # train 라벨에만 의존 = 상수
+        off = np.array([yt not in top3.get(d, [major])
+                        for yt, d in zip(y_np, did)]) & va
+        n_off = int(off.sum())
+        if n_off == 0:
+            # off-prior 자리가 없으면 이 기준으로는 아무것도 못 고른다. top1 로 조용히
+            # 물러나지 않고 -1 로 둬서, best_state 가 안 잡힌 채 끝까지 도는 것이
+            # 로그에 드러나게 한다.
+            print("[gnn] off-prior val 자리 0개 — offprior3 로는 모델 선택 불가")
+            return lambda logits: -1.0
+        m_off = torch.tensor(off)
+        y_off = torch.tensor(y_np[off])
+        k = min(TOP_K, n_cls)
+        print(f"[gnn] offprior3 선택 기준 — val off-prior 자리 {n_off}개")
+
+        def _score(logits: torch.Tensor) -> float:
+            # 게이트가 off-prior 를 test_top3 와 함께 두는 것과 같은 이유의 가드다 —
+            # off-prior 만 보고 고르면 희소 업종을 Top-3 에 밀어 넣어 본 지표를 무너뜨린다.
+            if _topk_acc(logits[m_va], y[m_va], TOP_K) < OFFPRIOR_TOP3_FLOOR:
+                return -1.0
+            hit = (logits[m_off].topk(k, dim=1).indices
+                   == y_off.unsqueeze(1)).any(dim=1).float().mean()
+            return float(hit)
+
+        return _score
+
+    raise ValueError(f"알 수 없는 select_by: {select_by}")
+
+
 def train(edge_types: set[str] | None = None, epochs: int = 400,
           hidden: int = 128, lr: float = 0.01, weight_decay: float = 5e-4,
           patience: int = 50, save: bool = True, use_demand: bool = True,
           use_building: bool = True, use_neighbor: bool = False,
           resume: bool = True, ckpt_every: int = 25,
-          label_level: str = "group", class_weight: bool = False) -> dict:
+          label_level: str = "group", class_weight: bool = False,
+          select_by: str = "top1") -> dict:
     torch.manual_seed(SEED)
     rng = np.random.default_rng(SEED)
 
@@ -594,7 +660,9 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
     # 엉뚱한 모델을 학습하면서 조용히 성공한 것처럼 보인다.
     sig = {"in_dim": int(x.shape[1]), "classes": len(classes),
            "label_level": label_level, "class_weight": int(class_weight),
-           "hidden": hidden, "epochs": epochs, "patience": patience}
+           "hidden": hidden, "epochs": epochs, "patience": patience,
+           # 기준이 다르면 best_state 의 의미가 달라진다 — 이어붙이면 안 된다.
+           "select_by": select_by}
     start_ep, best_val, best_state, bad = 1, -1.0, None, 0
     if resume and _RESUME.exists():
         # 저장 도중 죽으면 파일이 깨진다 — 무인 재시도 루프에서 그게 매 회 예외가 되면
@@ -615,6 +683,9 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
         else:
             print("[gnn] 재개 파일이 현재 설정과 달라 무시한다 — 처음부터 학습")
 
+    # 검증 점수 함수는 **루프 밖에서** 만든다 — 상수 재계산을 없애는 것이 요점이다.
+    val_score = _make_val_scorer(select_by, y, y_np, did, tr, va, m_va, len(classes))
+
     for ep in range(start_ep, epochs + 1):
         model.train()
         opt.zero_grad()
@@ -626,14 +697,14 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
         model.eval()
         with torch.no_grad():
             logits = model(x, ei)
-            v = _topk_acc(logits[m_va], y[m_va], 1)
+            v = val_score(logits)
         if v > best_val:
             best_val, bad = v, 0
             best_state = {k: t.clone() for k, t in model.state_dict().items()}
         else:
             bad += 1
             if bad >= patience:
-                print(f"  조기 종료 ep{ep} (val top1 {best_val:.4f})")
+                print(f"  조기 종료 ep{ep} (val {select_by} {best_val:.4f})")
                 break
         if ckpt_every and ep % ckpt_every == 0:
             # 임시 파일에 쓰고 원자적으로 바꿔친다 — 저장 중 죽어도 직전 체크포인트는 산다
@@ -645,7 +716,8 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
                         "best_state": best_state}, tmp)
             tmp.replace(_RESUME)
         if ep % 50 == 0:
-            print(f"  ep{ep:4d} loss {float(loss.detach()):.4f} · val top1 {v:.4f}")
+            print(f"  ep{ep:4d} loss {float(loss.detach()):.4f} · "
+                  f"val {select_by} {v:.4f}")
 
     # 여기 왔으면 완주(또는 조기 종료)다 — 재개 파일은 다음 학습을 오염시키므로 지운다
     _RESUME.unlink(missing_ok=True)
@@ -660,7 +732,9 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
         "test_top1": round(_topk_acc(logits[m_te], y[m_te], 1), 4),
         f"test_top{TOP_K}": round(_topk_acc(logits[m_te], y[m_te], TOP_K), 4),
         "test_macro_f1": round(_macro_f1(pred[te], y_np[te], len(classes)), 4),
-        "val_top1": round(best_val, 4),
+        # 이름을 유지하면 select_by 가 top1 이 아닐 때 조용히 다른 지표가 된다.
+        "val_select_by": select_by,
+        "val_best": round(best_val, 4),
         **_baselines(y_np, did, tr, te, len(classes)),
         **_offprior_top3(logits, y_np, did, tr, te),
     }
@@ -751,6 +825,12 @@ if __name__ == "__main__":
     ap.add_argument("--label-level", default="group", choices=("group", "category2"),
                     help="라벨 입도. category2 는 세분 업종 실험(산출물 저장 안 함)")
     ap.add_argument("--patience", type=int, default=50)
+    ap.add_argument("--select-by", default="top1", choices=SELECT_BY,
+                    help="조기 종료·모델 선택 기준(검증셋). top1=종전 기본값 · "
+                         "macro_f1=희소 업종 회수 · offprior3=거점 사전분포가 못 "
+                         "맞히는 자리의 Top-3(게이트와 같은 지표, val Top-3 "
+                         # argparse 는 help 에 %% 치환을 돌린다 — 리터럴 % 는 못 넣는다
+                         f"{OFFPRIOR_TOP3_FLOOR:.2f} 하한으로 가드)")
     ap.add_argument("--class-weight", action="store_true",
                     help="빈도 역수 균형 손실 — macro-F1 이 낮은 원인이 라벨 편중인지 "
                          "피처 부족인지 가르는 진단용. 2026-08-17 실측 결과 '피처 부족' "
@@ -766,4 +846,4 @@ if __name__ == "__main__":
               use_building=not a.no_building,
               resume=not a.no_resume, ckpt_every=a.ckpt_every,
               label_level=a.label_level, patience=a.patience,
-              class_weight=a.class_weight)
+              class_weight=a.class_weight, select_by=a.select_by)

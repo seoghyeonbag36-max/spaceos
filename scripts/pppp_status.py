@@ -91,6 +91,57 @@ def _hubs() -> int:
         return sum(1 for p in GOLD.iterdir() if p.is_dir() and (p / "coverage.json").exists())
 
 
+def _count_measured_foot_hubs() -> int | None:
+    """거점 내 `foot` 서열이 **실측**으로 갈리는 거점 수. 못 세면 None.
+
+    왜 산출물이 아니라 백엔드 함수를 부르나: 판정은 "유닛 좌표 → 최근접 상권 →
+    유동총량이 2종 이상인가" 인데, 그 유닛 모집단이 `seoul_pages` 의 시드 270유닛이다
+    (`vacant_units.json` 의 580유닛과 **다른 모집단**이다 — 그쪽을 세면 다른 수가 나온다).
+    규칙을 여기 옮겨 적으면 한쪽만 고쳐졌을 때 조용히 어긋나므로, 권위 있는 함수를
+    그대로 부른다. 0.2초면 끝나고 네트워크도 파일 쓰기도 없다.
+
+    None 은 "못 셌다" 이고 호출부가 종전 0.5 가중으로 물러난다 — 0 으로 세면 실측이
+    있는데도 진행률이 떨어져 보인다.
+    """
+    try:
+        sys.path.insert(0, str(ROOT / "apps" / "backend"))
+        from app.services import districts as _d
+        from app.services import posting_inputs as _pi
+
+        return sum(
+            1 for d in _d.DISTRICTS
+            if _pi._measured_offsets(
+                _pi._unit_trdar_flpop(d["id"], _d.DISTRICTS_BY_ID[d["id"]]["units"])
+            ) is not None)
+    except Exception:
+        return None
+
+
+def _hourly_axis_note() -> str:
+    """24시간 시간축(생활인구)의 **실제 적재 상태**를 세어 문장으로 만든다.
+
+    이 자리에 "24시간 실측은 시간 축만 갈아끼우면 된다"고 적어 두었던 것이
+    2026-08-24 에 배선되면서 곧바로 낡았다. 같은 일이 또 일어나지 않게, 진행 문구를
+    손으로 적지 않고 **산출물을 세어** 만든다.
+    """
+    doc = _load(GOLD / "page_footfall_hourly.json")
+    if not doc:
+        return ("시간은 6구간으로 접힌다 — 24시간 축은 배선됐으나 산출물이 없다"
+                "(`python -m data.collectors.living_population_hourly` → "
+                "`build_page_footfall_hourly`)")
+    d = doc.get("districts") or {}
+    covered = sum(1 for v in d.values()
+                  if (v.get("weekday") or {}).get("hours_covered") == 24)
+    we = sum(1 for v in d.values()
+             if (v.get("weekend") or {}).get("hours_covered") == 24)
+    smp = doc.get("sample") or {}
+    return (f"시간 축은 **6구간 → 24시간**으로 갈아끼웠다(08-24, 생활인구 행정동). "
+            f"평일 24시간이 채워진 거점 {covered}개 · 주말 {we}개 "
+            f"(표본 {smp.get('dates')}일: 평일 {smp.get('weekday_dates')} / "
+            f"주말 {smp.get('weekend_dates')}). 나머지 거점은 응답이 "
+            f"`time_source:\"trdar_band\"` 로 6구간임을 밝히고 물러난다")
+
+
 def _coverages() -> list[dict]:
     out = []
     for p in sorted(GOLD.glob("*/coverage.json")):
@@ -141,12 +192,16 @@ def page_track(total: int) -> Track:
         "예전 유동 레이어는 Math.random() 점 120개였고 시간 슬라이더는 오버레이 "
         "effect 의존성에 hour 가 없어 **드래그해도 아무것도 안 바뀌는 장식**이었다. "
         "⚠ 100% 는 '네 레이어가 실데이터를 쓴다'는 뜻이지 격자 실측이라는 뜻이 아니다 — "
-        "유동·밀도 값은 **상권 단위 집계**를 셀에 얹은 것이고(거점당 상권 1~9, 중앙 3) "
-        "시간은 6구간으로 접힌다. 응답 `resolution:\"trdar\"` 와 범례 배지가 이걸 "
-        "밝힌다. 24시간 실측은 생활인구(행정동)로 시간 축만 갈아끼우면 된다",
+        "유동·밀도 값은 **상권 단위 집계**를 셀에 얹은 것이다(거점당 상권 1~9, 중앙 3). "
+        "응답 `resolution:\"trdar\"` 와 범례 배지가 이걸 밝힌다. "
+        + _hourly_axis_note()
+        + " ⚠ 그래도 **격자 실측은 아니다** — 시간 축이 24시간이 되어도 값은 여전히 "
+          "상권(공간)·행정동(시간) 집계이고, 거점 내부의 시간 차이는 알 수 없다",
         auto=False,
         evidence=("docs/feature-page.md §유동·밀도 · services/footfall_layer.py · "
-                  "apps/backend/tests/test_footfall_layer.py (13건)"),
+                  "data/pipelines/build_page_footfall_hourly.py · "
+                  "apps/backend/tests/test_footfall_layer.py (21건) · "
+                  "data/tests/test_page_footfall_hourly.py (12건)"),
     ))
     t.gates.append(Gate(
         "지도·건물상세·3D 트윈 표면", 1.0,
@@ -243,10 +298,23 @@ def platform_track() -> Track:
               "게이트 지표가 나아지지 않았으므로 산출물은 되돌렸고 피처는 기본 off "
               "(`--neighbor` 로만 켜진다). 코드와 음성 결과는 남겼다 — 지우면 다음 "
               "사람이 같은 것을 다시 시도한다. "
-              "다음 후보는 **조기 종료 기준**이다: val top1 로 멈추는데(ep113 종료) "
-              "top1 은 거점 사전분포에 지배되는 지표라 off-prior 가 최적화되기 전에 "
-              "멈췄을 수 있다 — macro-F1 만 +6.9% 오른 것이 이를 약하게 지지한다. "
-              "그 밖의 레버는 Platform 감성(막힘 6번)",
+              "⚠ 2026-08-24 **조기 종료 기준 3종 ablation — 기각.** 위 항목이 "
+              "'다음 후보' 로 지목했던 가설이다(val top1 은 거점 사전분포에 지배되는 "
+              "지표라 off-prior 가 최적화되기 전에 멈춘다). `--select-by` 를 만들어 "
+              "같은 조건(600ep·patience 80·동일 시드)으로 셋을 돌렸다: "
+              "top1 **35.92%** · macro_f1 **37.17%** · offprior3 **37.17%** "
+              "(Top-3 방어선은 셋 다 91.7~91.8% 유지). "
+              "결정적인 것은 **게이트 지표를 val 에서 직접 최적화한 offprior3 가 "
+              "macro_f1 과 소수점까지 같은 값에 멈췄다**는 것이다 — val 은 37.70% 까지 "
+              "올랐는데 test 는 37.17% 였으므로 val 과잉적합도 아니다. 즉 이 피처 "
+              "집합의 **천장**이 37% 대이고, 언제 멈추느냐로는 넘을 수 없다. "
+              "top1 대비 +1.25%p 는 표준오차 ≈1.63%p 안이라 유의하지도 않다. "
+              "기본값은 top1 그대로 두었다(종전 재현성 유지). "
+              "→ 남은 레버는 **거점 안에서 값이 변하는 피처**다: 105개 중 5개뿐이라 "
+              "집계 지표가 거점 평균으로 설명된다(docs/finding-sequence-and-accuracy-"
+              "2026-08-17.md). Page 24시간 축(생활인구 행정동)이 그 5개를 늘리는 "
+              "첫 후보다. 그 밖의 레버는 Platform 감성(막힘 6번). "
+              "실측표: reports/gnn_selectby_ablation.json",
         ))
     return t
 
@@ -267,7 +335,10 @@ def posting_track(total: int) -> Track:
     ))
 
     # 4입력(rent·foot·area·prem) 중 실데이터가 몇 개인가 — 거점별로 세어 평균낸다.
-    # foot 은 절대수준만 실데이터(flpop)이고 거점 내 서열은 시드라 0.5 로 센다.
+    # foot 은 2026-08-24 에 거점 내 서열까지 실측이 됐다(최근접 상권 유동총량).
+    # 51/54거점·255/270유닛이 `flpop+trdar` 이고, 남은 3거점은 상권이 1곳이라
+    # **원리적으로** 못 가른다 — 시드가 남아서가 아니라 데이터에 구조가 없어서다.
+    # 그래서 0.5 가 아니라 실측 거점 비율로 센다.
     rent = sum(1 for v in hubs.values() if v.get("rent_per_m2_krw_thousand"))
     foot = sum(1 for v in hubs.values() if v.get("flpop"))
     # area 는 오랫동안 "0/54" 로 **하드코딩**돼 있었다(08-23 발견). 실제로는
@@ -283,11 +354,21 @@ def posting_track(total: int) -> Track:
         units = raw.get("units") if isinstance(raw, dict) else raw
         if units and all(u.get("area") for u in units):
             area += 1
-    per_hub = (rent + 0.5 * foot + 0.5 * area) / (4 * total) if total else 0.0
+    # 최근접 상권으로 거점 내 서열이 갈리는 거점 수 — 손으로 적지 않고 센다.
+    # 못 세면(None) 종전 0.5 가중으로 물러난다.
+    foot_measured = _count_measured_foot_hubs()
+    foot_score = foot_measured if foot_measured is not None else 0.5 * foot
+    per_hub = ((rent + foot_score + 0.5 * area) / (4 * total)
+               if total else 0.0)
     t.gates.append(Gate(
         "3-Tier 입력 4종 실데이터화", per_hub,
-        f"rent {rent}/{total} ✅(R-ONE) · foot {foot}/{total} ◐(flpop+seed, 서열은 시드) · "
-        f"area {area}/{total} ◐(대장 상업면적÷capacity — 건물 실측, 유닛 서열은 균등분할) · "
+        f"rent {rent}/{total} ✅(R-ONE) · foot {foot}/{total} "
+        + (f"(거점 내 서열까지 실측 {foot_measured}/{total} ✅ — 최근접 상권 "
+           f"유동총량. 나머지는 유닛이 전부 같은 상권에 배정돼 **원리적으로** 못 "
+           f"가른다: nokdu·garak 은 상권 1곳, euljiro 는 유닛 5개가 300m 안) · "
+           if foot_measured is not None else
+           "◐(절대수준만 실측 — 서열 판정을 못 셌다) · ")
+        + f"area {area}/{total} ◐(대장 상업면적÷capacity — 건물 실측, 유닛 서열은 균등분할) · "
         f"prem 0/{total} ⬜(표본 밀도 부족)",
     ))
 

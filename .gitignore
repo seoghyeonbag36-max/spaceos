@@ -65,6 +65,11 @@ data/gold/*
 # 없다**(pandas·pyarrow 미탑재). 빠지면 유동 레이어가 조용히 비고, 예전처럼
 # Math.random() 샘플로 되돌아간 것과 구분이 안 된다.
 !data/gold/platform_page_footfall.json
+# 예외: Page **24시간 시간축**(생활인구 행정동, 08-24) — footfall_layer.hourly_share 가
+# 정적 서빙한다. 원천은 bronze 원본이라 배포에 없다. 빠지면 배포 환경에서 시간 축이
+# **영영 6구간으로만** 뜨는데, 응답이 `time_source:"trdar_band"` 로 정상 폴백을
+# 밝히기 때문에 고장으로 안 보인다 — 로컬에서만 24시간이 되는 상태가 된다.
+!data/gold/page_footfall_hourly.json
 # 예외: Page 다거점 red dot 실데이터 — 각 거점 page_building_master.geojson 만 추적(Vercel 서빙).
 # building_vacancy.json·대장 원본·parquet 등 중간·원본 산출물은 계속 제외.
 !data/gold/*/
@@ -139,3 +144,6 @@ ml/artifacts/.train_gnn_resume.tmp
 
 # MCP 서버가 만드는 로컬 상태 — 코드가 참조하지 않는다(0바이트로 남는다)
 sqlite_mcp_server.db
+
+# 무인 실행 산출물(로그·비교표) — 결론은 docs/ 에 남긴다
+reports/
