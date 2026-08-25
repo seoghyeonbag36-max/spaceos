@@ -199,9 +199,31 @@ def _kosis_store_sales() -> dict[str, float]:
 
 @lru_cache(maxsize=1)
 def _trdar_seoul_median() -> dict[str, float]:
-    """상권분석 점포당 월매출의 **서울 중앙**(만원). 거점 상대수준의 기준점이다."""
+    """상권분석 점포당 월매출의 **서울 중앙**(만원). 거점 상대수준의 기준점이다.
+
+    ⚠ 2026-08-25 수정 — 이 함수는 이름과 다른 것을 세고 있었다. `_revenue()` 는
+    산출물의 `districts`(= **우리 54거점**)만 돌려주는데, 그 54개의 중앙을 "서울
+    중앙"이라 부르고 있었다. 그러면 `per_pyeong` 의 거점 배율
+    `m["median"] / seoul` 이 **정의상 중앙 1.00** 이 된다 — 즉 우리 거점이 서울
+    평균보다 장사가 잘 되는지 여부가 **구조적으로 지워진다.** 프라임 인벤토리인데
+    매출 프리미엄이 0 인 채로 임대료 프리미엄만 남는 모양이 여기서 나왔다.
+
+    제대로 된 기준점은 같은 파일에 **이미 있었다** — `build_posting_revenue` 가
+    서울 전체 상권(관측 393 · 점포 18,226)을 `seoul` 키로 떨궈 두는데 서빙이
+    읽지 않고 있었다. 산출물에 있는 값을 제품이 안 쓰는 것, 이 저장소가 반복해
+    잡아 온 그 양식이다.
+
+    `seoul` 키가 없는 낡은 산출물이면 종전 방식으로 물러난다 — 그 경우 배율이
+    1.00 근처로 눌리지만, 없는 기준점을 지어내는 것보다 낫다.
+    """
+    top = _read(_REV).get("seoul") or {}
+    out = {t: top[t]["median"] for t in TIERS
+           if isinstance(top.get(t), dict) and top[t].get("median")}
+    if len(out) == len(TIERS):
+        return out
+
     rev = _revenue()
-    out: dict[str, float] = {}
+    out = {}
     for t in TIERS:
         xs = [d[t]["median"] for d in rev.values() if t in d and d[t].get("median")]
         if xs:
