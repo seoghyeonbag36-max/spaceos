@@ -39,6 +39,7 @@ R-ONE 임대료도 flpop 유동인구도 **거점 단위**라, 유닛에 그대�
 from __future__ import annotations
 
 import json
+import statistics
 import time
 from pathlib import Path
 from typing import Any
@@ -46,6 +47,7 @@ from typing import Any
 # repo/data/gold  (services → app → backend → apps → repo)
 _GOLD = Path(__file__).resolve().parents[4] / "data" / "gold"
 _INPUTS_JSON = _GOLD / "platform_posting_inputs.json"
+_UNIT_FOOT_JSON = _GOLD / "platform_unit_foot.json"
 _TTL_SECONDS = 300.0
 
 # 층 계수 — build_posting_inputs._FLOOR_FACTOR 와 동일하게 유지할 것.
@@ -68,6 +70,20 @@ def _load() -> dict | None:
     _cache["data"] = json.loads(_INPUTS_JSON.read_text(encoding="utf-8"))
     _cache["at"] = now
     return _cache["data"]
+
+
+def _load_unit_foot() -> dict:
+    """`gold/platform_unit_foot.json` 의 units 표 — `_load()` 와 같은 TTL 캐시를 쓴다."""
+    now = time.monotonic()
+    if _cache.get("foot") is not None and now - _cache.get("foot_at", 0.0) < _TTL_SECONDS:
+        return _cache["foot"]
+    if not _UNIT_FOOT_JSON.exists():
+        _cache["foot"], _cache["foot_at"] = {}, now
+        return {}
+    doc = json.loads(_UNIT_FOOT_JSON.read_text(encoding="utf-8"))
+    _cache["foot"] = doc.get("units") or {}
+    _cache["foot_at"] = now
+    return _cache["foot"]
 
 
 def is_available() -> bool:
@@ -152,9 +168,10 @@ _RANK_EPS = 0.25
 
 
 # 유닛의 최근접 상권 유동총량이 거점 평균에서 이 비율만큼 벗어나야 ±1칸 움직인다.
-# **실측이 아니라 계수다** — 이보다 작은 차이는 '어느 상권에 배정되나'의 경계 노이즈와
-# 구분되지 않는다(거점당 상권 1~9곳, 중앙 3곳이라 경계가 굵다).
-_TRDAR_EPS = 0.15
+# **실측이 아니라 계수다** — 이보다 작은 차이는 '어느 구역에 배정되나'의 경계 노이즈와
+# 구분되지 않는다. 상권은 거점당 1~9곳(중앙 3)이라 경계가 굵고, 집계구는 중앙 6곳이라
+# 덜 굵다. 둘 다 같은 계수를 쓴다 — 소스별로 나눌 근거가 아직 없다.
+_RANK_OFFSET_EPS = 0.15
 
 
 def _unit_trdar_flpop(district_id: str, units: list[dict]) -> list[float | None]:
@@ -190,22 +207,67 @@ def _unit_trdar_flpop(district_id: str, units: list[dict]) -> list[float | None]
     return out
 
 
-def _measured_offsets(vals: list[float | None]) -> list[int] | None:
-    """최근접 상권 유동총량 → 거점 내 ±1칸 오프셋. 서열이 안 나오면 None.
+def _unit_jipgyegu_flpop(district_id: str, units: list[dict]) -> list[float | None]:
+    """유닛별 **집계구 생활인구**(주간대 7일 가중평균). 없으면 전부 None.
 
-    None 을 돌려주는 두 경우 모두 "실측으로 못 가른다" 는 뜻이라 시드로 물러나야 한다:
+    `_unit_trdar_flpop` 의 승격판이다. 상권은 거점당 1~9곳(중앙 3)이라 경계가 굵고
+    상권 1곳짜리 거점은 아예 못 갈랐다. 집계구는 거점당 중앙 **6개**(1~11)라 입도가
+    2배이고, 종전에 "원리적으로 못 가른다"던 `nokdu`(상권 1곳 → 집계구 6개) ·
+    `euljiro`(유닛이 300m 안 → 집계구 7개)가 갈린다.
+
+    산출물: `gold/platform_unit_foot.json` (`build_unit_foot`).
+    배정: SGIS 과거집계구 **2016 4Q** 경계 PIP — 생활인구 코드와 **100.00%** 일치한다
+    (2025 2분기 경계로는 37.5%였다 · 집계구 재획정).
+
+    ⚠ 키는 `"{거점}|{유닛id}"` 다. 유닛 id 는 건물 단위라 거점 간 유일하지 않다 —
+      거점 반경이 겹치는 47건이 두 거점에 함께 잡힌다.
+
+    ⚠ 값은 평일·주말을 7:2 로 섞은 것이다. 산출물에는 `weekday`·`weekend` 가 따로
+      실려 있는데, 일부 거점은 두 축의 **서열이 뒤집힌다**(`cityhall` ρ=−1.00 —
+      도심 업무지구가 주말에 비는 정도가 자리마다 다르다). 지금 `foot` 스키마가 등급
+      하나라 섞어 쓰지만, 그 사실은 산출물에 남아 있다.
+
+    ⚠ 원천 계열은 **2026-07-31 로 생산 종료**(국가표준격자 250m 전환)다. 후속은
+      자치구 단위라 더 거칠다 — 이 값은 그 시점까지의 대표값이고 갱신되지 않는다.
+    """
+    table = _load_unit_foot()
+    if not table:
+        return [None] * len(units)
+    return [(table.get(f"{district_id}|{u.get('id')}") or {}).get("foot_value")
+            for u in units]
+
+
+def _measured_offsets(vals: list[float | None]) -> list[int] | None:
+    """유동인구 실측값 → 거점 내 ±1칸 오프셋. 서열이 안 나오면 None.
+
+    기준점은 **중앙값**이다. 이 오프셋이 뜻하는 것은 "거점 안에서 가운데보다 위냐
+    아래냐" 이므로 기준은 거점의 중심경향이어야 하는데, **평균은 우편향 분포에서
+    중심이 아니다.**
+
+    ⚠ 2026-08-25 평균 → 중앙 교체. 집계구(입도 2배)로 올리자 드러났다 — 유동인구는
+    소수 핫셀이 평균을 끌어올리는 우편향이라, 거점별 **평균/중앙 비의 중앙이 1.171**
+    이고 51거점 중 **34곳이 우편향**이다. 평균으로 자르면 다수가 `저` 로 밀리고,
+    그 결과 `_foot_median` 이 0.8 로 내려간 거점이 21곳이 되어(종전 17) 정규화가
+    거점 매출을 25% 부풀렸다. 상권 단위에서는 집계로 왜도가 뭉개져 이 결함이
+    드러나지 않았을 뿐이다.
+
+    교체 효과(전 거점): premium 프리미엄 −0.436 → **+0.058%p** · 마진 6.20/5.03/8.05
+    → **5.72/4.76/7.79** 로, 상권 기준 종전값(5.75/4.80/7.84)에 다시 붙는다. 즉 이
+    수정은 값을 바꾸려는 것이 아니라 **입도를 올려도 수준이 안 흔들리게** 하는 것이다.
+
+    None 을 돌려주는 두 경우 모두 "실측으로 못 가른다" 는 뜻이라 호출부가 물러난다:
       - 값이 있는 유닛이 2개 미만
-      - 값이 전부 같다(상권 1곳짜리 거점)
+      - 값이 전부 같다(구역이 1곳뿐인 거점)
     """
     known = [v for v in vals if v is not None]
     if len(known) < 2 or len(set(known)) < 2:
         return None
-    mean = sum(known) / len(known)
-    if mean <= 0:
+    center = statistics.median(known)
+    if center <= 0:
         return None
     return [0 if v is None else
-            1 if v > mean * (1 + _TRDAR_EPS) else
-            -1 if v < mean * (1 - _TRDAR_EPS) else 0
+            1 if v > center * (1 + _RANK_OFFSET_EPS) else
+            -1 if v < center * (1 - _RANK_OFFSET_EPS) else 0
             for v in vals]
 
 
@@ -286,7 +348,13 @@ def resolve_units(district_id: str, units: list[dict]) -> list[dict]:
 
     # 거점 내 서열을 **실측(최근접 상권 유동총량)** 으로 매길 수 있는지 먼저 본다.
     # 되면 시드 서열을 쓰지 않는다 — 되지 않을 때만(상권 1곳짜리 거점 등) 물러난다.
-    offsets = _measured_offsets(_unit_trdar_flpop(district_id, units))
+    # 집계구(입도 2배) 를 먼저 본다. 없거나 서열이 안 나오면 상권으로 물러난다 —
+    # 폴백을 조용히 하지 않도록 어느 쪽이 돌았는지 `foot_src` 로 들고 다닌다.
+    offsets = _measured_offsets(_unit_jipgyegu_flpop(district_id, units))
+    foot_src = "flpop+jipgyegu"
+    if offsets is None:
+        offsets = _measured_offsets(_unit_trdar_flpop(district_id, units))
+        foot_src = "flpop+trdar"
 
     out: list[dict] = []
     for i, unit in enumerate(units):
@@ -305,7 +373,7 @@ def resolve_units(district_id: str, units: list[dict]) -> list[dict]:
         if district_grade:
             if offsets is not None:
                 resolved["foot"] = _apply_offset(district_grade, offsets[i])
-                resolved["inputs_source"]["foot"] = "flpop+trdar"
+                resolved["inputs_source"]["foot"] = foot_src
             elif unit.get("foot"):
                 resolved["foot"] = _blend_foot(
                     district_grade, unit.get("foot", ""), seed_feet)

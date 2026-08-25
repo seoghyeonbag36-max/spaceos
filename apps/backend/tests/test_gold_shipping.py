@@ -39,6 +39,9 @@ _SHIPPED = [
     "platform_events.json",
     "platform_page_footfall.json",
     "page_footfall_hourly.json",
+    # 2026-08-25 추가 — posting_inputs._unit_jipgyegu_flpop 이 읽는다.
+    # 빠지면 foot 서열이 조용히 상권(입도 절반)으로 내려간다.
+    "platform_unit_foot.json",
     "garosugil/vacant_units.json",
     "garosugil/page_building_master.geojson",
     "garosugil/calibration.json",
