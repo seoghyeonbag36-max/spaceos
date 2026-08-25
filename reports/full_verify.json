@@ -1,0 +1,33 @@
+{
+  "started": "2026-08-24T21:36:01",
+  "results": [
+    {
+      "step": "backend-pytest",
+      "status": "pass",
+      "exit": 0,
+      "seconds": 60.2,
+      "log": "reports\\logs\\verify_backend-pytest.log"
+    },
+    {
+      "step": "gnn-import",
+      "status": "pass",
+      "exit": 0,
+      "seconds": 12.5,
+      "log": "reports\\logs\\verify_gnn-import.log"
+    },
+    {
+      "step": "pppp-status",
+      "status": "pass",
+      "exit": 0,
+      "seconds": 1.4,
+      "log": "reports\\logs\\verify_pppp-status.log"
+    },
+    {
+      "step": "frontend-build",
+      "status": "pass",
+      "exit": 0,
+      "seconds": 24.9,
+      "log": "reports\\logs\\verify_frontend-build.log"
+    }
+  ]
+}

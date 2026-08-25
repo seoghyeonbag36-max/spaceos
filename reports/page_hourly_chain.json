@@ -1,0 +1,22 @@
+{
+  "started": "2026-08-24T14:12:25",
+  "wait": {
+    "waited_s": 3213,
+    "hubs": 1,
+    "why": "프로세스 종료(거점 1/54)"
+  },
+  "steps": [
+    {
+      "step": "collect",
+      "exit": 0,
+      "seconds": 253.5,
+      "log": "reports\\logs\\page_hourly_collect.log"
+    },
+    {
+      "step": "gold",
+      "exit": 0,
+      "seconds": 4.8,
+      "log": "reports\\logs\\page_hourly_gold.log"
+    }
+  ]
+}

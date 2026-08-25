@@ -1,0 +1,97 @@
+{
+  "probed_at": "2026-08-25",
+  "source": "data/bronze/platform13/2026-08-01/naver_blog.json",
+  "leg1_structure": {
+    "keys": [
+      "_query",
+      "bloggerlink",
+      "bloggername",
+      "description",
+      "district_id",
+      "link",
+      "postdate",
+      "title"
+    ],
+    "spatial_keys": [
+      "district_id"
+    ],
+    "sub_district_key": [],
+    "verdict": "거점 내 상수 — 거점 원핫에 흡수되어 정보량 0"
+  },
+  "leg2_attribution": {
+    "posts": 16605,
+    "nodes": 40388,
+    "names_kept": 19254,
+    "names_dropped_generic": 21134,
+    "posts_attributed": 2454,
+    "posts_attributed_pct": 14.78,
+    "nodes_with_sentiment": 1284,
+    "nodes_with_sentiment_pct": 3.18,
+    "top10": [
+      [
+        "sillim",
+        "서서갈비",
+        47
+      ],
+      [
+        "gwangjang",
+        "구테이블",
+        38
+      ],
+      [
+        "garosugil",
+        "영동소곱창",
+        30
+      ],
+      [
+        "sillim",
+        "장수촌풍천장어직판장",
+        27
+      ],
+      [
+        "seoulsup",
+        "기댈빙",
+        20
+      ],
+      [
+        "hongdae",
+        "와우산로",
+        19
+      ],
+      [
+        "mullae",
+        "갤러리문래",
+        19
+      ],
+      [
+        "samcheong",
+        "푸노야",
+        17
+      ],
+      [
+        "anam",
+        "대나무다방",
+        17
+      ],
+      [
+        "sukmyung",
+        "남영돈",
+        17
+      ]
+    ]
+  },
+  "leg3_signal": {
+    "scored_posts": 12359,
+    "no_sentiment_word_pct": 25.57,
+    "neg_word_share_pct": 0.53,
+    "post_score_mean": 0.9793,
+    "post_score_pstdev": 0.1785,
+    "share_exactly_plus_one_pct": 98.33,
+    "district_mean_min": 0.9135,
+    "district_mean_max": 1.0,
+    "between_district_pstdev": 0.0164,
+    "within_district_pstdev": 0.1625,
+    "variance_ratio": 0.1011
+  },
+  "verdict": "기각 — 세 다리가 모두 끊긴다. (1) 공간 키가 district_id 뿐이라 거점 원핫에 흡수되고, (2) 점포 귀속은 노드의 3%대이며 그나마 유명 점포 편향이라 예측 대상인 공실에는 원리적으로 없고, (3) 감성이 홍보성 표본이라 거점 간 분산이 거점 내 분산의 1/10 이다."
+}
