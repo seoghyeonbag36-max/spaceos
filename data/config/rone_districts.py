@@ -102,6 +102,34 @@ DISTRICT_RONE: dict[str, str] = {
 # 현재 seochon 은 "서울>도심>광화문"에 매핑돼 있어 서촌 표본으로 교체하면 더 정확하지만,
 # 기존 거점의 피처·forecast 가 바뀌므로 별도 검증 후 반영할 것.
 
+# ── 벤치마크 계층 (2026-08-25 · docs/feature-posting.md §0-N) ────────────────────
+# R-ONE 응답은 상권 행만 있는 게 아니라 **상위 계층 행을 같이 싣는다**(CLS_FULLNM 깊이:
+#   0 = 시도/전국 · 1 = 시도>권역 또는 시도>상권 · 2 = 서울>권역>상권).
+# 종전 수집기는 DISTRICT_RONE 에 없는 행을 전부 버렸다 — 그래서 "서울 평균"이 응답 안에
+# 있는데도 저장소에 없었다. 이것이 필요한 이유는 §0-N 이다: 우리 임대료는 R-ONE×층계수인데
+# 비교 기준(KOSIS 임차료율)은 층 기준이 달라, 두 축을 같은 기준에 놓을 벤치마크가 없었다.
+#
+# ⚠ 서울 평균도 R-ONE 표본이라 **사실상 1층 기준**이다 — 우리 쪽과 같은 축이라는 점이
+#   핵심이지, 그 자체가 층 중립이라는 뜻이 아니다.
+BENCHMARK_SEOUL = "서울"
+BENCHMARK_ZONES = ("서울>강남", "서울>도심", "서울>영등포신촌", "서울>기타")
+
+
+def benchmark_scope(cls_fullnm: str) -> str | None:
+    """CLS_FULLNM → 벤치마크 계층 이름. 벤치마크가 아니면 None.
+
+    거점 매핑(DISTRICT_RONE)과 **배타적이지 않다** — 둘 다 같은 응답에서 뽑되
+    서로 다른 산출물로 나간다. 기존 rone_{series}.json 은 건드리지 않는다
+    (build_gold 가 district_id 로 조인하고 LSTM 데이터셋까지 물려 있다).
+    """
+    c = str(cls_fullnm)
+    if c == BENCHMARK_SEOUL:
+        return "seoul"
+    if c in BENCHMARK_ZONES:
+        return "zone"
+    return None
+
+
 # 시리즈명 → 기간 분할 통계표 ID (전부 분기 QY)
 SERIES_TABLES: dict[str, list[str]] = {
     "vac_small": ["A_2024_00252", "A_2024_00255", "T241833134686576"],  # 공실률 소규모 상가 (%)

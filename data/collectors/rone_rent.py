@@ -1,7 +1,8 @@
-"""R-ONE 상업용부동산 임대동향 수집 — 33거점 공실률·임대료 분기 시계열 (Bronze).
+"""R-ONE 상업용부동산 임대동향 수집 — 54거점 공실률·임대료 분기 시계열 (Bronze).
 
 소스: reb.or.kr SttsApiTblData.do (키: REB_RONE_API_KEY, 분기 QY)
-산출: bronze/platform13/{날짜}/rone_{vac_small,vac_mid,rent_small}.json
+산출: bronze/platform13/{날짜}/rone_{vac_small,vac_mid,rent_small}.json         — 54거점
+      bronze/platform13/{날짜}/rone_{vac_small,vac_mid,rent_small}_bench.json  — 서울·권역 (§0-N)
   행마다 district_id 를 부가 (config/rone_districts.DISTRICT_RONE 매핑, 공유 상권은 복수 행).
 
 실행: python -m data.collectors.rone_rent
@@ -14,7 +15,7 @@ import urllib.request
 
 from data.collectors.common import load_env, save_json
 from data.config.platform_districts import SLUG as SLUG13
-from data.config.rone_districts import DISTRICT_RONE, SERIES_TABLES
+from data.config.rone_districts import DISTRICT_RONE, SERIES_TABLES, benchmark_scope
 
 _BASE = "https://www.reb.or.kr/r-one/openapi/SttsApiTblData.do"
 _PAGE = 1000
@@ -72,29 +73,38 @@ def collect() -> None:
 
     for series, table_ids in SERIES_TABLES.items():
         out: list[dict] = []
+        bench: list[dict] = []
         for sid in table_ids:
             rows = _fetch_all(key, sid)
             kept = 0
+            kept_bench = 0
             for r in rows:
                 cls = str(r.get("CLS_FULLNM", ""))
-                if cls not in rone_to_districts:
+                scope = benchmark_scope(cls)
+                if cls not in rone_to_districts and scope is None:
                     continue
                 q = _quarter_code(r.get("WRTTIME_DESC", ""))
                 if not q:
                     continue
-                for did in rone_to_districts[cls]:
-                    out.append({
-                        "district_id": did,
-                        "quarter": q,
-                        "value": r.get("DTA_VAL"),
-                        "rone_cls": cls,
-                        "statbl_id": sid,
-                        "itm_nm": r.get("ITM_NM"),
-                        "unit": r.get("UI_NM"),
-                    })
+                common = {
+                    "quarter": q,
+                    "value": r.get("DTA_VAL"),
+                    "rone_cls": cls,
+                    "statbl_id": sid,
+                    "itm_nm": r.get("ITM_NM"),
+                    "unit": r.get("UI_NM"),
+                }
+                # 벤치마크(서울·권역)와 거점은 배타적이지 않다 — 같은 응답에서 둘 다 뽑되
+                # 산출물을 나눈다. 기존 rone_{series}.json 의 스키마·내용은 그대로다.
+                if scope is not None:
+                    bench.append({"scope": scope, **common})
+                    kept_bench += 1
+                for did in rone_to_districts.get(cls, ()):
+                    out.append({"district_id": did, **common})
                     kept += 1
-            print(f"  {series} {sid}: 원본 {len(rows)}행 → 매핑 {kept}행")
+            print(f"  {series} {sid}: 원본 {len(rows)}행 → 매핑 {kept}행 · 벤치마크 {kept_bench}행")
         save_json(out, SLUG13, f"rone_{series}.json")
+        save_json(bench, SLUG13, f"rone_{series}_bench.json")
 
 
 if __name__ == "__main__":

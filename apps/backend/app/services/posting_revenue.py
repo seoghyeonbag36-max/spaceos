@@ -112,6 +112,49 @@ def _pyeong_rent() -> float | None:
 
 
 @lru_cache(maxsize=1)
+def _seoul_pyeong_rent() -> float | None:
+    """R-ONE **서울 집계** 소규모상가 임대료(만원/평·월) — 우리와 **같은 축**의 기준점.
+
+    ## 왜 이것이 따로 필요한가 (docs/feature-posting.md §0-N·§0-O)
+
+    `_pyeong_rent()` 는 우리 54거점의 중앙이라 자기 자신이 기준점이 될 수 없다.
+    서울 기준점은 지금까지 KOSIS 역산(점포당 임차료 ÷ A) 하나뿐이었는데, KOSIS 는
+    **점포가 실제 있는 층**의 실지불액이고 R-ONE 은 사실상 **1층 기준** 시세라
+    두 값을 나란히 놓으면 층 기준이 어긋난 채 비교된다.
+
+    이 값은 거점값과 똑같은 R-ONE 소규모상가 표본이라, 우리 거점과 대면 **층 관례가
+    양변에서 상쇄된다.** 그래서 층과 무관한 순수 입지 격차를 잴 수 있다.
+
+    ⚠ **"서울 평균"이 아니다.** 2026-08-25 실측으로 확인했다 — `서울` 행은 R-ONE
+    **표본 상권 59곳**의 집계이지 서울 전역 상업용부동산의 평균이 아니다(59곳 단순평균
+    55.21 · 중앙 51.41 사이에 52.54 가 놓인다). 우리 54거점은 그 59곳 중 42곳에
+    매핑돼 있으므로, 이 비교는 **부분집합 대 전체**이지 프라임 대 서울평균이 아니다.
+    KOSIS(서울 전역 사업체 전수)와는 모집단 축이 다르다 — 자세히는 `location_premium()`.
+    """
+    v = (_read(_INPUTS).get("seoul") or {}).get("rent_per_m2_krw_thousand")
+    return float(v) * 3.3058 / 10 if v else None      # 천원/㎡ → 만원/평
+
+
+def location_premium() -> float | None:
+    """우리 인벤토리의 **층 무관 입지 배율** — 거점 중앙 ÷ R-ONE 서울 집계.
+
+    양변이 같은 R-ONE 소규모상가 표본(1층 기준)이라 층 계수가 약분된다. 이것이
+    §0-N 이 요구한 "두 기준을 같은 축에 놓기"의 실제 산출물이다.
+
+    2026-08-25 실측 **1.109**(+10.9%). 이 값이 하는 일은 프리미엄을 키우는 것이
+    아니라, `test_margin_gap_is_exactly_the_prime_rent_premium` 이 기대 온 *"우리
+    유닛은 전부 프라임이라 임대료 비중이 서울보다 높아야 한다"* 는 전제를 **측정으로
+    반증**하는 것이다 — 54거점 중 **22곳(유닛 182/528)이 이 기준선 아래**다.
+    즉 프리미엄이 0 근처인 것은 이상현상이 아니라, 인벤토리가 서울 상권 분포의
+    41백분위 근처에 걸쳐 있다는 사실의 결과다.
+    """
+    ours, seoul = _pyeong_rent(), _seoul_pyeong_rent()
+    if not ours or not seoul:
+        return None
+    return ours / seoul
+
+
+@lru_cache(maxsize=1)
 def _area_measured() -> dict[str, float]:
     """공정위 가맹사업 정보공개서에서 받은 tier별 A(평) — 실측.
 
@@ -307,6 +350,8 @@ def diagnostics() -> dict:
           for t in TIERS} if a else {}
     return {
         "pyeong_rent": _pyeong_rent(),
+        "seoul_pyeong_rent": _seoul_pyeong_rent(),
+        "location_premium": (round(lp, 3) if (lp := location_premium()) else None),
         "avg_store_pyeong": a,
         "area_basis": area_basis(),
         "revenue_basis": revenue_basis(),
@@ -321,7 +366,8 @@ def diagnostics() -> dict:
 
 
 def clear_cache() -> None:
-    for f in (_revenue, _rates, _industries, _pyeong_rent, avg_store_pyeong,
+    for f in (_revenue, _rates, _industries, _pyeong_rent, _seoul_pyeong_rent,
+              avg_store_pyeong,
               _area_measured, _area_from_rent, _kosis_store_sales,
               _trdar_seoul_median, _foot_median):
         f.cache_clear()
