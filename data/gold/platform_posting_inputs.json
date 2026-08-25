@@ -1,7 +1,7 @@
 {
   "source": "R-ONE 소규모상가 임대료(rent_small) + 서울 상권분석 유동인구(flpop)",
   "quarter": "20261",
-  "built_at": "2026-08-01T07:35:03+00:00",
+  "built_at": "2026-08-25T12:27:55+00:00",
   "rent_unit": "천원/㎡·월 (R-ONE 소규모상가, 사실상 1층 기준)",
   "floor_factor": {
     "B2": 0.6,
@@ -283,5 +283,11 @@
       "flpop": 2994160,
       "foot": "저"
     }
+  },
+  "seoul": {
+    "rent_per_m2_krw_thousand": 52.54,
+    "rone_cls": "서울",
+    "statbl_id": "T248223134698125",
+    "n_rows": 1
   }
 }

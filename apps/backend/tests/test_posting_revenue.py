@@ -106,16 +106,27 @@ def test_revenue_is_proportional_to_area():
 
 
 def test_foot_normalisation_pins_district_level_to_measurement():
-    """foot 중앙인 유닛은 정확히 `면적 × 거점 평당매출` 을 받는다(계수 1.0).
+    """정규화가 거점 매출 수준을 실측에 고정한다 — foot 서열이 수준을 밀지 못한다.
 
-    `foot` 의 거점 내 서열은 아직 시드라, 정규화하지 않으면 그 시드가 거점의 매출
-    수준까지 밀어 올린다.
+    ⚠ 2026-08-25 단언을 다시 적었다. 종전에는 *"계수가 정확히 1.0 인 유닛이 있다"* 로
+      확인했는데, 그건 **유닛 수가 홀수일 때만** 참이다. `_foot_median` 은
+      `st.median` 이라 짝수면 두 중간값의 평균(예 0.9)을 돌려주고, 그 값은
+      `_FOOT_K` 격자(0.8·1.0·1.25)에 없다. 집계구 승격으로 등급 분포가 바뀌자
+      garosugil 이 6/3/3 이 되어 중앙이 0.9 가 됐고, 종전 단언이 유닛을 못 찾아
+      깨졌다 — **모델이 아니라 단언이 격자를 전제하고 있었다.**
+
+      지금은 불변식 자체를 확인한다: 각 유닛의 매출은 `면적 × 평당매출 × (계수/중앙)`
+      이고, **계수의 중앙이 1.0 으로 정규화**되므로 거점 수준이 서열에 안 밀린다.
     """
     med = P._foot_median(_D)
-    u = next((u for u in _units() if P._FOOT_K[u["foot"]] == med), None)
-    assert u is not None
-    expect = u["area"] * P.per_pyeong(_D, "value")
-    assert P.revenue_of(u, _D, "value") == pytest.approx(expect, rel=1e-9)
+    assert med > 0
+    for u in _units():
+        k = P._FOOT_K[u["foot"]]
+        expect = u["area"] * P.per_pyeong(_D, "value") * (k / med)
+        assert P.revenue_of(u, _D, "value") == pytest.approx(expect, rel=1e-9), u["id"]
+    # 정규화된 계수의 중앙은 정확히 1.0 이다 — 이것이 "수준을 안 민다"의 정의다
+    ks = sorted(P._FOOT_K[u["foot"]] / med for u in _units())
+    assert st.median(ks) == pytest.approx(1.0, rel=1e-9)
 
 
 # ── 비용 = 임대료 + 매출 × 비임차 비용률 ────────────────────────────────────
@@ -204,7 +215,16 @@ def test_margin_gap_is_exactly_the_prime_rent_premium():
     med, rent_share = _margin_and_rent_share()
     for t in P.TIERS:
         premium_pp = (rent_share[t] - rates[t]["rent_rate"]) * 100
-        assert premium_pp > 0, f"{t}: 프라임인데 임대료 비중이 서울 평균 이하 — 의심"
+        # ⚠ 2026-08-25 이 단언의 **근거가 바뀌었다**(§0-O). 종전 실패 문구는 "프라임인데
+        #   임대료 비중이 서울 평균 이하 — 의심" 이었는데, 그 '의심'이 기대던 *"우리
+        #   유닛은 전부 프라임"* 전제가 측정으로 반증됐다 — 54거점 중 22곳(유닛
+        #   182/528)이 R-ONE 서울 표본상권 집계보다 싸다. 즉 premium 이 0 근처인 것은
+        #   이상현상이 아니라 인벤토리가 41백분위에 걸쳐 있다는 사실의 결과다.
+        #   임계값은 **내리지 않았다** — 부호가 뒤집히면 여전히 무언가 잘못된 것이다.
+        #   → test_prime_inventory_premise_is_measurably_false 가 그 분포를 고정한다.
+        assert premium_pp > 0, (
+            f"{t}: 임대료 비중이 서울 기준 이하 — 분해가 성립하지 않는다 "
+            f"(프리미엄 {premium_pp:+.3f}%p)")
         # 마진 중앙이 "KOSIS 이익률 − 프라임 프리미엄" 근처에 선다(중앙값이라 정확히는
         # 안 맞지만, 두 %p 넘게 벌어지면 위 분해로 설명되지 않는 무언가가 있는 것이다).
         expect = rates[t]["profit_rate"] * 100 - premium_pp
@@ -370,3 +390,96 @@ def test_unviable_share_is_small_and_factory_can_win():
                 wins[best["tier"]] += 1
     assert unviable / n * 100 <= 20
     assert wins["factory"] > 0, "factory 0승은 死문항 — 추천이 둘로만 갈린다"
+
+
+# ── §0-O: R-ONE 서울 기준점 — 층 축은 맞았고, 모집단 축이 어긋났다 ─────────────
+
+def test_seoul_benchmark_sits_on_the_same_rone_axis_as_our_districts():
+    """서울 기준점이 우리 거점과 **같은 표본·같은 층 관례**여야 한다.
+
+    §0-N 이 요구한 수집의 산출물이다. 우리 거점 임대료와 서울 기준점이 둘 다 R-ONE
+    소규모상가(사실상 1층 기준)이므로, 둘을 나누면 **층 계수가 약분된다** — 그래서
+    `location_premium()` 은 층 관례와 무관한 순수 입지 격차다.
+
+    실측 2026-08-25 (분기 20261): 서울 17.37 만원/평 · 우리 중앙 19.26 → **1.109**.
+    """
+    seoul = P._seoul_pyeong_rent()
+    assert seoul, "R-ONE 서울 기준점 없음 — `python -m data.collectors.rone_rent` 후 build_posting_inputs"
+    ours = P._pyeong_rent()
+    assert ours and seoul < ours, "우리 거점 중앙이 서울 표본상권 집계보다 낮다 — 매핑 의심"
+
+    lp = P.location_premium()
+    # 대역을 넓게 잡는다. 이 값은 "프라임이라 얼마나 비싼가" 가 아니라 "우리가 고른
+    # 42개 상권이 서울 표본 59곳 안에서 어디쯤인가" 이므로 1 근처인 것이 정상이다.
+    assert 1.0 < lp < 1.4, f"입지 배율 {lp:.3f} — 대역 밖이면 기준 분기가 어긋났는지 볼 것"
+
+    # 분기가 강제로 일치해야 한다 — 벤치마크만 앞서 가면 배율이 조용히 틀어진다.
+    doc = P._read(P._INPUTS)
+    assert "seoul" in doc and doc.get("quarter"), "seoul 키가 분기와 함께 실려야 한다"
+
+
+def test_prime_inventory_premise_is_measurably_false():
+    """*"우리 유닛은 전부 프라임"* 은 틀렸다 — 41%가 서울 상권 기준선 아래다.
+
+    이 전제는 §0-I 이후 마진·프리미엄 논의를 계속 떠받쳐 왔고,
+    `test_margin_gap_is_exactly_the_prime_rent_premium` 의 실패 문구에도 들어 있었다.
+    R-ONE 서울 기준점이 생기면서 **처음으로 직접 잴 수 있게 됐다.**
+
+    실측 2026-08-25: 거점 **22/54** · 유닛 **182/528** 이 기준선 미만.
+    (noryangjin 30.3 · garak 31.6 … myeongdong 147.6 — 인벤토리는 프라임 집합이
+    아니라 서울 상권 분포 전반에 걸쳐 있다.)
+
+    그래서 프리미엄이 0 근처인 것은 모델 고장의 신호가 아니다. 이걸 고정해 두지
+    않으면 다음 사람이 또 "프라임인데 왜 0 이냐"에서 출발한다 — §0-L·§0-M·§0-N 이
+    세 번 그렇게 출발했다.
+    """
+    seoul_pm2 = (P._read(P._INPUTS).get("seoul") or {}).get("rent_per_m2_krw_thousand")
+    assert seoul_pm2
+    dist = P._read(P._INPUTS)["districts"]
+
+    below = [k for k, v in dist.items() if v["rent_per_m2_krw_thousand"] < seoul_pm2]
+    assert 15 <= len(below) <= 30, f"기준선 미만 거점 {len(below)}/54 — 분포가 크게 바뀌었다"
+
+    n_below = n_all = 0
+    for d in D.DISTRICTS:
+        n = len(D.resolved_units(d["id"]) or [])
+        n_all += n
+        if dist.get(d["id"], {}).get("rent_per_m2_krw_thousand", 0) < seoul_pm2:
+            n_below += n
+    assert n_all and 0.20 < n_below / n_all < 0.50, (
+        f"기준선 미만 유닛 {n_below}/{n_all} — '전부 프라임' 전제가 참이 되려면 0 이어야 한다")
+
+
+def test_kosis_rent_rate_cannot_be_rebased_by_a_single_floor_coefficient():
+    """§0-N 의 가설을 **기각**한다 — KOSIS↔R-ONE 격차는 층 하나로 환산되지 않는다.
+
+    §0-N 은 *"우리는 R-ONE(1층 기준)에 층 면적계수를 곱하는데 KOSIS 임차료는 점포가
+    실제 있는 층의 실지불액이니, R-ONE 서울 평균을 받으면 두 기준을 같은 축에 놓을
+    수 있다"* 고 적었다. 받아서 재 보니 **층 축은 맞출 수 있지만 모집단 축이 어긋난다.**
+
+    KOSIS 평당임차료 ÷ R-ONE 서울(1층 기준) 을 '서울 평균 점포의 함의 층계수'로 읽으면
+    tier 마다 값이 갈린다 (2026-08-25 실측):
+
+        premium 0.672 · value 0.425 · factory 0.460      ↔ 우리 유닛 실효계수 0.549
+
+    층이라면 tier 별로 이렇게 갈릴 이유가 없다. 이 비율은 층 × **모집단**이기 때문이다 —
+    R-ONE `서울` 은 **표본 상권 59곳의 집계**이고(단순평균 55.21 · 중앙 51.41 사이에
+    52.54), KOSIS 는 서울 전역 사업체 전수다. tier 마다 점포가 상권에 몰린 정도가
+    다르니 비율도 다르게 나온다.
+
+    즉 이 비율을 층 계수로 되돌려 KOSIS 임차료율을 보정하면 **모집단 차이를 층으로
+    오기입**하게 된다. 그래서 하지 않았다. 이 테스트는 그 유혹을 막는 자리다.
+    """
+    seoul_pp = P._seoul_pyeong_rent()
+    A = P.avg_store_pyeong()
+    ind = P._industries()
+    implied = {}
+    for t in P.TIERS:
+        xs = [v["rent_mn"] / float(v["estab"]) / 12 * 100 for v in ind.values()
+              if v.get("tier") == t and v.get("estab") and v.get("rent_mn") is not None]
+        implied[t] = (sum(xs) / len(xs)) / A[t] / seoul_pp
+
+    spread = max(implied.values()) - min(implied.values())
+    assert spread > 0.15, (
+        f"함의계수가 tier 간에 {spread:.3f} 밖에 안 갈린다 — 단일 층계수로 읽힐 여지가 "
+        f"생겼다는 뜻이므로, 그때는 §0-N 의 가설을 다시 볼 것: {implied}")

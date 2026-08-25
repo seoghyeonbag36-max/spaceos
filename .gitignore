@@ -29,6 +29,9 @@ data/silver/*
 data/gold/*
 !data/bronze/.gitkeep
 !data/silver/.gitkeep
+# 유닛→집계구 PIP 배정표. 원천 shapefile 은 bronze(전체 gitignore)라 git 으로 복구되지
+# 않는다 — 이 표가 조인 결과의 유일한 durable 기록이므로 추적한다.
+!data/silver/unit_jipgyegu.json
 !data/gold/.gitkeep
 *.parquet
 *.glb
@@ -77,6 +80,11 @@ data/gold/*
 # **영영 6구간으로만** 뜨는데, 응답이 `time_source:"trdar_band"` 로 정상 폴백을
 # 밝히기 때문에 고장으로 안 보인다 — 로컬에서만 24시간이 되는 상태가 된다.
 !data/gold/page_footfall_hourly.json
+
+# 유닛 단위 foot (집계구 생활인구 × SGIS 2016 4Q 경계 PIP) — **서빙이 읽는다**
+# (posting_inputs._unit_jipgyegu_flpop). 빠지면 새 클론에서 조용히 상권 폴백으로
+# 내려간다 — platform_posting_store_area.json 이 그렇게 빠져 있었다(08-25).
+!data/gold/platform_unit_foot.json
 # 예외: Page 다거점 red dot 실데이터 — 각 거점 page_building_master.geojson 만 추적(Vercel 서빙).
 # building_vacancy.json·대장 원본·parquet 등 중간·원본 산출물은 계속 제외.
 !data/gold/*/
@@ -158,4 +166,12 @@ ml/artifacts/.train_gnn_resume.tmp
 sqlite_mcp_server.db
 
 # 무인 실행 산출물(로그·비교표) — 결론은 docs/ 에 남긴다
-reports/
+# ⚠ `reports/` 가 아니라 `reports/*` 다 — 디렉터리째 제외하면 git 이 안으로
+#   들어가지 않아 아래 `!` 예외가 **먹지 않는다**.
+reports/*
+reports/logs/
+# 예외: 실측 근거표(작은 JSON). docs·게이트가 이 경로를 **근거로 인용**하는데
+# 통째로 무시돼 있어 새 클론에서는 검증할 방법이 없었다(2026-08-25 발견).
+# 기각된 실험의 실측표가 특히 그렇다 — 없으면 다음 사람이 같은 실험을 다시 돌린다.
+# reports/logs/ 는 계속 제외한다(용량).
+!reports/*.json

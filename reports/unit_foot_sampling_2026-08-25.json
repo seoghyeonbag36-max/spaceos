@@ -1,0 +1,72 @@
+{
+  "probed_at": "2026-08-25",
+  "question": "집계구 생활인구 표본을 A(1개월)/B(1주)/C(계절 4주) 중 무엇으로 잡을 것인가",
+  "criterion": "foot 은 거점 내 서열을 만드는 값이므로, 판단 기준은 '표본을 늘리면 서열이 바뀌는가'다 (Spearman ρ, 거점별 → 중앙)",
+  "axes": {
+    "seasonal": {
+      "samples": [
+        "2025-10-24(금)",
+        "2026-04-28(화)",
+        "2026-07-01(수)"
+      ],
+      "rho_median_range": [
+        0.976,
+        1.0
+      ],
+      "rho_mean_range": [
+        0.953,
+        0.979
+      ],
+      "districts_below_0_5": 0,
+      "verdict": "계절 보정(C) 불필요 — 9개월 간격에도 서열이 안 바뀐다"
+    },
+    "day_to_day": {
+      "pairs": 21,
+      "rho_median_of_medians": 1.0,
+      "rho_min": 0.9594,
+      "verdict": "일간 변동은 서열을 안 바꾼다"
+    },
+    "convergence": {
+      "1d_vs_7d_rho_median": 1.0,
+      "1d_vs_7d_rho_mean": 0.9718,
+      "5d_vs_7d_rho_mean": 0.9977,
+      "districts_below_0_9": {
+        "1d": 3,
+        "5d": 0
+      },
+      "verdict": "1개월(A)은 낭비 — 5일이면 이미 수렴"
+    },
+    "weekday_weekend": {
+      "rho_median": 0.964,
+      "rho_mean": 0.885,
+      "districts_below_0_5": 2,
+      "worst": {
+        "cityhall": -1.0,
+        "jangan": 0.4,
+        "myeongdong": 0.5
+      },
+      "cityhall_weekend_ratios": [
+        0.37,
+        0.58,
+        0.69
+      ],
+      "sat_vs_sun_rho_median": 1.0,
+      "verdict": "**여기 하나만 표본을 요구한다** — 주말이 들어가야 잡힌다. cityhall 은 서열이 완전 역전"
+    }
+  },
+  "decision": "B (1주 = 평일 5 + 주말 2)",
+  "rationale": "1주가 필요한 이유는 표본 크기가 아니다 — 계절·일간·수렴 세 축 모두 서열을 안 바꾼다. 필요한 이유는 평일/주말 구조 차이 하나뿐이고, 그건 주말이 표본에 있어야만 잡힌다. 토 vs 일 ρ중앙 1.0 이라 주말 2일로 족하다. A는 낭비, C는 불필요.",
+  "sample_used": [
+    "2026-07-01",
+    "2026-07-02",
+    "2026-07-03",
+    "2026-07-04",
+    "2026-07-05",
+    "2026-07-06",
+    "2026-07-07"
+  ],
+  "downloaded_mb": {
+    "per_day": 41,
+    "total_verification": 407
+  }
+}

@@ -40,7 +40,8 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from data.collectors.common import GOLD
+from data.collectors.common import GOLD, load_latest
+from data.config.platform_districts import SLUG as SLUG13
 
 _TIMESERIES = GOLD / "platform13" / "platform_district_timeseries.parquet"
 _OUT = GOLD / "platform_posting_inputs.json"
@@ -81,6 +82,40 @@ def _foot_grades(flpop: pd.Series) -> dict[str, str]:
     return {d: ("저" if v <= lo else "고" if v > hi else "중") for d, v in flpop.items()}
 
 
+def _seoul_benchmark(quarter: str) -> dict | None:
+    """R-ONE **서울 평균** 소규모상가 임대료(천원/㎡) — 거점과 같은 분기로 맞춘다.
+
+    ## 왜 필요한가 (docs/feature-posting.md §0-N)
+
+    우리 유닛 임대료는 `R-ONE 거점값 × 층 계수`인데, 그 결과를 검증하는 유일한 서울
+    기준점이 KOSIS 임차료율이었다. KOSIS 는 **점포가 실제 있는 층**의 실지불액이고
+    R-ONE 은 사실상 **1층 기준** 시세라, 두 값을 나란히 놓으면 층 기준이 어긋난 채로
+    비교된다. 같은 R-ONE 축의 서울 평균이 있어야 그 어긋남을 분리해 잴 수 있다.
+
+    ⚠ 서울 평균도 R-ONE 표본이라 **그 자체가 층 중립인 것은 아니다.** 우리 쪽과
+    같은 축이라는 점이 핵심이다.
+
+    ⚠ 분기를 거점과 **강제로 일치**시킨다. 최신 분기를 따로 집으면 벤치마크만 앞서
+    가서 배율이 조용히 틀어진다(거점 rent 는 gold 시계열 분기에 묶여 있다).
+    없으면 None 을 돌려 `seoul` 키를 아예 싣지 않는다 — 어긋난 분기로 채우느니
+    비어 있는 편이 낫다.
+    """
+    rows = load_latest(SLUG13, "rone_rent_small_bench.json") or []
+    hit = [r for r in rows if r.get("scope") == "seoul" and str(r.get("quarter")) == str(quarter)
+           and r.get("value") is not None]
+    if not hit:
+        return None
+    # 같은 분기가 통계표 여럿에 걸치면(표본개편 경계) 최신 통계표를 쓴다.
+    hit.sort(key=lambda r: str(r.get("statbl_id")))
+    v = float(hit[-1]["value"])
+    return {
+        "rent_per_m2_krw_thousand": round(v, 2),
+        "rone_cls": hit[-1].get("rone_cls"),
+        "statbl_id": hit[-1].get("statbl_id"),
+        "n_rows": len(hit),
+    }
+
+
 def run() -> dict:
     if not _TIMESERIES.exists():
         raise FileNotFoundError(
@@ -105,6 +140,8 @@ def run() -> dict:
         if pd.notna(row.rent_small) and pd.notna(row.flpop)
     }
 
+    seoul = _seoul_benchmark(str(quarter))
+
     out = {
         "source": "R-ONE 소규모상가 임대료(rent_small) + 서울 상권분석 유동인구(flpop)",
         "quarter": str(quarter),
@@ -118,6 +155,10 @@ def run() -> dict:
         ),
         "districts": districts,
     }
+    if seoul:
+        # 거점과 **같은 축**(R-ONE 소규모상가)의 서울 평균. §0-N 의 층 기준 비대칭을
+        # 재려면 이 값이 필요하다. 없으면 키 자체를 싣지 않아 서빙이 물러난다.
+        out["seoul"] = seoul
     _OUT.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
     return out
 
@@ -130,6 +171,14 @@ def main() -> None:
     print(f"  임대료(천원/㎡) {rents[0][0]:.1f}({rents[0][1]}) ~ {rents[-1][0]:.1f}({rents[-1][1]})")
     from collections import Counter
     print(f"  유동인구 등급 {dict(Counter(v['foot'] for v in d.values()))}")
+    s = out.get("seoul")
+    if s:
+        pp = s["rent_per_m2_krw_thousand"] * _PYEONG_TO_M2 / 10
+        print(f"  서울 평균(R-ONE {s['rone_cls']}) {s['rent_per_m2_krw_thousand']:.2f} 천원/㎡ "
+              f"= {pp:.2f} 만원/평 (1층 기준)")
+    else:
+        print("  [주의] 서울 평균 없음 — `python -m data.collectors.rone_rent` 로 "
+              "rone_rent_small_bench.json 을 먼저 받을 것")
 
 
 if __name__ == "__main__":

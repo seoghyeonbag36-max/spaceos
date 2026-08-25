@@ -23,6 +23,9 @@ def _isolate_marketing_cache():
     mkt.clear_district_cache()
 
 
+# `foot` 서열의 실측 소스 — 집계구(기본) · 최근접 상권(폴백)
+_MEASURED_FOOT = {"flpop+jipgyegu", "flpop+trdar"}
+
 def test_simulate_revenue_fallback():
     """코파일럿 미설정 시 3-Tier 폴백으로 응답한다 (서울 13 Page 시드)."""
     r = client.post(f"{V1}/ai/simulate-revenue", json={"district_id": "garosugil"})
@@ -85,12 +88,13 @@ def test_postings_declare_input_provenance():
     for p in postings:
         src = p["inputs_source"]
         assert src["rent"] == "rone", "임대료가 R-ONE 실데이터가 아니다"
-        # 2026-08-24: 거점 내 서열이 시드 → 최근접 상권 실측으로 바뀌었다.
-        # 가로수길은 상권 3곳(신사·논현1·잠원)이라 실측으로 갈린다 — 여기가
-        # `flpop+seed` 로 돌아갔다면 조용히 프록시로 후퇴한 것이다.
-        # (거점별로 어느 쪽이 맞는지는 test_seed_fallback_only_where_trdar_
-        #  cannot_differentiate 가 전 거점에 대해 지킨다.)
-        assert src["foot"] == "flpop+trdar", f"거점 내 서열이 실측이 아니다: {src['foot']}"
+        # 2026-08-24: 거점 내 서열이 시드 → 최근접 상권 실측으로 바뀌었고,
+        # 2026-08-25: 상권 → **집계구**로 다시 올라갔다(거점당 구역 중앙 3 → 6).
+        # `flpop+seed` 나 `flpop` 으로 돌아갔다면 조용히 프록시로 후퇴한 것이다.
+        # 특정 문자열로 못박지 않는다 — 더 나은 실측으로 갈아탈 때마다 의도와
+        # 무관하게 깨진다. (거점별로 어느 쪽이 맞는지는
+        #  test_seed_fallback_only_where_trdar_cannot_differentiate 가 전 거점에 대해 지킨다.)
+        assert src["foot"] in _MEASURED_FOOT, f"거점 내 서열이 실측이 아니다: {src['foot']}"
         # 2026-08-24 실 인벤토리 배선: area 는 건축물대장(상업면적÷capacity),
         # prem 은 **값이 없다**. 둘 다 "있는 척"하면 안 되는 것은 그대로다 —
         # 다만 밝히는 내용이 달라졌다. "absent" 는 권리금 0 이 관측이 아니라
@@ -542,7 +546,13 @@ def test_foot_ordering_is_measured_not_seeded():
     for d in svc.DISTRICTS:
         for u in svc.resolved_units(d["id"]) or []:
             src[u["inputs_source"]["foot"]] += 1
-    assert src["flpop+trdar"] > src["flpop+seed"], dict(src)
+    # 2026-08-25 집계구 승격 — 서열의 원천이 `flpop+trdar` 에서 `flpop+jipgyegu` 로
+    # 올라갔다(거점당 구역 중앙 3 → 6). 종전에는 이 단언이 trdar 를 직접 셌는데,
+    # 그러면 더 나은 실측으로 갈아탈 때 통과하지 못한다. **실측 대 시드**를 센다.
+    measured = sum(v for k, v in src.items() if k in _MEASURED_FOOT)
+    assert measured > src.get("flpop+seed", 0), dict(src)
+    # 승격이 실제로 걸렸는지도 고정한다 — 조용히 상권으로 물러나면 여기서 걸린다.
+    assert src.get("flpop+jipgyegu", 0) > src.get("flpop+trdar", 0), dict(src)
     # 시드 잔존은 '상권으로 못 가르는 거점' 에 국한돼야 한다.
     assert src["flpop+seed"] / max(1, sum(src.values())) < 0.15, dict(src)
 
