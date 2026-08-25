@@ -281,10 +281,78 @@ def test_weighted_floor_rent_is_a_lower_bound_than_1f():
                 f"{d['id']} {u['id']} 가중계수 {factor:.3f} >= 1F {one_f}")
             # 출처가 어느 모델이 돌았는지 밝히는가 — 안 밝히면 상한과 하한이 같은
             # 이름으로 섞여 나가고, 그건 실측처럼 보이는 추정치가 된다.
-            assert u.get("inputs_source", {}).get("floor") == "flr_ouln", (
+            assert u.get("inputs_source", {}).get("floor") in (
+                "flr_ouln", "flr_ouln+vac"), (
                 f"{d['id']} {u['id']} 층 근거가 응답에 안 드러난다")
             checked += 1
     assert checked > 400, f"층 분포가 붙은 유닛이 {checked}개뿐 — 배선이 풀렸다"
+
+
+def test_vacant_floor_band_is_ordered():
+    """공실 유닛의 층 괄호가 **뒤집히지 않는다** — 1F 고정 ≥ 전체 층 ≥ 빈 층 ≥ 빈 층 하단.
+
+    2026-08-25 오후(§0-M). 위 테스트가 고정한 괄호는 두 끝(1F 고정 · 건물 전체 층
+    가중평균)뿐이었다. 그런데 **공실 유닛은 점포가 있는 층에 있을 수 없다** — 건물
+    상업층 **전체**를 평균에 넣은 값은 이미 찬 층까지 세는 것이라 공실 자리의
+    임대료로는 여전히 상한이었다.
+
+    좁힐 근거는 새로 받을 것이 없었다. Page 마스터가 `occ_floors`(상가정보 flrNo·
+    인허가로 확인된 점유 층)와 `unknown_n` 을 이미 싣고 있었다 — 수집이 아니라
+    **배선** 문제였다(이 저장소가 반복해 잡아 온 양식이다).
+
+    괄호가 남는 원인은 상가정보 flrNo 공란(약 30%)이다:
+      · `vac_floor_mix`    점유 하한(확인된 층만 찼다) → 빈 층 최다 → 임대료 **상단**
+      · `vac_floor_mix_lo` 점유 상한(층 미상까지 낮은 층부터 찼다) → 임대료 **하단**
+
+    지상 상업층 계수는 층이 올라갈수록 단조 감소하므로(1F 1.00 · 2F 0.45 · 3F 0.40 ·
+    4F+ 0.30) 낮은 층을 덜어낸 쪽이 항상 싸다. 그 단조성이 깨지면 괄호의 두 끝이
+    이름과 반대가 되므로 여기서 막는다.
+
+    실측(528유닛 · 계수 중앙): 1F 1.000 → 전체 층 0.549 → 빈 층 0.487 → 하단 0.401.
+    ⚠ **싣는 값은 여전히 `floor_mix`(전체 층)다.** 빈 층을 실어 보니 premium 티어의
+    프라임 프리미엄이 +0.3%p → **−0.23%p** 로 부호를 넘어 위
+    `test_margin_gap_is_exactly_the_prime_rent_premium` 가 걸렸다 — 프라임 인벤토리가
+    서울 평균보다 임대료 부담이 낮다는 뜻이라 성립하지 않는다. 임계값을 내려
+    통과시키지 않고 **싣는 값을 되돌렸고**, 이 테스트는 그 선택까지 함께 고정한다.
+    """
+    from app.services.posting_inputs import (
+        _floor_factor, _mixed_floor_factor, _weighted)
+
+    one_f = _floor_factor("1F", None)
+    checked = narrowed = 0
+    for d in D.DISTRICTS:
+        for u in (D.resolved_units(d["id"]) or []):
+            mix, vac = u.get("floor_mix"), u.get("vac_floor_mix")
+            if not mix or not vac:
+                continue
+            f_all = _weighted(mix, None)
+            f_vac = _weighted(vac, None)
+            f_lo = _weighted(u.get("vac_floor_mix_lo"), None)
+            assert f_all is not None and f_vac is not None
+            assert set(vac) <= set(mix), (
+                f"{d['id']} {u['id']} 빈 층이 건물 상업층 밖이다 — 분모와 갈라졌다")
+            assert abs(sum(vac.values()) - 1.0) < 0.01, (
+                f"{d['id']} {u['id']} 빈 층 비중 합 {sum(vac.values()):.3f} != 1")
+            assert f_vac <= one_f + 1e-9, (
+                f"{d['id']} {u['id']} 빈 층 계수 {f_vac:.3f} > 1F {one_f}")
+            if f_lo is not None:
+                assert f_lo <= f_vac + 1e-9, (
+                    f"{d['id']} {u['id']} 하단 {f_lo:.3f} > 상단 {f_vac:.3f} — 괄호가 뒤집혔다")
+            # 싣는 값은 **건물 전체 층**이다 — 빈 층을 실어 보니 프라임 프리미엄이
+            # 부호를 넘어 위 트립와이어가 걸렸다. 근거 라벨이 측정치 쪽으로 올라가
+            # 있으면 응답이 "빈 층으로 계산했다"고 거짓말을 하게 된다.
+            shipped, _ = _mixed_floor_factor(u, None)
+            assert shipped == pytest.approx(f_all, abs=1e-9), (
+                f"{d['id']} {u['id']} 싣는 계수가 floor_mix 가 아니다 — "
+                f"괄호의 아래 끝이 조용히 실렸다")
+            assert u.get("inputs_source", {}).get("floor") == "flr_ouln", (
+                f"{d['id']} {u['id']} 층 근거가 싣는 모델과 어긋난다")
+            if u.get("occ_floors"):
+                narrowed += 1
+            checked += 1
+    assert checked > 400, f"빈 층 분포가 붙은 유닛이 {checked}개뿐 — 배선이 풀렸다"
+    assert narrowed > 200, (
+        f"점유 층으로 좁혀진 유닛이 {narrowed}개뿐 — occ_floors 배선이 풀렸다")
 
 
 def test_unviable_share_is_small_and_factory_can_win():

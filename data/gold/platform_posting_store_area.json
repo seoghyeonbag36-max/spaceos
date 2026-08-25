@@ -1,0 +1,25 @@
+{
+  "source": "공정거래위원회 가맹정보 브랜드별 가맹점 현황(data.go.kr 15110241), 기준 2024",
+  "note": "A(평) = avrgSlsAmt / arUnitAvrgSlsAmt. 정보공개서 면적단위가 3.3㎡ 라 몫이 평이고, 두 값이 같은 금액 단위라 단위는 상쇄된다. pyeong 은 가맹점수 가중 중앙값(주값), pyeong_brand_median 은 브랜드 단순 중앙값. 전국 가맹점 모집단이라 서울 실측 매출과 축이 완전히 같지는 않다.",
+  "skipped": 4227,
+  "tiers": {
+    "premium": {
+      "pyeong": 20.8,
+      "pyeong_brand_median": 21.1,
+      "brands": 452,
+      "stores": 10316
+    },
+    "value": {
+      "pyeong": 18.5,
+      "pyeong_brand_median": 25.4,
+      "brands": 1828,
+      "stores": 74083
+    },
+    "factory": {
+      "pyeong": 17.1,
+      "pyeong_brand_median": 15.9,
+      "brands": 536,
+      "stores": 37143
+    }
+  }
+}

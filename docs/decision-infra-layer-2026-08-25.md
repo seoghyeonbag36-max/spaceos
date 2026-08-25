@@ -17,7 +17,7 @@
 | **DB** | ⛔ **없다** | `app/models/` 에 `__init__.py` 뿐. ORM 모델 0개 · 마이그레이션 0건 |
 | **PostgreSQL/PostGIS·Redis·Celery** | ⛔ **코드에 없다** | `requirements.txt` 에만 있다. `app/` 전체에서 import 0건 |
 | **파이프라인 오케스트레이션** | ⛔ 없다 | Airflow DAG **0건**. 수집·가공이 전부 수동 스크립트 |
-| **CI/CD** | ⛔ 없다 | `infra/github/`·`infra/k8s/` 가 `.gitkeep` 만 |
+| **CI/CD** | ◐ **CI 만 섰다**(2026-08-25 오후) | `.github/workflows/ci.yml` — 백엔드·데이터 pytest + 프론트 tsc/빌드. CD 는 여전히 없다(`infra/k8s/` 는 `.gitkeep` 만) |
 | **인증·테넌시** | ⛔ 없다 | JWT/OAuth 0건. 계정·권한·조직 개념 자체가 없다 |
 | **과금** | ⛔ 스텁 | `api/v1/payments.py` 의 reserve/apply 가 전부 `TODO` 주석 |
 
@@ -84,6 +84,28 @@ DB 를 **분석 데이터용이 아니라 사용자 데이터용**으로만 도�
    → **CI 에 그대로 걸 수 있다.** 튜닝이 선행일 이유가 없다.
    (앞서 한 번 5분 타임아웃에 걸려 "완주 못 함"으로 남았던 것은 다른 작업과 CPU 를
    나눠 쓰던 중이었기 때문이다. 스위트 자체는 문제가 없다.)
+
+   ✅ **착수·완료(2026-08-25 오후) — `.github/workflows/ci.yml`.** 잡 셋을 병렬로
+   돌린다: 백엔드 pytest(약 1분 30초) · 데이터 파이프라인 pytest(38건 4초) ·
+   프론트 `npm run build`(= `tsc -b && vite build`). 시크릿이 필요 없다 —
+   `conftest.py` 가 `LLM_API_KEY` 를 전역으로 비우고 실호출 검증은
+   `SPACEOS_LIVE_LLM=1` opt-in 이라 CI 에서 skip 된다. 포크 PR 에서도 그대로 돈다.
+
+   ⚠ **워크플로는 `infra/github/` 이 아니라 `.github/workflows/` 에 있다.** Actions 는
+   저장소 루트의 그 경로만 읽고 설정으로 바꿀 수 없다. 위 표가 `infra/github/` 을
+   CI 자리로 적어 두어 거기에 넣을 뻔했고, 넣었으면 **파일은 있는데 CI 는 안 도는**
+   상태가 됐을 것이다 — 이 문서 §1 의 "함정 하나"(compose 는 있는데 앱이 안 쓴다)와
+   정확히 같은 모양이다. `infra/github/README.md` 에 그 사실을 적어 두었다.
+
+   ⚠ **CI 를 세우려다 실제 결함을 하나 찾았다.**
+   `data/gold/platform_posting_store_area.json`(914B · 공정위 기반 평균 점포 면적 A)이
+   `.gitignore` 에 걸려 **추적되지 않고 있었다** — 형제 세 파일에는 전부 `!` 예외가
+   있는데 이것만 빠져 있었다. 새로 클론한 환경(CI·Vercel)에는 파일이 없어
+   `posting_revenue` 가 임차료 **역산 폴백**으로 내려간다(§0-I 가 "한식집 7.1평은
+   실물이 아니었다"며 기각한 모델이다). 로컬에는 파일이 있어 **개발 기계에서는
+   영원히 안 드러난다.** 예외를 추가해 추적으로 돌렸고,
+   `apps/backend/tests/test_gold_shipping.py` 가 서빙이 읽는 Gold 13개의 추적 여부를
+   전수 단언한다. → 즉 CI 는 걸기 전부터 이미 한 건을 값했다.
 2. **계정 층 (1~2주).** 위 A.
 3. **과금 (파일럿 계약 직전).** 네이버페이 스텁을 실제 연동으로. 파일럿이 무상이면
    미룬다 — 다만 **미룬다는 결정을 기록**한다. 지금은 결정이 아니라 공백이다.
