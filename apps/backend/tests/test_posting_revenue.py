@@ -211,11 +211,21 @@ def test_margin_gap_is_exactly_the_prime_rent_premium():
         assert abs(med[t] - expect) < 2.0, f"{t}: 마진 {med[t]:.1f} vs 분해 {expect:.1f}"
 
 
-def test_margins_sit_below_kosis_band_because_units_are_prime():
-    """마진은 KOSIS 대역(3.5~10.5%) **아래**지만 붕괴하지는 않는다.
+def test_margins_stay_in_sane_bounds():
+    """마진 중앙이 상식 범위 안에 있다 (붕괴도, 과대도 아니다).
 
-    대역 안에 들면 오히려 이상하다 — 프라임 자리의 임대료를 서울 평균 이익률과
-    같은 자리에 놓는 셈이기 때문이다.
+    ⚠ 2026-08-25 **이 테스트의 이름과 전제가 바뀌었다.** 종전 이름은
+      `test_margins_sit_below_kosis_band_because_units_are_prime` 였고 *"대역 안에 들면
+      오히려 이상하다"* 고 적혀 있었다. 층 분포를 실측(`floor_mix`)으로 갈면서 마진
+      중앙이 **5.5 / 4.3 / 7.0%** 로 올라와 KOSIS 대역(3.5~10.5%) 안에 들어왔다.
+      전제가 틀렸던 것이 아니라 **입력이 틀려 있었다** — 종전 값(0.4/−1.7/2.1%)은
+      전 유닛 1F 가정이 만든 임대료 상한의 결과였다.
+
+      그렇다고 "이제 맞다"는 뜻은 아니다. 프라임 프리미엄이 premium 에서 **0.3%p**
+      까지 내려왔는데(종전 3.5%p), 이는 프라임 54거점 인벤토리가 서울 **평균**과
+      같은 임대료 부담을 진다는 뜻이라 그것대로 미심쩍다. 두 모델은 참값을 사이에
+      두고 있다 — 1F 고정은 **상한**, 층 면적 가중평균은 **하한**에 가깝다.
+      → test_weighted_floor_rent_is_a_lower_bound_than_1f 가 그 괄호를 코드로 고정한다.
 
     ⚠ 2026-08-24 실 인벤토리 배선으로 **value 중앙이 0 을 넘어 내려갔다**(+0.7% →
       **−1.7%**). 종전 하한은 `0 < med[t]` 였다. 그 트립와이어가 울린 이유를 먼저
@@ -237,9 +247,44 @@ def test_margins_sit_below_kosis_band_because_units_are_prime():
     """
     med, _ = _margin_and_rent_share()
     for t in P.TIERS:
-        assert med[t] < 10.5, f"{t} 마진 중앙 {med[t]:.1f}% — KOSIS 대역 안이면 의심"
+        assert med[t] < 10.5, f"{t} 마진 중앙 {med[t]:.1f}% — KOSIS 이익률 상한 초과"
         assert med[t] > -5.0, (
             f"{t} 마진 중앙 {med[t]:.1f}% — 분해로 설명되는 폭을 넘어 무너졌다")
+
+
+def test_weighted_floor_rent_is_a_lower_bound_than_1f():
+    """층 가중평균 임대료는 1F 고정보다 **반드시 싸다** — 참값은 둘 사이에 있다.
+
+    2026-08-25 에 `build_vacant_units` 가 층을 층별개요 면적 비중으로 실측하면서
+    임대료가 중앙 45% 내려갔고, 그 결과 통과 조건 넷이 전부 ✅ 가 됐다. 숫자가
+    원하는 방향으로 움직였을 때가 가장 위험하므로, **어느 쪽이 상한이고 어느 쪽이
+    하한인지**를 코드로 못박는다.
+
+    - 1F 고정(종전) = 상한. R-ONE 소규모상가 임대료가 사실상 1층 기준이라 계수 1.00 이
+      전 유닛에 걸린다.
+    - 층 면적 가중평균(현행) = 하한에 가깝다. 실제 창업 임차인은 저층을 고르는 쪽으로
+      쏠리는데, 이 모델은 건물의 모든 상업층을 면적 비중대로 평균낸다.
+
+    참값을 안다고 주장하지 않는다. 괄호가 있다는 사실만 고정한다.
+    """
+    from app.services.posting_inputs import _floor_factor, _mixed_floor_factor
+
+    one_f = _floor_factor("1F", None)
+    checked = 0
+    for d in D.DISTRICTS:
+        for u in (D.resolved_units(d["id"]) or []):
+            mix = u.get("floor_mix")
+            if not mix or float(mix.get("1F", 0.0)) >= 0.999:
+                continue
+            factor, used = _mixed_floor_factor(u, None)
+            assert used and factor < one_f, (
+                f"{d['id']} {u['id']} 가중계수 {factor:.3f} >= 1F {one_f}")
+            # 출처가 어느 모델이 돌았는지 밝히는가 — 안 밝히면 상한과 하한이 같은
+            # 이름으로 섞여 나가고, 그건 실측처럼 보이는 추정치가 된다.
+            assert u.get("inputs_source", {}).get("floor") == "flr_ouln", (
+                f"{d['id']} {u['id']} 층 근거가 응답에 안 드러난다")
+            checked += 1
+    assert checked > 400, f"층 분포가 붙은 유닛이 {checked}개뿐 — 배선이 풀렸다"
 
 
 def test_unviable_share_is_small_and_factory_can_win():

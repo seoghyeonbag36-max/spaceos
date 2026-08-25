@@ -116,11 +116,7 @@ def test_rent_falls_with_floor():
     """
     from app.services import districts as svc
 
-    # ⚠ 실 인벤토리(2026-08-24 배선)는 **528유닛 전부 `1F`** 다 — build_vacant_units
-    #   가 층을 1F 로 가정하기 때문이다. 그래서 resolved_units 로는 층 계수가 한 번도
-    #   안 밟히고, 이 회귀 테스트가 조용히 0건 검사로 비어 버렸다. 계수 자체를
-    #   직접 검사한다 — 인벤토리에 상층이 생기면 위 경로로도 자동으로 걸린다.
-    from app.services.posting_inputs import _floor_factor
+    from app.services.posting_inputs import _floor_factor, _mixed_floor_factor
 
     base = _floor_factor("1F", None)
     checked = 0
@@ -129,15 +125,27 @@ def test_rent_falls_with_floor():
         checked += 1
     assert checked == 5
 
-    # 인벤토리에 상층이 실제로 있으면 응답에서도 지켜져야 한다(지금은 없다).
+    # ⚠ 2026-08-25: 실 인벤토리에 **실측 층 분포**(floor_mix)가 붙으면서 이 테스트의
+    #   종전 형태가 틀린 것을 검사하게 됐다. 유닛의 `floor` 는 이제 한 층이 아니라
+    #   범위 라벨("1~5F")이고, 임대료는 층 **면적 가중평균**으로 계산된다. 라벨로 정렬해
+    #   비교하면 최빈층 2F 짜리 건물이 1F 짜리보다 비싸게 나올 수 있다(실제로 걸렸다:
+    #   "myeongdong 2F 평당 26.7 >= 1F 24.0"). 라벨이 임대료를 정하지 않기 때문이고,
+    #   그건 버그가 아니라 이 유닛이 **건물의 호실당 평균**이라는 뜻이다.
+    #   그래서 모델이 실제로 주장하는 것을 검사한다 — 상층 비중이 큰 건물일수록 층
+    #   가중계수가 낮다(= 평당 임대료가 싸다).
+    mixed_checked = 0
     for did in ("garosugil", "myeongdong", "songridan"):
-        per_pyeong = {u["floor"]: u["rent"] / u["area"]
-                      for u in (svc.resolved_units(did) or [])}
-        if "1F" not in per_pyeong:
-            continue
-        for floor, v in per_pyeong.items():
-            if floor != "1F" and floor.endswith("F"):
-                assert v < per_pyeong["1F"], f"{did} {floor} 평당 {v:.1f} >= 1F"
+        for u in (svc.resolved_units(did) or []):
+            mix = u.get("floor_mix")
+            if not mix:
+                continue
+            factor, used_mix = _mixed_floor_factor(u, None)
+            assert used_mix, f"{did} {u['id']} 가 floor_mix 를 들고도 안 썼다"
+            # 1F 비중이 1.0 이 아닌 이상 계수는 1F 단독(1.00)보다 반드시 낮다.
+            if float(mix.get("1F", 0.0)) < 0.999:
+                assert factor < base, f"{did} {u['id']} 계수 {factor:.3f} >= 1F"
+            mixed_checked += 1
+    assert mixed_checked > 0, "실 인벤토리에 floor_mix 가 하나도 없다 — 배선이 풀렸다"
 
 
 @requires_gold

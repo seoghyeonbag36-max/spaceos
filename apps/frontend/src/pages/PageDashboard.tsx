@@ -194,12 +194,22 @@ function Src({ src }: { src?: string }) {
   if (!src) return null;
   const label = src === "rone" ? "R-ONE"
     : src === "flpop+seed" ? "유동인구"
-      : src === "seed" ? "추정" : src;
+      : src === "flr_ouln" ? "층 실측"
+        : src === "assumed_1f" ? "1F 가정"
+          : src === "seed" ? "추정" : src;
   const title = src === "rone" ? "한국부동산원 R-ONE 소규모상가 임대료 × 면적 × 층 계수"
     : src === "flpop+seed" ? "서울 상권분석 유동인구(거점 수준) + 시드의 거점 내 서열"
-      : "실데이터 소스가 없어 손으로 적은 프록시 값이다";
+      : src === "flr_ouln"
+        ? ("층별개요 상업층의 면적 비중으로 임대료를 가중평균했다. "
+          + "이 유닛은 건물의 호실당 평균 자리라 특정 한 층이 아니다 — "
+          + "실제 임차인이 저층을 고르면 임대료는 이보다 높다(하한).")
+        : src === "assumed_1f"
+          ? "층 근거가 없어 1층으로 가정했다 — 층 계수가 최댓값이라 임대료 상한이다"
+          : "실데이터 소스가 없어 손으로 적은 프록시 값이다";
   return (
-    <span className={`srcbadge ${src === "seed" ? "is-syn" : "is-gold"}`}
+    // `assumed_1f` 도 합성 취급이다 — 관측이 아니라 가정이라, 초록(실측) 배지를
+    // 달면 "층을 실측했다"로 읽힌다.
+    <span className={`srcbadge ${src === "seed" || src === "assumed_1f" ? "is-syn" : "is-gold"}`}
       style={{ marginLeft: 3 }} title={title}>{label}</span>
   );
 }
@@ -551,7 +561,9 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
                   <div key={p.id} className="unit">
                     <div className="uhead">
                       <span className="uname">{p.n}</span>
-                      <span className="upill">{p.floor} · {p.area}평 · 前 {p.was}</span>
+                      <span className="upill">
+                        {p.floor}<Src src={p.inputs_source?.floor} /> · {p.area}평 · 前 {p.was}
+                      </span>
                     </div>
                     <div className="umeta">
                       임대료 {p.rent.toLocaleString()}만원<Src src={p.inputs_source?.rent} />

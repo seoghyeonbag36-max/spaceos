@@ -92,6 +92,25 @@ def _floor_factor(floor: str, table: dict[str, float] | None) -> float:
     return float(tbl.get("1F", 1.0))
 
 
+def _mixed_floor_factor(unit: dict, table: dict[str, float] | None) -> tuple[float, bool]:
+    """유닛의 층 계수와 "실측 분포를 썼는가". 실 인벤토리는 `floor_mix` 를 들고 온다.
+
+    실 인벤토리 유닛은 건물의 **호실당 평균** 자리다(면적 = 상업면적 ÷ 호실 수).
+    그러면 임대료도 한 층이 아니라 상업층 전체의 **면적 가중평균**이어야 짝이 맞는다.
+    08-24 배선 때는 이 값이 전부 `1F`(계수 1.00)라 임대료가 계통적 상한이었고, 그것이
+    value 마진 중앙을 −1.7% 로 끌어내린 원인이었다(docs/feature-posting.md §0-J ④).
+
+    `floor_mix` 가 없으면(시드 유닛·폴백 산출물) 종전 그대로 단일 층 라벨을 쓴다.
+    """
+    mix = unit.get("floor_mix")
+    if isinstance(mix, dict) and mix:
+        total = sum(float(v) for v in mix.values())
+        if total > 0:
+            weighted = sum(_floor_factor(k, table) * float(v) for k, v in mix.items())
+            return weighted / total, True
+    return _floor_factor(unit.get("floor", "1F"), table), False
+
+
 def for_district(district_id: str) -> dict | None:
     """거점의 실데이터 입력. 미적재·미지원 거점이면 None(→ 시드 프록시 유지)."""
     data = _load()
@@ -247,11 +266,16 @@ def resolve_units(district_id: str, units: list[dict]) -> list[dict]:
     for i, unit in enumerate(units):
         resolved = {**unit, "inputs_source": {**seed_src, **_origin_src(unit)}}
         if rent_per_m2:
-            factor = _floor_factor(unit.get("floor", "1F"), data.get("floor_factor"))
+            factor, mixed = _mixed_floor_factor(unit, data.get("floor_factor"))
             # 시드 rent 와 같은 단위(만원/월): 천원/㎡ × ㎡ ÷ 10
             resolved["rent"] = max(
                 1, round(rent_per_m2 * unit["area"] * _PYEONG_TO_M2 * factor / 10))
+            # 임대료의 **출처**는 어느 쪽이든 R-ONE 이다. 층을 어떻게 적용했는지는
+            # 다른 축이라 별도 필드로 밝힌다 — 한 라벨에 뭉치면 계통적 상한(1F 고정)과
+            # 가중평균이 같은 이름으로 섞인다.
             resolved["inputs_source"]["rent"] = "rone"
+            resolved["inputs_source"]["floor"] = (
+                unit.get("floor_basis") or "flr_ouln") if mixed else "assumed_1f"
         if district_grade:
             if offsets is not None:
                 resolved["foot"] = _apply_offset(district_grade, offsets[i])
