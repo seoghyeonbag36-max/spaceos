@@ -141,6 +141,49 @@ def _floor_mix(rows: list[dict]) -> dict[str, float]:
     return {k: round(v / s, 4) for k, v in mix.items()} if s > 0 else {}
 
 
+def _vacant_floor_mixes(mix: dict[str, float], occ: set[int], unknown_n: int
+                        ) -> tuple[dict[str, float], dict[str, float]]:
+    """빈 층만 남긴 면적 비중 두 벌 — `(임대료 상단, 임대료 하단)`.
+
+    **공실 유닛은 점포가 있는 층에 있을 수 없다.** 그런데 08-25 오전까지의 임대료는
+    건물 상업층 **전체**의 면적 가중평균이었다(§0-L) — 이미 찬 층까지 평균에 넣은
+    값이라 공실 자리의 임대료로는 여전히 상한이었다. 층 근거는 새로 받을 것이
+    없었다: Page 마스터가 `occ_floors`(상가정보 flrNo·인허가로 확인된 점유 층)와
+    `unknown_n`(층 미상 점포로 배정된 층 수)을 이미 싣고 있다. 수집이 아니라
+    **배선** 문제였다.
+
+    괄호가 생기는 이유는 층 미상 점포다(상가정보 flrNo 공란 약 30%):
+
+      · 점유 **하한**(확인된 층만 찼다) → 빈 층이 가장 많다 → 낮은 층이 남는다
+        → 임대료 **상단**
+      · 점유 **상한**(층 미상까지 낮은 층부터 찼다고 본다) → 빈 층이 가장 적고
+        높은 층만 남는다 → 임대료 **하단**
+
+    층 미상을 낮은 층부터 앉히는 것은 `build_page_master._aggregate` 의 상한 계산과
+    **같은 규칙**이다. 규칙이 갈라지면 같은 건물에 대해 Page 와 Posting 이 서로 다른
+    층을 비었다고 말하게 된다.
+
+    지상 상업층의 층 계수는 층이 올라갈수록 단조 감소하므로(1F 1.00 · 2F 0.45 ·
+    3F 0.40 · 4F+ 0.30) 낮은 층을 덜어낸 쪽이 항상 계수가 낮다 — 두 벌의 대소가
+    뒤집히지 않는다는 뜻이고, `test_vacant_floor_band_is_ordered` 가 고정한다.
+    """
+    if not mix:
+        return {}, {}
+    vac = sorted(int(k[:-1]) for k in mix if int(k[:-1]) not in occ)
+    if not vac:
+        # 층별 면적 비중에 남은 층이 전부 점유로 확인됐다. 공실 판정과 어긋나므로
+        # 좁히지 않고 물러난다 — 빈 집합으로 나누면 임대료가 조용히 0 이 된다.
+        return {}, {}
+    vac_lo = vac[unknown_n:] or vac[-1:]
+
+    def _renorm(nos: list[int]) -> dict[str, float]:
+        sub = {f"{n}F": mix[f"{n}F"] for n in nos}
+        s = sum(sub.values())
+        return {k: round(v / s, 4) for k, v in sub.items()} if s > 0 else {}
+
+    return _renorm(vac), _renorm(vac_lo)
+
+
 def _units_for(slug: str) -> list[dict]:
     master = GOLD / slug / "page_building_master.geojson"
     attrs_path = SILVER / slug / "building_attrs.json"
@@ -195,6 +238,19 @@ def _units_for(slug: str) -> list[dict]:
         else:
             rep_floor, floor_basis = "1F", "assumed_1f"
 
+        # 공실 유닛이 실제로 **어느 층에 있을 수 있는가**. 점포가 확인된 층은 뺀다.
+        # 근거는 이미 이 건물의 Page 마스터에 있다(occ_floors·unknown_n) — 새 수집이
+        # 아니라 배선이다. 좁힐 근거가 없으면(occ 가 비었거나 층별개요가 없으면)
+        # 두 벌 다 비워서 내보내고, 소비자는 종전 floor_mix 로 물러난다.
+        occ = {int(f) for f in (p.get("occ_floors") or [])}
+        unknown_n = int(p.get("unknown_n") or 0)
+        vac_mix, vac_mix_lo = _vacant_floor_mixes(mix, occ, unknown_n)
+        # ⚠ `floor_basis` 는 승격하지 않는다. 이 둘은 **싣는 값이 아니라 괄호의 아래
+        # 끝을 재는 측정치**다 — 실어 보니 premium 프라임 프리미엄이 −0.23%p 로 부호를
+        # 넘어 트립와이어(test_margin_gap_is_exactly_the_prime_rent_premium)가 걸렸다.
+        # 근거 라벨을 올리면 응답이 "빈 층으로 계산했다"고 말하게 되는데 실제로는
+        # floor_mix 로 계산한다 — 그 어긋남이 정확히 이 저장소가 반복해 잡아 온 것이다.
+
         out.append({
             "id": f"vu-{p.get('id')}",
             "n": at.get("bld_nm") or p.get("name") or "(이름 미상)",
@@ -202,8 +258,14 @@ def _units_for(slug: str) -> list[dict]:
             "lat": round(lat, 6), "lng": round(lng, 6),
             "area": area_pyeong,
             "floor": rep_floor,
-            "floor_mix": mix,             # {"1F": 0.42, ...} 면적 비중 · 합 1.0
-            "floor_basis": floor_basis,   # flr_ouln(실측) / assumed_1f(폴백)
+            "floor_mix": mix,             # {"1F": 0.42, ...} 건물 상업층 전체 · 합 1.0
+            # 빈 층만 남긴 면적 비중 두 벌. 괄호의 두 끝이고, 임대료는 이 사이에 있다.
+            "vac_floor_mix": vac_mix,        # 점유 하한 → 임대료 **상단**
+            "vac_floor_mix_lo": vac_mix_lo,  # 점유 상한(층 미상 배정) → 임대료 **하단**
+            "occ_floors": sorted(occ),       # 점포·인허가로 점유가 확인된 층
+            "unknown_n": unknown_n,          # 층 미상 점포로 배정된 층 수(괄호 폭의 원인)
+            # flr_ouln+vac(빈 층 실측) / flr_ouln(건물 전체 층) / assumed_1f(폴백)
+            "floor_basis": floor_basis,
             "was": p.get("industry") or "",
             "capacity": capacity, "active": p.get("active") or 0,
             "vacancy_rate": p.get("vacancy_rate"),
@@ -232,6 +294,12 @@ def run(slugs: list[str]) -> dict[str, int]:
                      "층은 층별개요(bldg_flr_raw) 상업층의 **면적 비중**이다(floor_mix) — "
                      "유닛이 호실당 평균이므로 임대료도 층 가중평균으로 계산한다. "
                      "종전 '전부 1F 가정'은 계수를 최댓값에 고정해 임대료 상한을 만들었다. "
+                     "그 층 가중평균도 여전히 상한이었다 — 공실 유닛은 점포가 있는 층에 "
+                     "있을 수 없는데 상업층 **전체**를 평균에 넣었기 때문이다. "
+                     "vac_floor_mix 는 점유가 확인된 층(occ_floors)을 덜어낸 것이고, "
+                     "vac_floor_mix_lo 는 층 미상 점포까지 낮은 층부터 점유로 배정한 것이다 "
+                     "— 임대료의 참값은 이 둘 사이에 있고 괄호 폭의 원인은 상가정보 flrNo "
+                     "공란(약 30%)이다. "
                      "권리금은 거점 단위 소스가 없어 "
                      "유닛에 없다 — 통계(상가건물임대차 실태조사 142006)는 있으나 전국 7,000 "
                      "표본이라 시도·상권유형 단위다."),

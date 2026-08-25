@@ -517,13 +517,30 @@ def posting_track(total: int) -> Track:
         "참값을 사이에 둔다: **1F 고정 = 상한 · 층 가중평균 = 하한**. 어느 쪽이 돌았는지 "
         "`inputs_source['floor']`(flr_ouln/assumed_1f)가 밝히고, 괄호 자체는 "
         "`test_weighted_floor_rent_is_a_lower_bound_than_1f` 가 고정한다. "
-        "다음 레버는 **공실 유닛이 실제로 어느 층인지**(상가정보 flrNo 매칭)다 — 그때 "
-        "비로소 괄호가 한 점으로 좁혀진다. 폴백은 garak 1곳 5유닛뿐이고 "
+        "⚠ **2026-08-25 오후 그 다음 레버('공실 유닛이 실제로 어느 층인지')를 실행했다 "
+        "— 괄호는 좁혀지지 않았고 층 축이 바닥을 쳤다.** 새로 받을 자료는 없었다: Page "
+        "마스터가 `occ_floors`(상가정보 flrNo·인허가로 점유가 확인된 층)와 `unknown_n` 을 "
+        "이미 싣고 있어 **수집이 아니라 배선**이었다(§0-J 와 같은 양식). 전수 프로브 "
+        "528/528 PNU 매칭 · flrNo 보유 365/528 · floor_mix ⊂ com_floors 528/528 일치 · "
+        "점유 층을 실제로 덜어낸 유닛 326/528. 계수 중앙은 1F 1.000 → 전체 층 **0.549** "
+        "→ 빈 층 **0.487** → 하단 **0.401** 로 내려간다. **통과 조건 넷은 오히려 좋아졌는데"
+        "**(회수불가 1.3→1.1% · factory 417→419승 · 마진 5.5/4.3/7.0 → 6.0/5.2/7.6) "
+        "`test_margin_gap_is_exactly_the_prime_rent_premium` 이 걸렸다 — premium 프라임 "
+        "프리미엄이 **+0.3%p → −0.23%p** 로 부호를 넘어, 프라임 54거점 인벤토리가 서울 "
+        "평균보다 임대료 부담이 **낮다**는 성립 불가한 값이 된다. 임계값을 내리지 않고 "
+        "**싣는 값을 `floor_mix` 로 되돌렸다.** 산출물에는 `vac_floor_mix`·"
+        "`vac_floor_mix_lo`·`occ_floors`·`unknown_n` 을 남기되 `floor_basis` 는 승격하지 "
+        "않는다(라벨이 올라가면 응답이 안 쓴 모델로 계산했다고 말한다). "
+        "**층 축은 다 썼다** — 프리미엄을 층으로 두 번 고쳐 +5.3 → +0.3 → −0.2%p 이고, "
+        "세 번째 수정은 0.5%p 만 움직이며 부호만 넘겼다. 남은 후보는 층이 아니라 **분모**"
+        "다: 매출 절대수준이 KOSIS 서울 **평균**에 앵커돼 있고(`revenue_basis` "
+        "= kosis-anchored) 프라임 보정이 없다. → docs/feature-posting.md §0-M. "
+        "폴백은 garak 1곳 5유닛뿐이고 "
         "`area_basis`·`revenue_basis` 로 어느 모델이 돌았는지 드러난다",
         auto=False,
         evidence=("docs/feature-posting.md §0-I · services/posting_revenue.py · "
                   "data/pipelines/build_posting_store_area.py · "
-                  "apps/backend/tests/test_posting_revenue.py (15건) · "
+                  "apps/backend/tests/test_posting_revenue.py (16건) · "
                   "scripts/posting_cost_sensitivity.py::_shipped"),
     ))
     return t

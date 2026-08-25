@@ -92,6 +92,16 @@ def _floor_factor(floor: str, table: dict[str, float] | None) -> float:
     return float(tbl.get("1F", 1.0))
 
 
+def _weighted(mix: dict, table: dict[str, float] | None) -> float | None:
+    """면적 비중 dict → 층 계수 가중평균. 비었거나 합이 0 이면 None."""
+    if not isinstance(mix, dict) or not mix:
+        return None
+    total = sum(float(v) for v in mix.values())
+    if total <= 0:
+        return None
+    return sum(_floor_factor(k, table) * float(v) for k, v in mix.items()) / total
+
+
 def _mixed_floor_factor(unit: dict, table: dict[str, float] | None) -> tuple[float, bool]:
     """유닛의 층 계수와 "실측 분포를 썼는가". 실 인벤토리는 `floor_mix` 를 들고 온다.
 
@@ -100,14 +110,30 @@ def _mixed_floor_factor(unit: dict, table: dict[str, float] | None) -> tuple[flo
     08-24 배선 때는 이 값이 전부 `1F`(계수 1.00)라 임대료가 계통적 상한이었고, 그것이
     value 마진 중앙을 −1.7% 로 끌어내린 원인이었다(docs/feature-posting.md §0-J ④).
 
+    ⚠ 08-25 오후 — **한 칸 더 내려갈 수 있는지 재 보고, 내리지 않기로 했다**(§0-M).
+
+    논리만 보면 이 가중평균도 여전히 상한이다. 공실 유닛은 점포가 있는 층에 있을 수
+    없는데 건물 상업층 **전체**를 평균에 넣고 있기 때문이다. 좁힐 근거도 이미
+    있었다 — Page 마스터의 `occ_floors`(상가정보 flrNo·인허가로 확인된 점유 층)를
+    덜어낸 `vac_floor_mix` 가 산출물에 실려 있다(수집이 아니라 배선 문제였다).
+
+    그런데 그걸 실어 보니 `test_margin_gap_is_exactly_the_prime_rent_premium` 의
+    트립와이어가 걸렸다 — premium 티어의 프라임 프리미엄이 **+0.3%p → −0.23%p** 로
+    부호를 넘는다. 프라임 54거점 인벤토리가 서울 **평균보다 임대료 부담이 낮다**는
+    뜻이라 물리적으로 성립하지 않는다. 임계값을 내려 통과시키는 것은 이 저장소가
+    금지해 온 방향이라, **싣는 값은 `floor_mix`(건물 전체 층) 그대로 둔다.**
+
+    즉 층 축은 여기까지다. 프리미엄이 0 근처에 눌려 있는 것은 층이 원인이 아니고
+    (1F 고정 +5.3%p → 전체 층 +0.3%p → 빈 층 −0.2%p 로 층을 두 번 고쳤는데도 0 을
+    못 벗어난다), 다음 레버는 **매출 절대수준의 프라임 보정**이다. `vac_floor_mix`
+    는 괄호의 아래 끝을 재는 측정치로 남긴다 — `test_vacant_floor_band_is_ordered`
+    가 순서를, 위 트립와이어가 하한을 고정한다.
+
     `floor_mix` 가 없으면(시드 유닛·폴백 산출물) 종전 그대로 단일 층 라벨을 쓴다.
     """
-    mix = unit.get("floor_mix")
-    if isinstance(mix, dict) and mix:
-        total = sum(float(v) for v in mix.values())
-        if total > 0:
-            weighted = sum(_floor_factor(k, table) * float(v) for k, v in mix.items())
-            return weighted / total, True
+    w = _weighted(unit.get("floor_mix"), table)
+    if w is not None:
+        return w, True
     return _floor_factor(unit.get("floor", "1F"), table), False
 
 

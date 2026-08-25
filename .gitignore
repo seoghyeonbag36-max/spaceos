@@ -57,6 +57,13 @@ data/gold/*
 # 영업비용률. districts.tier_scenarios 가 month_cost 를 여기서 읽는다. 빠지면
 # 배포에서 비용률이 없어 조용히 **원가·인건비 없는 옛 모델**로 되돌아간다.
 !data/gold/platform_posting_cost_rates.json
+# 예외: 공정위 가맹사업 정보공개서 기반 평균 점포 면적 A(914B). **누락돼 있었다
+# (2026-08-25 발견).** 형제 세 파일(revenue·cost_rates·inputs)은 예외가 걸려 있는데
+# 이것만 빠져 있어, 새로 클론한 환경(CI·Vercel)에서는 파일이 없어 posting_revenue 가
+# 임차료 **역산 폴백**으로 내려간다 — §0-I 가 "한식집 7.1평은 실물이 아니었다"고
+# 기각한 바로 그 모델이다. area_basis() 가 "ftc" → "rent" 로 바뀌므로 조용하지는
+# 않지만, 아무도 안 보면 조용한 것과 같다.
+!data/gold/platform_posting_store_area.json
 # 예외: Program 상권 행사(~480KB, 52거점 785건) — services/events.py 가 정적 서빙.
 # 빠지면 배포 환경에서 events_source 가 "seed" 로 떨어져 지어낸 행사가 지도에 다시 찍힌다.
 !data/gold/platform_events.json
