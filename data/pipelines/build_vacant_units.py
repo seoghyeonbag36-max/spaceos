@@ -74,7 +74,8 @@ import json
 import sys
 from datetime import datetime, timezone
 
-from data.collectors.common import GOLD, SILVER
+from data.collectors.building_vacancy import NON_CAPACITY_PURPS
+from data.collectors.common import BRONZE, GOLD, SILVER
 from data.config.page_hubs import HUBS
 
 _M2_PER_PYEONG = 3.3058
@@ -90,6 +91,55 @@ _VACANT_STATUS = {"empty", "high"}
 _MIN_PYEONG, _MAX_PYEONG = 5, 200
 _MAX_UNITS = 12   # 프론트 카드 수 상한
 
+# 층 분포에서 버릴 꼬리 — 이보다 작은 면적 비중의 층은 반올림 노이즈다.
+_MIN_FLOOR_SHARE = 0.005
+
+
+def _load_floor_rows(slug: str) -> dict[str, list[dict]]:
+    """거점의 층별개요 원본(bronze bldg_flr_raw)을 날짜 오름차순 병합 — 최신이 이긴다.
+
+    `floor_capacity` 가 capacity 를 낼 때 쓴 바로 그 원본이다. 여기서는 층 **수**가
+    아니라 층별 **면적**이 필요해서 다시 읽는다.
+    """
+    merged: dict[str, list[dict]] = {}
+    for p in sorted(BRONZE.glob(f"{slug}/*/bldg_flr_raw.json")):
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(d, dict):
+            merged.update(d)
+    return merged
+
+
+def _floor_mix(rows: list[dict]) -> dict[str, float]:
+    """지상 상업층의 **면적 비중**. `{"1F": 0.42, "2F": 0.31, ...}` · 합 1.0.
+
+    필터는 `floor_capacity.commercial_floor_nos` 와 **같은 negative 필터**다. 층 집합이
+    갈라지면 capacity(분모)와 층 분포(임대료)가 서로 다른 건물을 가리키게 된다 —
+    528유닛 전수 프로브에서 두 집합은 **528/528 일치**했고, 층별 면적 합은
+    `com_area_flr` 와 중앙비 1.000(±2% 안 526/528)이었다. 즉 이 함수는 새 가정을
+    들이는 것이 아니라 **이미 쓰고 있던 면적을 층으로 쪼개기만 한다.**
+    """
+    by_flr: dict[int, float] = {}
+    for r in rows:
+        if str(r.get("flrGbCdNm", "")) not in ("지상", ""):
+            continue
+        if any(p in str(r.get("mainPurpsCdNm", "")) for p in NON_CAPACITY_PURPS):
+            continue
+        no = int(r.get("flrNo") or 0)
+        if no <= 0:
+            continue
+        by_flr[no] = by_flr.get(no, 0.0) + float(r.get("area") or 0.0)
+    total = sum(by_flr.values())
+    if total <= 0:
+        return {}
+    mix = {f"{no}F": area / total for no, area in sorted(by_flr.items())
+           if area / total >= _MIN_FLOOR_SHARE}
+    # 꼬리를 버린 만큼 다시 정규화 — 합이 1 이 아니면 가중평균이 조용히 틀어진다.
+    s = sum(mix.values())
+    return {k: round(v / s, 4) for k, v in mix.items()} if s > 0 else {}
+
 
 def _units_for(slug: str) -> list[dict]:
     master = GOLD / slug / "page_building_master.geojson"
@@ -97,6 +147,7 @@ def _units_for(slug: str) -> list[dict]:
     if not master.exists():
         return []
     attrs = json.loads(attrs_path.read_text(encoding="utf-8")) if attrs_path.exists() else {}
+    flr_rows = _load_floor_rows(slug)
 
     fc = json.loads(master.read_text(encoding="utf-8"))
     out: list[dict] = []
@@ -126,13 +177,33 @@ def _units_for(slug: str) -> list[dict]:
         lng = sum(q[0] for q in pts) / len(pts)
 
         floors = p.get("floors") or 1
+
+        # 층 — 08-25 까지 전 유닛이 무조건 "1F" 였다. 유닛은 건물의 **호실당 평균**인데
+        # 1F 만 보면 임대료 계수가 최댓값(1.00)에 고정돼 계통적 상한이 된다(§0-J ④).
+        # 실측 층 분포를 붙여 가중평균으로 계산하게 한다. 원본이 없으면 물러나되,
+        # 물러났다는 사실을 `floor_basis` 가 밝힌다.
+        mix = _floor_mix(flr_rows.get(str(p.get("pnu") or "")) or [])
+        if mix:
+            # 층 라벨은 **범위**로 적는다("1~5F"). 처음에 면적 최대 층을 대표로 골랐더니
+            # `test_rent_falls_with_floor` 가 "myeongdong 2F 평당 26.7 >= 1F 24.0" 으로
+            # 걸렸다 — 라벨은 최빈층인데 임대료는 가중평균이라 둘이 분리됐기 때문이다.
+            # 애초에 이 유닛은 건물의 **호실당 평균**이지 특정 한 층이 아니다. 한 층을
+            # 적으면 "그 층의 자리"로 읽히고, 그건 우리가 관측한 것이 아니다.
+            nos = sorted(int(k[:-1]) for k in mix)
+            rep_floor = f"{nos[0]}F" if len(nos) == 1 else f"{nos[0]}~{nos[-1]}F"
+            floor_basis = "flr_ouln"
+        else:
+            rep_floor, floor_basis = "1F", "assumed_1f"
+
         out.append({
             "id": f"vu-{p.get('id')}",
             "n": at.get("bld_nm") or p.get("name") or "(이름 미상)",
             "grp": p.get("industry") or "",
             "lat": round(lat, 6), "lng": round(lng, 6),
             "area": area_pyeong,
-            "floor": "1F",                # 상가정보 flrNo 로 층을 특정하기 전까지 1층 가정
+            "floor": rep_floor,
+            "floor_mix": mix,             # {"1F": 0.42, ...} 면적 비중 · 합 1.0
+            "floor_basis": floor_basis,   # flr_ouln(실측) / assumed_1f(폴백)
             "was": p.get("industry") or "",
             "capacity": capacity, "active": p.get("active") or 0,
             "vacancy_rate": p.get("vacancy_rate"),
@@ -158,7 +229,10 @@ def run(slugs: list[str]) -> dict[str, int]:
             "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "note": ("면적은 건물 상업면적 ÷ 호실 수(호실당 평균, 평). 대장 면적이 없는 "
                      "건물은 제외했다 — 면적을 가정하면 그 위 투자비·매출이 전부 가정이 된다. "
-                     "층은 1F 가정(상가정보 flrNo 매칭 전). 권리금은 거점 단위 소스가 없어 "
+                     "층은 층별개요(bldg_flr_raw) 상업층의 **면적 비중**이다(floor_mix) — "
+                     "유닛이 호실당 평균이므로 임대료도 층 가중평균으로 계산한다. "
+                     "종전 '전부 1F 가정'은 계수를 최댓값에 고정해 임대료 상한을 만들었다. "
+                     "권리금은 거점 단위 소스가 없어 "
                      "유닛에 없다 — 통계(상가건물임대차 실태조사 142006)는 있으나 전국 7,000 "
                      "표본이라 시도·상권유형 단위다."),
             "units": units,

@@ -94,7 +94,12 @@ export const BASIS_LABEL: Record<string, string> = {
 
 /** 입력 필드별 출처 — 프록시를 실측으로 오독하지 않기 위한 구분자.
  *  "rone" R-ONE 임대료 · "flpop+seed" 유동인구+거점 내 서열 · "seed" 손으로 적은 프록시 */
-export type PostingInputSource = Record<"area" | "rent" | "prem" | "foot", string>;
+export type PostingInputSource = Record<"area" | "rent" | "prem" | "foot", string> & {
+  /** 층 근거 — "flr_ouln"(층별개요 면적 비중 실측) / "assumed_1f"(폴백, 임대료 상한).
+   *  rent 출처("rone")와 **다른 축**이다. 한 라벨에 뭉치면 상한과 하한이 같은
+   *  이름으로 나간다 → docs/feature-posting.md §0-L */
+  floor?: string;
+};
 
 export interface PostingUnit {
   id: string; n: string; grp: string; lat: number; lng: number;

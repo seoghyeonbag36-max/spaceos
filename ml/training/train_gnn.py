@@ -323,6 +323,13 @@ def _adong_hour_block(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]] | Non
     거점 단위라 그대로는 못 쓰고, 그 앞단인 행정동 표를 따로 낸다
     (`build_adong_hourly_features`). 54거점이 행정동 206개에 걸치고 52거점이 2개 이상이다.
 
+    ⚠ **결론은 이미 나 있다 — 안 올랐다(2026-08-24, 기본 off 유지).** 115열 재학습
+    결과 off-prior 37.63 → **37.51%**(−0.12%p) 로 1σ 안이다. 위 문단의 기대("거점 안에서
+    값이 변하는 피처를 늘린다")는 실현되지 않았고, 진단은 *막는 것은 변동의 **양**이
+    아니라 **종류*** 로 좁혀졌다 — 시간·유동 계열로는 약국을 병원 옆에서 못 가린다.
+    상세와 근거표: **docs/feature-platform.md §0-J**.
+    2026-08-25 재실행에서 네 지표가 소수점까지 재현됐다(reports/gnn_adong_2026-08-25.json).
+
     **실측 귀속률 95.1%** (노드 40,597 중 38,592). 나머지는 좌표 캐시에 없는 셀이다 —
     0 으로 채우지 않고 **같은 거점에서 귀속된 노드의 평균**으로 채운다. 0(=표준화 후
     전체 평균)으로 채우면 그 거점에만 없는 가짜 대비가 생겨, 이 블록이 노리는 것과
@@ -940,7 +947,9 @@ if __name__ == "__main__":
                     help="Page 건물 물리·대장 피처 제외 — 08-17 이전 95피처 재현(ablation)")
     ap.add_argument("--adong", action="store_true",
                     help="Page 행정동 24시간 생활인구 피처 10열을 켠다(105→115열). "
-                         "기본 off — 종전 105열 재현이 기준선이다. _adong_hour_block 참조")
+                         "기본 off — **이미 기각된 실험이다**: off-prior 37.63→37.51%% "
+                         "(1σ 안, 2026-08-24). 다시 돌리기 전에 "
+                         "docs/feature-platform.md §0-J 를 읽을 것")
     ap.add_argument("--label-level", default="group", choices=("group", "category2"),
                     help="라벨 입도. category2 는 세분 업종 실험(산출물 저장 안 함)")
     ap.add_argument("--patience", type=int, default=50)
