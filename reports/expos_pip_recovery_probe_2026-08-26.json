@@ -1,0 +1,100 @@
+{
+  "probe": "expos_pip_recovery_probe_2026-08-26",
+  "question": "집합건물(capacity_method=expos_units) 을 Posting area 유닛 인벤토리에 편입할 수 있는가 — PIP 폴백 미작동 원인 규명 + R-ONE 앵커 존재 여부",
+  "scope_note": "읽기 전용 조사. API 신규 호출 0건, gold 산출물 무수정. 사용 데이터: 기존 bronze/gold(마지막 수집 스냅샷).",
+
+  "q1_pip_fallback_diagnosis": {
+    "method": "build_page_master._pip_fallback/_split_stores 를 그대로 재현해 반경 내 점포의 bldMngNo/lnoCd 분포를 직접 확인",
+    "corpus_wide_orphan_rate": {
+      "note": "PIP 후보 풀 크기 = bldMngNo 결측 점포 수 (54거점 stores_raw.json 전량)",
+      "total_stores": 222260,
+      "missing_bldMngNo": 642,
+      "pct": 0.29,
+      "worst_hub": {"slug": "yongsan", "stores": 2400, "missing": 70, "pct": 2.92},
+      "best_hubs_pct_0": ["itaewon", "hannam", "samcheong", "yeouido", "yeonhui"]
+    },
+    "large_mall_buildings_scan": {
+      "definition": "capacity_method=='expos_units' AND capacity>=20 (54거점 page_building_master.geojson)",
+      "buildings": 1129,
+      "active_pip_eq_0": 1100,
+      "active_pip_eq_0_pct": 97.4,
+      "active_pip_gt_0": 29,
+      "aggregate_capacity": 152571,
+      "aggregate_active": 56348,
+      "aggregate_occupancy_pct": 36.9,
+      "unit_gap": 96223
+    },
+    "deep_dive_worst14": {
+      "note": "occupancy 최저 30건(active_pip==0) 을 (slug,pnu) 로 dedupe 한 14개 고유 건물에 대해 150m 반경 내 점포 전수를 bldMngNo/lnoCd 로 재조사",
+      "fragmentation_candidate_bldMngNo_missing_gt_0": 1,
+      "genuine_no_nearby_orphan_stores": 13,
+      "examples": [
+        {
+          "slug": "gwangjang", "pnu": "1114015200100190001", "name": "방산종합시장",
+          "capacity": 785, "active": 10, "licensed": 1,
+          "near_150m_stores": 198, "near_missing_bldMngNo": 0,
+          "finding": "lnoCd==target 인 점포 18건(모두 유효 bldMngNo) 중 소매 10 + 과학기술 5 + 부동산 2 + 시설관리임대 1 → NON_STOREFRONT_LCLS 필터 후 정확히 active=10 재현. 인허가(licensing) 소스도 독립적으로 1건만 확인 — 두 소스가 합치한다. 도매시장 쇠퇴(방산/동대문 도매상가) 로 보이는 진짜 저활성."
+        },
+        {
+          "slug": "seoulsup", "pnu": "1120011400106850696", "name": "갤러리아포레",
+          "capacity": 73, "active": 19, "active_pip": 0,
+          "finding": "전유부 73호(필터 후) 중 21호(29%)가 기타전시장/기타공연장/기타집회장/기타운동시설 — 주거 입주민 전용 문화·체육 시설로 보이며 상가정보에 '점포'로 등록될 수 없는 종류. NON_CAPACITY_PURPS 가 아직 이 범주를 걸러내지 못해 분모가 부풀어 있음(조인 문제 아님)."
+        },
+        {
+          "slug": "myeongdong", "pnu": "1114012400100240023", "name": "명동하늘빌딩",
+          "capacity": 428, "active": 6,
+          "finding": "전유부 446호 중 393호(92%)가 '기타판매시설' 단일 카테고리 — 소분양(구분소유) 테마상가 특유의 초세분 호실 패턴. 반경 120m 내 406개 점포 전원이 유효 bldMngNo 로 다른 지번에 정확히 귀속됨(orphan 0). 이 지번 폴리곤 내부 PIP 매칭도 7건으로 active(6~7)와 일치 — 조인 로직은 정상 작동, 분양형 상가 특유의 구조적 저활성으로 보임."
+        },
+        {
+          "slug": "banpo", "pnu": "1165010600100700000", "name": "신반포한신아파트",
+          "capacity_master": 876, "capacity_ledger_snapshot": 438,
+          "finding": "전유부 중 125호가 '복리시설'(주택법상 아파트 부대복리시설 — 커뮤니티홀·경로당 등 비영업 시설) — 상가정보에 절대 등록될 수 없는 카테고리인데 NON_CAPACITY_PURPS 에 없어 분모에 포함됨."
+        }
+      ]
+    },
+    "verdict": "PIP 폴백은 정상 작동한다(코드 버그 아님). 후보 풀(bldMngNo 결측 점포) 자체가 54거점 전체에서 0.29%(642/222,260)에 불과해 96,223유닛 규모의 capacity-active 격차를 설명할 수 없다. 원인은 그룹핑/PIP 로직이 아니라 (a) 상가정보·인허가 두 독립 소스가 동시에 확인하는 진짜 저활성(도매상가·분양형 상가의 구조적 공실) 과 (b) NON_CAPACITY_PURPS 가 아직 걸러내지 못하는 비영업 전유부 카테고리(문화/전시/공연/집회/체육 시설, 아파트 복리시설)로 인한 분모 과대집계 — 두 가지가 섞여 있다. '3다리' 중 '원인 규명' 다리는 이걸로 닫힌다: bldMngNo 파편화 가설은 기각."
+  },
+
+  "q2_rone_mall_anchor": {
+    "collector_series_tables": {
+      "vac_small": ["A_2024_00252", "A_2024_00255", "T241833134686576"],
+      "vac_mid": ["A_2024_00251", "A_2024_00254", "T249633134845544"],
+      "rent_small": ["A_2024_00275", "A_2024_00279", "T248223134698125"],
+      "note": "집합상가/mall 전용 STATBL_ID 는 collector 에 등록돼 있지 않다 — 08-25 밤 발견한 '이미 받아놓고 안 쓰는 필드' 패턴은 이번엔 없었다(rone_vac_mid.json 원본 필드는 district_id/quarter/value/rone_cls/statbl_id/itm_nm/unit 뿐, 건물유형 부표 없음)."
+    },
+    "anchor_mall_provenance": {
+      "constant": "calibrate_vacancy.ANCHOR_MALL = 9.99",
+      "label": "부동산원 신사역 집합상가 공실률 (%)",
+      "actual_source": "docs/poc-building-vacancy.md §0.5 '강남구 상권 비교 (2025년 기준)' 표 — 언론/2차 인용 비교표",
+      "cross_check": "같은 §0.5 표의 자매 수치인 '가로수길 가두상권 41.6%' 는 2026-07-28 에 '부동산원 통계가 아니다' 로 이미 폐기됨(calibrate_vacancy.py 주석). 9.99 도 같은 표·같은 출처라 신뢰도가 같은 수준으로 낮다 — R-ONE SttsApiTblData 로 재확인된 적이 없다.",
+      "current_code_stance": "_rone_aligned() 의 세그먼트 루프 (('mid', anchor_mid), ('small', anchor_small), ('mall', None)) 가 이미 mall 앵커를 명시적으로 None 처리하고 있다 — 즉 코드는 이미 '앵커 없음'을 정확히 반영하고 있었다."
+    },
+    "verdict": "R-ONE OpenAPI(SttsApiTblData) 로 실제 수집 중인 3개 시계열 중 집합상가 전용 통계표는 없다. 저장소에 남은 유일한 '집합상가 앵커' 값(9.99)은 R-ONE 원본이 아니라 이미 한 번 신뢰가 깨진 것과 같은 2차 출처다. 즉 이 세그먼트를 검증할 근거 자체가 현재 없다 — R-ONE 이 별도 STATBL_ID 로 집합상가 계열을 공개하는지는 API 메타데이터 조회(저비용, 대량 페이지네이션 불필요)로만 확인 가능하며 이번 조사에서는 신규 호출 금지 지침에 따라 실행하지 않았다. 필요시 예상 비용은 낮음(메타데이터/카탈로그 조회 수준)."
+  },
+
+  "final_judgment": {
+    "open_the_gate": false,
+    "reasoning": [
+      "귀속(조인) 문제가 아니다 — PIP 폴백 후보 풀이 corpus 전체 0.29%로 96,223유닛 격차를 설명 못한다(실측, 새 코드 불필요).",
+      "구조적 신호다 — 두 개의 독립 소스(상가정보·인허가)가 동시에 저활성을 확인하는 사례(방산종합시장 등 도매상가)와, capacity 자체가 비영업 전유부(문화·복리시설)를 세는 사례가 섞여 있다. 둘 다 '더 나은 조인'으로는 못 고친다.",
+      "검증 근거가 없다 — R-ONE 에 집합상가 전용 앵커가 없어, 설사 분자를 회복시켜도 '맞는지 틀린지' 댈 자가 없다.",
+      "설령 분모(NON_CAPACITY_PURPS 확장)를 고쳐도 build_vacant_units._COUNTED_METHODS={'floor_ouln'} 가 expos_units 를 애초에 배제하도록 설계돼 있어(calibrate_vacancy.py 의 '집합건물 공실률은 아직 신뢰 구간 밖' 명시적 경고와 정합) Posting area 게이트에 영향이 없다."
+    ],
+    "recommendation": "이 레버는 파지 않는다. 다만 부수적으로 확인된 저비용·저위험 개선점 하나는 남긴다: data/collectors/building_vacancy.py 의 NON_CAPACITY_PURPS(전역 상수, 현재 라인 108~110 부근)에 '전시장·공연장·집회장·운동시설·복리시설' 카테고리를 추가하면 갤러리아포레·신반포한신아파트류 건물의 capacity 과대집계가 줄어든다(기존 2026-07-26/07-28/08-23 의 기타공장·숙박·고시원 추가와 같은 패턴). 단, 이 수정은 mall 세그먼트를 앵커 비교·Posting 인벤토리에 편입시키지는 못한다 — 표시용 참고 지표 개선에 그친다."
+  },
+
+  "files_read_only": [
+    "data/pipelines/build_page_master.py",
+    "data/pipelines/calibrate_vacancy.py",
+    "data/pipelines/build_vacant_units.py",
+    "data/collectors/building_vacancy.py",
+    "data/collectors/rone_rent.py",
+    "data/config/rone_districts.py",
+    "docs/finding-anchor-population.md",
+    "docs/poc-building-vacancy.md",
+    "data/gold/*/page_building_master.geojson (54거점)",
+    "data/gold/seoulsup/building_vacancy.json",
+    "data/bronze/{seoulsup,gwangjang,dongdaemun,myeongdong,banpo,...}/*/stores_raw.json",
+    "data/bronze/{seoulsup,myeongdong,banpo}/*/bldg_ledger_raw.json"
+  ]
+}

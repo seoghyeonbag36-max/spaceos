@@ -120,3 +120,50 @@ DB 를 **분석 데이터용이 아니라 사용자 데이터용**으로만 도�
 | 2 | 파일럿을 유상으로 받나 | 무상 → 과금 3순위로 미룸 |
 | 3 | 테넌시 단위가 조직인가 개인인가 | **조직**(B2B 이므로) |
 | 4 | `mapbox-gl` 을 지우나 | 지운다(소스 import 0건) |
+
+## 6. 결정 완료 (2026-08-26)
+
+4개 전부 기본값대로 확정했다. 착수 전 재검증한 근거:
+
+- **런타임 쓰기 경로 0건** 재확인 — `apps/backend/app` 전체에서 Gold 데이터에 디스크
+  쓰기를 하는 코드가 없다(`posting_copilot.py` 의 유일한 write 류 호출은 외부 API
+  요청 바디 직렬화일 뿐). 완전 읽기 전용 서빙이라는 이 문서의 전제가 여전히 맞는다.
+- **Gold 규모** 106MB·291개 파일 — PostGIS 이관(B)을 정당화할 규모가 아니다.
+- **DB·과금·인증**은 08-25 이후 손댄 흔적 없이 그대로 0(`app/models/`엔 `__init__.py`뿐,
+  `payments.py`전부 TODO).
+
+| # | 결정 | 근거 |
+|---|---|---|
+| 1 | **A** — 계정층만 추가, Gold 는 파일 서빙 유지 | 위 재검증대로 완전 읽기 전용·소규모라 B 는 불필요한 4~6주 지연, C 는 파일럿 온보딩 자체를 막는다 |
+| 2 | **무상** | CLAUDE.md KPI 가 이미 "유료 전환 **의향** 30%+"로 정의돼 있다 — 무상 트라이얼 후 전환을 재는 설계를 전제한다. 과금은 계약 직전(3순위)으로 유지 |
+| 3 | **조직** | 대상 고객(프랜차이즈 본사·자산운용사·지자체)이 전부 다인원 조직 — 개인 계정으로는 관리자 권한 분리가 안 된다 |
+| 4 | **제거** | 소스 import 0건 재확인, `apps/frontend/package.json` 에서 제거·`npm install`·`npm run build` 통과 확인(2026-08-26) |
+
+다음: §4 순서대로 **1) 계정층(1~2주)** 착수 — `users`·`orgs`·`memberships`·`api_keys`·
+`audit_log` + Alembic + JWT. 조직 테넌시(결정 3)를 스키마에 처음부터 반영한다.
+
+## 7. 계정층 1차 배선 완료 (2026-08-26)
+
+가입(=조직 생성)·로그인·`/me` 최소 골격을 붙였다. 분석 API(buildings·districts·ai·...)는
+전혀 안 건드렸다 — 기존 서빙은 인증 없이 그대로 공개다.
+
+- `apps/backend/app/models/auth.py` — `Org`·`User`·`Membership`·`ApiKey`·`AuditLog`
+  (UUID 는 문자열로 저장 — Postgres 전용 타입에 안 묶어서 테스트가 SQLite 를 쓸 수 있게)
+- `apps/backend/app/core/db.py` — `settings.database_url` 기반 세션(지연 연결, DB 없이도
+  앱 기동 가능). `apps/backend/app/core/security.py` — bcrypt 해시 + JWT(pyjwt)
+- `apps/backend/app/api/v1/auth.py` — `POST /api/v1/auth/signup`(조직+admin 멤버십 생성)
+  · `POST /api/v1/auth/login` · `GET /api/v1/auth/me`
+- `apps/backend/migrations/` — Alembic. `alembic upgrade head` 로 적용(SQLite·Postgres
+  양쪽에서 업/다운그레이드 확인함). DB URL 은 `alembic.ini` 가 아니라 `app.core.config.settings`
+  에서만 읽는다(출처 하나) — `migrations/env.py` 참고
+- 테스트: `apps/backend/tests/test_auth.py`(8건, SQLite 인메모리 — Postgres 불필요).
+  전체 스위트 239 passed(기존 231 + 신규 8) · 5 skipped, 회귀 없음
+
+⚠ **아직 안 한 것** (다음 배선 대상):
+- 기존 서빙 라우터에 인증을 걸지 않았다 — 지금은 계정이 있어도 없어도 분석 API 는 그대로
+  열려 있다. 파일럿에 실제로 계정을 요구하려면 라우터별로 `Depends(get_current_user)` 를
+  달아야 한다(전부 한번에 걸지, 특정 엔드포인트만 걸지는 별도 판단)
+- `ApiKey` 모델은 만들었지만 발급·검증 엔드포인트는 없다(B2B 연동은 보통 API 키를 쓴다)
+- Vercel 서버리스는 연결마다 새 프로세스라 커넥션 풀링 문제가 흔하다 — 실제 Postgres 에
+  붙일 때 `NullPool` 또는 pgbouncer 필요 여부를 확인할 것(로컬은 지금 방식으로 충분)
+- `jwt_secret` 기본값(`dev-only-change-me`)을 배포 전에 반드시 `.env` 로 덮어써야 한다

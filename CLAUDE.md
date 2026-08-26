@@ -104,6 +104,9 @@ memory           프로젝트 메모리 (전략·용어집 — 기존 유지)
 cd apps/backend && pip install -r requirements.txt && uvicorn app.main:app --reload
 cd apps/backend && pytest                 # 테스트
 
+# 계정층 DB 마이그레이션(Alembic, 2026-08-26 도입) — 분석 Gold 파이프라인과는 무관한 별도 DB
+cd apps/backend && alembic upgrade head    # DATABASE_URL 은 .env(app.core.config.settings) 기준
+
 # Frontend
 cd apps/frontend && npm install && npm run dev
 cd apps/frontend && npm run build         # 타입체크 + 빌드
