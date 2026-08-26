@@ -87,6 +87,8 @@ _TRDAR_DEMAND = _GOLD / "features" / "trdar_demand.parquet"
 _PAGE_BUILDING = _GOLD / "features" / "page_building.parquet"
 _ADONG_HOURLY = _GOLD / "features" / "adong_hourly.parquet"
 _COORD_ADONG = _REPO / "data" / "silver" / "coord_adong_cache.json"
+_JIPGYEGU_HOURLY = _GOLD / "features" / "jipgyegu_hourly.parquet"
+_NODE_JIPGYEGU = _REPO / "data" / "silver" / "node_jipgyegu.json"
 _MLRUNS = _REPO / "ml" / "mlruns"
 
 MIN_CLASS_NODES = 10   # 이보다 작은 업종 대분류는 '기타'로 병합
@@ -405,10 +407,91 @@ def _adong_hour_block(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]] | Non
     return np.nan_to_num(block), [f"adong_{c}" for c in _ADONG_COLS]
 
 
+def _jipgyegu_block(nodes: pd.DataFrame) -> tuple[np.ndarray, list[str]] | None:
+    """노드 → 소속 **집계구**의 24시간 생활인구 블록. `_adong_hour_block` 의 고운 판본.
+
+    **왜 이 블록인가**: off-prior 게이트는 37%대에서 네 번 기각됐고, §0-J 의 진단은
+    *막는 것은 변동의 **양**이 아니라 **종류**다* 였다. 이 블록은 그 진단에 대한
+    **반증 시도**다 — 같은 유동 계열이되 입도가 다르다. 2026-08-26 3다리 프로브가
+    사전등록 기각 조건("분산비가 0.221 근처면 돌리지 않는다")에 안 걸린다고 판정했다:
+
+    | | 행정동 | 집계구 |
+    |---|---|---|
+    | 노드 귀속 | 95.1% | **100.0%** |
+    | 거점당 구획 | 1~2 | 중앙 **19** |
+    | within-district 분산비(동일 10열) | 0.266 | **0.458** |
+
+    ⚠ **임계값 0.221 은 잘못 인용된 값이었다.** §0-J 표의 **15열** 평균이 0.221 인데
+    이 파일이 실제로 실은 것은 0.15 미만 5열을 뺀 **10열**이고 그 평균은 **0.266** 이다.
+    프로브가 행정동 블록에 같은 함수를 돌려 §0-J 표를 소수점까지 재현했다(0.266 ·
+    귀속 95.0%) — 자는 같고 틀린 것은 인용이다. reports/jipgyegu_foot_probe_2026-08-26.json.
+
+    **열은 `_ADONG_COLS` 와 같은 10열이다** — 입도만 바꾼 A/B 여야 한다. 열 집합을
+    같이 바꾸면 "고와져서 좋아졌나 / 열이 늘어서 좋아졌나"를 못 가른다.
+
+    귀속 규칙: `silver/node_jipgyegu.json`(SGIS 과거집계구 2016 4Q 경계 PIP 배정)을
+    노드 id 로 조회한다. **네트워크를 타지 않는다.** 행정동판과 달리 좌표 격자 캐시가
+    아니라 폴리곤 PIP 결과라 **40,388/40,388 = 100%** 다 — 그래서 미귀속 폴백이 사실상
+    돌지 않지만, 배정표가 낡아 노드가 늘면 필요하므로 같은 폴백(거점 평균)을 남긴다.
+    0 으로 채우지 않는 이유도 같다: 그 거점에만 없는 가짜 대비가 생긴다.
+
+    스케일: 이 블록만 z-score 표준화한다(수요·건물 블록과 같은 방식). 기본값이 off 라
+    종전 105열 파이프라인이 그대로 재현되고 ablation 이 깨끗해진다.
+
+    반환 None = 표·배정표 부재 → 학습은 종전 피처로 계속한다.
+    """
+    if not _JIPGYEGU_HOURLY.exists():
+        print(f"[gnn] 집계구 시간 테이블 없음({_JIPGYEGU_HOURLY.name}) — "
+              f"python -m data.pipelines.build_jipgyegu_hourly_features 먼저. "
+              f"집계구 피처 없이 진행")
+        return None
+    if not _NODE_JIPGYEGU.exists():
+        print(f"[gnn] 노드→집계구 배정표 없음({_NODE_JIPGYEGU.name}) — "
+              f"python -m data.pipelines.build_node_jipgyegu 먼저. 집계구 피처 없이 진행")
+        return None
+
+    tbl = pd.read_parquet(_JIPGYEGU_HOURLY)
+    missing = [c for c in _ADONG_COLS if c not in tbl.columns]
+    if missing:
+        print(f"[gnn] 집계구 테이블에 컬럼 없음 {missing} — 집계구 피처 없이 진행")
+        return None
+    tbl = tbl.set_index(tbl["oa"].astype(str))
+
+    assign = json.loads(_NODE_JIPGYEGU.read_text(encoding="utf-8")).get("nodes") or {}
+    oa = nodes["node_id"].astype(str).map(lambda n: assign.get(n, "")).to_numpy()
+
+    m = tbl.reindex(oa)
+    block = m[_ADONG_COLS].astype(float).to_numpy()
+    matched = ~np.isnan(block).any(axis=1)
+    if not matched.any():
+        print("[gnn] ⚠️ 집계구 귀속 0건 — 배정표의 node_id 와 그래프 노드가 안 맞는다. 건너뜀")
+        return None
+
+    # 미귀속 폴백: 같은 거점에서 귀속된 노드의 평균 → 없으면 전체 평균
+    did = nodes["district_id"].fillna("").astype(str).to_numpy()
+    frame = pd.DataFrame(block, columns=_ADONG_COLS)
+    frame["_d"] = did
+    hub_mean = frame[matched].groupby("_d")[_ADONG_COLS].mean()
+    fill = hub_mean.reindex(did).to_numpy()
+    glob = np.nanmean(block[matched], axis=0)
+    fill = np.where(np.isnan(fill), glob, fill)
+    block = np.where(np.isnan(block), fill, block)
+
+    sd = block.std(axis=0)
+    sd[sd == 0] = 1.0
+    block = (block - block.mean(axis=0)) / sd
+    n_hub = len(set(did[matched]))
+    print(f"[gnn] 집계구 시간 피처 {len(_ADONG_COLS)}열 결합 · 귀속률 "
+          f"{matched.mean():.1%} · 귀속 거점 {n_hub} · "
+          f"집계구 {len(set(oa[matched]))}곳")
+    return np.nan_to_num(block), [f"oa_{c}" for c in _ADONG_COLS]
+
+
 def _features(nodes: pd.DataFrame, edges: pd.DataFrame,
               use_demand: bool = True,
               use_building: bool = True,
-              use_adong: bool = False) -> tuple[np.ndarray, list[str]]:
+              use_adong: bool = False,
+              use_jipgyegu: bool = False) -> tuple[np.ndarray, list[str]]:
     """공실 상태에서도 관측 가능한 입지 피처만 구성한다."""
     lat = pd.to_numeric(nodes["lat"], errors="coerce").to_numpy()
     lon = pd.to_numeric(nodes["lon"], errors="coerce").to_numpy()
@@ -453,6 +536,12 @@ def _features(nodes: pd.DataFrame, edges: pd.DataFrame,
             x = np.column_stack([x, block[0]])
             names += block[1]
             print(f"[gnn] 행정동 시간 피처 결합 → 총 {len(names)}열")
+    if use_jipgyegu:
+        block = _jipgyegu_block(nodes)
+        if block is not None:
+            x = np.column_stack([x, block[0]])
+            names += block[1]
+            print(f"[gnn] 집계구 시간 피처 결합 → 총 {len(names)}열")
     return np.nan_to_num(x).astype(np.float32), names
 
 
@@ -721,7 +810,7 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
           hidden: int = 128, lr: float = 0.01, weight_decay: float = 5e-4,
           patience: int = 50, save: bool = True, use_demand: bool = True,
           use_building: bool = True, use_neighbor: bool = False,
-          use_adong: bool = False,
+          use_adong: bool = False, use_jipgyegu: bool = False,
           resume: bool = True, ckpt_every: int = 25,
           label_level: str = "group", class_weight: bool = False,
           select_by: str = "top1") -> dict:
@@ -745,7 +834,8 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
     y_np, classes = _labels(nodes, level=label_level)
     x_np, feat_names = _features(nodes, edges, use_demand=use_demand,
                                  use_building=use_building,
-                                 use_adong=use_adong)
+                                 use_adong=use_adong,
+                                 use_jipgyegu=use_jipgyegu)
     ei = _edge_index(nodes, edges, edge_types)
     did = nodes["district_id"].fillna("").astype(str).to_numpy()
 
@@ -873,6 +963,10 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
                                                        for n in feat_names)),
                     "adong_hour_features": int(any(n.startswith("adong_")
                                                    for n in feat_names)),
+                    # 어느 시간 블록이 돌았는지 산출물이 스스로 밝힌다 — 안 밝히면
+                    # 나중에 이 런이 행정동인지 집계구인지 커밋 메시지로만 남는다.
+                    "jipgyegu_features": int(any(n.startswith("oa_")
+                                                 for n in feat_names)),
                     "edge_types": ",".join(sorted(edge_types)) if edge_types else "all"})
     print("[gnn·metrics]", metrics)
 
@@ -950,6 +1044,13 @@ if __name__ == "__main__":
                          "기본 off — **이미 기각된 실험이다**: off-prior 37.63→37.51%% "
                          "(1σ 안, 2026-08-24). 다시 돌리기 전에 "
                          "docs/feature-platform.md §0-J 를 읽을 것")
+    ap.add_argument("--jipgyegu", action="store_true",
+                    help="**집계구** 24시간 생활인구 피처 10열을 켠다(105→115열). "
+                         "--adong 의 고운 판본이고 열은 같다 — 입도만 바꾼 A/B 다. "
+                         "기본 off. 2026-08-26 3다리 프로브가 사전등록 기각 조건에 "
+                         "안 걸린다고 판정했다(분산비 0.458 vs 행정동 0.266, 노드 "
+                         "귀속 100%%). 돌리기 전에 docs/feature-platform.md §0-Q 를 "
+                         "읽을 것 — 프로브는 변동의 **양**만 쟀다")
     ap.add_argument("--label-level", default="group", choices=("group", "category2"),
                     help="라벨 입도. category2 는 세분 업종 실험(산출물 저장 안 함)")
     ap.add_argument("--patience", type=int, default=50)
@@ -972,6 +1073,7 @@ if __name__ == "__main__":
               save=not a.no_save, use_demand=not a.no_demand,
               use_neighbor=a.neighbor,
               use_adong=a.adong,
+              use_jipgyegu=a.jipgyegu,
               use_building=not a.no_building,
               resume=not a.no_resume, ckpt_every=a.ckpt_every,
               label_level=a.label_level, patience=a.patience,
