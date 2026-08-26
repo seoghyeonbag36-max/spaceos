@@ -77,5 +77,53 @@
     "single_arm_se_pp": 1.63,
     "offprior_nodes": 877,
     "note": "+2.05%p 는 단일 팔 표준오차(1.63%p)의 1.26배다. 다만 **같은 test 877자리 위의 쌍대 비교**라 올바른 검정은 McNemar 이고, 그 2x2 표를 만들려면 노드별 예측을 남겨야 한다 — 이번 런은 안 남겼다. 따라서 '지금까지 중 가장 큰 양의 이동'까지가 이 실측이 말할 수 있는 것이고, **유의성은 확정되지 않았다.**"
+  },
+  "mcnemar_followup": {
+    "ran": "2026-08-26 (same session, follow-up to initial run)",
+    "why": "초기 판정('+2.05%p 는 단일 팔 표준오차의 1.26배 — 유의성 미확정')을 실제로 닫는다. 세 팔(control_105 · adong_115 · jipgyegu_115)을 오늘 같은 코드로 다시 돌리며 노드별 예측(877개 off-prior 자리)을 남기고 McNemar 쌍대검정을 적용했다 — 세 런 모두 원래 값(control 0.3592 · adong 0.3751 · jipgyegu 0.3797)을 소수점까지 재현해 결정론성을 재확인했다(SEED=42 고정, 라벨에만 의존하는 분할이라 세 팔의 test 877자리가 동일 노드 집합이다).",
+    "adong_vs_control": {
+      "n": 877,
+      "both_hit": 278,
+      "both_miss": 511,
+      "a_only_hit": 37,
+      "b_only_hit": 51,
+      "a_rate": 0.3592,
+      "b_rate": 0.3751,
+      "delta_pp": 1.6,
+      "discordant": 88,
+      "chi2": 1.92,
+      "p_value": 0.1658,
+      "significant_at_0.05": false
+    },
+    "jipgyegu_vs_control": {
+      "n": 877,
+      "both_hit": 267,
+      "both_miss": 496,
+      "a_only_hit": 48,
+      "b_only_hit": 66,
+      "a_rate": 0.3592,
+      "b_rate": 0.3797,
+      "delta_pp": 2.05,
+      "discordant": 114,
+      "chi2": 2.535,
+      "p_value": 0.1113,
+      "significant_at_0.05": false
+    },
+    "jipgyegu_vs_adong": {
+      "n": 877,
+      "both_hit": 275,
+      "both_miss": 490,
+      "a_only_hit": 54,
+      "b_only_hit": 58,
+      "a_rate": 0.3751,
+      "b_rate": 0.3797,
+      "delta_pp": 0.46,
+      "discordant": 112,
+      "chi2": 0.08,
+      "p_value": 0.7768,
+      "significant_at_0.05": false
+    },
+    "verdict": "**셋 다 유의하지 않다**(p=0.11~0.78, 전부 >0.05). jipgyegu vs adong 은 +0.46pp·p=0.777 로 사실상 구별이 안 된다 — 두 시간 블록(행정동·집계구)이 **통계적으로 같은 자리**에 있다. §0-J 의 '천장 37%대' 진단은 살아남는다: 기준선이 낡았던 것은 사실이지만(37.63→35.92), 그 위에 무엇을 얹어도 — 행정동이든 집계구든 — 지금 표본(off-prior 877)으로는 유의한 개선을 **증명할 수 없다.** 관측된 방향(둘 다 양의 이동)은 우연으로 배제되지 않을 뿐, 확정되지도 않았다.",
+    "caveat": "n=877 · discordant 자리가 88~114개뿐이라 검정력이 낮다. 이 표본 크기에서 McNemar 가 검출할 수 있는 최소 유의 차이는 대략 3~4%p 대다(discordant 비율 고려). 즉 '유의하지 않다'는 '차이가 없다'가 아니라 '이 표본으로는 못 잰다'는 뜻이다 — off-prior 자리 자체를 늘리지 않는 한(거점을 늘리거나 라벨을 세분화), 이 대역의 판정은 항상 이 정도 불확실성을 띤다."
   }
 }

@@ -813,7 +813,7 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
           use_adong: bool = False, use_jipgyegu: bool = False,
           resume: bool = True, ckpt_every: int = 25,
           label_level: str = "group", class_weight: bool = False,
-          select_by: str = "top1") -> dict:
+          select_by: str = "top1", dump_preds: str | None = None) -> dict:
     torch.manual_seed(SEED)
     rng = np.random.default_rng(SEED)
 
@@ -949,6 +949,28 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
         **_baselines(y_np, did, tr, te, len(classes)),
         **_offprior_top3(logits, y_np, did, tr, te),
     }
+
+    if dump_preds:
+        # McNemar 쌍대검정용 노드별 예측 — 두 팔이 **같은 test 분할**(SEED 고정, 라벨만
+        # 의존)이라 node_id 로 정렬하면 그대로 짝지어진다. off-prior 자리만 남긴다 —
+        # 게이트 지표가 그 부분집합이고, 전체 test 는 거점 사전분포 몫(97.7%)에 묻힌다.
+        top3_by_d, major = _district_top3(y_np, did, tr)
+        off = np.array([yt not in top3_by_d.get(d, [major])
+                        for yt, d in zip(y_np, did)]) & te
+        k = min(TOP_K, logits.shape[1])
+        topk_idx = logits.topk(k, dim=1).indices.numpy()
+        node_ids = nodes["node_id"].astype(str).to_numpy()
+        rows = [{"node_id": node_ids[i], "district": did[i], "y": int(y_np[i]),
+                "hit_top3": bool(y_np[i] in topk_idx[i])}
+               for i in np.flatnonzero(off)]
+        out_p = Path(dump_preds)
+        out_p.parent.mkdir(parents=True, exist_ok=True)
+        out_p.write_text(json.dumps({
+            "offprior_nodes": len(rows), "features": len(feat_names),
+            "hit_rate": round(sum(r["hit_top3"] for r in rows) / len(rows), 4) if rows else None,
+            "rows": rows,
+        }, ensure_ascii=False), encoding="utf-8")
+        print(f"[gnn] 예측 덤프 → {out_p} ({len(rows)}행)")
     base = metrics["baseline_district_prior_top1"]
     metrics["lift_vs_district_prior_pct"] = (
         round((metrics["test_top1"] - base) / base * 100, 1) if base else None)
@@ -1064,6 +1086,9 @@ if __name__ == "__main__":
                     help="빈도 역수 균형 손실 — macro-F1 이 낮은 원인이 라벨 편중인지 "
                          "피처 부족인지 가르는 진단용. 2026-08-17 실측 결과 '피처 부족' "
                          "쪽이라 회수 효과는 미미하다(모듈 docstring 참조). 산출물 저장 안 함")
+    ap.add_argument("--dump-preds", default=None,
+                    help="off-prior test 자리의 노드별 예측을 JSON 으로 남긴다 — 두 런이 "
+                         "같은 SEED 라 test 분할이 동일하므로 McNemar 쌍대검정에 쓴다")
     a = ap.parse_args()
     if a.report:
         quality_report()
@@ -1077,4 +1102,5 @@ if __name__ == "__main__":
               use_building=not a.no_building,
               resume=not a.no_resume, ckpt_every=a.ckpt_every,
               label_level=a.label_level, patience=a.patience,
-              class_weight=a.class_weight, select_by=a.select_by)
+              class_weight=a.class_weight, select_by=a.select_by,
+              dump_preds=a.dump_preds)
