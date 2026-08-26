@@ -30,9 +30,14 @@
 
 ## 어느 집계구를 남기나
 
-`silver/unit_jipgyegu.json`(유닛 → 집계구 PIP 배정표)에 있는 코드만 남긴다. 19,038개
-중 우리가 쓰는 것은 326개뿐이라 저장량이 60분의 1 이 된다. 배정표가 없으면 실행을
+배정표(`silver/*_jipgyegu.json`)에 있는 코드만 남긴다. 배정표가 없으면 실행을
 거부한다 — 전량을 받아 놓고 나중에 못 붙이는 것이 최악이다(행정동판과 같은 원칙).
+
+⚠ **2026-08-26 에 대상이 세 배로 넓어졌다.** 종전에는 유닛 배정표(집계구 293곳)만
+봤는데, 그 keep-list 로는 Platform GNN 노드의 **43.5%** · Page 격자 셀의 **88.4%**
+밖에 못 덮는다. 대상이 셋이므로 배정표도 셋이고 `target_codes()` 가 합집합을 쓴다
+(→ **1,501곳**, 19,153 중 7.8%). 넓혀도 **내려받는 양은 그대로**다 — 필터는 해제
+후에 걸리고 ZIP 스트리밍 구간은 안 바뀐다.
 
 실행:
   python -m data.collectors.living_population_jipgyegu --month 202607 --days 7
@@ -53,6 +58,8 @@ from data.collectors.common import BRONZE, DATA_ROOT
 _URL = "https://datafile.seoul.go.kr/bigfile/iot/inf/nio_download.do?&useCache=false"
 _INF_ID = "OA-14979"
 _SILVER = DATA_ROOT / "silver" / "unit_jipgyegu.json"
+_NODE_SILVER = DATA_ROOT / "silver" / "node_jipgyegu.json"
+_CELL_SILVER = DATA_ROOT / "silver" / "cell_jipgyegu.json"
 _OUT_DIR = BRONZE / "seoul"
 
 # CSV 열 이름 — 2026-07 실측 (33열)
@@ -61,13 +68,32 @@ _C_DATE, _C_HOUR, _C_ADONG, _C_OA, _C_TOT = (
 
 
 def target_codes() -> set[str]:
-    """유닛에 배정된 집계구 코드만 — 없으면 실행을 거부한다."""
+    """배정표에 있는 집계구 코드만 — 없으면 실행을 거부한다.
+
+    **세 표의 합집합**이다. 대상이 셋이기 때문이다:
+
+    - `unit_jipgyegu`  공실 유닛 528호 → 집계구 **293**곳 (Posting `foot` 서열)
+    - `node_jipgyegu`  점포 노드 40,388개 → 집계구 **1,155**곳 (Platform GNN 피처)
+    - `cell_jipgyegu`  100m 격자 셀 3,699개 → 집계구 **1,303**곳 (Page 유동·밀도 레이어)
+
+    노드·셀 표는 2026-08-26 프로브가 요구한 것이다: 노드 PIP 는 **100%** 성공하는데
+    생활인구 프로필은 43.5% 만 있었고, 그 차이가 전부 여기 keep-list 가 좁아서
+    생겼다(셀은 88.4%). ZIP 을 스트리밍하며 증분 해제하므로 **내려받는 양은 넓혀도
+    그대로**이고(~290MB/7일), 늘어나는 저장은 1,501/19,153 = **7.8%** 다 — 원래의
+    금지 사유("전량을 받아 놓고 나중에 못 붙인다")에 걸리지 않는다.
+
+    노드·셀 표는 **없어도 된다** — 있으면 넓히고, 없으면 종전대로 유닛만 받는다.
+    """
     if not _SILVER.exists():
         raise FileNotFoundError(
             f"{_SILVER} 없음 — `python -m data.pipelines.build_unit_jipgyegu` 를 먼저 실행할 것. "
             f"배정표 없이 전량을 받으면 60배를 저장하고도 유닛에 못 붙인다")
     doc = json.loads(_SILVER.read_text(encoding="utf-8"))
-    return {v["oa_code"] for v in doc["units"].values()}
+    codes = {v["oa_code"] for v in doc["units"].values()}
+    for extra in (_NODE_SILVER, _CELL_SILVER):
+        if extra.exists():
+            codes |= set(json.loads(extra.read_text(encoding="utf-8")).get("oa_codes") or [])
+    return codes
 
 
 def _open_zip(month: str):

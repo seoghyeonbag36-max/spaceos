@@ -29,9 +29,16 @@ data/silver/*
 data/gold/*
 !data/bronze/.gitkeep
 !data/silver/.gitkeep
-# 유닛→집계구 PIP 배정표. 원천 shapefile 은 bronze(전체 gitignore)라 git 으로 복구되지
-# 않는다 — 이 표가 조인 결과의 유일한 durable 기록이므로 추적한다.
+# 집계구 PIP 배정표 3종. 원천 shapefile 은 bronze(전체 gitignore)라 git 으로 복구되지
+# 않는다 — 이 표들이 조인 결과의 유일한 durable 기록이므로 추적한다.
+#   unit  공실 유닛 528호   → 집계구 293곳   (Posting `foot` 서열)
+#   node  점포 노드 40,388  → 집계구 1,155곳 (Platform GNN 피처, 1.5MB)
+#   cell  100m 격자 셀 3,699 → 집계구 1,303곳 (Page 유동·밀도 레이어)
+# 셋의 합집합이 living_population_jipgyegu 의 keep-list 다(1,501곳). 하나라도 빠지면
+# 재수집 때 대상이 조용히 좁아지고, 그만큼의 셀·노드가 값 없이 폴백으로 내려간다.
 !data/silver/unit_jipgyegu.json
+!data/silver/node_jipgyegu.json
+!data/silver/cell_jipgyegu.json
 !data/gold/.gitkeep
 *.parquet
 *.glb
@@ -85,6 +92,11 @@ data/gold/*
 # (posting_inputs._unit_jipgyegu_flpop). 빠지면 새 클론에서 조용히 상권 폴백으로
 # 내려간다 — platform_posting_store_area.json 이 그렇게 빠져 있었다(08-25).
 !data/gold/platform_unit_foot.json
+# 예외: Page 유동·밀도 레이어의 **집계구** 판(604KB, 54거점 1,303집계구 × 24시간).
+# services/footfall_layer 가 정적 서빙한다. 빠지면 `jipgyegu_of()` 가 None 을 돌려
+# 레이어가 **조용히 상권 단위로 되돌아간다** — 화면은 멀쩡해 보이고 배지만 바뀌므로
+# 아무도 안 본다. 그게 이 저장소가 반복해 온 실패 양식이다(형제 파일들의 주석 참조).
+!data/gold/page_footfall_jipgyegu.json
 # 예외: Page 다거점 red dot 실데이터 — 각 거점 page_building_master.geojson 만 추적(Vercel 서빙).
 # building_vacancy.json·대장 원본·parquet 등 중간·원본 산출물은 계속 제외.
 !data/gold/*/
