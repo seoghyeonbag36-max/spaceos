@@ -1,0 +1,72 @@
+{
+  "probe": "unit_floor_split",
+  "built_at": "2026-08-26T04:20:58+00:00",
+  "question": "유닛을 상업층마다 1개로 풀면 통과조건 4종과 프라임 프리미엄 트립와이어가 유지되는가 — 파이프라인을 고치기 전에 잰다",
+  "rule_preregistered": "하나라도 나빠지거나 premium_pp>0 이 깨지면 임계값을 건드리지 않고 되돌린다 (§0-M 이 층 축에서 한 번 겪었다)",
+  "why_not_expos": "전유부 호실 실면적은 집합건물 전용이고 인벤토리는 _COUNTED_METHODS={'floor_ouln'} 이라 일반건축물만 — 공실유닛 450 PNU 와 교집합 0(설계상 배제)",
+  "before": {
+    "units": 528,
+    "unviable": 3,
+    "unviable_pct": 0.57,
+    "win": {
+      "premium": 33,
+      "value": 59,
+      "factory": 433
+    },
+    "margin_median": {
+      "premium": 5.72,
+      "value": 4.76,
+      "factory": 7.79
+    },
+    "roi_median": 1.3,
+    "premium_pp": {
+      "premium": 0.0582,
+      "value": 2.2199,
+      "factory": 1.0019
+    },
+    "area_median": 41.0,
+    "area_p10_p90": [
+      20,
+      89
+    ]
+  },
+  "after": {
+    "units": 2201,
+    "unviable": 51,
+    "unviable_pct": 2.32,
+    "win": {
+      "premium": 117,
+      "value": 259,
+      "factory": 1774
+    },
+    "margin_median": {
+      "premium": 7.11,
+      "value": 6.34,
+      "factory": 8.83
+    },
+    "roi_median": 1.1,
+    "premium_pp": {
+      "premium": -1.3428,
+      "value": 0.6217,
+      "factory": -0.0455
+    },
+    "area_median": 44,
+    "area_p10_p90": [
+      18,
+      94
+    ]
+  },
+  "checks": {
+    "회수불가 (낮을수록 좋다)": {
+      "before": 0.57,
+      "after": 2.32
+    },
+    "factory 승수 비율": {
+      "before": 82.0,
+      "after": 80.6
+    }
+  },
+  "tripwire_premium_pp_positive": false,
+  "margin_in_kosis_band": true,
+  "verdict": "되돌림"
+}
