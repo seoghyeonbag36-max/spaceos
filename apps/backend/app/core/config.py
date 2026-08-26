@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     database_url: str = "postgresql://spaceos:spaceos@localhost:5432/spaceos"
     # Redis (캐싱 / Celery 브로커)
     redis_url: str = "redis://localhost:6379/0"
+    # 계정층 JWT — 기본값은 로컬 개발용이다. 배포 환경은 .env 로 반드시 덮어쓸 것
+    # (기본값 그대로 배포하면 누구나 토큰을 위조할 수 있다).
+    jwt_secret: str = "dev-only-change-me"
+    jwt_algorithm: str = "HS256"
+    jwt_expires_minutes: int = 60 * 24 * 7   # 7일
     # CORS 허용 오리진
     cors_origins: list[str] = ["http://localhost:5173"]
     # LLM API (PPPP 마케팅 콘텐츠 생성)
