@@ -452,13 +452,22 @@ export default function MapShell() {
           <span className="note">
             {footHm
               ? <>
-                  유동인구 · {footHm.time_source === "adong_hourly"
-                    ? `${String(footHm.hour).padStart(2, "0")}시 (${footHm.daytype === "weekend" ? "주말" : "평일"})`
-                    : footHm.band_label} · 상권 {footHm.trdar_count}곳{" "}
-                  <span style={TRDAR_BADGE}>TRDAR 상권단위</span>{" "}
-                  {/* 시간 눈금을 밝힌다 — 24시간과 6구간은 값의 스케일이 다르다 */}
+                  유동인구 · {footHm.time_source === "trdar_band"
+                    ? footHm.band_label
+                    : `${String(footHm.hour).padStart(2, "0")}시 (${footHm.daytype === "weekend" ? "주말" : "평일"})`}
+                  {" · "}
+                  {footHm.resolution === "jipgyegu"
+                    ? `집계구 ${footHm.oa_count ?? 0}곳`
+                    : `상권 ${footHm.trdar_count}곳`}{" "}
+                  {/* 공간 눈금 — 어느 구획의 집계인지 밝힌다. 둘 다 격자 실측은 아니다. */}
                   <span style={TRDAR_BADGE}>
-                    {footHm.time_source === "adong_hourly" ? "생활인구 24h" : "TRDAR 6구간"}
+                    {footHm.resolution === "jipgyegu" ? "집계구 단위" : "TRDAR 상권단위"}
+                  </span>{" "}
+                  {/* 시간 눈금 — 세 축의 값 스케일이 서로 다르다 */}
+                  <span style={TRDAR_BADGE}>
+                    {footHm.time_source === "jipgyegu_hourly" ? "생활인구 24h(집계구)"
+                      : footHm.time_source === "adong_hourly" ? "생활인구 24h(행정동)"
+                      : "TRDAR 6구간"}
                   </span>
                 </>
               : "유동인구 · 불러오는 중"}
@@ -468,7 +477,14 @@ export default function MapShell() {
         {layer === "density" && (
           <span className="note">
             {densHm
-              ? <>{densHm.label} · {densHm.unit} · 상권 {densHm.trdar_count}곳 <span style={TRDAR_BADGE}>TRDAR 상권단위</span></>
+              ? <>
+                  {densHm.label} · {densHm.unit} · {densHm.resolution === "jipgyegu"
+                    ? `집계구 ${densHm.oa_count ?? 0}곳`
+                    : `상권 ${densHm.trdar_count}곳`}{" "}
+                  <span style={TRDAR_BADGE}>
+                    {densHm.resolution === "jipgyegu" ? "집계구 단위" : "TRDAR 상권단위"}
+                  </span>
+                </>
               : "밀도 · 불러오는 중"}
           </span>
         )}

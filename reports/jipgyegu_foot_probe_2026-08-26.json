@@ -1,0 +1,82 @@
+{
+  "probe": "jipgyegu_foot",
+  "built_at": "2026-08-26T00:20:57+00:00",
+  "question": "집계구 24시간 생활인구가 GNN off-prior 게이트를 움직일 수 있는 종류의 정보인가 — 600ep 을 사기 전에 판정한다",
+  "rule_preregistered": "docs/feature-platform.md §0-L: 분산비가 _adong_hour_block(0.221) 근처면 돌리지 않는다",
+  "sample_days": [
+    "2026-07-01",
+    "2026-07-02",
+    "2026-07-03",
+    "2026-07-04",
+    "2026-07-05",
+    "2026-07-06",
+    "2026-07-07"
+  ],
+  "cols": [
+    "wd_peak_hour",
+    "we_peak_hour",
+    "wd_share_evening",
+    "we_share_evening",
+    "wd_log_total",
+    "we_log_total",
+    "we_share_morning",
+    "we_share_night",
+    "wd_share_night",
+    "we_peakiness"
+  ],
+  "calibration_adong": {
+    "ran": true,
+    "attach_rate": 0.9504,
+    "per_feature": {
+      "wd_peak_hour": 0.439,
+      "we_peak_hour": 0.389,
+      "wd_share_evening": 0.338,
+      "we_share_evening": 0.304,
+      "wd_log_total": 0.228,
+      "we_log_total": 0.213,
+      "we_share_morning": 0.217,
+      "we_share_night": 0.197,
+      "wd_share_night": 0.169,
+      "we_peakiness": 0.169
+    },
+    "mean": 0.266,
+    "adong_count": 128
+  },
+  "leg1_structure": {
+    "oa_per_district_median": 6,
+    "oa_per_district_min_max": [
+      1,
+      12
+    ],
+    "district_oa_pairs": 298,
+    "oa_codes_hit": 273
+  },
+  "leg2_attachment": {
+    "nodes": 40388,
+    "pip_ok": 40388,
+    "pip_rate": 1.0,
+    "attached": 17557,
+    "rate": 0.4347,
+    "gap_is_collection_not_structure": 22831,
+    "oa_profiled": 293,
+    "oa_in_boundary": 19153,
+    "adong_reference": 0.951
+  },
+  "leg3_signal": {
+    "within_district_ratio_mean": 0.458,
+    "per_feature": {
+      "wd_peak_hour": 0.603,
+      "we_peak_hour": 0.551,
+      "wd_share_evening": 0.4,
+      "we_share_evening": 0.495,
+      "wd_log_total": 0.384,
+      "we_log_total": 0.454,
+      "we_share_morning": 0.387,
+      "we_share_night": 0.451,
+      "wd_share_night": 0.388,
+      "we_peakiness": 0.463
+    },
+    "adong_baseline": 0.221,
+    "delta_vs_adong": 0.237
+  }
+}

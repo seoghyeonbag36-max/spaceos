@@ -198,21 +198,28 @@ export interface TrdarCell {
   lat: number; lng: number; c_lat: number; c_lng: number;
   dlat: number; dlng: number;
   v: number;
-  /** 이 셀이 값을 가져온 상권 이름 — 값의 출처를 셀 단위로 밝힌다 */
-  trdar: string;
+  /** 이 셀이 값을 가져온 상권 이름 — 상권 경로에서만 채워진다 */
+  trdar?: string;
+  /** 이 셀이 값을 가져온 집계구 코드 — 집계구 경로에서만 채워진다 */
+  oa?: string;
 }
 
 /**
  * 시간대별 유동인구 레이어(Page).
  *
- * ⚠ `resolution: "trdar"` 는 값이 **상권 단위 집계**라는 뜻이다. 셀 값은 그 셀의
- * 실측이 아니라 **최근접 상권의 값**이다 — 범례에 반드시 함께 노출한다.
+ * ⚠ `resolution` 은 값이 **어느 구획의 집계**인지를 뜻한다. 어느 쪽이든 셀 값은 그
+ * 셀의 실측이 아니다 — 범례에 반드시 함께 노출한다.
+ * - `jipgyegu` : 집계구(거점당 중앙 26곳, 면적 중앙 약 22,000㎡). 2026-08-26 부터 기본.
+ * - `trdar`    : 상권(거점당 1~9곳·중앙 3). 집계구 산출물이 없을 때의 폴백.
  * 2026-08-23 이전에는 이 레이어가 `Math.random()` 이었다.
  */
 export interface FootfallHeatmap {
   district: string;
-  footfall_source: "trdar";
-  resolution: "trdar";
+  footfall_source: "flpop_jipgyegu" | "trdar";
+  resolution: "jipgyegu" | "trdar";
+  /** 집계구 경로에서 쓴 집계구 수. 상권 경로에서는 없다. */
+  oa_count?: number;
+  /** 상권 경로에서 쓴 상권 수. 집계구 경로에서는 0 이다(‘없다’가 아니라 ‘안 썼다’). */
   trdar_count: number;
   hour: number;
   band: string;
@@ -220,13 +227,15 @@ export interface FootfallHeatmap {
   /**
    * 2026-08-24: **시간 축**은 생활인구(행정동 x 24시간)로 갈아끼웠다.
    * `resolution`/`footfall_source` 는 여전히 공간 해상도(상권)를 뜻하고 바뀌지 않는다.
+   * - `jipgyegu_hourly` : 공간·시간이 **한 표**에서 나온다. 구성비 곱셈이 없다
+   *   (`share_basis: null`). 거점 내부에서 시각에 따라 셀 서열이 바뀐다.
    * - `adong_hourly` : 24시간 눈금. `daytype` 으로 평일/주말이 갈린다.
    * - `trdar_band`   : 산출물이 그 거점을 못 담을 때의 종전 6구간 폴백.
    * `share_basis` 가 다른 두 응답의 셀 값은 **눈금이 달라 직접 비교할 수 없다**.
    */
-  time_source?: "adong_hourly" | "trdar_band";
+  time_source?: "jipgyegu_hourly" | "adong_hourly" | "trdar_band";
   daytype?: "weekday" | "weekend";
-  share_basis?: "hour24" | "band6";
+  share_basis?: "hour24" | "band6" | null;
   hour_share?: number | null;
   unit: string;
   min: number; max: number;
@@ -237,10 +246,18 @@ export interface FootfallHeatmap {
 /** 상권 밀도 레이어(Page). `metric="flpop"` 은 **유동인구** 밀도다(상주인구 아님). */
 export interface DensityHeatmap {
   district: string;
-  density_source: "trdar";
-  resolution: "trdar";
+  density_source: "flpop_jipgyegu" | "trdar";
+  resolution: "jipgyegu" | "trdar";
+  oa_count?: number;
   trdar_count: number;
   metric: "flpop" | "stor";
+  /**
+   * ⚠ **분자의 정의**가 경로마다 다르다 — 안 보고 값을 나란히 놓으면 안 된다.
+   * - `flpop_mean24_per_1k_m2` : 집계구 24시간 평균 생활인구 ÷ 폴리곤 면적
+   * - 없음(상권 경로)          : 일 총량 기준 `flpop_per_1k_m2`
+   * 점포 밀도(`stor`)는 집계구 원천이 없어 **항상 상권**이다.
+   */
+  density_basis?: "flpop_mean24_per_1k_m2";
   unit: string;
   label: string;
   min: number; max: number;

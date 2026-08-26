@@ -35,6 +35,8 @@ _GOLD = Path(__file__).resolve().parents[4] / "data" / "gold"
 _SRC = _GOLD / "platform_page_footfall.json"
 # 생활인구(행정동 × 24시간). 있으면 시간 축을 6구간 → 24시간으로 갈아끼운다.
 _HOURLY_SRC = _GOLD / "page_footfall_hourly.json"
+# 생활인구(**집계구** × 24시간). 있으면 공간 축까지 상권 → 집계구로 올린다.
+_JIPGYEGU_SRC = _GOLD / "page_footfall_jipgyegu.json"
 
 # 시간대 6구간 — TRDAR 원천의 눈금. Program 수요신호(§0-C)와 같은 자를 쓴다.
 TMZONS = ["00_06", "06_11", "11_14", "14_17", "17_21", "21_24"]
@@ -106,9 +108,36 @@ def hourly_share(district_id: str, hour: int,
     return float(v) if v is not None else None
 
 
+@lru_cache(maxsize=1)
+def _load_jipgyegu() -> dict:
+    """집계구 24시간 산출물(`page_footfall_jipgyegu.json`). 없으면 빈 dict.
+
+    `_load()` 와 같은 원칙 — 없는 것을 0 으로 채우지 않는다. 여기서 빈 dict 는
+    "공간 축을 상권에서 집계구로 못 올린다" 는 뜻이고, 호출부는 종전 상권 경로로
+    물러난다(레이어를 내리지는 않는다).
+    """
+    if not _JIPGYEGU_SRC.exists():
+        return {}
+    try:
+        return json.loads(_JIPGYEGU_SRC.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def jipgyegu_of(district_id: str) -> dict | None:
+    """그 거점의 집계구 배정(셀 → 집계구). 산출물이 그 거점을 **전부** 덮을 때만 있다.
+
+    부분 커버는 산출물 단계에서 이미 걸러진다 — 한 화면에서 어떤 셀은 집계구, 어떤
+    셀은 상권 값을 쓰면 색은 그럴듯한데 셀 간 비교가 거짓이 된다.
+    """
+    d = (_load_jipgyegu().get("districts") or {}).get(district_id)
+    return d or None
+
+
 def clear_cache() -> None:
     _load.cache_clear()
     _load_hourly.cache_clear()
+    _load_jipgyegu.cache_clear()
 
 
 def trdars_of(district_id: str) -> list[dict]:
@@ -142,6 +171,71 @@ def _cell_base(cell: dict, v: float | None) -> dict:
     }
 
 
+def _footfall_jipgyegu(district_id: str, jg: dict, cells: list[dict],
+                       hour: int, daytype: str) -> dict | None:
+    """집계구 경로 — 셀 값 = 그 셀이 속한 **집계구의 그 시각 생활인구**.
+
+    상권 경로와 결정적으로 다른 점은 **곱셈이 없다는 것**이다. 종전에는 공간(상권
+    총량)과 시간(행정동 구성비)이 서로 다른 원천이라 둘을 곱해 붙였고, 그래서 거점
+    안의 시간 차이를 표현할 수 없었다(행정동이 거점당 1~2개였다). 집계구는 공간과
+    시간이 한 표에서 나오므로 거점 내부에서 시각에 따라 서열이 바뀐다.
+
+    ⚠ 값의 눈금이 상권 경로와 다르다 — 상권 경로는 `명/일 × 구성비`, 이쪽은 시각별
+    **생활인구 절대값**이다. `share_basis: null` 과 `unit` 이 그걸 밝히고, 프론트는
+    응답의 min/max 로 재정규화하므로 색은 정상이다. **두 경로의 v 를 직접 비교하면
+    안 된다.**
+
+    산출물이 그 셀을 안 담으면 통째로 None 을 돌려 상권 경로로 물러난다 — 일부만
+    집계구로 채우면 같은 화면의 두 셀이 서로 다른 눈금이 된다.
+    """
+    if not isinstance(hour, int) or not 0 <= hour <= 23:
+        hour = 12
+    daytype = "weekend" if daytype == "weekend" else "weekday"
+    key = "we" if daytype == "weekend" else "wd"
+    oa_tbl = _load_jipgyegu().get("oa") or {}
+    cmap = jg.get("cells") or {}
+
+    vals, out = [], []
+    for cell in cells:
+        oa = cmap.get(f"{cell['i']}|{cell['j']}")
+        prof = oa_tbl.get(oa) if oa else None
+        if not prof:
+            return None
+        v = round(float((prof.get(key) or [0.0] * 24)[hour]), 1)
+        vals.append(v)
+        c = _cell_base(cell, v)
+        c["oa"] = oa
+        out.append(c)
+
+    doc = _load_jipgyegu()
+    return {
+        "district": district_id,
+        "footfall_source": "flpop_jipgyegu",
+        "resolution": "jipgyegu",
+        "oa_count": jg.get("oa_count") or len(set(cmap.values())),
+        # 상권 경로와 필드 모양을 맞춘다 — 프론트가 한 타입으로 받는다. 집계구
+        # 경로에서 상권은 안 쓰이므로 0 이다(‘상권이 없다’가 아니라 ‘안 썼다’).
+        "trdar_count": 0,
+        "hour": hour,
+        "band": band_of_hour(hour),
+        "band_label": _TMZON_LABEL[band_of_hour(hour)],
+        "time_source": "jipgyegu_hourly",
+        "daytype": daytype,
+        # 구성비를 곱하지 않는다 — 곱할 것이 없다는 뜻으로 null 을 싣는다.
+        "share_basis": None,
+        "hour_share": None,
+        "unit": "명(시각 생활인구)",
+        "min": min(vals) if vals else 0.0,
+        "max": max(vals) if vals else 0.0,
+        "note": ("집계구 단위 생활인구를 격자에 얹은 값이다 — 공간·시간이 같은 "
+                 "원천이라 거점 내부의 시간 차이가 표현된다. ⚠ 그래도 격자 실측은 "
+                 "아니다: 집계구는 100m 격자보다 크고(면적 중앙 약 22,000㎡), 셀 "
+                 "값은 그 셀이 속한 구획의 값이다. 표본은 "
+                 f"{doc.get('sample_weekday', 0)}평일·{doc.get('sample_weekend', 0)}주말."),
+        "cells": out,
+    }
+
+
 def footfall_heatmap(district_id: str, hour: int = 12,
                      daytype: str = "weekday") -> dict | None:
     """시간대별 유동인구를 공실 격자에 얹는다.
@@ -162,9 +256,18 @@ def footfall_heatmap(district_id: str, hour: int = 12,
     시간 축이 왜 중요한가: 구성비는 시각에 따라 상권 간 서열까지 바꾼다. 총량만
     쓰면 슬라이더가 밝기만 바꾸는 장식이 된다(2026-08-23 이전 상태).
     """
-    trdars = trdars_of(district_id)
     cells = _grid(district_id)
-    if not trdars or cells is None:
+    if cells is None:
+        return None
+
+    jg = jipgyegu_of(district_id)
+    if jg:
+        doc = _footfall_jipgyegu(district_id, jg, cells, hour, daytype)
+        if doc is not None:
+            return doc
+
+    trdars = trdars_of(district_id)
+    if not trdars:
         return None
 
     band = band_of_hour(hour)
@@ -213,6 +316,62 @@ def footfall_heatmap(district_id: str, hour: int = 12,
     return doc
 
 
+def _density_jipgyegu(district_id: str, jg: dict,
+                      cells: list[dict]) -> dict | None:
+    """유동인구 밀도 — 집계구의 **24시간 평균 생활인구 ÷ 폴리곤 면적**.
+
+    ⚠ 상권 경로와 **분자의 정의가 다르다**: 상권판 `flpop_per_1k_m2` 는 일 총량
+    기준이고 이쪽은 24시간 평균(= 어느 시각에 평균 몇 명이 있나)이다. 절대값이
+    한 자릿수 이상 차이 나므로 `density_basis` 로 어느 쪽인지 밝힌다 — 두 응답의
+    v 를 나란히 놓으면 안 된다.
+
+    평일·주말은 표본 일수로 가중평균한다. 하나만 쓰면 업무지구/상업지구 중 한쪽이
+    체계적으로 과대평가된다(`cityhall` 은 주말비가 0.24~0.69 로 갈린다).
+    """
+    doc = _load_jipgyegu()
+    oa_tbl = doc.get("oa") or {}
+    cmap = jg.get("cells") or {}
+    n_wd = int(doc.get("sample_weekday") or 0)
+    n_we = int(doc.get("sample_weekend") or 0)
+    if n_wd + n_we <= 0:
+        return None
+
+    vals, out = [], []
+    for cell in cells:
+        oa = cmap.get(f"{cell['i']}|{cell['j']}")
+        prof = oa_tbl.get(oa) if oa else None
+        area = float((prof or {}).get("area_m2") or 0.0)
+        if not prof or area <= 0:
+            return None
+        wd = sum(prof.get("wd") or []) / 24.0
+        we = sum(prof.get("we") or []) / 24.0
+        mean_pop = (wd * n_wd + we * n_we) / (n_wd + n_we)
+        v = round(mean_pop / area * 1000.0, 2)
+        vals.append(v)
+        c = _cell_base(cell, v)
+        c["oa"] = oa
+        out.append(c)
+
+    return {
+        "district": district_id,
+        "density_source": "flpop_jipgyegu",
+        "resolution": "jipgyegu",
+        "oa_count": jg.get("oa_count") or len(set(cmap.values())),
+        "trdar_count": 0,
+        "metric": "flpop",
+        "density_basis": "flpop_mean24_per_1k_m2",
+        "unit": "명/1,000㎡ (24시간 평균)",
+        "label": "유동인구 밀도",
+        "min": min(vals) if vals else 0.0,
+        "max": max(vals) if vals else 0.0,
+        "note": ("집계구 단위다(상주인구가 아니라 **유동인구** 기준). 분자는 24시간 "
+                 "평균 생활인구를 평일·주말 표본으로 가중한 값이고, 분모는 집계구 "
+                 "폴리곤 면적이다. ⚠ 상권 경로(일 총량 기준)와 눈금이 달라 값을 "
+                 "직접 비교할 수 없다 — `density_basis` 를 볼 것."),
+        "cells": out,
+    }
+
+
 def density_heatmap(district_id: str, metric: str = "flpop") -> dict | None:
     """상권 밀도(유동인구 또는 점포)를 같은 격자에 얹는다.
 
@@ -221,9 +380,21 @@ def density_heatmap(district_id: str, metric: str = "flpop") -> dict | None:
     아니므로 그렇게 부르지 않는다.
     """
     key = "stor_per_1k_m2" if metric == "stor" else "flpop_per_1k_m2"
-    trdars = [t for t in trdars_of(district_id) if t.get(key) is not None]
     cells = _grid(district_id)
-    if not trdars or cells is None:
+    if cells is None:
+        return None
+
+    # ⚠ 점포 밀도는 올리지 않는다 — 집계구 단위 점포수 원천이 없다. 유동인구 밀도만
+    #   집계구로 가고, 그래서 두 metric 의 `resolution` 이 서로 다를 수 있다.
+    if metric != "stor":
+        jg = jipgyegu_of(district_id)
+        if jg:
+            doc = _density_jipgyegu(district_id, jg, cells)
+            if doc is not None:
+                return doc
+
+    trdars = [t for t in trdars_of(district_id) if t.get(key) is not None]
+    if not trdars:
         return None
 
     vals, out = [], []

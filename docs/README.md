@@ -16,6 +16,8 @@ Claude Code(CLI) 기반 SpaceOS 개발 가이드. PPPP 프레임워크 4기능�
 | [deploy-vercel.md](deploy-vercel.md) | 배포 — 프론트 정적 + FastAPI 서버리스 단일 Vercel 프로젝트 |
 | [api-keys-and-specs.md](api-keys-and-specs.md) · [api-key-checklist.md](api-key-checklist.md) | 인증키 5종과 응답 필드 스펙 |
 | [poc-building-vacancy.md](poc-building-vacancy.md) | 건물 단위 공실 PoC 설계 (D1 스키마) |
+| [decision-infra-layer-2026-08-25.md](decision-infra-layer-2026-08-25.md) | **결정 요청** — PPPP 게이트가 세지 않는 층(DB·인증·과금·오케스트레이션) |
+| [prep-sgis-application.md](prep-sgis-application.md) | SGIS 집계구 경계 취득 기록 (막힘 5 해소 · 재신청 절차 보존) |
 
 ### 실측 기록 (finding-*) — 판단의 근거가 남은 곳
 
@@ -24,7 +26,7 @@ Claude Code(CLI) 기반 SpaceOS 개발 가이드. PPPP 프레임워크 4기능�
 | [finding-sequence-and-accuracy-2026-08-17.md](finding-sequence-and-accuracy-2026-08-17.md) | 작업 순서·정확도 목표 재설정, Top-1 게이트 폐기와 off-prior 게이트 신설 |
 | [finding-anchor-population.md](finding-anchor-population.md) | R-ONE 앵커 대조 — 격차를 어떻게 읽나 |
 | [finding-expos-quota-2026-08-09.md](finding-expos-quota-2026-08-09.md) | 건축HUB 전유부 쿼터가 확장 속도를 정한 기록 (해소 08-17) |
-| [finding-foot-traffic-resolution.md](finding-foot-traffic-resolution.md) | 유동인구 해상도 — `foot` 만 집계구를 기다린다 |
+| [finding-foot-traffic-resolution.md](finding-foot-traffic-resolution.md) | 유동인구 해상도 — ~~`foot` 만 집계구를 기다린다~~ → **해소 08-25**. 본문 결론 둘이 반증돼 문서 앞에 정정 배너가 붙어 있다 |
 
 ## 진행률은 문서에서 읽지 않는다
 
@@ -39,6 +41,18 @@ python scripts/pppp_status.py
 
 `[선언]` 게이트는 줄이는 것이 목표다 — 2026-08-19 에 Platform off-prior 게이트가
 학습 체크포인트에서 직접 읽히면서 `[선언]` 9 → 8 이 됐다.
+
+⚠ **그리고 스크립트가 세지 않는 것이 둘 있다.** 진행률 100% 를 "끝났다"로 읽지 않으려면
+같이 봐야 한다.
+
+1. **인프라 층** — DB·인증·과금·오케스트레이션은 게이트 22개에 **아예 없다**.
+   → [decision-infra-layer-2026-08-25.md](decision-infra-layer-2026-08-25.md)
+2. **KPI② PMF** — B2B 파일럿 5~10건은 KPI 우선순위 2번인데 **이를 재는 게이트가 0개**다.
+   즉 PPPP 진행률은 KPI 절반(기술 완성도)만 말한다.
+
+**선언이 낡는 것이 이 저장소의 주된 실패 양식이다.** 2026-08-25 에 Platform 게이트가
+"막힘 5 의 선행은 SGIS 자료신청" 이라고 적고 있는 동안 그 자료는 **같은 날 이미 받아
+써서** Posting `foot` 을 승격시킨 뒤였다. 선언을 인용하기 전에 **근거 경로를 연다.**
 
 ## 권장 진행 순서
 
