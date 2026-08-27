@@ -802,10 +802,17 @@ def program_track(total: int) -> Track:
         "missing_actors · budget_share_mismatch warning). own 은 오탐 대조 테스트가 "
         "찾아낸 것이다 — 없으면 입간판 제안이 '수치 없는 행사 제안'으로 잘못 걸린다. "
         "곁가지로 리뷰 없는 입력(=공실)에 '방문 후기형 포스팅'을 제안하던 스텁을 고쳤다. "
-        "⚠ 근본 해소는 아니다 — 입력 계약 ③층(창업계획)은 여전히 미구현이다",
+        "그때 '근본 해소는 아니다 — ③층(창업계획)은 여전히 미구현'이라고 적어 뒀는데 "
+        "**같은 날 오후에 해소됐다**(services/program_venture.py · 08-23). 스텁의 판정은 "
+        "`reviews 가 비었나`라는 추정이었고, ③층의 개업예정일이 그걸 확정 판정으로 "
+        "바꿨다 — 위 `입력 계약 3층` 게이트가 그 자리다. "
+        "⚠ 2026-08-27 이 문구가 낡은 채 남아 있어 고쳤다. 같은 출력 안에서 두 게이트가 "
+        "③층을 두고 서로 다른 말을 하고 있었다 — 선언이 낡는 이 양식이 이 저장소의 "
+        "주된 실패 모양이라, 지우지 않고 경위를 남긴다",
         auto=False,
         evidence=("docs/feature-program.md §0-F · apps/backend/tests/"
-                  "test_program_output_split.py (14건) · services/ha_guard.py"),
+                  "test_program_output_split.py (14건) · services/ha_guard.py · "
+                  "③층 해소는 services/program_venture.py"),
     ))
     return t
 
@@ -833,6 +840,7 @@ def _pmf_instrumentation() -> list[tuple[bool, str]]:
     admin = ROOT / "apps" / "backend" / "app" / "api" / "v1" / "admin.py"
     deps = ROOT / "apps" / "backend" / "app" / "api" / "deps.py"
     usage = ROOT / "apps" / "backend" / "app" / "services" / "usage.py"
+    migr_test = ROOT / "apps" / "backend" / "tests" / "test_migration.py"
 
     def _has(p: Path, needle: str) -> bool:
         try:
@@ -847,6 +855,10 @@ def _pmf_instrumentation() -> list[tuple[bool, str]]:
          "분석 라우터에 계측 배선 (api/v1/router.py — 한 곳에 걸어 새 엔드포인트가 안 빠진다)"),
         (_has(admin, "/usage"),
          "관측 창구 GET /api/v1/admin/usage (조직별 접근·active_orgs)"),
+        # 위 셋이 다 서 있어도 계정 DB 의 표가 안 생기면 파일럿은 가입조차 못 한다.
+        # 스위트는 create_all 로 마이그레이션을 건너뛰므로 그 고장이 배포까지 안 보인다.
+        (_has(migr_test, "command.check") and _has(migr_test, "command.upgrade"),
+         "계정 DB 마이그레이션 가드 (tests/test_migration.py — 실행 + 모델 대조)"),
     ]
 
 

@@ -208,7 +208,64 @@ bcrypt 를 쓰면 p95 <200ms 목표를 API 키 경로에서 혼자 깎는다. �
 ### 테스트
 
 `test_config_guard.py`(5) · `test_auth.py` API 키 7건 추가(8→15) ·
-`test_usage_tracking.py`(7). 백엔드 스위트 **239 → 263 passed** · 5 skipped, 회귀 없음.
+`test_usage_tracking.py`(7). 백엔드 스위트 **258 passed · 5 skipped**(수집 263건), 회귀 없음.
+
+> ⚠ 2026-08-27 정정: 위 줄은 원래 "263 passed · 5 skipped"였는데 **5를 겹쳐 셌다.**
+> 263 은 수집 총계이고 그중 258 이 통과, 5 가 스킵이다. 스킵 5건은 결정적이라
+> (LLM 실호출 opt-in 4 · Tier2 거점 없음 1) 어느 기계에서 돌려도 같은 수가 나온다.
+
+### 마이그레이션은 그때 한 번도 실행되지 않았다 (2026-08-27 확인·해소)
+
+위 표의 1~4 를 붙이는 동안 **`alembic upgrade head` 가 한 번도 돈 적이 없었다.**
+`test_auth.py` · `test_usage_tracking.py` 가 `Base.metadata.create_all()` 로 표를 만들어
+`migrations/versions/*` 를 통째로 건너뛰기 때문이다 — 마이그레이션이 깨져 있어도
+스위트는 전부 초록이고, 고장은 배포 시점에야 드러난다. 이 저장소가 반복해 잡아 온
+양식(게이트는 100% 인데 산출물이 제품에 안 닿는다)과 같은 모양이다.
+
+08-27 에 처음 실행했고 **통과했다**(드리프트 0 · 계정층 5개 표 생성). 즉 당시에는
+운이 좋았던 것이고, 그 운을 가드로 바꾼 것이 `tests/test_migration.py`(4건)다:
+마이그레이션을 실제로 돌리고 → `alembic check` 로 모델과 대조하고 → 그 위에서
+가입·키발급·접근기록·집계를 태운다. 가드가 실제로 무는지도 확인했다(모델에 컬럼을
+임시로 넣자 `Detected added column 'orgs.drift_probe'` 로 실패).
+
+전체 경로(가입 → API키 → 분석 호출 → `/admin/usage`)도 실제 앱으로 한 번 태웠고
+**`active_orgs` 가 처음으로 0 → 1 로 움직였다.**
+
+### 계정층 배선이 프로덕션을 18시간 죽였다 (2026-08-27 발견·복구)
+
+같은 커밋(`1979bb4`, 08-26 23:04)이 **프로덕션 API 를 통째로 내렸다.** 08-27 오후에
+`https://spaceos-sandy.vercel.app` 을 눌러 보고 처음 알았다 — 프론트 정적 파일은 200 이고
+`/api/*` 와 `/health` 만 전부 500(`FUNCTION_INVOCATION_FAILED`)이었다. **화면은 멀쩡해
+보인다.** 지도가 비어 있는 것이 데이터 문제인지 API 문제인지 화면만 봐서는 구별되지 않는다.
+
+원인이 셋 겹쳐 있었고, 셋 다 "로컬과 CI 에서는 안 보이는" 종류였다.
+
+| # | 원인 | 왜 안 잡혔나 |
+|---|---|---|
+| 1 | 루트 `requirements.txt` 에 `sqlalchemy`·`bcrypt`·`pyjwt`·`email-validator` 없음 | 백엔드 CI 는 `apps/backend/requirements.txt`(전부 포함)로 돈다. **배포 최소 셋으로 import 해 보는 자리가 없었다** |
+| 2 | `core/db.py` 가 모듈 최상위에서 `create_engine()` 호출 | 파일 주석은 "지연 연결이라 괜찮다"고 적혀 있었고 **절반만 맞았다** — 커넥션은 안 열지만 DBAPI 드라이버(`psycopg2`)를 그 자리에서 import 한다. 로컬·CI 에는 psycopg2 가 깔려 있어 구멍이 안 보였다 |
+| 3 | Vercel 에 `JWT_SECRET` 미등록 | `_guard_prod_secrets` 가 설계대로 fail-closed. 가드는 제 일을 했는데 **아무도 값을 넣지 않았다** |
+
+②는 `get_optional_principal` 이 주장하던 "익명 요청은 DB 를 건드리지 않는다"와도 어긋나
+있었다. 엔진 생성을 늦추기만 하면 실패 지점이 import 에서 **요청마다로** 옮겨갈 뿐이라
+(`track_access` 가 `Depends(get_db)` 로 매 요청 세션을 만든다), `Session.get_bind()` 를
+오버라이드해 **질의하는 순간까지** 엔진을 미뤘다. 이제 익명 요청은 드라이버 없이도 돈다 —
+문서가 주장하던 성질이 처음으로 실제로 성립한다.
+
+재발 방지는 `.github/workflows/ci.yml` 의 **`서버리스 임포트` 잡**이다. 루트
+`requirements.txt` **만** 깔고 Python 3.14(=Vercel 빌드 버전)로 `api/index.py` 를 import 한
+뒤 익명 요청 200 을 확인하고, 마지막에 **psycopg2 가 없음**까지 확인한다 — 누가 배포 셋에
+드라이버를 넣으면 ②의 검사가 조용히 무의미해지기 때문이다.
+
+⚠ 남는 교훈: **프로덕션이 살아 있는지 아무도 안 보고 있었다.** 18시간이 걸린 이유는
+고치기 어려워서가 아니라(원인 셋 다 반나절 안에 해소됐다) 아무도 몰라서다. 헬스체크
+모니터링은 아직 없다.
+
+⚠ **다만 Postgres 로는 아직 못 재 봤다.** 이 기계에 Docker 도 Postgres 도 없다
+(`docker` · `psql` 둘 다 미설치, 2026-08-27 확인). 위 검증은 전부 SQLite 기준이라
+**마이그레이션↔모델 드리프트와 실행 가능성**을 재는 것이지 Postgres 고유 동작을
+재는 것이 아니다. 모델이 애초에 SQLite 를 전제로 설계돼 있어(`models/auth.py` 머리말)
+차이가 클 자리는 없지만, 그 구분을 흐리지 않으려고 적어 둔다.
 
 ### 그래도 남는 것 — 배선 100% 는 파일럿 0건과 양립한다
 
