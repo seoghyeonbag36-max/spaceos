@@ -55,6 +55,58 @@ jobs:
           PYTHONIOENCODING: utf-8     # 로그의 em dash 가 cp949 에서 죽는다(08-19 실측)
         run: python -m pytest -q
 
+  serverless:
+    name: 서버리스 임포트 (배포 의존성만)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # ⚠ 이 잡이 없어서 2026-08-26~27 프로덕션이 약 18시간 죽어 있었다.
+    #   백엔드 잡은 `apps/backend/requirements.txt`(sqlalchemy·psycopg2 포함)를 깔고
+    #   돌기 때문에 **배포가 쓰는 최소 셋으로는 import 조차 안 된다는 사실을 볼 수 없다.**
+    #   여기서는 루트 `requirements.txt` 만 깔아 배포 환경을 그대로 재현한다.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'      # Vercel 서버리스 빌드와 같은 버전(deploy-vercel.md)
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      # httpx 는 요청을 태워 보기 위한 **테스트 전용**이다. 앱이 import 하지 않으므로
+      # requirements.txt 에는 넣지 않는다 — 넣으면 배포 번들만 커진다.
+      - name: 배포 의존성만 설치
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt httpx
+
+      - name: 진입점 import + 익명 분석 요청
+        env:
+          PYTHONIOENCODING: utf-8
+          VERCEL: '1'                             # prod 판정을 배포와 똑같이 만든다
+          JWT_SECRET: ci-not-a-real-secret        # prod 가드가 요구한다(없으면 기동 실패)
+        run: |
+          python - <<'PY'
+          import importlib.util
+          from fastapi.testclient import TestClient
+
+          spec = importlib.util.spec_from_file_location("vercel_entry", "api/index.py")
+          entry = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(entry)          # ① import 가 되는가
+
+          client = TestClient(entry.app)
+          for path in ("/health", "/api/v1/commercial-districts/"):
+              r = client.get(path)                # ② 익명 요청이 DB 없이 도는가
+              assert r.status_code == 200, f"{path} -> {r.status_code} {r.text[:300]}"
+              print(f"OK {r.status_code} {path}")
+
+          # ③ DB 드라이버(psycopg2)가 없어야 의미가 있는 검사다. 누가 배포 셋에
+          #    드라이버를 추가하면 ②가 통과해도 이 성질은 사라지므로 여기서 막는다.
+          try:
+              import psycopg2                     # noqa: F401
+          except ModuleNotFoundError:
+              print("OK psycopg2 없음 — 익명 경로가 드라이버에 의존하지 않는다")
+          else:
+              raise SystemExit("배포 의존성에 psycopg2 가 들어왔다 — 이 검사가 무의미해진다")
+          PY
+
   data:
     name: 데이터 파이프라인 pytest
     runs-on: ubuntu-latest
