@@ -817,6 +817,57 @@ def _bar(pct: float, width: int = 20) -> str:
     return "█" * fill + "·" * (width - fill)
 
 
+# ─────────────────────────── KPI② (PMF) ───────────────────────────
+# 위 4트랙은 전부 KPI①(기술 완성도)이다. KPI②(B2B 파일럿 5~10건)는 **여기서 셀 수 없다** —
+# 파일럿 사용량은 산출물이 아니라 계정 DB 에 살고, 이 스크립트는 네트워크를 타지 않는다.
+#
+# 그래서 퍼센트를 만들지 않는다. 대신 둘을 갈라 적는다:
+#   ① 계측이 **배선됐나** — 이건 소스에서 셀 수 있다(아래)
+#   ② 파일럿이 **실제로 몇인가** — 이건 `GET /api/v1/admin/usage` 로만 알 수 있다
+# 이 구분을 안 하면 "게이트 100%" 를 보고 KPI 절반이 미착수라는 사실이 묻힌다
+# (docs/README.md §진행률 이 지적한 사각지대다).
+
+def _pmf_instrumentation() -> list[tuple[bool, str]]:
+    """PMF 계측 배선 여부 — 소스에서 직접 확인한다(선언이 아니라 실물)."""
+    router = ROOT / "apps" / "backend" / "app" / "api" / "v1" / "router.py"
+    admin = ROOT / "apps" / "backend" / "app" / "api" / "v1" / "admin.py"
+    deps = ROOT / "apps" / "backend" / "app" / "api" / "deps.py"
+    usage = ROOT / "apps" / "backend" / "app" / "services" / "usage.py"
+
+    def _has(p: Path, needle: str) -> bool:
+        try:
+            return needle in p.read_text(encoding="utf-8")
+        except OSError:
+            return False
+
+    return [
+        (_has(deps, "def track_access") and _has(usage, "def record_access"),
+         "사용량 기록기 (services/usage.record_access)"),
+        (_has(router, "track_access"),
+         "분석 라우터에 계측 배선 (api/v1/router.py — 한 곳에 걸어 새 엔드포인트가 안 빠진다)"),
+        (_has(admin, "/usage"),
+         "관측 창구 GET /api/v1/admin/usage (조직별 접근·active_orgs)"),
+    ]
+
+
+def print_kpi2() -> None:
+    checks = _pmf_instrumentation()
+    done = sum(1 for ok, _ in checks if ok)
+    print("\n" + "=" * 78)
+    print(f"KPI② PMF (B2B 파일럿 5~10건) — 위 진행률에 **포함되지 않는다**")
+    print(f"  계측 배선 {done}/{len(checks)}")
+    for ok, label in checks:
+        print(f"    {'✅' if ok else '⛔'} {label}")
+    if done == len(checks):
+        print("  ▶ 배선은 섰다. 다만 **배선 100% 는 파일럿 0 건과 양립한다** —")
+        print("    실제 파일럿 수·활성도는 이 스크립트가 아니라 다음으로 본다:")
+        print("      curl -H \"X-Admin-Token: $ADMIN_TOKEN\" .../api/v1/admin/usage")
+        print("    active_orgs 가 KPI② 목표(5~10)에 대응한다. 0 이면 둘 중 하나다:")
+        print("    ① 파일럿이 익명으로 쓰고 있다  ② 기록이 실패하고 있다(usage 경고 로그).")
+    else:
+        print("  ▶ 계측이 덜 섰다 — 파일럿을 받아도 무엇을 얼마나 썼는지 셀 수 없다.")
+
+
 def main() -> int:
     total = _hubs()
     tracks = [page_track(total), platform_track(), posting_track(total), program_track(total)]
@@ -830,6 +881,13 @@ def main() -> int:
                            "observe": g.observe,
                            "detail": g.detail, "evidence": g.evidence} for g in t.gates],
             } for t in tracks],
+            # KPI② 는 트랙이 아니다 — 퍼센트를 만들면 KPI① 평균에 섞여 사각지대가 묻힌다.
+            "kpi2_pmf": {
+                "in_progress_pct": False,
+                "instrumentation": [{"ok": ok, "what": what}
+                                    for ok, what in _pmf_instrumentation()],
+                "measured_by": "GET /api/v1/admin/usage (active_orgs)",
+            },
         }, ensure_ascii=False, indent=1))
         return 0
 
@@ -860,6 +918,7 @@ def main() -> int:
     tot = sum(len(t.gates) for t in tracks)
     print(f"게이트 {tot}개 중 선언 {dec}개 — 선언이 많을수록 이 숫자를 믿을 이유가 줄어든다.")
     print("가중치는 두지 않았다(전부 동일 가중). 평균이 아니라 게이트를 보고 판단할 것.")
+    print_kpi2()
     return 0
 
 

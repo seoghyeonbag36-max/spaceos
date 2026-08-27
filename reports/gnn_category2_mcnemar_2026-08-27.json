@@ -1,0 +1,78 @@
+{
+  "note": "off-prior 표본 확대 절반 ①(라벨 세분화) 실측 — docs/feature-platform.md §0-N. 노드별 예측 덤프(reports/preds/*_category2_2026-08-27.json, 각 ~315KB)는 .gitignore 대상이라 이 요약이 새 클론에서 검증 가능한 유일한 기록이다. 덤프는 아래 repro 로 재생성된다.",
+  "label_level": "category2",
+  "classes": 32,
+  "seed": 42,
+  "saved_artifacts": false,
+  "offprior_nodes": 3785,
+  "sample_expansion": {
+    "group_offprior_n": 877,
+    "category2_offprior_n": 3785,
+    "gain_x": 4.32,
+    "se_pp_group": 1.63,
+    "se_pp_category2": 0.78
+  },
+  "arms": {
+    "control_105": {
+      "features": 105,
+      "test_top1": 0.3267,
+      "test_top3": 0.6063,
+      "test_macro_f1": 0.0733,
+      "test_offprior_top3": 0.2349,
+      "lift_vs_district_prior_pct": 30.7,
+      "early_stop_epoch": 497
+    },
+    "adong_115": {
+      "features": 115,
+      "test_top1": 0.3229,
+      "test_top3": 0.6033,
+      "test_macro_f1": 0.0719,
+      "test_offprior_top3": 0.2325,
+      "lift_vs_district_prior_pct": 29.2,
+      "early_stop_epoch": 273
+    },
+    "jipgyegu_115": {
+      "features": 115,
+      "test_top1": 0.3272,
+      "test_top3": 0.6031,
+      "test_macro_f1": 0.071,
+      "test_offprior_top3": 0.2351,
+      "lift_vs_district_prior_pct": 30.9,
+      "early_stop_epoch": 318
+    }
+  },
+  "baselines": {
+    "baseline_major_top1": 0.2266,
+    "baseline_district_prior_top1": 0.25,
+    "baseline_district_prior_top3": 0.5323
+  },
+  "mcnemar": [
+    {
+      "a": "control_105", "b": "jipgyegu_115", "n": 3785,
+      "both_hit": 741, "both_miss": 2747, "a_only_hit": 148, "b_only_hit": 149,
+      "a_rate": 0.2349, "b_rate": 0.2351, "delta_pp": 0.03,
+      "discordant": 297, "chi2": 0.0, "p_value": 1.0, "significant_at_0.05": false
+    },
+    {
+      "a": "control_105", "b": "adong_115", "n": 3785,
+      "both_hit": 763, "both_miss": 2779, "a_only_hit": 126, "b_only_hit": 117,
+      "a_rate": 0.2349, "b_rate": 0.2325, "delta_pp": -0.24,
+      "discordant": 243, "chi2": 0.263, "p_value": 0.6078, "significant_at_0.05": false
+    },
+    {
+      "a": "adong_115", "b": "jipgyegu_115", "n": 3785,
+      "both_hit": 740, "both_miss": 2755, "a_only_hit": 140, "b_only_hit": 150,
+      "a_rate": 0.2325, "b_rate": 0.2351, "delta_pp": 0.26,
+      "discordant": 290, "chi2": 0.279, "p_value": 0.5972, "significant_at_0.05": false
+    }
+  ],
+  "conclusion": "표본을 4.32배로 늘려 SE 를 절반(1.63→0.78pp)으로 줄였는데도 세 팔의 델타가 0.03~0.26pp 로 오히려 group 레벨(+1.60~+2.05pp)보다 작아졌다. 검정력을 확보한 채 '가를 차이가 없다'가 확인된 것이고, §0-M 의 구조적 상한(37%대) 진단이 category2 입도에서 독립적으로 재현됐다.",
+  "repro": [
+    "python -u -m ml.training.train_gnn --label-level category2 --epochs 600 --patience 80 --no-save --dump-preds reports/preds/control_category2_2026-08-27.json",
+    "python -u -m ml.training.train_gnn --label-level category2 --adong --epochs 600 --patience 80 --no-save --dump-preds reports/preds/adong_category2_2026-08-27.json",
+    "python -u -m ml.training.train_gnn --label-level category2 --jipgyegu --epochs 600 --patience 80 --no-save --dump-preds reports/preds/jipgyegu_category2_2026-08-27.json",
+    "python scripts/mcnemar_gnn_arms.py reports/preds/control_category2_2026-08-27.json reports/preds/jipgyegu_category2_2026-08-27.json",
+    "python scripts/mcnemar_gnn_arms.py reports/preds/control_category2_2026-08-27.json reports/preds/adong_category2_2026-08-27.json",
+    "python scripts/mcnemar_gnn_arms.py reports/preds/adong_category2_2026-08-27.json reports/preds/jipgyegu_category2_2026-08-27.json"
+  ]
+}

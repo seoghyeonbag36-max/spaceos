@@ -1,0 +1,558 @@
+{
+  "total": {
+    "hubs": 54,
+    "nodes": 40388,
+    "off_prior": 877,
+    "yield_off_per_node": 0.0217,
+    "median_hub_nodes": 720.0,
+    "yield_median": 0.0209,
+    "yield_q75": 0.027,
+    "yield_cv": 0.391
+  },
+  "need_hubs_to_double_offprior": {
+    "at_mean_yield": 56.1,
+    "at_q75_yield": 45.2
+  },
+  "hubs": [
+    {
+      "district_id": "gwangjang",
+      "nodes": 723,
+      "test": 165,
+      "off_prior": 31,
+      "off_per_node": 0.0429,
+      "off_per_test": 0.1879,
+      "train_top3_share": 0.8369,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "garak",
+      "nodes": 101,
+      "test": 20,
+      "off_prior": 4,
+      "off_per_node": 0.0396,
+      "off_per_test": 0.2,
+      "train_top3_share": 0.9667,
+      "n_classes_present": 5
+    },
+    {
+      "district_id": "yeonhui",
+      "nodes": 438,
+      "test": 82,
+      "off_prior": 17,
+      "off_per_node": 0.0388,
+      "off_per_test": 0.2073,
+      "train_top3_share": 0.9191,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "myeongdong",
+      "nodes": 949,
+      "test": 179,
+      "off_prior": 35,
+      "off_per_node": 0.0369,
+      "off_per_test": 0.1955,
+      "train_top3_share": 0.8155,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "samcheong",
+      "nodes": 372,
+      "test": 77,
+      "off_prior": 13,
+      "off_per_node": 0.0349,
+      "off_per_test": 0.1688,
+      "train_top3_share": 0.8423,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "chungmuro",
+      "nodes": 755,
+      "test": 154,
+      "off_prior": 26,
+      "off_per_node": 0.0344,
+      "off_per_test": 0.1688,
+      "train_top3_share": 0.8801,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "dongdaemun",
+      "nodes": 1337,
+      "test": 253,
+      "off_prior": 45,
+      "off_per_node": 0.0337,
+      "off_per_test": 0.1779,
+      "train_top3_share": 0.8545,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "cheongdam",
+      "nodes": 514,
+      "test": 118,
+      "off_prior": 16,
+      "off_per_node": 0.0311,
+      "off_per_test": 0.1356,
+      "train_top3_share": 0.8851,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "namdaemun",
+      "nodes": 430,
+      "test": 94,
+      "off_prior": 13,
+      "off_per_node": 0.0302,
+      "off_per_test": 0.1383,
+      "train_top3_share": 0.844,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "hongdae",
+      "nodes": 1618,
+      "test": 305,
+      "off_prior": 48,
+      "off_per_node": 0.0297,
+      "off_per_test": 0.1574,
+      "train_top3_share": 0.8633,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "sinchon",
+      "nodes": 1515,
+      "test": 326,
+      "off_prior": 43,
+      "off_per_node": 0.0284,
+      "off_per_test": 0.1319,
+      "train_top3_share": 0.8356,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "jangan",
+      "nodes": 323,
+      "test": 65,
+      "off_prior": 9,
+      "off_per_node": 0.0279,
+      "off_per_test": 0.1385,
+      "train_top3_share": 0.8462,
+      "n_classes_present": 6
+    },
+    {
+      "district_id": "teheran",
+      "nodes": 861,
+      "test": 174,
+      "off_prior": 24,
+      "off_per_node": 0.0279,
+      "off_per_test": 0.1379,
+      "train_top3_share": 0.8703,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "sungshin",
+      "nodes": 518,
+      "test": 99,
+      "off_prior": 14,
+      "off_per_node": 0.027,
+      "off_per_test": 0.1414,
+      "train_top3_share": 0.9102,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "cityhall",
+      "nodes": 894,
+      "test": 174,
+      "off_prior": 24,
+      "off_per_node": 0.0268,
+      "off_per_test": 0.1379,
+      "train_top3_share": 0.8705,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "anam",
+      "nodes": 472,
+      "test": 101,
+      "off_prior": 12,
+      "off_per_node": 0.0254,
+      "off_per_test": 0.1188,
+      "train_top3_share": 0.9195,
+      "n_classes_present": 6
+    },
+    {
+      "district_id": "sukmyung",
+      "nodes": 556,
+      "test": 106,
+      "off_prior": 14,
+      "off_per_node": 0.0252,
+      "off_per_test": 0.1321,
+      "train_top3_share": 0.8837,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "nambu",
+      "nodes": 398,
+      "test": 80,
+      "off_prior": 10,
+      "off_per_node": 0.0251,
+      "off_per_test": 0.125,
+      "train_top3_share": 0.8766,
+      "n_classes_present": 6
+    },
+    {
+      "district_id": "sillim",
+      "nodes": 1094,
+      "test": 184,
+      "off_prior": 26,
+      "off_per_node": 0.0238,
+      "off_per_test": 0.1413,
+      "train_top3_share": 0.8776,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "dangsan",
+      "nodes": 309,
+      "test": 61,
+      "off_prior": 7,
+      "off_per_node": 0.0227,
+      "off_per_test": 0.1148,
+      "train_top3_share": 0.8848,
+      "n_classes_present": 6
+    },
+    {
+      "district_id": "jamsil",
+      "nodes": 1323,
+      "test": 251,
+      "off_prior": 30,
+      "off_per_node": 0.0227,
+      "off_per_test": 0.1195,
+      "train_top3_share": 0.9034,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "cheongnyangni",
+      "nodes": 813,
+      "test": 162,
+      "off_prior": 18,
+      "off_per_node": 0.0221,
+      "off_per_test": 0.1111,
+      "train_top3_share": 0.8907,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "seoulsup",
+      "nodes": 505,
+      "test": 104,
+      "off_prior": 11,
+      "off_per_node": 0.0218,
+      "off_per_test": 0.1058,
+      "train_top3_share": 0.9353,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "euljiro",
+      "nodes": 887,
+      "test": 184,
+      "off_prior": 19,
+      "off_per_node": 0.0214,
+      "off_per_test": 0.1033,
+      "train_top3_share": 0.9276,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "hapjeong",
+      "nodes": 379,
+      "test": 79,
+      "off_prior": 8,
+      "off_per_node": 0.0211,
+      "off_per_test": 0.1013,
+      "train_top3_share": 0.8761,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "nonhyeon",
+      "nodes": 949,
+      "test": 195,
+      "off_prior": 20,
+      "off_per_node": 0.0211,
+      "off_per_test": 0.1026,
+      "train_top3_share": 0.9372,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "songridan",
+      "nodes": 431,
+      "test": 85,
+      "off_prior": 9,
+      "off_per_node": 0.0209,
+      "off_per_test": 0.1059,
+      "train_top3_share": 0.9241,
+      "n_classes_present": 6
+    },
+    {
+      "district_id": "dosan",
+      "nodes": 721,
+      "test": 133,
+      "off_prior": 15,
+      "off_per_node": 0.0208,
+      "off_per_test": 0.1128,
+      "train_top3_share": 0.8886,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "mullae",
+      "nodes": 870,
+      "test": 182,
+      "off_prior": 18,
+      "off_per_node": 0.0207,
+      "off_per_test": 0.0989,
+      "train_top3_share": 0.9109,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "seolleung",
+      "nodes": 1217,
+      "test": 262,
+      "off_prior": 25,
+      "off_per_node": 0.0205,
+      "off_per_test": 0.0954,
+      "train_top3_share": 0.8936,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "hyehwa",
+      "nodes": 1003,
+      "test": 202,
+      "off_prior": 20,
+      "off_per_node": 0.0199,
+      "off_per_test": 0.099,
+      "train_top3_share": 0.9028,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "mangwon",
+      "nodes": 848,
+      "test": 185,
+      "off_prior": 16,
+      "off_per_node": 0.0189,
+      "off_per_test": 0.0865,
+      "train_top3_share": 0.9265,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "yongsan",
+      "nodes": 657,
+      "test": 127,
+      "off_prior": 12,
+      "off_per_node": 0.0183,
+      "off_per_test": 0.0945,
+      "train_top3_share": 0.9135,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "seongsu",
+      "nodes": 719,
+      "test": 137,
+      "off_prior": 13,
+      "off_per_node": 0.0181,
+      "off_per_test": 0.0949,
+      "train_top3_share": 0.9089,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "gangnam",
+      "nodes": 2002,
+      "test": 420,
+      "off_prior": 36,
+      "off_per_node": 0.018,
+      "off_per_test": 0.0857,
+      "train_top3_share": 0.9077,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "wangsimni",
+      "nodes": 916,
+      "test": 181,
+      "off_prior": 16,
+      "off_per_node": 0.0175,
+      "off_per_test": 0.0884,
+      "train_top3_share": 0.9033,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "gongdeok",
+      "nodes": 695,
+      "test": 138,
+      "off_prior": 12,
+      "off_per_node": 0.0173,
+      "off_per_test": 0.087,
+      "train_top3_share": 0.9269,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "seochon",
+      "nodes": 694,
+      "test": 130,
+      "off_prior": 12,
+      "off_per_node": 0.0173,
+      "off_per_test": 0.0923,
+      "train_top3_share": 0.914,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "itaewon",
+      "nodes": 581,
+      "test": 116,
+      "off_prior": 10,
+      "off_per_node": 0.0172,
+      "off_per_test": 0.0862,
+      "train_top3_share": 0.9286,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "noryangjin",
+      "nodes": 495,
+      "test": 97,
+      "off_prior": 8,
+      "off_per_node": 0.0162,
+      "off_per_test": 0.0825,
+      "train_top3_share": 0.9091,
+      "n_classes_present": 6
+    },
+    {
+      "district_id": "sharosugil",
+      "nodes": 764,
+      "test": 159,
+      "off_prior": 12,
+      "off_per_node": 0.0157,
+      "off_per_test": 0.0755,
+      "train_top3_share": 0.9149,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "kyunghee",
+      "nodes": 577,
+      "test": 107,
+      "off_prior": 9,
+      "off_per_node": 0.0156,
+      "off_per_test": 0.0841,
+      "train_top3_share": 0.9186,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "garosugil",
+      "nodes": 774,
+      "test": 180,
+      "off_prior": 12,
+      "off_per_node": 0.0155,
+      "off_per_test": 0.0667,
+      "train_top3_share": 0.9016,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "hannam",
+      "nodes": 322,
+      "test": 64,
+      "off_prior": 5,
+      "off_per_node": 0.0155,
+      "off_per_test": 0.0781,
+      "train_top3_share": 0.901,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "konkuk",
+      "nodes": 865,
+      "test": 168,
+      "off_prior": 13,
+      "off_per_node": 0.015,
+      "off_per_test": 0.0774,
+      "train_top3_share": 0.9084,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "yeonnam",
+      "nodes": 906,
+      "test": 193,
+      "off_prior": 12,
+      "off_per_node": 0.0132,
+      "off_per_test": 0.0622,
+      "train_top3_share": 0.9449,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "yeouido",
+      "nodes": 1278,
+      "test": 254,
+      "off_prior": 16,
+      "off_per_node": 0.0125,
+      "off_per_test": 0.063,
+      "train_top3_share": 0.9328,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "gunja",
+      "nodes": 504,
+      "test": 99,
+      "off_prior": 6,
+      "off_per_node": 0.0119,
+      "off_per_test": 0.0606,
+      "train_top3_share": 0.9012,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "apgujeong-rodeo",
+      "nodes": 839,
+      "test": 166,
+      "off_prior": 9,
+      "off_per_node": 0.0107,
+      "off_per_test": 0.0542,
+      "train_top3_share": 0.9376,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "ikseon",
+      "nodes": 662,
+      "test": 114,
+      "off_prior": 7,
+      "off_per_node": 0.0106,
+      "off_per_test": 0.0614,
+      "train_top3_share": 0.9321,
+      "n_classes_present": 6
+    },
+    {
+      "district_id": "jamsilsaenae",
+      "nodes": 754,
+      "test": 132,
+      "off_prior": 8,
+      "off_per_node": 0.0106,
+      "off_per_test": 0.0606,
+      "train_top3_share": 0.9127,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "banpo",
+      "nodes": 597,
+      "test": 109,
+      "off_prior": 5,
+      "off_per_node": 0.0084,
+      "off_per_test": 0.0459,
+      "train_top3_share": 0.9101,
+      "n_classes_present": 7
+    },
+    {
+      "district_id": "sadang",
+      "nodes": 471,
+      "test": 108,
+      "off_prior": 3,
+      "off_per_node": 0.0064,
+      "off_per_test": 0.0278,
+      "train_top3_share": 0.9538,
+      "n_classes_present": 5
+    },
+    {
+      "district_id": "nokdu",
+      "nodes": 193,
+      "test": 40,
+      "off_prior": 1,
+      "off_per_node": 0.0052,
+      "off_per_test": 0.025,
+      "train_top3_share": 0.9358,
+      "n_classes_present": 6
+    }
+  ]
+}
