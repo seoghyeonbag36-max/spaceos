@@ -15,6 +15,10 @@ import os
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, Header, HTTPException
+from sqlalchemy.orm import Session
+
+from app.core.db import get_db
+from app.services import usage as usage_service
 
 router = APIRouter()
 
@@ -59,3 +63,15 @@ def coverage() -> dict:
             "coverage_pct": round(shown / total * 100, 1) if total else None,
         },
     }
+
+
+@router.get("/usage", dependencies=[Depends(require_admin)])
+def usage(days: int = 30, db: Session = Depends(get_db)) -> dict:
+    """조직별 분석 API 사용량 — KPI② (B2B 파일럿) 를 재는 유일한 관측 지점.
+
+    `active_orgs` 가 목표 5~10건에 대응한다. 값이 0 인데 파일럿이 있다고 알고 있다면
+    둘 중 하나다: ① 파일럿이 자격증명 없이(익명으로) 쓰고 있다 ② 기록이 실패하고 있다
+    (`services/usage.record_access` 의 경고 로그를 볼 것). **둘 다 조용히 0 으로
+    보이므로** 이 엔드포인트가 그 구분을 드러내는 자리다.
+    """
+    return usage_service.usage_summary(db, days=days)

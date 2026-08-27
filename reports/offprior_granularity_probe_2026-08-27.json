@@ -1,0 +1,19 @@
+{
+  "group": {
+    "level": "group",
+    "n_classes": 7,
+    "n_test": 8080,
+    "n_off_prior": 877,
+    "off_prior_frac": 0.1085,
+    "se_at_p37": 1.63
+  },
+  "category2": {
+    "level": "category2",
+    "n_classes": 32,
+    "n_test": 8092,
+    "n_off_prior": 3785,
+    "off_prior_frac": 0.4677,
+    "se_at_p37": 0.78
+  },
+  "gain_x": 4.32
+}

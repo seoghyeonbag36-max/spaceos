@@ -47,8 +47,13 @@ python scripts/pppp_status.py
 
 1. **인프라 층** — DB·인증·과금·오케스트레이션은 게이트 22개에 **아예 없다**.
    → [decision-infra-layer-2026-08-25.md](decision-infra-layer-2026-08-25.md)
-2. **KPI② PMF** — B2B 파일럿 5~10건은 KPI 우선순위 2번인데 **이를 재는 게이트가 0개**다.
+2. **KPI② PMF** — B2B 파일럿 5~10건은 KPI 우선순위 2번인데 **이를 재는 게이트가 0개**였다.
    즉 PPPP 진행률은 KPI 절반(기술 완성도)만 말한다.
+   → **2026-08-27 착수**: `pppp_status.py` 가 이제 KPI② 블록을 따로 찍는다(트랙 평균에는
+   섞지 않는다 — 섞으면 사각지대가 묻힌다). 계측은 배선됐고 실제 파일럿 수는
+   `GET /api/v1/admin/usage` 의 `active_orgs` 로 본다.
+   ⚠ **"계측 배선 3/3" 은 "파일럿 3건"이 아니다** — 잴 준비가 됐다는 뜻이다.
+   → [decision-infra-layer-2026-08-25.md](decision-infra-layer-2026-08-25.md) §8
 
 **선언이 낡는 것이 이 저장소의 주된 실패 양식이다.** 2026-08-25 에 Platform 게이트가
 "막힘 5 의 선행은 SGIS 자료신청" 이라고 적고 있는 동안 그 자료는 **같은 날 이미 받아
