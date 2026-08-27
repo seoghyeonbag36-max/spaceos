@@ -22,9 +22,34 @@ GitHub `seoghyeonbag36-max/spaceos` ↔ Vercel 프로젝트 `spaceos` 가 연결
 - Root Directory: `.` (저장소 루트가 spaceos 자체이므로 기본값)
 - 배포 상태 확인: `vercel ls` / 실패 로그: `vercel inspect <배포URL> --logs`
 
-> **Python 버전 주의**: Vercel 서버리스 빌드는 Python 3.14 를 사용하며 `.python-version` 파일을
-> 무시한다. 루트 `requirements.txt` 는 cp314 휠이 있는 pydantic 2.12+/fastapi 0.119+ 하한을
-> 유지할 것 (구버전 고정 시 pydantic-core 소스 컴파일 → PyO3 미지원으로 빌드 실패).
+> **Python 버전 주의 — 두 버전이 쓰인다** (2026-08-27 배포 로그 실측으로 정정):
+>
+> | 단계 | 버전 | 무엇이 걸리나 |
+> |---|---|---|
+> | 의존성 해결 | **CPython 3.14.7** | 휠이 3.14 용으로 없으면 소스 빌드 → **빌드 실패** |
+> | 함수 런타임 | **3.12** | 코드가 실제로 도는 곳. 3.12 에서 동작해야 한다 |
+>
+> 종전 서술("서버리스 빌드는 3.14 를 쓰며 `.python-version` 을 무시한다")은 앞 칸만 보고
+> 뒤 칸을 런타임으로 오해한 것이다. 로그는 오히려 `.python-version`·`pyproject.toml`·
+> `Pipfile.lock` 을 **찾아본 뒤** 없어서 3.12 로 떨어진다고 말한다
+> (`No Python version specified in ... Using python version: 3.12`).
+>
+> 그래서 요구조건이 둘이다: **3.14 휠이 있을 것**(pydantic 2.12+/fastapi 0.119+ 하한 유지)
+> **그리고 3.12 에서 돌 것**.
+>
+> ### ⚠ 지뢰 — SQLAlchemy 2.0.35 는 3.14 에서 깨진다
+>
+> 런타임이 3.12 라 지금은 안 터진다. 하지만 **Vercel 이 런타임을 3.14 로 올리거나
+> 누가 `.python-version` 에 3.14 를 적는 순간 프로덕션이 다시 죽는다.**
+> `sqlalchemy/util/typing.py::make_union_type` 이 `cast(Any, Union).__getitem__(types)`
+> 를 부르는데 3.14 에서 `typing.Union` 이 바뀌어 `TypeError: descriptor '__getitem__'
+> requires a 'typing.Union' object but received a 'tuple'` 로 터진다. `models/auth.py` 의
+> `Mapped[datetime | None]` 같은 유니온 애노테이션을 매핑하는 자리다.
+>
+> 2026-08-27 에 CI `서버리스 임포트` 잡을 실수로 3.14 로 잡았다가 발견했다 — 잡은 3.12 로
+> 고쳤고, **이 지뢰는 그대로 남아 있다.** 해소하려면 SQLAlchemy 를 3.14 지원 버전으로
+> 올려야 한다(2.0.52 에는 cp314 휠이 있다). 올릴 때는 `apps/backend/requirements.txt` 와
+> **같이** 올릴 것 — 배포와 테스트가 다른 버전을 쓰면 그 차이가 다음 함정이 된다.
 
 ## 환경변수 (필수 1개 — 등록 완료)
 

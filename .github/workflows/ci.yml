@@ -66,9 +66,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ⚠ Vercel 은 파이썬을 **두 버전** 쓴다(2026-08-27 배포 로그 실측):
+      #     의존성 해결 단계 = CPython 3.14.7   → 휠이 3.14 용으로 있어야 설치가 된다
+      #     함수 런타임      = 3.12             → 코드가 실제로 도는 곳
+      #   여기서 재현할 것은 **런타임**이라 3.12 다. 처음에 3.14 로 잡았다가 잡이 터졌고,
+      #   그게 실제 지뢰를 하나 찾았다 → docs/deploy-vercel.md 의 "SQLAlchemy 와 3.14".
+      #   런타임 버전이 바뀌면 이 값도 같이 바꿀 것(안 그러면 재현이 아니라 연극이 된다).
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.14'      # Vercel 서버리스 빌드와 같은 버전(deploy-vercel.md)
+          python-version: '3.12'
           cache: pip
           cache-dependency-path: requirements.txt
 
