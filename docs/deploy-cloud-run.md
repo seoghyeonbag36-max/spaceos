@@ -73,6 +73,22 @@ $g = "$env:LOCALAPPDATA\Google\Cloud SDK\google-cloud-sdk\bin\gcloud.cmd"
 ⚠ Dockerfile 에 heredoc(`RUN python - <<'PY'`)을 쓰지 말 것 — Cloud Build 의 기본
 빌더(BuildKit 아님)가 파싱하지 못하고 `unknown instruction` 으로 죽는다.
 
+### 로컬에서 미리 확인하기 (2026-08-28 부터 가능)
+
+WSL2 설치 후 Docker Desktop 엔진이 뜬다. 배포 전에 같은 이미지를 손에서 확인할 수 있다:
+
+```bash
+docker build --build-arg VITE_NAVER_MAPS_KEY_ID=<키> -t spaceos-local:test .
+docker run -d --name spaceos-smoke -p 18080:8080 \
+  -e JWT_SECRET=local-smoke-secret-not-real -e DATABASE_URL="<Neon URL>" spaceos-local:test
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:18080/health
+docker rm -f spaceos-smoke
+```
+
+실측(2026-08-28): 이미지 **775MB** · gold 106MB(거점 56 디렉터리 · master 54개) ·
+프론트 dist 포함 · 네이버 키가 `MapShell-*.js` 번들에 인라인됨. 로컬 컨테이너가
+프로덕션과 동일하게 상권 54곳 전부 `gold` 로 응답한다.
+
 ## 모니터링
 
 Cloud Monitoring 업타임 체크 **2개**가 5분마다 돈다. 실패하면
@@ -100,7 +116,40 @@ Cloud Run Always Free: 월 200만 요청 · 180,000 vCPU초 · 360,000 GiB초 ·
 ⚠ 무료 체험(90일/$300) 종료 시 결제계정이 **자동으로 닫힌다.** 그때 수동으로 유료 계정
 전환을 해야 Always Free 가 이어진다. 전환해도 한도 안에서는 $0 다.
 
-## 아직 안 붙은 것
+## 계정 DB — Neon Postgres (2026-08-28 연결)
 
-- **계정 DB(Neon)** — `DATABASE_URL` 미설정. 분석 API 는 DB 없이 돌지만 가입·API키는 못 쓴다.
-  자격증명이 붙은 요청은 500 이 난다(조용히 통과하지 않는다).
+`DATABASE_URL` 이 Cloud Run 환경변수로 붙어 있다. **Neon 서버리스 Postgres 18.6**,
+`-pooler` 엔드포인트(서버리스는 커넥션이 금방 바닥나므로 풀링 쪽을 쓴다).
+
+마이그레이션은 로컬에서 원격 Neon 을 향해 돌린다:
+
+```bash
+cd apps/backend
+DATABASE_URL="<Neon 접속 문자열>" python -m alembic upgrade head
+DATABASE_URL="<...>" python -m alembic check     # 드리프트 0 확인
+```
+
+⚠ **`--set-env-vars`·`--update-env-vars` 에 이 URL 을 넣을 때는 `gcloud.cmd` 를 쓰지 말 것.**
+URL 의 `&`(`...sslmode=require&channel_binding=require`)를 cmd 래퍼가 명령 구분자로
+해석해 **값이 조용히 잘린다**(150자 → 126자, 2026-08-28 실측). 접속은 되므로 눈치채기
+어렵다. `bin\gcloud.ps1`(PowerShell 래퍼)로 넣으면 온전히 들어간다.
+
+검증(2026-08-28, 프로덕션 URL 로 실제 호출):
+
+| 단계 | 결과 |
+|---|---|
+| `POST /auth/signup` | 201 · 조직·사용자·멤버십 생성 |
+| `GET /auth/me` | 200 · role=admin |
+| `POST /auth/api-keys` | 201 · `sk_spaceos_…` 발급 |
+| 익명 분석 호출 | 200 (공개 데모 유지) |
+| API 키 분석 호출 | 200 · 사용량 기록됨 |
+| **잘못된 키** | **401** — DB 가 없던 때는 500 이었다. 이제 설계대로 거절한다 |
+| `GET /admin/usage` | `active_orgs: 1` 로 움직임 확인 |
+
+⚠ 검증에 쓴 연기시험 조직은 **지웠다.** 안 지우면 `active_orgs` 가 가짜 파일럿 1건으로
+시작해 KPI② 가 거짓이 된다. 지금 계정층 5개 표는 전부 0행이고, **`active_orgs: 0` 이
+정직한 현재 값**이다.
+
+⚠ 한글이 든 JSON 을 curl 로 보낼 때 Windows 셸이 cp949 로 인코딩하면 서버가
+`There was an error parsing the body`(400)로 거절한다. UTF-8 파일로 만들어
+`--data-binary @파일` 로 보낼 것.
