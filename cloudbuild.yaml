@@ -1,0 +1,38 @@
+# Cloud Build — SpaceOS 컨테이너 빌드 (Cloud Run 배포용)
+#
+# `gcloud run deploy --source` 를 쓰지 않는 이유: 네이버 지도 키가 **빌드 타임** 변수라
+# `--build-arg` 로 넣어야 하는데 `--source` 배포는 그걸 못 넘긴다. 그래서 빌드와 배포를
+# 나눈다 — 여기서 이미지를 만들고, `gcloud run deploy --image` 로 올린다.
+#
+# 실행:
+#   gcloud builds submit --config cloudbuild.yaml \
+#     --substitutions=_NAVER_KEY=<키>,_IMAGE=<이미지경로>
+#
+# ⚠ _NAVER_KEY 는 브라우저 번들에 인라인되는 **공개 클라이언트 키**다(비밀이 아니다).
+#   진짜 비밀값(JWT_SECRET·DATABASE_URL 등)은 여기 두지 말고 Cloud Run 런타임
+#   환경변수로 넣을 것 — 그쪽은 번들에 안 들어간다.
+
+substitutions:
+  _NAVER_KEY: ''
+  _IMAGE: 'us-central1-docker.pkg.dev/spaceos-digital-twin/spaceos/web:latest'
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build'
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'VITE_NAVER_MAPS_KEY_ID=${_NAVER_KEY}'
+      - '-t'
+      - '${_IMAGE}'
+      - '.'
+
+images:
+  - '${_IMAGE}'
+
+# 프론트 npm ci + 파이썬 의존성 + gold 106MB 복사가 들어가 기본 10분으로는 빠듯하다.
+timeout: '1800s'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
