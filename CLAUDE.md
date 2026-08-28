@@ -114,8 +114,12 @@ cd apps/frontend && npm run build         # 타입체크 + 빌드
 # 전체 로컬 스택 (DB + Redis + Backend)
 docker compose -f infra/docker/docker-compose.yml up
 
-# Vercel 배포 (프론트 정적 + FastAPI 서버리스 단일 프로젝트) — docs/deploy-vercel.md 참조
-cd spaceos && vercel --prod
+# 배포 — main 에 푸시하면 GitHub Actions 가 Cloud Run 으로 낸다(테스트→빌드→배포→검증).
+# 수동 배포·좌표·무료 한도의 경계는 docs/deploy-cloud-run.md 참조.
+#   프로덕션: https://spaceos-798830962560.us-central1.run.app
+# ⚠ Vercel 은 2026-08-28 프로덕션에서 내려왔다(무료 플랜이 상업적 사용 금지).
+#   `vercel --prod` 를 쓰지 말 것 — docs/deploy-vercel.md 는 이력으로만 남겼다.
+git push origin main
 
 # ML 골격 확인
 cd ml && python models/lstm/vacancy_lstm.py

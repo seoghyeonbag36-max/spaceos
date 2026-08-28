@@ -1,4 +1,14 @@
-# Vercel 배포 가이드
+# Vercel 배포 가이드 — ⛔ 2026-08-28 프로덕션에서 내려왔다
+
+> **프로덕션은 이제 Cloud Run 이다 → [deploy-cloud-run.md](deploy-cloud-run.md)**
+>
+> 이 문서는 **이력**으로 남긴다. 여기 적힌 함정들(파이썬 두 버전 · cp314 휠 · 이중
+> requirements · SQLAlchemy 3.14 지뢰)은 Vercel 서버리스 구조에서만 생기는 것이라
+> Cloud Run 에서는 해당 없다. 다만 **왜 옮겼는지**의 근거라서 지우지 않는다.
+>
+> 옮긴 이유는 성능이 아니라 **약관**이다: Vercel 무료(Hobby)는 상업적 사용을 금지하는데
+> SpaceOS 는 B2B 파일럿·DaaS 구독·M&A Exit 을 지향한다. 자세한 비교는
+> `decision-infra-layer-2026-08-25.md`.
 
 프론트(Vite 정적 빌드) + 백엔드(FastAPI, Python 서버리스 함수)를 **Vercel 프로젝트 하나**로 배포한다.
 로컬의 `localhost:5173`(프론트) + `localhost:8000`(백엔드) 구성이 배포에서는
