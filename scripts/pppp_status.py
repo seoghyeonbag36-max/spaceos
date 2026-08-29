@@ -6,7 +6,7 @@
 
 진행률을 문서에 손으로 적으면 **쿼터를 소진한 날마다 낡는다.** 실제로
 `docs/spaceos-vibe-build-sequence.md` 는 두 번 낡았다 — 08-02 에 멈춰 Tier1 을 13거점으로,
-08-09 에 멈춰 22거점으로 적고 있었다(실제 49). 숫자 하나가 아니라 **그 숫자에 기대는
+08-09 에 멈춰 22거점으로 적고 있었다(현재 54). 숫자 하나가 아니라 **그 숫자에 기대는
 진술이 같이** 낡는다는 게 문제라, 세는 일을 코드로 내렸다.
 
 ## 진행률을 정직하게 만드는 법
@@ -102,7 +102,7 @@ def _count_measured_foot_hubs() -> int | None:
 
     ⚠ 2026-08-25 **실 인벤토리 기준으로 갈아탔다.** 종전에는 `seoul_pages` 의 시드
     270유닛을 세고 있었는데, 08-24 배선 이후 제품이 실제로 쓰는 것은
-    `resolved_units`(실측 528유닛)다 — 게이트가 제품과 다른 모집단을 세고 있었다.
+    `resolved_units`(대장 기반 528 거점-feature 후보행)다 — 게이트가 제품과 다른 모집단을 세고 있었다.
 
     ⚠ 소스도 둘이 됐다: **집계구**(기본 · 거점당 중앙 6구역) → 없으면 **상권**(폴백 ·
     중앙 3구역). 둘 다 실측이므로 어느 쪽으로든 갈리면 센다.
@@ -400,11 +400,9 @@ def posting_track(total: int) -> Track:
         auto=False, evidence="apps/backend/app/services/districts.tier_scenarios",
     ))
 
-    # 4입력(rent·foot·area·prem) 중 실데이터가 몇 개인가 — 거점별로 세어 평균낸다.
-    # foot 은 2026-08-24 에 거점 내 서열까지 실측이 됐다(최근접 상권 유동총량).
-    # 51/54거점·255/270유닛이 `flpop+trdar` 이고, 남은 3거점은 상권이 1곳이라
-    # **원리적으로** 못 가른다 — 시드가 남아서가 아니라 데이터에 구조가 없어서다.
-    # 그래서 0.5 가 아니라 실측 거점 비율로 센다.
+    # 수집 가능한 3입력(rent·foot·area) 중 실데이터가 몇 개인가 — 거점별로 평균낸다.
+    # foot 은 2026-08-25 에 집계구 생활인구로 승격했다. 528/528 유닛을 배정했고
+    # 525유닛이 `flpop+jipgyegu` 다. 유닛 하나뿐인 3거점도 입력은 실측이므로 1.0으로 센다.
     rent = sum(1 for v in hubs.values() if v.get("rent_per_m2_krw_thousand"))
     foot = sum(1 for v in hubs.values() if v.get("flpop"))
     # area 는 오랫동안 "0/54" 로 **하드코딩**돼 있었다(08-23 발견). 실제로는
@@ -493,7 +491,14 @@ def posting_track(total: int) -> Track:
         f"이 레버는 파지 않는다 — `_COUNTED_METHODS={{'floor_ouln'}}` 가 expos_units 를 애초에 "
         f"배제하도록 설계돼 있어 고쳐도 이 게이트에 영향이 없다. → **층(§0-M·§0-Q)·집합건물"
         f"(§0-R) 두 레버가 모두 소진됐다 — 균등분할(0.5 가중)을 실질적 상한으로 본다.** "
-        f"실측표: reports/expos_pip_recovery_probe_2026-08-26.json",
+        f"실측표: reports/expos_pip_recovery_probe_2026-08-26.json. "
+        f"⚠ **2026-08-29 공식 공개 소스를 다시 탐색했지만 적격 후보는 0건**이다. "
+        f"건축HUB 전유공용면적·서울교통공사 지하도상가·LH 공급정보·온비드는 각각 "
+        f"호실 면적을 일부 제공해도 현재 임대가능 상태, 동일 민간 일반건축물 모집단, "
+        f"안정 조인키를 함께 충족하지 못한다. 일부 공공 재고를 기존 528 거점-feature 후보행의 "
+        f"실측처럼 승격하지 않고 **0.5 가중을 유지**한다 → docs/finding-posting-unit-area-sources-2026-08-29.md",
+        evidence=("data/validation/posting_unit_area_sources.py · data/tests/"
+                  "test_posting_unit_area_sources.py (3건) · docs/feature-posting.md §0-S"),
     ))
 
     # 권리금은 '못 얻는 데이터'가 아니라 '기업이 주는 값'이다. 수집 게이트로 세면
@@ -709,10 +714,12 @@ def _context_kinds() -> dict[str, int]:
 
 
 def program_track(total: int) -> Track:
-    """대상 재정의(2026-08-16) 기준.
+    """대상 재정의(2026-08-16)와 상용 입력 계약(2026-08-29) 기준.
 
     Program 의 대상은 **공실에 창업할 기업**이다. 게이트도 그 기준으로 센다 —
     옛 정의(영업 중 점주 / 324개 구역 감성)로 재면 이미 끝난 것처럼 보인다.
+    이미 영업 중인 기업이 직접 제공한 자료를 쓰는 상용 온보딩은 별도 인증·동의
+    계약으로 받으며, 공개 블로그 스니펫을 그 계약에 섞지 않는다.
     """
     t = Track("Program", "Phase 6-2 (공실 창업 기업 대상)")
     kinds = _context_kinds()
@@ -721,6 +728,36 @@ def program_track(total: int) -> Track:
         "생성 엔진 · 화면 · HA 검증", 1.0,
         "POST /marketing/generate + ProgramStudio + ha_guard 후처리 — 기반은 서 있다",
         auto=False, evidence="services/marketing.py · services/ha_guard.py · pages/ProgramStudio.tsx",
+    ))
+
+    schema_src = (ROOT / "apps/backend/app/schemas/marketing.py").read_text(encoding="utf-8")
+    router_src = (ROOT / "apps/backend/app/api/v1/marketing.py").read_text(encoding="utf-8")
+    onboarding_src = (ROOT / "apps/backend/app/services/program_onboarding.py").read_text(
+        encoding="utf-8"
+    ) if (ROOT / "apps/backend/app/services/program_onboarding.py").exists() else ""
+    studio_src = (ROOT / "apps/frontend/src/pages/ProgramStudio.tsx").read_text(encoding="utf-8")
+    commercial_ok = (
+        "ProgramCommercialOnboardingRequest" in schema_src
+        and 'Literal["merchant-provided"]' in schema_src
+        and 'Literal["request-only"]' in schema_src
+        and '"/onboarding/generate"' in router_src
+        and "get_current_principal" in router_src
+        and '"raw_input_persisted": False' in onboarding_src
+        and '"counts": counts' in onboarding_src
+        and "publicReviews" in studio_src
+        and "generateCommercialStoreMarketing" in studio_src
+    )
+    t.gates.append(Gate(
+        "상용 입력 온보딩 계약", 1.0 if commercial_ok else 0.0,
+        "2026-08-29 배선 완료 — 조직 JWT/API key 인증, `merchant-provided` 출처, "
+        "처리·권리·외부 모델 처리·request-only 보관 동의를 요청 스키마가 강제한다. "
+        "원문은 DB에 저장하지 않고 조직·계약 버전·항목 수·거점 감사 메타데이터만 남긴다. "
+        "ProgramStudio 는 공개 블로그 스니펫과 기업 제공 입력을 분리하고 API key 를 "
+        "브라우저 저장소에 보관하지 않으며 온보딩 영수증을 표시한다"
+        if commercial_ok else
+        "미배선 — 인증·명시 동의·원문 비저장·공개 스니펫 분리 중 하나 이상이 없다",
+        evidence=("apps/backend/tests/test_program_commercial_onboarding.py (6건) · "
+                  "apps/frontend npm run build · docs/feature-program.md §0-G"),
     ))
 
     ctx = kinds.get("blog_keyword", 0)

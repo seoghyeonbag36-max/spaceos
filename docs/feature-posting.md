@@ -3,11 +3,17 @@
 > PPPP: **Promotion → Posting**. 공실에 입점하려는 창업자에게 입점 의사결정 정보를 구조화해 제공한다.
 > **2026-07-18 개정**: 자체 비용-효용 계산 대신 **외부에서 만든 AI 창업 코파일럿 프로그램을 연동해 적용**하는 것을 1순위로 한다. 내부 3-Tier(고급화/가성비/기능중심) 계산은 폴백·검증용으로 유지.
 
-## 0. 구현 현황 (2026-08-22)
+## 0. 구현 현황 (2026-08-29)
 
-**어댑터는 여전히 미연동이고, 실제로 도는 것은 항상 3-Tier 폴백이다.**
-`_call_copilot()` 이 늘 `None` 을 반환한다 — 외부 코파일럿의 입출력 명세가 없어서이지
-코드가 없어서가 아니다. 그래서 그간의 작업은 **폴백의 입력과 기준**을 올리는 쪽이었다.
+**Posting 진행률은 97.6%다.** 남은 2.4%는 구현 누락이 아니라 `area` 해상도 게이트가
+**0.5**에 머문 결과다. 2026-08-29 공식 공개 소스를 다시 탐색했지만 현재 54거점의
+528 거점-feature 후보행(450 거점/PNU 쌍·407 고유 PNU)을 실제 호실 인벤토리로
+붙일 소스는 없었다. 값을 만들지 않고 현행 균등분할을 유지한 것이 현재의 fail-closed
+상한이다(§0-S).
+
+외부 코파일럿은 `spaceos.posting/1` 계약과 호출·정규화 어댑터까지 구현됐다. 다만 실제
+공급자의 URL·키는 아직 운영 입력으로 들어오지 않았으므로, 미설정 환경에서는 정상적으로
+3-Tier 폴백이 돈다. **공급자 설정은 `area` 실측 해상도 과제와 별개다.**
 
 | 항목 | 상태 | 비고 |
 |---|---|---|
@@ -15,11 +21,12 @@
 | `rec` 추천 기준 | ✅ 정의 완료(08-16) | **회수 최단**. `districts.recommend_tier()` 가 계산 |
 | 반올림 결함 | ✅ **교정(08-22)** | 반올림 후 비교라 270건 중 **14건(5.2%)이 premium 으로 잘못 넘어가** 있었다 → 원값 비교 |
 | `viable` · `basis` · `unviable_note` | ✅ **신설(08-22)** | "회수 불가"를 명시. `roi_basis` 는 **구현된 적 없는 유령 필드**였다(§0-C) |
-| 실제 공실 유닛 인벤토리 | ✅ **54/54거점 580유닛**(08-22 재실행 완주) | 추적 예외 `!data/gold/*/vacant_units.json` 완료 — 배선 가능 |
-| 3-Tier 입력 4종 | ◐ 2.5/4 | `rent` ✅ R-ONE · `foot` ✅ flpop+**최근접 상권 실측서열**(08-24, 51/54거점·255/270유닛) · `area` ◐ 대장÷capacity · `prem` ⬜ |
-| 외부 코파일럿 어댑터 | ⬜ | **외부 명세 확보**가 선행 |
-| 매출계수 근거 | ◐ **실측 확보(08-22)** | `gold/platform_posting_revenue.json` — §0-B |
-| 3-Tier **비용 모델** | ◐ **재보정, 조건 넷 중 셋 통과** | A 는 공정위 실측(20.8/18.5/17.1평), 매출 절대수준은 KOSIS 앵커(§0-I). 회수불가 10.0% ✅ · factory 165승 ✅ · 평당매출 195/144/201 ✅ · 마진 대역 밖 ❌(프라임 임대료로 산술 분해) |
+| 공실 건물 후보 인벤토리 | ✅ **54/54거점 528 거점-feature 후보행** | 450 거점/PNU 쌍·407 고유 PNU, `services/vacant_inventory` 로 런타임 배선 완료 |
+| 3-Tier 입력 4종 | ◐ **`area`만 0.5** | `rent` ✅ R-ONE · `foot` ✅ 528/528 배정(525유닛 `flpop+jipgyegu`) · `area` ◐ 대장 상업면적÷`capacity` 균등분할 · `prem` ✅ 기업 입력 계약/미입력 0 전제 |
+| 외부 코파일럿 어댑터 | ✅ **계약·구현 완료(08-23)** | `spaceos.posting/1`; 실제 공급자 URL·키는 별도 운영 입력, 미설정 시 `fallback-3tier` |
+| 매출계수 근거 | ✅ **실측 배선** | `gold/platform_posting_revenue.json` + KOSIS·R-ONE 앵커(§0-B~§0-O) |
+| 3-Tier **비용 모델** | ✅ **게이트 넷 유지** | 회수불가 0.6% · factory 433승/528 · 평당매출 205/154/234 · 마진 중앙 5.7/4.8/7.8%(§0-O·§0-P) |
+| 호실 면적 공식 소스 | ⛔ **적격 소스 없음(08-29)** | 후보 4종 모두 동일 모집단·현재 공실·안정 조인키 계약을 못 채움. 새 값·새 출처 표기 없이 `inputs_source["area"]="gold-ledger"` 유지(§0-S) |
 
 ### 0-A. 증상 — 08-22 전수 재측정 (문서의 이전 수치는 낡았었다)
 
@@ -1072,12 +1079,13 @@ SGIS 과거집계구 2016 4Q 경계가 도착하면서 막힘 5 가 풀렸다. �
 게이트 넷 유지·개선: 회수불가 0.8 → **0.6%** · factory 432 → **433승/528** ·
 마진 5.8/4.8/7.8 → **5.7/4.8/7.8**(KOSIS 대역 3.5~10.5 안).
 
-#### 곁가지 — 528유닛은 실제로 481개 건물이다
+#### 곁가지 — 528은 실제 호실 수도, 고유 건물 수도 아니다
 
-PIP 배정표를 유닛 id 로 키를 잡았더니 528이 481로 줄었다. **거점 반경이 겹쳐 같은
-건물이 두 거점에 잡히는 것이 47건**이다(apgujeong-rodeo↔dosan · chungmuro↔euljiro 등).
-유닛 id 는 건물 단위라 거점 간 유일하지 않다 — 배정표 키는 `"{거점}|{유닛id}"` 다.
-거점별로 `foot` 이 따로 필요하므로 쌍을 유지하는 것이 맞다.
+PIP 배정표를 bare feature id 로 키를 잡았더니 528이 481로 줄었다. 이 481도 건물 수가
+아니라 feature id 수다. **거점 반경이 겹쳐 같은 feature가 두 거점에 잡히는 재등장 47건**이
+있고(apgujeong-rodeo↔dosan · chungmuro↔euljiro 등), 동일 거점/PNU 안에서도 폴리곤 feature가
+중복된다. 정확한 식별 입도는 528 거점-feature 후보행 · 450 거점/PNU 쌍 · 407 고유 PNU다.
+거점별 `foot` 때문에 `"{거점}|{feature_id}"` 쌍은 유지하지만, 이를 실제 호실 ID로 해석하지 않는다.
 
 ### 0-Q. 층별 유닛 분할을 재 봤다 — 균등분할 유지, 층 축이 두 번째로 같은 벽에 부딪혔다 (2026-08-26)
 
@@ -1145,6 +1153,52 @@ active 56,348 = **96,223유닛**)를 이 0.29% 짜리 풀로 설명할 수 없�
 → **Posting `area` 게이트(0.5 가중)의 레버는 층(§0-M·§0-Q)·집합건물(§0-R) 둘 다
 소진됐다.** 균등분할을 현재의 실질적 상한으로 본다.
 
+### 0-S. 호실 면적 공식 소스 탐색 — 공개 범위에서 닫힘 (2026-08-29)
+
+층·집합건물 레버를 소진한 뒤, 현행 528 거점-유닛의 `area` 를 호실 실면적으로
+승격할 새 공식 소스를 다시 탐색했다. 공식 데이터라는 사실만으로는 충분하지 않다.
+다음 네 조건을 **같은 후보가 모두** 만족할 때만 런타임에 배선한다.
+
+1. 호실 단위 면적이 있다.
+2. 현재 공실·임대가능 상태를 식별한다.
+3. 54거점의 528 거점-feature 후보행(450 거점/PNU 쌍·407 고유 PNU)과 같은 민간
+   일반건축물 모집단을 덮는다.
+4. 기존 유닛에 붙일 안정적인 키(PNU+호 또는 동등한 키)가 있다.
+
+국토교통부 건축HUB 전유부, 서울교통공사 지하상가 임대정보, LH 상가 공급정보,
+온비드 공공자산 임대정보를 대조했지만 적격 후보는 **0개**였다. 건축HUB 전유부는
+호실 면적은 있어도 집합건물 모집단이며 현재 공실 상태가 없고, 나머지 세 후보는
+지하철·LH·공공자산이라는 별도 재고라 기존 민간 유닛에 붙일 수 없다. 상세 근거와
+원문 URL은 `docs/finding-posting-unit-area-sources-2026-08-29.md` 에 고정했다.
+
+따라서 `area` 점수 **0.5**와 Posting **97.6%**를 그대로 둔다. 이는 실패한 구현을
+숨긴 수치가 아니라, 없는 관측값을 만들어 1.0으로 올리지 않는 fail-closed 판정이다.
+런타임 산출물과 `inputs_source["area"]="gold-ledger"`의 의미도 바꾸지 않았다.
+
+**대상 파일**
+
+- `data/validation/posting_unit_area_sources.py` — 공식 후보와 네 조건의 적격성 계약
+- `data/tests/test_posting_unit_area_sources.py` — 부분 후보의 런타임 승격 방지
+- `docs/finding-posting-unit-area-sources-2026-08-29.md` — 원문 근거와 기각 사유
+- `docs/feature-posting.md` — 현재 진행 상태와 재개 조건
+
+**통과 테스트**
+
+- `test_no_public_source_is_eligible_for_existing_private_units`
+- `test_area_source_candidates_have_primary_evidence_and_rejection_reason`
+- `test_partial_public_stock_cannot_promote_the_existing_area_contract`
+
+**금지 사항**
+
+- 일부 공공자산 표본을 기존 528 거점-유닛의 실측처럼 붙이지 않는다.
+- 면적·공실 상태·모집단·조인키 중 하나라도 없으면 값을 만들지 않는다.
+- `inputs_source` 의미와 집합건물 배제 규칙을 바꾸지 않는다.
+
+다시 열 수 있는 조건은 공식 소스 또는 B2B 임대인 입력이 **같은 행에서** PNU,
+호실/층, 전용면적, 현재 임대가능 상태, 관측시점을 제공하는 경우뿐이다. B2B 계약을
+새 출처 값으로 만들려면 `inputs_source` 의미 변경이므로 먼저 별도 설계 판단을 받는다.
+외부 코파일럿의 `POSTING_COPILOT_URL`·키 설정은 이 면적 계약과 무관한 운영 작업이다.
+
 ## 0-1. 연동 타당성 검증 (2026-07-18)
 
 | 항목 | 판단 | 근거 |
@@ -1157,14 +1211,17 @@ active 56,348 = **96,223유닛**)를 이 0.29% 짜리 풀로 설명할 수 없�
 ## 1. 담당 코드 영역
 
 ```
-apps/backend/app/services/posting.py      외부 코파일럿 어댑터 + 3-Tier 폴백 (현존)
+apps/backend/app/services/posting.py      외부 코파일럿 어댑터 + 3-Tier 폴백
+apps/backend/app/services/posting_copilot.py  spaceos.posting/1 호출·정규화 계약
 apps/backend/app/services/districts.py    tier_scenarios() · recommend_tier() ← 비용 모델·추천 기준
 apps/backend/app/services/posting_inputs.py  rent/foot/area/prem 실데이터 서빙
 apps/backend/app/schemas/posting.py       시뮬레이션 요청/결과 스키마 (현존)
 apps/backend/app/api/v1/ai.py             POST /simulate-revenue (현존)
 apps/backend/app/core/config.py           posting_copilot_url / posting_copilot_key
 data/pipelines/build_posting_inputs.py    → gold/platform_posting_inputs.json
-data/pipelines/build_vacant_units.py      → gold/{거점}/vacant_units.json (49거점)
+data/pipelines/build_vacant_units.py      → gold/{거점}/vacant_units.json (54거점·528 거점-feature 후보행)
+data/validation/posting_unit_area_sources.py  호실 면적 공식 소스 적격성 계약
+data/tests/test_posting_unit_area_sources.py  부분 재고의 실측 승격 방지 테스트
 ml/inference/predictor.py                 매출 예측(LSTM) — 폴백·크로스체크 재사용
 ```
 
@@ -1178,41 +1235,46 @@ echo "POSTING_COPILOT_KEY=..." >> .env
 uvicorn app.main:app --reload
 ```
 
-## 3. 작업 순서
+## 3. 현재 작업 상태와 재개 순서
 
-> **현재 위치: 0번이 다음이다.** 1번은 외부 명세가 없어 막혀 있고, 그 사이 폴백의
-> 입력(`rent`)과 기준(`rec`)을 올렸다. 이제 그 둘이 올라탄 **계산식**이 남았다.
+2026-08-29 기준 비용 모델과 외부 코파일럿 계약은 구현됐다. 공개 공식 소스 탐색도
+끝났으며, `area` 를 1.0으로 올릴 적격 소스가 없다는 것이 결과다. 따라서 종전의
+“0번 비용 모델 보정이 다음”이라는 순서는 종료됐다.
 
-0. **3-Tier 비용 모델 보정 (최우선)** — `month_cost` 에 원가·인건비를 넣는다.
-   통과 조건 **셋**(§0-D): 마진 10~20% · `factory` 일부 조합 1위 · **회수불가 ≤20%**.
-   **2026-08-23: 자료 구멍이 둘 다 닫혔다(§0-F).** 원가율은 KOSIS 서비스업조사
-   `DT_3KB9001` 의 영업비용률(서울 2024, 업종별 89.5~96.5%)로 대체하고, 필요인원은
-   인건비를 매출 대비 비율로 직접 얻으므로 **질문 자체가 없어졌다.**
-   이제 막는 것은 자료가 아니라 **구현**이다. 남은 작업:
-   - `tier_scenarios` 의 `month_cost` 를 매출비례 영업비용률로 재정의 → `COST_BASIS` 갱신
-   - 매출계수 41/30/18 을 §0-B 실측(premium ×0.632 · value ×1.103 · factory ×1.192)으로 이동
-   - 32조합 감도표(`scripts/posting_cost_sensitivity.py`) 재실행으로 통과 조건 셋 확인
-   §0-D-1 대로 **비용만 고쳐서는 통과가 불가능**하다 — 둘을 같이 옮겨야 한다. §0-F 의
-   실측이 이를 다시 뒷받침한다(업종 간 비용률 차이가 7%p 뿐이라 tier 를 가르는 것은
-   비용이 아니라 매출이다).
-1. **어댑터 계약 확정** — 외부 코파일럿의 입출력 명세 확보 → `services/posting.py`의 `_call_copilot()` TODO 해소. 그 전까지는 요청/응답을 `PostingRequest`/`PostingResult`로 고정해 둔다.
-2. **폴백 유지** — `POSTING_COPILOT_URL` 미설정 또는 호출 실패 시 3-Tier 계산으로 동일 스키마 반환 (`source: "fallback-3tier"` 표기).
-3. **정규화 검증** — 코파일럿 응답 필드 ↔ `PostingResult` 매핑 테이블 작성, 단위(만원/월) 불일치 방지.
-4. **추천 연계** — GNN 업종 추천(Platform) 결과를 코파일럿 입력(업종 후보)으로 전달해 "이 공실 + 추천 업종 + 전략별 ROI"를 묶어 제공.
-5. **근거 데이터 보강(선택)** — 공정위 가맹정보(창업비용, `api-keys-and-specs.md` §8-C)로 폴백 가정을 실데이터로 치환.
+1. **현 상태 고정** — `area` 0.5, Posting 97.6%, 대장 상업면적÷`capacity` 균등분할,
+   `inputs_source["area"]="gold-ledger"`를 유지한다. 값이 없으면 채우지 않고 실패한다.
+2. **재개 입력 확인** — 공식 소스 또는 B2B 임대인 자료가 PNU·호실/층·전용면적·현재
+   임대가능 상태·관측시점을 같은 행에서 주는지 확인한다. 하나라도 없으면 중단한다.
+3. **출처 계약 선행** — 새 B2B 출처 값을 도입해야 한다면 코드보다 먼저
+   `inputs_source` 의미 변경에 대한 설계 판단을 받는다. 일부 공공재고를 민간재고의
+   대리값으로 쓰지 않는다.
+4. **검증 후 배선** — 네 적격 조건, 모집단 커버리지, 조인 유일성을 테스트로 고정한
+   뒤에만 Bronze→Silver→Gold 및 런타임 배선을 진행한다.
+5. **외부 공급자 설정은 별도** — `spaceos.posting/1` 어댑터는 완료됐다. 실제 공급자가
+   정해지면 `POSTING_COPILOT_URL`·키를 운영 환경에 넣고 계약 테스트를 실행한다. 이는
+   호실 면적과 무관하며 `area` 점수를 올리지 않는다.
 
-## 4. Claude Code 작업 예시
+## 4. 작업 요청 예시
 
 ```
-/clear
-/posting 외부 코파일럿 응답 명세가 확정됨.
-  services/posting.py 의 _call_copilot() 을 실제 API 호출로 교체하고
-  응답을 PostingResult 로 정규화. 실패 시 3-Tier 폴백 유지.
-  tests/test_posting.py 에 mock 응답 정규화 테스트 추가.
+/posting 임대인이 제공한 호실 자료가 확보됨.
+  대상: data 수집·정제 파일, posting_inputs 배선, 관련 테스트와 문서
+  입력: PNU·호실/층·전용면적·현재 임대가능 상태·관측시점
+  출처: merchant/landlord 제공 계약 — 새 inputs_source 값은 설계 승인 후 사용
+  통과: 네 적격 조건 + 조인 유일성 + 기존 528 거점-feature 후보 모집단 커버리지 테스트
+  금지: 결측 면적 추정, 별도 공공재고 대입, 기존 inputs_source 의미 변경
 ```
+
+외부 코파일럿 공급자 연결 요청은 위 면적 작업과 분리해 `spaceos.posting/1`의 URL·인증,
+타임아웃, 정규화 및 폴백만 대상으로 작성한다.
 
 ## 5. 검증
 
-- `cd apps/backend && pytest` — 폴백 계산·스키마 정규화 단위 테스트
-- 코파일럿 미설정 상태에서 `/api/v1/ai/simulate-revenue`가 3-Tier 결과를 반환하는지 확인
-- 외부 응답 매핑에 단위·통화 가정이 주석으로 명시됐는지 확인 (`TODO: 실제 연동` 규칙 준수)
+- `python -m pytest data/tests/test_posting_unit_area_sources.py -q`
+  - `test_no_public_source_is_eligible_for_existing_private_units`
+  - `test_area_source_candidates_have_primary_evidence_and_rejection_reason`
+  - `test_partial_public_stock_cannot_promote_the_existing_area_contract`
+- `cd apps/backend && pytest tests/test_posting_copilot.py` — `spaceos.posting/1` 정규화·실패 폴백 회귀
+- 코파일럿 미설정 상태에서 `/api/v1/ai/simulate-revenue`가 `source: "fallback-3tier"`로
+  응답하는지 확인한다. 공급자 미설정은 `area` 데이터 결손과 합쳐 표시하지 않는다.
+- 새 면적 소스는 네 조건 중 하나라도 없으면 런타임 산출물을 만들지 않아야 한다.
