@@ -1,0 +1,27 @@
+{
+  "_주석": [
+    "Firebase Hosting 을 Cloud Run 앞에 세워 읽기 좋은 주소를 얻는다.",
+    "spaceos-798830962560.us-central1.run.app → spaceos-digital-twin.web.app",
+    "",
+    "왜 전부(**) 를 Cloud Run 으로 넘기고, 프론트를 Hosting 에 따로 올리지 않는가:",
+    "  프론트를 Hosting 에 배포하면 CDN 이라 빠르고 Cloud Run egress(월 1GiB)도 아낀다.",
+    "  대신 프론트가 **두 곳**(Hosting 과 컨테이너)에 살게 되어 버전이 어긋날 수 있다 —",
+    "  한쪽만 배포되면 낡은 화면이 새 API 를 부른다. 이 저장소가 반복해 당한 양식이라",
+    "  단일 출처(컨테이너)를 지킨다. egress 가 실제로 문제가 되면 그때 나눈다.",
+    "",
+    "public 디렉터리는 비어 있다(파일을 올리지 않는다). 모든 요청이 리라이트로 나간다."
+  ],
+  "hosting": {
+    "public": "firebase-public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "spaceos",
+          "region": "us-central1"
+        }
+      }
+    ]
+  }
+}
