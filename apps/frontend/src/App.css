@@ -1,0 +1,47 @@
+/* SpaceOS 앱 셸 — 네이버지도식 "지도 우선" 레이아웃.
+   내비게이션은 화면 위쪽 줄을 먹지 않고 **좌측 아이콘 레일**로 고정된다.
+   그래야 지도 뷰가 뷰포트를 통째로 쓴다(2026-08-29 회의 「지도 전체화면」). */
+
+.appshell { min-height: 100dvh; }
+
+/* ── 좌측 레일 ──
+   fixed 라 어떤 뷰에서도 스크롤과 무관하게 같은 자리에 있다.
+   폭은 --rail-w 한 곳에서만 정한다 — MapShell 의 좌측 오프셋도 이 값을 쓴다. */
+.appshell .rail {
+  position: fixed; left: 0; top: 0; bottom: 0; width: var(--rail-w);
+  z-index: 1200;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px; padding: 8px 0;
+  background: #fff; border-right: 1px solid var(--line, #e5e7eb);
+  font-family: var(--font-sans, 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif);
+}
+.appshell .rail-logo {
+  width: 34px; height: 34px; flex: 0 0 34px; margin-bottom: 6px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; background: #3a5a98; color: #fff;
+  font-size: 15px; font-weight: 800; letter-spacing: -.5px;
+  user-select: none;
+}
+.appshell .rail-btn {
+  width: calc(var(--rail-w) - 8px); padding: 7px 0 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  border: 0; border-radius: 10px; background: transparent; cursor: pointer;
+  font-family: inherit; font-size: 10.5px; font-weight: 700; line-height: 1;
+  color: #8a93a0;
+}
+.appshell .rail-btn svg { width: 21px; height: 21px; }
+.appshell .rail-btn:hover { background: #f4f7fb; color: #5a6b85; }
+.appshell .rail-btn.active { background: #3a5a98; color: #fff; }
+
+/* ── 본문 ──
+   레일이 fixed 라 자리를 비켜주는 건 본문 몫이다. */
+.appshell .app-main { margin-left: var(--rail-w); }
+/* 지도 뷰의 MapShell 은 스스로 fixed 로 화면을 채운다 — 본문은 자리만 잡고 비운다. */
+.appshell.is-map, .appshell.is-map .app-main { height: 100dvh; overflow: hidden; }
+
+@media (max-width: 768px) {
+  .appshell .rail { padding: 6px 0; }
+  .appshell .rail-logo { width: 30px; height: 30px; flex-basis: 30px; font-size: 13px; }
+  .appshell .rail-btn { font-size: 9.5px; }
+  .appshell .rail-btn svg { width: 19px; height: 19px; }
+}

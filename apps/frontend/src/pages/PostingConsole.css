@@ -1,0 +1,87 @@
+/* SpaceOS Posting 콘솔 — 스코프 .postconsole (ProgramStudio 2단 레이아웃 계승).
+   왼쪽은 입력(sticky), 오른쪽은 결과. 결과 옆에는 늘 **그 값의 출처**가 붙는다 —
+   R-ONE 실측 임대료와 시드 프록시가 같은 숫자처럼 보이면 안 된다. */
+.postconsole{--card:#fff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;--blue:#2E6FB7;
+ --pos:#22B07D;--neg:#E03E36;
+ font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);background:#eef1f4;padding:20px;line-height:1.4}
+.postconsole *{box-sizing:border-box}
+.postconsole .wrap{max-width:1240px;margin:0 auto}
+
+.postconsole .hd{margin-bottom:14px}
+.postconsole .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af}
+.postconsole h1{font-size:27px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
+.postconsole .sub{font-size:13px;color:var(--sub);line-height:1.65;max-width:860px}
+.postconsole .sub b{color:var(--ink)}
+
+.postconsole .err{background:#fef2f2;border:1px solid #fecaca;border-radius:13px;padding:16px 18px;font-size:13px;color:#7f1d1d;margin:14px 0;line-height:1.7}
+.postconsole .errdetail{font-size:11px;color:#b91c1c;margin-top:6px;word-break:break-all}
+
+.postconsole .cols{display:grid;grid-template-columns:minmax(0,390px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:940px){.postconsole .cols{grid-template-columns:minmax(0,1fr)}}
+
+/* ── 입력 ── */
+.postconsole .panel{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 16px;position:sticky;top:14px}
+.postconsole .ptitle{font-size:14px;font-weight:800;margin-bottom:12px}
+.postconsole .field{display:block;margin-bottom:12px}
+.postconsole .flabel{display:flex;align-items:baseline;gap:5px;font-size:11.5px;font-weight:700;color:var(--sub);margin-bottom:5px}
+.postconsole .flabel em{font-style:normal;margin-left:auto;font-size:10.5px;font-weight:800;color:#5a6b85;background:#f1f4f8;border-radius:5px;padding:1px 6px}
+.postconsole input,.postconsole select{
+ width:100%;font-family:inherit;font-size:12.5px;color:var(--ink);background:#fafbfc;
+ border:1px solid var(--line);border-radius:9px;padding:8px 10px;line-height:1.5}
+.postconsole input:focus,.postconsole select:focus{outline:none;border-color:var(--blue);background:#fff}
+.postconsole .fhint{display:block;font-size:10.5px;color:#9aa3af;margin-top:5px;line-height:1.6}
+.postconsole .fhint b{color:var(--sub)}
+.postconsole .fhint code{background:#f1f4f8;border-radius:4px;padding:1px 4px;font-size:10px}
+.postconsole .chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.postconsole .chip{font-family:inherit;font-size:11px;font-weight:700;color:#3a5a98;background:#f2f6fb;
+ border:1px solid #e2eaf4;border-radius:6px;padding:3px 8px;cursor:pointer}
+.postconsole .chip.on{background:#3a5a98;border-color:#3a5a98;color:#fff}
+.postconsole .chipnote{font-style:normal;font-size:10px;color:#9aa3af}
+.postconsole .run{width:100%;margin-top:4px;font-family:inherit;font-size:13px;font-weight:800;color:#fff;
+ background:#3a5a98;border:0;border-radius:9px;padding:10px;cursor:pointer}
+.postconsole .run:disabled{background:#c8d2e0;cursor:not-allowed}
+
+/* ── 결과 ── */
+.postconsole .results{min-height:120px}
+.postconsole .empty{background:var(--card);border:1px dashed var(--line);border-radius:13px;
+ padding:40px 20px;text-align:center;color:var(--sub);font-size:13px}
+.postconsole .rhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:9px}
+.postconsole .rtitle{font-size:17px;font-weight:800;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.postconsole .rind{font-size:11px;font-weight:800;color:#3a5a98;background:#f2f6fb;border:1px solid #e2eaf4;border-radius:6px;padding:2px 7px}
+.postconsole .rbadges{display:flex;gap:5px;flex-wrap:wrap}
+.postconsole .badge{font-size:10px;font-weight:800;border-radius:5px;padding:2px 7px}
+.postconsole .badge.is-copilot{color:#fff;background:#0f7a55}
+.postconsole .badge.is-fallback{color:#5a6b85;background:#f1f4f8;border:1px solid #dfe5ee}
+.postconsole .badge.is-q{color:#8a5a00;background:#fdf5e3;border:1px solid #f0dcae}
+
+.postconsole .note{border-radius:9px;padding:10px 12px;font-size:11.5px;line-height:1.6;margin-bottom:10px}
+.postconsole .note.is-warn{background:#fdf5e3;border:1px solid #f0dcae;color:#7a5200}
+.postconsole .note.is-bad{background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d}
+.postconsole .notedetail{font-size:10.5px;margin-top:4px;word-break:break-all;opacity:.85}
+
+/* 입력 출처 배지 — 실측 / 프록시 / 전제를 색으로 가른다 */
+.postconsole .inputs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px}
+.postconsole .isrc{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;
+ border-radius:6px;padding:3px 8px}
+.postconsole .isrc i{font-style:normal;font-size:9.5px;font-weight:800}
+.postconsole .isrc.is-real{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.postconsole .isrc.is-proxy{color:#8a93a0;background:#f6f7f9;border:1px dashed #cfd5dd}
+.postconsole .isrc.is-absent{color:#8a5a00;background:#fdf5e3;border:1px dashed #f0dcae}
+
+.postconsole .tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:11px}
+.postconsole .tier{background:var(--card);border:1px solid var(--line);border-top:4px solid #d4dde6;border-radius:13px;padding:13px 14px}
+.postconsole .tier.rec{border-top-color:#3a5a98}
+.postconsole .tier.dead{opacity:.72;border-top-color:#e5b4b1}
+.postconsole .thd{display:flex;align-items:center;gap:7px}
+.postconsole .tname{font-size:15px;font-weight:800}
+.postconsole .trec{font-size:9.5px;font-weight:800;color:#fff;background:#3a5a98;border-radius:5px;padding:1px 6px}
+.postconsole .tsub{font-size:10.5px;color:#9aa3af;margin:3px 0 9px}
+.postconsole .trow{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;margin-top:5px;color:var(--sub)}
+.postconsole .trow span:last-child{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.postconsole .trow.big{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:12.5px}
+.postconsole .trow.big span:last-child{font-size:15px;font-weight:800}
+.postconsole .trow .pos{color:var(--pos)}
+.postconsole .trow .neg{color:var(--neg)}
+
+.postconsole .rsrc{font-size:10.5px;color:#9aa3af;line-height:1.7;margin-top:12px}
+.postconsole .rsrc b{color:var(--sub)}

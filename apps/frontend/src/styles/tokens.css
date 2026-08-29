@@ -18,7 +18,11 @@
   --shadow-card: 0 1px 3px rgba(11,27,51,.08), 0 4px 12px rgba(11,27,51,.06);
   --shadow-sheet: 0 -4px 24px rgba(11,27,51,.12);
   --font-sans: "Pretendard", system-ui, sans-serif;
+  /* 좌측 내비 레일 폭 — App.css 의 레일과 MapShell 의 좌측 오프셋이 같이 쓴다.
+     여기가 단일 출처다(두 곳에 숫자를 적으면 지도가 레일 밑으로 파고든다). */
+  --rail-w: 64px;
 }
+@media (max-width: 768px) { :root { --rail-w: 52px; } }
 /* UA 기본 body 여백(8px)을 지우지 않으면 100dvh 레이아웃이 뷰포트를 넘겨
    창 스크롤바가 하나 더 생긴다(2026-07-24 스크롤바 2개 증상의 원인). */
 html, body { margin: 0; padding: 0; }
