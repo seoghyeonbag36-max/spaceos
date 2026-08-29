@@ -7,7 +7,8 @@ Vercel 에서 옮겨 온 경위는 [deploy-vercel.md](deploy-vercel.md) 머리�
 
 | 항목 | 값 |
 |---|---|
-| **프로덕션 URL** | https://spaceos-798830962560.us-central1.run.app |
+| **프로덕션 URL** | **https://spaceos-twin.web.app** (Firebase Hosting) |
+| Cloud Run 원본 URL | https://spaceos-798830962560.us-central1.run.app |
 | GCP 프로젝트 | `spaceos-digital-twin` (표시명 SpaceOS) · 번호 `798830962560` |
 | 리전 | `us-central1` — **무료 한도가 적용되는 리전이라 그렇다** |
 | 이미지 | `us-central1-docker.pkg.dev/spaceos-digital-twin/spaceos/web` |
@@ -91,15 +92,20 @@ docker rm -f spaceos-smoke
 
 ## 모니터링
 
-Cloud Monitoring 업타임 체크 **2개**가 5분마다 돈다. 실패하면
+Cloud Monitoring 업타임 체크 **4개**가 5분마다 돈다. 실패하면
 `seoghyeonbag36@gmail.com` 으로 메일이 온다(알림 정책: "SpaceOS 프로덕션 다운 알림").
 
-| 체크 | 보는 것 |
-|---|---|
-| SpaceOS health | `/health` 가 200 이고 `"status":"ok"` 를 담는가 |
-| SpaceOS districts gold | 분석 API 가 `"vacancy_source":"gold"` 를 담는가 |
+| 체크 | 대상 | 보는 것 |
+|---|---|---|
+| SpaceOS health | Cloud Run 원본 | `/health` 가 200 이고 `"status":"ok"` 인가 |
+| SpaceOS districts gold | Cloud Run 원본 | 분석 API 가 `"vacancy_source":"gold"` 를 담는가 |
+| SpaceOS hosting health | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
+| SpaceOS hosting gold | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
 
-두 번째가 핵심이다. 첫 번째만 있으면 **프로세스는 살아 있고 데이터만 비어 있는 상태**를
+**둘로 나눠 두는 이유**: Cloud Run 이 멀쩡해도 Hosting 리라이트가 깨지면 사용자는 못 쓴다.
+원본만 보면 그 고장이 안 보인다. 반대로 Hosting 만 보면 어느 층이 깨졌는지 모른다.
+
+**gold 검사가 핵심이다.** health 만 있으면 **프로세스는 살아 있고 데이터만 비어 있는 상태**를
 못 잡는다 — 그게 이 저장소의 반복 실패 양식이다.
 
 ## 무료 한도와 그 경계
@@ -115,6 +121,25 @@ Cloud Run Always Free: 월 200만 요청 · 180,000 vCPU초 · 360,000 GiB초 ·
 
 ⚠ 무료 체험(90일/$300) 종료 시 결제계정이 **자동으로 닫힌다.** 그때 수동으로 유료 계정
 전환을 해야 Always Free 가 이어진다. 전환해도 한도 안에서는 $0 다.
+
+## 읽기 좋은 주소 — Firebase Hosting (2026-08-29)
+
+`spaceos-798830962560...` 의 숫자는 프로젝트 번호라 Cloud Run 에서 못 바꾼다. 앞에 Firebase
+Hosting 을 세워 **https://spaceos-twin.web.app** 을 얻었다. `firebase.json` 이 모든 요청(`**`)을
+Cloud Run 서비스 `spaceos`(us-central1)로 리라이트한다.
+
+- Firebase 프로젝트 = GCP 프로젝트(`spaceos-digital-twin`). 새로 만들지 않았다
+- 사이트 ID 는 `spaceos-twin` — `spaceos` 는 다른 프로젝트가 선점했다
+- 배포: `npx firebase-tools deploy --only hosting --project spaceos-digital-twin`
+- **정적 파일은 0개다.** 프론트도 컨테이너가 낸다(단일 출처 유지 — 아래 참조)
+
+⚠ **Firebase 를 처음 쓰는 계정은 CLI 로 프로젝트를 붙일 수 없다.** `projects:addfirebase` 가
+Owner·`firebase.admin` 이 있어도 403 `PERMISSION_DENIED` 로 막힌다(오류 문구는 이유를 안 밝힌다).
+콘솔에서 프로젝트를 한 번 만들어 **약관에 동의**해야 풀린다. 2026-08-29 에 이걸로 막혔다.
+
+⚠ 프론트를 Hosting 에 따로 올리지 않는 이유: CDN 이라 빠르고 Cloud Run egress 도 아끼지만,
+프론트가 **두 곳**에 살게 되어 한쪽만 배포되면 낡은 화면이 새 API 를 부른다. 단일 출처를
+지킨다. egress 가 실제로 문제되면 그때 나눈다.
 
 ## 계정 DB — Neon Postgres (2026-08-28 연결)
 

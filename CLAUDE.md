@@ -116,7 +116,7 @@ docker compose -f infra/docker/docker-compose.yml up
 
 # 배포 — main 에 푸시하면 GitHub Actions 가 Cloud Run 으로 낸다(테스트→빌드→배포→검증).
 # 수동 배포·좌표·무료 한도의 경계는 docs/deploy-cloud-run.md 참조.
-#   프로덕션: https://spaceos-798830962560.us-central1.run.app
+#   프로덕션: https://spaceos-twin.web.app  (Firebase Hosting → Cloud Run)
 # ⚠ Vercel 은 2026-08-28 프로덕션에서 내려왔다(무료 플랜이 상업적 사용 금지).
 #   `vercel --prod` 를 쓰지 말 것 — docs/deploy-vercel.md 는 이력으로만 남겼다.
 git push origin main
