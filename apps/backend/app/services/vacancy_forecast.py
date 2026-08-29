@@ -95,6 +95,12 @@ def get_forecast(district_id: str, quarters: int = 1) -> dict | None:
             "direction": "up" if sel["forecast_vac_proxy"] > item.get("last_vac_proxy", 0.0) else "down",
         })
     out["horizon_quarters"] = q
+    # 이 거점의 홀드아웃 1점(pred/actual/prev/direction_hit) — 전체 MAE 옆에 붙여
+    # "이 거점에서 실제로 얼마나 틀렸나"를 같이 보여준다. 평균만 내놓으면 거점별
+    # 오차가 평균 뒤에 숨는다(garosugil 0.155 ↔ anam 3.348). 54/54거점 보유.
+    holdout = (fc.get("holdout") or {}).get(district_id)
+    if holdout:
+        out["district_holdout"] = holdout
     anchor = _anchor(district_id)
     if anchor:
         out["ground_anchor"] = anchor

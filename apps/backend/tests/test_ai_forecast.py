@@ -71,6 +71,23 @@ def test_predict_vacancy_garosugil_ground_anchor():
     assert "ground_anchor" not in body2
 
 
+def test_predict_vacancy_carries_this_districts_holdout():
+    """거점별 홀드아웃 1점이 응답에 실려야 한다 — 전체 MAE 뒤에 거점 오차를 숨기지 않는다.
+
+    값은 박제하지 않는다(재학습마다 바뀐다). 산출물과 대조하고, 54/54거점 보유를 센다.
+    """
+    fc = json.loads((_GOLD / "platform_vacancy_forecast.json").read_text(encoding="utf-8"))
+    expected = fc["holdout"]
+    assert set(expected) >= set(SEOUL_DISTRICT_IDS), "홀드아웃 미보유 거점이 있다"
+    for did in SEOUL_DISTRICT_IDS:
+        body = client.post(f"{V1}/ai/predict-vacancy", json={"district_id": did}).json()
+        h = body.get("district_holdout")
+        assert h is not None, did
+        assert h == expected[did], did
+        assert isinstance(h["pred"], (int, float)) and isinstance(h["actual"], (int, float))
+        assert isinstance(h["direction_hit"], bool), did
+
+
 def test_district_summaries_carry_predicted_rate():
     """D단계 — 대시보드 응답에 다음 분기 예측 필드가 실려야 한다."""
     r = client.get(f"{V1}/commercial-districts")

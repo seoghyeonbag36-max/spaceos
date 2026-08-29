@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.schemas.district import DistrictSummary, Posting, Zone
 from app.services import districts as svc
+from app.services import platform_profile
 
 router = APIRouter()
 
@@ -49,6 +50,24 @@ async def get_sentiment(district_id: str) -> list[dict]:
     if zones is None:
         raise HTTPException(status_code=404, detail=f"unknown district: {district_id}")
     return zones
+
+
+@router.get("/{district_id}/platform")
+async def get_platform_profile(district_id: str) -> dict:
+    """Platform — "이 상권은 어떤 플랫폼인가" + "어느 자리에 어떤 업소가 들어와야 하나".
+
+    정체성(업종 구성·블로그 키워드·검색 트렌드·수요신호)과 자리 제안(실측 공실 유닛 ×
+    GNN 최근접 노드 추천)을 한 응답으로 낸다. 둘 다 없는 거점은 404 —
+    "이 거점을 모른다"가 아니라 "이 거점에 Platform 산출물이 없다"는 뜻이며,
+    `identity: null` 로 오는 경우(자리는 있는데 컨텍스트만 없다)와 구분된다.
+
+    감성은 여기 없다 — 전부 시드라 정체성의 근거로 쓸 수 없다(`/{거점}/sentiment` 참조).
+    """
+    p = platform_profile.profile(district_id)
+    if p is None:
+        raise HTTPException(status_code=404,
+                            detail=f"no platform profile for district: {district_id}")
+    return p
 
 
 @router.get("/{district_id}/postings", response_model=list[Posting])
