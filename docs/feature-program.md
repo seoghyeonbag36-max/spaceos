@@ -24,7 +24,7 @@
 | 상가 기본정보(이름·카테고리·좌표·주소) | 네이버 지역검색 API + 카카오 로컬 API | **가능(공식)** | `NAVER_CLIENT_ID/SECRET`, `KAKAO_REST_API_KEY` (§8-E) |
 | 리뷰성 텍스트 | 네이버 **블로그 검색 API** | **가능(공식)** | `data/collectors/naver_blog.py` 이미 구현 |
 | 검색 트렌드 | 네이버 데이터랩 | **가능(공식)** | 동일 수집기 |
-| **플레이스 리뷰·사진** | 공식 API **없음** | **조건부** | PoC 내부 검증 한정 크롤러(`data/crawlers/review_crawler.py`, 약관·저작권 리스크) → **상용은 점주 제공 데이터(B2B 온보딩 동의) 원칙**. 크롤링 원본(특히 사진)을 고객 화면에 직접 서빙 금지 |
+| **플레이스 리뷰·사진** | 공식 API **없음** | **조건부** | PoC 내부 검증 한정 크롤러(`data/crawlers/review_crawler.py`, 약관·저작권 리스크) → **상용은 점주 또는 권한을 받은 조직이 제공한 데이터와 명시 동의만 허용**(§0-K). 크롤링 원본(특히 사진)을 고객 화면에 직접 서빙 금지 |
 | 이미지 분석 | Claude(vision 내장) | **가능** | 별도 Vision API 불필요 (§8-D) |
 | 상권 단위 컨텍스트 | Platform Gold (`gold/program_content_context`, 8-A 상권분석·감성) | **가능** | 기존 Gold 매핑 설계(§9)와 일치 |
 
@@ -500,10 +500,67 @@ int 에는 넣을 수 없다. `test_budget_share_cannot_hold_absolute_amount` �
 제안하면 **있지도 않은 방문을 전제**한다. 리뷰가 비면 개업 예고·준비 과정으로
 바꾸고 근거도 리뷰 대신 자리·상권 수치로 돌린다.
 
-⚠ 이건 스텁만 고친 것이다. 근본 해소는 입력 계약 ③층(창업계획)이며 아직 미구현이다.
+⚠ 이 시점에는 스텁만 고친 것이었다. 근본 해소인 입력 계약 ③층(창업계획)은 같은 날
+오후 §0-J에서 배선됐고, 개업 전 방문·후기 전제를 `pre_open_visit_claim`으로 검증한다.
 
 검증: `tests/test_program_output_split.py` 14건(계약 4 + 행사 분리 4 + 주체·예산 4 +
 스텁 2). 기존 스위트의 `LLMChannelPlan` 사용처 35곳은 `conftest._perf` / `_act` 로 옮겼다.
+
+## 0-K. 상용 입력 온보딩 — 조직 인증·명시 동의·원문 비저장 (2026-08-29)
+
+공개 데모 `POST /api/v1/marketing/generate`는 그대로 둔다. 상용 입력은 별도 경로
+`POST /api/v1/marketing/onboarding/generate`로 분리해, 공개 네이버 블로그 스니펫이
+점주 제공 원문으로 둔갑하지 않게 했다. 이 경로는 신규 창업 기업이 자기 메뉴·사진·
+키워드·창업계획을 안전하게 넣는 신뢰 경계이며, 08-16 대상 재정의를 되돌리지 않는다.
+
+### 요청 계약
+
+- Bearer JWT 또는 `X-API-Key`로 **조직 인증**이 있어야 한다. 인증이 없거나 잘못되면 401이다.
+- 계약 버전은 `spaceos.program-onboarding/1`, 입력 출처는 `merchant-provided`, 처리 목적은
+  `program-marketing-generation`으로 고정한다.
+- 처리 동의, 입력 제공·처리 권한 확인, 외부 LLM 처리 동의, `request-only` 보존 확인을
+  각각 명시적으로 받아야 한다. bool 기본값으로 동의를 만들지 않으며 하나라도 빠지면 422다.
+- 리뷰·사진·메뉴·키워드·창업계획 중 하나는 실제로 있어야 한다. 빈 프로필도 422다.
+- 권리 확인은 **조직의 진술**이다. SpaceOS가 저작권·개인정보 권리의 사실성을 별도로
+  검증했다는 뜻으로 표시하지 않는다.
+
+### 저장·처리 경계
+
+감사 영수증을 DB에 먼저 확정한 뒤 생성 처리를 시작한다. 감사 저장이 실패하면 외부 모델에
+원문을 보내기 전에 요청이 실패한다. `AuditLog(action=program.onboarding.accepted)`에는
+조직/사용자(있는 경우), 계약 버전, 고정 목적, `merchant-provided`, `district_id`, 입력 종류별
+건수, 동의 확인값, `raw_input_retention=request-only`, `raw_input_persisted=false`만 저장한다.
+상호·주소·리뷰·사진 URL·메뉴·키워드 원문은 앱 DB에 저장하지 않고 응답에도 `profile`·
+`consent`를 되돌리지 않는다.
+
+`request-only`는 **SpaceOS 애플리케이션 DB의 원문 보존 범위**다. 외부 LLM 공급자의 보존
+정책까지 없다고 보장하는 표현이 아니므로, UI도 외부 모델 처리 동의를 별도로 받는다.
+ProgramStudio는 공개 스니펫을 `publicReviews`로 분리하고 상용 모드에서 자동 검색을 끈다.
+API key는 현재 메모리의 요청 헤더에만 쓰며 브라우저 저장소에는 보관하지 않는다.
+
+### 대상 파일과 통과 조건
+
+- 대상 파일
+  - `apps/backend/app/core/security.py`
+  - `apps/backend/app/schemas/marketing.py`
+  - `apps/backend/app/services/program_onboarding.py`
+  - `apps/backend/app/api/v1/marketing.py`
+  - `apps/backend/tests/test_program_commercial_onboarding.py`
+  - `apps/frontend/src/lib/api.ts`
+  - `apps/frontend/src/pages/ProgramStudio.tsx`
+  - `apps/frontend/src/pages/ProgramStudio.css`
+- 통과 테스트
+  - `test_commercial_onboarding_requires_org_auth`
+  - `test_commercial_onboarding_rejects_incomplete_consent`
+  - `test_commercial_onboarding_rejects_empty_merchant_content`
+  - `test_commercial_onboarding_returns_receipt_without_persisting_raw_input`
+  - `test_commercial_onboarding_is_scoped_to_authenticated_org`
+  - `test_commercial_onboarding_accepts_jwt_as_well_as_api_key`
+  - 프론트: `npm run build`(TypeScript 포함)
+- 금지 사항
+  - 공개 검색 스니펫을 `merchant-provided`로 전용하지 않는다.
+  - 원문을 감사로그·응답·브라우저 저장소에 남기지 않는다.
+  - 기술 온보딩 완료를 실제 B2B 파일럿 완료로 세지 않는다.
 
 ## 1. 담당 코드 영역
 
@@ -511,11 +568,16 @@ int 에는 넣을 수 없다. `test_budget_share_cannot_hold_absolute_amount` �
 apps/backend/app/services/marketing.py    가게/상권 마케팅 솔루션 생성 서비스 (현존)
 apps/backend/app/services/ha_guard.py     HA 후처리 검증 — 생성물이 지시를 지켰는지 서버가 판정
 apps/backend/app/services/store_lookup.py 가게 반자동 조회 — 카카오 로컬 + 네이버 블로그
+apps/backend/app/services/program_onboarding.py  조직별 상용 입력 영수증·원문 비저장 경계
 apps/backend/app/schemas/marketing.py     StoreProfile(menu 포함) / StoreMarketing 스키마
-apps/backend/app/api/v1/marketing.py      GET /{id}(상권) + POST /generate + GET /places·/reviews
+                                          + ProgramCommercialOnboardingRequest/Response
+apps/backend/app/api/v1/marketing.py      공개 POST /generate + 상용 POST /onboarding/generate
+                                          + GET /{id}(상권)·/places·/reviews
                                           ⚠ 정적 경로는 /{district_id} 보다 먼저 등록할 것
+apps/backend/app/core/security.py         JWT/API key 공통 Principal + 상용 필수 인증
+apps/backend/app/models/auth.py           AuditLog(원문 아닌 동의·건수 메타데이터)
 apps/backend/app/core/config.py           llm_api_key + kakao/naver 키 (data/.env 병행 로드)
-apps/frontend/src/pages/ProgramStudio.tsx Program 탭 — 입력 폼 + 결과 패널
+apps/frontend/src/pages/ProgramStudio.tsx 공개 데모/상용 온보딩 분리 입력 + 영수증
 data/collectors/naver_blog.py             블로그 리뷰·트렌드 수집 (거점 단위, 공식 API)
 data/crawlers/review_crawler.py           플레이스 리뷰 크롤러 골격 (PoC 한정, 미구현)
 ```
@@ -530,12 +592,16 @@ echo "LLM_API_KEY=sk-ant-..." >> .env        # .gitignore 로 보호됨
 
 ## 3. 작업 순서
 
-1. **가게 프로필 입력 계약** (`schemas/marketing.py`) — `StoreProfile`(이름·카테고리·주소·리뷰 텍스트·이미지 URL/설명). 수집 채널이 무엇이든 이 스키마로 정규화해 서비스에 전달.
-2. **가게 단위 생성** (`services/marketing.py::generate_store_marketing`) — 리뷰 키워드·이미지 분석(vision)으로 강점/톤을 추출해 온라인(채널 믹스·SNS 문구)과 오프라인(전단·팝업·행사 참여) 솔루션 생성. LLM 미설정 시 규칙 기반 스텁 + `TODO: 실제 연동`.
-3. **상권 단위 생성** — `GET /marketing/{id}`의 시드 데이터를 Platform Gold(`program_content_context`: 상권분석 시계열 + 감성 + 리뷰 키워드) 기반 생성으로 교체.
+1. ~~**가게 프로필 입력 계약**~~ — ✅ 공개 `StoreProfile` + 상용 `CommercialStoreProfile`로 분리 완료.
+2. ~~**가게 단위 생성**~~ — ✅ LLM/규칙 기반 폴백, 출력 분리, HA 후처리 배선 완료.
+3. ~~**상권 단위 생성**~~ — ✅ Platform Gold 컨텍스트와 수요신호·행사 배선 완료.
 4. ~~**Humanistic Authority 가드레일**~~ — ✅ 2026-08-06 완료. 프롬프트 + 후처리 검증
    (`services/ha_guard.py`, 2단 등급). → §0-3
 5. **폐업 사유 요약(연계)** — 건물 히스토리(Page)의 closure_reason LLM 요약은 기존 계획 유지.
+6. ~~**상용 입력 온보딩**~~ — ✅ 2026-08-29 완료. 조직 인증·명시 동의·원문 비저장 (§0-K).
+
+기술 트랙 다음 검증은 **실제 B2B 파일럿**이다. 온보딩 API가 201을 반환하는 것과 고객이
+반복 사용해 가치를 확인하는 것은 다른 지표이며, 후자는 `active_orgs`로만 센다.
 
 ## 4. Claude Code 작업 예시
 
@@ -552,3 +618,6 @@ echo "LLM_API_KEY=sk-ant-..." >> .env        # .gitignore 로 보호됨
 - 생성 콘텐츠 샘플을 균형·공생·공감 기준으로 정성 평가
 - 크롤링 산출물이 고객 노출 경로에 직접 서빙되지 않는지 확인 (PoC 내부 검증 한정)
 - API 키는 `.env`(`.gitignore` 보호)에만 — `.claude/settings.json`이 `.env` 읽기를 차단함
+- `pytest tests/test_program_commercial_onboarding.py -q` — §0-K의 정확한 6개 계약 테스트
+- `cd apps/frontend && npm run build` — 상용/공개 입력 분리 UI TypeScript·프로덕션 번들
+- 감사로그에는 원문이 없고 조직·계약·동의·항목별 건수만 있는지 확인한다.

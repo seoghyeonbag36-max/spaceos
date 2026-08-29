@@ -14,6 +14,8 @@
 .progstudio .cols>form.panel{position:sticky;top:14px}
 .progstudio .ptitle{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:800;margin-bottom:12px}
 .progstudio .ptools{display:flex;gap:6px}
+.progstudio .ghost.active{color:#fff;background:#3a5a98;border-color:#3a5a98}
+.progstudio .onboardIntro{font-size:11.5px;color:#1e3a5f;background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:9px 10px;line-height:1.55;margin:-2px 0 12px}
 
 /* 필드 */
 .progstudio .field{display:block;margin-bottom:11px}
@@ -51,6 +53,8 @@
 .progstudio .cname{font-size:12.5px;font-weight:800;margin-right:6px}
 .progstudio .ccat{font-size:10px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:5px;padding:1px 6px}
 .progstudio .caddr{display:block;font-size:11px;color:var(--sub);margin-top:3px}
+.progstudio .sourcebox{display:flex;flex-direction:column;gap:2px;font-size:10.5px;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:8px 10px;margin:0 0 10px}
+.progstudio .sourcebox b{font-size:11px;color:#334155}
 
 /* 안내·경고 */
 .progstudio .note{font-size:10.5px;color:#9aa3af;line-height:1.55;margin:6px 0}
@@ -65,6 +69,11 @@
 .progstudio .err{background:#fef2f2;border:1px solid #fecaca;border-radius:11px;padding:13px 15px;font-size:12.5px;color:#7f1d1d;line-height:1.7}
 .progstudio .err code{background:#fff;border:1px solid #fecaca;border-radius:5px;padding:1px 6px;font-size:11.5px}
 .progstudio .errdetail{font-size:11px;color:#b91c1c;margin-top:6px;word-break:break-all}
+.progstudio .consentbox{background:#f8fafc;border:1px solid #cbd5e1;border-radius:11px;padding:10px 11px;margin:10px 0}
+.progstudio .consent{display:flex;align-items:flex-start;gap:7px;font-size:10.8px;color:#475569;line-height:1.5;margin:7px 0;cursor:pointer}
+.progstudio .consent input{width:auto;flex:0 0 auto;margin:2px 0 0}
+.progstudio .receipt{font-size:11px;color:#0f6b4d;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:9px;padding:8px 10px;margin:10px 0}
+.progstudio .receipt code{font-size:10px;word-break:break-all}
 
 /* 사진 미리보기 — vision 상한 밖은 흐리게(넣었는데 안 쓰인 걸 숨기지 않는다) */
 .progstudio .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}

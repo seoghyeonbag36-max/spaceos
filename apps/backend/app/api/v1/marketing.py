@@ -3,14 +3,18 @@
 ⚠ 라우트 등록 순서 주의: 아래 `/{district_id}` 가 아무 문자열이나 삼키므로,
 정적 경로(`/generate`·`/places`·`/reviews`)는 **반드시 그보다 먼저** 선언한다.
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.orm import Session
 
+from app.core.db import get_db
+from app.core.security import Principal, get_current_principal
 from app.schemas.district import Marketing
 from app.schemas.marketing import (
+    ProgramCommercialOnboardingRequest, ProgramCommercialOnboardingResponse,
     StoreMarketing, StorePlaceLookup, StoreProfile, StoreReviewLookup, VacantSiteList,
 )
 from app.services import marketing as mkt
-from app.services import program_site, store_lookup
+from app.services import program_onboarding, program_site, store_lookup
 
 router = APIRouter()
 
@@ -23,6 +27,25 @@ async def generate_store_marketing(profile: StoreProfile) -> dict:
     LLM 키 미설정 시 규칙 기반 스텁으로 응답한다 (source 필드로 구분).
     """
     return mkt.generate_store_marketing(profile.model_dump())
+
+
+@router.post(
+    "/onboarding/generate",
+    response_model=ProgramCommercialOnboardingResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def onboard_and_generate(
+    request: ProgramCommercialOnboardingRequest,
+    principal: Principal = Depends(get_current_principal),
+    db: Session = Depends(get_db),
+) -> dict:
+    """조직 인증 + 점주 동의가 있는 상용 입력으로 Program 결과를 생성한다.
+
+    공개 데모 ``/generate`` 와 분리한 이유는 검색 스니펫과 점주 제공 원문을 같은
+    계약으로 섞지 않기 위해서다. 원문은 생성 중에만 쓰고 DB에는 동의 영수증과
+    항목별 건수만 남긴다.
+    """
+    return program_onboarding.generate(db, principal, request)
 
 
 @router.get("/places", response_model=StorePlaceLookup)

@@ -7,7 +7,10 @@ StoreProfile 은 수집 채널(네이버 지역검색·카카오 로컬·블로�
 """
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from datetime import datetime
+from typing import Literal, Self
+
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class VenturePlan(BaseModel):
@@ -52,6 +55,69 @@ class StoreProfile(BaseModel):
     image_urls: list[str] = []        # 상가 사진 (점주 제공 원칙) — vision 분석 입력
     menu: list[str] = []              # 메뉴 한 줄씩 ("대표메뉴 18,000원") — 지도 메뉴탭/점주 제공
     keywords: list[str] = []          # 사전 추출 키워드 (선택)
+
+
+class CommercialStoreProfile(StoreProfile):
+    """상용 온보딩용 점주 제공 입력.
+
+    공개 데모의 ``StoreProfile`` 과 분리한다. 이 모델에 든 리뷰·사진·메뉴·키워드는
+    **전부 점주 또는 그 권한을 받은 조직이 제공한 값**으로 취급하며, 공개 검색
+    스니펫을 섞지 않는다. 상한은 API 오용으로 원문이 무제한 메모리에 올라오는 것을
+    막는 운영 한계이지 데이터 값을 채우는 기본값이 아니다.
+    """
+
+    name: str = Field(min_length=1, max_length=120)
+    category: str = Field(min_length=1, max_length=120)
+    address: str | None = Field(default=None, max_length=300)
+    reviews: list[str] = Field(default_factory=list, max_length=100)
+    image_urls: list[str] = Field(default_factory=list, max_length=4)
+    menu: list[str] = Field(default_factory=list, max_length=100)
+    keywords: list[str] = Field(default_factory=list, max_length=50)
+
+    @field_validator("reviews", "menu", "keywords")
+    @classmethod
+    def _bounded_text(cls, values: list[str]) -> list[str]:
+        if any(not value.strip() for value in values):
+            raise ValueError("빈 문자열은 입력 항목으로 셀 수 없습니다")
+        if any(len(value) > 1000 for value in values):
+            raise ValueError("입력 항목 한 건은 1000자를 넘을 수 없습니다")
+        return values
+
+    @field_validator("image_urls")
+    @classmethod
+    def _public_http_images(cls, values: list[str]) -> list[str]:
+        if any(not value.startswith(("https://", "http://")) for value in values):
+            raise ValueError("사진은 공개 접근 가능한 http/https URL이어야 합니다")
+        return values
+
+
+class ProgramCommercialConsent(BaseModel):
+    """점주 제공 원문을 처리하기 위한 명시적 상용 계약.
+
+    bool 기본값을 두지 않고 ``Literal[True]`` 로 받는다. 체크박스를 렌더링만 하고
+    요청에서 빼먹거나, 프론트가 임의로 동의한 것으로 채우면 422로 실패한다.
+    """
+
+    contract_version: Literal["spaceos.program-onboarding/1"]
+    data_origin: Literal["merchant-provided"]
+    processing_purpose: Literal["program-marketing-generation"]
+    consent_to_process: Literal[True]
+    rights_confirmed: Literal[True]
+    allow_external_model_processing: Literal[True]
+    raw_input_retention: Literal["request-only"]
+
+
+class ProgramCommercialOnboardingRequest(BaseModel):
+    profile: CommercialStoreProfile
+    consent: ProgramCommercialConsent
+
+    @model_validator(mode="after")
+    def _requires_merchant_content(self) -> Self:
+        p = self.profile
+        if not any((p.reviews, p.image_urls, p.menu, p.keywords, p.venture)):
+            raise ValueError(
+                "상용 온보딩에는 리뷰·사진·메뉴·키워드·창업계획 중 하나가 필요합니다")
+        return self
 
 
 class StorePlace(BaseModel):
@@ -234,3 +300,15 @@ class StoreMarketing(BaseModel):
     ha_check: str                     # LLM 자기신고 — 이것만으로는 검증이 아니다
     source: str                       # "llm" | "rule-stub"
     ha_findings: list[HAFinding] = []  # 서버 후처리 검증 결과 (ha_check 와 다르다)
+
+
+class ProgramCommercialOnboardingResponse(BaseModel):
+    """조직별 동의 영수증 + 생성 결과. 점주 제공 원문은 응답에도 되돌려주지 않는다."""
+
+    onboarding_id: str
+    org_id: str
+    accepted_at: datetime
+    contract_version: Literal["spaceos.program-onboarding/1"]
+    input_source: Literal["merchant-provided"]
+    raw_input_persisted: Literal[False]
+    marketing: StoreMarketing

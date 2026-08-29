@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  listDistricts, generateStoreMarketing, lookupStorePlaces, lookupStoreReviews,
+  listDistricts, generateCommercialStoreMarketing, generateStoreMarketing,
+  lookupStorePlaces, lookupStoreReviews,
 } from "@/lib/api";
 import type {
   ChannelPlan, DistrictSummary, StoreMarketing, StorePlace,
@@ -82,9 +83,17 @@ export default function ProgramStudio() {
   const [busy, setBusy] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [commercialMode, setCommercialMode] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const [rightsConfirmed, setRightsConfirmed] = useState(false);
+  const [processingConsent, setProcessingConsent] = useState(false);
+  const [externalConsent, setExternalConsent] = useState(false);
+  const [retentionAcknowledged, setRetentionAcknowledged] = useState(false);
+  const [onboardingReceipt, setOnboardingReceipt] = useState<string | null>(null);
 
   // 반자동 채우기 — 후보 검색(카카오) → 선택 → 블로그 스니펫 주입(네이버)
   const [places, setPlaces] = useState<StorePlace[] | null>(null);
+  const [publicReviews, setPublicReviews] = useState<string[]>([]);
   const [lookupBusy, setLookupBusy] = useState(false);
   const [lookupNote, setLookupNote] = useState<string | null>(null);
 
@@ -104,17 +113,44 @@ export default function ProgramStudio() {
     return () => { if (timer.current) window.clearInterval(timer.current); };
   }, [busy]);
 
-  const reviews = useMemo(() => linesOf(form.reviewsText), [form.reviewsText]);
+  const merchantReviews = useMemo(() => linesOf(form.reviewsText), [form.reviewsText]);
+  const reviews = useMemo(
+    () => commercialMode ? merchantReviews : [...merchantReviews, ...publicReviews],
+    [commercialMode, merchantReviews, publicReviews],
+  );
   const images = useMemo(() => linesOf(form.imagesText), [form.imagesText]);
   const menu = useMemo(() => linesOf(form.menuText), [form.menuText]);
   const keywords = useMemo(() => commaOf(form.keywordsText), [form.keywordsText]);
   const badImages = images.filter((u) => !isHttp(u));
 
-  const canSubmit = form.name.trim() !== "" && form.category.trim() !== "" && !busy;
+  const hasMerchantContent = merchantReviews.length > 0 || images.length > 0
+    || menu.length > 0 || keywords.length > 0;
+  const commercialReady = apiKey.trim() !== "" && hasMerchantContent
+    && rightsConfirmed && processingConsent && externalConsent && retentionAcknowledged;
+  const canSubmit = form.name.trim() !== "" && form.category.trim() !== "" && !busy
+    && (!commercialMode || commercialReady);
 
   const set = <K extends keyof FormState>(k: K) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  function toggleCommercialMode() {
+    // 공개 검색 스니펫·합성 예시가 점주 제공 데이터로 둔갑하지 않도록 모드를 바꿀 때
+    // 입력을 비운다. API 키도 브라우저 저장소에 남기지 않고 현재 메모리에서만 가진다.
+    setCommercialMode(!commercialMode);
+    setApiKey("");
+    setForm(EMPTY);
+    setPublicReviews([]);
+    setPlaces(null);
+    setLookupNote(null);
+    setResult(null);
+    setError(null);
+    setOnboardingReceipt(null);
+    setRightsConfirmed(false);
+    setProcessingConsent(false);
+    setExternalConsent(false);
+    setRetentionAcknowledged(false);
+  }
 
   /** 상호로 가게 후보를 찾는다. 자동 선택하지 않는다 — 같은 상호가 전국에 있다. */
   async function searchPlaces() {
@@ -151,12 +187,7 @@ export default function ProgramStudio() {
     setLookupNote(null);
     try {
       const r = await lookupStoreReviews(p.name, p.address ?? p.road_address);
-      if (r.reviews.length) {
-        setForm((f) => ({
-          ...f,
-          reviewsText: [f.reviewsText.trim(), ...r.reviews].filter(Boolean).join("\n"),
-        }));
-      }
+      if (r.reviews.length) setPublicReviews((old) => [...old, ...r.reviews]);
       setLookupNote(`'${r.query}' 검색 → ${r.reviews.length}건 주입. ${r.note ?? ""}`.trim());
     } catch (err) {
       setLookupNote(`리뷰 스니펫 조회 실패: ${String(err)}`);
@@ -170,18 +201,37 @@ export default function ProgramStudio() {
     if (!canSubmit) return;
     setBusy(true);
     setError(null);
+    setOnboardingReceipt(null);
     try {
-      const r = await generateStoreMarketing({
+      const profile = {
         name: form.name.trim(),
         category: form.category.trim(),
         district_id: form.districtId || undefined,
         address: form.address.trim() || undefined,
-        reviews,
+        // 상용 경로는 점주가 직접 넣은 원문만 보낸다. 공개 검색 스니펫은 별도 state라
+        // 구조적으로 섞일 수 없다.
+        reviews: commercialMode ? merchantReviews : reviews,
         image_urls: images.filter(isHttp),
         menu,
         keywords,
-      });
-      setResult(r);
+      };
+      if (commercialMode) {
+        // canSubmit 이 네 확인을 모두 요구한다. 여기서는 그 확인 뒤에만 Literal true
+        // 계약을 만든다 — 체크박스의 기본값으로 동의를 만들어 보내지 않는다.
+        const onboarded = await generateCommercialStoreMarketing(profile, {
+          contract_version: "spaceos.program-onboarding/1",
+          data_origin: "merchant-provided",
+          processing_purpose: "program-marketing-generation",
+          consent_to_process: true,
+          rights_confirmed: true,
+          allow_external_model_processing: true,
+          raw_input_retention: "request-only",
+        }, apiKey.trim());
+        setResult(onboarded.marketing);
+        setOnboardingReceipt(onboarded.onboarding_id);
+      } else {
+        setResult(await generateStoreMarketing(profile));
+      }
     } catch (err) {
       setError(String(err));
     } finally {
@@ -205,24 +255,46 @@ export default function ProgramStudio() {
         {/* ── 입력 ── */}
         <form className="panel" onSubmit={submit}>
           <div className="ptitle">
-            가게 프로필
+            {commercialMode ? "상용 입력 온보딩" : "가게 프로필"}
             <div className="ptools">
-              <button type="button" className="ghost" onClick={() => setForm(SAMPLE)}>예시 채우기</button>
-              <button type="button" className="ghost" onClick={() => { setForm(EMPTY); setResult(null); setError(null); }}>비우기</button>
+              {!commercialMode && (
+                <button type="button" className="ghost" onClick={() => setForm(SAMPLE)}>예시 채우기</button>
+              )}
+              <button type="button" className={`ghost ${commercialMode ? "active" : ""}`}
+                onClick={toggleCommercialMode}>
+                {commercialMode ? "공개 데모로" : "상용 온보딩"}
+              </button>
+              <button type="button" className="ghost" onClick={() => {
+                setForm(EMPTY); setPublicReviews([]); setResult(null); setError(null);
+                setOnboardingReceipt(null);
+                setApiKey(""); setRightsConfirmed(false); setProcessingConsent(false);
+                setExternalConsent(false); setRetentionAcknowledged(false);
+              }}>비우기</button>
             </div>
           </div>
 
+          {commercialMode && (
+            <div className="onboardIntro">
+              이 경로는 <b>점주 또는 권한을 받은 조직이 직접 제공한 데이터만</b> 받는다.
+              카카오·블로그 자동 검색은 끄고, 원문은 생성 요청 중에만 사용한다.
+            </div>
+          )}
+
           <div className="row2">
             <Field label="가게명" required
-              hint="상호를 넣고 검색하면 카카오 로컬에서 후보를 찾아 기본정보·블로그 스니펫을 채운다.">
-              <div className="inputbtn">
+              hint={commercialMode
+                ? "점주 또는 권한을 받은 조직이 확인한 상호를 직접 입력한다."
+                : "상호를 넣고 검색하면 카카오 로컬에서 후보를 찾아 기본정보·블로그 스니펫을 채운다."}>
+              {commercialMode ? (
+                <input value={form.name} onChange={set("name")} placeholder="점주 확인 상호" />
+              ) : <div className="inputbtn">
                 <input value={form.name} onChange={set("name")} placeholder="예: 맡기다"
                   onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); searchPlaces(); } }} />
                 <button type="button" className="ghost" onClick={searchPlaces}
                   disabled={!form.name.trim() || lookupBusy}>
                   {lookupBusy ? "…" : "검색"}
                 </button>
-              </div>
+              </div>}
             </Field>
             <Field label="카테고리" required>
               <input value={form.category} onChange={set("category")} list="cat-hints" placeholder="예: 카페" />
@@ -271,9 +343,18 @@ export default function ProgramStudio() {
             <input value={form.address} onChange={set("address")} placeholder="예: 서울 강남구 신사동 …" />
           </Field>
 
-          <Field label="리뷰 · 블로그 텍스트"
-            hint="한 줄에 하나. 검색으로 채운 것은 네이버 블로그 스니펫이지 플레이스 방문자 리뷰가 아니다(공식 API 없음) — 점주가 준 원문을 직접 붙여넣어도 된다."
-            count={reviews.length ? `${reviews.length}건` : undefined}>
+          {!commercialMode && publicReviews.length > 0 && (
+            <div className="sourcebox">
+              <b>공개 검색 스니펫 {publicReviews.length}건</b>
+              <span>네이버 블로그 검색 결과이며 점주 제공 원문이 아니다. 공개 데모에만 합류한다.</span>
+            </div>
+          )}
+
+          <Field label={commercialMode ? "점주 제공 리뷰" : "직접 입력 리뷰 · 블로그 텍스트"}
+            hint={commercialMode
+              ? "한 줄에 하나. 제공·처리 권한을 확인한 원문만 입력한다."
+              : "한 줄에 하나. 자동 검색분은 위에 별도 표시되고, 이 칸에는 직접 입력한 원문만 둔다."}
+            count={merchantReviews.length ? `${merchantReviews.length}건` : undefined}>
             <textarea rows={8} value={form.reviewsText} onChange={set("reviewsText")}
               placeholder={"원두를 매주 바꿔서 소개해주는 게 좋아요.\n2층 창가 자리가 조용해서 작업하기 좋았습니다.\n…"} />
           </Field>
@@ -319,8 +400,38 @@ export default function ProgramStudio() {
             </div>
           )}
 
+          {commercialMode && (
+            <div className="consentbox">
+              <Field label="조직 API 키" required
+                hint="발급된 sk_spaceos_… 키. 요청 헤더에만 사용하며 브라우저 저장소에 보관하지 않는다.">
+                <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)}
+                  autoComplete="off" placeholder="sk_spaceos_…" />
+              </Field>
+              <label className="consent">
+                <input type="checkbox" checked={rightsConfirmed}
+                  onChange={(e) => setRightsConfirmed(e.target.checked)} />
+                점주 제공 데이터이며 리뷰·사진·메뉴를 제공하고 처리할 권한이 있음을 확인한다.
+              </label>
+              <label className="consent">
+                <input type="checkbox" checked={processingConsent}
+                  onChange={(e) => setProcessingConsent(e.target.checked)} />
+                Program 마케팅 생성 목적으로 입력을 처리하는 데 동의한다.
+              </label>
+              <label className="consent">
+                <input type="checkbox" checked={externalConsent}
+                  onChange={(e) => setExternalConsent(e.target.checked)} />
+                설정된 경우 외부 LLM의 텍스트·이미지 처리 경로를 사용할 수 있음에 동의한다.
+              </label>
+              <label className="consent">
+                <input type="checkbox" checked={retentionAcknowledged}
+                  onChange={(e) => setRetentionAcknowledged(e.target.checked)} />
+                원문은 애플리케이션 DB에 저장하지 않고, 조직·계약 버전·항목별 건수만 감사기록에 남음을 확인한다.
+              </label>
+            </div>
+          )}
+
           <button type="submit" className="primary" disabled={!canSubmit}>
-            {busy ? `생성 중… ${elapsed}초` : "마케팅 솔루션 생성"}
+            {busy ? `생성 중… ${elapsed}초` : commercialMode ? "동의하고 상용 생성" : "마케팅 솔루션 생성"}
           </button>
           {busy && <div className="note">Claude 실호출은 사진 포함 시 10~20초 걸린다.</div>}
         </form>
@@ -347,6 +458,11 @@ export default function ProgramStudio() {
           {busy && <div className="empty">생성 중… {elapsed}초</div>}
 
           {result && !busy && <Result r={result} />}
+          {onboardingReceipt && !busy && (
+            <div className="receipt">
+              상용 입력 동의 영수증 <code>{onboardingReceipt}</code> · 원문 DB 저장 없음
+            </div>
+          )}
         </div>
       </div>
 

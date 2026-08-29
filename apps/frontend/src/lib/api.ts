@@ -308,10 +308,14 @@ export const getPostings = (id: string) => getJSON<Posting[]>(`/commercial-distr
 /** 거점(상권) 마케팅 — 온라인 콘텐츠는 Gold 기반 생성(Program), 행사는 시드 */
 export const getMarketing = (id: string) => getJSON<Marketing>(`/marketing/${id}`);
 
-async function postJSON<T>(path: string, body: unknown): Promise<T> {
+async function postJSON<T>(
+  path: string,
+  body: unknown,
+  extraHeaders: Record<string, string> = {},
+): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...extraHeaders },
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`API ${path} failed: ${res.status}`);
@@ -420,3 +424,37 @@ export interface StoreMarketing {
 /** 가게 단위 마케팅 광고 솔루션 자동 생성(Program) — 상가 사진·정보·리뷰 기반 */
 export const generateStoreMarketing = (profile: StoreProfileInput) =>
   postJSON<StoreMarketing>("/marketing/generate", profile);
+
+/** 점주 제공 원문을 처리하는 상용 온보딩 동의 계약. 모든 true 값은 UI에서 사용자가
+ *  각각 확인한 뒤에만 전송한다. 백엔드는 누락·false 를 422로 거절한다. */
+export interface ProgramCommercialConsent {
+  contract_version: "spaceos.program-onboarding/1";
+  data_origin: "merchant-provided";
+  processing_purpose: "program-marketing-generation";
+  consent_to_process: true;
+  rights_confirmed: true;
+  allow_external_model_processing: true;
+  raw_input_retention: "request-only";
+}
+
+export interface ProgramCommercialOnboardingResponse {
+  onboarding_id: string;
+  org_id: string;
+  accepted_at: string;
+  contract_version: "spaceos.program-onboarding/1";
+  input_source: "merchant-provided";
+  raw_input_persisted: false;
+  marketing: StoreMarketing;
+}
+
+/** 조직 API 키를 쓰는 상용 Program 경로. 키는 호출 헤더에만 쓰고 브라우저 저장소에
+ *  보관하지 않는다. 공개 데모 `/marketing/generate`와 계약을 섞지 않는다. */
+export const generateCommercialStoreMarketing = (
+  profile: StoreProfileInput,
+  consent: ProgramCommercialConsent,
+  apiKey: string,
+) => postJSON<ProgramCommercialOnboardingResponse>(
+  "/marketing/onboarding/generate",
+  { profile, consent },
+  { "X-API-Key": apiKey },
+);

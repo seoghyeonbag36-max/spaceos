@@ -138,6 +138,20 @@ def get_optional_principal(
     return Principal(org=org, user=user, via="jwt")
 
 
+def get_current_principal(
+    principal: Principal | None = Depends(get_optional_principal),
+) -> Principal:
+    """JWT 또는 조직 API 키가 확인된 주체만 허용한다.
+
+    공개 분석 API 는 ``get_optional_principal`` 로 익명을 허용하지만, 점주 제공 원문을
+    처리하는 상용 온보딩은 어느 조직의 동의인지 반드시 알아야 한다. 잘못된 자격증명은
+    선택 의존성에서 이미 401이고, 자격증명이 아예 없는 경우도 여기서 401로 막는다.
+    """
+    if principal is None:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "조직 인증이 필요합니다")
+    return principal
+
+
 def get_current_user(
     creds: HTTPAuthorizationCredentials | None = Depends(_bearer),
     db: Session = Depends(get_db),
