@@ -507,7 +507,7 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
     <div className="pagedash"><div className="wrap">
       <div className="hd">
         <div>
-          <button className="back" onClick={onBack}>← 주요 Platform 보드</button>
+          <button className="back" onClick={onBack}>← 거점 보드</button>
           <h1>{summary.name}</h1>
           <div className="sub">
             {detail?.sub ?? summary.note} · 공실률 {summary.vacancy_rate.toFixed(1)}%

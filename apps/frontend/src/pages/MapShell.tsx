@@ -9,8 +9,8 @@
 // 거점은 하드코딩(gangnam-garosugil)이 아니라 **실측 거점 목록에서 고른다** —
 // vacancy_source === "gold" 인 거점만 건물 폴리곤이 있고, 합성 거점은 404 라 빈 지도가 된다.
 //
-// ⚠ 이 컴포넌트는 position:absolute·inset:0 이라 **위치 지정된 부모** 안에 있어야 한다
-//   (App.tsx 의 main 이 지도 뷰에서만 position:relative). 지도 캔버스 사이징 함정은
+// ⚠ 이 컴포넌트는 position:fixed 로 뷰포트(좌측 레일 제외)를 통째로 채운다 —
+//   부모 레이아웃에 기대지 않는다. 지도 캔버스 사이징 함정은
 //   MapShell.css 의 .map-canvas 주석 참조.
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { loadNaverMaps, describeNaverMapError } from "@/lib/naverMap";

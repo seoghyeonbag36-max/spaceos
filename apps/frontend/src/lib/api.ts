@@ -322,10 +322,141 @@ async function postJSON<T>(
   return res.json() as Promise<T>;
 }
 
-/** 입점 시뮬레이션(Posting) — 외부 AI 창업 코파일럿 어댑터 경유(미설정 시 3-Tier 폴백) */
+/** 입점 시뮬레이션 결과 — 코파일럿·폴백이 같은 스키마로 흐른다. */
+export interface SimulateResult {
+  district_id: string; unit_id: string; industry_type: string | null;
+  scenarios: Record<string, TierScenario>;
+  /** "copilot" | "fallback-3tier" */
+  source: string;
+  /** 폴백으로 떨어진 **이유**. 코파일럿 미설정이면 null(폴백이 정상 동작이다),
+   *  설정돼 있는데 실패했으면 사유가 온다. 둘을 섞으면 코파일럿이 죽어도 모른다. */
+  source_note: string | null;
+  /** 입력 필드별 출처. prem 이 "absent" 면 권리금 0 은 관측이 아니라 **전제**다. */
+  inputs_source: PostingInputSource | null;
+  inputs_quarter: string | null;
+  /** 세 전략 모두 회수 불가일 때만 채워진다 — "추천이 없다"와 "회수가 안 된다"는 다르다. */
+  unviable_note: string | null;
+}
+
+/** 입점 시뮬레이션(Posting) — 외부 AI 창업 코파일럿 어댑터 경유(미설정 시 3-Tier 폴백).
+ *  `prem`(권리금, 만원)은 **입력 계약**이다 — 공개 통계가 없어 그 자리에 들어갈 기업만 안다.
+ *  안 보내면 0 을 전제로 계산하고 `inputs_source.prem === "absent"` 가 그 사실을 밝힌다. */
 export const simulateRevenue = (req: {
-  district_id: string; unit_id?: string; industry_type?: string; strategy?: string;
-}) => postJSON<unknown>("/ai/simulate-revenue", req);
+  district_id: string; unit_id?: string; industry_type?: string;
+  strategy?: string; prem?: number;
+}) => postJSON<SimulateResult>("/ai/simulate-revenue", req);
+
+/* ===== Platform 정체성·자리 제안 — GET /commercial-districts/{id}/platform ===== */
+
+/** 업종 군(카카오 플레이스 라벨을 묶은 것). members 로 근거 라벨을 펼쳐 볼 수 있다. */
+export interface CategoryGroup {
+  group: string; n: number; share: number;
+  members: { label: string; n: number }[];
+}
+
+/** 검색 트렌드 한 계열. direction 은 최근 3개월 vs 직전 3개월(±5% 보합)로 **계산된** 값이다. */
+export interface TrendSeries {
+  keyword: string; prior: number; recent: number; change_pct: number;
+  direction: "up" | "down" | "flat";
+  points: { period: string; value: number }[];
+}
+
+/** TRDAR 수요신호 — 누가·언제 오는가. 값이 없는 거점은 필드가 비어 온다. */
+export interface DemandSignal {
+  bands?: { band: string; label: string; flpop: number; selng: number | null; gap: number | null }[];
+  peak_band?: string | null;
+  gap_band?: string | null;
+  ages?: { band: string; share: number }[];
+  female_share?: number; weekend_flpop?: number; weekend_selng?: number;
+  store_count?: number; franchise_share?: number;
+  open_rate?: number; close_rate?: number; trdar_n?: number;
+}
+
+/** "이 상권은 어떤 플랫폼인가" — 감성은 여기 없다(전부 시드라 근거로 쓰지 않는다). */
+export interface PlatformIdentity {
+  archetype: string | null;
+  /** 유형 라벨을 만든 규칙 그대로. 화면에 같이 적어 판정을 감사할 수 있게 한다. */
+  archetype_rule: string;
+  categories: { groups: CategoryGroup[]; ungrouped: { label: string; n: number }[]; total: number };
+  /** 표시용 불용어를 걸렀으면 dropped 로 몇 개인지 밝힌다(조용히 지우지 않는다) */
+  keywords: { words: { word: string; n: number }[]; dropped: number; scanned: number };
+  trends: TrendSeries[];
+  demand: DemandSignal;
+  source: string;
+}
+
+/** "어느 자리에 어떤 업소가 들어오면 좋은가" — 자리는 실측 공실 유닛이다.
+ *  ⚠ `was`(직전 업종)는 상가정보 분류, `recommendations`는 GNN 7군이라 **눈금이 다르다**.
+ *     둘을 자동으로 비교해 "업종 전환"이라고 판정하지 말 것. */
+export interface OpeningSite {
+  unit_id: string; name: string;
+  lat: number | null; lng: number | null;
+  area_py: number | null; floor: string | null;
+  capacity: number | null; vacancy_rate: number | null;
+  was: string | null;
+  recommendations: IndustryRec[];
+  matched_distance_m: number | null;
+  /** 이 자리에서 **상권 평균 대비** 가장 두드러지는 업종.
+   *  GNN Top-1 은 상권 사전확률에 눌려 거의 모든 자리가 같은 답을 낸다 — 평균을 빼야
+   *  자리별 신호가 남는다. 노드 Top-3 밖 업종을 0 으로 보는 근사라 **자리 간 비교용**이다. */
+  distinct: { industry: string; score: number; district_mean: number; delta_pp: number } | null;
+}
+
+export interface PlatformProfile {
+  district_id: string;
+  identity: PlatformIdentity | null;
+  openings: {
+    sites: OpeningSite[]; unit_count: number; matched_count: number;
+    match_radius_m: number; source: string; distinct_note?: string;
+  };
+}
+
+/** Platform 정체성 + 자리 제안. 산출물이 없는 거점은 404. */
+export const getPlatformProfile = (id: string) =>
+  getJSON<PlatformProfile>(`/commercial-districts/${id}/platform`);
+
+/* ===== LSTM 공실 예측(Platform 5-1) — POST /ai/predict-vacancy ===== */
+
+/** 재귀 예측 1분기. h2 부터는 외생 피처를 마지막 관측값으로 고정한 근사다. */
+export interface ForecastHorizon {
+  quarter: string; forecast_vac_proxy: number; delta: number; direction: "up" | "down";
+}
+
+/** 공실 예측 응답.
+ *  ⚠ 단위는 **공실률(%)이 아니라 vac_proxy(공실 프록시)** 다 — R-ONE 실측은 피처로 들어간다.
+ *     화면에 %로 쓰려면 `delta` 를 현재 공실률에 가산하는 근사만 허용된다
+ *     (백엔드 services/districts._predicted 와 같은 식).
+ *  ⚠ `model === "lstm-stub"` 은 Gold 미적재 폴백이다(HTTP 200). 실측처럼 그리면 안 된다. */
+export interface VacancyForecast {
+  district_id: string;
+  model: string;
+  forecast_vac_proxy: number;
+  last_vac_proxy: number;
+  delta: number;
+  direction: "up" | "down";
+  last_quarter: string;
+  forecast_quarter?: string;
+  n_quarters: number;
+  horizons: ForecastHorizon[];
+  horizon_quarters: number;
+  trained_at: string | null;
+  /** 전체 홀드아웃 지표. `holdout_direction_acc` 는 54거점 표본에서 노이즈가 커
+   *  게이트에서 내렸다 — 성능 근거로 인용하지 않는다(MAE 가 주지표). */
+  metrics: Record<string, number> | null;
+  /** 이 거점의 홀드아웃 1점 — 전체 MAE 뒤에 거점 오차를 숨기지 않기 위해 붙는다 */
+  district_holdout?: { pred: number; actual: number; prev: number; direction_hit: boolean };
+  /** 지상검증 실측 앵커 (보유 거점에만 — 현재 garosugil) */
+  ground_anchor?: {
+    estimated_vacancy_pct: number; vacancy_band_pct: [number, number] | null;
+    anchor_street_pct: number | null; buildings_used: number | null;
+    as_of: string; source: string;
+  };
+}
+
+/** LSTM 공실 예측 — horizon_months 는 백엔드에서 분기로 환산된다(올림, 1~4 클램프).
+ *  ⚠ 미지원 거점은 404 — 호출부에서 잡아 빈 상태로 둔다. */
+export const predictVacancy = (district_id: string, horizon_months = 3) =>
+  postJSON<VacancyForecast>("/ai/predict-vacancy", { district_id, horizon_months });
 
 /* ===== GNN 업종 추천(Platform 5-2) — POST /ai/recommend-industry ===== */
 

@@ -142,6 +142,19 @@ def _load_context_rows(slug: str) -> list[tuple[str, str, float]] | None:
         return None
 
 
+def context_rows(district_id: str | None) -> list[tuple[str, str, float]] | None:
+    """상권 컨텍스트 CSV 를 (kind, key, value) 행으로 — **거점 id 로** 묻는 공개 입구.
+
+    Platform(services/platform_profile)이 같은 파일을 읽되 파서를 두 벌 두지 않도록
+    별칭 해석·슬러그 검증까지 여기서 한 번에 한다. 로더가 갈리면 인코딩·결측 규칙이
+    조용히 달라져 두 화면이 같은 거점을 다르게 말하게 된다.
+    """
+    slug = _DISTRICT_ALIAS.get(district_id or "", district_id or "")
+    if not _SLUG_RE.match(slug):
+        return None
+    return _load_context_rows(slug)
+
+
 def _top_n(rows: list[tuple[str, str, float]], kind: str, n: int = 5) -> list[tuple[str, float]]:
     """해당 kind 의 상위 n건 (value 내림차순) — 예전 nlargest 대체."""
     hits = [(k, v) for kd, k, v in rows if kd == kind]
