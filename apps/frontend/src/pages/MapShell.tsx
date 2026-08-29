@@ -13,7 +13,7 @@
 //   (App.tsx 의 main 이 지도 뷰에서만 position:relative). 지도 캔버스 사이징 함정은
 //   MapShell.css 의 .map-canvas 주석 참조.
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { loadNaverMaps } from "@/lib/naverMap";
+import { loadNaverMaps, describeNaverMapError } from "@/lib/naverMap";
 import { getBuildingVacancy, getDensityHeatmap, getFootfallHeatmap, getRentHeatmap, listDistricts, recommendIndustry,
   type DensityHeatmap, type DistrictSummary, type FootfallHeatmap, type GeoJSONFC, type IndustryRecommend, type RentHeatmap } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
@@ -238,7 +238,7 @@ export default function MapShell() {
         });
         setReady(true);
       })
-      .catch((e) => alive && setErr(e?.message ?? "지도 로드 실패"));
+      .catch((e) => alive && setErr(describeNaverMapError(e)));
     return () => { alive = false; };
   }, []);
 
@@ -343,8 +343,8 @@ export default function MapShell() {
           <strong>네이버 지도를 불러오지 못했습니다</strong>
           <div>{err}</div>
           <div>
-            <code>apps/frontend/.env</code> 의 <code>VITE_NAVER_MAPS_KEY_ID</code> 설정 +
-            NCP 콘솔에 <code>http://localhost:5173</code> 도메인 등록이 필요합니다.
+            NCP 콘솔 &gt; Maps &gt; Application 의 Web 서비스 URL 에{" "}
+            <code>{window.location.origin}</code> 을 등록해야 합니다.
           </div>
         </div>
       )}
