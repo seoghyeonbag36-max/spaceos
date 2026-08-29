@@ -7,7 +7,7 @@ import type {
   DistrictSummary, DistrictDetail, Posting, Marketing, TierScenario, VacancyHeatmap, GeoJSONFC,
   VacancySource,
 } from "@/lib/api";
-import { loadNaverMaps } from "@/lib/naverMap";
+import { loadNaverMaps, describeNaverMapError } from "@/lib/naverMap";
 import { colors } from "@/design/tokens/colors";
 import "./PageDashboard.css";
 
@@ -299,7 +299,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
 
         setMapReady(true);
       })
-      .catch((e) => live && setMapErr(e?.message ?? String(e)));
+      .catch((e) => live && setMapErr(describeNaverMapError(e)));
 
     return () => {
       live = false;
