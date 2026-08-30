@@ -39,10 +39,16 @@ MARK = {OK: "[OK]", PARTIAL: "[~ ]", TODO: "[  ]", BLOCKED: "[!!]"}
 
 
 def _hubs() -> dict:
+    """조회 대상 거점 전부 — `ALL_HUBS` 를 쓴다.
+
+    ⚠ 종전에는 `HUBS + GYEONGGI_HUBS` 를 손으로 합쳤다. 그래서 2026-08-30 서울 미커버
+      자치구 배치(`SEOUL_BATCH2_HUBS`)를 더하자 프로버가 그 12거점을 **"등록 안 됨"으로
+      보고**했다 — 수집은 멀쩡히 끝났는데 프로버만 못 본 것이다. 배치가 늘 때마다 여기를
+      고쳐야 하는 구조였고, 그게 곧 잊히는 자리다. `page_hubs` 가 이미 `ALL_HUBS` 로
+      전부 합쳐 두므로 그것을 단일 출처로 삼는다.
+    """
     from data.config import page_hubs as ph
-    hubs = dict(ph.HUBS)
-    hubs.update(getattr(ph, "GYEONGGI_HUBS", {}))
-    return hubs
+    return dict(getattr(ph, "ALL_HUBS", None) or ph.HUBS)
 
 
 def _latest(slug: str, name: str) -> Path | None:

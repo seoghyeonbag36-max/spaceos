@@ -1,0 +1,63 @@
+{
+ "miasageori": {
+  "stage": "stores",
+  "at": "2026-08-30T21:51:41",
+  "minutes": 0.2
+ },
+ "suyu": {
+  "stage": "stores",
+  "at": "2026-08-30T21:51:52",
+  "minutes": 0.2
+ },
+ "bulgwang": {
+  "stage": "stores",
+  "at": "2026-08-30T21:52:03",
+  "minutes": 0.2
+ },
+ "yeonsinnae": {
+  "stage": "stores",
+  "at": "2026-08-30T21:52:16",
+  "minutes": 0.2
+ },
+ "hwagok": {
+  "stage": "stores",
+  "at": "2026-08-30T21:52:23",
+  "minutes": 0.1
+ },
+ "kkachisan": {
+  "stage": "stores",
+  "at": "2026-08-30T21:52:30",
+  "minutes": 0.1
+ },
+ "mokdong-yc": {
+  "stage": "stores",
+  "at": "2026-08-30T21:52:37",
+  "minutes": 0.1
+ },
+ "sanggye": {
+  "stage": "stores",
+  "at": "2026-08-30T21:52:46",
+  "minutes": 0.2
+ },
+ "sangbong": {
+  "stage": "stores",
+  "at": "2026-08-30T21:52:53",
+  "minutes": 0.1
+ },
+ "oryudong": {
+  "stage": "stores",
+  "at": "2026-08-30T21:52:59",
+  "minutes": 0.1
+ },
+ "doksan": {
+  "stage": "stores",
+  "at": "2026-08-30T21:53:01",
+  "minutes": 0.0
+ },
+ "cheonho": {
+  "stage": "stores",
+  "at": "2026-08-30T21:53:09",
+  "minutes": 0.1
+ },
+ "finished_at": "2026-08-30T21:53:09"
+}
