@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { caveatKind, CaveatNote } from "@/components/DistrictPicker";
 import {
   listDistricts, generateCommercialStoreMarketing, generateStoreMarketing,
   lookupStorePlaces, lookupStoreReviews,
@@ -334,9 +335,14 @@ export default function ProgramStudio() {
             <select value={form.districtId} onChange={set("districtId")} disabled={districts === null}>
               <option value="">{districts === null ? "거점 불러오는 중…" : "— 결합 안 함 —"}</option>
               {(districts ?? []).map((d) => (
-                <option key={d.id} value={d.id}>{d.name} · {d.gu}</option>
+                // 이 select 는 "— 결합 안 함 —" 빈 옵션을 갖고 있어 DistrictPicker 로
+                // 통째로 바꾸지 못한다. 예외 표식만 같은 규칙으로 단다.
+                <option key={d.id} value={d.id}>
+                  {caveatKind(d) ? (caveatKind(d) === "mall" ? "▣ " : "▤ ") : ""}{d.name} · {d.gu}
+                </option>
               ))}
             </select>
+            <CaveatNote district={(districts ?? []).find((d) => d.id === form.districtId)} />
           </Field>
 
           <Field label="주소">

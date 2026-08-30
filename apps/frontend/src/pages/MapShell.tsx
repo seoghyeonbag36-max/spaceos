@@ -13,6 +13,7 @@
 //   부모 레이아웃에 기대지 않는다. 지도 캔버스 사이징 함정은
 //   MapShell.css 의 .map-canvas 주석 참조.
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import DistrictPicker, { CaveatNote } from "@/components/DistrictPicker";
 import { loadNaverMaps, describeNaverMapError } from "@/lib/naverMap";
 import { getBuildingVacancy, getDensityHeatmap, getFootfallHeatmap, getRentHeatmap, listDistricts, recommendIndustry,
   type DensityHeatmap, type DistrictSummary, type FootfallHeatmap, type GeoJSONFC, type IndustryRecommend, type RentHeatmap } from "@/lib/api";
@@ -352,12 +353,11 @@ export default function MapShell() {
       {/* 상단: 거점 선택 + 검색 + 레이어 토글 */}
       <div className="overlay overlay-top">
         {hubs.length > 0 && (
-          <select className="hub-select" value={districtId} onChange={(e) => setDistrictId(e.target.value)}
-            title="건물 폴리곤이 있는 실측 거점만 나온다">
-            {hubs.map((h) => (
-              <option key={h.id} value={h.id}>{h.name} · 공실 {h.vacancy_rate.toFixed(1)}%</option>
-            ))}
-          </select>
+          <>
+            <DistrictPicker className="hub-select" districts={hubs}
+              value={districtId} onChange={setDistrictId} />
+            <CaveatNote district={hubs.find((h) => h.id === districtId)} />
+          </>
         )}
         <input className="search" placeholder={`건물 검색 (${hub?.name ?? "가로수길"})`} value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="seg" role="tablist">

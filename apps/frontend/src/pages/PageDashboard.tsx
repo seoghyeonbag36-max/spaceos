@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { CaveatNote, MeasuredValue } from "@/components/DistrictPicker";
 import {
   BASIS_LABEL,
   listDistricts, getDistrict, getPostings, getMarketing, getVacancyHeatmap, getBuildingVacancy,
@@ -98,12 +99,18 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
   const kpi = useMemo(() => {
     const n = summaries.length;
     const avg = (f: (s: DistrictSummary) => number) => summaries.reduce((a, s) => a + f(s), 0) / Math.max(1, n);
+    // 감성·리뷰는 경기 거점에 소스가 없어 null 이다. **null 을 0 으로 세면 안 된다** —
+    // 평균이 내려가 서울 거점까지 실제보다 낮게 보인다. 실측이 있는 거점만 분모에 넣는다.
+    const measured = summaries.filter((s) => s.sentiment !== null && s.sentiment !== undefined);
+    const sentAvg = measured.length
+      ? measured.reduce((a, s) => a + (s.sentiment ?? 0), 0) / measured.length : null;
     return {
       n,
-      sent: avg((s) => s.sentiment),
+      sent: sentAvg,
+      sentN: measured.length,
       vac: avg((s) => s.vacancy_rate),
       vacant: summaries.reduce((a, s) => a + s.vacant_units, 0),
-      reviews: summaries.reduce((a, s) => a + s.reviews, 0),
+      reviews: summaries.reduce((a, s) => a + (s.reviews ?? 0), 0),
       gold: summaries.filter((s) => s.vacancy_source === "gold").length,
     };
   }, [summaries]);
@@ -123,7 +130,12 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
 
       <div className="kpis">
         <div className="kpi"><div className="l">거점</div><div className="v">{kpi.n}<small>곳</small></div><div className="d">Phase 1~2 자치구 핫플 상권</div></div>
-        <div className="kpi"><div className="l">평균 감성지수</div><div className="v" style={{ color: sentHex(kpi.sent) }}>{kpi.sent.toFixed(1)}<small>pt</small></div><div className="d">추정치 — 리뷰 수집 미착수</div></div>
+        <div className="kpi"><div className="l">평균 감성지수</div>
+          <div className="v" style={{ color: kpi.sent === null ? undefined : sentHex(kpi.sent) }}>
+            {kpi.sent === null ? <span className="value-absent">실측 없음</span>
+              : <>{kpi.sent.toFixed(1)}<small>pt</small></>}</div>
+          {/* 분모를 밝힌다 — 감성 소스가 없는 거점(경기)은 평균에서 뺐다. */}
+          <div className="d">추정치 · {kpi.sentN}/{kpi.n}거점 실측</div></div>
         <div className="kpi"><div className="l">평균 공실률</div><div className="v" style={{ color: vacHex(kpi.vac) }}>{kpi.vac.toFixed(1)}<small>%</small></div><div className="d">100m 그리드 · 실측 {kpi.gold} / 합성 {kpi.n - kpi.gold}</div></div>
         <div className="kpi"><div className="l">공실 호실 합계</div><div className="v">{kpi.vacant.toLocaleString()}<small>개</small></div><div className="d">실측 거점은 건축물대장 호실 기준</div></div>
       </div>
@@ -138,12 +150,18 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
               <SourceBadge source={s.vacancy_source} />
             </div>
             <div className="dhot">{s.type} · {s.note}</div>
-            <Bar k="감성" v={s.sentiment} max={100} color={sentHex(s.sentiment)} text={`${s.sentiment.toFixed(1)}pt`} />
+            {s.sentiment === null || s.sentiment === undefined
+              ? <div className="dmeta"><span className="value-absent"
+                  title="이 거점에는 감성 소스가 없다 — 0 이 아니라 재지 않은 것이다">감성 실측 없음</span></div>
+              : <Bar k="감성" v={s.sentiment} max={100} color={sentHex(s.sentiment)}
+                     text={`${s.sentiment.toFixed(1)}pt`} />}
             <Bar k="공실" v={s.vacancy_rate} max={VAC_BAR_MAX} color={vacHex(s.vacancy_rate)} text={`${s.vacancy_rate.toFixed(1)}%`} />
             <div className="dmeta">
-              <span>리뷰 {s.reviews.toLocaleString()}</span>
+              <span>리뷰 {s.reviews === null || s.reviews === undefined
+                ? <span className="value-absent">없음</span> : s.reviews.toLocaleString()}</span>
               <span>공실 {s.vacant_units}개</span>
-              <span className={s.risk_zones > 0 ? "risk" : ""}>위험구역 {s.risk_zones}</span>
+              {s.risk_zones !== null && s.risk_zones !== undefined &&
+                <span className={s.risk_zones > 0 ? "risk" : ""}>위험구역 {s.risk_zones}</span>}
               <Anchor pct={s.anchor_pct} gap={s.anchor_gap_pp} />
               <Pred rate={s.predicted_rate} delta={s.predicted_delta} direction={s.predicted_direction} />
             </div>
@@ -512,8 +530,12 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
           <div className="sub">
             {detail?.sub ?? summary.note} · 공실률 {summary.vacancy_rate.toFixed(1)}%
             {" "}<Pred rate={summary.predicted_rate} delta={summary.predicted_delta} direction={summary.predicted_direction} />
-            {" "}· 감성 {summary.sentiment.toFixed(1)}pt · 추천 상위 Tier {summary.rec_top}
+            {" "}· 감성 <MeasuredValue value={summary.sentiment} unit="pt" />
+            {summary.rec_top ? ` · 추천 상위 Tier ${summary.rec_top}` : ""}
           </div>
+          {/* 예외 거점이면 왜 다른지 여기서 전문으로 밝힌다. 목록의 표식(▤·▣)만 보고
+              숫자를 그대로 믿지 않게 하는 자리다. */}
+          <CaveatNote district={summary} />
         </div>
       </div>
 

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DistrictPicker, { CaveatNote, MeasuredValue } from "@/components/DistrictPicker";
 import {
   getPlatformProfile, getSentiment, listDistricts, predictVacancy, recommendIndustry,
 } from "@/lib/api";
@@ -138,11 +139,8 @@ export default function PlatformConsole() {
       <div className="picker">
         <label className="pk">
           <span>상권</span>
-          <select value={districtId} onChange={(e) => setDistrictId(e.target.value)}>
-            {districts.map((d) => (
-              <option key={d.id} value={d.id}>{d.name} · {d.gu}</option>
-            ))}
-          </select>
+          <DistrictPicker districts={districts} value={districtId}
+            onChange={setDistrictId} suffix={(d) => d.gu} />
         </label>
         {hub && (
           <div className="chips">
@@ -717,10 +715,13 @@ function SentimentSection({ zones, hub }: { zones: Zone[] | null; hub?: District
           불리나&rdquo;가 언급 빈도에서 감성으로 올라선다.
         </div>
       </div>
+      {hub && <CaveatNote district={hub} />}
       {hub && (
         <div className="seedsum">
-          거점 감성 {hub.sentiment.toFixed(1)}pt · 위험 구역 {hub.risk_zones}곳 ·
-          가정 표본 {hub.reviews.toLocaleString()}건
+          거점 감성 <MeasuredValue value={hub.sentiment} unit="pt" /> ·
+          위험 구역 {hub.risk_zones ?? "—"}곳 ·
+          가정 표본 {hub.reviews === null || hub.reviews === undefined
+            ? <span className="value-absent">없음</span> : `${hub.reviews.toLocaleString()}건`}
         </div>
       )}
       {!zones && <div className="empty">감성 구역 불러오는 중…</div>}

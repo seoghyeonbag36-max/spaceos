@@ -28,3 +28,27 @@
 html, body { margin: 0; padding: 0; }
 /* 스크롤은 문서(창) 한 곳에서만 일어난다 — App 은 내부 overflow 컨테이너를 두지 않는다. */
 html, body { font-family: var(--font-sans); color: var(--ink); background: #eef1f4; }
+
+/* ── 예외 표시 · 실측 없음 (2026-08-30) ────────────────────────────────────────
+   고양·파주 확장으로 두 가지를 화면이 말해야 한다:
+   ① 이 거점의 수치를 다른 거점과 나란히 놓으면 안 되는 이유(caveat)
+   ② 값이 0 인 것과 **재지 않은 것**의 구분
+   색은 토큰만 쓴다(하드코딩 금지 — design skill 규칙). */
+.caveat-note {
+  margin: 8px 0 0; padding: 8px 10px; border-radius: var(--radius-md);
+  font-size: 12px; line-height: 1.5; color: var(--ink);
+  background: rgba(234, 179, 8, .08); border: 1px solid rgba(234, 179, 8, .35);
+}
+.caveat-note strong { color: #8A6100; font-weight: 700; margin-right: 2px; }
+/* 단일시설은 표본 한계와 성격이 다르다 — 색으로도 가른다.
+   계획상가는 "분모가 일부만 덮는다"(경고), 단일시설은 "축이 다르다"(정보). */
+.caveat-note.caveat-mall {
+  background: rgba(14, 165, 183, .07); border-color: rgba(14, 165, 183, .32);
+}
+.caveat-note.caveat-mall strong { color: var(--brand-pressed); }
+
+/* 재지 않은 값. 0 으로 보이면 안 되므로 숫자꼴을 아예 쓰지 않는다. */
+.value-absent {
+  color: var(--muted); font-style: normal; font-size: .92em;
+  border-bottom: 1px dotted var(--line); cursor: help;
+}

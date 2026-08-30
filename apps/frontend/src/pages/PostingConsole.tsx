@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DistrictPicker, { CaveatNote } from "@/components/DistrictPicker";
 import {
   BASIS_LABEL, getPostings, listDistricts, recommendIndustry, simulateRevenue,
 } from "@/lib/api";
@@ -148,9 +149,9 @@ export default function PostingConsole() {
 
           <label className="field">
             <span className="flabel">상권</span>
-            <select value={districtId} onChange={(e) => setDistrictId(e.target.value)}>
-              {districts.map((d) => <option key={d.id} value={d.id}>{d.name} · {d.gu}</option>)}
-            </select>
+            <DistrictPicker districts={districts} value={districtId}
+              onChange={setDistrictId} suffix={(d) => d.gu} />
+            <CaveatNote district={districts.find((d) => d.id === districtId)} />
           </label>
 
           <label className="field">
