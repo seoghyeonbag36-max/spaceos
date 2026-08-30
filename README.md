@@ -69,7 +69,9 @@ python scripts/pppp_status.py     # 트랙별 진행률 + 게이트 ([자동] = 
 
 - `CLAUDE.md` — 프로젝트 컨텍스트 + 코드베이스 가이드 (자동 로드)
 - `.claude/settings.json` — 권한 설정
-- `.claude/commands/` — 슬래시 커맨드
+- `.claude/skills/` — 스킬(슬래시 명령 겸용). 2026-08-30 `.claude/commands/` 에서 전환.
+  체인 둘: `/hub-chain`(거점을 등록→배포까지 미는 선형) · `/loop-engine`(상태를 읽고 다음 수를 고르는 루프).
+  체인이 읽는 상태는 `python scripts/chain_status.py <slug>` 가 산출물에서 낸다
   - 트랙 전환: `/platform` `/page` `/posting` `/program` `/design`
   - 진행·검증: `/pppp-status` `/verify` `/quota`(건축HUB 일일 쿼터 소진)
   - 개발: `/backend-dev` `/frontend-dev` `/ml-train` `/district-map` `/director`

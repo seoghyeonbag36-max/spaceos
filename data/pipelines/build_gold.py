@@ -326,7 +326,13 @@ _OFFSITE_PLACES = frozenset({
 })
 
 
-def _is_offsite(text: str, hub_terms: frozenset[str] = frozenset()) -> bool:
+# 거점이 속한 도시의 지명 — 이 이름들은 그 거점에게 **타지명이 아니다**.
+# 기본값이 {"서울"} 이라 서울 54거점의 판정은 종전과 완전히 같다(회귀 없음).
+_HOME_TERMS_DEFAULT = frozenset({"서울"})
+
+
+def _is_offsite(text: str, hub_terms: frozenset[str] = frozenset(),
+                home_terms: frozenset[str] = _HOME_TERMS_DEFAULT) -> bool:
     """서울 거점 컨텍스트에 섞인 타 지역 글인가 (동명이지 필터).
 
     수집 질의를 "서울 {거점명} …"로 좁힌 것이 1차 방어고(collectors/naver_blog.py),
@@ -344,13 +350,18 @@ def _is_offsite(text: str, hub_terms: frozenset[str] = frozenset()) -> bool:
        단 "서울"이 함께 있으면 남긴다. 서울 상호에 지명이 들어간 경우(시청역 '진주회관',
        여의도 '진주집', 안암 '제주고깃집')를 죽이지 않기 위한 예외다.
     """
+    # ⚠ **자기 도시 이름을 타지명으로 세면 그 도시의 글이 전멸한다.** 2026-08-29 실측:
+    #   home_terms 를 넣기 전 "고양 화정 맛집" 100건 중 100건, "파주 운정 맛집" 100건 중
+    #   100건이 폐기됐다(서울 거점은 0건). 필터가 "서울 거점"을 전제로 짜여 있었고,
+    #   도시 축이 생기면서 그 전제가 드러났다.
+    offsite = _OFFSITE_PLACES - home_terms
     for hub in hub_terms:
-        for place in _OFFSITE_PLACES:
+        for place in offsite:
             if re.search(rf"{re.escape(place)}(?:특별시|광역시|시|군|구)?\s*{re.escape(hub)}", text):
                 return True
-    if "서울" in text:
+    if any(h in text for h in home_terms):
         return False
-    return any(p in text for p in _OFFSITE_PLACES)
+    return any(p in text for p in offsite)
 
 
 # 한 블로거가 한 거점 키워드 집계에 넣을 수 있는 글 수 상한.

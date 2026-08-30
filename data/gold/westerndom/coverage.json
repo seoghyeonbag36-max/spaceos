@@ -2,21 +2,22 @@
   "slug": "westerndom",
   "hub_name": "일산 웨스턴돔",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-30T15:43:16",
+  "built_at": "2026-08-30T17:05:57",
   "shown": 58,
   "excluded_total": 10,
   "excluded_unknown": 0,
   "excluded_non_commercial": 10,
   "coverage_pct": 85.3,
   "status": {
-    "full": 29,
-    "partial": 16,
+    "full": 30,
+    "partial": 17,
     "high": 8,
-    "empty": 5
+    "empty": 3
   },
   "source": {
     "stores+ledger": 53,
-    "polygon_only": 5
+    "polygon_only": 3,
+    "pip_only": 2
   },
   "reference_vacancy_pct": 18.0,
   "reference_buildings": 39,

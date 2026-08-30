@@ -2,7 +2,7 @@
   "slug": "unjeong",
   "hub_name": "운정",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-30T16:01:15",
+  "built_at": "2026-08-30T17:06:09",
   "shown": 205,
   "excluded_total": 597,
   "excluded_unknown": 59,
@@ -10,24 +10,24 @@
   "coverage_pct": 25.6,
   "status": {
     "full": 81,
-    "partial": 5,
-    "high": 9,
+    "partial": 6,
+    "high": 8,
     "empty": 110
   },
   "source": {
     "stores+ledger": 95,
     "polygon_only": 110
   },
-  "reference_vacancy_pct": 50.0,
+  "reference_vacancy_pct": 49.3,
   "reference_buildings": 44,
   "reference_coverage_pct": 88.0,
-  "mixed_vacancy_pct": 63.9,
+  "mixed_vacancy_pct": 63.7,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 41,
-      "active": 44,
+      "active": 45,
       "capacity": 50,
-      "vacancy_pct": 12.0
+      "vacancy_pct": 10.0
     },
     "floor_approx": {
       "buildings": 6,

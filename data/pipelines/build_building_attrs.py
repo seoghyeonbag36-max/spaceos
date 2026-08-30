@@ -30,7 +30,7 @@ from pathlib import Path
 
 from data.collectors.building_vacancy import NON_CAPACITY_PURPS
 from data.collectors.common import BRONZE, SILVER, load_latest
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import HUBS, get_hub
 
 # R-ONE 중대형/소규모 표본이 되는 '상가건물'의 표제부 주용도. 업무시설·숙박시설은
 # 1층에 점포가 있어도 상가 표본이 아니다(13거점 B모집단에 업무 509동·숙박 332동).
@@ -288,9 +288,10 @@ def main() -> None:
     slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(HUBS)
     done = 0
     for s in slugs:
-        if s not in HUBS:
-            print(f"[attrs] 미등록 거점 '{s}' — 건너뜀")
-            continue
+        if get_hub(s) is None:
+            # 이름을 대고 불렀는데 못 찾았다 = 오타이거나 미등록이다. 건너뛰고 exit 0 으로
+            # 끝내면 부르는 쪽(hub-chain·loop-engine)이 수집된 줄 안다 — 2026-08-30 hwajeong.
+            raise SystemExit(f"[attrs] 미등록 거점 '{s}' — page_hubs 의 HUBS/GYEONGGI_HUBS 확인")
         if not (BRONZE / s).exists():
             continue
         if run(s):

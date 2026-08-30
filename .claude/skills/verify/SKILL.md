@@ -1,9 +1,26 @@
 ---
 name: verify
-description: SpaceOS 로컬 앱을 띄우고 변경분을 실제 표면에서 관찰하는 절차 (백엔드 API / Vite 프록시 / 지도 UI).
+description: SpaceOS 변경분을 실제 표면에서 확인하는 절차 — 정적 3종(pytest·build·torch) + 로컬 앱을 띄워 API·Vite 프록시·지도 픽셀까지. 작업을 마쳤을 때.
 ---
 
 # SpaceOS 검증 레시피
+
+## 0. 정적 검증 3종 — 변경 직후 항상
+
+```bash
+cd apps/backend && pytest -q                 # 백엔드 테스트/임포트
+cd apps/frontend && npm run build            # 프론트 타입체크 + 빌드
+cd ml && python -c "import torch; print('torch', torch.__version__)"
+```
+
+무인으로 한 번에: `python scripts/run_full_verify.py`
+(→ `reports/full_verify.json` + `reports/logs/verify_*.log`)
+
+실패하면 원인과 수정안을 제시하고 통과까지 반복한다. `CLAUDE.md` 규칙도 같이 본다 —
+경로 · 타입힌트 · 한국어 주석 · 더미의 `TODO` 표기.
+
+**아래는 정적 검증이 잡지 못하는 것**을 위한 절차다. 이 저장소에서 실제로 밟은 함정은
+전부 "테스트는 초록인데 화면·데이터가 틀린" 자리에서 나왔다.
 
 ## 띄우기
 
@@ -112,14 +129,16 @@ curl.exe -s "http://localhost:5173/api/v1/heatmap/buildings?district=gangnam-gar
 garosugil = 17.6%). 예전에 쓰던 공통 41.6% 는 부동산원 통계가 아니라 가로수길 가두
 1층 실태조사(2024) 값을 잘못 표기한 것이라 2026-07-28 폐기했다.
 API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — **54/54 전 거점**이 앵커를
-가지며(2026-08-17 `calibrate_vacancy` 재산출) 격차는 **-5.16 ~ +34.55%p** 다
-(`GET /heatmap/vacancy` 전수 실측. 최소 cheongdam -5.16 / 최대 nokdu +34.55 /
-garosugil +2.88). 대조가 안 되던 거점은 이제 없다. 모집단이 달라(우리는 호실·전수,
-R-ONE 은 면적·표본) 격차 0 은 목표가 아니다.
+가진다. 모집단이 달라(우리는 호실·전수, R-ONE 은 면적·표본) 격차 0 은 목표가 아니다.
 
-🔴 **nokdu +34.55%p 는 가드레일(30%p)을 넘어 `test_gold_anchor_comparison_attached` 가
-실패 중이다.** 검증에서 이 실패를 만나면 "환경 문제"가 아니라 **알려진 미해결 이상치**다
-(2위 sharosugil 23.00p 와 11.5%p 벌어진 단독 이상치). → [docs/feature-page.md §0](../../../docs/feature-page.md)
+**2026-08-30 전수 재측정**(TestClient 로 54거점 `GET /heatmap/vacancy` 전부 호출):
+격차 **-10.66 ~ +21.77%p** (최소 cheongdam -10.66 / 최대 nokdu +21.77 / garosugil -1.78).
+가드레일 30%p 를 넘는 거점은 **0곳**이고 `pytest -k anchor` **3건 전부 통과**한다.
+
+> 이 문단은 08-17 측정치(nokdu +34.55 / sharosugil 23.00 / garosugil +2.88, 테스트 실패
+> 중)를 적고 있었다. 그 뒤 Gold 가 재빌드되며 값이 바뀌었는데 문서만 남아 있었다 —
+> **이 저장소의 주된 실패 양식이 그대로 재현된 자리다.** 인용 전에 다시 재라:
+> `python scripts/chain_status.py <slug>` 가 서빙과 같은 기준(`floor_ouln` 만)으로 찍는다.
 
 ⚠ `calibration.json` 의 `gap_pp` 필드를 인용하지 말 것 — 그건 집합건물을 포함한 혼합
 추정(`estimated_vacancy_pct`) 기준이라 값이 훨씬 크다. 대표 집계 기준 격차는 API 가 준다.

@@ -61,6 +61,34 @@ _PYEONG_TO_M2 = 3.3058
 _cache: dict[str, Any] = {}
 
 
+def _load_shared_rone() -> frozenset[str]:
+    """`data/config/rone_districts.SHARED_RONE` — 단독 R-ONE 표본이 없어 인접·포괄 상권을
+    빌려 쓰는 거점 집합. `data/` 는 백엔드 패키지 밖이라 경로로 로드한다
+    (app/data/measured_pages.py · tests/test_city_registry.py 와 같은 방식).
+
+    읽지 못하면 **빈 집합이 아니라 예외를 내지 않고 빈 집합으로 눕는다** — 라벨이
+    `rone` 으로만 나가 공유 사실이 감춰지므로, 배포 이미지에 config 가 빠지는 일이
+    없도록 Dockerfile 가드가 data/ 를 싣는지 함께 확인할 것.
+    """
+    import importlib.util
+    import sys
+    from pathlib import Path
+    # app/services/posting_inputs.py → app → backend → apps → 저장소 루트 = parents[4]
+    path = Path(__file__).resolve().parents[4] / "data" / "config" / "rone_districts.py"
+    if not path.exists():
+        return frozenset()
+    key = "_posting_shared_rone"
+    if key not in sys.modules:
+        spec = importlib.util.spec_from_file_location(key, path)
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[key] = mod
+        spec.loader.exec_module(mod)
+    return frozenset(getattr(sys.modules[key], "SHARED_RONE", ()))
+
+
+_SHARED_RONE: frozenset[str] = _load_shared_rone()
+
+
 def _load() -> dict | None:
     now = time.monotonic()
     if _cache.get("data") is not None and now - _cache.get("at", 0.0) < _TTL_SECONDS:
@@ -367,7 +395,12 @@ def resolve_units(district_id: str, units: list[dict]) -> list[dict]:
             # 임대료의 **출처**는 어느 쪽이든 R-ONE 이다. 층을 어떻게 적용했는지는
             # 다른 축이라 별도 필드로 밝힌다 — 한 라벨에 뭉치면 계통적 상한(1F 고정)과
             # 가중평균이 같은 이름으로 섞인다.
-            resolved["inputs_source"]["rent"] = "rone"
+            # 같은 R-ONE 상권을 여러 거점이 나눠 쓰면 임대·공실 피처가 **거점 간 동일**하다
+            # (거점 원핫으로만 구분된다). 서울은 8쌍이 그렇고, 경기는 표본이 고양 2·파주 1
+            # 뿐이라 거의 전부가 공유다. 그 사실이 라벨에서 사라지면 화면이 빌린 값을
+            # 실측처럼 보여준다 → `rone` 과 `rone-shared` 를 가른다.
+            resolved["inputs_source"]["rent"] = (
+                "rone-shared" if district_id in _SHARED_RONE else "rone")
             resolved["inputs_source"]["floor"] = (
                 unit.get("floor_basis") or "flr_ouln") if mixed else "assumed_1f"
         if district_grade:

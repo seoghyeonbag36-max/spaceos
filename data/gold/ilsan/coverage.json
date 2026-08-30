@@ -2,7 +2,7 @@
   "slug": "ilsan",
   "hub_name": "일산 라페스타",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-30T15:43:16",
+  "built_at": "2026-08-30T17:05:54",
   "shown": 60,
   "excluded_total": 23,
   "excluded_unknown": 1,
@@ -11,12 +11,13 @@
   "status": {
     "full": 29,
     "partial": 17,
-    "high": 9,
-    "empty": 5
+    "high": 10,
+    "empty": 4
   },
   "source": {
     "stores+ledger": 55,
-    "polygon_only": 5
+    "polygon_only": 4,
+    "pip_only": 1
   },
   "reference_vacancy_pct": 27.3,
   "reference_buildings": 47,

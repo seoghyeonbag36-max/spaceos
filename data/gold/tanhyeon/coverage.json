@@ -2,34 +2,34 @@
   "slug": "tanhyeon",
   "hub_name": "탄현",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-30T15:33:23",
-  "shown": 411,
-  "excluded_total": 562,
+  "built_at": "2026-08-30T17:06:04",
+  "shown": 412,
+  "excluded_total": 561,
   "excluded_unknown": 193,
-  "excluded_non_commercial": 369,
-  "coverage_pct": 42.2,
+  "excluded_non_commercial": 368,
+  "coverage_pct": 42.3,
   "status": {
-    "full": 256,
+    "full": 258,
     "partial": 73,
     "high": 44,
-    "empty": 38
+    "empty": 37
   },
   "source": {
     "stores+ledger": 346,
-    "polygon_only": 38,
-    "pip_only": 24,
+    "pip_only": 26,
+    "polygon_only": 37,
     "stores+ledger+pip": 3
   },
-  "reference_vacancy_pct": 39.3,
+  "reference_vacancy_pct": 39.2,
   "reference_buildings": 131,
   "reference_coverage_pct": 94.9,
-  "mixed_vacancy_pct": 27.9,
+  "mixed_vacancy_pct": 27.8,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 75,
-      "active": 216,
+      "active": 217,
       "capacity": 244,
-      "vacancy_pct": 11.5
+      "vacancy_pct": 11.1
     },
     "expos_units": {
       "buildings": 56,

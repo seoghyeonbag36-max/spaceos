@@ -38,7 +38,7 @@ import re
 from collections import Counter, defaultdict
 
 from data.collectors.common import BRONZE, GOLD, latest_bronze
-from data.config.page_hubs import HUBS, PageHub
+from data.config.page_hubs import HUBS, PageHub, get_hub
 from data.pipelines.build_page_master import _addr_pnu, _build_dong_map
 
 _DATE_DIGITS = re.compile(r"\D+")
@@ -152,10 +152,12 @@ def main() -> None:
     slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(HUBS)
     ok = 0
     for slug in slugs:
-        if slug not in HUBS:
-            print(f"[building-history] unknown slug '{slug}', skipped")
-            continue
-        ok += run(HUBS[slug])
+        if get_hub(slug) is None:
+            # 이름을 대고 불렀는데 못 찾았다 = 오타이거나 미등록이다. 건너뛰고 exit 0 으로
+            # 끝내면 부르는 쪽(hub-chain·loop-engine)이 산출된 줄 안다 — 2026-08-30 hwajeong.
+            raise SystemExit(f"[building-history] 미등록 거점 '{slug}' — "
+                             "page_hubs 의 HUBS/GYEONGGI_HUBS 확인")
+        ok += run(get_hub(slug))
     print(f"[building-history] done: {ok}/{len(slugs)} districts")
 
 

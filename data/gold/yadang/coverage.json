@@ -2,39 +2,39 @@
   "slug": "yadang",
   "hub_name": "야당",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-30T15:49:08",
-  "shown": 313,
-  "excluded_total": 332,
+  "built_at": "2026-08-30T17:06:13",
+  "shown": 316,
+  "excluded_total": 329,
   "excluded_unknown": 78,
-  "excluded_non_commercial": 254,
-  "coverage_pct": 48.5,
+  "excluded_non_commercial": 251,
+  "coverage_pct": 49.0,
   "status": {
-    "full": 142,
-    "partial": 36,
-    "high": 5,
-    "empty": 130
+    "full": 156,
+    "partial": 39,
+    "high": 4,
+    "empty": 117
   },
   "source": {
-    "polygon_only": 130,
-    "pip_only": 4,
+    "pip_only": 20,
+    "polygon_only": 117,
     "stores+ledger": 179
   },
-  "reference_vacancy_pct": 26.8,
+  "reference_vacancy_pct": 26.4,
   "reference_buildings": 116,
   "reference_coverage_pct": 97.5,
-  "mixed_vacancy_pct": 23.0,
+  "mixed_vacancy_pct": 22.7,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 93,
-      "active": 124,
+      "active": 125,
       "capacity": 147,
-      "vacancy_pct": 15.6
+      "vacancy_pct": 15.0
     },
     "expos_units": {
       "buildings": 23,
-      "active": 289,
+      "active": 290,
       "capacity": 417,
-      "vacancy_pct": 30.7
+      "vacancy_pct": 30.5
     },
     "floor_approx": {
       "buildings": 3,

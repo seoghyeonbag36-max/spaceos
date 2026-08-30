@@ -187,3 +187,6 @@ reports/logs/
 # 기각된 실험의 실측표가 특히 그렇다 — 없으면 다음 사람이 같은 실험을 다시 돌린다.
 # reports/logs/ 는 계속 제외한다(용량).
 !reports/*.json
+
+# Playwright MCP 세션 부산물 (스냅샷·콘솔 로그) — 산출물이 아니다
+.playwright-mcp/
