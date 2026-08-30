@@ -134,7 +134,10 @@ def stages(slug: str) -> list[dict]:
         bldgs = {s.get("bldMngNo") for s in stores if s.get("bldMngNo")}
         ratio = round(len(stores) / len(bldgs), 1) if bldgs else 0.0
         ev = f"점포 {len(stores):,} · 건물 {len(bldgs):,} · 건물당 {ratio}"
-        if ratio > STORES_PER_BLDG_MAX:
+        if ratio > STORES_PER_BLDG_MAX and hub.caveat:
+            add("점포", OK,
+                ev + f" (>{STORES_PER_BLDG_MAX} 계획상가 밀집 · 예외 승인: {hub.caveat})")
+        elif ratio > STORES_PER_BLDG_MAX:
             add("점포", BLOCKED, ev + f" (>{STORES_PER_BLDG_MAX} 계획상가 밀집)",
                 "거점을 내리거나 집합상가 비중을 명시한 채 진행 — plan-gyeonggi 3-B")
         else:

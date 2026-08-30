@@ -1,0 +1,152 @@
+[
+  {
+    "slug": "madu",
+    "name": "마두역",
+    "city": "goyang",
+    "stores": 2528,
+    "buildings": 148,
+    "per": 17.08108108108108,
+    "top10": 47.072784810126585,
+    "verdict": "기각(밀집)"
+  },
+  {
+    "slug": "baekseok",
+    "name": "백석역",
+    "city": "goyang",
+    "stores": 2206,
+    "buildings": 538,
+    "per": 4.100371747211896,
+    "top10": 38.34995466908431,
+    "verdict": "주의"
+  },
+  {
+    "slug": "kintex",
+    "name": "킨텍스",
+    "city": "goyang",
+    "stores": 1189,
+    "buildings": 229,
+    "per": 5.179039301310044,
+    "top10": 69.64586846543001,
+    "verdict": "주의"
+  },
+  {
+    "slug": "bamgasi",
+    "name": "밤가시마을",
+    "city": "goyang",
+    "stores": 1334,
+    "buildings": 650,
+    "per": 2.0523076923076924,
+    "top10": 11.619190404797601,
+    "verdict": "통과"
+  },
+  {
+    "slug": "starfield",
+    "name": "스타필드 고양",
+    "city": "goyang",
+    "stores": 1197,
+    "buildings": 145,
+    "per": 8.255172413793103,
+    "top10": 79.9498746867168,
+    "verdict": "주의"
+  },
+  {
+    "slug": "haengsin",
+    "name": "행신역",
+    "city": "goyang",
+    "stores": 1009,
+    "buildings": 186,
+    "per": 5.424731182795699,
+    "top10": 30.921704658077303,
+    "verdict": "주의"
+  },
+  {
+    "slug": "wondang",
+    "name": "원당역",
+    "city": "goyang",
+    "stores": 950,
+    "buildings": 229,
+    "per": 4.14410480349345,
+    "top10": 22.339304531085354,
+    "verdict": "통과"
+  },
+  {
+    "slug": "samsong",
+    "name": "삼송역",
+    "city": "goyang",
+    "stores": 1303,
+    "buildings": 249,
+    "per": 5.232931726907631,
+    "top10": 63.929393706830396,
+    "verdict": "주의"
+  },
+  {
+    "slug": "daehwa",
+    "name": "대화역",
+    "city": "goyang",
+    "stores": 1250,
+    "buildings": 430,
+    "per": 2.9069767441860463,
+    "top10": 25.2,
+    "verdict": "주의"
+  },
+  {
+    "slug": "juyeop",
+    "name": "주엽역",
+    "city": "goyang",
+    "stores": 2373,
+    "buildings": 106,
+    "per": 22.38679245283019,
+    "top10": 37.75811209439528,
+    "verdict": "기각(밀집)"
+  },
+  {
+    "slug": "unjeongstn",
+    "name": "운정역",
+    "city": "paju",
+    "stores": 1082,
+    "buildings": 176,
+    "per": 6.1477272727272725,
+    "top10": 47.227356746765246,
+    "verdict": "주의"
+  },
+  {
+    "slug": "mokdong",
+    "name": "운정 목동(행복주택)",
+    "city": "paju",
+    "stores": 1211,
+    "buildings": 118,
+    "per": 10.177966101694915,
+    "top10": 35.30391340549542,
+    "verdict": "기각(밀집)"
+  },
+  {
+    "slug": "gyoha",
+    "name": "교하",
+    "city": "paju",
+    "stores": 108,
+    "buildings": 69,
+    "per": 1.5507246376811594,
+    "top10": 42.05607476635514,
+    "verdict": "주의"
+  },
+  {
+    "slug": "munsan",
+    "name": "문산역",
+    "city": "paju",
+    "stores": 1047,
+    "buildings": 348,
+    "per": 3.0057471264367814,
+    "top10": 25.812619502868067,
+    "verdict": "주의"
+  },
+  {
+    "slug": "outlet",
+    "name": "파주 프리미엄아울렛",
+    "city": "paju",
+    "stores": 289,
+    "buildings": 57,
+    "per": 5.0701754385964914,
+    "top10": 82.00692041522491,
+    "verdict": "주의"
+  }
+]
