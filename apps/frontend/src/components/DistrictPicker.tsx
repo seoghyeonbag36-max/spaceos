@@ -34,9 +34,12 @@ const MARK: Record<Exclude<CaveatKind, null>, string> = {
   planned: "▤",     // 계획상가 밀집
 };
 
-const KIND_LABEL: Record<Exclude<CaveatKind, null>, string> = {
-  mall: "단일시설",
-  planned: "표본 한계",
+/** 목록의 표식이 무엇을 뜻하는지 알려주는 짧은 꼬리표.
+ *  `caveat` 문구 자체가 이미 "예외 서빙 —" · "단일시설 상권 —" 처럼 자기 종류를 밝히므로
+ *  여기서 같은 말을 반복하지 않는다("▤ 표본 한계 — 대표값 한계 — …" 가 됐던 자리다). */
+const KIND_HINT: Record<Exclude<CaveatKind, null>, string> = {
+  mall: "이 표식은 시설 한 채가 상권 전체를 좌우한다는 뜻이다",
+  planned: "이 표식은 공실 분모가 상업 재고의 일부만 덮는다는 뜻이다",
 };
 
 /** 도시 순서 — 서울을 먼저, 나머지는 이름순. 거점 수가 아니라 **원년 도시**가 기준이다. */
@@ -113,7 +116,7 @@ export function CaveatNote({ district }: { district?: DistrictSummary | null }) 
   if (!kind) return null;
   return (
     <p className={`caveat-note caveat-${kind}`} role="note">
-      <strong>{MARK[kind]} {KIND_LABEL[kind]}</strong> — {district.caveat}
+      <strong title={KIND_HINT[kind]}>{MARK[kind]}</strong> {district.caveat}
     </p>
   );
 }

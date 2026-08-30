@@ -161,7 +161,14 @@ export default function PlatformConsole() {
       {profErr && (
         <div className="err">
           <strong>이 상권의 Platform 산출물이 없습니다.</strong>
-          <div className="errdetail">{profErr}</div>
+          {/* 404 는 고장이 아니라 **아직 수집하지 않았다**는 뜻이다(경기 거점은 Platform
+              트랙이 미착수다). 원시 에러 문자열을 사용자에게 보이면 고장처럼 읽히므로
+              404 만 사람 말로 바꾸고, 그 외(5xx·네트워크)는 원문을 남겨 진단을 돕는다. */}
+          <div className="errdetail">
+            {/404/.test(profErr)
+              ? "이 도시에는 아직 Platform 소스(업종 구성·감성·트렌드)를 수집하지 않았다."
+              : profErr}
+          </div>
         </div>
       )}
       {!profErr && !prof && <div className="loading">상권 정체성 불러오는 중…</div>}
@@ -506,7 +513,9 @@ function ForecastCard({ fc, err, quarters, onQuarters, hub }: {
         ))}
       </div>
 
-      {err && <div className="empty">이 거점의 예측 산출물이 없다 — <code>{err}</code></div>}
+      {err && <div className="empty">이 거점의 예측 산출물이 없다{/404/.test(err)
+        ? " — LSTM 은 서울 54거점 pooled 로 학습돼 경기 거점 예측이 없다."
+        : <> — <code>{err}</code></>}</div>}
       {!err && !fc && <div className="empty">예측 불러오는 중…</div>}
       {stub && <div className="empty">Gold 미적재 폴백(<code>lstm-stub</code>) — 실측 예측이 아니다.</div>}
 
@@ -638,7 +647,9 @@ function RecommendCard({ rec, err }: { rec: IndustryRecommend | null; err: strin
         )}
       </div>
 
-      {err && <div className="empty">이 거점의 추천 산출물이 없다 — <code>{err}</code></div>}
+      {err && <div className="empty">이 거점의 추천 산출물이 없다{/404/.test(err)
+        ? " — GNN 노드·엣지가 이 거점에는 아직 없다."
+        : <> — <code>{err}</code></>}</div>}
       {!err && !rec && <div className="empty">추천 불러오는 중…</div>}
       {stub && <div className="empty">Gold 미적재 폴백(<code>gnn-stub</code>) — 실측 추천이 아니다.</div>}
       {rec && !stub && rec.recommendations.length === 0 && (
