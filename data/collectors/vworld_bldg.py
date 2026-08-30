@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover
     requests = None
 
 from data.collectors.common import bronze_dir, latest_bronze, load_env, save_json
-from data.config.page_hubs import HUBS, PageHub
+from data.config.page_hubs import HUBS, PageHub, get_hub
 
 _URL = "https://api.vworld.kr/ned/wfs/getBldgisSpceWFS"
 _TYPENAME = "dt_d010"
@@ -176,10 +176,11 @@ def main() -> None:
     force = "--force" in sys.argv[1:]
     slugs = args or list(HUBS)
     for slug in slugs:
-        hub = HUBS.get(slug)
+        hub = get_hub(slug)
         if hub is None:
-            print(f"[vworld] 미등록 거점 '{slug}' — page_hubs.HUBS 확인, 건너뜀")
-            continue
+            # 이름을 대고 불렀는데 못 찾았다 = 오타이거나 미등록이다. 건너뛰고 exit 0 으로
+            # 끝내면 부르는 쪽(hub-chain·loop-engine)이 수집된 줄 안다 — 2026-08-30 hwajeong.
+            raise SystemExit(f"[vworld] 미등록 거점 '{slug}' — page_hubs 의 HUBS/GYEONGGI_HUBS 확인")
         if not force and latest_bronze(slug, "bldg_polygons.geojson") is not None:
             print(f"[vworld:{slug}] bldg_polygons.geojson 이미 존재 — 건너뜀(--force 로 재수집)")
             continue

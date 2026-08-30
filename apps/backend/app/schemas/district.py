@@ -10,13 +10,25 @@ class DistrictSummary(BaseModel):
     id: str
     name: str
     gu: str
+    # 도시 — 54거점이 전부 서울이던 동안은 암묵이었다(파일명이 곧 도시였다).
+    # 고양·파주가 같은 목록에 섞이면 프론트가 구분할 방법이 필요하다.
+    # `city` 는 슬러그(seoul/goyang/paju), `city_name` 은 화면 표기(서울/고양/파주).
+    city: str = "seoul"
+    city_name: str = "서울"
     type: str
     center: list[float]
     note: str
     rec_top: str
-    sentiment: float
-    reviews: int
-    risk_zones: int
+    # 감성구역 시드가 없는 실측 거점은 **null** 이다. 0 이 아니다 —
+    # 0 은 "쟀더니 0", null 은 "재지 않았다". 화면은 이 둘을 다르게 그려야 한다.
+    sentiment: float | None = None
+    reviews: int | None = None
+    risk_zones: int | None = None
+    # 시드 없이 Gold 만으로 서는 거점(고양·파주). 화면이 빈 축을 밝히는 근거.
+    measured_only: bool = False
+    # 예외 표시 — 비어 있지 않으면 이 거점의 수치를 다른 거점과 **직접 비교하면 안 된다**.
+    # 거점을 목록에서 빼는 대신 왜 다른지 밝힌 채로 싣기 위한 자리다(계획상가 밀집 등).
+    caveat: str = ""
     vacancy_rate: float
     vacant_units: int
     cell_count: int

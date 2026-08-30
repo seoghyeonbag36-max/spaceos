@@ -104,6 +104,12 @@ def test_history_covers_all_page_master_districts():
 
     for master_path in master_paths:
         history_path = master_path.parent / "building_history.json"
+        slug = master_path.parent.name
+        licensing = list((ROOT / "data" / "bronze" / slug).glob("*/licensing_biz.json"))
+        # 경기 인허가 원본이 없는 거점은 빈 이력이 정상이며 파일을 지어내지 않는다.
+        if not licensing:
+            assert not history_path.exists(), f"{history_path}: 원본 없이 이력을 만들었다"
+            continue
         assert history_path.exists(), f"{history_path} missing"
 
         data = _load(history_path)

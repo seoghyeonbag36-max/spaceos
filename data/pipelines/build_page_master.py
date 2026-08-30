@@ -36,7 +36,7 @@ from collections import Counter, defaultdict
 from data.collectors.building_vacancy import (
     NON_STOREFRONT_LCLS, STORES_PER_FLOOR as _STORES_PER_FLOOR)
 from data.collectors.common import GOLD, load_latest
-from data.config.page_hubs import HUBS, PageHub
+from data.config.page_hubs import HUBS, PageHub, get_hub
 from data.pipelines.build_building_attrs import lic_floors
 from data.pipelines.build_building_attrs import load as load_attrs
 
@@ -230,7 +230,10 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
             dup += 1
             continue
         seen.add(key)
-        alive.append((x, y, addr, str(r.get("RDNWHLADDR", ""))))
+        # 좌표계는 행이 스스로 밝힌다. 서울 인허가는 표기가 없어 TM(=변환 필요),
+        # 경기(gg_licensing)는 "EPSG:4326" 을 달고 온다(=변환하면 안 된다).
+        alive.append((x, y, addr, str(r.get("RDNWHLADDR", "")),
+                      str(r.get("CRS") or "") == "EPSG:4326"))
     if dup:
         print(f"[page-master] licensing: 동일 점포 중복 인허가 {dup}건 제외 "
               f"(업종 여러 장을 가진 점포 — 남은 {len(alive)}건)")
@@ -239,12 +242,20 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
             print("[page-master] licensing: 영업·좌표 유효 행 0 — 건너뜀")
         return {}
 
-    try:
-        from pyproj import Transformer
-    except ImportError:
-        print("[page-master] pyproj 없음 (pip install pyproj) — licensing 건너뜀")
-        return {}
-    tr = Transformer.from_crs("EPSG:2097", "EPSG:4326", always_xy=True)
+    # 전 행이 이미 WGS84 면 변환기가 필요 없다(경기 거점). 서울 행이 하나라도 있으면 만든다.
+    tr = None
+    if any(not w for *_, w in alive):
+        try:
+            from pyproj import Transformer
+        except ImportError:
+            print("[page-master] pyproj 없음 (pip install pyproj) — licensing 건너뜀")
+            return {}
+        tr = Transformer.from_crs("EPSG:2097", "EPSG:4326", always_xy=True)
+
+    def _lonlat(x: float, y: float, is_wgs: bool) -> tuple[float, float]:
+        """행의 좌표계에 맞춰 (경도, 위도). WGS84 행을 다시 변환하면 좌표가 통째로
+        어긋나고 **PIP 가 아무 건물에도 안 걸려 조용히 0 건이 된다**(2026-08-30)."""
+        return (x, y) if is_wgs else tr.transform(x, y)
 
     # 폴리곤 인덱스 + pnu별 중심 (자가 보정 기준점)
     index = []
@@ -263,11 +274,11 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
     dong_code = {v: k for k, v in dong_map.items()}   # 동명 → 법정동코드5
     dlons: list[float] = []
     dlats: list[float] = []
-    for x, y, addr, _rdn in alive:
+    for x, y, addr, _rdn, is_wgs in alive:
         pnu = _addr_pnu(addr, dong_code, sigungu)
         if pnu not in cent:
             continue
-        lon, lat = tr.transform(x, y)
+        lon, lat = _lonlat(x, y, is_wgs)
         clon, clat = cent[pnu]
         kx = 111320.0 * math.cos(math.radians(clat))
         dlons.append((lon - clon) * kx)
@@ -280,8 +291,8 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
 
     out: dict[str, dict] = defaultdict(lambda: {"n": 0, "floors": set(), "unknown": 0})
     hit = 0
-    for x, y, addr, rdn in alive:
-        lon, lat = tr.transform(x, y)
+    for x, y, addr, rdn, is_wgs in alive:
+        lon, lat = _lonlat(x, y, is_wgs)
         kx = 111320.0 * math.cos(math.radians(lat))
         lon -= off_e / kx
         lat -= off_n / 110540.0
@@ -602,10 +613,11 @@ def main() -> None:
     slugs = args or list(HUBS)
     ok = 0
     for slug in slugs:
-        hub = HUBS.get(slug)
+        hub = get_hub(slug)
         if hub is None:
-            print(f"[page-master] 미등록 거점 '{slug}' — page_hubs.HUBS 확인, 건너뜀")
-            continue
+            # 이름을 대고 불렀는데 못 찾았다 = 오타이거나 미등록이다. 건너뛰고 exit 0 으로
+            # 끝내면 부르는 쪽(hub-chain·loop-engine)이 수집된 줄 안다 — 2026-08-30 hwajeong.
+            raise SystemExit(f"[page-master] 미등록 거점 '{slug}' — page_hubs 의 HUBS/GYEONGGI_HUBS 확인")
         if run(hub):
             ok += 1
     print(f"[page-master] 완료: {ok}/{len(slugs)}거점")

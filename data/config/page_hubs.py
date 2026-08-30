@@ -28,6 +28,16 @@ class PageHub:
     cy: float                  # 중심 위도(lat)
     radius_m: int = 500        # V-World 폴리곤 수집 bbox 반경(±m). 대각 코너는 ≈radius×√2 까지 커버
     stores_radius_m: int = 700 # 점포 수집 반경 — 폴리곤 커버리지 ⊇ 원칙(경계 건물 empty 오판 방지)
+    # 도시 슬러그 — apps/backend/app/data/cities.CITIES 의 키와 같은 값.
+    # 54거점이 전부 서울이던 동안은 암묵이었다. 경기 거점이 붙으면서 필드가 됐다.
+    # ⚠ 여기와 백엔드 레지스트리가 어긋나면 수집은 되는데 API 가 다른 도시로 부른다
+    #   → apps/backend/tests/test_city_registry.py 가 고정한다.
+    city: str = "seoul"
+    # 예외 표시 — 이 거점의 수치를 **다른 거점과 나란히 놓으면 안 되는 이유**를 적는다.
+    # 비어 있으면 예외가 아니다. 채워져 있으면 API 응답(`caveat`)에 그대로 실려
+    # 화면이 그 문구를 보여준다. 거점을 빼는 대신 **왜 다른지 밝힌 채로 넣기 위한** 자리다.
+    # ⚠ 여기에 적은 문구가 곧 사용자에게 보이는 경고다. 추측이 아니라 실측을 적는다.
+    caveat: str = ""
 
 
 # 핵심 13거점 (platform13 원년 거점 집합). garosugil 은 검증 반경 유지.
@@ -95,6 +105,42 @@ HUBS: dict[str, PageHub] = {
     "dangsan":         PageHub("dangsan",         "당산",          126.902, 37.5346, 300, 500),
 }
 
+# ── 경기 확장 후보 (2026-08-29 등재) ─────────────────────────────────────────
+# **수집 대상 등록일 뿐 화면 노출이 아니다.** Gold 산출물이 서기 전에는 API 거점 목록
+# (app/data/seoul_pages.DISTRICTS)에 오르지 않는다 — 시드 zones/units 를 지어내지 않기
+# 위해서다. 좌표·반경 근거와 선정 기준은 docs/plan-gyeonggi-expansion-2026-08-29.md.
+#
+# ⚠ 라페스타·웨스턴돔은 계획상가 밀집으로 일반 채택 기준(건물당 점포 10개 이하)을
+#   넘지만, 2026-08-30 제품 판단으로 **예외 서빙**한다. 예외는 caveat 로 응답에 밝히며
+#   두 상권은 합치지 않고 각각의 중심·반경과 Gold 산출물을 갖는다.
+GYEONGGI_HUBS: dict[str, PageHub] = {
+    "hwajeong":  PageHub("hwajeong",  "화정",       126.8330, 37.6350, 500, 700, city="goyang",
+                          caveat="대표값 한계 — 집합 호실 비중이 80%를 넘는다. 공실률은 "
+                                 "일반건축물 표본에 근거한다."),
+    # 좌표는 카카오 로컬에서 공식 도로명주소를 대조했다(라페스타 중앙로 1305-56,
+    # 웨스턴돔 정발산로 24). 350m 점포 프로브의 건물 id 중복은 2동뿐이라 별도 판정한다.
+    "ilsan":     PageHub("ilsan",     "일산 라페스타", 126.768308, 37.661029, 250, 350,
+                          city="goyang",
+                          caveat="예외 서빙 — 계획상가 밀집으로 일반 채택 기준을 넘는다. "
+                                 "공실률은 일반건축물 표본에만 근거하므로 다른 거점과 직접 "
+                                 "비교하지 말 것."),
+    "westerndom": PageHub("westerndom", "일산 웨스턴돔", 126.772184, 37.655885, 250, 350,
+                          city="goyang",
+                          caveat="예외 서빙 — 계획상가 밀집으로 일반 채택 기준을 넘는다. "
+                                 "공실률은 일반건축물 표본에만 근거하므로 다른 거점과 직접 "
+                                 "비교하지 말 것."),
+    "geumchon":  PageHub("geumchon",  "금촌",       126.7740, 37.7600, 500, 700, city="paju"),
+    "unjeong":   PageHub("unjeong",   "운정",       126.7660, 37.7220, 500, 700, city="paju"),
+    # 야당역 경의중앙선(소리천로 10) 중심 — 파주 주요 상권 판정 대상이며 운정과 합치지 않는다.
+    "yadang":    PageHub("yadang",    "야당",       126.761454, 37.712611, 500, 700, city="paju"),
+    # 탄현 — R-ONE `경기>탄현역` **정확 매핑** 후보(좌표는 카카오 로컬 실측:
+    # 37.6940,126.7611 = 고양 일산서구. 파주 탄현면과는 12km 떨어져 있다).
+    # 라페스타(ilsan)가 탄현역 앵커를 4.07km 공유로 빌려 쓰는 문제의 대안으로 등재.
+    "tanhyeon":  PageHub("tanhyeon",  "탄현",       126.7611, 37.6940, 500, 700, city="goyang",
+                          caveat="대표값 한계 — 집합 호실 비중이 80%를 넘는다. 공실률은 "
+                                 "일반건축물 표본에 근거한다."),
+}
+
 # 거점 id 별칭 → 정규 slug (프론트/레거시 경로 호환).
 ALIASES: dict[str, str] = {
     "gangnam-garosugil": "garosugil",
@@ -102,13 +148,28 @@ ALIASES: dict[str, str] = {
 }
 
 
+# 명시 지정용 통합 레지스트리 — **순회 대상이 아니다.**
+#
+# `HUBS`(서울 54)는 인자 없이 실행했을 때의 기본 순회 집합으로 그대로 둔다. 경기 거점은
+# 아직 수집 전이라, 전 거점 루프에 섞이면 산출물 없는 거점이 매 실행마다 실패로 찍히고
+# 거점 수를 세는 곳(coverage tier · Dockerfile 가드 · pppp_status)의 분모가 흔들린다.
+# 그래서 **이름을 대고 부를 때만** 잡히게 한다.
+ALL_HUBS: dict[str, PageHub] = {**HUBS, **GYEONGGI_HUBS}
+
+
 def resolve(district: str) -> str | None:
-    """거점 id/별칭 → 정규 slug. 미지원이면 None."""
-    if district in HUBS:
+    """거점 id/별칭 → 정규 slug. 미지원이면 None. 경기 거점도 여기서 잡힌다."""
+    if district in ALL_HUBS:
         return district
     return ALIASES.get(district)
 
 
 def get_hub(district: str) -> PageHub | None:
+    """거점 id/별칭 → PageHub. 수집기·파이프라인의 CLI 진입점이 쓰는 조회구다.
+
+    ⚠ 여기서 None 이 나오면 **조용히 건너뛰지 말 것.** 사람이 이름을 대고 부른 경우이므로
+      오타이거나 미등록이다. 2026-08-30 에 `hwajeong` 을 수집하려 했을 때 수집기가
+      `HUBS` 만 보고 건너뛴 뒤 exit 0 으로 끝나, 체인이 "수집 완료"로 읽었다.
+    """
     slug = resolve(district)
-    return HUBS.get(slug) if slug else None
+    return ALL_HUBS.get(slug) if slug else None

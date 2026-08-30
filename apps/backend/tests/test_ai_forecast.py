@@ -4,6 +4,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
+from app.data.measured_pages import MEASURED_BY_ID
 from app.main import app
 from tests.test_districts import SEOUL_DISTRICT_IDS
 
@@ -93,7 +94,15 @@ def test_district_summaries_carry_predicted_rate():
     r = client.get(f"{V1}/commercial-districts")
     assert r.status_code == 200
     for d in r.json():
-        assert d["predicted_rate"] is not None, d["id"]
+        assert "predicted_rate" in d, d["id"]
+        assert "predicted_direction" in d, d["id"]
+        # 서울 pooled LSTM 범위 밖인 실측 거점은 None 이 정상이며 키는 유지돼야 한다.
+        if d["predicted_rate"] is None:
+            assert d["id"] in MEASURED_BY_ID, d["id"]
+            assert d["predicted_direction"] is None, d["id"]
+            continue
+        if d["id"] not in MEASURED_BY_ID:
+            assert d["predicted_rate"] is not None, d["id"]
         assert 0 <= d["predicted_rate"] <= 100
         assert d["predicted_direction"] in ("up", "down")
 

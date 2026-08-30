@@ -1,0 +1,48 @@
+{
+  "slug": "tanhyeon",
+  "hub_name": "탄현",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-30T15:33:23",
+  "shown": 411,
+  "excluded_total": 562,
+  "excluded_unknown": 193,
+  "excluded_non_commercial": 369,
+  "coverage_pct": 42.2,
+  "status": {
+    "full": 256,
+    "partial": 73,
+    "high": 44,
+    "empty": 38
+  },
+  "source": {
+    "stores+ledger": 346,
+    "polygon_only": 38,
+    "pip_only": 24,
+    "stores+ledger+pip": 3
+  },
+  "reference_vacancy_pct": 39.3,
+  "reference_buildings": 131,
+  "reference_coverage_pct": 94.9,
+  "mixed_vacancy_pct": 27.9,
+  "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 75,
+      "active": 216,
+      "capacity": 244,
+      "vacancy_pct": 11.5
+    },
+    "expos_units": {
+      "buildings": 56,
+      "active": 535,
+      "capacity": 993,
+      "vacancy_pct": 46.1
+    },
+    "floor_approx": {
+      "buildings": 7,
+      "active": 18,
+      "capacity": 48,
+      "vacancy_pct": 62.5
+    }
+  },
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+}

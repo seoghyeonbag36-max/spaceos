@@ -44,7 +44,7 @@ except ImportError:  # pragma: no cover
     requests = None
 
 from data.collectors.common import GOLD, latest_bronze, load_env, load_latest, save_json
-from data.config.page_hubs import HUBS, PageHub
+from data.config.page_hubs import HUBS, PageHub, get_hub
 
 BASE_SDSC = "http://apis.data.go.kr/B553077/api/open/sdsc2"
 BASE_BLD = "http://apis.data.go.kr/1613000/BldRgstHubService"
@@ -669,10 +669,11 @@ def main() -> None:
     do_ledger = "--no-ledger" not in argv and os.getenv("PAGE_LEDGER", "1") != "0"
     slugs = args or list(HUBS)
     for slug in slugs:
-        hub = HUBS.get(slug)
+        hub = get_hub(slug)
         if hub is None:
-            print(f"[bldg-vac] 미등록 거점 '{slug}' — page_hubs.HUBS 확인, 건너뜀")
-            continue
+            # 이름을 대고 불렀는데 못 찾았다 = 오타이거나 미등록이다. 건너뛰고 exit 0 으로
+            # 끝내면 부르는 쪽(hub-chain·loop-engine)이 수집된 줄 안다 — 2026-08-30 hwajeong.
+            raise SystemExit(f"[bldg-vac] 미등록 거점 '{slug}' — page_hubs 의 HUBS/GYEONGGI_HUBS 확인")
         if do_ledger:
             # 대장 모드: 완료 판정이 애매하므로 run_hub 의 재개 로직에 맡긴다
             # (기존 완료 건물은 건너뛰고 나머지만 채운다). 점포는 기존분 재사용.

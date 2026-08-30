@@ -29,8 +29,8 @@ import sys
 import time
 from collections import Counter
 
-from data.collectors.common import GOLD, load_env, save_json
-from data.config.page_hubs import HUBS
+from data.collectors.common import GOLD, latest_bronze, load_env, save_json
+from data.config.page_hubs import HUBS, get_hub
 from data.collectors.building_vacancy import (
     BASE_BLD, NON_CAPACITY_PURPS, STORES_PER_FLOOR, _body, _get_json, _items, _jibun,
     _ts, classify,
@@ -101,7 +101,24 @@ def _persist(slug: str, path, rows: list[dict], raw: dict[str, list]) -> None:
     gold 를 먼저 임시파일에 쓰고 교체한다 — 저장 도중 죽어도 기존 파일이 남는다.
     building_vacancy.json 에는 대장 수집 결과가 들어 있어 깨지면 손해가 크다.
     """
-    save_json(raw, slug, "bldg_flr_raw.json")
+    # 기존 원본과 **합쳐서** 쓴다. 이번 실행분만 쓰면 부분 수집이 원본을 지운다 —
+    # 2026-08-30 `--only-approx` 로 잔여 2동을 받다가 화정의 56지번짜리 원본이
+    # 2지번으로 덮였다. gold 의 capacity 는 이미 반영돼 있어 공실률은 멀쩡한데,
+    # `build_building_attrs` 가 층별개요를 못 읽어 상업면적·층분포만 조용히 사라졌다
+    # (다시 `recalc_floor_ouln` 을 돌렸다면 분모가 통째로 붕괴했을 것이다).
+    prev_path = latest_bronze(slug, "bldg_flr_raw.json")
+    merged = dict(raw)
+    if prev_path is not None:
+        try:
+            prev = json.loads(prev_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            prev = {}
+        if isinstance(prev, dict):
+            kept = len(set(prev) - set(raw))
+            merged = {**prev, **raw}          # 이번 실행분이 우선(갱신), 나머지는 보존
+            if kept:
+                print(f"[flr-cap:{slug}] 기존 원본 {kept}지번 보존 · 이번 {len(raw)}지번 반영")
+    save_json(merged, slug, "bldg_flr_raw.json")
     tmp = path.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
     tmp.replace(path)
@@ -208,9 +225,10 @@ def main() -> None:
         print("[flr-cap] ⚠ 거점 미지정 — garosugil 로 폴백합니다. "
               "의도한 게 아니면 지금 중단하고 거점을 명시하십시오.")
     for s in slugs:
-        if s not in HUBS:
-            print(f"[flr-cap] 미등록 거점 '{s}' — 건너뜀")
-            continue
+        if get_hub(s) is None:
+            # 이름을 대고 불렀는데 못 찾았다 = 오타이거나 미등록이다. 건너뛰고 exit 0 으로
+            # 끝내면 부르는 쪽(hub-chain·loop-engine)이 수집된 줄 안다 — 2026-08-30 hwajeong.
+            raise SystemExit(f"[flr-cap] 미등록 거점 '{s}' — page_hubs 의 HUBS/GYEONGGI_HUBS 확인")
         run(key, s, only_approx)
 
 

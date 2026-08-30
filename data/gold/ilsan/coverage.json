@@ -1,0 +1,46 @@
+{
+  "slug": "ilsan",
+  "hub_name": "일산 라페스타",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-08-30T15:43:16",
+  "shown": 60,
+  "excluded_total": 23,
+  "excluded_unknown": 1,
+  "excluded_non_commercial": 22,
+  "coverage_pct": 72.3,
+  "status": {
+    "full": 29,
+    "partial": 17,
+    "high": 9,
+    "empty": 5
+  },
+  "source": {
+    "stores+ledger": 55,
+    "polygon_only": 5
+  },
+  "reference_vacancy_pct": 27.3,
+  "reference_buildings": 47,
+  "reference_coverage_pct": 97.9,
+  "mixed_vacancy_pct": 28.5,
+  "by_capacity_method": {
+    "expos_units": {
+      "buildings": 39,
+      "active": 1005,
+      "capacity": 1388,
+      "vacancy_pct": 27.6
+    },
+    "floor_ouln": {
+      "buildings": 8,
+      "active": 28,
+      "capacity": 33,
+      "vacancy_pct": 15.2
+    },
+    "floor_approx": {
+      "buildings": 1,
+      "active": 2,
+      "capacity": 5,
+      "vacancy_pct": 60.0
+    }
+  },
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+}

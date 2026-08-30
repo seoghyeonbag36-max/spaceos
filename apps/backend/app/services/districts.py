@@ -20,6 +20,14 @@ from __future__ import annotations
 import math
 
 from app.data.seoul_pages import DISTRICTS, DISTRICTS_BY_ID
+from app.data import cities, measured_pages
+
+# 시드(서울 54) + 실측 거점(Gold 만으로 서는 거점, 예: 고양 화정).
+# **시드가 이긴다** — measured_pages.build() 가 이미 시드 id 를 제외하고 만든다.
+# 이 합본은 API 표면에서만 쓴다. `DISTRICTS`(시드) 자체는 건드리지 않는다 —
+# 세는 곳(tests·문서)이 여럿이라 그 수가 흔들리면 안 된다.
+PAGES: list[dict] = [*DISTRICTS, *measured_pages.MEASURED]
+PAGES_BY_ID: dict[str, dict] = {**DISTRICTS_BY_ID, **measured_pages.MEASURED_BY_ID}
 from app.services import (gold_vacancy, posting_inputs, posting_revenue,
                           vacancy_forecast, vacant_inventory)
 
@@ -269,9 +277,13 @@ def _predicted(district_id: str, current_rate: float) -> dict:
 
 
 def _summary(d: dict) -> dict:
+    # 실측 거점은 `city` 를 직접 갖는다(gu 가 자치구가 아니라 도시명이라 of_gu 로는 못 찾는다).
+    _city = cities.by_id(d["city"]) if d.get("city") else cities.of_gu(d.get("gu"))
     sum_r = sum(z["r"] for z in d["zones"])
-    sent = sum(z["s"] * z["r"] for z in d["zones"]) / sum_r
-    risk = sum(1 for z in d["zones"] if z["s"] < 40)
+    # 감성구역이 없는 거점(실측 거점)은 **재지 않은 것**이다. 0 으로 내려보내면 "쟀더니
+    # 0" 으로 읽히므로 None 을 내려보내고, 그 사실을 화면이 밝힌다(measured_pages 머리말).
+    sent = (sum(z["s"] * z["r"] for z in d["zones"]) / sum_r) if sum_r else None
+    risk = sum(1 for z in d["zones"] if z["s"] < 40) if d["zones"] else None
     ci = cells_for(d)
     # 추천은 계산한다(recommend_tier). 예전에는 시드에 손으로 적은 `u["rec"]` 를 그대로
     # 세어 카드에 노출했다 — 기준이 정의된 적이 없는 값이었다.
@@ -289,9 +301,17 @@ def _summary(d: dict) -> dict:
     top = max(TIER, key=lambda k: tiers[k]) if any(tiers.values()) else None
     rec_top = TIER[top]["nm"] if top else ""
     return {
-        "id": d["id"], "name": d["name"], "gu": d["gu"], "type": d["type"],
+        "id": d["id"], "name": d["name"], "gu": d["gu"],
+        # 도시는 시드에 적지 않고 `gu` 로 판정한다 — 54개 항목을 건드리지 않고
+        # 도시 축을 넣기 위해서다(app/data/cities.of_gu).
+        "city": _city.id, "city_name": _city.short,
+        "type": d["type"],
         "center": d["center"], "note": d["sub"], "rec_top": rec_top,
-        "sentiment": round(sent, 1), "reviews": sum_r, "risk_zones": risk,
+        "sentiment": round(sent, 1) if sent is not None else None,
+        "reviews": sum_r if d["zones"] else None, "risk_zones": risk,
+        # 시드 없이 Gold 만으로 서는 거점인가 — 화면이 빈 축을 "실측 없음"으로 그리는 근거.
+        "measured_only": bool(d.get("measured_only")),
+        "caveat": d.get("caveat") or "",
         "vacancy_rate": ci["avg_vacancy"], "vacant_units": ci["sum_vac"],
         "cell_count": len(ci["cells"]), "store_count": ci["sum_stores"],
         "tier_mix": tiers,
@@ -306,26 +326,26 @@ def _summary(d: dict) -> dict:
 
 def list_summaries() -> list[dict]:
     """거점 요약(감성·공실·리뷰·Tier) 목록 — City Dashboard 용."""
-    return [_summary(d) for d in DISTRICTS]
+    return [_summary(d) for d in PAGES]
 
 
 def get_summary(district_id: str) -> dict | None:
-    d = DISTRICTS_BY_ID.get(district_id)
+    d = PAGES_BY_ID.get(district_id)
     return _summary(d) if d else None
 
 
 def get_district(district_id: str) -> dict | None:
     """거점 전체 원천 데이터(zones/units/events/poi/grid)."""
-    return DISTRICTS_BY_ID.get(district_id)
+    return PAGES_BY_ID.get(district_id)
 
 
 def get_sentiment(district_id: str) -> list[dict] | None:
-    d = DISTRICTS_BY_ID.get(district_id)
+    d = PAGES_BY_ID.get(district_id)
     return d["zones"] if d else None
 
 
 def get_vacancy_heatmap(district_id: str) -> dict | None:
-    d = DISTRICTS_BY_ID.get(district_id)
+    d = PAGES_BY_ID.get(district_id)
     if not d:
         return None
     ci = cells_for(d)

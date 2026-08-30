@@ -36,8 +36,18 @@ async function getJSON<T>(path: string): Promise<T> {
 /** 거점 요약 — GET /commercial-districts (backend DistrictSummary 스키마) */
 export interface DistrictSummary {
   id: string; name: string; gu: string; type: string;
+  /** 도시 슬러그(seoul/goyang/paju) — 54거점이 전부 서울이던 동안은 암묵이었다.
+   *  경기 거점이 같은 목록에 섞이면 화면이 이 값으로 가른다. */
+  city: string;
+  /** 화면 표기(서울/고양/파주) */
+  city_name: string;
+  /** 시드 없이 Gold 만으로 서는 거점(경기). 감성·예측 축이 null 이어도 정상이다. */
+  measured_only?: boolean;
+  /** 예외 표시 — 비어 있지 않으면 이 거점의 수치를 다른 거점과 직접 비교하면 안 된다.
+   *  (예: 일산 라페스타·웨스턴돔 — 계획상가 밀집으로 공실 분모가 재고 일부만 덮는다) */
+  caveat?: string;
   center: [number, number]; note: string; rec_top: string;
-  sentiment: number; reviews: number; risk_zones: number;
+  sentiment: number | null; reviews: number | null; risk_zones: number | null;
   vacancy_rate: number; vacant_units: number; cell_count: number; store_count: number;
   tier_mix: { premium: number; value: number; factory: number };
   /** 공실 수치 출처. "gold"면 실측 건물 집계, "synthetic"이면 합성 그리드 */

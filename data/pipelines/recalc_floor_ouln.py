@@ -43,7 +43,7 @@ from data.collectors.common import BRONZE, GOLD
 from data.collectors.floor_capacity import (
     _commercial_floors, capacity_floors, commercial_floor_nos, ground_floors,
 )
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import HUBS, get_hub
 from data.pipelines.build_building_attrs import load as load_attrs
 from data.pipelines.build_building_attrs import run as build_attrs
 
@@ -205,9 +205,10 @@ def main() -> None:
     slugs = args.slugs or list(HUBS)
     hit = 0
     for s in slugs:
-        if s not in HUBS:
-            print(f"[recalc-ouln] 미등록 거점 '{s}' — 건너뜀")
-            continue
+        if get_hub(s) is None:
+            # 이름을 대고 불렀는데 못 찾았다 = 오타이거나 미등록이다. 건너뛰고 exit 0 으로
+            # 끝내면 부르는 쪽(hub-chain·loop-engine)이 수집된 줄 안다 — 2026-08-30 hwajeong.
+            raise SystemExit(f"[recalc-ouln] 미등록 거점 '{s}' — page_hubs 의 HUBS/GYEONGGI_HUBS 확인")
         r = run(s, apply, legacy=args.legacy)
         if r is None:
             continue

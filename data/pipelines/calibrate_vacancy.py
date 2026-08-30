@@ -32,7 +32,7 @@ import json
 from functools import lru_cache
 
 from data.collectors.common import GOLD, load_latest
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import HUBS, get_hub
 from data.config.rone_districts import DISTRICT_RONE
 from data.pipelines.build_building_attrs import load as load_attrs
 
@@ -319,7 +319,7 @@ def main() -> None:
     import sys
 
     slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(HUBS)
-    ok = sum(1 for s in slugs if s in HUBS and run(s))
+    ok = sum(1 for s in slugs if get_hub(s) is not None and run(s))
     print(f"[calibrate] 완료: {ok}거점")
 
 

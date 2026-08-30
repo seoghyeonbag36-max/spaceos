@@ -1,10 +1,11 @@
-"""거점 API 테스트 — 서울 54 Page 시드(app/data/seoul_pages.py) 기준.
+"""거점 API 테스트 — 서울 시드와 Gold 실측 거점의 전체 서빙 목록 기준.
 
 공실 수치는 Gold 실측(data/gold/{slug}/page_building_master.geojson)이 있으면 실측,
 없으면 합성 폴백이다 — 아래 Gold 배선 테스트는 파일 존재를 기준으로 기대값을 정한다.
 """
 import json
 import re
+import runpy
 from functools import lru_cache
 from pathlib import Path
 
@@ -12,8 +13,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.data import seoul_pages
+from app.data.measured_pages import MEASURED_BY_ID
 from app.data.seoul_pages import DISTRICTS
 from app.main import app
+from app.services.districts import PAGES, PAGES_BY_ID
 
 client = TestClient(app)
 V1 = "/api/v1"
@@ -22,25 +25,11 @@ V1 = "/api/v1"
 GOLD_TIMESERIES = (Path(__file__).resolve().parents[3]
                    / "data" / "gold" / "platform13" / "platform_district_timeseries.parquet")
 GOLD_QUARTER = "20252"  # 2025Q2 — 주석이 인용하는 분기
+RONE_SLUGS = set(runpy.run_path(str(
+    Path(__file__).resolve().parents[3] / "data" / "config" / "rone_districts.py"
+))["DISTRICT_RONE"])
 
-SEOUL_DISTRICT_IDS = {
-    "garosugil", "apgujeong-rodeo", "hongdae", "yeonnam", "ikseon", "seochon",
-    "myeongdong", "euljiro", "seongsu", "seoulsup", "itaewon", "hannam", "songridan",
-    # 2026-07-22 Phase 1 자치구 미커버 상권 확장분
-    "gangnam", "hapjeong", "mangwon", "samcheong", "gwangjang", "dongdaemun",
-    # 2026-07-22 Phase 2 자치구 확장분 (용산은 itaewon/hannam 이 이미 커버)
-    "jamsil", "konkuk", "yeouido", "mullae", "banpo", "sinchon", "yeonhui", "cheongnyangni",
-    # 2026-07-24 Phase 3(관악·동작) + Phase 4(성북) 확장분
-    "sharosugil", "nokdu", "sillim", "noryangjin", "sungshin", "anam",
-    # 2026-07-24 Phase 1 자치구(강남) 내 미커버 상권 확장분
-    "cheongdam", "dosan", "nonhyeon", "teheran", "seolleung",
-    # 2026-07-24 Phase 1·2 자치구 내 미커버 상권 2차 확장분
-    "yongsan", "namdaemun", "cityhall", "jamsilsaenae", "garak",
-    # 2026-07-25 Phase 1·2 자치구 내 미커버 상권 3차 확장분
-    "jangan", "gongdeok", "gunja", "chungmuro", "nambu", "kyunghee", "wangsimni",
-    # 2026-07-25 Phase 1·2 자치구 내 미커버 상권 4차 확장분 (R-ONE 21분기 표본 소진)
-    "sadang", "sukmyung", "hyehwa", "dangsan",
-}
+SEOUL_DISTRICT_IDS = {d["id"] for d in DISTRICTS}
 
 # 1~13번 초기 거점은 개·폐업률 주석 자체가 없다(Phase 1·2 확장분에만 병기).
 # 여기에 주석을 추가하면 이 집합에서 빼야 gold 대조 대상에 들어간다.
@@ -54,10 +43,19 @@ def test_list_districts():
     r = client.get(f"{V1}/commercial-districts")
     assert r.status_code == 200
     data = r.json()
-    assert len(data) == len(DISTRICTS) == 54
-    assert {d["id"] for d in data} == SEOUL_DISTRICT_IDS
+    assert len(DISTRICTS) == 54
+    assert len(data) == len(PAGES) == len(PAGES_BY_ID)
+    assert {d["id"] for d in data} == set(PAGES_BY_ID)
     for d in data:
-        assert 0 <= d["sentiment"] <= 100
+        # Gold 만으로 선 실측 거점에는 감성구역 시드가 없으므로 None 이 측정 부재를 뜻한다.
+        if d["measured_only"]:
+            assert d["sentiment"] is None
+            assert d["reviews"] is None
+            assert d["risk_zones"] is None
+        else:
+            assert 0 <= d["sentiment"] <= 100
+            assert d["reviews"] is not None
+            assert d["risk_zones"] is not None
         assert 0 <= d["vacancy_rate"] <= 100
         # 추천 합계는 **유닛 수 이하**다. 상수 5 를 박아 두었다가 2026-08-24 실
         # 인벤토리 배선에서 깨졌다 — 5 는 시드 거점의 유닛 수였고, 실 인벤토리는
@@ -131,7 +129,8 @@ def test_building_vacancy_geojson():
 
 def test_all_districts_have_heatmap_cells():
     """전 거점 그리드 셀이 비어 있지 않아야 한다 (Gold 실측·합성 폴백 무관)."""
-    for d in DISTRICTS:
+    # 실측 거점도 API 서빙 목록의 일부이므로 시드만 돌면 Gold 배선 회귀를 놓친다.
+    for d in PAGES:
         r = client.get(f"{V1}/heatmap/vacancy", params={"district": d["id"]})
         assert r.status_code == 200, d["id"]
         hm = r.json()
@@ -192,7 +191,7 @@ def _gold_slugs() -> tuple[str, ...]:
     헬퍼 자체를 집계 가능 여부로 정의한다.
     """
     out: list[str] = []
-    for d in DISTRICTS:
+    for d in PAGES:
         fc = _gold_master(d["id"])
         if fc and any(_counted(f["properties"]) for f in fc["features"]):
             out.append(d["id"])
@@ -327,6 +326,14 @@ def test_gold_anchor_comparison_attached():
     """
     for slug in _gold_slugs():
         hm = client.get(f"{V1}/heatmap/vacancy", params={"district": slug}).json()
+        if hm["anchor_pct"] is None:
+            # R-ONE 표본이 없는 경기 실측 거점은 앵커를 만들지 않는 것이 정상이다.
+            assert slug in MEASURED_BY_ID, slug
+            assert slug not in RONE_SLUGS, f"{slug}: 매핑은 있는데 calibration.json이 없다"
+            assert hm["anchor_gap_pp"] is None, slug
+            s = client.get(f"{V1}/commercial-districts/{slug}/summary").json()
+            assert s["anchor_pct"] is None and s["anchor_gap_pp"] is None, slug
+            continue
         assert hm["anchor_pct"] is not None, f"{slug}: calibration.json 없음 — calibrate_vacancy 실행 필요"
         assert 0 < hm["anchor_pct"] < 60, f"{slug} 앵커 범위"
         assert hm["anchor_gap_pp"] == pytest.approx(hm["avg_vacancy"] - hm["anchor_pct"], abs=0.01), slug
