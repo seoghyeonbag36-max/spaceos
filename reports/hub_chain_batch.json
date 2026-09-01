@@ -1,63 +1,65 @@
 {
  "miasageori": {
-  "stage": "stores",
-  "at": "2026-08-30T21:51:41",
-  "minutes": 0.2
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:33",
+  "minutes": 0.0
  },
  "suyu": {
-  "stage": "stores",
-  "at": "2026-08-30T21:51:52",
-  "minutes": 0.2
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:33",
+  "minutes": 0.0
  },
  "bulgwang": {
-  "stage": "stores",
-  "at": "2026-08-30T21:52:03",
-  "minutes": 0.2
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:34",
+  "minutes": 0.0
  },
  "yeonsinnae": {
-  "stage": "stores",
-  "at": "2026-08-30T21:52:16",
-  "minutes": 0.2
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:34",
+  "minutes": 0.0
  },
  "hwagok": {
-  "stage": "stores",
-  "at": "2026-08-30T21:52:23",
-  "minutes": 0.1
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:34",
+  "minutes": 0.0
  },
  "kkachisan": {
-  "stage": "stores",
-  "at": "2026-08-30T21:52:30",
-  "minutes": 0.1
+  "stage": "anchor",
+  "at": "2026-09-01T22:54:27",
+  "minutes": 5.9
  },
  "mokdong-yc": {
-  "stage": "stores",
-  "at": "2026-08-30T21:52:37",
-  "minutes": 0.1
+  "stage": "anchor",
+  "at": "2026-09-01T22:54:28",
+  "minutes": 0.0
  },
  "sanggye": {
-  "stage": "stores",
-  "at": "2026-08-30T21:52:46",
-  "minutes": 0.2
+  "stage": "anchor",
+  "at": "2026-09-01T22:54:28",
+  "minutes": 0.0
  },
  "sangbong": {
-  "stage": "stores",
-  "at": "2026-08-30T21:52:53",
-  "minutes": 0.1
+  "stage": "anchor",
+  "at": "2026-09-01T22:57:09",
+  "minutes": 2.7
  },
  "oryudong": {
-  "stage": "stores",
-  "at": "2026-08-30T21:52:59",
-  "minutes": 0.1
+  "stage": "anchor",
+  "at": "2026-09-01T22:57:09",
+  "minutes": 0.0
  },
  "doksan": {
-  "stage": "stores",
-  "at": "2026-08-30T21:53:01",
+  "stage": "anchor",
+  "at": "2026-09-01T22:57:09",
   "minutes": 0.0
  },
  "cheonho": {
-  "stage": "stores",
-  "at": "2026-08-30T21:53:09",
-  "minutes": 0.1
+  "stage": "anchor",
+  "at": "2026-09-01T22:57:10",
+  "minutes": 0.0
  },
- "finished_at": "2026-08-30T21:53:09"
+ "finished_at": "2026-09-01T22:57:10",
+ "stopped_reason": "battery 4%",
+ "stopped_at": "2026-09-01T00:11:07"
 }

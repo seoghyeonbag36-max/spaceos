@@ -32,13 +32,32 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from data.collectors.common import load_env  # noqa: E402
-from data.config.page_hubs import HUBS  # noqa: E402
+from data.config.page_hubs import (  # noqa: E402
+    ALL_HUBS,
+    GYEONGGI_HUBS,
+    HUBS,
+    SEOUL_BATCH2_HUBS,
+)
 
 GOLD = ROOT / "data" / "gold"
 BRONZE = ROOT / "data" / "bronze"
 _EXPOS = "http://apis.data.go.kr/1613000/BldRgstHubService/getBrExposPubuseAreaInfo"
 
 OK, WARN, BAD = "OK  ", "주의", "중단"
+
+# 잔여는 **`ALL_HUBS` 로 센다.** 종전에는 `HUBS`(서울 코어 54)만 돌아서, 신규 배치로
+# 등록된 거점은 대장이 0동이어도 잔여에 잡히지 않았다 — 2026-08-31 에 서울 2차 12 +
+# 경기 13, **25거점이 미수집인데 "전유부 잔여 없음" 으로 찍혔다.** 08-30 에
+# chain_status 가 같은 이유로 신규 배치를 "등록 안 됨" 으로 보고한 것과 같은 결함이다
+# (배치 목록을 손으로 합치면 배치가 늘 때마다 틀린다). 단일 출처는 ALL_HUBS 다.
+#
+# 다만 **명령줄은 배치별로 갈라 찍는다** — 서울과 경기를 한 줄에 섞어 놓으면
+# "경기는 빼고" 같은 지시를 그 줄 그대로는 실행할 수 없다.
+_GROUPS: tuple[tuple[str, dict], ...] = (
+    ("서울 코어", HUBS),
+    ("서울 2차", SEOUL_BATCH2_HUBS),
+    ("경기", GYEONGGI_HUBS),
+)
 
 
 def check_quota() -> tuple[str, str]:
@@ -167,7 +186,7 @@ def _gold(slug: str) -> list | None:
 def report_remaining() -> None:
     """전유부(대장) 잔여와 층별개요 대상을 gold 에서 유도해 출력한다."""
     missing, partial = [], []
-    for slug in HUBS:
+    for slug in ALL_HUBS:
         rows = _gold(slug)
         if rows is None or not rows:
             missing.append(slug)          # 파일이 없거나 0동 = 미수집
@@ -175,9 +194,12 @@ def report_remaining() -> None:
             partial.append((slug, sum(1 for r in rows
                                       if r.get("capacity_method") == "rate_limited")))
 
-    print(f"\n■ 전유부(대장) — 미수집 {len(missing)}거점 / 전체 {len(HUBS)}")
+    print(f"\n■ 전유부(대장) — 미수집 {len(missing)}거점 / 전체 {len(ALL_HUBS)}")
     if missing:
-        print("  " + " ".join(missing))
+        for label, grp in _GROUPS:
+            part = [s for s in missing if s in grp]
+            if part:
+                print(f"  [{label}] " + " ".join(part))
     if partial:
         print("  429 강등이 남은 거점(재실행하면 자동 재수집): "
               + " ".join(f"{s}({n})" for s, n in partial))
@@ -186,8 +208,13 @@ def report_remaining() -> None:
     # (2026-08-15). 429 강등 거점도 같은 실행에서 자동 재수집되므로 뒤에 붙인다.
     todo = missing + [s for s, _ in partial]
     if todo:
-        print("      → powershell -ExecutionPolicy Bypass -File "
-              "scripts\\run_bldgvac_until_done.ps1 -MaxPasses 20 " + " ".join(todo))
+        for label, grp in _GROUPS:
+            part = [s for s in todo if s in grp]
+            if not part:
+                continue
+            print(f"      [{label} {len(part)}거점] → powershell -ExecutionPolicy Bypass "
+                  "-File scripts\\run_bldgvac_until_done.ps1 -MaxPasses 20 "
+                  + " ".join(part))
         print("        (쿼터가 먼저 끊기면 '진행 0동' 으로 멈춘다 — 정상이다. "
               "150동마다 체크포인트라 내일 같은 줄을 다시 돌리면 완료분을 건너뛴다)")
     else:
@@ -200,7 +227,7 @@ def report_remaining() -> None:
     # 판단이라 그 값은 한다.
     print("\n■ 층별개요 — 시도 이력 대조 중(bronze raw 스캔, 십수 초)…")
     rows_out = []
-    for slug in HUBS:
+    for slug in ALL_HUBS:
         rows = _gold(slug)
         if not rows:
             continue

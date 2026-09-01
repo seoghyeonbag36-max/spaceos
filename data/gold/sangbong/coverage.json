@@ -1,0 +1,48 @@
+{
+  "slug": "sangbong",
+  "hub_name": "상봉",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-09-01T22:58:42",
+  "shown": 606,
+  "excluded_total": 2361,
+  "excluded_unknown": 258,
+  "excluded_non_commercial": 2103,
+  "coverage_pct": 20.4,
+  "status": {
+    "full": 315,
+    "partial": 86,
+    "high": 60,
+    "empty": 145
+  },
+  "source": {
+    "stores+ledger": 450,
+    "polygon_only": 144,
+    "stores+ledger+pip": 5,
+    "pip_only": 7
+  },
+  "reference_vacancy_pct": 20.0,
+  "reference_buildings": 335,
+  "reference_coverage_pct": 92.0,
+  "mixed_vacancy_pct": 22.7,
+  "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 274,
+      "active": 475,
+      "capacity": 580,
+      "vacancy_pct": 18.1
+    },
+    "expos_units": {
+      "buildings": 61,
+      "active": 233,
+      "capacity": 305,
+      "vacancy_pct": 23.6
+    },
+    "floor_approx": {
+      "buildings": 29,
+      "active": 31,
+      "capacity": 146,
+      "vacancy_pct": 78.8
+    }
+  },
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+}
