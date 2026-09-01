@@ -93,6 +93,34 @@ def _hubs() -> int:
         return sum(1 for p in GOLD.iterdir() if p.is_dir() and (p / "coverage.json").exists())
 
 
+def _scored_slugs() -> set[str] | None:
+    """진행률의 **분모가 되는 거점**(= `HUBS` 54). 못 읽으면 None = 필터하지 않는다."""
+    try:
+        sys.path.insert(0, str(ROOT))
+        from data.config.page_hubs import HUBS
+
+        return set(HUBS)
+    except Exception:
+        return None
+
+
+def _gold_glob(pattern: str) -> list[Path]:
+    """gold 산출물을 훑되 **분모와 같은 모집단만** 센다.
+
+    2026-09-01: 서울 2차 12거점의 Gold 가 서자 Page 가 **120.4%**, Posting 이 102.2%
+    로 나왔다. 분자는 `GOLD.glob` 으로 **모든** 거점 디렉토리를 세는데 분모(`_hubs()`)
+    는 `HUBS` 54 라, 수집만 끝나고 서빙 목록에 없는 거점이 분자에만 들어갔다.
+    `page_hubs` 가 경고한 그대로다 — "거점 수를 세는 곳의 분모가 흔들린다".
+
+    100%를 넘는 진행률은 자릿수가 틀린 게 아니라 **세는 대상이 틀린 것**이라 클램프로
+    덮지 않는다. 분자를 분모와 같은 집합으로 맞춘다. 새 배치가 진행률에 잡히려면
+    `HUBS` 에 올라야 하고, 그건 곧 서빙에 오른다는 뜻이다.
+    """
+    paths = sorted(GOLD.glob(pattern))
+    keep = _scored_slugs()
+    return paths if keep is None else [p for p in paths if p.parent.name in keep]
+
+
 def _count_measured_foot_hubs() -> int | None:
     """거점 내 `foot` 서열이 **실측**으로 갈리는 거점 수. 못 세면 None.
 
@@ -158,7 +186,7 @@ def _hourly_axis_note() -> str:
 
 def _coverages() -> list[dict]:
     out = []
-    for p in sorted(GOLD.glob("*/coverage.json")):
+    for p in _gold_glob("*/coverage.json"):
         j = _load(p)
         if j:
             j["_slug"] = p.parent.name
@@ -188,7 +216,7 @@ def page_track(total: int) -> Track:
         f"{len(good)}/{total}거점 — 최저 " + " · ".join(f"{s} {v:.1f}%" for v, s in low),
     ))
 
-    anchored = [p for p in GOLD.glob("*/calibration.json")]
+    anchored = _gold_glob("*/calibration.json")
     t.gates.append(Gate(
         "R-ONE 앵커 대조 보유",
         len(anchored) / total if total else 0.0,
@@ -413,7 +441,7 @@ def posting_track(total: int) -> Track:
     # foot 과 같은 성격이므로 같은 0.5 로 센다. 상가정보 flrNo 로 유닛별
     # 실면적을 특정하면 그때 1.0 이다.
     area = 0
-    for d in sorted(GOLD.glob("*/vacant_units.json")):
+    for d in _gold_glob("*/vacant_units.json"):
         raw = _load(d)
         units = raw.get("units") if isinstance(raw, dict) else raw
         if units and all(u.get("area") for u in units):
@@ -556,7 +584,7 @@ def posting_track(total: int) -> Track:
         auto=False, evidence="apps/backend/app/services/districts.recommend_tier",
     ))
 
-    vu = list(GOLD.glob("*/vacant_units.json"))
+    vu = _gold_glob("*/vacant_units.json")
     # 유닛 수는 **세어서** 적는다. 종전에는 "580유닛"이 문구에 박혀 있었는데 실측은
     # 528 이었다 — 선언이 낡는 이 저장소의 주된 실패 양식이 게이트 문구에서 났다.
     n_units = 0
@@ -702,7 +730,7 @@ def _context_kinds() -> dict[str, int]:
     import csv
 
     out: dict[str, int] = {}
-    for p in GOLD.glob("*/program_content_context.csv"):
+    for p in _gold_glob("*/program_content_context.csv"):
         try:
             with p.open(encoding="utf-8-sig", newline="") as f:
                 kinds = {(r.get("kind") or "").split(":")[0] for r in csv.DictReader(f)}

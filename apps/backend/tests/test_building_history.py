@@ -102,13 +102,22 @@ def test_history_covers_all_page_master_districts():
     master_paths = sorted((ROOT / "data" / "gold").glob("*/page_building_master.geojson"))
     assert master_paths
 
+    # bronze 는 저장소에 올리지 않는다(.gitignore). 그래서 CI 체크아웃에서는 인허가
+    # 원본이 **한 거점도** 없고, 아래 "원본 없이 이력을 만들었다" 가 이력을 정상적으로
+    # 커밋해 둔 거점마다 터진다 — 2026-08-30 부터 배포가 이 한 줄에 막혀 있었다
+    # (anam 에서 실패, 로컬에서는 통과라 눈에 안 띄었다). 원본이 하나라도 있는
+    # 환경에서만 그 판정을 한다. 판정을 못 하는 것과 위반을 못 본 척하는 것은 다르므로,
+    # 있으면 종전대로 거점마다 엄격히 본다.
+    bronze_has_licensing = any((ROOT / "data" / "bronze").glob("*/*/licensing_biz.json"))
+
     for master_path in master_paths:
         history_path = master_path.parent / "building_history.json"
         slug = master_path.parent.name
         licensing = list((ROOT / "data" / "bronze" / slug).glob("*/licensing_biz.json"))
         # 경기 인허가 원본이 없는 거점은 빈 이력이 정상이며 파일을 지어내지 않는다.
         if not licensing:
-            assert not history_path.exists(), f"{history_path}: 원본 없이 이력을 만들었다"
+            if bronze_has_licensing:
+                assert not history_path.exists(), f"{history_path}: 원본 없이 이력을 만들었다"
             continue
         assert history_path.exists(), f"{history_path} missing"
 

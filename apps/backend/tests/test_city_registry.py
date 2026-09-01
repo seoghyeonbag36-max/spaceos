@@ -167,8 +167,17 @@ def test_default_iteration_stays_seoul_only():
     """
     ph = _load_page_hubs()
     assert len(ph.HUBS) == 54
-    assert len(ph.ALL_HUBS) == 54 + len(ph.GYEONGGI_HUBS)
-    assert not (set(ph.GYEONGGI_HUBS) & set(ph.HUBS))
+    # 확장 배치는 늘어난다(08-30 서울 2차 12 · 경기 20). 고정할 것은 **개수가 아니라
+    # 구조**다 — 기본 순회(HUBS)는 54 로 남고, ALL_HUBS 는 그 배치들의 합이며,
+    # 어느 배치도 서로 슬러그를 겹치지 않는다. 종전에는 `54 + GYEONGGI` 로 적혀 있어
+    # 배치가 하나 늘 때마다 깨졌다(09-01 에 86 != 74 로 배포가 막혔다).
+    batches = (ph.SEOUL_BATCH2_HUBS, ph.GYEONGGI_HUBS)
+    assert len(ph.ALL_HUBS) == 54 + sum(len(b) for b in batches)
+    for b in batches:
+        assert not (set(b) & set(ph.HUBS))
+    # 슬러그 충돌은 조용히 거점을 **덮는다** — 08-30 에 파주 목동이 양천 목동에 덮여
+    # ALL_HUBS 가 86 이 아니라 85 로 나왔다. 그래서 배치끼리도 겹치면 안 된다.
+    assert not (set(ph.SEOUL_BATCH2_HUBS) & set(ph.GYEONGGI_HUBS))
 
 
 def test_caveat_is_carried_from_hub_to_api():
