@@ -1,0 +1,65 @@
+{
+ "miasageori": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:33",
+  "minutes": 0.0
+ },
+ "suyu": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:33",
+  "minutes": 0.0
+ },
+ "bulgwang": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:34",
+  "minutes": 0.0
+ },
+ "yeonsinnae": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:34",
+  "minutes": 0.0
+ },
+ "hwagok": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:48:34",
+  "minutes": 0.0
+ },
+ "kkachisan": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:54:27",
+  "minutes": 5.9
+ },
+ "mokdong-yc": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:54:28",
+  "minutes": 0.0
+ },
+ "sanggye": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:54:28",
+  "minutes": 0.0
+ },
+ "sangbong": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:57:09",
+  "minutes": 2.7
+ },
+ "oryudong": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:57:09",
+  "minutes": 0.0
+ },
+ "doksan": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:57:09",
+  "minutes": 0.0
+ },
+ "cheonho": {
+  "stage": "anchor",
+  "at": "2026-09-01T22:57:10",
+  "minutes": 0.0
+ },
+ "finished_at": "2026-09-01T22:57:10",
+ "stopped_reason": "battery 4%",
+ "stopped_at": "2026-09-01T00:11:07"
+}

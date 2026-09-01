@@ -105,6 +105,38 @@ HUBS: dict[str, PageHub] = {
     "dangsan":         PageHub("dangsan",         "당산",          126.902, 37.5346, 300, 500),
 }
 
+# ── 서울 미커버 자치구 2차 확장 (2026-08-30 등재) ────────────────────────────
+# 서울 25구 중 **10구에 거점이 0개**였다(중랑·강북·도봉·노원·은평·양천·강서·구로·금천·강동).
+# 그런데 미사용 R-ONE 표본 16개 중 12개가 **정확히 그 구들**을 가리킨다 — 부동산원이
+# 2024Q3 표본개편 때 서울 외곽 구를 새로 넣었고, 우리 미커버 구와 겹친다.
+#
+# 표본이 그 자리에 있으므로 **정확 매핑**이다(경기 17/20 이 공유였던 것과 다르다).
+# ⚠ 대가는 이력 길이다 — 이 표본들은 **8분기**뿐이라 기존 거점(21~22분기)에 못 미친다.
+#   Page(공실·앵커 대조)는 8분기로 충분하지만 **LSTM 이력은 짧다**. samcheong 이 북촌
+#   7분기를 피해 광화문에 매핑된 것과 같은 제약이고, 분기가 쌓이면 풀린다.
+#
+# 1차 프로브(등록 없이 상가정보만 · 건축HUB 콜 0): 통과 10 · 주의 2 · 기각 0.
+# 건물당 점포 2.3~3.8 로 **가로수길(4.5)보다도 낮다** — 경기(7.7~46.8)와 대비된다.
+# 기존 거점과 2.4~7.7km 떨어져 이격 문제도 없다.
+# 근거: reports/seoul_uncovered_probe.json
+SEOUL_BATCH2_HUBS: dict[str, PageHub] = {
+    # ⚠ 양천 목동은 `mokdong-yc` 다 — 파주 운정 목동(`mokdong`)과 슬러그가 부딪혔다.
+    #   먼저 등록되고 Gold 까지 선 파주 쪽을 지키고 서울 쪽에 구 약칭을 붙였다.
+    #   같은 지명이 여러 시에 있다는 것이 도시 축을 넣은 뒤 처음 드러난 자리다.
+    "miasageori":  PageHub("miasageori",  "미아사거리",127.0301, 37.6133, 500, 700),
+    "suyu":        PageHub("suyu",        "수유",      127.0255, 37.6379, 500, 700),
+    "bulgwang":    PageHub("bulgwang",    "불광",      126.9303, 37.6100, 500, 700),  # 주의: top10 26.3%
+    "yeonsinnae":  PageHub("yeonsinnae",  "연신내",    126.9211, 37.6192, 500, 700),
+    "hwagok":      PageHub("hwagok",      "화곡",      126.8405, 37.5417, 500, 700),
+    "kkachisan":   PageHub("kkachisan",   "까치산",    126.8464, 37.5322, 500, 700),
+    "mokdong-yc":       PageHub("mokdong-yc",     "목동",      126.8646, 37.5261, 500, 700),
+    "sanggye":     PageHub("sanggye",     "상계",      127.0734, 37.6607, 500, 700),
+    "sangbong":    PageHub("sangbong",    "상봉",      127.0857, 37.5969, 500, 700),
+    "oryudong":    PageHub("oryudong",    "오류동",    126.8448, 37.4944, 500, 700),
+    "doksan":      PageHub("doksan",      "독산",      126.8895, 37.4660, 500, 700),  # 주의: top10 58.3%
+    "cheonho":     PageHub("cheonho",     "천호",      127.1239, 37.5385, 500, 700),
+}
+
 # ── 경기 확장 후보 (2026-08-29 등재) ─────────────────────────────────────────
 # **수집 대상 등록일 뿐 화면 노출이 아니다.** Gold 산출물이 서기 전에는 API 거점 목록
 # (app/data/seoul_pages.DISTRICTS)에 오르지 않는다 — 시드 zones/units 를 지어내지 않기
@@ -207,7 +239,7 @@ ALIASES: dict[str, str] = {
 # 아직 수집 전이라, 전 거점 루프에 섞이면 산출물 없는 거점이 매 실행마다 실패로 찍히고
 # 거점 수를 세는 곳(coverage tier · Dockerfile 가드 · pppp_status)의 분모가 흔들린다.
 # 그래서 **이름을 대고 부를 때만** 잡히게 한다.
-ALL_HUBS: dict[str, PageHub] = {**HUBS, **GYEONGGI_HUBS}
+ALL_HUBS: dict[str, PageHub] = {**HUBS, **SEOUL_BATCH2_HUBS, **GYEONGGI_HUBS}
 
 
 def resolve(district: str) -> str | None:

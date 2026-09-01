@@ -1,0 +1,48 @@
+{
+  "slug": "oryudong",
+  "hub_name": "오류동",
+  "tier": "Tier1(대장)",
+  "built_at": "2026-09-01T22:21:53",
+  "shown": 356,
+  "excluded_total": 1282,
+  "excluded_unknown": 206,
+  "excluded_non_commercial": 1076,
+  "coverage_pct": 21.7,
+  "status": {
+    "full": 183,
+    "partial": 48,
+    "high": 47,
+    "empty": 78
+  },
+  "source": {
+    "stores+ledger": 245,
+    "pip_only": 15,
+    "polygon_only": 77,
+    "stores+ledger+pip": 19
+  },
+  "reference_vacancy_pct": 35.0,
+  "reference_buildings": 210,
+  "reference_coverage_pct": 94.6,
+  "mixed_vacancy_pct": 55.2,
+  "by_capacity_method": {
+    "floor_ouln": {
+      "buildings": 162,
+      "active": 313,
+      "capacity": 368,
+      "vacancy_pct": 14.9
+    },
+    "expos_units": {
+      "buildings": 48,
+      "active": 284,
+      "capacity": 551,
+      "vacancy_pct": 48.5
+    },
+    "floor_approx": {
+      "buildings": 12,
+      "active": 12,
+      "capacity": 78,
+      "vacancy_pct": 84.6
+    }
+  },
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+}
