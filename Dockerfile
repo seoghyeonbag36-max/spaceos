@@ -50,6 +50,13 @@ RUN pip install --no-cache-dir -r apps/backend/requirements.txt
 # 저장소 레이아웃 유지 (위 "왜 저장소 레이아웃을" 참조)
 COPY apps/backend/ ./apps/backend/
 COPY data/gold/ ./data/gold/
+# data/config 는 **서빙이 런타임에 읽는다**(백엔드 패키지 밖이라 경로로 로드한다):
+#   app/data/measured_pages.py    → page_hubs.py    (시드 밖 거점 목록)
+#   app/services/posting_inputs.py → rone_districts.py (앵커 공유 표기)
+# 2026-08-30~09-02 동안 이 줄이 없어서 프로덕션이 조용히 **54거점만** 서빙했다 —
+# 서울 2차 12거점과 경기 7거점이 통째로 빠졌고, `rone-shared` 라벨도 `rone` 으로
+# 눕고 있었다. 두 로더 다 "파일 없으면 빈 값" 으로 눕도록 쓰여 있어 아무 데도 안 터졌다.
+COPY data/config/ ./data/config/
 COPY --from=frontend /fe/dist/ ./apps/frontend/dist/
 
 # ── 빌드 시점 가드 ───────────────────────────────────────────────────────────
@@ -71,6 +78,14 @@ RUN set -eu; \
       echo "  업로드 규칙(.gitignore/.dockerignore)이 바뀌어 gold 가 빠졌을 가능성이 크다"; exit 1; \
     fi; \
     echo "가드 통과: gold 거점 ${n}개 · 프론트 index.html 있음"
+
+# 거점 목록 가드 — gold 파일이 있는 것과 **서빙이 그것을 목록에 올리는 것**은 다른 일이다.
+# 위 가드는 파일만 세므로 data/config 가 빠져도 통과한다(2026-09-02 실측: gold 73거점이
+# 멀쩡히 실린 이미지가 화면에는 54거점만 냈다). 그래서 서빙 코드를 실제로 불러 센다.
+RUN set -eu; \
+    PYTHONPATH=/app/apps/backend python -c "import sys; from app.data import measured_pages as m; h=len(m._load_hubs()); n=len(m.MEASURED); print('page_hubs %d거점 로드 · 시드 밖 서빙 %d거점' % (h, n)); sys.exit(0 if h >= 50 and n >= 15 else 1)" \
+      || { echo "빌드 중단: 시드 밖 거점이 서빙 목록에 안 오른다 — data/config 가 이미지에 안 들어왔을 가능성이 크다"; \
+           echo "  확인: COPY data/config/ · .dockerignore · gcloud 업로드(.gitignore)"; exit 1; }
 
 # app.main 을 import 할 수 있게 (WORKDIR 은 /app 이므로 경로 계산과 분리된다)
 ENV PYTHONPATH=/app/apps/backend

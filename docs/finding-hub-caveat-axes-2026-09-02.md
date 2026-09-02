@@ -96,17 +96,46 @@ KPI② B2B 파일럿의 표적이라 잃는 것이 더 크다. banpo 도 남는�
 표시 없는 거점 목록을 고정한다. 새 거점이 그 대역에 들어오면 테스트가 깨져 이 문서를 다시
 꺼내게 된다.
 
-## 5. 곁가지로 드러난 것 — 문구가 배포 이미지에 안 실린다
+## 5. 곁가지로 드러난 것 → **별건 사고였다** (같은 날 확인·수정)
 
 경기 거점의 예외 문구는 `data/config/page_hubs.py` 의 `PageHub.caveat` 에 있는데,
-**`Dockerfile` 은 `apps/backend/` 와 `data/gold/` 만 복사한다**(51~53행). `data/config` 가
+**`Dockerfile` 이 `apps/backend/` 와 `data/gold/` 만 복사하고 있었다.** `data/config` 가
 이미지에 없으므로 `measured_pages._load_hubs()` 가 프로덕션에서 빈 dict 를 돌려준다.
 
 그래서 서울 세 거점의 판단은 `apps/backend/app/data/hub_caveats.py` — **배포되는 패키지
 안**에 두었다. `chain_status` 는 두 곳을 다 본다(`hub.caveat or _backend_caveat(slug)`).
 
-⚠ 이것은 경기 거점이 프로덕션 화면에 아예 안 뜬다는 뜻이기도 하다(같은 dict 가 비므로).
-경기 작업이 중단 상태라 여기서는 고치지 않았다. 재개할 때 먼저 볼 것.
+그리고 이것을 "곁가지"로 적어 둔 채 넘어갔는데, **화면에서 실제로 터져 있었다.**
+프로덕션 응답을 직접 세니 정확히 **54거점**이었다:
+
+```
+GET https://spaceos-twin.web.app/api/v1/commercial-districts  → 54
+  서울 2차 12거점(kkachisan·miasageori·sanggye·…)  0개
+  경기 7거점(hwajeong·ilsan·westerndom·…)          0개
+```
+
+`data/config` 없는 트리를 만들어 재현했고 같은 54가 나왔다. 함께 눕고 있던 것이 하나 더
+있다 — `posting_inputs._load_shared_rone()` 도 같은 디렉터리를 읽는다. 비면 `SHARED_RONE`
+가 빈 집합이 되어 앵커 공유 거점이 `rone-shared` 가 아니라 **`rone`** 으로 나간다.
+공유 사실이 감춰지는 것이라, 이 저장소가 지키는 원칙을 프로덕션에서만 어기고 있었다.
+그 함수의 독스트링은 이미 *"배포 이미지에 config 가 빠지는 일이 없도록 Dockerfile
+가드가 data/ 를 싣는지 함께 확인할 것"* 이라고 적고 있었다 — **그 가드가 없었다.**
+
+셋으로 막았다:
+
+| 층 | 무엇 | 언제 걸리나 |
+|---|---|---|
+| ① | `COPY data/config/ ./data/config/` | — (원인 제거) |
+| ② | Dockerfile 빌드 가드 — 서빙 코드를 불러 거점 수를 센다 | 이미지 빌드 시 |
+| ③ | `tests/test_deploy_image_ships_runtime_data.py` (3건) | CI·로컬 (소스만 읽는다) |
+
+②는 기존 가드로는 못 잡았다. 그것은 **gold 파일 수**를 세는데, 이번 이미지는 gold 73거점이
+멀쩡히 실린 채로 화면에 54개만 냈다 — 파일이 있는 것과 서빙이 목록에 올리는 것은 다른
+일이다. ③은 백엔드가 읽는 `data/<하위>` 를 소스에서 긁어 Dockerfile COPY 와 대조하므로
+**다음에 새 디렉터리를 읽기 시작할 때**를 잡는다.
+
+두 로더의 폴백은 그대로 두되(예외를 내면 앱이 안 뜬다) **경고를 남기게** 했다. 조용한
+폴백이 이 사고의 전달 경로였다.
 
 ## 6. 남긴 것
 

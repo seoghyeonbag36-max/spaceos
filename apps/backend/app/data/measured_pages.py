@@ -34,10 +34,13 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import logging
 import sys
 from pathlib import Path
 
 from app.data import cities
+
+logger = logging.getLogger(__name__)
 
 # apps/backend/app/data/measured_pages.py → 저장소 루트
 _REPO = Path(__file__).resolve().parents[4]
@@ -50,7 +53,14 @@ def _load_hubs() -> dict:
 
     `data/` 는 백엔드 패키지 밖이라 import 경로가 없다(tests/test_city_registry.py 와 같은 방식).
     """
-    if not _PAGE_HUBS.exists():                       # 배포 이미지에 data/config 가 없을 때
+    if not _PAGE_HUBS.exists():
+        # 배포 이미지에 data/config 가 없을 때. **조용히 눕지 않는다** — 2026-09-02 에
+        # 정확히 이 자리가 프로덕션에서 빈 dict 를 돌려주어 서울 2차 12거점 + 경기
+        # 7거점이 화면에서 통째로 사라졌고, 폴백이 말이 없어서 아무도 몰랐다.
+        # Dockerfile 이 `COPY data/config/` 를 하는지 볼 것(빌드 가드도 같이 있다).
+        logger.warning(
+            "page_hubs 를 못 읽는다(%s) — 시드 밖 거점이 목록에서 통째로 빠진다. "
+            "배포 이미지에 data/config 가 실렸는지 확인할 것", _PAGE_HUBS)
         return {}
     key = "_measured_pages_hubs"
     if key in sys.modules:

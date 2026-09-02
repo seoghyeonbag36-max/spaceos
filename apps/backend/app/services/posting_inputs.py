@@ -66,16 +66,24 @@ def _load_shared_rone() -> frozenset[str]:
     빌려 쓰는 거점 집합. `data/` 는 백엔드 패키지 밖이라 경로로 로드한다
     (app/data/measured_pages.py · tests/test_city_registry.py 와 같은 방식).
 
-    읽지 못하면 **빈 집합이 아니라 예외를 내지 않고 빈 집합으로 눕는다** — 라벨이
-    `rone` 으로만 나가 공유 사실이 감춰지므로, 배포 이미지에 config 가 빠지는 일이
-    없도록 Dockerfile 가드가 data/ 를 싣는지 함께 확인할 것.
+    읽지 못하면 예외를 내지 않고 빈 집합으로 눕는다 — 라벨이 `rone` 으로만 나가
+    공유 사실이 감춰진다. **2026-09-02 에 실제로 그렇게 눕고 있었다**: Dockerfile 이
+    `data/config` 를 COPY 하지 않아 프로덕션에서 이 집합이 내내 비어 있었다. 이 독스트링이
+    "Dockerfile 가드가 data/ 를 싣는지 함께 확인할 것"이라고 적어 둔 그 가드가 없었던
+    것이다. 지금은 셋으로 막는다 — COPY 줄 · Dockerfile 빌드 가드 ·
+    tests/test_deploy_image_ships_runtime_data.py. 그래도 눕게 되면 **경고를 남긴다.**
     """
     import importlib.util
+    import logging
     import sys
     from pathlib import Path
     # app/services/posting_inputs.py → app → backend → apps → 저장소 루트 = parents[4]
     path = Path(__file__).resolve().parents[4] / "data" / "config" / "rone_districts.py"
     if not path.exists():
+        logging.getLogger(__name__).warning(
+            "rone_districts 를 못 읽는다(%s) — 앵커 공유 거점이 `rone-shared` 가 아니라 "
+            "`rone` 으로 나간다(공유 사실이 감춰진다). 배포 이미지에 data/config 가 "
+            "실렸는지 확인할 것", path)
         return frozenset()
     key = "_posting_shared_rone"
     if key not in sys.modules:
