@@ -134,12 +134,23 @@ def build_cells(district_id: str, grid: dict) -> dict | None:
     buildings_used = 0
     excluded_mall = 0
     seen_lots: set[str] = set()         # 지번 중복 제거 — 모듈 상단 "집계 단위" 참조
+    # 집합건물이 들고 있는 **호실 수**. 건물 수(excluded_mall)로는 이 거점에서 분모가
+    # 얼마나 빠졌는지 알 수 없다 — 집합건물은 건물 수로는 소수인데 호실이 많다
+    # (모듈 상단 2번). 이 값이 있어야 "분모가 상업 재고의 몇 %를 덮나"를 말할 수 있다.
+    mall_lots: set[str] = set()
+    mall_capacity = 0
 
     for feat in fc["features"]:
         props = feat["properties"]
         capacity = props.get("capacity") or 0
         if props.get("capacity_method") == "expos_units":
             excluded_mall += 1          # 집합건물 — 분자 미매칭이라 대표 집계에서 뺀다
+            # 호실 수는 지번당 한 번만 센다. 집계 대상과 **같은 규칙**이라야 두 값의
+            # 비(inventory_coverage_pct)가 성립한다 — 한쪽만 폴리곤 수로 세면 비가 거짓이 된다.
+            mall_lot = props.get("pnu") or props.get("id")
+            if mall_lot not in mall_lots:
+                mall_lots.add(mall_lot)
+                mall_capacity += capacity
             continue
         if capacity <= 0 or props.get("capacity_method") not in _COUNTED_METHODS:
             continue
@@ -205,6 +216,17 @@ def build_cells(district_id: str, grid: dict) -> dict | None:
         "polygons_total": polygons_total,
         "precision_pct": round(buildings_used / buildings_total * 100, 1),
         "excluded_mall": excluded_mall,
+        # 대표 집계의 분모가 이 거점 상업 재고에서 차지하는 비율(%). 분모에 실린 호실을
+        # 집합건물 호실까지 더한 전체로 나눈 값이다.
+        #
+        # ⚠ `precision_pct` 와 다른 것을 잰다. 저쪽은 **지번 수** 기준(집계된 지번 /
+        #   전체 지번)이고 이쪽은 **호실 수** 기준이다. 집합건물은 지번으로는 몇 개
+        #   안 되는데 호실이 수천이라 두 값이 크게 갈린다(banpo 지번 기준 100% ↔
+        #   호실 기준 5.2%). 대표값을 얼마나 믿을 수 있는지는 호실 쪽이 말해 준다.
+        "inventory_coverage_pct": (
+            round(sum_capacity / (sum_capacity + mall_capacity) * 100, 1)
+            if sum_capacity + mall_capacity else None
+        ),
         "anchor_pct": anchor,
         # 자릿수를 피연산자(avg 2자리 · anchor_pct 2자리)에 맞춘다. 1자리로 줄이면
         # 격차가 실제 차이와 최대 0.05%p 어긋나 "gap == avg - anchor" 가 성립하지 않는다.

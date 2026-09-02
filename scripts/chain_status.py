@@ -95,6 +95,28 @@ def _city_of(hub) -> tuple[str, str]:
     return declared, known
 
 
+def _backend_caveat(slug: str) -> str:
+    """서빙이 실제로 내려보내는 예외 문구(app/data/hub_caveats). 없으면 빈 문자열.
+
+    판단이 코드에 있는데 프로버가 계속 "정해라"를 물으면 그것이 곧 낡은 선언이다 —
+    이 저장소가 반복해 당한 실패 양식이라 프로버가 같은 자리를 본다.
+    """
+    try:
+        from app.data import hub_caveats
+    except Exception:
+        return ""
+    # 문구의 비율은 서빙이 집계에서 뽑는다. 프로버는 서빙을 띄우지 않으므로 같은 재료
+    # (coverage.json 의 capacity 근거별 호실 수)로 같은 값을 만들어 넘긴다 — 넘기지
+    # 않으면 문구가 "일부" 로 뭉개져, 프로버만 숫자 없는 문장을 보게 된다.
+    by = ((_load(GOLD / slug / "coverage.json") or {}).get("by_capacity_method") or {})
+    counted = (by.get("floor_ouln") or {}).get("capacity") or 0
+    mall = (by.get("expos_units") or {}).get("capacity") or 0
+    cells = {"capacity": counted or None,
+             "inventory_coverage_pct": round(counted / (counted + mall) * 100, 1)
+                                       if counted + mall else None}
+    return hub_caveats.caveat_of(slug, cells)
+
+
 def _served_vac(cov: dict | None) -> float | None:
     """서빙과 **같은 기준**의 거점 대표 공실률 — `floor_ouln` 만 센다.
 
@@ -140,9 +162,14 @@ def stages(slug: str) -> list[dict]:
         bldgs = {s.get("bldMngNo") for s in stores if s.get("bldMngNo")}
         ratio = round(len(stores) / len(bldgs), 1) if bldgs else 0.0
         ev = f"점포 {len(stores):,} · 건물 {len(bldgs):,} · 건물당 {ratio}"
-        if ratio > STORES_PER_BLDG_MAX and hub.caveat:
+        # 예외 승인은 두 곳에 있을 수 있다. 경기 실측 거점은 `page_hubs.PageHub.caveat`
+        # 에 적고, 서울 시드 거점은 백엔드 판단(app/data/hub_caveats)에 적는다 —
+        # `data/config` 가 배포 이미지에 안 실려서(Dockerfile 51~53행) 서울 거점의
+        # 문구를 page_hubs 에 두면 프로덕션 화면에 안 나온다.
+        approval = hub.caveat or _backend_caveat(slug)
+        if ratio > STORES_PER_BLDG_MAX and approval:
             add("점포", OK,
-                ev + f" (>{STORES_PER_BLDG_MAX} 계획상가 밀집 · 예외 승인: {hub.caveat})")
+                ev + f" (>{STORES_PER_BLDG_MAX} 계획상가 밀집 · 예외 승인: {approval})")
         elif ratio > STORES_PER_BLDG_MAX:
             add("점포", BLOCKED, ev + f" (>{STORES_PER_BLDG_MAX} 계획상가 밀집)",
                 "거점을 내리거나 집합상가 비중을 명시한 채 진행 — plan-gyeonggi 3-B")

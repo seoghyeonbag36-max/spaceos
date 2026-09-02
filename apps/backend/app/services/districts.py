@@ -20,7 +20,7 @@ from __future__ import annotations
 import math
 
 from app.data.seoul_pages import DISTRICTS, DISTRICTS_BY_ID
-from app.data import cities, measured_pages
+from app.data import cities, hub_caveats, measured_pages
 
 # 시드(서울 54) + 실측 거점(Gold 만으로 서는 거점, 예: 고양 화정).
 # **시드가 이긴다** — measured_pages.build() 가 이미 시드 id 를 제외하고 만든다.
@@ -260,6 +260,15 @@ def unviable_note(scenarios: dict) -> str | None:
             f"({basis_note(basis)})")
 
 
+def _predicted_none() -> dict:
+    """예측 3필드를 비운다 — 대표 공실률을 내린 거점에서 쓴다.
+
+    `predicted_rate` 는 현재 공실률 + delta 라, 대표값을 내려 놓고 이것만 남기면
+    화면이 내린 수를 그대로 되살린다(rate - delta).
+    """
+    return {"predicted_rate": None, "predicted_delta": None, "predicted_direction": None}
+
+
 def _predicted(district_id: str, current_rate: float) -> dict:
     """LSTM forecast 의 vac_proxy delta(%p 근사)를 현재 공실률에 가산한 다음 분기 근사.
 
@@ -285,6 +294,7 @@ def _summary(d: dict) -> dict:
     sent = (sum(z["s"] * z["r"] for z in d["zones"]) / sum_r) if sum_r else None
     risk = sum(1 for z in d["zones"] if z["s"] < 40) if d["zones"] else None
     ci = cells_for(d)
+    withheld = hub_caveats.is_withheld(d["id"])
     # 추천은 계산한다(recommend_tier). 예전에는 시드에 손으로 적은 `u["rec"]` 를 그대로
     # 세어 카드에 노출했다 — 기준이 정의된 적이 없는 값이었다.
     # `recommended` 플래그를 그대로 읽는다 — 여기서 recommend_tier 를 다시 부르면
@@ -311,16 +321,26 @@ def _summary(d: dict) -> dict:
         "reviews": sum_r if d["zones"] else None, "risk_zones": risk,
         # 시드 없이 Gold 만으로 서는 거점인가 — 화면이 빈 축을 "실측 없음"으로 그리는 근거.
         "measured_only": bool(d.get("measured_only")),
-        "caveat": d.get("caveat") or "",
-        "vacancy_rate": ci["avg_vacancy"], "vacant_units": ci["sum_vac"],
+        # 예외 문구는 시드에 적힌 것(경기 실측 거점)이 있으면 그것을, 없으면 계획상가
+        # 판단(hub_caveats)에서 만든다. 후자는 비율을 **이 집계에서** 뽑으므로 재수집으로
+        # 값이 움직이면 문구도 같이 움직인다 — 손으로 적은 수가 낡는 것을 막는다.
+        "caveat": d.get("caveat") or hub_caveats.caveat_of(d["id"], ci),
+        # 대표값을 내린 거점은 vacancy_rate·anchor_gap_pp·predicted_* 를 함께 내린다.
+        # 셋 다 대표값에서 유도되는 값이라, 하나만 남기면 내린 수를 되계산할 수 있다.
+        "vacancy_rate": None if withheld else ci["avg_vacancy"],
+        "vacancy_withheld": withheld,
+        "inventory_coverage_pct": ci.get("inventory_coverage_pct"),
+        "vacant_units": ci["sum_vac"],
         "cell_count": len(ci["cells"]), "store_count": ci["sum_stores"],
         "tier_mix": tiers,
         "vacancy_source": ci["vacancy_source"],
         "building_count": ci.get("buildings"),
         "precision_pct": ci.get("precision_pct"),
+        # 앵커(R-ONE) 자체는 남긴다 — 우리 대표값과 무관한 외부 관측이다.
+        # 격차는 대표값과의 차이라 대표값이 없으면 성립하지 않는다.
         "anchor_pct": ci.get("anchor_pct"),
-        "anchor_gap_pp": ci.get("anchor_gap_pp"),
-        **_predicted(d["id"], ci["avg_vacancy"]),
+        "anchor_gap_pp": None if withheld else ci.get("anchor_gap_pp"),
+        **(_predicted_none() if withheld else _predicted(d["id"], ci["avg_vacancy"])),
     }
 
 
@@ -349,8 +369,17 @@ def get_vacancy_heatmap(district_id: str) -> dict | None:
     if not d:
         return None
     ci = cells_for(d)
+    withheld = hub_caveats.is_withheld(district_id)
     return {"district_id": district_id, "resolution_m": 100, **ci,
-            **_predicted(district_id, ci["avg_vacancy"])}
+            # 셀은 그대로 둔다 — 내린 것은 셀이 아니라 거점 하나로 뭉친 대표값이다.
+            "avg_vacancy": None if withheld else ci["avg_vacancy"],
+            # 격차도 같이 내린다. 여기를 빼먹으면 화면이 `앵커 + 격차` 로 내린 수를
+            # 그대로 되살린다 — 요약 응답만 막고 히트맵을 안 막은 채로 한 번 새어
+            # 나갔다(2026-09-02, test_gold_anchor_comparison_attached 가 잡았다).
+            "anchor_gap_pp": None if withheld else ci.get("anchor_gap_pp"),
+            "vacancy_withheld": withheld,
+            **(_predicted_none() if withheld
+               else _predicted(district_id, ci["avg_vacancy"]))}
 
 
 def resolved_units(district_id: str) -> list[dict] | None:

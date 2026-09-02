@@ -373,7 +373,11 @@ export default function MapShell() {
           <div className="sp-title">{hub?.name ?? "가로수길"} · 건물 공실</div>
           <div className="sp-sub">
             {hub ? `${hub.gu} · ` : ""}{filtered.length.toLocaleString()}동 · {src === "api" ? "실측" : "샘플"}(추정)
-            {hub && ` · 거점 ${hub.vacancy_rate.toFixed(1)}%`}
+            {/* 거점 대표값이 없으면 그 사실을 적는다 — 조용히 빠지면 있는 값을 못 본
+                것처럼 읽힌다. 아래 건물 목록은 그대로다(내린 것은 대표값뿐이다). */}
+            {hub && (hub.vacancy_rate !== null && Number.isFinite(hub.vacancy_rate)
+              ? ` · 거점 ${hub.vacancy_rate.toFixed(1)}%`
+              : hub.vacancy_withheld ? " · 거점 대표값 미제공" : "")}
           </div>
           {hub?.anchor_pct != null && hub.anchor_gap_pp != null && (
             <div className="sp-anchor" title="R-ONE 중대형상가 공실률 대비. 모집단이 달라 격차 0 이 정상은 아니며 거점 간 비교용이다.">

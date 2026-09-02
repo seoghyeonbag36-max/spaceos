@@ -29,7 +29,17 @@ class DistrictSummary(BaseModel):
     # 예외 표시 — 비어 있지 않으면 이 거점의 수치를 다른 거점과 **직접 비교하면 안 된다**.
     # 거점을 목록에서 빼는 대신 왜 다른지 밝힌 채로 싣기 위한 자리다(계획상가 밀집 등).
     caveat: str = ""
-    vacancy_rate: float
+    # 공실 대표값 — **None 이 두 가지 뜻을 갖지 않게** 한다.
+    #   vacancy_withheld=False + None  → 재지 않았다(Gold 미보유 등)
+    #   vacancy_withheld=True  + None  → 쟀지만 거점을 대표하지 못해 **내렸다**
+    # 후자는 계획상가 밀집 거점이다(app/data/hub_caveats). 화면이 둘을 다르게 그려야
+    # 한다 — "실측 없음" 과 "대표값 미제공" 은 사용자에게 다른 말이다.
+    vacancy_rate: float | None
+    vacancy_withheld: bool = False
+    # 대표 집계의 분모가 이 거점 상업 재고에서 차지하는 비율(%) — 호실 기준.
+    # `precision_pct`(지번 기준)와 다른 것을 잰다: services/gold_vacancy 참조.
+    # 이 값이 낮을수록 대표 공실률을 믿을 이유가 준다.
+    inventory_coverage_pct: float | None = None
     vacant_units: int
     cell_count: int
     store_count: int
@@ -86,7 +96,12 @@ class VacancyHeatmap(BaseModel):
     cells: list[Cell]
     sum_stores: int
     sum_vac: int
-    avg_vacancy: float
+    # 거점 평균 — DistrictSummary.vacancy_rate 와 같은 값이고 같은 이유로 None 이 된다.
+    # 셀(`cells`)은 내리지 않는다: 셀 값은 그 셀 건물들의 실측이고, 내린 것은 그것들을
+    # 거점 하나의 수로 뭉친 **대표값**이다.
+    avg_vacancy: float | None
+    vacancy_withheld: bool = False
+    inventory_coverage_pct: float | None = None
     # "gold"(실측 건물 집계) | "synthetic"(합성 그리드 폴백) — DistrictSummary 와 동일 의미
     vacancy_source: str = "synthetic"
     # Gold 경로에서만 — 총 호실 수, 집계·전체 **지번** 수, 정밀 표본 비율(%),

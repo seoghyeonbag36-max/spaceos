@@ -146,7 +146,9 @@ export default function PlatformConsole() {
           <div className="chips">
             <span className="chip">{hub.type}</span>
             <span className="chip">
-              공실률 {hub.vacancy_rate.toFixed(1)}%
+              공실률{" "}
+              <MeasuredValue value={hub.vacancy_rate} unit="%"
+                absent={hub.vacancy_withheld ? "대표값 미제공" : "실측 없음"} />
               <i className={`src ${hub.vacancy_source === "gold" ? "is-gold" : "is-syn"}`}>
                 {hub.vacancy_source === "gold" ? "실측" : "합성"}
               </i>
@@ -486,8 +488,11 @@ function ForecastCard({ fc, err, quarters, onQuarters, hub }: {
   const stub = fc?.model === "lstm-stub";
   // 공실률(%)은 예측의 단위가 아니다 — delta 를 현재 공실률에 가산한 **근사**로만 쓴다.
   // 백엔드 services/districts._predicted 와 같은 식이라 거점 대시보드 값과 어긋나지 않는다.
-  const approxPct = fc && hub
-    ? Math.max(0, Math.min(100, hub.vacancy_rate + fc.delta))
+  // 대표 공실률이 없는 거점(미측정 · 대표값 미제공)은 환산 자체가 성립하지 않는다.
+  // 0 을 기준으로 더하면 없는 기준선을 지어내게 된다.
+  const baseVac = hub?.vacancy_rate ?? null;
+  const approxPct = fc && baseVac !== null && Number.isFinite(baseVac)
+    ? Math.max(0, Math.min(100, baseVac + fc.delta))
     : null;
   const maxAbs = fc
     ? Math.max(...fc.horizons.map((h) => Math.abs(h.forecast_vac_proxy)), 0.001)
@@ -532,11 +537,20 @@ function ForecastCard({ fc, err, quarters, onQuarters, hub }: {
             </div>
           </div>
 
+          {/* 환산이 빠진 이유를 밝힌다. 조용히 사라지면 예측 자체가 없는 것으로 읽힌다. */}
+          {approxPct == null && hub?.vacancy_withheld && (
+            <div className="approx">
+              <div className="note">
+                이 거점은 <b>거점 대표 공실률을 내렸다</b>(계획상가 밀집) — 기준선이 없어
+                %  환산을 내지 않는다. 예측 자체는 위 vac_proxy 로 유효하다.
+              </div>
+            </div>
+          )}
           {/* 단위를 숨기지 않는다 — %는 예측의 단위가 아니라 파생 근사다 */}
-          {approxPct != null && hub && (
+          {approxPct != null && baseVac != null && (
             <div className="approx">
               <div className="approxv">
-                공실률 환산 <b>{hub.vacancy_rate.toFixed(1)}%</b> → <b>{approxPct.toFixed(1)}%</b>
+                공실률 환산 <b>{baseVac.toFixed(1)}%</b> → <b>{approxPct.toFixed(1)}%</b>
               </div>
               <div className="note">
                 예측의 단위는 vac_proxy 다. %는 delta 를 현재 공실률에 가산한 <b>근사</b>이고,

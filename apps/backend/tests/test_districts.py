@@ -56,7 +56,14 @@ def test_list_districts():
             assert 0 <= d["sentiment"] <= 100
             assert d["reviews"] is not None
             assert d["risk_zones"] is not None
-        assert 0 <= d["vacancy_rate"] <= 100
+        # 대표값을 내린 거점(계획상가 밀집)은 None 이 정상이다. 그 자리를 0 으로
+        # 채우면 "공실 0%" 로 읽히므로, **누가 내렸는지**를 플래그로 함께 확인한다.
+        if d["vacancy_rate"] is None:
+            assert d["vacancy_withheld"], d["id"]
+            assert d["anchor_gap_pp"] is None and d["predicted_rate"] is None, d["id"]
+        else:
+            assert not d["vacancy_withheld"], d["id"]
+            assert 0 <= d["vacancy_rate"] <= 100
         # 추천 합계는 **유닛 수 이하**다. 상수 5 를 박아 두었다가 2026-08-24 실
         # 인벤토리 배선에서 깨졌다 — 5 는 시드 거점의 유닛 수였고, 실 인벤토리는
         # 거점당 1~30 유닛이다. 지켜야 할 성질은 "유닛 수를 넘지 않는다"이지
@@ -247,7 +254,13 @@ def test_gold_cells_are_internally_consistent():
         bld = sum(c["buildings"] for c in hm["cells"])
         assert cap == hm["capacity"] and act == hm["sum_stores"] and bld == hm["buildings"], slug
         assert hm["sum_vac"] == cap - act, slug
-        assert hm["avg_vacancy"] == pytest.approx((cap - act) / cap * 100, abs=0.01), slug
+        # 대표값을 내려도 **셀은 그대로**여야 한다 — 내린 것은 셀이 아니라 거점 하나로
+        # 뭉친 대표값이다. 그래서 정합 검사는 셀에서 다시 계산해 계속 건다.
+        if hm["vacancy_withheld"]:
+            assert hm["avg_vacancy"] is None, slug
+            assert cap > 0 and 0 <= (cap - act) / cap * 100 <= 100, slug
+        else:
+            assert hm["avg_vacancy"] == pytest.approx((cap - act) / cap * 100, abs=0.01), slug
         # 공실 호실 수가 음수인 셀은 active > capacity 를 뜻한다(파이프라인 규칙 위반)
         assert all(c["vac_n"] >= 0 for c in hm["cells"]), slug
 
@@ -271,13 +284,19 @@ def test_gold_aggregate_excludes_weak_evidence():
         assert hm["buildings"] == len(counted), f"{slug} 집계 지번 수"
         assert hm["buildings_total"] == len(_by_lot(props)), f"{slug} 전체 지번 수"
         assert hm["polygons_total"] == len(props), f"{slug} 전체 폴리곤 수"
-        assert hm["avg_vacancy"] == pytest.approx((cap - act) / cap * 100, abs=0.01), slug
+        # 대표값을 내린 거점은 응답에 값이 없다. 그래도 **집계 규칙 자체**는 검사한다 —
+        # 규칙이 깨지면 셀과 인벤토리 커버리지가 같이 틀어지기 때문이다.
+        served_avg = (cap - act) / cap * 100
+        if hm["vacancy_withheld"]:
+            assert hm["avg_vacancy"] is None, slug
+        else:
+            assert hm["avg_vacancy"] == pytest.approx(served_avg, abs=0.01), slug
 
         # 제외된 건물이 실제로 있어야 하고(현 산출물 기준), 전수 집계와 값이 달라야 한다.
         assert len(counted) < len(props), f"{slug} 제외 규칙이 아무것도 걸러내지 않았다"
         all_cap = sum(p.get("capacity") or 0 for p in props)
         all_act = sum(p.get("active") or 0 for p in props)
-        assert hm["avg_vacancy"] != pytest.approx((all_cap - all_act) / all_cap * 100, abs=0.01), slug
+        assert served_avg != pytest.approx((all_cap - all_act) / all_cap * 100, abs=0.01), slug
 
 
 def test_lot_polygons_counted_once():
@@ -336,6 +355,15 @@ def test_gold_anchor_comparison_attached():
             continue
         assert hm["anchor_pct"] is not None, f"{slug}: calibration.json 없음 — calibrate_vacancy 실행 필요"
         assert 0 < hm["anchor_pct"] < 60, f"{slug} 앵커 범위"
+        if hm["vacancy_withheld"]:
+            # 격차는 대표값과 앵커의 차이다. 대표값을 내린 거점에서 격차만 남기면
+            # 화면이 그 차이로 내린 수를 되계산할 수 있다 — 둘 다 내린다.
+            # 앵커(R-ONE) 자체는 외부 관측이라 그대로 싣는다(위 범위 검사가 계속 걸린다).
+            assert hm["anchor_gap_pp"] is None, slug
+            s = client.get(f"{V1}/commercial-districts/{slug}/summary").json()
+            assert s["anchor_pct"] == hm["anchor_pct"], slug
+            assert s["anchor_gap_pp"] is None and s["vacancy_rate"] is None, slug
+            continue
         assert hm["anchor_gap_pp"] == pytest.approx(hm["avg_vacancy"] - hm["anchor_pct"], abs=0.01), slug
         # 집합건물을 섞던 시절 격차가 +63%p 까지 벌어졌다. 그 회귀를 막는 상한이다.
         assert -20 < hm["anchor_gap_pp"] < 30, f"{slug} 앵커 격차 이상 — 집계 규칙 회귀 의심"

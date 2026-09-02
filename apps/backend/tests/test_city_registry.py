@@ -200,6 +200,17 @@ def test_caveat_is_carried_from_hub_to_api():
             continue
         assert rows[slug].get("caveat") == text, f"{slug}: caveat 이 응답까지 안 실린다"
 
+    # 예외 문구의 출처는 둘이다. 경기 실측 거점은 `page_hubs.PageHub.caveat`,
+    # 서울 시드 거점은 백엔드 판단(`app.data.hub_caveats`) — `data/config` 가 배포
+    # 이미지에 안 실려서(Dockerfile 51~53행) 서울 문구를 page_hubs 에 두면
+    # 프로덕션 화면에서 조용히 사라진다. 여기서는 둘 다 예외로 인정한다.
+    from app.data import hub_caveats as hc
+
+    excepted = set(hub_caveats) | hc.WITHHELD | hc.DISCLOSED
+    for slug in hc.WITHHELD | hc.DISCLOSED:
+        if slug in rows:
+            assert rows[slug]["caveat"], f"{slug}: 판단은 있는데 문구가 응답에 없다"
+
     # 예외가 아닌 거점은 비어 있어야 한다 — 전 거점에 경고가 붙으면 경고가 무의미해진다
-    normal = [r for sid, r in rows.items() if sid not in hub_caveats]
+    normal = [r for sid, r in rows.items() if sid not in excepted]
     assert normal and all(not r.get("caveat") for r in normal)

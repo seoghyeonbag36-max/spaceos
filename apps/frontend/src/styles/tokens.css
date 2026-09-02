@@ -46,6 +46,14 @@ html, body { font-family: var(--font-sans); color: var(--ink); background: #eef1
   background: rgba(14, 165, 183, .07); border-color: rgba(14, 165, 183, .32);
 }
 .caveat-note.caveat-mall strong { color: var(--brand-pressed); }
+/* 대표값 미제공(2026-09-02 banpo) — 앞의 둘보다 한 단계 무겁다. 저 둘은 "값은 있는데
+   비교하지 말라"이고 이쪽은 **값을 아예 안 싣는다**. 경고색을 가장 진하게 준다. */
+.caveat-note.caveat-withheld {
+  background: rgba(224, 62, 54, .06); border-color: rgba(224, 62, 54, .30);
+}
+/* 공실 축의 상단색(#E03E36 — PageDashboard.vacHex)을 어둡게 쓴 값이다. 앞의 두
+   caveat 과 같은 방식으로 적는다(이 블록은 경고 강도를 색으로만 가른다). */
+.caveat-note.caveat-withheld strong { color: #B3261E; }
 
 /* 재지 않은 값. 0 으로 보이면 안 되므로 숫자꼴을 아예 쓰지 않는다. */
 .value-absent {

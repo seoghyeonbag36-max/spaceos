@@ -48,7 +48,15 @@ export interface DistrictSummary {
   caveat?: string;
   center: [number, number]; note: string; rec_top: string;
   sentiment: number | null; reviews: number | null; risk_zones: number | null;
-  vacancy_rate: number; vacant_units: number; cell_count: number; store_count: number;
+  /** 거점 대표 공실률(%). **null 이 두 가지 뜻을 갖지 않게** `vacancy_withheld` 와 함께 읽는다:
+   *    withheld=false + null → 재지 않았다
+   *    withheld=true  + null → 쟀지만 거점을 대표하지 못해 **내렸다**(계획상가 밀집) */
+  vacancy_rate: number | null;
+  vacancy_withheld?: boolean;
+  /** 대표 집계의 분모가 이 거점 상업 재고에서 차지하는 비율(%) — 호실 기준.
+   *  `precision_pct`(지번 기준)와 다른 것을 잰다. 낮을수록 대표값을 믿을 이유가 준다. */
+  inventory_coverage_pct?: number | null;
+  vacant_units: number; cell_count: number; store_count: number;
   tier_mix: { premium: number; value: number; factory: number };
   /** 공실 수치 출처. "gold"면 실측 건물 집계, "synthetic"이면 합성 그리드 */
   vacancy_source: VacancySource;
@@ -163,7 +171,12 @@ export interface HeatCell {
 /** 거점 공실 히트맵 — GET /heatmap/vacancy?district={id} */
 export interface VacancyHeatmap {
   district_id: string; resolution_m: number;
-  cells: HeatCell[]; sum_stores: number; sum_vac: number; avg_vacancy: number;
+  cells: HeatCell[]; sum_stores: number; sum_vac: number;
+  /** 거점 평균 — DistrictSummary.vacancy_rate 와 같은 값·같은 null 규칙.
+   *  셀(`cells`)은 내려가지 않는다: 내린 것은 셀이 아니라 거점 하나로 뭉친 대표값이다. */
+  avg_vacancy: number | null;
+  vacancy_withheld?: boolean;
+  inventory_coverage_pct?: number | null;
   /** 공실 수치 출처 — "gold"면 실측 건물 집계, "synthetic"이면 합성 그리드 */
   vacancy_source: VacancySource;
   /** Gold 경로에서만 — 총 호실 수, 집계 건물 수, 마스터 전체 건물 수, 정밀 표본 비율(%),

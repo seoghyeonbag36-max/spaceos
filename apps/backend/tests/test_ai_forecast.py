@@ -96,9 +96,12 @@ def test_district_summaries_carry_predicted_rate():
     for d in r.json():
         assert "predicted_rate" in d, d["id"]
         assert "predicted_direction" in d, d["id"]
-        # 서울 pooled LSTM 범위 밖인 실측 거점은 None 이 정상이며 키는 유지돼야 한다.
+        # None 이 정상인 자리는 둘이다.
+        #   ① 서울 pooled LSTM 범위 밖인 실측 거점(경기)
+        #   ② 거점 대표 공실률을 내린 거점 — predicted_rate 는 대표값 + delta 라,
+        #      이것만 남기면 화면이 내린 수를 되계산한다(app/data/hub_caveats).
         if d["predicted_rate"] is None:
-            assert d["id"] in MEASURED_BY_ID, d["id"]
+            assert d["id"] in MEASURED_BY_ID or d["vacancy_withheld"], d["id"]
             assert d["predicted_direction"] is None, d["id"]
             continue
         if d["id"] not in MEASURED_BY_ID:

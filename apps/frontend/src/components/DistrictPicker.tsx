@@ -11,18 +11,27 @@
  *
  * 1. **도시** — `<optgroup>` 으로 묶는다. 서울과 경기 거점을 한 목록에 평평하게 늘어놓으면
  *    사용자가 지금 어느 도시를 보는지 모른다.
- * 2. **예외**(`caveat`) — 두 종류다. 계획상가 밀집(공실 분모가 재고 일부만 덮는다)과
- *    단일시설(공실률이 건물 한 채에 좌우된다). 성격이 다르면 대응도 달라야 하므로
- *    아이콘을 가른다. 문구 전문은 `CaveatNote` 가 상세에서 보여준다.
+ * 2. **예외**(`caveat`) — 세 종류다. 계획상가 밀집(공실 분모가 재고 일부만 덮는다),
+ *    단일시설(공실률이 건물 한 채에 좌우된다), 그리고 대표값 미제공(분모가 너무 얕아
+ *    거점 대표 공실률을 아예 내렸다 — 2026-09-02 banpo). 성격이 다르면 대응도 달라야
+ *    하므로 아이콘을 가른다. 문구 전문은 `CaveatNote` 가 상세에서 보여준다.
  * 3. **실측 없음**(`measured_only` + `sentiment === null`) — 0 이 아니라 **재지 않은 것**이다.
  *    옵션 라벨에서 공실률만 보여주고 감성은 아예 적지 않는다.
  */
 import type { DistrictSummary } from "@/lib/api";
 
-/** 예외의 종류 — `caveat` 문구 앞머리로 가른다(백엔드가 그렇게 쓴다). */
-export type CaveatKind = "mall" | "planned" | null;
+/** 예외의 종류 — 셋이다.
+ *
+ *  `withheld` 는 문구가 아니라 **`vacancy_withheld` 플래그**로 가른다. 앞머리 문자열로
+ *  판정하면 백엔드 문구를 다듬는 순간 조용히 `planned` 로 떨어지는데, 그러면 값이 없는
+ *  거점이 값이 있는 거점의 표식을 달게 된다. 나머지 둘은 종전대로 문구로 가른다.
+ */
+export type CaveatKind = "mall" | "planned" | "withheld" | null;
 
-export function caveatKind(d: Pick<DistrictSummary, "caveat">): CaveatKind {
+export function caveatKind(
+  d: Pick<DistrictSummary, "caveat" | "vacancy_withheld">,
+): CaveatKind {
+  if (d.vacancy_withheld) return "withheld";
   const t = d.caveat ?? "";
   if (!t) return null;
   if (t.startsWith("단일시설")) return "mall";
@@ -32,6 +41,7 @@ export function caveatKind(d: Pick<DistrictSummary, "caveat">): CaveatKind {
 const MARK: Record<Exclude<CaveatKind, null>, string> = {
   mall: "▣",        // 시설 한 채
   planned: "▤",     // 계획상가 밀집
+  withheld: "▨",    // 대표값을 내렸다 — 표식만으로도 다른 둘과 구분돼야 한다
 };
 
 /** 목록의 표식이 무엇을 뜻하는지 알려주는 짧은 꼬리표.
@@ -40,6 +50,7 @@ const MARK: Record<Exclude<CaveatKind, null>, string> = {
 const KIND_HINT: Record<Exclude<CaveatKind, null>, string> = {
   mall: "이 표식은 시설 한 채가 상권 전체를 좌우한다는 뜻이다",
   planned: "이 표식은 공실 분모가 상업 재고의 일부만 덮는다는 뜻이다",
+  withheld: "이 표식은 거점 대표 공실률을 내렸다는 뜻이다 — 값이 없는 것이 아니라 대표하지 못해 안 싣는다",
 };
 
 /** 도시 순서 — 서울을 먼저, 나머지는 이름순. 거점 수가 아니라 **원년 도시**가 기준이다. */
@@ -72,9 +83,13 @@ export default function DistrictPicker({
   }
   const cities = [...byCity.keys()].sort(cityOrder);
 
-  const tail = suffix ?? ((d: DistrictSummary) =>
+  const tail = suffix ?? ((d: DistrictSummary) => {
     // 공실률은 실측이 있을 때만. 없는 값을 0 으로 그리지 않는다.
-    Number.isFinite(d.vacancy_rate) ? `공실 ${d.vacancy_rate.toFixed(1)}%` : "실측 없음");
+    // "실측 없음"(안 쟀다)과 "대표값 미제공"(쟀지만 대표하지 못한다)은 다른 말이다.
+    if (d.vacancy_withheld) return "대표값 미제공";
+    return d.vacancy_rate !== null && Number.isFinite(d.vacancy_rate)
+      ? `공실 ${d.vacancy_rate.toFixed(1)}%` : "실측 없음";
+  });
 
   return (
     <select

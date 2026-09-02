@@ -98,17 +98,25 @@ export default function PageDashboard() {
 function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (id: string) => void }) {
   const kpi = useMemo(() => {
     const n = summaries.length;
-    const avg = (f: (s: DistrictSummary) => number) => summaries.reduce((a, s) => a + f(s), 0) / Math.max(1, n);
+    // 전체를 그대로 나누던 `avg` 헬퍼는 걷어냈다. 남은 두 평균(감성·공실)이 **둘 다**
+    // null 을 분모에서 빼야 해서, 헬퍼를 두면 실수로 그것을 부르는 자리가 생긴다.
     // 감성·리뷰는 경기 거점에 소스가 없어 null 이다. **null 을 0 으로 세면 안 된다** —
     // 평균이 내려가 서울 거점까지 실제보다 낮게 보인다. 실측이 있는 거점만 분모에 넣는다.
     const measured = summaries.filter((s) => s.sentiment !== null && s.sentiment !== undefined);
     const sentAvg = measured.length
       ? measured.reduce((a, s) => a + (s.sentiment ?? 0), 0) / measured.length : null;
+    // 공실률도 같다. 대표값을 내린 거점(계획상가 밀집 — vacancy_withheld)을 0 으로 세면
+    // 서울 평균이 통째로 내려간다. 감성과 같은 규칙으로 분모에서 뺀다.
+    const vacMeasured = summaries.filter(
+      (s) => s.vacancy_rate !== null && s.vacancy_rate !== undefined && Number.isFinite(s.vacancy_rate));
+    const vacAvg = vacMeasured.length
+      ? vacMeasured.reduce((a, s) => a + (s.vacancy_rate ?? 0), 0) / vacMeasured.length : null;
     return {
       n,
       sent: sentAvg,
       sentN: measured.length,
-      vac: avg((s) => s.vacancy_rate),
+      vac: vacAvg,
+      vacN: vacMeasured.length,
       vacant: summaries.reduce((a, s) => a + s.vacant_units, 0),
       reviews: summaries.reduce((a, s) => a + (s.reviews ?? 0), 0),
       gold: summaries.filter((s) => s.vacancy_source === "gold").length,
@@ -136,13 +144,21 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
               : <>{kpi.sent.toFixed(1)}<small>pt</small></>}</div>
           {/* 분모를 밝힌다 — 감성 소스가 없는 거점(경기)은 평균에서 뺐다. */}
           <div className="d">추정치 · {kpi.sentN}/{kpi.n}거점 실측</div></div>
-        <div className="kpi"><div className="l">평균 공실률</div><div className="v" style={{ color: vacHex(kpi.vac) }}>{kpi.vac.toFixed(1)}<small>%</small></div><div className="d">100m 그리드 · 실측 {kpi.gold} / 합성 {kpi.n - kpi.gold}</div></div>
+        <div className="kpi"><div className="l">평균 공실률</div>
+          <div className="v" style={{ color: kpi.vac === null ? undefined : vacHex(kpi.vac) }}>
+            {kpi.vac === null ? <span className="value-absent">실측 없음</span>
+              : <>{kpi.vac.toFixed(1)}<small>%</small></>}</div>
+          {/* 분모를 밝힌다 — 대표값을 내린 거점은 평균에서 뺐다. */}
+          <div className="d">100m 그리드 · {kpi.vacN}/{kpi.n}거점 · 실측 {kpi.gold} / 합성 {kpi.n - kpi.gold}</div></div>
         <div className="kpi"><div className="l">공실 호실 합계</div><div className="v">{kpi.vacant.toLocaleString()}<small>개</small></div><div className="d">실측 거점은 건축물대장 호실 기준</div></div>
       </div>
 
       <div className="grid">
         {summaries.map((s, i) => (
-          <button key={s.id} className="dcard" style={{ borderLeftColor: vacHex(s.vacancy_rate) }} onClick={() => onOpen(s.id)}>
+          <button key={s.id} className="dcard"
+            style={{ borderLeftColor: s.vacancy_rate === null || s.vacancy_rate === undefined
+              ? "var(--line, #d1d5db)" : vacHex(s.vacancy_rate) }}
+            onClick={() => onOpen(s.id)}>
             <div className="dtop">
               <div className="dord">{i + 1}</div>
               <div className="dname">{s.name}</div>
@@ -155,7 +171,16 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
                   title="이 거점에는 감성 소스가 없다 — 0 이 아니라 재지 않은 것이다">감성 실측 없음</span></div>
               : <Bar k="감성" v={s.sentiment} max={100} color={sentHex(s.sentiment)}
                      text={`${s.sentiment.toFixed(1)}pt`} />}
-            <Bar k="공실" v={s.vacancy_rate} max={VAC_BAR_MAX} color={vacHex(s.vacancy_rate)} text={`${s.vacancy_rate.toFixed(1)}%`} />
+            {/* 대표값을 내린 거점은 막대를 그리지 않는다 — 길이 0 짜리 막대는 "공실 0%"
+                로 읽힌다. 왜 없는지는 카드를 눌러 들어가면 CaveatNote 가 전문으로 밝힌다. */}
+            {s.vacancy_rate === null || s.vacancy_rate === undefined
+              ? <div className="dmeta"><span className="value-absent"
+                  title={s.vacancy_withheld
+                    ? "쟀지만 거점을 대표하지 못해 내렸다 — 계획상가 밀집"
+                    : "이 거점에는 공실 실측이 없다"}>
+                  {s.vacancy_withheld ? "공실 대표값 미제공" : "공실 실측 없음"}</span></div>
+              : <Bar k="공실" v={s.vacancy_rate} max={VAC_BAR_MAX} color={vacHex(s.vacancy_rate)}
+                     text={`${s.vacancy_rate.toFixed(1)}%`} />}
             <div className="dmeta">
               <span>리뷰 {s.reviews === null || s.reviews === undefined
                 ? <span className="value-absent">없음</span> : s.reviews.toLocaleString()}</span>
@@ -443,7 +468,9 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
             <span className="ml-ticks"><em>0%</em><em>{VAC_SCALE_MAX}%+</em></span>
             {hm && (
               <span className="ml-stat">
-                평균 <b style={{ color: vacHex(hm.avg_vacancy) }}>{hm.avg_vacancy.toFixed(1)}%</b>
+                평균 {hm.avg_vacancy === null || hm.avg_vacancy === undefined
+                  ? <b className="value-absent" title="쟀지만 거점을 대표하지 못해 내렸다">대표값 미제공</b>
+                  : <b style={{ color: vacHex(hm.avg_vacancy) }}>{hm.avg_vacancy.toFixed(1)}%</b>}
                 {" "}<Pred rate={hm.predicted_rate} delta={hm.predicted_delta} direction={hm.predicted_direction} />
                 {" "}· 셀 {hm.cells.length} · 영업 {hm.sum_stores.toLocaleString()} · 공실 {hm.sum_vac}
                 {" "}<SourceBadge source={hm.vacancy_source} />
@@ -528,7 +555,9 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
           <button className="back" onClick={onBack}>← 거점 보드</button>
           <h1>{summary.name}</h1>
           <div className="sub">
-            {detail?.sub ?? summary.note} · 공실률 {summary.vacancy_rate.toFixed(1)}%
+            {detail?.sub ?? summary.note} · 공실률{" "}
+            <MeasuredValue value={summary.vacancy_rate} unit="%"
+              absent={summary.vacancy_withheld ? "대표값 미제공" : "실측 없음"} />
             {" "}<Pred rate={summary.predicted_rate} delta={summary.predicted_delta} direction={summary.predicted_direction} />
             {" "}· 감성 <MeasuredValue value={summary.sentiment} unit="pt" />
             {summary.rec_top ? ` · 추천 상위 Tier ${summary.rec_top}` : ""}
