@@ -24,6 +24,11 @@
 `data/config/page_hubs` 에 등록됐고 **Gold 가 실제로 선** 거점만 오른다(아래 `_is_measured`).
 등록만 하고 수집 전인 거점은 오르지 않는다 — 목록에 뜨는데 지도가 비는 상태를 막는다.
 
+## 어느 도시를 서빙하는가 — `SERVED_CITIES`
+
+Gold 가 섰다고 자동으로 화면에 오르지는 않는다. 어느 도시를 **지금** 서빙할지는 제품
+판단이고, 그 판단을 `SERVED_CITIES` 한 곳에 둔다(아래). 2026-09-03 현재 서울만이다.
+
 ## 서울 54거점은 건드리지 않는다
 
 `seoul_pages.DISTRICTS` 는 그대로다. 이 모듈은 **더할 뿐** 기존 항목을 바꾸지 않는다.
@@ -46,6 +51,19 @@ logger = logging.getLogger(__name__)
 _REPO = Path(__file__).resolve().parents[4]
 _GOLD = _REPO / "data" / "gold"
 _PAGE_HUBS = _REPO / "data" / "config" / "page_hubs.py"
+
+
+# 지금 화면에 올릴 도시. **수집·등재와 별개인 제품 판단**이라 코드 한 곳에 둔다.
+#
+# 2026-09-03: 경기(고양·파주) 작업을 중단하기로 해서 서울만 남겼다. 고양·파주 7거점
+# (hwajeong·ilsan·westerndom·geumchon·unjeong·tanhyeon·yadang)은 Gold 도 앵커도 서 있고
+# `page_hubs.GYEONGGI_HUBS` 에 그대로 등재돼 있다 — **지우지 않았다.** 재개할 때
+# 여기에 도시 id 를 되넣으면 그날로 다시 뜬다.
+#
+# ⚠ 되넣기 전에 볼 것: 경기 거점의 예외 문구는 `page_hubs.PageHub.caveat` 에 있고,
+#   그 파일이 배포 이미지에 실리는지는 `tests/test_deploy_image_ships_runtime_data.py`
+#   가 지킨다(2026-09-02 에 안 실려서 프로덕션이 54거점만 냈다).
+SERVED_CITIES: frozenset[str] = frozenset({"seoul"})
 
 
 def _load_hubs() -> dict:
@@ -147,6 +165,10 @@ def build() -> list[dict]:
         if slug in DISTRICTS_BY_ID:       # 시드 거점이 이긴다 — 서울 54는 그대로
             continue
         if not _is_measured(slug):        # 수집 전 거점은 목록에 올리지 않는다
+            continue
+        # 서빙 대상 도시가 아니면 올리지 않는다. 산출물이 없어서가 아니라 **안 올리기로
+        # 정해서** 빠지는 것이라, 두 이유를 위 조건과 갈라 둔다(위 SERVED_CITIES 주석).
+        if getattr(hub, "city", "seoul") not in SERVED_CITIES:
             continue
         out.append(_entry(hub, _coverage(slug)))
     return out

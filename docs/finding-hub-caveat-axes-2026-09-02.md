@@ -137,6 +137,36 @@ GET https://spaceos-twin.web.app/api/v1/commercial-districts  → 54
 두 로더의 폴백은 그대로 두되(예외를 내면 앱이 안 뜬다) **경고를 남기게** 했다. 조용한
 폴백이 이 사고의 전달 경로였다.
 
+## 5-B. 서빙 범위 — 서울 12거점만 올린다 (2026-09-03 판단)
+
+§5 를 고치면 서울 2차 12거점과 **경기 7거점이 같이** 뜬다. 경기 작업은 중단 중이라
+사용자 판단으로 **서울만** 올린다.
+
+`measured_pages.SERVED_CITIES` 한 곳이 그 판단을 갖는다:
+
+```python
+SERVED_CITIES: frozenset[str] = frozenset({"seoul"})
+```
+
+경기 7거점(hwajeong·ilsan·westerndom·geumchon·unjeong·tanhyeon·yadang)은 **지우지
+않았다** — Gold·앵커·좌표·예외 문구가 전부 그대로 있고 `GYEONGGI_HUBS` 에도 남아 있다.
+재개할 때 이 집합에 도시 id 를 되넣으면 그날로 다시 뜬다. 중단은 **서빙만 끄는 것**이지
+산출물을 버리는 것이 아니다 — 버리면 재개가 재수집이 된다.
+
+두 이유를 코드에서 갈라 뒀다. `_is_measured()` 로 빠지면 "산출물이 없어서"이고,
+`SERVED_CITIES` 로 빠지면 "안 띄우기로 정해서"다. 섞이면 다음 사람이 경기 거점을 보고
+수집이 덜 됐다고 읽는다.
+
+서빙 결과: **66거점 = 서울 시드 54 + 서울 2차 12.**
+
+⚠ Dockerfile 빌드 가드의 임계도 같이 내렸다(15 → 10). 그 가드가 잡으려는 것은 **0**
+(= config 가 통째로 안 실림)이지 정확한 거점 수가 아니다 — 정확한 수를 박으면 서빙
+판단이 바뀔 때마다 배포가 깨진다.
+
+감시: `tests/test_city_registry.py::test_only_served_cities_reach_the_api` 가
+① `SERVED_CITIES` 가 서울뿐인지 ② 경기 Gold 가 살아 있는지 ③ 경기가 서빙에 안 새는지
+셋을 함께 본다.
+
 ## 6. 남긴 것
 
 | 무엇 | 어디 |

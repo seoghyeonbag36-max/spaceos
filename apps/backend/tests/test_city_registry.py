@@ -17,6 +17,7 @@ from app.data import cities
 
 _REPO = Path(__file__).resolve().parents[3]
 _PAGE_HUBS = _REPO / "data" / "config" / "page_hubs.py"
+_GOLD = _REPO / "data" / "gold"
 
 
 def _load_page_hubs():
@@ -61,8 +62,14 @@ def test_gyeonggi_hubs_do_not_mutate_seoul_seed():
     assert not (gg & set(DISTRICTS_BY_ID)), "경기 후보가 서울 시드를 변형했다"
 
 
-def test_ilsan_exceptions_are_separate_served_pages():
-    """라페스타·웨스턴돔은 예외 근거를 밝힌 서로 다른 Gold 거점이어야 한다."""
+def test_ilsan_exceptions_are_separate_hubs_with_their_own_caveats():
+    """라페스타·웨스턴돔은 예외 근거를 밝힌 서로 다른 Gold 거점이어야 한다.
+
+    ⚠ 2026-09-03 부터 **서빙은 검사하지 않는다.** 경기 작업을 중단하며 화면 서빙을
+      서울로 좁혔기 때문이다(`measured_pages.SERVED_CITIES`). 등재·좌표·예외 문구는
+      그대로 살아 있어야 하고 — 재개하면 그날로 다시 떠야 하므로 — 여기서 계속 지킨다.
+      서빙 여부는 아래 `test_only_served_cities_reach_the_api` 가 따로 본다.
+    """
     ph = _load_page_hubs()
     from app.services import districts as svc
 
@@ -78,11 +85,32 @@ def test_ilsan_exceptions_are_separate_served_pages():
     assert (lafesta.cx, lafesta.cy) != (westerndom.cx, westerndom.cy)
 
     for hub in required.values():
-        row = svc.get_summary(hub.slug)
-        assert row is not None, f"{hub.name}: Gold가 없어 API 서빙 목록에서 빠졌다"
-        assert row["measured_only"] is True
-        assert row["vacancy_source"] == "gold"
-        assert row["caveat"].startswith("예외 서빙")
+        # Gold 는 서 있어야 한다 — 서빙을 껐다고 산출물까지 사라지면 재개가 재수집이 된다.
+        assert (_GOLD / hub.slug / "page_building_master.geojson").exists(), hub.name
+        assert hub.caveat.startswith("예외 서빙"), hub.name
+
+
+def test_only_served_cities_reach_the_api():
+    """화면에 오르는 도시는 `SERVED_CITIES` 가 정한다 — 산출물 유무와 별개다.
+
+    2026-09-03: 경기(고양·파주) 작업 중단으로 서울만 서빙한다. 경기 7거점은 Gold·앵커가
+    다 선 채로 `GYEONGGI_HUBS` 에 남아 있고 **의도적으로** 목록에서 빠진다. 이 둘이
+    갈리지 않으면 "산출물이 없어서 안 뜬다"와 "안 띄우기로 정했다"를 구분할 수 없다.
+    """
+    from app.data import measured_pages as mp
+    from app.services import districts as svc
+
+    assert mp.SERVED_CITIES == frozenset({"seoul"}), (
+        f"서빙 도시가 바뀌었다: {sorted(mp.SERVED_CITIES)} — 의도한 변경인지 확인할 것")
+
+    rows = svc.list_summaries()
+    assert {r["city"] for r in rows} == mp.SERVED_CITIES
+
+    ph = _load_page_hubs()
+    gg_with_gold = {s for s in getattr(ph, "GYEONGGI_HUBS", {})
+                    if (_GOLD / s / "page_building_master.geojson").exists()}
+    assert gg_with_gold, "경기 Gold 가 통째로 사라졌다 — 중단은 서빙만 끄는 것이다"
+    assert not (gg_with_gold & {r["id"] for r in rows}), "경기 거점이 서빙에 샜다"
 
 
 @pytest.mark.parametrize("pnu,expected", [

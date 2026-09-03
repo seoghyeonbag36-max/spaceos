@@ -82,8 +82,13 @@ RUN set -eu; \
 # 거점 목록 가드 — gold 파일이 있는 것과 **서빙이 그것을 목록에 올리는 것**은 다른 일이다.
 # 위 가드는 파일만 세므로 data/config 가 빠져도 통과한다(2026-09-02 실측: gold 73거점이
 # 멀쩡히 실린 이미지가 화면에는 54거점만 냈다). 그래서 서빙 코드를 실제로 불러 센다.
+#
+# 임계는 **느슨하게** 둔다. 잡으려는 것은 0(= config 가 통째로 안 실림)이지 정확한
+# 거점 수가 아니다. 서빙 대상은 제품 판단으로 바뀐다 — 2026-09-03 경기 중단으로
+# 19 → 12 가 됐다(app/data/measured_pages.SERVED_CITIES). 정확한 수를 박아 두면
+# 판단이 바뀔 때마다 배포가 깨진다.
 RUN set -eu; \
-    PYTHONPATH=/app/apps/backend python -c "import sys; from app.data import measured_pages as m; h=len(m._load_hubs()); n=len(m.MEASURED); print('page_hubs %d거점 로드 · 시드 밖 서빙 %d거점' % (h, n)); sys.exit(0 if h >= 50 and n >= 15 else 1)" \
+    PYTHONPATH=/app/apps/backend python -c "import sys; from app.data import measured_pages as m; h=len(m._load_hubs()); n=len(m.MEASURED); print('page_hubs %d거점 로드 · 시드 밖 서빙 %d거점' % (h, n)); sys.exit(0 if h >= 50 and n >= 10 else 1)" \
       || { echo "빌드 중단: 시드 밖 거점이 서빙 목록에 안 오른다 — data/config 가 이미지에 안 들어왔을 가능성이 크다"; \
            echo "  확인: COPY data/config/ · .dockerignore · gcloud 업로드(.gitignore)"; exit 1; }
 
