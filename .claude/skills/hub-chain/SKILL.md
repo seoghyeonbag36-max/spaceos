@@ -29,6 +29,7 @@ python scripts/chain_status.py --all --json    # 기계용
 | 4 | Gold 빌드 | `gold-build` | `Page마스터` = Tier1 · 정밀커버리지 ≥80% |
 | 5 | 앵커 대조 | `gold-build` | `앵커` 격차 \|gap\| ≤ 30%p |
 | 6 | 서빙 등재 | `page` / `backend-dev` | `서빙등재` ok — API 목록에 뜬다 |
+| — | (서빙 보류) | — | `서빙등재` **`[--]`** — 도시가 `measured_pages.SERVED_CITIES` 밖이다. 결손이 아니라 **제품 판단**이니 고칠 코드를 찾지 말 것 |
 | 7 | 검증 | `verify` | 정적 3종 + 지도 픽셀 |
 | 8 | 배포 | `deploy` | CI 초록 (`vacancy_source: gold` 확인 포함) |
 

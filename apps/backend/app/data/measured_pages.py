@@ -63,6 +63,17 @@ _PAGE_HUBS = _REPO / "data" / "config" / "page_hubs.py"
 # ⚠ 되넣기 전에 볼 것: 경기 거점의 예외 문구는 `page_hubs.PageHub.caveat` 에 있고,
 #   그 파일이 배포 이미지에 실리는지는 `tests/test_deploy_image_ships_runtime_data.py`
 #   가 지킨다(2026-09-02 에 안 실려서 프로덕션이 54거점만 냈다).
+#
+# 2026-09-05: **수집도 함께 멈추기로 했다.** 09-03 에 서빙만 끄고 수집 쪽은 그대로
+# 두었더니, `chain_status` 와 `quota_preflight` 가 그 결정을 모른 채 경기 17거점의
+# 대장·공실유닛을 계속 "다음 한 수"로 냈다. 그 줄을 집으면 화면에 닿지 않을 데이터에
+# 하루치 쿼터가 사라진다(쿼터는 회수되지 않는다). 그래서 두 스크립트가 이 상수를 읽어
+# 대상에서 뺀다 — **재개는 여기에 도시 id 를 되넣는 것 하나로 끝난다.**
+#   · scripts/chain_status.py `_served_cities()` — 보류 거점은 다음 한 수를 안 낸다
+#     (`--include-paused` 로 꺼낸다). 단계·근거는 그대로 보인다.
+#   · scripts/quota_preflight.py `_paused()` — 실행줄과 콜 배정에서 뺀다
+#   두 곳 다 **이 상수를 못 읽으면 아무것도 빼지 않는다** — 못 읽은 것을 '보류'로
+#   단정하면 서울 잔여까지 조용히 사라지기 때문이다.
 SERVED_CITIES: frozenset[str] = frozenset({"seoul"})
 
 

@@ -10,6 +10,10 @@
     python scripts/chain_status.py hwajeong geumchon
     python scripts/chain_status.py --all --json
     python scripts/chain_status.py hwajeong --next    # 다음 명령 한 줄만
+    python scripts/chain_status.py --all --next --include-paused   # 보류 도시까지
+
+⚠ 서빙 보류 도시(`measured_pages.SERVED_CITIES` 밖)의 거점은 **다음 한 수를 내지 않는다.**
+  단계와 근거는 그대로 보이고 명령만 가려진다 — `--include-paused` 로 꺼낸다.
 """
 from __future__ import annotations
 
@@ -35,7 +39,10 @@ PRECISE_COVERAGE_MIN = 80.0  # 미만 = floor_approx 잔여 많음 (build_page_m
 ANCHOR_GAP_MAX = 30.0        # 초과 = 앵커 가드레일 위반 (test_gold_anchor_comparison_attached)
 
 OK, PARTIAL, TODO, BLOCKED = "ok", "partial", "todo", "blocked"
-MARK = {OK: "[OK]", PARTIAL: "[~ ]", TODO: "[  ]", BLOCKED: "[!!]"}
+# 산출물이 없어서 못 한 것이 아니라 **안 하기로 정해서** 비어 있는 단계. 미완과 갈라
+# 두지 않으면 제품 판단이 배선 결손으로 보고되고, 읽는 사람이 멀쩡한 코드를 고치러 간다.
+PAUSED = "paused"
+MARK = {OK: "[OK]", PARTIAL: "[~ ]", TODO: "[  ]", BLOCKED: "[!!]", PAUSED: "[--]"}
 
 
 def _hubs() -> dict:
@@ -82,6 +89,25 @@ def _served_ids() -> set[str]:
             return {d["id"] for d in DISTRICTS}
         except Exception:
             return set()
+
+
+def _served_cities() -> frozenset[str] | None:
+    """지금 **서빙하기로 정한** 도시. 판단을 못 읽으면 None.
+
+    `_served_ids()` 와 다른 축이다: 저쪽은 "목록에 실제로 올랐나", 이쪽은 "올릴 도시로
+    정했나"다. 둘을 안 가르면 제품 판단으로 뺀 거점이 **배선 결손으로 보고된다** —
+    2026-09-05 에 geumchon·tanhyeon·yadang 셋이 그렇게 나왔다. Gold·건물마스터·앵커가
+    다 서 있는데 프로버가 `_is_measured` 를 디버깅하라고 시켰고, 정작 거르는 것은 그
+    다음 줄의 `SERVED_CITIES` 였다(measured_pages.build).
+
+    None 을 돌려주면 판정하지 않는다 — 판단을 못 읽었을 때 "보류"라고 단정하면 진짜
+    배선 결손이 조용히 묻힌다. 못 읽은 것과 안 하기로 한 것은 같지 않다.
+    """
+    try:
+        from app.data.measured_pages import SERVED_CITIES
+    except Exception:
+        return None
+    return frozenset(SERVED_CITIES)
 
 
 def _city_of(hub) -> tuple[str, str]:
@@ -268,15 +294,24 @@ def stages(slug: str) -> list[dict]:
     else:
         prev = {s["stage"]: s["status"] for s in out}
         ready = prev.get("Page마스터") in (OK, PARTIAL) and prev.get("앵커") != BLOCKED
-        add("서빙등재", TODO if ready else BLOCKED,
-            "거점 목록 미등재 (지도·API 목록에 안 뜬다)",
-            "Gold 가 섰는데 목록에 없다 — app/data/measured_pages._is_measured 조건 확인" if ready
-            else "Gold 가 서기 전에는 등재하지 않는다 — 시드를 지어내지 않기 위해")
+        on = _served_cities()
+        if on is not None and declared not in on:
+            # 산출물이 없어서가 아니라 **안 올리기로 정해서** 빠진다. 여기에 수집·디버깅
+            # 명령을 주면 안 된다 — 다음 한 수로 뽑히지 않도록 next 를 비운다.
+            add("서빙등재", PAUSED,
+                f"'{declared}' 는 서빙 대상 도시가 아니다 — 제품 판단으로 뺐다"
+                f" (measured_pages.SERVED_CITIES={{{', '.join(sorted(on))}}})"
+                + ("" if ready else " · Gold 도 아직 안 섰다"))
+        else:
+            add("서빙등재", TODO if ready else BLOCKED,
+                "거점 목록 미등재 (지도·API 목록에 안 뜬다)",
+                "Gold 가 섰는데 목록에 없다 — app/data/measured_pages._is_measured 조건 확인" if ready
+                else "Gold 가 서기 전에는 등재하지 않는다 — 시드를 지어내지 않기 위해")
 
     return out
 
 
-def summarize(slug: str) -> dict:
+def summarize(slug: str, *, include_paused: bool = False) -> dict:
     st = stages(slug)
     blocked = [s for s in st if s["status"] == BLOCKED]
     done = sum(1 for s in st if s["status"] == OK)
@@ -284,8 +319,18 @@ def summarize(slug: str) -> dict:
     # 안 된다 — 마지막 단계(서빙등재)는 선행이 없을 때 항상 막힘으로 나오므로, 그것을
     # 집으면 루프가 "아직 수집도 안 한 거점을 등재하라"는 헛수를 둔다.
     nxt = next((s for s in st if s["status"] in (BLOCKED, TODO) and s["next"]), {})
+    # 서빙이 보류된 도시의 거점은 **다음 한 수를 내지 않는다.** 단계는 그대로 보이되
+    # 명령만 거둔다 — 2026-09-05 결정(경기 중단 유지 + 수집도 멈춤)이다.
+    #
+    # 종전에는 명령을 그대로 냈다. 그래서 서빙은 09-03 에 껐는데 프로버는 경기 17거점의
+    # 대장·공실유닛을 계속 "다음 한 수"로 냈고, 그걸 집으면 **화면에 닿지 않을 데이터에
+    # 하루치 쿼터를 태우게** 된다. 재개할 때는 `--include-paused` 로 되살린다(명령이
+    # 지워진 것이 아니라 가려진 것이다 — 단계 목록에는 그대로 있다).
+    paused = any(s["status"] == PAUSED for s in st)
+    if paused and not include_paused:
+        nxt = {}
     return {"slug": slug, "done": done, "total": len(st), "stages": st,
-            "blocked": [b["stage"] for b in blocked],
+            "blocked": [b["stage"] for b in blocked], "serving_paused": paused,
             "next_stage": nxt.get("stage", ""), "next": nxt.get("next", "")}
 
 
@@ -294,26 +339,35 @@ def main() -> int:
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     as_json = "--json" in flags
     only_next = "--next" in flags
+    incl = "--include-paused" in flags
     slugs = sorted(_hubs()) if ("--all" in flags or not args) else args
 
-    reports = [summarize(s) for s in slugs]
+    reports = [summarize(s, include_paused=incl) for s in slugs]
     if as_json:
         print(json.dumps(reports, ensure_ascii=False, indent=2))
         return 0
     if only_next:
         for r in reports:
-            print(f"{r['slug']}\t{r['next_stage']}\t{r['next']}")
+            nxt = r["next"]
+            if nxt and r["serving_paused"]:
+                nxt += "   # ⚠ 서빙 보류 도시 — 화면에는 안 오른다(--include-paused 로 꺼낸 값)"
+            print(f"{r['slug']}\t{r['next_stage']}\t{nxt}")
         return 0
 
     for r in reports:
         head = f"\n■ {r['slug']}  {r['done']}/{r['total']} 단계 통과"
         if r["blocked"]:
             head += "  막힘: " + ", ".join(r["blocked"])
+        if r["serving_paused"]:
+            head += "  보류: 서빙 대상 도시 아님" + ("" if incl else " (다음 한 수 없음)")
         print(head)
         for s in r["stages"]:
             print(f"  {MARK[s['status']]} {s['stage']:10s} {s['evidence']}")
-            if s["next"]:
+            # 보류 거점의 명령은 **지우지 않고 가린다** — 재개할 때 다시 찾아야 하므로.
+            if s["next"] and (incl or not r["serving_paused"]):
                 print(f"       -> {s['next']}")
+            elif s["next"]:
+                print(f"       -  (보류 중 — --include-paused 로 명령 표시)")
     pending = next((r for r in reports if r["next"]), None)
     if pending:
         print(f"\n다음 한 수 [{pending['slug']} / {pending['next_stage']}]: {pending['next']}")

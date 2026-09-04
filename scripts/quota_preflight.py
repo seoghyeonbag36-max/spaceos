@@ -60,6 +60,31 @@ _GROUPS: tuple[tuple[str, dict], ...] = (
 )
 
 
+def _paused() -> set[str]:
+    """서빙 보류 도시의 거점 — **오늘 쿼터를 태울 대상에서 뺀다.**
+
+    2026-09-03 에 경기(고양·파주) 서빙을 중단했고, 2026-09-05 에 수집도 멈추기로
+    했다. 그런데 이 스크립트는 그 결정을 모른 채 경기 16거점 실행줄을 계속 찍고
+    있었다 — 그 줄을 그대로 돌리면 **화면에 닿지 않을 데이터에 하루치 쿼터가 사라진다**
+    (쿼터는 하루가 지나면 회수되지 않는다).
+
+    판단은 `measured_pages.SERVED_CITIES` 한 곳에 있고 여기서 그것을 읽는다. 슬러그를
+    손으로 적으면 재개할 때 고칠 곳이 둘이 되고, 그 중 하나는 잊힌다.
+
+    판단을 못 읽으면 **빈 집합**을 돌려준다(아무것도 빼지 않는다). 못 읽은 것을
+    '보류'로 단정하면 서울 잔여까지 조용히 사라져, 있는 일이 없는 것처럼 보인다.
+    """
+    backend = ROOT / "apps" / "backend"
+    if str(backend) not in sys.path:
+        sys.path.insert(0, str(backend))
+    try:
+        from app.data.measured_pages import SERVED_CITIES
+    except Exception:
+        return set()
+    return {slug for slug, hub in ALL_HUBS.items()
+            if getattr(hub, "city", "seoul") not in SERVED_CITIES}
+
+
 def check_quota() -> tuple[str, str]:
     """전유부 1콜 프로브. 429 면 아직 안 열린 것이므로 오늘 작업을 시작하지 않는다."""
     import os
@@ -185,8 +210,11 @@ def _gold(slug: str) -> list | None:
 
 def report_remaining() -> None:
     """전유부(대장) 잔여와 층별개요 대상을 gold 에서 유도해 출력한다."""
+    paused = _paused()
     missing, partial = [], []
     for slug in ALL_HUBS:
+        if slug in paused:                # 서빙 보류 도시 — 오늘 쿼터를 태우지 않는다
+            continue
         rows = _gold(slug)
         if rows is None or not rows:
             missing.append(slug)          # 파일이 없거나 0동 = 미수집
@@ -194,7 +222,12 @@ def report_remaining() -> None:
             partial.append((slug, sum(1 for r in rows
                                       if r.get("capacity_method") == "rate_limited")))
 
-    print(f"\n■ 전유부(대장) — 미수집 {len(missing)}거점 / 전체 {len(ALL_HUBS)}")
+    live = len(ALL_HUBS) - len(paused)
+    print(f"\n■ 전유부(대장) — 미수집 {len(missing)}거점 / 서빙 대상 {live}")
+    if paused:
+        # 숫자에서 뺐다는 사실을 밝힌다. 조용히 빼면 다음 사람이 "잔여 없음"을 완주로 읽는다.
+        print(f"  (서빙 보류로 제외 {len(paused)}거점 — measured_pages.SERVED_CITIES 밖. "
+              "재개하려면 거기에 도시 id 를 되넣는다)")
     if missing:
         for label, grp in _GROUPS:
             part = [s for s in missing if s in grp]
@@ -228,6 +261,8 @@ def report_remaining() -> None:
     print("\n■ 층별개요 — 시도 이력 대조 중(bronze raw 스캔, 십수 초)…")
     rows_out = []
     for slug in ALL_HUBS:
+        if slug in paused:                # 위와 같은 이유 — 보류 도시는 콜을 배정하지 않는다
+            continue
         rows = _gold(slug)
         if not rows:
             continue

@@ -69,4 +69,20 @@ def test_status_and_index_link_to_the_new_evidence() -> None:
     # 거짓말하고 있었다. `no_com_floor` 로 갈라 지도·분모에서 빼자 66/66 이 됐다.
     # 게이트가 아니라 대상 정의가 바뀐 것이므로, **대표 공실률은 66거점 전부 불변**이다
     # (그 값은 원래 expos_units·floor_ouln 만 세었다). 근거: docs/feature-page.md §no-com-floor
-    assert scores == {"Page": 100.0, "Platform": 100.0, "Posting": 97.6, "Program": 100.0}
+    #
+    # 2026-09-05 Posting 97.6 → 100.0. 이것도 수집으로 올린 것이 **아니다** — `area` 의
+    # 0.5 가중을 걷어낸 결과다. 게이트 이름이 "수집 가능한 것"인데 수집 가능한 범위(건물
+    # 단위 상업면적)는 66/66 으로 이미 다 얻었고, 남은 0.5 는 자료 부재가 아니라 **입도
+    # 상한**이었다(건물 안 유닛 간 균등분할). 그 상한은 층 2회·집합건물·외부 소스 재탐색
+    # 으로 세 방향에서 닫혔으므로 수집으로는 안 채워진다 — 계속 세면 "더 모으면 오른다"고
+    # 거짓말하는 셈이라 `prem` 을 분모에서 뺀 08-24 결정과 같은 처리를 했다.
+    # **값은 사라지지 않았다**: 관측 전용 게이트 "유닛 면적 입도"가 50% 를 계속 찍는다
+    # (아래 단언이 그것을 지킨다). 근거: docs/feature-posting.md §0-M·§0-Q·§0-R·§0-S
+    assert scores == {"Page": 100.0, "Platform": 100.0, "Posting": 100.0, "Program": 100.0}
+
+    # 상한을 평균에서 뺐다면 **관측으로는 반드시 남아야 한다.** 둘 다 빠지면 균등분할이
+    # 실측처럼 인용된다 — 이 저장소가 반복해 당한 실패 양식(선언이 낡는 것)의 다른 얼굴이다.
+    gates = {g["name"]: g for t in json.loads(result.stdout)["tracks"] for g in t["gates"]}
+    ceiling = next(g for n, g in gates.items() if n.startswith("유닛 면적 입도"))
+    assert ceiling["observe"] is True
+    assert ceiling["value"] == 0.5

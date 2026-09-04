@@ -449,10 +449,20 @@ def posting_track(total: int) -> Track:
     # area 는 오랫동안 "0/54" 로 **하드코딩**돼 있었다(08-23 발견). 실제로는
     # vacant_units.json 의 모든 유닛에 채워져 있고, tier_scenarios 가 unit["area"] 로
     # 그걸 그대로 쓴다 — 게이트만 몰랐고 Posting 진행률을 과소평가했다.
-    # 단 1.0 은 아니다: 값은 건축물대장 상업면적 ÷ capacity 라 **건물 단위는 실측,
-    # 건물 안 유닛 간 서열은 균등분할**이다(build_vacant_units.area_pyeong).
-    # foot 과 같은 성격이므로 같은 0.5 로 센다. 상가정보 flrNo 로 유닛별
-    # 실면적을 특정하면 그때 1.0 이다.
+    # 값은 건축물대장 상업면적 ÷ capacity 라 **건물 단위는 실측, 건물 안 유닛 간
+    # 서열은 균등분할**이다(build_vacant_units.area_pyeong).
+    #
+    # 2026-09-05 결정: **이 게이트에서는 1.0 으로 센다.** 게이트 이름이 "수집 가능한
+    # 것"이고, 수집 가능한 범위(건물 단위 상업면적)는 66/66 으로 이미 다 얻었다.
+    # 남은 것은 자료 부재가 아니라 **입도 상한**이고, 그 상한은 세 방향에서 독립적으로
+    # 닫혔다: 층 축 2회(§0-M 빈 층 배정 · §0-Q 층별 유닛 분할 — 둘 다 프라임 프리미엄
+    # 부호를 뒤집는다) · 집합건물 편입(§0-R — 검증할 R-ONE 앵커 자체가 없다) ·
+    # 외부 공개 소스 재탐색(§0-S, 08-29 — 적격 후보 0건).
+    #
+    # 0.5 를 계속 세면 "수집하면 채워진다"로 읽히는데 **그게 사실이 아니다** — `prem`
+    # 을 분모에서 뺀 것(08-24)과 같은 논리다. 입도 상한은 지우지 않고 아래 관측 전용
+    # 게이트로 옮겨 값이 계속 보이게 한다(Platform off-prior 폐기와 같은 처리).
+    # 상가정보 flrNo 로 유닛별 실면적을 특정하는 길이 열리면 그 관측 게이트가 오른다.
     area = 0
     for d in _gold_glob("*/vacant_units.json"):
         raw = _load(d)
@@ -467,7 +477,7 @@ def posting_track(total: int) -> Track:
     # `prem`(권리금)은 공개 통계가 없고 실제로도 임대인·기존 임차인과의 협상값이라
     # **수집으로는 영영 안 채워진다.** 0/54 를 계속 세면 "언젠가 수집하면 된다"로
     # 읽히는데 그게 사실이 아니다. 아래 '입력 계약' 게이트로 옮겼다.
-    per_hub = ((rent + foot_score + 0.5 * area) / (3 * total)
+    per_hub = ((rent + foot_score + area) / (3 * total)
                if total else 0.0)
     t.gates.append(Gate(
         "3-Tier 입력 3종 실데이터화 (수집 가능한 것)", per_hub,
@@ -540,6 +550,32 @@ def posting_track(total: int) -> Track:
         f"실측처럼 승격하지 않고 **0.5 가중을 유지**한다 → docs/finding-posting-unit-area-sources-2026-08-29.md",
         evidence=("data/validation/posting_unit_area_sources.py · data/tests/"
                   "test_posting_unit_area_sources.py (3건) · docs/feature-posting.md §0-S"),
+    ))
+
+    # 위 게이트에서 뺀 **입도 상한**을 여기 남긴다. 지우면 다음 사람이 "유닛 면적은
+    # 실측"으로만 읽고, 유닛 간 서열을 실측처럼 인용하게 된다 — 그건 균등분할이다.
+    t.gates.append(Gate(
+        "유닛 면적 입도 (게이트 폐기 2026-09-05, 관측만)", 0.5,
+        f"건물 단위 상업면적 {area}/{total} ✅ 실측(건축물대장) · **건물 안 유닛 간 "
+        f"서열은 균등분할** — `build_vacant_units.area_pyeong` 이 상업면적 ÷ capacity "
+        f"로 균등하게 나눈다. 즉 같은 건물의 두 유닛은 면적이 항상 같게 나오고, "
+        f"**유닛 단위 면적 비교는 근거가 없다**(건물 간 비교는 실측이다). "
+        f"⚠ **2026-09-05 결정 — 게이트 폐기, 관측 전용으로 강등.** 세 레버가 독립적으로 "
+        f"닫혔다: **① 층 축 2회** — §0-M(빈 층 배정) · §0-Q(층별 유닛 분할, 528→2,201) "
+        f"둘 다 프라임 프리미엄 부호를 뒤집는다(premium +0.058 → −1.343pp). "
+        f"**② 집합건물 편입** — §0-R, 분자·분모를 고쳐도 검증할 R-ONE 앵커가 없고 "
+        f"`_COUNTED_METHODS={{'floor_ouln'}}` 가 expos_units 를 설계상 배제한다. "
+        f"**③ 외부 공개 소스** — §0-S(08-29), 건축HUB 전유공용면적·서울교통공사 "
+        f"지하도상가·LH·온비드 넷 다 '현재 임대가능 · 동일 민간 일반건축물 모집단 · "
+        f"안정 조인키' 세 조건을 함께 못 채워 적격 후보 **0건**. "
+        f"수집으로 채워지는 값이 아니므로 진행률 평균에서 뺐다(`prem` 을 분모에서 뺀 "
+        f"08-24 결정, Platform off-prior 폐기 08-26 과 같은 논리). 값은 계속 관측한다 — "
+        f"다음 레버는 상가정보 `flrNo` 로 유닛별 실면적을 특정하는 것이고, 그것이 열리면 "
+        f"이 값이 1.0 으로 오른다.",
+        evidence=("data/pipelines/build_vacant_units.py (area_pyeong) · "
+                  "docs/feature-posting.md §0-M·§0-Q·§0-R·§0-S · "
+                  "docs/finding-posting-unit-area-sources-2026-08-29.md"),
+        observe=True,
     ))
 
     # 권리금은 '못 얻는 데이터'가 아니라 '기업이 주는 값'이다. 수집 게이트로 세면
@@ -999,6 +1035,18 @@ def main() -> int:
     # 작업 순서는 의존 방향으로 결정된 값을 따로 적는다.
     rank = " > ".join(f"{t.name} {t.pct:.0f}%" for t in sorted(tracks, key=lambda x: -x.pct))
     print(f"진행률 순위: {rank}")
+    # 네 트랙이 다 100% 가 되면 이 줄은 순위로서 아무 말도 하지 않는다. 그리고 그때가
+    # **이 숫자가 가장 위험한 순간**이다 — "PPPP 완료"로 인용되기 때문이다. 그래서
+    # 무엇이 이 숫자 밖에 있는지를 숫자 바로 옆에 적는다(2026-09-05).
+    if all(t.pct >= 99.95 for t in tracks):
+        obs = [(t.name, g) for t in tracks for g in t.gates if g.observe]
+        print("⚠ 네 트랙 모두 100% — **게이트 배선이 끝났다는 뜻이지 제품이 끝났다는 "
+              "뜻이 아니다.** 이 숫자 밖에 있는 것:")
+        print("   · KPI② PMF(B2B 파일럿) — 아래 블록. 진행률에 포함되지 않는다")
+        for name, g in obs:
+            print(f"   · [{name}] {g.name} — 현재 {g.value:.1%} (상한 판정, 평균에서 제외)")
+        print("   · 서빙 보류 도시 — measured_pages.SERVED_CITIES 밖의 거점은 "
+              "게이트가 세지 않는다 (scripts/chain_status.py --all)")
     # 의존 방향: Page 의 공실 유닛이 Posting·Program 의 재료이고, Program 의 대상은
     # 'Posting(창업)할 기업'이라 Posting 이 앞선다. Co.I(공실에 어떤 업종이 들어와야
     # 하는지)는 별도 단계가 아니라 Platform 의 업종추천 그 자체다 — 독립 트랙으로 세면
