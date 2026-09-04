@@ -2,27 +2,28 @@
   "slug": "konkuk",
   "hub_name": "건대입구·화양동",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T19:48:21",
-  "shown": 588,
-  "excluded_total": 1476,
-  "excluded_unknown": 214,
+  "built_at": "2026-09-04T23:28:13",
+  "shown": 585,
+  "excluded_total": 1479,
+  "excluded_unknown": 14,
   "excluded_non_commercial": 1262,
-  "coverage_pct": 28.5,
+  "excluded_determined": 203,
+  "coverage_pct": 28.3,
   "status": {
-    "full": 406,
+    "full": 405,
     "partial": 70,
-    "high": 26,
+    "high": 24,
     "empty": 86
   },
   "source": {
-    "stores+ledger": 480,
+    "stores+ledger": 477,
     "polygon_only": 86,
     "pip_only": 22
   },
   "reference_vacancy_pct": 9.1,
   "reference_buildings": 436,
-  "reference_coverage_pct": 99.5,
-  "mixed_vacancy_pct": 10.0,
+  "reference_coverage_pct": 100.0,
+  "mixed_vacancy_pct": 8.9,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 411,
@@ -35,13 +36,7 @@
       "active": 132,
       "capacity": 160,
       "vacancy_pct": 17.5
-    },
-    "floor_approx": {
-      "buildings": 2,
-      "active": 4,
-      "capacity": 13,
-      "vacancy_pct": 69.2
     }
   },
-  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용. excluded_determined = 상가 건물이 아님이 **확정**돼 뺀 건물(표제부 비상업 · 층별개요 지상 상업층 0). 재수집해도 안 바뀌므로 reference_coverage_pct 분모에도 들어가지 않는다 — 이 값이 커지는 것은 수집이 덜 됐다는 뜻이 아니다."
 }

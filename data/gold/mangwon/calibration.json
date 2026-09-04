@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>영등포신촌>망원역",
   "anchor_vac_small_pct": 0.967777182311531,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 28.4,
-  "alpha_street": 0.062,
-  "gap_pp": 26.6,
-  "buildings_used": 739,
+  "estimated_vacancy_pct": 27.9,
+  "alpha_street": 0.063,
+  "gap_pp": 26.1,
+  "buildings_used": 730,
   "rone_aligned": {
     "mid": {
-      "buildings": 615,
-      "vacancy_units_pct": 24.0,
+      "buildings": 613,
+      "vacancy_units_pct": 23.8,
       "buildings_floor": 613,
       "vacancy_floor_hi_pct": 13.7,
       "vacancy_floor_lo_pct": 25.7,
@@ -19,8 +19,8 @@
       "gap_pp": 14.7
     },
     "small": {
-      "buildings": 119,
-      "vacancy_units_pct": 9.1,
+      "buildings": 113,
+      "vacancy_units_pct": 7.9,
       "buildings_floor": 113,
       "vacancy_floor_hi_pct": 6.1,
       "vacancy_floor_lo_pct": 13.3,
@@ -29,8 +29,8 @@
       "gap_pp": 7.7
     },
     "mall": {
-      "buildings": 98,
-      "vacancy_units_pct": 50.4,
+      "buildings": 96,
+      "vacancy_units_pct": 49.3,
       "buildings_floor": 2,
       "vacancy_floor_hi_pct": 0.0,
       "vacancy_floor_lo_pct": 20.0,
@@ -44,16 +44,16 @@
     "anchor_pct": 1.75,
     "alpha": 0.073,
     "gap_pp": 22.1,
-    "coverage_pct": 98.7,
-    "excluded_floor_approx": 11
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 18.1,
+      "estimated_vacancy_pct": 17.3,
       "anchor_pct": 1.75,
-      "alpha": 0.097,
-      "gap_pp": 16.3,
-      "buildings": 759
+      "alpha": 0.101,
+      "gap_pp": 15.5,
+      "buildings": 748
     },
     "mall": {
       "estimated_vacancy_pct": 50.1,
@@ -70,13 +70,6 @@
       "anchor_pct": 1.75,
       "alpha": 0.035,
       "gap_pp": 48.3
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 65.7,
-      "buildings": 11,
-      "anchor_pct": 1.75,
-      "alpha": 0.027,
-      "gap_pp": 63.9
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 17.3,

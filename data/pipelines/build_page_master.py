@@ -34,7 +34,7 @@ import re
 from collections import Counter, defaultdict
 
 from data.collectors.building_vacancy import (
-    NON_STOREFRONT_LCLS, STORES_PER_FLOOR as _STORES_PER_FLOOR)
+    NO_COM_FLOOR, NON_STOREFRONT_LCLS, STORES_PER_FLOOR as _STORES_PER_FLOOR)
 from data.collectors.common import GOLD, load_latest
 from data.config.page_hubs import ACTIVE_HUBS, PageHub, get_hub
 from data.pipelines.build_building_attrs import lic_floors
@@ -321,6 +321,11 @@ def _licensed_pip(polys: list[dict], slug: str, dong_map: dict[str, str],
 _METHOD_RANK = {"expos_units": 0, "floor_ouln": 1, "floor_approx": 2}
 # 분모 근거가 정밀해 대표 집계에 넣는 방법 — calibrate_vacancy.primary 와 같은 정의.
 PRECISE_METHODS = ("expos_units", "floor_ouln")
+# capacity 가 없는 것이 **수집 실패가 아니라 판정**인 방법. 재수집해도 안 바뀐다.
+#   non_commercial  표제부 주용도가 상업이 아니다
+#   no_com_floor    층별개요를 받았고 지상 상업층이 0 이다(recalc_floor_ouln 강등)
+# 이 둘을 excluded_unknown 에 섞으면 커버리지가 "더 모으면 오른다"고 거짓말한다.
+DETERMINED_METHODS = ("non_commercial", NO_COM_FLOOR)
 
 
 def _method_of(rows: list[dict]) -> str:
@@ -442,8 +447,14 @@ def run(hub: PageHub) -> bool:
                              fresh=fresh.get(pnu, 0) if stores else None,
                              licensed=lic_n, at=attrs.get(pnu), lic=lic)
             status = _classify(agg["occupancy"])
-            if status is None:                    # capacity 미확인 → 지도 제외
-                stats["excluded_unknown"] += 1
+            if status is None:                    # capacity 없음 → 지도 제외
+                # 다만 '못 얻었다'와 '재 봤더니 상가가 아니다'를 갈라 센다. 뒤엣것은
+                # 재수집 대상이 아니라 판정이므로 커버리지 분모에서도 빠져야 한다.
+                ms = {r.get("capacity_method") for r in by_lno[pnu]}
+                if ms and ms <= set(DETERMINED_METHODS):
+                    stats["excluded_determined"] += 1
+                else:
+                    stats["excluded_unknown"] += 1
                 continue
             props = {
                 "name": _label(pnu, agg["name"], dong_map),
@@ -521,7 +532,8 @@ def run(hub: PageHub) -> bool:
     print(f"[page-master:{slug}] status: "
           + ", ".join(f"{k}={stats[k]}" for k in ("full", "partial", "high", "empty")))
     print(f"[page-master:{slug}] 제외: unknown={stats['excluded_unknown']}, "
-          f"비상업={stats['excluded_non_commercial']}")
+          f"비상업={stats['excluded_non_commercial']}, "
+          f"판정(비상가 확정)={stats['excluded_determined']}")
 
     # ── 집계 공실률 — **capacity_method 별로 분해해서 본다** (2026-07-28) ──────────
     # 예전에는 stores+ledger 전체를 한 덩어리로 합산했다. 그러면 지표가 "이 상권이
@@ -579,7 +591,8 @@ def run(hub: PageHub) -> bool:
     # 별도 파일로 남긴다(2026-07-26). 지도에 섞어 표시하면 근거가 다른 데이터가 한
     # 화면에 오게 되어 "대장 기반 실측" 논증이 무너지므로 노출 경로를 분리한다.
     shown = sum(stats[k] for k in ("full", "partial", "high", "empty"))
-    excluded = stats["excluded_unknown"] + stats["excluded_non_commercial"]
+    excluded = (stats["excluded_unknown"] + stats["excluded_non_commercial"]
+                + stats["excluded_determined"])
     (GOLD / slug / "coverage.json").write_text(json.dumps({
         "slug": slug,
         "hub_name": hub.name,
@@ -589,6 +602,7 @@ def run(hub: PageHub) -> bool:
         "excluded_total": excluded,
         "excluded_unknown": stats["excluded_unknown"],
         "excluded_non_commercial": stats["excluded_non_commercial"],
+        "excluded_determined": stats["excluded_determined"],
         "coverage_pct": round(shown / (shown + excluded) * 100, 1) if shown + excluded else None,
         "status": {k: stats[k] for k in ("full", "partial", "high", "empty")},
         "source": dict(Counter(f["properties"]["source"] for f in feats)),
@@ -602,7 +616,11 @@ def run(hub: PageHub) -> bool:
                 "reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 "
                 "집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. "
                 "mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 "
-                "구성비에 따라 흔들린다 — 하위호환용.",
+                "구성비에 따라 흔들린다 — 하위호환용. "
+                "excluded_determined = 상가 건물이 아님이 **확정**돼 뺀 건물"
+                "(표제부 비상업 · 층별개요 지상 상업층 0). 재수집해도 안 바뀌므로 "
+                "reference_coverage_pct 분모에도 들어가지 않는다 — 이 값이 커지는 것은 "
+                "수집이 덜 됐다는 뜻이 아니다.",
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     return True
 

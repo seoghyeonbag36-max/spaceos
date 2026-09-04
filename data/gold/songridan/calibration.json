@@ -1,10 +1,10 @@
 {
-  "anchor_pct": 17.35,
+  "anchor_pct": 17.44,
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>잠실/송파",
   "anchor_vac_small_pct": 6.5731457912479,
   "ref_garosu_street_2024_pct": null,
   "estimated_vacancy_pct": 17.6,
-  "alpha_street": 0.986,
+  "alpha_street": 0.991,
   "gap_pp": 0.2,
   "buildings_used": 381,
   "rone_aligned": {
@@ -15,7 +15,7 @@
       "vacancy_floor_hi_pct": 11.1,
       "vacancy_floor_lo_pct": 25.6,
       "vacancy_area_pct": 13.2,
-      "anchor_pct": 17.35,
+      "anchor_pct": 17.44,
       "gap_pp": -4.2
     },
     "small": {
@@ -41,8 +41,8 @@
   "primary": {
     "estimated_vacancy_pct": 16.0,
     "buildings": 523,
-    "anchor_pct": 17.35,
-    "alpha": 1.084,
+    "anchor_pct": 17.44,
+    "alpha": 1.09,
     "gap_pp": -1.4,
     "coverage_pct": 100.0,
     "excluded_floor_approx": 0
@@ -50,15 +50,15 @@
   "segments": {
     "street": {
       "estimated_vacancy_pct": 12.1,
-      "anchor_pct": 17.35,
-      "alpha": 1.434,
+      "anchor_pct": 17.44,
+      "alpha": 1.441,
       "gap_pp": -5.3,
       "buildings": 446
     },
     "mall": {
       "estimated_vacancy_pct": 36.9,
-      "anchor_pct": 17.35,
-      "alpha": 0.47,
+      "anchor_pct": 17.44,
+      "alpha": 0.473,
       "gap_pp": 19.5,
       "buildings": 77
     }
@@ -67,15 +67,15 @@
     "expos_units": {
       "estimated_vacancy_pct": 36.9,
       "buildings": 77,
-      "anchor_pct": 17.35,
-      "alpha": 0.47,
+      "anchor_pct": 17.44,
+      "alpha": 0.473,
       "gap_pp": 19.5
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 12.1,
       "buildings": 446,
-      "anchor_pct": 17.35,
-      "alpha": 1.434,
+      "anchor_pct": 17.44,
+      "alpha": 1.441,
       "gap_pp": -5.3
     }
   },

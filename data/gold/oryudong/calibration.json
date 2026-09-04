@@ -3,10 +3,10 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>오류동역",
   "anchor_vac_small_pct": 10.4974458539896,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 55.2,
+  "estimated_vacancy_pct": 53.6,
   "alpha_street": 0.027,
-  "gap_pp": 53.7,
-  "buildings_used": 264,
+  "gap_pp": 52.1,
+  "buildings_used": 250,
   "rone_aligned": {
     "mid": {
       "buildings": 124,
@@ -29,8 +29,8 @@
       "gap_pp": 0.9
     },
     "mall": {
-      "buildings": 65,
-      "vacancy_units_pct": 55.6,
+      "buildings": 64,
+      "vacancy_units_pct": 55.2,
       "buildings_floor": 4,
       "vacancy_floor_hi_pct": 0.0,
       "vacancy_floor_lo_pct": 0.0,
@@ -44,16 +44,16 @@
     "anchor_pct": 1.47,
     "alpha": 0.048,
     "gap_pp": 29.5,
-    "coverage_pct": 95.5,
-    "excluded_floor_approx": 12
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 22.2,
+      "estimated_vacancy_pct": 13.5,
       "anchor_pct": 1.47,
-      "alpha": 0.066,
-      "gap_pp": 20.7,
-      "buildings": 205
+      "alpha": 0.109,
+      "gap_pp": 12.0,
+      "buildings": 193
     },
     "mall": {
       "estimated_vacancy_pct": 47.4,
@@ -70,13 +70,6 @@
       "anchor_pct": 1.47,
       "alpha": 0.031,
       "gap_pp": 45.9
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 84.6,
-      "buildings": 12,
-      "anchor_pct": 1.47,
-      "alpha": 0.017,
-      "gap_pp": 83.1
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 13.5,

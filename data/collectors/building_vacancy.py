@@ -109,6 +109,13 @@ NON_CAPACITY_PURPS = ("아파트", "오피스", "다세대주택", "단독주택
                       "고시원", "독서실", "다중생활시설",
                       "다중주택", "다가구주택", "금융업소")
 
+# 층별개요를 **받아 봤는데** 지상 상업층이 0 으로 확정된 건물의 capacity_method.
+# floor_approx(= 지상 전체 층수 근사)와 반드시 구분해야 한다. 둘을 한 라벨로 쓰면
+# "아직 못 쟀다"와 "재 봤더니 상가층이 없다"가 섞여, 커버리지가 회수 불가능한 잔여를
+# 계속 미수집으로 센다(2026-09-04 doksan 83.5% 의 정체가 이것이었다 — 잔여 13동 전부
+# 시도 완료분이라 재호출로는 1%p 도 못 올린다). 판정이므로 지도·집계에서 모두 뺀다.
+NO_COM_FLOOR = "no_com_floor"
+
 # 분자에서 제외할 사무실형 업종 대분류 — 분모(상업 층·상가 호)와 도메인 정합.
 # 사무실 입주 업종을 세면 점포 수용량 대비 분자가 부풀어 공실이 과소추정된다
 # (2026-07-19 정합 교정: 미필터 시 집계 공실률 5.7% vs 부동산원 41.6%).
@@ -489,7 +496,7 @@ def fetch_capacity(key: str, jibun: dict, raw_store: dict) -> tuple[int | None, 
 
 def classify(occ: float | None, method: str) -> str:
     """MapShell/백엔드 status 코드 (full/partial/high/empty/unknown/n_a)."""
-    if method == "non_commercial":
+    if method in ("non_commercial", NO_COM_FLOOR):
         return "n_a"
     if occ is None:
         return "unknown"

@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>천호",
   "anchor_vac_small_pct": 5.00440398308333,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 24.2,
-  "alpha_street": 0.357,
-  "gap_pp": 15.6,
-  "buildings_used": 475,
+  "estimated_vacancy_pct": 21.3,
+  "alpha_street": 0.405,
+  "gap_pp": 12.7,
+  "buildings_used": 459,
   "rone_aligned": {
     "mid": {
-      "buildings": 298,
-      "vacancy_units_pct": 24.2,
+      "buildings": 294,
+      "vacancy_units_pct": 22.1,
       "buildings_floor": 294,
       "vacancy_floor_hi_pct": 22.8,
       "vacancy_floor_lo_pct": 38.5,
@@ -19,8 +19,8 @@
       "gap_pp": 13.9
     },
     "small": {
-      "buildings": 148,
-      "vacancy_units_pct": 11.1,
+      "buildings": 144,
+      "vacancy_units_pct": 10.4,
       "buildings_floor": 144,
       "vacancy_floor_hi_pct": 11.9,
       "vacancy_floor_lo_pct": 35.8,
@@ -29,8 +29,8 @@
       "gap_pp": 7.2
     },
     "mall": {
-      "buildings": 85,
-      "vacancy_units_pct": 33.4,
+      "buildings": 84,
+      "vacancy_units_pct": 32.8,
       "buildings_floor": 4,
       "vacancy_floor_hi_pct": 0.0,
       "vacancy_floor_lo_pct": 0.0,
@@ -44,16 +44,16 @@
     "anchor_pct": 8.63,
     "alpha": 0.464,
     "gap_pp": 10.0,
-    "coverage_pct": 96.7,
-    "excluded_floor_approx": 19
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 18.7,
+      "estimated_vacancy_pct": 14.3,
       "anchor_pct": 8.63,
-      "alpha": 0.462,
-      "gap_pp": 10.1,
-      "buildings": 487
+      "alpha": 0.604,
+      "gap_pp": 5.7,
+      "buildings": 468
     },
     "mall": {
       "estimated_vacancy_pct": 25.1,
@@ -70,13 +70,6 @@
       "anchor_pct": 8.63,
       "alpha": 0.344,
       "gap_pp": 16.5
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 81.4,
-      "buildings": 19,
-      "anchor_pct": 8.63,
-      "alpha": 0.106,
-      "gap_pp": 72.8
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 14.3,

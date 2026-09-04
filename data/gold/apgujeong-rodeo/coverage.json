@@ -2,28 +2,29 @@
   "slug": "apgujeong-rodeo",
   "hub_name": "압구정로데오",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T19:39:49",
-  "shown": 773,
-  "excluded_total": 199,
-  "excluded_unknown": 63,
+  "built_at": "2026-09-04T23:26:39",
+  "shown": 769,
+  "excluded_total": 203,
+  "excluded_unknown": 16,
   "excluded_non_commercial": 136,
-  "coverage_pct": 79.5,
+  "excluded_determined": 51,
+  "coverage_pct": 79.1,
   "status": {
     "full": 414,
     "partial": 201,
-    "high": 92,
+    "high": 88,
     "empty": 66
   },
   "source": {
     "pip_only": 47,
-    "stores+ledger": 655,
+    "stores+ledger": 652,
     "polygon_only": 65,
-    "stores+ledger+pip": 6
+    "stores+ledger+pip": 5
   },
   "reference_vacancy_pct": 19.9,
   "reference_buildings": 617,
-  "reference_coverage_pct": 99.4,
-  "mixed_vacancy_pct": 23.8,
+  "reference_coverage_pct": 100.0,
+  "mixed_vacancy_pct": 23.4,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 583,
@@ -36,13 +37,7 @@
       "active": 350,
       "capacity": 523,
       "vacancy_pct": 33.1
-    },
-    "floor_approx": {
-      "buildings": 4,
-      "active": 5,
-      "capacity": 24,
-      "vacancy_pct": 79.2
     }
   },
-  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용. excluded_determined = 상가 건물이 아님이 **확정**돼 뺀 건물(표제부 비상업 · 층별개요 지상 상업층 0). 재수집해도 안 바뀌므로 reference_coverage_pct 분모에도 들어가지 않는다 — 이 값이 커지는 것은 수집이 덜 됐다는 뜻이 아니다."
 }

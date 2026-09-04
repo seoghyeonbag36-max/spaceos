@@ -2,28 +2,29 @@
   "slug": "hyehwa",
   "hub_name": "혜화·대학로",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T20:02:55",
-  "shown": 871,
-  "excluded_total": 1584,
-  "excluded_unknown": 221,
+  "built_at": "2026-09-04T23:30:19",
+  "shown": 864,
+  "excluded_total": 1591,
+  "excluded_unknown": 13,
   "excluded_non_commercial": 1363,
-  "coverage_pct": 35.5,
+  "excluded_determined": 215,
+  "coverage_pct": 35.2,
   "status": {
-    "full": 516,
+    "full": 512,
     "partial": 136,
-    "high": 72,
+    "high": 69,
     "empty": 147
   },
   "source": {
     "polygon_only": 145,
-    "stores+ledger": 617,
+    "stores+ledger": 610,
     "pip_only": 101,
     "stores+ledger+pip": 8
   },
   "reference_vacancy_pct": 22.8,
   "reference_buildings": 498,
-  "reference_coverage_pct": 99.0,
-  "mixed_vacancy_pct": 27.1,
+  "reference_coverage_pct": 100.0,
+  "mixed_vacancy_pct": 26.5,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 459,
@@ -36,13 +37,7 @@
       "active": 142,
       "capacity": 318,
       "vacancy_pct": 55.3
-    },
-    "floor_approx": {
-      "buildings": 5,
-      "active": 7,
-      "capacity": 18,
-      "vacancy_pct": 61.1
     }
   },
-  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용. excluded_determined = 상가 건물이 아님이 **확정**돼 뺀 건물(표제부 비상업 · 층별개요 지상 상업층 0). 재수집해도 안 바뀌므로 reference_coverage_pct 분모에도 들어가지 않는다 — 이 값이 커지는 것은 수집이 덜 됐다는 뜻이 아니다."
 }

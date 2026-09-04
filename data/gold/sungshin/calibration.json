@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>성신여대",
   "anchor_vac_small_pct": 0.0,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 26.3,
-  "alpha_street": 0.486,
-  "gap_pp": 13.5,
-  "buildings_used": 568,
+  "estimated_vacancy_pct": 25.1,
+  "alpha_street": 0.509,
+  "gap_pp": 12.3,
+  "buildings_used": 559,
   "rone_aligned": {
     "mid": {
-      "buildings": 326,
-      "vacancy_units_pct": 23.2,
+      "buildings": 325,
+      "vacancy_units_pct": 23.1,
       "buildings_floor": 325,
       "vacancy_floor_hi_pct": 19.3,
       "vacancy_floor_lo_pct": 36.8,
@@ -19,16 +19,16 @@
       "gap_pp": 3.2
     },
     "small": {
-      "buildings": 163,
-      "vacancy_units_pct": 7.4,
+      "buildings": 160,
+      "vacancy_units_pct": 7.5,
       "buildings_floor": 160,
       "vacancy_floor_hi_pct": 4.5,
       "vacancy_floor_lo_pct": 33.2,
       "vacancy_area_pct": 3.4
     },
     "mall": {
-      "buildings": 38,
-      "vacancy_units_pct": 56.3
+      "buildings": 37,
+      "vacancy_units_pct": 55.8
     },
     "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
   },
@@ -38,16 +38,16 @@
     "anchor_pct": 12.78,
     "alpha": 0.526,
     "gap_pp": 11.5,
-    "coverage_pct": 98.2,
-    "excluded_floor_approx": 10
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 19.8,
+      "estimated_vacancy_pct": 18.3,
       "anchor_pct": 12.78,
-      "alpha": 0.645,
-      "gap_pp": 7.0,
-      "buildings": 525
+      "alpha": 0.698,
+      "gap_pp": 5.5,
+      "buildings": 515
     },
     "mall": {
       "estimated_vacancy_pct": 42.0,
@@ -64,13 +64,6 @@
       "anchor_pct": 12.78,
       "alpha": 0.304,
       "gap_pp": 29.2
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 73.8,
-      "buildings": 10,
-      "anchor_pct": 12.78,
-      "alpha": 0.173,
-      "gap_pp": 61.0
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 18.3,

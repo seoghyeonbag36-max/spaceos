@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>화곡",
   "anchor_vac_small_pct": 9.24871311112664,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 23.3,
-  "alpha_street": 0.684,
-  "gap_pp": 7.4,
-  "buildings_used": 413,
+  "estimated_vacancy_pct": 21.5,
+  "alpha_street": 0.741,
+  "gap_pp": 5.6,
+  "buildings_used": 405,
   "rone_aligned": {
     "mid": {
-      "buildings": 330,
-      "vacancy_units_pct": 15.2,
+      "buildings": 328,
+      "vacancy_units_pct": 14.7,
       "buildings_floor": 328,
       "vacancy_floor_hi_pct": 18.7,
       "vacancy_floor_lo_pct": 32.9,
@@ -19,7 +19,7 @@
       "gap_pp": 3.4
     },
     "small": {
-      "buildings": 73,
+      "buildings": 72,
       "vacancy_units_pct": 7.8,
       "buildings_floor": 72,
       "vacancy_floor_hi_pct": 16.7,
@@ -29,8 +29,8 @@
       "gap_pp": 6.2
     },
     "mall": {
-      "buildings": 99,
-      "vacancy_units_pct": 44.7,
+      "buildings": 97,
+      "vacancy_units_pct": 43.4,
       "buildings_floor": 3,
       "vacancy_floor_hi_pct": 0.0,
       "vacancy_floor_lo_pct": 20.0,
@@ -44,16 +44,16 @@
     "anchor_pct": 15.93,
     "alpha": 0.931,
     "gap_pp": 1.2,
-    "coverage_pct": 98.4,
-    "excluded_floor_approx": 8
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 11.2,
+      "estimated_vacancy_pct": 9.5,
       "anchor_pct": 15.93,
-      "alpha": 1.422,
-      "gap_pp": -4.7,
-      "buildings": 413
+      "alpha": 1.677,
+      "gap_pp": -6.4,
+      "buildings": 405
     },
     "mall": {
       "estimated_vacancy_pct": 39.5,
@@ -70,13 +70,6 @@
       "anchor_pct": 15.93,
       "alpha": 0.403,
       "gap_pp": 23.6
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 74.4,
-      "buildings": 8,
-      "anchor_pct": 15.93,
-      "alpha": 0.214,
-      "gap_pp": 58.5
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 9.5,

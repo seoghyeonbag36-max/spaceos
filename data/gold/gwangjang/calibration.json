@@ -1,26 +1,26 @@
 {
-  "anchor_pct": 8.52,
+  "anchor_pct": 9.2,
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>도심>종로",
   "anchor_vac_small_pct": 0.0,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 68.8,
-  "alpha_street": 0.124,
-  "gap_pp": 60.3,
-  "buildings_used": 748,
+  "estimated_vacancy_pct": 68.7,
+  "alpha_street": 0.134,
+  "gap_pp": 59.5,
+  "buildings_used": 730,
   "rone_aligned": {
     "mid": {
-      "buildings": 512,
-      "vacancy_units_pct": 43.4,
+      "buildings": 508,
+      "vacancy_units_pct": 43.1,
       "buildings_floor": 508,
       "vacancy_floor_hi_pct": 33.1,
       "vacancy_floor_lo_pct": 55.8,
       "vacancy_area_pct": 33.4,
-      "anchor_pct": 8.52,
-      "gap_pp": 24.9
+      "anchor_pct": 9.2,
+      "gap_pp": 24.2
     },
     "small": {
-      "buildings": 375,
-      "vacancy_units_pct": 20.4,
+      "buildings": 369,
+      "vacancy_units_pct": 20.3,
       "buildings_floor": 369,
       "vacancy_floor_hi_pct": 16.0,
       "vacancy_floor_lo_pct": 52.3,
@@ -39,25 +39,25 @@
   "primary": {
     "estimated_vacancy_pct": 68.0,
     "buildings": 1079,
-    "anchor_pct": 8.52,
-    "alpha": 0.125,
-    "gap_pp": 59.5,
-    "coverage_pct": 98.1,
-    "excluded_floor_approx": 21
+    "anchor_pct": 9.2,
+    "alpha": 0.135,
+    "gap_pp": 58.8,
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 32.0,
-      "anchor_pct": 8.52,
-      "alpha": 0.266,
-      "gap_pp": 23.5,
-      "buildings": 989
+      "estimated_vacancy_pct": 30.6,
+      "anchor_pct": 9.2,
+      "alpha": 0.301,
+      "gap_pp": 21.4,
+      "buildings": 968
     },
     "mall": {
       "estimated_vacancy_pct": 85.7,
-      "anchor_pct": 8.52,
-      "alpha": 0.099,
-      "gap_pp": 77.2,
+      "anchor_pct": 9.2,
+      "alpha": 0.107,
+      "gap_pp": 76.5,
       "buildings": 111
     }
   },
@@ -65,23 +65,16 @@
     "expos_units": {
       "estimated_vacancy_pct": 85.7,
       "buildings": 111,
-      "anchor_pct": 8.52,
-      "alpha": 0.099,
-      "gap_pp": 77.2
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 75.8,
-      "buildings": 21,
-      "anchor_pct": 8.52,
-      "alpha": 0.112,
-      "gap_pp": 67.3
+      "anchor_pct": 9.2,
+      "alpha": 0.107,
+      "gap_pp": 76.5
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 30.6,
       "buildings": 968,
-      "anchor_pct": 8.52,
-      "alpha": 0.278,
-      "gap_pp": 22.1
+      "anchor_pct": 9.2,
+      "alpha": 0.301,
+      "gap_pp": 21.4
     }
   },
   "note": "⚠ 대표값은 2026-08-01부터 **rone_aligned** 다(R-ONE 과 같은 모집단·단위). 아래 primary/segments/methods 는 하위호환용이며 집합건물이 섞여 있어 앵커 대조에 쓰면 과대추정된다. primary(v4) = 구 대표값. capacity 근거가 정밀한 expos_units(전유부 실측) + floor_ouln(층별개요 상업층) 만 집계한다. floor_approx 는 분모 과대 편향이 커서 제외하며, coverage_pct 가 낮으면 그 거점은 floor_capacity 수집이 덜 된 상태다(대표값을 신뢰하기 전에 채울 것). combined(v1) = 방법 혼합 — 하위호환용이며 방법 구성비에 흔들리므로 앵커 비교에 쓰지 말 것. segments(v2) = 가두/집합 분리. methods(v3) = capacity_method 단위. 앵커는 거점별 R-ONE 중대형 공실률이다 (2026-07-28 이전의 전 거점 공통 41.6% 는 가로수길 가두 1층 실태조사 값을 부동산원 통계로 잘못 표기한 것이라 폐기). ⚠ 알려진 한계: expos_units(집합건물) 세그먼트는 **분자**가 구조적으로 부족하다 — 상가정보가 대형 집합상가 내부 점포를 그 건물의 bdMgtSn 으로 귀속시키지 못한다. 11거점 실측(2026-07-28) 결과 floor_ouln 의 앵커 격차는 +4~+19%p 인데 expos_units 는 +21~+72%p 로 갈린다(예: 익선 피카디리플러스 capacity 1,031 / active 57). 집합건물 공실률은 아직 신뢰 구간 밖이며, 층·호 단위 매칭(flrNo/hoNo) 을 붙이기 전까지 단독 인용하지 말 것."

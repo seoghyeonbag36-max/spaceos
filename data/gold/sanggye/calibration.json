@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>상계역",
   "anchor_vac_small_pct": 0.0,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 8.6,
-  "alpha_street": 0.927,
-  "gap_pp": 0.6,
-  "buildings_used": 514,
+  "estimated_vacancy_pct": 8.4,
+  "alpha_street": 0.949,
+  "gap_pp": 0.4,
+  "buildings_used": 512,
   "rone_aligned": {
     "mid": {
-      "buildings": 296,
-      "vacancy_units_pct": 18.8,
+      "buildings": 294,
+      "vacancy_units_pct": 17.8,
       "buildings_floor": 294,
       "vacancy_floor_hi_pct": 22.7,
       "vacancy_floor_lo_pct": 35.4,
@@ -38,16 +38,16 @@
     "anchor_pct": 7.97,
     "alpha": 0.565,
     "gap_pp": 6.1,
-    "coverage_pct": 99.6,
-    "excluded_floor_approx": 2
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 12.5,
+      "estimated_vacancy_pct": 11.9,
       "anchor_pct": 7.97,
-      "alpha": 0.637,
-      "gap_pp": 4.5,
-      "buildings": 414
+      "alpha": 0.67,
+      "gap_pp": 3.9,
+      "buildings": 412
     },
     "mall": {
       "estimated_vacancy_pct": 18.3,
@@ -64,13 +64,6 @@
       "anchor_pct": 7.97,
       "alpha": 0.435,
       "gap_pp": 10.3
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 81.8,
-      "buildings": 2,
-      "anchor_pct": 7.97,
-      "alpha": 0.097,
-      "gap_pp": 73.8
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 11.9,

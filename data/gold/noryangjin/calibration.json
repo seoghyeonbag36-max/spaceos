@@ -3,10 +3,10 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>노량진",
   "anchor_vac_small_pct": 1.73676974139365,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 29.9,
-  "alpha_street": 0.298,
-  "gap_pp": 21.0,
-  "buildings_used": 338,
+  "estimated_vacancy_pct": 28.6,
+  "alpha_street": 0.312,
+  "gap_pp": 19.7,
+  "buildings_used": 333,
   "rone_aligned": {
     "mid": {
       "buildings": 269,
@@ -19,8 +19,8 @@
       "gap_pp": 1.5
     },
     "small": {
-      "buildings": 72,
-      "vacancy_units_pct": 15.6,
+      "buildings": 71,
+      "vacancy_units_pct": 15.7,
       "buildings_floor": 71,
       "vacancy_floor_hi_pct": 11.1,
       "vacancy_floor_lo_pct": 49.1,
@@ -29,8 +29,8 @@
       "gap_pp": 8.1
     },
     "mall": {
-      "buildings": 40,
-      "vacancy_units_pct": 48.1,
+      "buildings": 39,
+      "vacancy_units_pct": 45.1,
       "buildings_floor": 1,
       "vacancy_floor_hi_pct": 66.7,
       "vacancy_floor_lo_pct": 100.0,
@@ -44,16 +44,16 @@
     "anchor_pct": 8.92,
     "alpha": 0.386,
     "gap_pp": 14.2,
-    "coverage_pct": 98.5,
-    "excluded_floor_approx": 6
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 21.5,
+      "estimated_vacancy_pct": 20.3,
       "anchor_pct": 8.92,
-      "alpha": 0.415,
-      "gap_pp": 12.6,
-      "buildings": 359
+      "alpha": 0.439,
+      "gap_pp": 11.4,
+      "buildings": 353
     },
     "mall": {
       "estimated_vacancy_pct": 35.6,
@@ -70,13 +70,6 @@
       "anchor_pct": 8.92,
       "alpha": 0.251,
       "gap_pp": 26.7
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 77.4,
-      "buildings": 6,
-      "anchor_pct": 8.92,
-      "alpha": 0.115,
-      "gap_pp": 68.5
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 20.3,

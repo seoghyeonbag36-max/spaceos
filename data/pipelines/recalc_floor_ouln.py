@@ -38,7 +38,7 @@ import json
 import statistics
 from collections import Counter
 
-from data.collectors.building_vacancy import STORES_PER_FLOOR, classify
+from data.collectors.building_vacancy import NO_COM_FLOOR, STORES_PER_FLOOR, classify
 from data.collectors.common import BRONZE, GOLD
 from data.collectors.floor_capacity import (
     _commercial_floors, capacity_floors, commercial_floor_nos, ground_floors,
@@ -49,7 +49,10 @@ from data.pipelines.build_building_attrs import run as build_attrs
 
 # 재계산 대상 — 층별개요로 분모를 다시 깔 수 있는 방식만. expos_units(전유부 실측)는
 # 층수 근사보다 정밀하므로 건드리지 않는다(recalc_capacity 의 회귀 교훈과 동일).
-_TARGET_METHODS = {"floor_ouln", "floor_approx"}
+# no_com_floor 도 넣는다 — 이 모듈이 붙인 라벨이고, 근거(bronze 층별개요)가 그대로
+# 남아 있으므로 NON_CAPACITY_PURPS 나 capacity_floors 가 넓어지면 **되돌릴 수 있어야**
+# 한다. 넣지 않으면 강등이 편도가 되어 필터를 고쳐도 그 건물들이 영영 안 돌아온다.
+_TARGET_METHODS = {"floor_ouln", "floor_approx", NO_COM_FLOOR}
 
 
 def _vac(active: int, cap: int) -> tuple[float, float, str]:
@@ -132,7 +135,7 @@ def run(slug: str, apply: bool, legacy: bool = False) -> dict | None:
                   if r.get("capacity_method") in _TARGET_METHODS
                   and isinstance(r.get("vacancy_bldg"), (int, float))]
 
-    changed = zero_com = widened = 0
+    changed = zero_com = widened = demoted = 0
     ratios: list[float] = []
     after_vac: list[float] = []
     for r in rows:
@@ -151,7 +154,21 @@ def run(slug: str, apply: bool, legacy: bool = False) -> dict | None:
                   else capacity_floors(com_nos, store_nos, at.get("grnd_flr") or 0))
         n_com = len(floors) if not legacy else _commercial_floors(recs)
         if not n_com:
-            zero_com += 1          # 상업층 0 — 값을 지어내지 않고 기존 행 유지
+            # 상업층 0. 값을 지어내지 않는 것(2026-07-26 교정)은 그대로 두되, **라벨은
+            # 바꾼다**(2026-09-04). 종전에는 floor_approx 로 남겨서 "아직 층별개요를
+            # 못 받았다"와 구별이 안 됐다. 이 행은 층별개요를 정상 수신했고 지상 상업층이
+            # 0 이며 점포·인허가로 확인된 지상층도 없다 — 재호출로 바뀌지 않는 **판정**이다.
+            # 실측 분포(66거점 642동 중 634동)도 이쪽이었다: 지상층 주용도가 여관·호텔·
+            # 오피스텔·사무소·고시원, 즉 NON_CAPACITY_PURPS 모집단 그 자체다.
+            # floor_approx 로 두면 capacity = 지상 전체 층수가 남아 13층 오피스텔이
+            # 지도에 "공실 84.6%" 로 칠해진다(doksan 어반팰리스, active 2 / cap 13).
+            # --legacy 는 좁은 필터(_commercial_floors)라 강등 근거로 쓰지 않는다.
+            zero_com += 1
+            if not legacy and r.get("capacity_method") == "floor_approx":
+                demoted += 1               # dry-run 에서도 센다 — 규모를 보고 반영을 정한다
+                if apply:
+                    r.update(capacity=None, capacity_method=NO_COM_FLOOR,
+                             occupancy=None, vacancy_bldg=None, status="n_a")
             continue
         widened += len(floors) > len(com_nos)
         if n_grnd:
@@ -179,11 +196,12 @@ def run(slug: str, apply: bool, legacy: bool = False) -> dict | None:
                      occupancy=occ, vacancy_bldg=vac, status=st, **extra)
         changed += 1
 
-    if apply and changed:
+    if apply and (changed or demoted):
         path.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
 
     return {
-        "slug": slug, "층별개요보유": len(flr), "재계산": changed, "상업층0유지": zero_com,
+        "slug": slug, "층별개요보유": len(flr), "재계산": changed, "상업층0": zero_com,
+        "상업층0강등": demoted,
         "분모확장": widened,
         "before_pinned": before_pin,
         "before_vac": round(statistics.fmean(before_vac), 1) if before_vac else None,
@@ -215,7 +233,7 @@ def main() -> None:
         hit += 1
         print(f"[recalc-ouln:{s}][{'APPLY' if apply else 'DRY-RUN'}] "
               f"층별개요 {r['층별개요보유']}지번 → 재계산 {r['재계산']}동 "
-              f"(상업층0 유지 {r['상업층0유지']})")
+              f"(상업층0 {r['상업층0']}동 중 {r['상업층0강등']}동 no_com_floor 강등)")
         print(f"    capacity==active 로 고정돼 있던 행: {r['before_pinned']}동")
         print(f"    점포 확인 층으로 분모가 넓어진 건물: {r['분모확장']}동")
         print(f"    평균 공실 {r['before_vac']}% → {r['after_vac']}%")

@@ -1,12 +1,12 @@
 {
-  "anchor_pct": 17.35,
+  "anchor_pct": 17.44,
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>잠실/송파",
   "anchor_vac_small_pct": 6.5731457912479,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 8.3,
-  "alpha_street": 2.09,
-  "gap_pp": -9.1,
-  "buildings_used": 422,
+  "estimated_vacancy_pct": 7.6,
+  "alpha_street": 2.295,
+  "gap_pp": -9.8,
+  "buildings_used": 406,
   "rone_aligned": {
     "mid": {
       "buildings": 283,
@@ -15,7 +15,7 @@
       "vacancy_floor_hi_pct": 12.8,
       "vacancy_floor_lo_pct": 26.0,
       "vacancy_area_pct": 15.1,
-      "anchor_pct": 17.35,
+      "anchor_pct": 17.44,
       "gap_pp": -2.3
     },
     "small": {
@@ -41,24 +41,24 @@
   "primary": {
     "estimated_vacancy_pct": 14.6,
     "buildings": 464,
-    "anchor_pct": 17.35,
-    "alpha": 1.188,
+    "anchor_pct": 17.44,
+    "alpha": 1.194,
     "gap_pp": -2.8,
-    "coverage_pct": 96.1,
-    "excluded_floor_approx": 19
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 18.0,
-      "anchor_pct": 17.35,
-      "alpha": 0.964,
-      "gap_pp": 0.6,
-      "buildings": 383
+      "estimated_vacancy_pct": 11.6,
+      "anchor_pct": 17.44,
+      "alpha": 1.503,
+      "gap_pp": -5.8,
+      "buildings": 364
     },
     "mall": {
       "estimated_vacancy_pct": 17.0,
-      "anchor_pct": 17.35,
-      "alpha": 1.021,
+      "anchor_pct": 17.44,
+      "alpha": 1.026,
       "gap_pp": -0.4,
       "buildings": 100
     }
@@ -67,22 +67,15 @@
     "expos_units": {
       "estimated_vacancy_pct": 17.0,
       "buildings": 100,
-      "anchor_pct": 17.35,
-      "alpha": 1.021,
+      "anchor_pct": 17.44,
+      "alpha": 1.026,
       "gap_pp": -0.4
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 85.8,
-      "buildings": 19,
-      "anchor_pct": 17.35,
-      "alpha": 0.202,
-      "gap_pp": 68.4
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 11.6,
       "buildings": 364,
-      "anchor_pct": 17.35,
-      "alpha": 1.496,
+      "anchor_pct": 17.44,
+      "alpha": 1.503,
       "gap_pp": -5.8
     }
   },

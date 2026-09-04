@@ -62,9 +62,11 @@ def test_status_and_index_link_to_the_new_evidence() -> None:
         encoding="utf-8",
     )
     scores = {track["name"]: track["pct"] for track in json.loads(result.stdout)["tracks"]}
-    # 2026-09-04 서울 2차 12거점이 분모에 들어오면서 Page 가 100.0 → 99.7 이 됐다.
-    # 회귀가 아니라 **새 거점의 실측**이다: `대표 집계 커버리지 ≥90%` 가 65/66 이고
-    # 미달은 doksan 83.5% 한 곳인데, 그 결손은 회수 불가다 — 건축HUB 층별개요
-    # 프리플라이트가 doksan 의 floor_approx 13동을 전부 **판정완료(상업층 0 확정)**
-    # 로 분류한다(재호출해도 안 바뀐다). 그래서 수집 과제로 적지 않고 값으로 고정한다.
-    assert scores == {"Page": 99.7, "Platform": 100.0, "Posting": 97.6, "Program": 100.0}
+    # 2026-09-04 Page 99.7 → 100.0. 수집으로 올린 것이 **아니다** — 그날 오전까지
+    # 미달이던 doksan 83.5% 의 정체가 결손이 아니라 **분류 오류**였다: 잔여 13동은
+    # 층별개요를 이미 받았고 지상 상업층이 0 으로 확정된 건물인데(재호출해도 안 바뀐다)
+    # `floor_approx`(= 아직 못 쟀다)와 같은 라벨을 써서 커버리지가 "더 모으면 오른다"고
+    # 거짓말하고 있었다. `no_com_floor` 로 갈라 지도·분모에서 빼자 66/66 이 됐다.
+    # 게이트가 아니라 대상 정의가 바뀐 것이므로, **대표 공실률은 66거점 전부 불변**이다
+    # (그 값은 원래 expos_units·floor_ouln 만 세었다). 근거: docs/feature-page.md §no-com-floor
+    assert scores == {"Page": 100.0, "Platform": 100.0, "Posting": 97.6, "Program": 100.0}

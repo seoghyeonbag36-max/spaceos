@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>도심>시청",
   "anchor_vac_small_pct": 8.07543737147909,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 9.0,
-  "alpha_street": 1.302,
-  "gap_pp": -2.7,
-  "buildings_used": 487,
+  "estimated_vacancy_pct": 8.6,
+  "alpha_street": 1.362,
+  "gap_pp": -3.1,
+  "buildings_used": 481,
   "rone_aligned": {
     "mid": {
-      "buildings": 328,
-      "vacancy_units_pct": 34.7,
+      "buildings": 326,
+      "vacancy_units_pct": 34.6,
       "buildings_floor": 326,
       "vacancy_floor_hi_pct": 28.8,
       "vacancy_floor_lo_pct": 51.8,
@@ -19,8 +19,8 @@
       "gap_pp": 8.1
     },
     "small": {
-      "buildings": 235,
-      "vacancy_units_pct": 27.1,
+      "buildings": 232,
+      "vacancy_units_pct": 27.2,
       "buildings_floor": 232,
       "vacancy_floor_hi_pct": 24.2,
       "vacancy_floor_lo_pct": 52.8,
@@ -44,16 +44,16 @@
     "anchor_pct": 11.72,
     "alpha": 0.509,
     "gap_pp": 11.3,
-    "coverage_pct": 98.9,
-    "excluded_floor_approx": 9
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 20.5,
+      "estimated_vacancy_pct": 20.1,
       "anchor_pct": 11.72,
-      "alpha": 0.572,
-      "gap_pp": 8.8,
-      "buildings": 744
+      "alpha": 0.583,
+      "gap_pp": 8.4,
+      "buildings": 735
     },
     "mall": {
       "estimated_vacancy_pct": 27.3,
@@ -70,13 +70,6 @@
       "anchor_pct": 11.72,
       "alpha": 0.429,
       "gap_pp": 15.6
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 63.9,
-      "buildings": 9,
-      "anchor_pct": 11.72,
-      "alpha": 0.183,
-      "gap_pp": 52.2
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 20.1,
