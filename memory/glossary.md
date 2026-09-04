@@ -20,7 +20,7 @@ SpaceOS 프로젝트 전체에서 사용되는 용어·약어·고유명사 사�
 | **LSTM** | Long Short-Term Memory | 시계열 매출·공실률 예측 |
 | **PostGIS** | PostgreSQL 공간 확장 | 건물·공실 GIS 데이터 |
 | **Three.js / R3F** | 3D 렌더링 라이브러리 | @react-three/fiber로 React 통합 |
-| **Mapbox GL** | 2D 지도 라이브러리 | 3D 모델 배치 베이스맵 |
+| **네이버 지도** | 2D 지도 SDK (`lib/naverMap.ts`) | 3D 모델 배치 베이스맵. Mapbox GL 은 2026-08-25 제거 |
 | **Bronze/Silver/Gold** | 데이터 레이크 3계층 | 원본 → 정제 → 분석용 |
 | **MLflow** | ML 모델 버전 관리 | 학습 → 등록 → 추론 자동화 |
 | **GLB / glTF** | 3D 모델 포맷 | OSM Buildings → GLB 변환 |

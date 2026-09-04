@@ -450,7 +450,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
         )}
       </div>
 
-      <div ref={elRef} className="mapbox" />
+      <div ref={elRef} className="mapcanvas" />
 
       <div className="maplegend">
         {layer === "buildings" ? (
