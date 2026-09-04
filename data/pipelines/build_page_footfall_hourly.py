@@ -41,7 +41,7 @@ from collections import defaultdict
 
 from data.collectors.common import BRONZE, GOLD
 from data.collectors.living_population_hourly import FILENAME, SLUG, adong8
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS
 from data.pipelines.build_hub_adong import load as load_hub_adong
 
 _OUT = GOLD / "page_footfall_hourly.json"
@@ -133,7 +133,7 @@ def run() -> dict:
     districts: dict[str, dict] = {}
     thin: list[str] = []
 
-    for slug in HUBS:
+    for slug in ACTIVE_HUBS:
         adong = hub_adong.get(slug) or {}
         if not adong:
             continue
@@ -183,7 +183,7 @@ def run() -> dict:
     _OUT.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
 
     print(f"→ {_OUT.name}  ({_OUT.stat().st_size / 1024:.0f}KB)")
-    print(f"   거점 {len(districts)}/{len(HUBS)} · 날짜 {len(dates)}"
+    print(f"   거점 {len(districts)}/{len(ACTIVE_HUBS)} · 날짜 {len(dates)}"
           f"(평일 {len(wd_dates)} / 주말 {len(we_dates)})")
     if thin:
         print(f"   [주의] 24시간이 안 채워진 곳 {len(thin)}건: {', '.join(thin[:6])}"

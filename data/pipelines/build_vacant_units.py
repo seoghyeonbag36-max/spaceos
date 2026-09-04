@@ -76,7 +76,7 @@ from datetime import datetime, timezone
 
 from data.collectors.building_vacancy import NON_CAPACITY_PURPS
 from data.collectors.common import BRONZE, GOLD, SILVER
-from data.config.page_hubs import HUBS, get_hub
+from data.config.page_hubs import ACTIVE_HUBS, get_hub
 
 _M2_PER_PYEONG = 3.3058
 
@@ -312,7 +312,7 @@ def run(slugs: list[str]) -> dict[str, int]:
 
 
 def main() -> None:
-    slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(HUBS)
+    slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(ACTIVE_HUBS)
     counts = run([s for s in slugs if get_hub(s) is not None])
     ok = {k: v for k, v in counts.items() if v}
     print(f"[vacant-units] 산출 {len(ok)}거점 / 시도 {len(counts)}거점")

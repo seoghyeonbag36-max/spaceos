@@ -36,7 +36,7 @@ from data.collectors.building_vacancy import (
     _jibun,
 )
 from data.collectors.common import latest_bronze, load_env, load_latest, save_json
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS, ALL_HUBS
 
 try:
     import requests
@@ -120,11 +120,11 @@ def main() -> None:
     if (not key or requests is None) and not dry:
         print("[refetch] DATA_GO_KR_SERVICE_KEY 미설정(또는 requests 없음) — 중단")
         return
-    slugs = [a for a in argv if not a.startswith("-")] or list(HUBS)
+    slugs = [a for a in argv if not a.startswith("-")] or list(ACTIVE_HUBS)
 
     t = f = 0
     for slug in slugs:
-        if slug not in HUBS:
+        if slug not in ALL_HUBS:
             print(f"[refetch] 미등록 거점 '{slug}' — 건너뜀")
             continue
         a, b = run(key or "", slug, dry, include_capped)

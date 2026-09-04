@@ -40,7 +40,7 @@ import sys
 from pathlib import Path
 
 from data.collectors.common import BRONZE, SILVER
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS, ALL_HUBS
 from data.pipelines.build_building_attrs import is_commercial, stream_rows
 
 _ITEM_INDENT = 6          # 대장(bldg_ledger_raw.json) 전용. 층별개요는 4.
@@ -163,4 +163,4 @@ def load(slug: str) -> dict:
 
 if __name__ == "__main__":
     argv = [a for a in sys.argv[1:] if not a.startswith("-")]
-    run([s for s in (argv or list(HUBS)) if s in HUBS])
+    run([s for s in (argv or list(ACTIVE_HUBS)) if s in ALL_HUBS])

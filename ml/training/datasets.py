@@ -88,10 +88,17 @@ def build_dataset(look_back: int | None = None) -> PooledDataset:
         look_back = max(2, min(8, n_min - 2))  # 홀드아웃 1분기 확보
 
     feats = df[list(SEQ_FEATURES)].to_numpy(dtype=np.float64)
-    mu, sd = feats.mean(axis=0), feats.std(axis=0)
+    # ⚠ nan 을 무시하고 센다. 2026-09-04 에 여기가 66거점 학습을 통째로 죽였다:
+    # 서울 2차 12거점이 붙으면서 R-ONE 계열(vac_small·vac_mid·rent_small)에 결측이
+    # 생겼는데(kkachisan 14분기 · sangbong 4분기 — 그 상권의 R-ONE 시계열이 늦게
+    # 시작한다), `mean(axis=0)` 은 한 칸만 nan 이어도 **그 열 전체를 nan** 으로 만든다.
+    # 그러면 표준화가 모든 거점·모든 샘플을 nan 으로 오염시켜 8 trial 이 전부
+    # `MAE nan · 방향정확도 0.0%` 로 나온다 — 결측 18칸이 1,452행 학습을 죽였다.
+    mu, sd = np.nanmean(feats, axis=0), np.nanstd(feats, axis=0)
     sd[sd == 0] = 1.0
 
     Xs, ys, s_did, s_last = [], [], [], []
+    dropped = 0
     for di, did in enumerate(dids):
         g = df[df["district_id"] == did]
         z = (g[list(SEQ_FEATURES)].to_numpy(dtype=np.float64) - mu) / sd
@@ -99,12 +106,24 @@ def build_dataset(look_back: int | None = None) -> PooledDataset:
         onehot[di] = 1.0
         n = len(g)
         for end in range(look_back, n):  # 윈도우 [end-look_back, end) → 타깃 end
-            win = np.hstack([z[end - look_back:end], np.tile(onehot, (look_back, 1))])
+            src = z[end - look_back:end]
+            tgt = g[TARGET].iloc[end]
+            # 결측이 낀 윈도우는 **학습에서 뺀다** — 채워 넣지 않는다. 결측은 R-ONE
+            # 시계열의 시작 시점 차이라 거점 앞쪽에 몰려 있고, 뒤쪽(예측 기준 윈도우)은
+            # 온전하다. 그래서 버려도 예측을 잃는 거점은 없다(train_lstm._forecast_next
+            # 가 마지막 윈도우로 따로 낸다). 평균으로 메우면 안 받은 분기를 받은 것처럼
+            # 학습하게 되므로 그렇게 하지 않는다.
+            if not np.isfinite(src).all() or not np.isfinite(tgt):
+                dropped += 1
+                continue
+            win = np.hstack([src, np.tile(onehot, (look_back, 1))])
             Xs.append(win)
-            ys.append(g[TARGET].iloc[end])
+            ys.append(tgt)
             s_did.append(di)
             s_last.append(end == n - 1)
 
+    if dropped:
+        print(f"[dataset] 결측 윈도우 {dropped}개 제외 · 학습 윈도우 {len(Xs)}개")
     X = np.asarray(Xs, dtype=np.float32)
     y_raw = np.asarray(ys, dtype=np.float64)
     y_mu, y_sd = float(y_raw.mean()), float(y_raw.std() or 1.0)

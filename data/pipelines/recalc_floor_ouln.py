@@ -43,7 +43,7 @@ from data.collectors.common import BRONZE, GOLD
 from data.collectors.floor_capacity import (
     _commercial_floors, capacity_floors, commercial_floor_nos, ground_floors,
 )
-from data.config.page_hubs import HUBS, get_hub
+from data.config.page_hubs import ACTIVE_HUBS, get_hub
 from data.pipelines.build_building_attrs import load as load_attrs
 from data.pipelines.build_building_attrs import run as build_attrs
 
@@ -202,7 +202,7 @@ def main() -> None:
     args = ap.parse_args()
     apply = not args.dry_run
 
-    slugs = args.slugs or list(HUBS)
+    slugs = args.slugs or list(ACTIVE_HUBS)
     hit = 0
     for s in slugs:
         if get_hub(s) is None:

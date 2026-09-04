@@ -25,7 +25,7 @@ except ImportError:  # pragma: no cover
     requests = None
 
 from data.collectors.common import load_env, save_json
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS
 
 SERVICE = "culturalEventInfo"
 SLUG = "platform13"          # 거점 공통 Bronze 폴더(다거점 산출물 관례)
@@ -110,7 +110,7 @@ def collect(upcoming_only: bool = True) -> dict[str, int]:
             if end is None or end < today:
                 continue          # 이미 끝난 행사는 상권 유입 요인이 아니다
         lat, lon = c
-        near = [(h.slug, _dist_m(lat, lon, h.cy, h.cx)) for h in HUBS.values()]
+        near = [(h.slug, _dist_m(lat, lon, h.cy, h.cx)) for h in ACTIVE_HUBS.values()]
         for slug, d in near:
             if d <= RADIUS_M:
                 kept.append({**row, "district_id": slug, "distance_m": round(d)})

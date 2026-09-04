@@ -438,10 +438,19 @@ def test_prime_inventory_premise_is_measurably_false():
     dist = P._read(P._INPUTS)["districts"]
 
     below = [k for k, v in dist.items() if v["rent_per_m2_krw_thousand"] < seoul_pm2]
-    assert 15 <= len(below) <= 30, f"기준선 미만 거점 {len(below)}/54 — 분포가 크게 바뀌었다"
+    # ⚠ **비율로 잰다.** 종전에는 `15 <= len(below) <= 30` 이라고 절대 개수로 적었는데,
+    #   그 대역은 54거점에서만 뜻이 있었다 — 2026-09-04 서울 2차 12거점이 붙자 32/66
+    #   (48.5%, 대역 안)인데도 `32 <= 30` 으로 깨졌다. 이 테스트가 고정하려는 것은
+    #   "인벤토리가 프라임 집합이 아니다"라는 **분포의 성질**이지 거점 수가 아니다.
+    #   아래 유닛 단언이 이미 비율(0.20~0.50)로 되어 있어 거기에 맞춘다.
+    share = len(below) / len(dist)
+    assert dist and 0.20 < share < 0.60, (
+        f"기준선 미만 거점 {len(below)}/{len(dist)} = {share:.1%} — 분포가 크게 바뀌었다")
 
     n_below = n_all = 0
-    for d in D.DISTRICTS:
+    # 시드 54가 아니라 **서빙 목록(PAGES)** 을 돈다 — 2026-09-04 부터 시드 밖 거점도
+    # 실 인벤토리로 유닛을 내므로, DISTRICTS 로 세면 제품과 다른 모집단을 재게 된다.
+    for d in getattr(D, "PAGES", None) or D.DISTRICTS:
         n = len(D.resolved_units(d["id"]) or [])
         n_all += n
         if dist.get(d["id"], {}).get("rent_per_m2_krw_thousand", 0) < seoul_pm2:

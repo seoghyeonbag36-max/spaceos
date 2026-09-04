@@ -30,7 +30,7 @@ import time
 from collections import Counter
 
 from data.collectors.common import GOLD, latest_bronze, load_env, save_json
-from data.config.page_hubs import HUBS, get_hub
+from data.config.page_hubs import ACTIVE_HUBS, get_hub
 from data.collectors.building_vacancy import (
     BASE_BLD, NON_CAPACITY_PURPS, STORES_PER_FLOOR, _body, _get_json, _items, _jibun,
     _ts, classify,

@@ -47,7 +47,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from data.collectors.common import load_env, save_json, today
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS, ALL_HUBS
 from data.pipelines.build_hub_adong import load as load_hub_adong
 
 # 헤더 정규화 후 이 조각이 들어 있으면 그 열로 본다. 순서가 곧 우선순위다.
@@ -241,7 +241,7 @@ def main() -> None:
             "  data.seoul.go.kr OA-22300(수도권 생활이동)에서 파일을 내려받은 뒤\n"
             "  python -m data.collectors.living_migration <디렉터리> [slug ...]\n"
             "  또는 data/.env 에 SEOUL_MIGRATION_DIR= 를 넣을 것")
-    slugs = [s for s in argv[1:] if s in HUBS] or list(HUBS)
+    slugs = [s for s in argv[1:] if s in ALL_HUBS] or list(ACTIVE_HUBS)
     collect(src, slugs)
 
 

@@ -145,7 +145,7 @@ def fetch_hub_trends(months: int = _TREND_MONTHS) -> dict[str, list[dict]]:
     """거점 slug → [{period, ratio}] 월별 시계열. 키 없음·실패 시 빈 dict."""
     import datetime
 
-    from data.config.page_hubs import HUBS
+    from data.config.page_hubs import ACTIVE_HUBS
 
     cid, secret = os.getenv("NAVER_CLIENT_ID"), os.getenv("NAVER_CLIENT_SECRET")
     if not cid or not secret or requests is None:
@@ -161,7 +161,7 @@ def fetch_hub_trends(months: int = _TREND_MONTHS) -> dict[str, list[dict]]:
     headers = {"X-Naver-Client-Id": cid, "X-Naver-Client-Secret": secret,
                "Content-Type": "application/json"}
 
-    items = sorted(HUBS.items())
+    items = sorted(ACTIVE_HUBS.items())
     out: dict[str, list[dict]] = {}
     for i in range(0, len(items), _HUB_BATCH):
         chunk = items[i:i + _HUB_BATCH]

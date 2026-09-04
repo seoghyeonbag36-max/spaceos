@@ -18,7 +18,7 @@ def test_canonical_progress_names_current_state_and_remaining_work() -> None:
     """정본은 완료된 작업을 다시 '다음 작업'으로 만들지 않아야 한다."""
     doc = _read("docs/spaceos-vibe-build-sequence.md")
 
-    assert "현재 위치 요약 (2026-08-29)" in doc
+    assert "현재 위치 요약 (2026-09-04)" in doc
     assert "Posting" in doc and "97.6%" in doc
     assert "Platform" in doc and "관측 전용" in doc
     assert "상용 입력 온보딩" in doc
@@ -62,4 +62,9 @@ def test_status_and_index_link_to_the_new_evidence() -> None:
         encoding="utf-8",
     )
     scores = {track["name"]: track["pct"] for track in json.loads(result.stdout)["tracks"]}
-    assert scores == {"Page": 100.0, "Platform": 100.0, "Posting": 97.6, "Program": 100.0}
+    # 2026-09-04 서울 2차 12거점이 분모에 들어오면서 Page 가 100.0 → 99.7 이 됐다.
+    # 회귀가 아니라 **새 거점의 실측**이다: `대표 집계 커버리지 ≥90%` 가 65/66 이고
+    # 미달은 doksan 83.5% 한 곳인데, 그 결손은 회수 불가다 — 건축HUB 층별개요
+    # 프리플라이트가 doksan 의 floor_approx 13동을 전부 **판정완료(상업층 0 확정)**
+    # 로 분류한다(재호출해도 안 바뀐다). 그래서 수집 과제로 적지 않고 값으로 고정한다.
+    assert scores == {"Page": 99.7, "Platform": 100.0, "Posting": 97.6, "Program": 100.0}
