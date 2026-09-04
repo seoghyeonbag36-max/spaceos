@@ -40,7 +40,9 @@ CI 검증 단계가 `/health` 200 과 분석 API 의 `"vacancy_source":"gold"` �
 ## 배포 후 확인
 
 ```bash
-curl.exe -s https://spaceos-twin.web.app/api/v1/health
+curl.exe -s https://spaceos-twin.web.app/health          # ⚠ /api/v1 아래가 아니다
+curl.exe -s "https://spaceos-twin.web.app/api/v1/heatmap/vacancy?district=<slug>" | head -c 200
+#   → vacancy_source: "gold" 인가("synthetic" 이면 그 거점은 합성 폴백이다)
 curl.exe -s "https://spaceos-twin.web.app/api/v1/commercial-districts" | head -c 300
 ```
 

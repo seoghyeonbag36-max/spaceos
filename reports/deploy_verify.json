@@ -1,0 +1,278 @@
+{
+  "started": "2026-09-04T23:06:39",
+  "ci": {
+    "why": "완료",
+    "waited_s": 2,
+    "runs": [
+      {
+        "conclusion": "success",
+        "databaseId": 33881188816,
+        "displayTitle": "merge(page,platform,posting,program): 서울 2차 12거점 세 트랙 편입 + LSTM 결측 내성",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 33881188817,
+        "displayTitle": "merge(page,platform,posting,program): 서울 2차 12거점 세 트랙 편입 + LSTM 결측 내성",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "databaseId": 33758490262,
+        "displayTitle": "feat(page): 서빙을 서울로 좁힌다 — 2차 12거점만 올리고 경기 7거점은 끈다",
+        "status": "completed"
+      }
+    ]
+  },
+  "verify": {
+    "base": "https://spaceos-twin.web.app/api/v1",
+    "checked_at": "2026-09-04T23:07:11",
+    "health": {
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "service": "spaceos-backend",
+        "version": "0.1.0"
+      }
+    },
+    "districts": {
+      "status": 200,
+      "count": 66,
+      "batch2_present": [
+        "bulgwang",
+        "cheonho",
+        "doksan",
+        "hwagok",
+        "kkachisan",
+        "miasageori",
+        "mokdong-yc",
+        "oryudong",
+        "sangbong",
+        "sanggye",
+        "suyu",
+        "yeonsinnae"
+      ]
+    },
+    "hubs": {
+      "miasageori": {
+        "page": {
+          "status": 200,
+          "features": 754
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 75
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "suyu": {
+        "page": {
+          "status": 200,
+          "features": 1143
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 101
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "bulgwang": {
+        "page": {
+          "status": 200,
+          "features": 573
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 54
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "yeonsinnae": {
+        "page": {
+          "status": 200,
+          "features": 827
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 79
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "hwagok": {
+        "page": {
+          "status": 200,
+          "features": 565
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 76
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "kkachisan": {
+        "page": {
+          "status": 200,
+          "features": 579
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 68
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "mokdong-yc": {
+        "page": {
+          "status": 200,
+          "features": 479
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 57
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "sanggye": {
+        "page": {
+          "status": 200,
+          "features": 644
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 64
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "sangbong": {
+        "page": {
+          "status": 200,
+          "features": 606
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 76
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "oryudong": {
+        "page": {
+          "status": 200,
+          "features": 356
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 48
+        },
+        "posting": {
+          "status": 200,
+          "units": 11
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "doksan": {
+        "page": {
+          "status": 200,
+          "features": 246
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 22
+        },
+        "posting": {
+          "status": 200,
+          "units": 5
+        },
+        "platform": {
+          "status": 200
+        }
+      },
+      "cheonho": {
+        "page": {
+          "status": 200,
+          "features": 658
+        },
+        "vacancy": {
+          "status": 200,
+          "source": "gold",
+          "cells": 82
+        },
+        "posting": {
+          "status": 200,
+          "units": 12
+        },
+        "platform": {
+          "status": 200
+        }
+      }
+    },
+    "failures": [],
+    "verdict": "통과"
+  },
+  "finished": "2026-09-04T23:07:44"
+}
