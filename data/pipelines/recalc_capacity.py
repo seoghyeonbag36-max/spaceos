@@ -26,7 +26,7 @@ from collections import Counter
 
 from data.collectors.building_vacancy import classify, expos_units
 from data.collectors.common import GOLD, load_latest
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS
 
 
 def capacity_from_raw(raw: dict) -> tuple[int | None, str]:
@@ -121,7 +121,7 @@ def run(slug: str, dry_run: bool) -> dict | None:
 def main() -> None:
     argv = sys.argv[1:]
     dry = "--dry-run" in argv
-    slugs = [a for a in argv if not a.startswith("-")] or list(HUBS)
+    slugs = [a for a in argv if not a.startswith("-")] or list(ACTIVE_HUBS)
 
     print(f"{'거점':16s} {'건물':>6s} {'expos':>13s} {'capacity합':>16s} {'clip':>13s} {'800초과':>7s}")
     tot = Counter()

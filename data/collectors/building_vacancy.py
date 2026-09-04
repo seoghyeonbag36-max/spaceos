@@ -20,7 +20,7 @@ D1 프로브(2026-07-07)로 확정된 실측 필드 기준. 구 BldRgstService_v
       쿼터를 어디에 쓰고 있는지·왜 지금 구조인지: docs/finding-expos-quota-2026-08-09.md
       LIMIT_BUILDINGS 환경변수로 스모크 테스트 가능 (예: LIMIT_BUILDINGS=8).
 
-다거점: config/page_hubs.py HUBS 를 순회한다. 점포(sdsc2)·폴리곤(V-World)은 쿼터가
+다거점: config/page_hubs.py ACTIVE_HUBS(=서빙 도시 66거점) 를 순회한다. 점포(sdsc2)·폴리곤(V-World)은 쿼터가
 넉넉하나 **건축HUB 대장은 일일 쿼터가 빡빡**하다(garosugil 1곳 ≈ 720동 = 720~1,440콜).
   --no-ledger (또는 PAGE_LEDGER=0): 대장 수집을 건너뛰고 stores_raw.json 만 남긴다.
     → build_page_master 가 V-World 폴리곤 지상층수로 capacity 를 근사(Tier 2 확장 경로).
@@ -44,7 +44,7 @@ except ImportError:  # pragma: no cover
     requests = None
 
 from data.collectors.common import GOLD, latest_bronze, load_env, load_latest, save_json
-from data.config.page_hubs import HUBS, PageHub, get_hub
+from data.config.page_hubs import ACTIVE_HUBS, PageHub, get_hub
 
 BASE_SDSC = "http://apis.data.go.kr/B553077/api/open/sdsc2"
 BASE_BLD = "http://apis.data.go.kr/1613000/BldRgstHubService"
@@ -667,7 +667,7 @@ def main() -> None:
     args = [a for a in argv if not a.startswith("-")]
     force = "--force" in argv
     do_ledger = "--no-ledger" not in argv and os.getenv("PAGE_LEDGER", "1") != "0"
-    slugs = args or list(HUBS)
+    slugs = args or list(ACTIVE_HUBS)
     for slug in slugs:
         hub = get_hub(slug)
         if hub is None:

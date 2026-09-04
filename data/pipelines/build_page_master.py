@@ -19,7 +19,7 @@
   properties: id/name/status/capacity/active/industry/vacancy_rate (+floors/height)
   → apps/backend/app/services/building_vacancy.py 가 이 파일을 서빙.
 
-다거점: config/page_hubs.py HUBS 를 순회한다. 동명맵(_DONG)은 거점 상수가 아니라
+다거점: config/page_hubs.py ACTIVE_HUBS(=서빙 도시 66거점) 를 순회한다. 동명맵(_DONG)은 거점 상수가 아니라
 점포 주소(lnoAdr)에서 동적으로 구성하고, gold building_vacancy.json(대장 산출물)이
 없는 거점은 V-World 폴리곤 지상층수로 capacity 를 근사한다(Tier 2 확장 경로).
 
@@ -36,7 +36,7 @@ from collections import Counter, defaultdict
 from data.collectors.building_vacancy import (
     NON_STOREFRONT_LCLS, STORES_PER_FLOOR as _STORES_PER_FLOOR)
 from data.collectors.common import GOLD, load_latest
-from data.config.page_hubs import HUBS, PageHub, get_hub
+from data.config.page_hubs import ACTIVE_HUBS, PageHub, get_hub
 from data.pipelines.build_building_attrs import lic_floors
 from data.pipelines.build_building_attrs import load as load_attrs
 
@@ -610,7 +610,7 @@ def run(hub: PageHub) -> bool:
 def main() -> None:
     import sys
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
-    slugs = args or list(HUBS)
+    slugs = args or list(ACTIVE_HUBS)
     ok = 0
     for slug in slugs:
         hub = get_hub(slug)

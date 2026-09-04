@@ -9,7 +9,7 @@ PNU·층수·연면적·높이(hg)·용도코드 + gml 좌표 수신 확인.
 - 서버 maxFeatures 상한 1000 → 상한 도달 시 bbox 4분할 재귀 타일링, PNU+fid 로 중복 제거.
 - bbox 축 순서는 lon,lat (소량 bbox 실호출로 검증됨).
 
-다거점: config/page_hubs.py HUBS 전체를 순회한다. 이미 bldg_polygons.geojson 이
+다거점: config/page_hubs.py ACTIVE_HUBS 전체를 순회한다. 이미 bldg_polygons.geojson 이
 있는 거점은 건너뛴다(garosugil 검증 산출물 보존·재실행 안전). 특정 거점만 수집하려면
 인자로 slug 를 넘긴다: python -m data.collectors.vworld_bldg hongdae seongsu
 
@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover
     requests = None
 
 from data.collectors.common import bronze_dir, latest_bronze, load_env, save_json
-from data.config.page_hubs import HUBS, PageHub, get_hub
+from data.config.page_hubs import ACTIVE_HUBS, PageHub, get_hub
 
 _URL = "https://api.vworld.kr/ned/wfs/getBldgisSpceWFS"
 _TYPENAME = "dt_d010"
@@ -174,7 +174,7 @@ def main() -> None:
 
     args = [a for a in sys.argv[1:] if not a.startswith("-")]
     force = "--force" in sys.argv[1:]
-    slugs = args or list(HUBS)
+    slugs = args or list(ACTIVE_HUBS)
     for slug in slugs:
         hub = get_hub(slug)
         if hub is None:

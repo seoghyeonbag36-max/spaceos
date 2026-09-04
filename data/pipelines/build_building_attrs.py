@@ -30,7 +30,7 @@ from pathlib import Path
 
 from data.collectors.building_vacancy import NON_CAPACITY_PURPS
 from data.collectors.common import BRONZE, SILVER, load_latest
-from data.config.page_hubs import HUBS, get_hub
+from data.config.page_hubs import ACTIVE_HUBS, get_hub
 
 # R-ONE 중대형/소규모 표본이 되는 '상가건물'의 표제부 주용도. 업무시설·숙박시설은
 # 1층에 점포가 있어도 상가 표본이 아니다(13거점 B모집단에 업무 509동·숙박 332동).
@@ -285,7 +285,7 @@ def load(slug: str) -> dict[str, dict]:
 
 
 def main() -> None:
-    slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(HUBS)
+    slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(ACTIVE_HUBS)
     done = 0
     for s in slugs:
         if get_hub(s) is None:

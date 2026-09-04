@@ -24,7 +24,7 @@ import json
 from collections import defaultdict
 
 from data.collectors.common import GOLD, load_latest
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS
 from data.pipelines.build_hub_adong import load as load_hub_adong
 
 _OUT = GOLD / "platform_page_migration.json"
@@ -53,7 +53,7 @@ def run() -> dict:
     districts: dict[str, dict] = {}
     skipped: list[str] = []
 
-    for slug in HUBS:
+    for slug in ACTIVE_HUBS:
         doc = load_latest(slug, "living_migration.json")
         if not doc:
             skipped.append(slug)
@@ -102,7 +102,7 @@ def run() -> dict:
     _OUT.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
 
     print(f"→ {_OUT.name}  ({_OUT.stat().st_size/1024:.0f}KB)")
-    print(f"   거점 {len(districts)}/{len(HUBS)}")
+    print(f"   거점 {len(districts)}/{len(ACTIVE_HUBS)}")
     if skipped:
         print(f"   생활이동 미수집 {len(skipped)}거점: {', '.join(skipped[:6])}"
               f"{' …' if len(skipped) > 6 else ''}")

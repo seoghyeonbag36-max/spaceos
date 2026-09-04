@@ -36,7 +36,7 @@ from collections import defaultdict
 
 from data.collectors.common import (BRONZE, latest_bronze, load_env, load_latest,
                                     save_json, today)
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS, ALL_HUBS
 
 # 2026-07-19 프로브 확정 서비스 ID (서울 열린데이터광장)
 #
@@ -211,9 +211,9 @@ def collect(slugs: list[str], force: bool = False) -> None:
         print("[licensing] SEOUL_OPENAPI_KEY 미설정 — 건너뜀")
         return
 
-    targets = [s for s in slugs if s in HUBS
+    targets = [s for s in slugs if s in ALL_HUBS
                and (force or latest_bronze(s, "licensing_biz.json") is None)]
-    skipped = [s for s in slugs if s in HUBS and s not in targets]
+    skipped = [s for s in slugs if s in ALL_HUBS and s not in targets]
     if skipped:
         print(f"[licensing] 이미 존재 — 건너뜀: {', '.join(skipped)} (--force 로 재수집)")
     if not targets:
@@ -292,4 +292,4 @@ if __name__ == "__main__":
     load_env()
     argv = sys.argv[1:]
     args = [a for a in argv if not a.startswith("-")]
-    collect(args or list(HUBS), force="--force" in argv)
+    collect(args or list(ACTIVE_HUBS), force="--force" in argv)

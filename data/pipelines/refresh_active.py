@@ -28,7 +28,7 @@ from collections import Counter
 
 from data.collectors.building_vacancy import classify, group_by_building
 from data.collectors.common import GOLD, load_latest
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS
 
 
 def run(slug: str, dry_run: bool) -> dict | None:
@@ -81,7 +81,7 @@ def run(slug: str, dry_run: bool) -> dict | None:
 def main() -> None:
     argv = sys.argv[1:]
     dry = "--dry-run" in argv
-    slugs = [a for a in argv if not a.startswith("-")] or list(HUBS)
+    slugs = [a for a in argv if not a.startswith("-")] or list(ACTIVE_HUBS)
 
     print(f"{'거점':16s} {'건물':>6s} {'갱신':>6s} {'점포0':>6s} {'active 합':>18s}")
     tot: Counter = Counter()

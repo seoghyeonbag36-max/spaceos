@@ -83,7 +83,7 @@ def _merge_csv(path: Path, new_rows: list[tuple[str, str, float]]) -> None:
 
 
 def run(dry: bool = False) -> None:
-    from data.config.page_hubs import HUBS
+    from data.config.page_hubs import ALL_HUBS
 
     trends = _load_bronze()
     if not trends:
@@ -106,7 +106,7 @@ def run(dry: bool = False) -> None:
             thin += 1
             continue
 
-        name = HUBS[slug].name if slug in HUBS else slug
+        name = ALL_HUBS[slug].name if slug in ALL_HUBS else slug
         rows = [(f"{KIND}:{name}", p["period"], round(float(p["ratio"]), 5)) for p in pts]
         if dry:
             v = [float(p["ratio"]) for p in pts][-6:]

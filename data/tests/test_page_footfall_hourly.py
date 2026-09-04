@@ -72,7 +72,7 @@ def _gold(monkeypatch, tmp_path, rows, hubs):
     monkeypatch.setattr(P, "BRONZE", bronze)
     monkeypatch.setattr(P, "_OUT", tmp_path / "out.json")
     monkeypatch.setattr(P, "load_hub_adong", lambda: hubs)
-    monkeypatch.setattr(P, "HUBS", list(hubs))
+    monkeypatch.setattr(P, "ACTIVE_HUBS", list(hubs))
     return P.run()
 
 

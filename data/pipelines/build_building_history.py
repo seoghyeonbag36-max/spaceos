@@ -38,7 +38,7 @@ import re
 from collections import Counter, defaultdict
 
 from data.collectors.common import BRONZE, GOLD, latest_bronze
-from data.config.page_hubs import HUBS, PageHub, get_hub
+from data.config.page_hubs import ACTIVE_HUBS, PageHub, get_hub
 from data.pipelines.build_page_master import _addr_pnu, _build_dong_map
 
 _DATE_DIGITS = re.compile(r"\D+")
@@ -149,7 +149,7 @@ def run(hub: PageHub) -> bool:
 def main() -> None:
     import sys
 
-    slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(HUBS)
+    slugs = [a for a in sys.argv[1:] if not a.startswith("-")] or list(ACTIVE_HUBS)
     ok = 0
     for slug in slugs:
         if get_hub(slug) is None:

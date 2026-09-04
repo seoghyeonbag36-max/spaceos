@@ -119,6 +119,7 @@ def _forecast_next(res: dict) -> dict:
     df = load_gold()
     lb = res["params"]["look_back"]
     out: dict[str, dict] = {}
+    skipped: list[str] = []
     model.eval()
     for di, did in enumerate(ds.district_ids):
         g = df[df["district_id"] == did]
@@ -128,6 +129,11 @@ def _forecast_next(res: dict) -> dict:
         onehot = np.zeros(len(ds.district_ids))
         onehot[di] = 1.0
         win = z[-lb:].copy()
+        if not np.isfinite(win).all():
+            # 마지막 윈도우에 결측이 있으면 예측을 **내지 않는다**(채워서 내지 않는다).
+            # 2026-09-04 현재 해당 거점 0곳 — R-ONE 결측은 전부 시계열 앞쪽이다.
+            skipped.append(did)
+            continue
         last = float(g[TARGET].iloc[-1])
         q = str(g["quarter"].iloc[-1])
         horizons: list[dict] = []
@@ -158,6 +164,8 @@ def _forecast_next(res: dict) -> dict:
             "n_quarters": int(len(g)),
             "horizons": horizons,
         }
+    if skipped:
+        print(f"[forecast] 결측으로 예측 제외 {len(skipped)}거점: {skipped}")
     return out
 
 

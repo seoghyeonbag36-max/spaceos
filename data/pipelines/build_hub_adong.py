@@ -49,7 +49,7 @@ except ImportError:  # pragma: no cover
     requests = None
 
 from data.collectors.common import GOLD, SILVER, load_env
-from data.config.page_hubs import HUBS
+from data.config.page_hubs import ACTIVE_HUBS, ALL_HUBS
 from data.pipelines.build_building_attrs import load as load_attrs
 
 _URL = "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json"
@@ -217,8 +217,8 @@ def load() -> dict[str, dict]:
 def main() -> None:
     load_env()
     argv = sys.argv[1:]
-    slugs = [a for a in argv if not a.startswith("-")] or list(HUBS)
-    run([s for s in slugs if s in HUBS], force="--force" in argv)
+    slugs = [a for a in argv if not a.startswith("-")] or list(ACTIVE_HUBS)
+    run([s for s in slugs if s in ALL_HUBS], force="--force" in argv)
 
 
 if __name__ == "__main__":

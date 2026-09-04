@@ -397,14 +397,21 @@ def resolved_units(district_id: str) -> list[dict] | None:
     시드 원본은 건드리지 않는다(프로세스 전역 공유 dict 다).
     각 유닛의 `inputs_source` 가 필드별 출처(seed/rone/flpop/gold-ledger/absent)를 밝힌다.
     """
-    if district_id not in DISTRICTS_BY_ID:
-        return None
     # 실 인벤토리 유닛에는 `rent` 가 **없다** — R-ONE 으로 계산해서 넣는 값이다.
     # 그래서 R-ONE 입력(gold/platform_posting_inputs.json)이 미적재면 임대료가 빈
     # 유닛이 나가고 `tier_scenarios` 가 KeyError 로 죽는다. 신규 클론에서 실제로
     # 그렇게 된다 → 둘이 **함께** 있을 때만 실 인벤토리를 쓰고, 아니면 시드로 물러난다.
     real = (vacant_inventory.units(district_id)
             if posting_inputs.for_district(district_id) else [])
+    if district_id not in DISTRICTS_BY_ID:
+        # 시드 밖 거점(서울 2차 12거점 · 2026-09-04). 여기서 무조건 None 을 내던 탓에
+        # **지도에는 뜨는데 Posting 은 통째로 비는** 거점이 있었다: 12거점 전부
+        # 인벤토리 136유닛 + R-ONE 입력을 갖추고도 `get_postings` 가 None 이었다.
+        # 시드가 문지기였던 것이지 재료가 없던 것이 아니다 — 이 저장소가 반복해서
+        # 겪은 '수집이 아니라 배선' 양식이다(feature-posting.md §0-J 와 같은 자리).
+        # 시드가 없으므로 **폴백도 없다**: 실 인벤토리가 없으면 그대로 None 이다.
+        # 지어낸 유닛으로 화면을 채우지 않는다.
+        return posting_inputs.resolve_units(district_id, real) if real else None
     if real:
         return posting_inputs.resolve_units(district_id, real)
     return posting_inputs.resolve_units(district_id, DISTRICTS_BY_ID[district_id]["units"])

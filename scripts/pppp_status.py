@@ -86,20 +86,28 @@ def _hubs() -> int:
     """전체 거점 수. page_hubs 를 못 읽으면 gold 디렉토리 수로 떨어진다."""
     try:
         sys.path.insert(0, str(ROOT))
-        from data.config.page_hubs import HUBS
+        from data.config.page_hubs import ACTIVE_HUBS
 
-        return len(HUBS)
+        return len(ACTIVE_HUBS)
     except Exception:
         return sum(1 for p in GOLD.iterdir() if p.is_dir() and (p / "coverage.json").exists())
 
 
 def _scored_slugs() -> set[str] | None:
-    """진행률의 **분모가 되는 거점**(= `HUBS` 54). 못 읽으면 None = 필터하지 않는다."""
+    """진행률의 **분모가 되는 거점**(= `ACTIVE_HUBS` 66). 못 읽으면 None = 필터하지 않는다.
+
+    2026-09-03 에 `HUBS` 54 → `ACTIVE_HUBS` 66 으로 옮겼다. 아래 `_gold_glob` 이 적어 둔
+    조건("새 배치가 진행률에 잡히려면 `HUBS` 에 올라야 하고, 그건 곧 서빙에 오른다는
+    뜻")이 실제로 충족됐기 때문이다 — 서울 2차 12거점은 09-03 부터 서빙에 올라 있다
+    (`measured_pages.SERVED_CITIES`). 분모를 54 로 두면 그 12거점의 결손이 진행률에
+    **안 잡힌다**: 실제로 09-03 실측에서 12거점은 Platform·Posting·Program 산출물
+    0/12 인데 세 트랙이 전부 100% 로 찍히고 있었다.
+    """
     try:
         sys.path.insert(0, str(ROOT))
-        from data.config.page_hubs import HUBS
+        from data.config.page_hubs import ACTIVE_HUBS
 
-        return set(HUBS)
+        return set(ACTIVE_HUBS)
     except Exception:
         return None
 
@@ -144,7 +152,12 @@ def _count_measured_foot_hubs() -> int | None:
         from app.services import posting_inputs as _pi
 
         n = 0
-        for d in _d.DISTRICTS:
+        # ⚠ `_d.DISTRICTS` 가 아니라 `_d.PAGES` 를 돈다. DISTRICTS 는 **시드 54거점**이라
+        #   이 게이트가 구조적으로 54 를 못 넘었다 — 2026-09-04 에 서울 2차 12거점이
+        #   `foot 66/66` 인데 '거점 내 서열 실측 54/66' 으로 찍힌 것이 그 때문이고,
+        #   실측이 없어서가 아니라 **세는 모집단이 제품과 달랐다.** PAGES 가 화면에
+        #   올라간 거점 전부다(서빙 목록과 같은 자리).
+        for d in getattr(_d, "PAGES", None) or _d.DISTRICTS:
             units = _d.resolved_units(d["id"]) or []
             if len(units) < 2:
                 # 유닛이 1개뿐이면 가를 것이 없다 — "못 가른다"와 구분해 실측으로 센다

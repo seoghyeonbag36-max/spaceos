@@ -241,6 +241,26 @@ ALIASES: dict[str, str] = {
 # 그래서 **이름을 대고 부를 때만** 잡히게 한다.
 ALL_HUBS: dict[str, PageHub] = {**HUBS, **SEOUL_BATCH2_HUBS, **GYEONGGI_HUBS}
 
+# ── 기본 순회 집합 (2026-09-03) ──────────────────────────────────────────────
+# 위 주석은 "`HUBS`(서울 54)가 기본 순회 집합"이라고 적었는데, 서울 2차 12거점이
+# 08-30 에 Tier1 로 서고 09-03 에 **서빙에 올라간** 뒤로는 그게 틀린 기본값이다.
+# 그대로 두면 이런 일이 벌어진다(실측 09-03): 12거점이 Page Gold 는 갖고 있는데
+# `platform_page_footfall` · `page_footfall_hourly` · `platform_posting_inputs` ·
+# `program_content_context` 에서 **통째로 0/12** 였다. 수집이 덜 된 게 아니라
+# 파이프라인이 `HUBS` 만 돌아서다.
+#
+# 그래서 순회 대상을 **도시**로 가른다 — 지금 산출물을 만드는 도시가 `ACTIVE_CITIES` 다.
+# 경기 20거점은 여기 없으므로 종전처럼 이름을 대고 불러야만 잡힌다(작업 중단 상태).
+#
+# ⚠ 이 집합은 **서빙 목록과 같아야 한다**(`app/data/measured_pages.SERVED_CITIES`).
+#   달라지면 "화면에는 뜨는데 산출물은 안 만드는" 거점이 생긴다 — 그 어긋남을
+#   `tests/test_active_cities_match_serving.py` 가 잡는다. 어느 쪽을 바꾸든 둘 다 바꾼다.
+ACTIVE_CITIES: frozenset[str] = frozenset({"seoul"})
+
+ACTIVE_HUBS: dict[str, PageHub] = {
+    slug: hub for slug, hub in ALL_HUBS.items() if hub.city in ACTIVE_CITIES
+}
+
 
 def resolve(district: str) -> str | None:
     """거점 id/별칭 → 정규 slug. 미지원이면 None. 경기 거점도 여기서 잡힌다."""
