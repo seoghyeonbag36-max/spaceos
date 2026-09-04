@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>독산/시흥",
   "anchor_vac_small_pct": 15.4131150089385,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 15.8,
-  "alpha_street": 0.933,
-  "gap_pp": 1.1,
-  "buildings_used": 147,
+  "estimated_vacancy_pct": 8.2,
+  "alpha_street": 1.797,
+  "gap_pp": -6.5,
+  "buildings_used": 131,
   "rone_aligned": {
     "mid": {
-      "buildings": 59,
-      "vacancy_units_pct": 49.3,
+      "buildings": 48,
+      "vacancy_units_pct": 28.2,
       "buildings_floor": 48,
       "vacancy_floor_hi_pct": 33.6,
       "vacancy_floor_lo_pct": 55.7,
@@ -29,8 +29,8 @@
       "gap_pp": 19.7
     },
     "mall": {
-      "buildings": 52,
-      "vacancy_units_pct": 46.8,
+      "buildings": 47,
+      "vacancy_units_pct": 35.1,
       "buildings_floor": 8,
       "vacancy_floor_hi_pct": 0.0,
       "vacancy_floor_lo_pct": 0.0,
@@ -44,16 +44,16 @@
     "anchor_pct": 14.74,
     "alpha": 0.904,
     "gap_pp": 1.6,
-    "coverage_pct": 85.8,
-    "excluded_floor_approx": 18
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 46.8,
+      "estimated_vacancy_pct": 19.6,
       "anchor_pct": 14.74,
-      "alpha": 0.315,
-      "gap_pp": 32.1,
-      "buildings": 88
+      "alpha": 0.752,
+      "gap_pp": 4.9,
+      "buildings": 70
     },
     "mall": {
       "estimated_vacancy_pct": 14.9,
@@ -70,13 +70,6 @@
       "anchor_pct": 14.74,
       "alpha": 0.989,
       "gap_pp": 0.2
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 87.4,
-      "buildings": 18,
-      "anchor_pct": 14.74,
-      "alpha": 0.169,
-      "gap_pp": 72.7
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 19.6,

@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>목동",
   "anchor_vac_small_pct": 1.57689061754669,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 13.4,
-  "alpha_street": 0.746,
-  "gap_pp": 3.4,
-  "buildings_used": 399,
+  "estimated_vacancy_pct": 13.2,
+  "alpha_street": 0.758,
+  "gap_pp": 3.2,
+  "buildings_used": 396,
   "rone_aligned": {
     "mid": {
-      "buildings": 328,
-      "vacancy_units_pct": 17.4,
+      "buildings": 327,
+      "vacancy_units_pct": 17.3,
       "buildings_floor": 327,
       "vacancy_floor_hi_pct": 19.3,
       "vacancy_floor_lo_pct": 32.4,
@@ -19,8 +19,8 @@
       "gap_pp": 11.6
     },
     "small": {
-      "buildings": 35,
-      "vacancy_units_pct": 13.6,
+      "buildings": 34,
+      "vacancy_units_pct": 14.0,
       "buildings_floor": 34,
       "vacancy_floor_hi_pct": 14.0,
       "vacancy_floor_lo_pct": 46.5,
@@ -40,16 +40,16 @@
     "anchor_pct": 10.0,
     "alpha": 0.508,
     "gap_pp": 9.7,
-    "coverage_pct": 99.4,
-    "excluded_floor_approx": 3
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 14.0,
+      "estimated_vacancy_pct": 13.7,
       "anchor_pct": 10.0,
-      "alpha": 0.714,
-      "gap_pp": 4.0,
-      "buildings": 382
+      "alpha": 0.73,
+      "gap_pp": 3.7,
+      "buildings": 379
     },
     "mall": {
       "estimated_vacancy_pct": 28.8,
@@ -66,13 +66,6 @@
       "anchor_pct": 10.0,
       "alpha": 0.347,
       "gap_pp": 18.8
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 55.6,
-      "buildings": 3,
-      "anchor_pct": 10.0,
-      "alpha": 0.18,
-      "gap_pp": 45.6
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 13.7,

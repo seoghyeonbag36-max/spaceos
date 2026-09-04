@@ -2,40 +2,35 @@
   "slug": "samcheong",
   "hub_name": "삼청동·북촌",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T19:46:17",
-  "shown": 638,
-  "excluded_total": 1027,
-  "excluded_unknown": 189,
+  "built_at": "2026-09-04T23:27:43",
+  "shown": 614,
+  "excluded_total": 1051,
+  "excluded_unknown": 2,
   "excluded_non_commercial": 838,
-  "coverage_pct": 38.3,
+  "excluded_determined": 211,
+  "coverage_pct": 36.9,
   "status": {
-    "full": 307,
-    "partial": 84,
-    "high": 12,
+    "full": 288,
+    "partial": 80,
+    "high": 11,
     "empty": 235
   },
   "source": {
     "polygon_only": 235,
-    "stores+ledger": 344,
+    "stores+ledger": 320,
     "pip_only": 47,
     "stores+ledger+pip": 12
   },
   "reference_vacancy_pct": 12.3,
   "reference_buildings": 283,
-  "reference_coverage_pct": 92.8,
-  "mixed_vacancy_pct": 14.1,
+  "reference_coverage_pct": 100.0,
+  "mixed_vacancy_pct": 13.9,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 278,
       "active": 418,
       "capacity": 474,
       "vacancy_pct": 11.8
-    },
-    "floor_approx": {
-      "buildings": 22,
-      "active": 25,
-      "capacity": 31,
-      "vacancy_pct": 19.4
     },
     "expos_units": {
       "buildings": 5,
@@ -44,5 +39,5 @@
       "vacancy_pct": 28.6
     }
   },
-  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용. excluded_determined = 상가 건물이 아님이 **확정**돼 뺀 건물(표제부 비상업 · 층별개요 지상 상업층 0). 재수집해도 안 바뀌므로 reference_coverage_pct 분모에도 들어가지 않는다 — 이 값이 커지는 것은 수집이 덜 됐다는 뜻이 아니다."
 }

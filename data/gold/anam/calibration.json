@@ -3,10 +3,10 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>성신여대",
   "anchor_vac_small_pct": 0.0,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 9.2,
-  "alpha_street": 1.389,
-  "gap_pp": -3.6,
-  "buildings_used": 163,
+  "estimated_vacancy_pct": 8.8,
+  "alpha_street": 1.452,
+  "gap_pp": -4.0,
+  "buildings_used": 162,
   "rone_aligned": {
     "mid": {
       "buildings": 139,
@@ -27,8 +27,8 @@
       "vacancy_area_pct": 0.0
     },
     "mall": {
-      "buildings": 12,
-      "vacancy_units_pct": 28.8
+      "buildings": 11,
+      "vacancy_units_pct": 26.7
     },
     "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
   },
@@ -38,16 +38,16 @@
     "anchor_pct": 12.78,
     "alpha": 1.727,
     "gap_pp": -5.4,
-    "coverage_pct": 99.4,
-    "excluded_floor_approx": 1
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 6.1,
+      "estimated_vacancy_pct": 5.6,
       "anchor_pct": 12.78,
-      "alpha": 2.095,
-      "gap_pp": -6.7,
-      "buildings": 153
+      "alpha": 2.282,
+      "gap_pp": -7.2,
+      "buildings": 152
     },
     "mall": {
       "estimated_vacancy_pct": 21.6,
@@ -64,13 +64,6 @@
       "anchor_pct": 12.78,
       "alpha": 0.592,
       "gap_pp": 8.8
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 50.0,
-      "buildings": 1,
-      "anchor_pct": 12.78,
-      "alpha": 0.256,
-      "gap_pp": 37.2
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 5.6,

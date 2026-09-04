@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>강남>테헤란로",
   "anchor_vac_small_pct": 1.02678444048604,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 15.1,
-  "alpha_street": 0.599,
-  "gap_pp": 6.1,
-  "buildings_used": 705,
+  "estimated_vacancy_pct": 13.5,
+  "alpha_street": 0.67,
+  "gap_pp": 4.5,
+  "buildings_used": 693,
   "rone_aligned": {
     "mid": {
-      "buildings": 510,
-      "vacancy_units_pct": 26.2,
+      "buildings": 509,
+      "vacancy_units_pct": 26.1,
       "buildings_floor": 509,
       "vacancy_floor_hi_pct": 15.5,
       "vacancy_floor_lo_pct": 30.3,
@@ -19,8 +19,8 @@
       "gap_pp": 6.8
     },
     "small": {
-      "buildings": 20,
-      "vacancy_units_pct": 32.4,
+      "buildings": 17,
+      "vacancy_units_pct": 32.1,
       "buildings_floor": 17,
       "vacancy_floor_hi_pct": 25.0,
       "vacancy_floor_lo_pct": 42.9,
@@ -44,16 +44,16 @@
     "anchor_pct": 9.05,
     "alpha": 0.375,
     "gap_pp": 15.1,
-    "coverage_pct": 98.0,
-    "excluded_floor_approx": 19
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 25.1,
+      "estimated_vacancy_pct": 22.8,
       "anchor_pct": 9.05,
-      "alpha": 0.361,
-      "gap_pp": 16.1,
-      "buildings": 759
+      "alpha": 0.397,
+      "gap_pp": 13.8,
+      "buildings": 740
     },
     "mall": {
       "estimated_vacancy_pct": 27.0,
@@ -70,13 +70,6 @@
       "anchor_pct": 9.05,
       "alpha": 0.335,
       "gap_pp": 18.0
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 84.5,
-      "buildings": 19,
-      "anchor_pct": 9.05,
-      "alpha": 0.107,
-      "gap_pp": 75.5
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 22.8,

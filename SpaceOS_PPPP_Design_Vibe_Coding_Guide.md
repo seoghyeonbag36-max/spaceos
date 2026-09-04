@@ -595,6 +595,11 @@ async def recommend(req: RecommendRequest) -> list[IndustryScore]:
 
 ### 코드 — 공실 히트맵 (Mapbox)
 
+> ⚠ **이 예시는 낡았다(2026-09-04 확인).** 실제 베이스맵은 네이버 지도
+> (`apps/frontend/src/lib/naverMap.ts`)이고 `mapbox-gl` 은 2026-08-25 에
+> 의존성에서 제거됐다. 아래 코드를 그대로 복사하지 말 것 — 이 문서의
+> Mapbox 언급은 전부 착수 시점의 계획이다.
+
 ```tsx
 // apps/frontend/src/components/VacancyHeatmap.tsx
 import { useEffect, useRef } from "react";

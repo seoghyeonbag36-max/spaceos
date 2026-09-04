@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>까치산역",
   "anchor_vac_small_pct": 3.82995239671686,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 29.5,
-  "alpha_street": 0.261,
-  "gap_pp": 21.8,
-  "buildings_used": 440,
+  "estimated_vacancy_pct": 22.0,
+  "alpha_street": 0.35,
+  "gap_pp": 14.3,
+  "buildings_used": 414,
   "rone_aligned": {
     "mid": {
-      "buildings": 276,
-      "vacancy_units_pct": 20.2,
+      "buildings": 274,
+      "vacancy_units_pct": 19.4,
       "buildings_floor": 274,
       "vacancy_floor_hi_pct": 21.7,
       "vacancy_floor_lo_pct": 39.3,
@@ -19,8 +19,8 @@
       "gap_pp": 14.3
     },
     "small": {
-      "buildings": 79,
-      "vacancy_units_pct": 12.3,
+      "buildings": 77,
+      "vacancy_units_pct": 11.7,
       "buildings_floor": 77,
       "vacancy_floor_hi_pct": 12.6,
       "vacancy_floor_lo_pct": 31.5,
@@ -29,8 +29,8 @@
       "gap_pp": 11.7
     },
     "mall": {
-      "buildings": 89,
-      "vacancy_units_pct": 38.7,
+      "buildings": 86,
+      "vacancy_units_pct": 33.8,
       "buildings_floor": 2,
       "vacancy_floor_hi_pct": 0.0,
       "vacancy_floor_lo_pct": 0.0,
@@ -44,16 +44,16 @@
     "anchor_pct": 7.69,
     "alpha": 0.423,
     "gap_pp": 10.5,
-    "coverage_pct": 93.4,
-    "excluded_floor_approx": 32
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 24.1,
+      "estimated_vacancy_pct": 13.3,
       "anchor_pct": 7.69,
-      "alpha": 0.319,
-      "gap_pp": 16.4,
-      "buildings": 398
+      "alpha": 0.578,
+      "gap_pp": 5.6,
+      "buildings": 366
     },
     "mall": {
       "estimated_vacancy_pct": 32.3,
@@ -70,13 +70,6 @@
       "anchor_pct": 7.69,
       "alpha": 0.238,
       "gap_pp": 24.6
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 83.4,
-      "buildings": 32,
-      "anchor_pct": 7.69,
-      "alpha": 0.092,
-      "gap_pp": 75.7
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 13.3,

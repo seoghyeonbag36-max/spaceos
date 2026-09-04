@@ -3,13 +3,13 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>강남>강남대로",
   "anchor_vac_small_pct": 0.0,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 41.4,
+  "estimated_vacancy_pct": 41.3,
   "alpha_street": 0.167,
-  "gap_pp": 34.5,
-  "buildings_used": 747,
+  "gap_pp": 34.4,
+  "buildings_used": 743,
   "rone_aligned": {
     "mid": {
-      "buildings": 625,
+      "buildings": 624,
       "vacancy_units_pct": 22.1,
       "buildings_floor": 624,
       "vacancy_floor_hi_pct": 14.3,
@@ -19,8 +19,8 @@
       "gap_pp": 6.7
     },
     "small": {
-      "buildings": 57,
-      "vacancy_units_pct": 24.5,
+      "buildings": 56,
+      "vacancy_units_pct": 24.8,
       "buildings_floor": 56,
       "vacancy_floor_hi_pct": 14.9,
       "vacancy_floor_lo_pct": 33.7,
@@ -42,16 +42,16 @@
     "anchor_pct": 6.89,
     "alpha": 0.225,
     "gap_pp": 23.8,
-    "coverage_pct": 99.1,
-    "excluded_floor_approx": 9
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 19.9,
+      "estimated_vacancy_pct": 18.7,
       "anchor_pct": 6.89,
-      "alpha": 0.346,
-      "gap_pp": 13.0,
-      "buildings": 844
+      "alpha": 0.369,
+      "gap_pp": 11.8,
+      "buildings": 835
     },
     "mall": {
       "estimated_vacancy_pct": 43.0,
@@ -68,13 +68,6 @@
       "anchor_pct": 6.89,
       "alpha": 0.16,
       "gap_pp": 36.1
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 88.5,
-      "buildings": 9,
-      "anchor_pct": 6.89,
-      "alpha": 0.078,
-      "gap_pp": 81.6
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 18.7,

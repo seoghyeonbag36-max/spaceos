@@ -90,13 +90,15 @@ claude
 
 ```bash
 cd apps/frontend
-npm install            # 의존성 설치 (react, three, mapbox-gl 등)
+npm install            # 의존성 설치 (react, three, @react-three/fiber 등)
 npm run dev            # http://localhost:5173
 ```
 
-- Mapbox 지도가 필요한 화면은 토큰이 있어야 한다. 작업자는 본인 무료 토큰을 발급(https://account.mapbox.com)받아 `apps/frontend/.env`에 넣는다.
+- 지도가 필요한 화면은 **네이버 지도** 키가 있어야 한다(베이스맵은 네이버다 — `mapbox-gl` 은
+  2026-08-25 에 제거됐다). 키를 `apps/frontend/.env` 에 넣고, NCP 콘솔의 Web 서비스 URL 에
+  `http://localhost:5173` 을 등록한다.
   ```
-  VITE_MAPBOX_TOKEN=pk.작업자_본인_토큰
+  VITE_NAVER_MAPS_KEY_ID=발급받은_키
   ```
 - 백엔드 데이터가 필요 없는 순수 UI 작업이라면 백엔드를 띄우지 않아도 화면 디자인은 가능하다(데이터는 목업으로).
 
@@ -151,7 +153,7 @@ npm run build          # 타입체크 + 빌드 통과해야 함
 - [ ] `npm install -g @anthropic-ai/claude-code` 설치
 - [ ] 프로젝트 폴더에서 `claude` 실행 + 로그인
 - [ ] `cd apps/frontend && npm install && npm run dev` → localhost:5173 확인
-- [ ] (지도 화면 시) 본인 Mapbox 토큰을 `apps/frontend/.env`에 설정
+- [ ] (지도 화면 시) 네이버 지도 키를 `apps/frontend/.env` 의 `VITE_NAVER_MAPS_KEY_ID` 에 설정
 - [ ] `/frontend-dev` 슬래시 커맨드로 첫 화면 시안 작업 시도
 - [ ] `npm run build` 통과 확인 후 커밋/전달
 

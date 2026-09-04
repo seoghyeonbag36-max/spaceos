@@ -3,10 +3,10 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>불광역",
   "anchor_vac_small_pct": 7.12709570281399,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 11.9,
-  "alpha_street": 1.186,
-  "gap_pp": -2.2,
-  "buildings_used": 420,
+  "estimated_vacancy_pct": 10.4,
+  "alpha_street": 1.357,
+  "gap_pp": -3.7,
+  "buildings_used": 406,
   "rone_aligned": {
     "mid": {
       "buildings": 216,
@@ -19,8 +19,8 @@
       "gap_pp": 9.9
     },
     "small": {
-      "buildings": 84,
-      "vacancy_units_pct": 16.7,
+      "buildings": 81,
+      "vacancy_units_pct": 14.9,
       "buildings_floor": 81,
       "vacancy_floor_hi_pct": 15.8,
       "vacancy_floor_lo_pct": 29.8,
@@ -29,8 +29,8 @@
       "gap_pp": 11.9
     },
     "mall": {
-      "buildings": 56,
-      "vacancy_units_pct": 40.7,
+      "buildings": 55,
+      "vacancy_units_pct": 40.0,
       "buildings_floor": 5,
       "vacancy_floor_hi_pct": 28.6,
       "vacancy_floor_lo_pct": 28.6,
@@ -44,16 +44,16 @@
     "anchor_pct": 14.12,
     "alpha": 0.784,
     "gap_pp": 3.9,
-    "coverage_pct": 96.3,
-    "excluded_floor_approx": 14
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 19.1,
+      "estimated_vacancy_pct": 15.0,
       "anchor_pct": 14.12,
-      "alpha": 0.739,
-      "gap_pp": 5.0,
-      "buildings": 328
+      "alpha": 0.941,
+      "gap_pp": 0.9,
+      "buildings": 314
     },
     "mall": {
       "estimated_vacancy_pct": 23.1,
@@ -70,13 +70,6 @@
       "anchor_pct": 14.12,
       "alpha": 0.611,
       "gap_pp": 9.0
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 78.1,
-      "buildings": 14,
-      "anchor_pct": 14.12,
-      "alpha": 0.181,
-      "gap_pp": 64.0
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 15.0,

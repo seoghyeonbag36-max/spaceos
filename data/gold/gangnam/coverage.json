@@ -2,27 +2,28 @@
   "slug": "gangnam",
   "hub_name": "강남역·강남대로",
   "tier": "Tier1(대장)",
-  "built_at": "2026-08-23T19:44:54",
-  "shown": 991,
-  "excluded_total": 662,
-  "excluded_unknown": 139,
+  "built_at": "2026-09-04T23:27:35",
+  "shown": 987,
+  "excluded_total": 666,
+  "excluded_unknown": 28,
   "excluded_non_commercial": 523,
-  "coverage_pct": 60.0,
+  "excluded_determined": 115,
+  "coverage_pct": 59.7,
   "status": {
-    "full": 543,
+    "full": 542,
     "partial": 176,
-    "high": 98,
+    "high": 95,
     "empty": 174
   },
   "source": {
-    "stores+ledger": 747,
+    "stores+ledger": 743,
     "pip_only": 70,
     "polygon_only": 174
   },
   "reference_vacancy_pct": 30.5,
   "reference_buildings": 661,
-  "reference_coverage_pct": 99.4,
-  "mixed_vacancy_pct": 41.4,
+  "reference_coverage_pct": 100.0,
+  "mixed_vacancy_pct": 41.3,
   "by_capacity_method": {
     "floor_ouln": {
       "buildings": 534,
@@ -35,13 +36,7 @@
       "active": 1985,
       "capacity": 3532,
       "vacancy_pct": 43.8
-    },
-    "floor_approx": {
-      "buildings": 4,
-      "active": 4,
-      "capacity": 25,
-      "vacancy_pct": 84.0
     }
   },
-  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용."
+  "note": "excluded_unknown = 건축물대장에서 capacity 를 얻지 못해 지도에서 뺀 건물. 공개 지도에는 노출하지 않는다(관리자 전용). reference_vacancy_pct = 분모 근거가 정밀한 방법(expos_units·floor_ouln)만 집계한 대표값이며 reference_coverage_pct 가 낮으면 신뢰하지 말 것. mixed_vacancy_pct(구 reference)는 floor_approx 를 섞은 값이라 방법 구성비에 따라 흔들린다 — 하위호환용. excluded_determined = 상가 건물이 아님이 **확정**돼 뺀 건물(표제부 비상업 · 층별개요 지상 상업층 0). 재수집해도 안 바뀌므로 reference_coverage_pct 분모에도 들어가지 않는다 — 이 값이 커지는 것은 수집이 덜 됐다는 뜻이 아니다."
 }

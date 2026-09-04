@@ -223,7 +223,10 @@ TRDAR 과 생활인구는 어느 하나가 낫다기보다 **축이 반대**다:
 (`api/v1/heatmap.py::footfall` 과 `MapShell` 슬라이더는 08-23 에 섰다 — 생활인구를
 붙일 때는 `footfall_layer` 의 시간 축만 갈아끼우면 된다.)
 
-⚠ 아래 §2 의 **Mapbox 안내는 낡았다** — 실제 베이스맵은 네이버 지도(`lib/naverMap.ts`)다.
+⚠ 아래 **§3·§4 는 착수 시점의 계획**이라 Mapbox 를 전제한다 — 이력으로만 읽을 것.
+실제 베이스맵은 네이버 지도(`lib/naverMap.ts`)이고 `mapbox-gl` 은 2026-08-25 에
+의존성에서 제거됐다(`docs/decision-infra-layer-2026-08-25.md`). §2 의 실행 절차는
+2026-09-04 에 현재 값으로 고쳤다.
 
 ### 분모에서 고시원·독서실·주거를 걷어냈다 (2026-08-23)
 
@@ -502,6 +505,51 @@ premium 12.6평** — 대리값이 1.5배 작다. 매출이 면적에 비례하�
 정한 뒤의 별도 판단이다 — 공정재 정보공개서(`ESSENTIAL_PARAMETER_ERROR` 로 막힌 §0-E)를
 기다릴 이유는 없어졌다.
 
+### no-com-floor — 커버리지가 세고 있던 것은 결손이 아니었다 (2026-09-04)
+
+`대표 집계 커버리지` 가 65/66 에서 멈춰 있었고 미달은 doksan 83.5% 한 곳이었다.
+남은 13동을 수집 과제로 적기 전에 프리플라이트로 세어 보니 **회수 가능분이 0** 이었다:
+13동 전부 2026-09-01 에 층별개요를 정상 수신했고, 지상 상업층이 0 으로 확정된
+건물이다(`bronze/doksan/2026-09-01/bldg_flr_raw.json` 대조, 미시도 0동).
+
+즉 커버리지가 재고 있던 것은 "덜 모았다"가 아니라 **라벨이 겹친다** 였다.
+`floor_approx` 하나가 두 상태를 가리키고 있었다.
+
+| 상태 | 뜻 | 옳은 대응 |
+|---|---|---|
+| 아직 못 쟀다 | 층별개요 미시도 | 수집한다 — 커버리지 분모에 남아야 한다 |
+| 재 봤더니 상가층이 없다 | 층별개요 수신 · 지상 상업층 0 | **판정**이다 — 분모에서 빠져야 한다 |
+
+둘째 것을 `no_com_floor` 로 갈랐다(`data/collectors/building_vacancy.NO_COM_FLOOR`).
+강등은 API 콜 없이 `recalc_floor_ouln` 이 bronze 원본에서 한다.
+
+**왜 지도에서도 빼는가.** `floor_approx` 의 capacity 는 *지상 전체 층수* 다. 그래서
+13층 오피스텔(어반팰리스, 점포 2건)이 `capacity 13 / active 2` 로 계산돼 지도에
+**"공실 84.6%"** 로 칠해지고 있었다. 강등 대상 634동의 지상층 주용도를 세면
+여관 1,200 · 기타일반숙박 496 · 사무소 455 · 오피스텔 338 · 관광호텔 299 · 고시원 163
+— `NON_CAPACITY_PURPS` 모집단 그 자체다. 상가 건물이 아닌 것에 상가 공실률을 붙여
+그리고 있었던 셈이다.
+
+**이 변경이 움직이지 않은 것.** 대표 공실률(`reference_vacancy_pct`)은 **66거점 전부
+불변**이다 — 그 값은 원래부터 `expos_units + floor_ouln` 만 세었고, 강등분은 그 밖에
+있었다. `calibration.json` 의 `rone_aligned.mid`(앵커 대조 대표값)도 66거점 불변이다.
+움직인 것은 분모의 정의뿐이다. 지표를 올리려고 데이터를 뺀 것이 아니라는 근거가 이것이다.
+
+**결과**
+
+| | 전 | 후 |
+|---|---|---|
+| 커버리지 ≥90% 거점 | 65/66 (최저 doksan 83.5%) | **66/66 (전부 100%)** |
+| 지도 표시 건물 | — | −672동 (상가 아님이 확정된 것) |
+| `excluded_unknown` | 12,461 중 11,789 이 실은 판정분 | 판정분을 `excluded_determined` 로 분리 |
+
+`excluded_determined` 는 coverage.json 에 새로 실리는 칸이다. **이 값이 커지는 것은
+수집이 덜 됐다는 뜻이 아니다** — 그 구분이 이 절의 요점이다.
+
+⚠ 강등은 **편도가 아니다.** `_TARGET_METHODS` 에 `no_com_floor` 가 들어 있어,
+`NON_CAPACITY_PURPS` 나 `capacity_floors` 가 넓어지면 같은 bronze 원본에서 다시
+`floor_ouln` 으로 올라온다. 회귀는 `data/tests/test_no_com_floor.py` (4건)가 고정한다.
+
 ## 1. 담당 코드 영역
 
 ```
@@ -516,11 +564,11 @@ apps/backend/app/api/v1/districts.py 상권 정보 + /heatmap GeoJSON
 
 ```bash
 cd apps/frontend
-npm install                 # react, three, @react-three/fiber, mapbox-gl, d3, plotly
+npm install                 # react, three, @react-three/fiber, d3, plotly
 npm run dev                 # http://localhost:5173
 
-# Mapbox 토큰 (.env)
-echo "VITE_MAPBOX_TOKEN=pk.xxxx" > .env
+# 네이버 지도 키 (.env) — NCP 콘솔 Web 서비스 URL 에 http://localhost:5173 등록 필수
+echo "VITE_NAVER_MAPS_KEY_ID=xxxx" > .env
 ```
 
 > 백엔드를 함께 띄워야 `/api` 프록시가 동작한다: `cd apps/backend && uvicorn app.main:app --reload`

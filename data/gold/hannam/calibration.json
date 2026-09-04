@@ -3,14 +3,14 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>이태원",
   "anchor_vac_small_pct": 3.85089245838018,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 20.7,
-  "alpha_street": 0.692,
-  "gap_pp": 6.4,
-  "buildings_used": 443,
+  "estimated_vacancy_pct": 20.3,
+  "alpha_street": 0.705,
+  "gap_pp": 6.0,
+  "buildings_used": 440,
   "rone_aligned": {
     "mid": {
-      "buildings": 330,
-      "vacancy_units_pct": 24.3,
+      "buildings": 326,
+      "vacancy_units_pct": 23.5,
       "buildings_floor": 326,
       "vacancy_floor_hi_pct": 18.2,
       "vacancy_floor_lo_pct": 38.2,
@@ -19,8 +19,8 @@
       "gap_pp": 6.1
     },
     "small": {
-      "buildings": 126,
-      "vacancy_units_pct": 17.9,
+      "buildings": 122,
+      "vacancy_units_pct": 14.6,
       "buildings_floor": 122,
       "vacancy_floor_hi_pct": 7.6,
       "vacancy_floor_lo_pct": 28.8,
@@ -44,16 +44,16 @@
     "anchor_pct": 14.31,
     "alpha": 0.601,
     "gap_pp": 9.5,
-    "coverage_pct": 98.2,
-    "excluded_floor_approx": 9
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 19.2,
+      "estimated_vacancy_pct": 17.7,
       "anchor_pct": 14.31,
-      "alpha": 0.746,
-      "gap_pp": 4.9,
-      "buildings": 490
+      "alpha": 0.809,
+      "gap_pp": 3.4,
+      "buildings": 481
     },
     "mall": {
       "estimated_vacancy_pct": 65.6,
@@ -70,13 +70,6 @@
       "anchor_pct": 14.31,
       "alpha": 0.218,
       "gap_pp": 51.3
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 66.7,
-      "buildings": 9,
-      "anchor_pct": 14.31,
-      "alpha": 0.215,
-      "gap_pp": 52.4
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 17.7,

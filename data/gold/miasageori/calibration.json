@@ -3,13 +3,13 @@
   "anchor_source": "R-ONE 중대형상가 공실률 (최신 분기) — 서울>기타>미아사거리",
   "anchor_vac_small_pct": 9.0332654790052,
   "ref_garosu_street_2024_pct": null,
-  "estimated_vacancy_pct": 23.6,
-  "alpha_street": 0.289,
-  "gap_pp": 16.8,
-  "buildings_used": 560,
+  "estimated_vacancy_pct": 22.8,
+  "alpha_street": 0.299,
+  "gap_pp": 16.0,
+  "buildings_used": 551,
   "rone_aligned": {
     "mid": {
-      "buildings": 277,
+      "buildings": 276,
       "vacancy_units_pct": 20.9,
       "buildings_floor": 276,
       "vacancy_floor_hi_pct": 23.7,
@@ -19,7 +19,7 @@
       "gap_pp": 14.0
     },
     "small": {
-      "buildings": 175,
+      "buildings": 174,
       "vacancy_units_pct": 8.1,
       "buildings_floor": 174,
       "vacancy_floor_hi_pct": 12.7,
@@ -40,16 +40,16 @@
     "anchor_pct": 6.82,
     "alpha": 0.373,
     "gap_pp": 11.5,
-    "coverage_pct": 98.5,
-    "excluded_floor_approx": 8
+    "coverage_pct": 100.0,
+    "excluded_floor_approx": 0
   },
   "segments": {
     "street": {
-      "estimated_vacancy_pct": 12.4,
+      "estimated_vacancy_pct": 11.4,
       "anchor_pct": 6.82,
-      "alpha": 0.55,
-      "gap_pp": 5.6,
-      "buildings": 475
+      "alpha": 0.598,
+      "gap_pp": 4.6,
+      "buildings": 467
     },
     "mall": {
       "estimated_vacancy_pct": 46.4,
@@ -66,13 +66,6 @@
       "anchor_pct": 6.82,
       "alpha": 0.147,
       "gap_pp": 39.6
-    },
-    "floor_approx": {
-      "estimated_vacancy_pct": 61.8,
-      "buildings": 8,
-      "anchor_pct": 6.82,
-      "alpha": 0.11,
-      "gap_pp": 55.0
     },
     "floor_ouln": {
       "estimated_vacancy_pct": 11.4,

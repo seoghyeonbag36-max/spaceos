@@ -25,7 +25,7 @@
 
 ## Tech Stack (확정)
 - **FE**: React + TypeScript + Three.js/@react-three/fiber + **네이버 지도**(`lib/naverMap.ts`) + Tailwind
-  - ⚠ `mapbox-gl` 은 package.json 에 남아 있으나 **소스에서 import 0건**이다(베이스맵은 네이버). 제거 판단 대기
+  - `mapbox-gl` 은 **제거됐다**(2026-08-25 커밋 1979bb4 · package.json·lock 모두 정리 완료). 베이스맵은 네이버뿐이니 다시 끌어오지 말 것
 - **BE**: FastAPI + PostgreSQL/PostGIS + Redis + Celery
 - **ML**: PyTorch + PyTorch Geometric (GNN) + LSTM + MLflow + LangChain
 - **Data**: Airflow + Selenium/Playwright + Bronze/Silver/Gold 3계층
