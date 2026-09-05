@@ -38,7 +38,8 @@ export function caveatKind(
   return "planned";                    // 계획상가 밀집 · 대표값 한계 등
 }
 
-const MARK: Record<Exclude<CaveatKind, null>, string> = {
+/** 예외 표식 — 목록·패널이 같은 기호를 쓰도록 여기가 단일 출처다. */
+export const MARK: Record<Exclude<CaveatKind, null>, string> = {
   mall: "▣",        // 시설 한 채
   planned: "▤",     // 계획상가 밀집
   withheld: "▨",    // 대표값을 내렸다 — 표식만으로도 다른 둘과 구분돼야 한다

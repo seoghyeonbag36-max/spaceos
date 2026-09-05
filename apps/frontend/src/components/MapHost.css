@@ -1,0 +1,52 @@
+/* 공유 지도 셸 — 좌측 내비 레일(--rail-w) 오른쪽 전부를 지도가 쓴다.
+   이 규칙은 종전 MapShell.css 의 `.mapshell` 에 있던 것을 그대로 옮긴 것이다
+   (2026-09-05 지도 셸 승격 — 설계서 §10-1). */
+.maphost {
+  position: fixed;
+  inset: 0 0 0 var(--rail-w, 0px);
+  overflow: hidden;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  color: var(--ink, #1c2533);
+}
+
+/* 지도 뷰가 아닐 때 — 언마운트하지 않고 숨긴다.
+   display:none 은 컨테이너를 0×0 으로 만들어 다시 보일 때 지도가 접힌 채로 남는다.
+   visibility 는 레이아웃을 그대로 두므로 SDK 에 resize 를 알릴 필요가 없다. */
+.maphost.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.maphost .map-canvas {
+  position: absolute;
+  inset: 0;
+  /* ⚠ inset:0 만으로 크기를 잡지 말 것. 네이버 지도 SDK 가 초기화하면서 컨테이너의
+     position 을 relative 로 덮어쓰는데, 그러면 inset 이 사이징이 아니라 오프셋으로
+     해석돼 높이가 0 으로 접힌다(2026-08-01 실측 — 지도가 아예 안 보였다).
+     width/height 100% 는 position 이 뭐가 되든 부모(.maphost)를 채운다. */
+  width: 100%;
+  height: 100%;
+  background: #e9eef5; /* 지도 로드 전/실패 시 바탕 */
+  outline: none;
+}
+
+/* 지도 키 미설정/도메인 미등록 시 안내 (레이아웃은 그대로 시연) */
+.maphost .map-note {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  color: var(--muted, #6b7280);
+  background: var(--bg, #f4f7fb);
+  z-index: 1;
+}
+.maphost .map-note strong { color: var(--ink, #1c2533); font-size: 15px; }
+.maphost .map-note code {
+  background: #fff; border: 1px solid var(--line, #e3e9f2);
+  border-radius: 6px; padding: 2px 6px; font-size: 12px;
+}

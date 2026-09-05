@@ -9,12 +9,13 @@
 // 거점은 하드코딩(gangnam-garosugil)이 아니라 **실측 거점 목록에서 고른다** —
 // vacancy_source === "gold" 인 거점만 건물 폴리곤이 있고, 합성 거점은 404 라 빈 지도가 된다.
 //
-// ⚠ 이 컴포넌트는 position:fixed 로 뷰포트(좌측 레일 제외)를 통째로 채운다 —
-//   부모 레이아웃에 기대지 않는다. 지도 캔버스 사이징 함정은
-//   MapShell.css 의 .map-canvas 주석 참조.
+// ⚠ 2026-09-05: **지도는 더 이상 이 컴포넌트가 만들지 않는다.** MapHost 가 앱 전체에서
+//   하나만 만들어 들고 있고(설계서 §10-1), 여기서는 그 위에 오버레이만 그린다.
+//   그전에는 탭을 옮길 때마다 지도가 죽고 다시 태어나 사용자가 맞춘 카메라가 날아갔다.
+//   이 컴포넌트의 루트는 이제 MapHost 안을 채우는 절대배치 레이어다(MapShell.css 참조).
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import DistrictPicker, { CaveatNote } from "@/components/DistrictPicker";
-import { loadNaverMaps, describeNaverMapError } from "@/lib/naverMap";
+import { useMapHost } from "@/components/MapHost";
 import { getBuildingVacancy, getDensityHeatmap, getFootfallHeatmap, getRentHeatmap, listDistricts, recommendIndustry,
   type DensityHeatmap, type DistrictSummary, type FootfallHeatmap, type GeoJSONFC, type IndustryRecommend, type RentHeatmap } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
@@ -119,11 +120,9 @@ function rentColor(v: number, min: number, max: number) {
 }
 
 export default function MapShell() {
-  const elRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
+  // 지도는 MapHost 소유다 — 여기서는 빌려 쓰기만 한다.
+  const { map, ready } = useMapHost();
   const overlaysRef = useRef<any[]>([]);
-  const [ready, setReady] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
   const [layer, setLayer] = useState<Layer>("vacancy");
   const [buildings, setBuildings] = useState<Building[]>(LOCAL_BUILDINGS);
   const [rentHm, setRentHm] = useState<RentHeatmap | null>(null);
@@ -222,44 +221,30 @@ export default function MapShell() {
 
   // 거점이 바뀌면 지도도 그 거점으로 옮긴다
   useEffect(() => {
-    if (!ready || !hub) return;
+    if (!ready || !hub || !map) return;
     const naver = (window as any).naver;
-    mapRef.current?.setCenter(new naver.maps.LatLng(center.lat, center.lng));
-  }, [ready, hub, center.lat, center.lng]);
-
-  // 지도 1회 초기화
-  useEffect(() => {
-    let alive = true;
-    loadNaverMaps()
-      .then(() => {
-        if (!alive || !elRef.current) return;
-        const naver = (window as any).naver;
-        mapRef.current = new naver.maps.Map(elRef.current, {
-          center: new naver.maps.LatLng(GAROSU.lat, GAROSU.lng),
-          zoom: 16, scaleControl: false, mapDataControl: false,
-        });
-        setReady(true);
-      })
-      .catch((e) => alive && setErr(describeNaverMapError(e)));
-    return () => { alive = false; };
-  }, []);
+    map.setCenter(new naver.maps.LatLng(center.lat, center.lng));
+  }, [ready, map, hub, center.lat, center.lng]);
 
   const clearOverlays = () => {
     overlaysRef.current.forEach((o) => o.setMap?.(null));
     overlaysRef.current = [];
   };
 
+  // 이 탭을 떠날 때 Page 레이어를 걷는다 — 지도는 계속 살아 있으므로, 안 걷으면
+  // 거점 탭으로 옮겨도 건물 폴리곤이 그대로 남는다.
+  useEffect(() => clearOverlays, []);
+
   const focus = (b: Building) => {
     setSelected(b);
     const naver = (window as any).naver;
-    mapRef.current?.panTo(new naver.maps.LatLng(b.center.lat, b.center.lng));
+    map?.panTo(new naver.maps.LatLng(b.center.lat, b.center.lng));
   };
 
   // 레이어 전환/데이터 변경 → 오버레이 다시 그림 (form follows data)
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !map) return;
     const naver = (window as any).naver;
-    const map = mapRef.current;
     clearOverlays();
 
     if (layer === "vacancy") {
@@ -332,24 +317,13 @@ export default function MapShell() {
         overlaysRef.current.push(poly);
       });
     }
-  }, [layer, ready, buildings, rentHm, footHm, densHm, center.lat, center.lng]);
+  }, [layer, ready, map, buildings, rentHm, footHm, densHm, center.lat, center.lng]);
 
   const filtered = useMemo(() => buildings.filter((b) => !q || b.name.includes(q)), [buildings, q]);
 
   return (
     <div className="mapshell">
-      <div ref={elRef} className="map-canvas" />
-
-      {err && (
-        <div className="map-note">
-          <strong>네이버 지도를 불러오지 못했습니다</strong>
-          <div>{err}</div>
-          <div>
-            NCP 콘솔 &gt; Maps &gt; Application 의 Web 서비스 URL 에{" "}
-            <code>{window.location.origin}</code> 을 등록해야 합니다.
-          </div>
-        </div>
-      )}
+      {/* 지도 캔버스와 인증 실패 안내는 MapHost 가 그린다 — 여기는 오버레이만. */}
 
       {/* 상단: 거점 선택 + 검색 + 레이어 토글 */}
       <div className="overlay overlay-top">

@@ -5,11 +5,13 @@ import PostingConsole from "@/pages/PostingConsole";
 import PageDashboard from "@/pages/PageDashboard";
 import AdminCoverage from "@/pages/AdminCoverage";
 import ProgramStudio from "@/pages/ProgramStudio";
+import MapHost from "@/components/MapHost";
 import "./App.css";
 
-// 지도 뷰는 네이버 지도 SDK(지도 + 거리뷰 파노라마)를 끌고 들어온다 — 눌렀을 때만 받는다.
-// 2026-09-05 에 3D 트윈이 빠지며 이 청크는 832KB 만큼 가벼워졌지만, SDK 는 그대로라 lazy 를 유지한다.
+// 지도 위 오버레이 두 벌 — 지도 SDK 는 MapHost 가 받지만, 이 화면들도 거리뷰·층 스택 등
+// 무거운 자식을 끌고 들어오므로 눌렀을 때만 받는다.
 const MapShell = lazy(() => import("@/pages/MapShell"));
+const HubExplorer = lazy(() => import("@/pages/HubExplorer"));
 
 /**
  * SpaceOS 프론트엔드 진입점.
@@ -52,19 +54,28 @@ const NAV: { key: View; label: string; icon: JSX.Element }[] = [
 export default function App() {
   const [view, setView] = useState<View>("seoul");
   const [isAdmin, setIsAdmin] = useState(() => window.location.hash === "#admin");
+  const [isBoard, setIsBoard] = useState(() => window.location.hash === "#board");
 
   useEffect(() => {
-    const onHash = () => setIsAdmin(window.location.hash === "#admin");
+    const onHash = () => {
+      setIsAdmin(window.location.hash === "#admin");
+      setIsBoard(window.location.hash === "#board");
+    };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
   if (isAdmin) return <AdminCoverage />;
+  // #board 는 종전 거점 보드(PageDashboard). 「거점」 탭이 HubExplorer 로 바뀌면서
+  // 갈 곳을 잃었는데, 층별 매물·입점·마케팅 섹션이 아직 다른 화면으로 다 옮겨지지
+  // 않아 지우지 않고 해시로 남겼다. TODO: 세 섹션의 이사가 끝나면 이 화면을 뺀다.
+  if (isBoard) return <PageDashboard />;
 
-  // 지도 뷰: MapShell 이 스스로 position:fixed 로 레일 오른쪽 전체를 채운다.
-  // 셸은 문서 스크롤만 잠근다(대시보드 두 뷰는 기존대로 창 스크롤 하나만 쓴다 —
+  // 지도 뷰: 지도는 MapHost 가 position:fixed 로 레일 오른쪽 전체를 채운다.
+  // 셸은 문서 스크롤만 잠근다(대시보드 뷰들은 기존대로 창 스크롤 하나만 쓴다 —
   // 내부 overflow 를 두면 스크롤바가 2개로 보인다, 2026-07-24 수정).
-  const isMap = view === "map";
+  // 2026-09-05: **거점 탭도 지도 뷰다.** 두 탭이 같은 지도 인스턴스를 공유한다.
+  const isMap = view === "map" || view === "hubs";
 
   return (
     <div className={"appshell" + (isMap ? " is-map" : "")}>
@@ -87,14 +98,18 @@ export default function App() {
         {view === "seoul" && <SeoulDashboard />}
         {view === "platform" && <PlatformConsole />}
         {view === "posting" && <PostingConsole />}
-        {view === "hubs" && <PageDashboard />}
         {view === "program" && <ProgramStudio />}
-        {isMap && (
-          <Suspense fallback={<div style={{ padding: 24, fontSize: 13, color: "#6b7280" }}>지도 불러오는 중…</div>}>
-            <MapShell />
-          </Suspense>
-        )}
       </main>
+
+      {/* 지도는 앱 수명 동안 **하나**다. 탭이 바뀌어도 언마운트하지 않고 오버레이만
+          갈아끼운다 — 그래야 사용자가 맞춰 둔 중심·줌이 탭 왕복에도 남는다.
+          지도 뷰가 아닐 때는 visibility 로 숨긴다(MapHost.css 참조). */}
+      <MapHost active={isMap}>
+        <Suspense fallback={<div className="map-loading">지도 화면 불러오는 중…</div>}>
+          {view === "hubs" && <HubExplorer />}
+          {view === "map" && <MapShell />}
+        </Suspense>
+      </MapHost>
     </div>
   );
 }
