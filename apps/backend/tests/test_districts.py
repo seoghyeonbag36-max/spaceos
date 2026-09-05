@@ -47,15 +47,13 @@ def test_list_districts():
     assert len(data) == len(PAGES) == len(PAGES_BY_ID)
     assert {d["id"] for d in data} == set(PAGES_BY_ID)
     for d in data:
-        # Gold 만으로 선 실측 거점에는 감성구역 시드가 없으므로 None 이 측정 부재를 뜻한다.
-        if d["measured_only"]:
-            assert d["sentiment"] is None
-            assert d["reviews"] is None
-            assert d["risk_zones"] is None
-        else:
-            assert 0 <= d["sentiment"] <= 100
-            assert d["reviews"] is not None
-            assert d["risk_zones"] is not None
+        # 감성은 **어느 거점에서도 재지 않았다**(2026-09-05). 종전에는 시드 54거점만
+        # 손으로 적은 값을 갖고 실측 12거점은 None 이라 갈라져 있었는데, 구역을 행정동
+        # 실측으로 갈면서 그 입력이 사라졌다 — 이제 66거점이 똑같이 None 이다.
+        # 0 으로 채우면 "쟀더니 0" 으로 읽힌다(docs/feature-platform.md §0-K·§0-M).
+        assert d["sentiment"] is None, d["id"]
+        assert d["reviews"] is None, d["id"]
+        assert d["risk_zones"] is None, d["id"]
         # 대표값을 내린 거점(계획상가 밀집)은 None 이 정상이다. 그 자리를 0 으로
         # 채우면 "공실 0%" 로 읽히므로, **누가 내렸는지**를 플래그로 함께 확인한다.
         if d["vacancy_rate"] is None:
@@ -97,13 +95,22 @@ def test_district_summary_and_detail():
 
     r = client.get(f"{V1}/commercial-districts/garosugil")
     assert r.status_code == 200
-    assert len(r.json()["zones"]) == 6
-    assert len(r.json()["units"]) == 5
+    body = r.json()
+    # 구역 수는 **거점이 걸친 행정동 수**라 거점마다 다르다(1~11). 전 거점이 똑같이
+    # 6개였던 것은 실측이 아니라 시드 서식이었다 — 그래서 개수를 박지 않고 성질을 잰다.
+    assert body["zones"], "garosugil 에 구역이 없다 — build_district_zones 미실행?"
+    for z in body["zones"]:
+        assert z["vacancy_rate"] is not None      # 실측
+        assert z["s"] is None                     # 감성은 못 잰다
+    assert len(body["units"]) == 5
 
 
 def test_sentiment_and_heatmap():
+    # ⚠ 엔드포인트 이름은 /sentiment 인데 감성은 실려 있지 않다 — 2026-09-05 에 손으로
+    # 적은 감성 구역을 행정동 실측 구역으로 갈았다. 이름은 공개 API 표면이라 두었고,
+    # 필드가 그 사실을 밝힌다(services/districts.get_sentiment).
     r = client.get(f"{V1}/commercial-districts/seongsu/sentiment")
-    assert r.status_code == 200 and len(r.json()) == 6
+    assert r.status_code == 200 and r.json()
 
     r = client.get(f"{V1}/heatmap/vacancy", params={"district": "seongsu"})
     assert r.status_code == 200

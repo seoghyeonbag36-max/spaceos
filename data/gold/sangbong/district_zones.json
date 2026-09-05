@@ -1,0 +1,99 @@
+{
+ "slug": "sangbong",
+ "built_at": "2026-09-05T11:04:16+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 274,
+  "knn_vs_pnu_compared": 274,
+  "knn_vs_pnu_agree_pct": 98.9
+ },
+ "dropped_spillover": [
+  {
+   "n": "면목2동",
+   "buildings": 3,
+   "stores": 90,
+   "capacity": 13,
+   "active": 8
+  },
+  {
+   "n": "중화2동",
+   "buildings": 2,
+   "stores": 159,
+   "capacity": 5,
+   "active": 3
+  }
+ ],
+ "residual": {
+  "buildings": 5,
+  "capacity": 18,
+  "active": 11
+ },
+ "zones": [
+  {
+   "n": "상봉2동",
+   "grp": "상봉동",
+   "lat": 37.594632,
+   "lng": 127.086488,
+   "stores": 1166,
+   "buildings": 181,
+   "capacity": 380,
+   "active": 320,
+   "vacancy_rate": 15.79,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "상봉1동",
+   "grp": "상봉동",
+   "lat": 37.599038,
+   "lng": 127.087218,
+   "stores": 461,
+   "buildings": 47,
+   "capacity": 93,
+   "active": 79,
+   "vacancy_rate": 15.05,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "중화1동",
+   "grp": "중화동",
+   "lat": 37.599719,
+   "lng": 127.081805,
+   "stores": 312,
+   "buildings": 34,
+   "capacity": 69,
+   "active": 51,
+   "vacancy_rate": 26.09,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "면목본동",
+   "grp": "면목동",
+   "lat": 37.592858,
+   "lng": 127.088873,
+   "stores": 108,
+   "buildings": 7,
+   "capacity": 20,
+   "active": 14,
+   "vacancy_rate": 30.0,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  }
+ ]
+}

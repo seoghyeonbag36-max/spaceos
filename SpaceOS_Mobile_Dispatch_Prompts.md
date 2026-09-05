@@ -42,7 +42,7 @@ SpaceOS 저장소에서 Claude Code 세션으로 작업해줘.
 
 1. 25구 폴리곤(src/lib/seoul/districts.ts) 위에 공실률을 색으로 칠하는 히트맵 레이어를 올리고, 기존 VacancyLegend 컴포넌트(src/design/components/VacancyLegend.tsx)로 deployOrder 구간 범례를 단다(서울 Phase 계획 색 구간과 동일하게).
 2. 구 클릭 시 우측/하단 패널에 해당 구 요약(공실률·phase·추천 업종 Top3)을 표시. 데이터는 src/lib/api.ts 경유 /api/v1/heatmap·/api/v1/ai 에서 가져오되, 미구현 엔드포인트는 mock + TODO 주석.
-3. 선택한 구의 대표 블록을 @react-three/fiber로 가볍게 3D 렌더(로딩 3초 이내 목표). 미설치면 설치 여부부터 확인하고, 무거우면 토글로 분리.
+3. 선택한 구의 대표 건물을 **2D 층 스택 + 네이버 거리뷰**(`components/BuildingViewer.tsx`)로 띄운다(로딩 3초 이내 목표). ⚠ **3D(@react-three/fiber)를 새로 깔지 말 것** — 2026-09-05 에 제거했다(feature-posting.md §0-V).
 4. 베이스맵은 네이버지도 경로만 사용(mapbox 잔존 코드는 없다 — 2026-08-25 제거). Tailwind 대신 기존 design/tokens·styles/tokens.css 유지.
 
 npm run build(타입체크 통과)까지 확인하고, 변경 파일과 스크린샷을 알려줘.

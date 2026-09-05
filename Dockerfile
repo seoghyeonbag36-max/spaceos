@@ -74,7 +74,7 @@ RUN set -eu; \
       echo "빌드 중단: 프론트 index.html 이 없다 — 빌드 산출물이 안 들어왔다"; exit 1; \
     fi; \
     if [ "$n" -lt 50 ]; then \
-      echo "빌드 중단: page_building_master.geojson 이 ${n}개뿐이다 (54거점 기준 50 미만)"; \
+      echo "빌드 중단: page_building_master.geojson 이 ${n}개뿐이다 (임계 50 미만 — 2026-09-05 실측 73개)"; \
       echo "  업로드 규칙(.gitignore/.dockerignore)이 바뀌어 gold 가 빠졌을 가능성이 크다"; exit 1; \
     fi; \
     echo "가드 통과: gold 거점 ${n}개 · 프론트 index.html 있음"

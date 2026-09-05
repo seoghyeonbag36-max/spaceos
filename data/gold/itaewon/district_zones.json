@@ -1,0 +1,84 @@
+{
+ "slug": "itaewon",
+ "built_at": "2026-09-05T11:04:05+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 400,
+  "knn_vs_pnu_compared": 400,
+  "knn_vs_pnu_agree_pct": 99.0
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "이태원1동",
+   "grp": "이태원동",
+   "lat": 37.533694,
+   "lng": 126.992745,
+   "stores": 1657,
+   "buildings": 292,
+   "capacity": 728,
+   "active": 652,
+   "vacancy_rate": 10.44,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "한남동",
+   "grp": "한남동",
+   "lat": 37.536004,
+   "lng": 126.999057,
+   "stores": 704,
+   "buildings": 77,
+   "capacity": 209,
+   "active": 172,
+   "vacancy_rate": 17.7,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "이태원2동",
+   "grp": "이태원동",
+   "lat": 37.537986,
+   "lng": 126.990598,
+   "stores": 475,
+   "buildings": 17,
+   "capacity": 30,
+   "active": 22,
+   "vacancy_rate": 26.67,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "보광동",
+   "grp": "보광동",
+   "lat": 37.530957,
+   "lng": 126.997497,
+   "stores": 159,
+   "buildings": 14,
+   "capacity": 23,
+   "active": 21,
+   "vacancy_rate": 8.7,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  }
+ ]
+}

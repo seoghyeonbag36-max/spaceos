@@ -20,9 +20,9 @@
 ### Q2. 실제 공실 위치·유동인구 흐름을 어떻게 시각화하는가
 베이스: 회의 1번대로 **네이버 지도(Naver Maps JS API v3) 확대** 위 2개 오버레이.
 
-- **공실 위치**: GIS건물통합정보 footprint를 `naver.maps.Polygon`으로 그리고 `fillColor`를 점유율 상태(🟢full→🟡partial→🟠high→🔴suspected_empty)로 매핑. 건물 클릭 → 상세 패널 + Three.js 3D 디지털 트윈.
+- **공실 위치**: GIS건물통합정보 footprint를 `naver.maps.Polygon`으로 그리고 `fillColor`를 점유율 상태(🟢full→🟡partial→🟠high→🔴suspected_empty)로 매핑. 건물 클릭 → 상세 패널 + ~~Three.js 3D 디지털 트윈~~ → **2D 층 스택 + 네이버 거리뷰**(`BuildingViewer`, 2026-09-05 교체).
 - **유동인구 흐름**: `naver.maps.visualization.HeatMap`(생활인구 밀도) + **시간 슬라이더 애니메이션**(시간대별 값 재생 = 흐름 근사). 진짜 이동 벡터(OD 유선)는 생활이동/PLIP 확보 시 확장.
-- **한 줄**: 공실은 네이버 지도 위 건물 폴리곤 색상+클릭 3D 트윈, 유동인구는 생활인구 히트맵+시간 슬라이더.
+- **한 줄**: 공실은 네이버 지도 위 건물 폴리곤 색상+클릭 시 2D 층 스택·거리뷰, 유동인구는 생활인구 히트맵+시간 슬라이더.
 
 ---
 

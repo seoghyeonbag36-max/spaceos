@@ -1,0 +1,92 @@
+{
+ "slug": "sinchon",
+ "built_at": "2026-09-05T11:04:08+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 690,
+  "knn_vs_pnu_compared": 690,
+  "knn_vs_pnu_agree_pct": 100.0
+ },
+ "dropped_spillover": [
+  {
+   "n": "신수동",
+   "buildings": 1,
+   "stores": 37,
+   "capacity": 7,
+   "active": 6
+  }
+ ],
+ "residual": {
+  "buildings": 1,
+  "capacity": 7,
+  "active": 6
+ },
+ "zones": [
+  {
+   "n": "신촌동",
+   "grp": "창천동",
+   "lat": 37.558042,
+   "lng": 126.938611,
+   "stores": 2861,
+   "buildings": 499,
+   "capacity": 1439,
+   "active": 1203,
+   "vacancy_rate": 16.4,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "대흥동",
+   "grp": "노고산동",
+   "lat": 37.55425,
+   "lng": 126.939013,
+   "stores": 923,
+   "buildings": 105,
+   "capacity": 280,
+   "active": 224,
+   "vacancy_rate": 20.0,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "서교동",
+   "grp": "노고산동",
+   "lat": 37.555153,
+   "lng": 126.933773,
+   "stores": 541,
+   "buildings": 72,
+   "capacity": 218,
+   "active": 176,
+   "vacancy_rate": 19.27,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "서강동",
+   "grp": "창전동",
+   "lat": 37.553324,
+   "lng": 126.932819,
+   "stores": 141,
+   "buildings": 13,
+   "capacity": 28,
+   "active": 24,
+   "vacancy_rate": 14.29,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  }
+ ]
+}

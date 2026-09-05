@@ -1,0 +1,92 @@
+{
+ "slug": "seolleung",
+ "built_at": "2026-09-05T11:04:11+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 520,
+  "knn_vs_pnu_compared": 520,
+  "knn_vs_pnu_agree_pct": 100.0
+ },
+ "dropped_spillover": [
+  {
+   "n": "삼성1동",
+   "buildings": 1,
+   "stores": 188,
+   "capacity": 3,
+   "active": 3
+  }
+ ],
+ "residual": {
+  "buildings": 1,
+  "capacity": 3,
+  "active": 3
+ },
+ "zones": [
+  {
+   "n": "대치4동",
+   "grp": "대치동",
+   "lat": 37.502768,
+   "lng": 127.052917,
+   "stores": 2783,
+   "buildings": 205,
+   "capacity": 837,
+   "active": 746,
+   "vacancy_rate": 10.87,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "역삼1동",
+   "grp": "역삼동",
+   "lat": 37.505812,
+   "lng": 127.045062,
+   "stores": 2245,
+   "buildings": 158,
+   "capacity": 563,
+   "active": 499,
+   "vacancy_rate": 11.37,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "삼성2동",
+   "grp": "삼성동",
+   "lat": 37.50722,
+   "lng": 127.052101,
+   "stores": 2163,
+   "buildings": 102,
+   "capacity": 458,
+   "active": 406,
+   "vacancy_rate": 11.35,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "역삼2동",
+   "grp": "역삼동",
+   "lat": 37.501618,
+   "lng": 127.044615,
+   "stores": 1730,
+   "buildings": 54,
+   "capacity": 243,
+   "active": 209,
+   "vacancy_rate": 13.99,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  }
+ ]
+}

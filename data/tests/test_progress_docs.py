@@ -1,4 +1,4 @@
-"""PPPP 진행 문서가 2026-08-29 구현 계약과 함께 움직이는지 검증한다."""
+"""PPPP 진행 문서가 구현 계약과 함께 움직이는지 검증한다(기준 갱신 2026-09-05)."""
 
 import json
 import subprocess
@@ -18,8 +18,13 @@ def test_canonical_progress_names_current_state_and_remaining_work() -> None:
     """정본은 완료된 작업을 다시 '다음 작업'으로 만들지 않아야 한다."""
     doc = _read("docs/spaceos-vibe-build-sequence.md")
 
-    assert "현재 위치 요약 (2026-09-04)" in doc
-    assert "Posting" in doc and "97.6%" in doc
+    assert "현재 위치 요약 (2026-09-05)" in doc
+    # 2026-09-05: `area` 게이트를 관측 전용으로 강등하며 Posting 이 97.6 → 100% 가 됐다.
+    # 이 가드가 옛 값을 고정하고 있으면 **가드 자신이 드리프트의 원인**이 된다 —
+    # 실제로 그날 아래 세 번째 테스트는 100.0 을 고정하는데 이 줄은 97.6% 를 요구해
+    # 두 단언이 서로 모순이었다. 정본에 옛 값이 남지 않았음을 대신 고정한다.
+    assert "Posting" in doc
+    assert "97.6%" not in doc and "99.7%" not in doc
     assert "Platform" in doc and "관측 전용" in doc
     assert "상용 입력 온보딩" in doc
     assert "B2B 파일럿" in doc

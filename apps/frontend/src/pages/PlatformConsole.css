@@ -151,6 +151,7 @@
 .platconsole .badge.is-ground{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
 .platconsole .badge.is-warn{color:#8a5a00;background:#fdf5e3;border:1px solid #f0dcae}
 .platconsole .badge.is-seed{color:#8a93a0;background:#f6f7f9;border:1px dashed #cfd5dd}
+.platconsole .badge.is-measured{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
 
 /* 분기 세그먼트 */
 .platconsole .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;width:fit-content;margin-bottom:12px}
@@ -218,19 +219,23 @@
 .platconsole .recnote{font-size:10.5px;color:#9aa3af;line-height:1.6}
 .platconsole .recnote b{color:var(--sub)}
 
-/* ── 감성(시드) — 회색 배경 · 점선 테두리로 위 카드들과 서열을 가른다 ── */
-.platconsole .seedwrap{margin-top:16px;background:#f6f7f9;border:1px dashed #cfd5dd;border-radius:13px;padding:15px 16px}
-.platconsole .seedhd h2{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px;color:#5a6b85}
-.platconsole .seednote{font-size:11.5px;color:var(--sub);line-height:1.65;margin-top:6px;max-width:860px}
-.platconsole .seednote b{color:#5a6b85}
-.platconsole .seedsum{font-size:11px;font-weight:700;color:#8a93a0;margin-top:8px}
-.platconsole .seedwrap .empty{background:#fff;margin-top:10px}
+/* ── 구역(행정동 실측) ──────────────────────────────────────────────────
+   2026-09-05 이전에는 손으로 적은 감성 구역이라 회색 배경 + 점선으로 위 카드들과
+   서열을 갈라 두었다. 지금은 값이 실측이라 실선으로 올린다 — 다만 **감성만은
+   여전히 없고**, 그 사실은 배경색이 아니라 카드 안의 "감성 실측 없음"이 말한다. */
+.platconsole .zonewrap{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px 16px}
+.platconsole .zonehd h2{font-size:15px;font-weight:800;display:flex;align-items:center;gap:7px}
+.platconsole .zonenote{font-size:11.5px;color:var(--sub);line-height:1.65;margin-top:6px;max-width:860px}
+.platconsole .zonesum{font-size:11px;font-weight:700;color:#8a93a0;margin-top:8px}
+.platconsole .zonewrap .empty{background:#f6f7f9;margin-top:10px}
 .platconsole .zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px;margin-top:11px}
 .platconsole .zone{background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 11px}
 .platconsole .zhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-.platconsole .zname{font-size:12.5px;font-weight:800;color:#5a6b85}
-/* 점수를 감성 색축으로 물들이지 않는다 — 시드값에 실측과 같은 시각적 권위를 주게 된다 */
-.platconsole .zscore{font-size:15px;font-weight:800;color:#9aa3af;font-variant-numeric:tabular-nums}
+.platconsole .zname{font-size:12.5px;font-weight:800}
+/* 공실률은 **실측**이라 거점 카드와 같은 색축을 쓴다(색은 인라인 style 로 온다).
+   ⚠ 이 자리에 감성을 넣지 말 것 — 못 잰 값에 실측의 시각적 권위를 주게 된다. */
+.platconsole .zscore{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
 .platconsole .zmeta{font-size:10.5px;color:#9aa3af;margin-top:3px}
+.platconsole .zsent{font-size:10.5px;color:#9aa3af;margin-top:5px;padding-top:5px;border-top:1px dashed #eceff2}
 .platconsole .zkw{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
 .platconsole .kw{font-size:10px;font-weight:700;color:#8a93a0;background:#f6f7f9;border:1px solid #eceff2;border-radius:5px;padding:1px 5px}

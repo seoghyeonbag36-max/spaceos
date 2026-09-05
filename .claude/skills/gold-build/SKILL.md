@@ -17,6 +17,7 @@ Gold 만 읽는다. 순서를 어기면 조용히 결손이 영구화된다 — 
 | Page | `gold/{slug}/building_vacancy.json` | 수집기 `building_vacancy` |
 | Page | `gold/{slug}/vacant_units.json` | `build_vacant_units` |
 | Page | `gold/{slug}/calibration.json` (α·앵커) | `calibrate_vacancy` |
+| Platform | `gold/{slug}/district_zones.json` (행정동 실측 구역) | `build_district_zones` — **`build_page_master` 뒤에** |
 | Page(유동) | 24시간 프로파일 | `build_hub_adong` → `living_population_hourly` → `build_page_footfall_hourly` |
 | Platform | `platform_district_timeseries` · `platform_store_graph_{nodes,edges}` | `build_gold` · `build_store_graph_edges` |
 | Platform | `gold/platform_vacancy_forecast.json` | `ml.training.train_lstm` |
@@ -32,6 +33,10 @@ python -m data.pipelines.build_building_attrs <slug>
 python -m data.pipelines.build_page_master <slug>
 python -m data.pipelines.build_vacant_units <slug>
 python -m data.pipelines.calibrate_vacancy
+
+# 행정동 실측 구역 — 반드시 build_page_master **뒤에** 돈다(그 산출물을 읽는다).
+# 인자가 없으면 ACTIVE_HUBS 전부. --dry-run 이면 분포만 찍고 저장하지 않는다.
+python -m data.pipelines.build_district_zones <slug>
 
 # Platform 분기 갱신 — 수집→Gold→학습→검증을 한 번에 (분기 1회)
 python -m data.pipelines.refresh_platform                # 전체 (약 40~50분)

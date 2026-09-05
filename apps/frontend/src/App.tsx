@@ -7,19 +7,20 @@ import AdminCoverage from "@/pages/AdminCoverage";
 import ProgramStudio from "@/pages/ProgramStudio";
 import "./App.css";
 
-// 지도 뷰는 네이버 지도 SDK·3D 트윈을 끌고 들어와 무겁다 — 눌렀을 때만 받는다.
+// 지도 뷰는 네이버 지도 SDK(지도 + 거리뷰 파노라마)를 끌고 들어온다 — 눌렀을 때만 받는다.
+// 2026-09-05 에 3D 트윈이 빠지며 이 청크는 832KB 만큼 가벼워졌지만, SDK 는 그대로라 lazy 를 유지한다.
 const MapShell = lazy(() => import("@/pages/MapShell"));
 
 /**
  * SpaceOS 프론트엔드 진입점.
- * 전환: 서울(25구 로드맵) · 거점(54거점 보드+심층) + PPPP 네 서비스.
+ * 전환: 서울(25구 로드맵) · 거점(서빙 66거점 보드+심층) + PPPP 네 서비스.
  * TODO: react-router 도입 시 /seoul, /hubs, /platform, /page, /posting, /program 으로 분리.
  *
  * 2026-08-29: **PPPP 네 트랙이 각자 화면을 갖는다.** 그전까지 Program 만 독립 표면이었고
  * (ProgramStudio) 나머지 셋은 거점 심층 뷰 한 페이지에 네 섹션으로 쌓여 있었다 —
  * 트랙 경계는 API 에 이미 있는데 화면에만 없었다.
  *   Platform → PlatformConsole  (상권 정체성 + 자리별 업종)
- *   Page     → MapShell         (공실 히트맵 4레이어 + 3D 트윈. 종전 "지도" 탭)
+ *   Page     → MapShell         (공실 히트맵 4레이어 + 2D 층 스택·거리뷰. 종전 "지도" 탭)
  *   Posting  → PostingConsole   (3-Tier 비용-효용 + 권리금 입력 계약)
  *   Program  → ProgramStudio    (가게 단위 마케팅 생성)
  * "주요 Platform" 버튼이 열던 것은 실제로는 거점 보드(PageDashboard)라 **거점**으로

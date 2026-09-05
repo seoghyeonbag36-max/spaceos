@@ -90,7 +90,7 @@ claude
 
 ```bash
 cd apps/frontend
-npm install            # 의존성 설치 (react, three, @react-three/fiber 등)
+npm install            # 의존성 설치 (react, d3, plotly — three 계열은 2026-09-05 제거됨)
 npm run dev            # http://localhost:5173
 ```
 

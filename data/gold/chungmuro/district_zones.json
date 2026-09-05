@@ -1,0 +1,100 @@
+{
+ "slug": "chungmuro",
+ "built_at": "2026-09-05T11:04:13+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 739,
+  "knn_vs_pnu_compared": 739,
+  "knn_vs_pnu_agree_pct": 98.6
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "필동",
+   "grp": "필동2가",
+   "lat": 37.56105,
+   "lng": 126.994874,
+   "stores": 1748,
+   "buildings": 293,
+   "capacity": 760,
+   "active": 662,
+   "vacancy_rate": 12.89,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "을지로동",
+   "grp": "을지로3가",
+   "lat": 37.565081,
+   "lng": 126.992664,
+   "stores": 2246,
+   "buildings": 257,
+   "capacity": 727,
+   "active": 650,
+   "vacancy_rate": 10.59,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "광희동",
+   "grp": "충무로4가",
+   "lat": 37.563574,
+   "lng": 126.997242,
+   "stores": 1359,
+   "buildings": 120,
+   "capacity": 322,
+   "active": 269,
+   "vacancy_rate": 16.46,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "명동",
+   "grp": "충무로2가",
+   "lat": 37.562779,
+   "lng": 126.988937,
+   "stores": 1118,
+   "buildings": 60,
+   "capacity": 205,
+   "active": 172,
+   "vacancy_rate": 16.1,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  },
+  {
+   "n": "장충동",
+   "grp": "묵정동",
+   "lat": 37.560718,
+   "lng": 127.000987,
+   "stores": 106,
+   "buildings": 9,
+   "capacity": 16,
+   "active": 13,
+   "vacancy_rate": 18.75,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z5"
+  }
+ ]
+}

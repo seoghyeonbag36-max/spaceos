@@ -1,12 +1,15 @@
 """거점(commercial district) 도메인 서비스.
 
 공실 집계의 입력은 **Gold 실데이터 우선**이다 (2026-08-01 배선 교체).
-- 실측 거점(40곳 — 2026-08-15 실측): 실측 건물을 100m 셀로 집계 (services/gold_vacancy).
-  응답의 `vacancy_source == "gold"`.
-- 나머지 14곳: 기존 `build_cells()` 합성 그리드로 폴백. `vacancy_source == "synthetic"`.
+- 실측 거점: 실측 건물을 100m 셀로 집계 (services/gold_vacancy). 응답의 `vacancy_source == "gold"`.
+- 그 밖: 기존 `build_cells()` 합성 그리드로 폴백. `vacancy_source == "synthetic"`.
   → 해당 거점의 대장을 받아 파이프라인을 돌리면 자동으로 실데이터로 바뀐다.
 
-갈림길은 **파일 존재가 아니다.** `page_building_master.geojson` 은 이제 54거점 전부에 있다
+**2026-09-05 실측: 서빙 66거점이 전부 `gold` 다**(전 거점 `GET /heatmap/vacancy` 호출로 확인).
+즉 `synthetic` 폴백은 코드에 남아 있지만 지금 그 길을 타는 서빙 거점은 없다. 이 문장은
+거점이 늘면 낡는다 — **세어서 고칠 것**(개수를 여기 박아 두지 않는 이유이기도 하다).
+
+갈림길은 **파일 존재가 아니다.** `page_building_master.geojson` 은 서빙 거점 전부에 있다
 (대장 없는 거점도 폴리곤 근사로 만든다 — Tier2). `gold_vacancy.build_cells()` 가 셀을 만들려면
 `_COUNTED_METHODS = {"floor_ouln"}` 인 건물이 있어야 하므로, 실질 조건은 **층별개요까지 받았는가**
 다. 파일 존재를 실측의 대리지표로 쓰면 Tier2 거점을 실측으로 오분류한다(13거점 시절엔 둘이
@@ -22,14 +25,35 @@ import math
 from app.data.seoul_pages import DISTRICTS, DISTRICTS_BY_ID
 from app.data import cities, hub_caveats, measured_pages
 
+from app.services import (district_zones, gold_vacancy, posting_inputs, posting_revenue,
+                          vacancy_forecast, vacant_inventory)
+
+
+def _with_zones(page: dict) -> dict:
+    """구역을 **Gold 실측으로 덮은 사본**을 만든다 — 시드에 적힌 값이 아니라(2026-09-05).
+
+    시드 거점(54)과 실측 거점(12)이 여기서 같은 소스를 보게 된다. 그전에는 앞의 54곳만
+    손으로 적은 감성 구역을 갖고 뒤의 12곳은 빈 목록이라, 같은 화면이 거점에 따라 다른
+    종류의 값을 그렸다.
+
+    ⚠ **원본 dict 를 제자리에서 고치지 않는다.** `DISTRICTS` 는 시드를 세는 곳이
+    여럿이라(tests·문서) 그 내용이 흔들리면 안 된다 — 아래 PAGES 주석과 같은 이유다.
+    실제로 제자리 변형으로 먼저 짰다가 `test_the_seed_no_longer_carries_hand_written_zones`
+    가 잡았다.
+
+    파일이 없는 거점은 빈 목록이 된다 — 파이프라인을 아직 안 돌렸다는 뜻이고, 그 사실이
+    화면에 "구역 없음"으로 드러난다. 조용히 시드로 되돌아가지 않는다.
+    """
+    return {**page, "zones": district_zones.zones(page["id"])}
+
+
 # 시드(서울 54) + 실측 거점(Gold 만으로 서는 거점, 예: 고양 화정).
 # **시드가 이긴다** — measured_pages.build() 가 이미 시드 id 를 제외하고 만든다.
 # 이 합본은 API 표면에서만 쓴다. `DISTRICTS`(시드) 자체는 건드리지 않는다 —
 # 세는 곳(tests·문서)이 여럿이라 그 수가 흔들리면 안 된다.
-PAGES: list[dict] = [*DISTRICTS, *measured_pages.MEASURED]
-PAGES_BY_ID: dict[str, dict] = {**DISTRICTS_BY_ID, **measured_pages.MEASURED_BY_ID}
-from app.services import (gold_vacancy, posting_inputs, posting_revenue,
-                          vacancy_forecast, vacant_inventory)
+PAGES: list[dict] = [_with_zones(p) for p in (*DISTRICTS, *measured_pages.MEASURED)]
+PAGES_BY_ID: dict[str, dict] = {p["id"]: p for p in PAGES}
+
 
 # 입점 3-Tier 정의
 TIER = {
@@ -288,11 +312,19 @@ def _predicted(district_id: str, current_rate: float) -> dict:
 def _summary(d: dict) -> dict:
     # 실측 거점은 `city` 를 직접 갖는다(gu 가 자치구가 아니라 도시명이라 of_gu 로는 못 찾는다).
     _city = cities.by_id(d["city"]) if d.get("city") else cities.of_gu(d.get("gu"))
-    sum_r = sum(z["r"] for z in d["zones"])
-    # 감성구역이 없는 거점(실측 거점)은 **재지 않은 것**이다. 0 으로 내려보내면 "쟀더니
-    # 0" 으로 읽히므로 None 을 내려보내고, 그 사실을 화면이 밝힌다(measured_pages 머리말).
-    sent = (sum(z["s"] * z["r"] for z in d["zones"]) / sum_r) if sum_r else None
-    risk = sum(1 for z in d["zones"] if z["s"] < 40) if d["zones"] else None
+    # 감성은 **아무 거점에서도 재지 않았다**(2026-09-05). 종전에는 시드에 손으로 적은
+    # `z["s"]`·`z["r"]` 을 가중평균해 "거점 감성"으로 내려보냈는데, 그 입력에 근거가
+    # 없었다(54거점 × 6구역 = 324개 전부 사람이 쓴 값). 구역을 행정동 실측으로 갈면서
+    # 그 입력이 사라졌고, 따라서 파생값도 함께 내린다.
+    #
+    # 0 으로 내려보내면 "쟀더니 0" 으로 읽히므로 None 을 주고 화면이 "실측 없음"으로
+    # 그린다(measured_pages 머리말과 같은 원칙). 좌표를 가진 점포 리뷰 채널이 생기면
+    # 그때 되살아난다 — docs/feature-platform.md §0-K.
+    zs = d["zones"]
+    sum_r = sum(z["r"] for z in zs if z.get("r") is not None)
+    scored = [z for z in zs if z.get("s") is not None and z.get("r")]
+    sent = (sum(z["s"] * z["r"] for z in scored) / sum_r) if scored and sum_r else None
+    risk = sum(1 for z in scored if z["s"] < 40) if scored else None
     ci = cells_for(d)
     withheld = hub_caveats.is_withheld(d["id"])
     # 추천은 계산한다(recommend_tier). 예전에는 시드에 손으로 적은 `u["rec"]` 를 그대로
@@ -318,7 +350,7 @@ def _summary(d: dict) -> dict:
         "type": d["type"],
         "center": d["center"], "note": d["sub"], "rec_top": rec_top,
         "sentiment": round(sent, 1) if sent is not None else None,
-        "reviews": sum_r if d["zones"] else None, "risk_zones": risk,
+        "reviews": sum_r if scored else None, "risk_zones": risk,
         # 시드 없이 Gold 만으로 서는 거점인가 — 화면이 빈 축을 "실측 없음"으로 그리는 근거.
         "measured_only": bool(d.get("measured_only")),
         # 예외 문구는 시드에 적힌 것(경기 실측 거점)이 있으면 그것을, 없으면 계획상가
@@ -360,6 +392,12 @@ def get_district(district_id: str) -> dict | None:
 
 
 def get_sentiment(district_id: str) -> list[dict] | None:
+    """거점의 구역 목록. 거점이 없으면 None, 구역이 없으면 빈 리스트.
+
+    ⚠ 엔드포인트 이름은 `/sentiment` 인데 **감성은 실려 있지 않다.** 2026-09-05 에
+    손으로 적은 감성 구역을 행정동 실측 구역으로 갈았고, `s`/`d`/`r` 은 null 이다.
+    이름을 바꾸지 않은 것은 공개 API 표면이기 때문이다 — 필드가 그 사실을 밝힌다.
+    """
     d = PAGES_BY_ID.get(district_id)
     return d["zones"] if d else None
 

@@ -1,6 +1,6 @@
 ---
 name: fe-designer
-description: "React+TS·네이버지도·@react-three/fiber 3D·디자인시스템/토큰 전담. apps/frontend 및 design/ 작업, 대시보드 통합 시 위임."
+description: "React+TS·네이버지도(지도+거리뷰)·2D 층 스택·디자인시스템/토큰 전담. apps/frontend 및 design/ 작업, 대시보드 통합 시 위임."
 tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
@@ -8,7 +8,9 @@ tools: Read, Edit, Write, Bash, Grep, Glob
 
 담당:
 - 컴포넌트 `apps/frontend/src/components/`·`src/design/components/`, 페이지 `src/pages/`.
-- 지도는 네이버 지도(`src/lib/naverMap.ts`), 3D는 @react-three/fiber, 차트는 D3/Plotly.
+- 지도는 네이버 지도(`src/lib/naverMap.ts` — 지도 + 거리뷰 파노라마), 건물 상세는
+  2D 층 스택(`components/BuildingViewer.tsx`), 차트는 D3/Plotly.
+  ⚠ 3D(@react-three/fiber)는 2026-09-05 에 제거됐다 — 다시 끌어오지 말 것.
 - 모든 API 호출은 `src/lib/api.ts`로 일원화, 경로 별칭 `@/`.
 - 디자인 토큰 단일출처 `design/tokens/tokens.json` ⇄ `src/design/tokens/*.ts` 동기화. 색 하드코딩 금지.
 

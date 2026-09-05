@@ -722,25 +722,43 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
             : "Page · 100m 그리드 합성 — 건물 데이터 수집 시 실측으로 교체"}</small></h2>
           <VacancyMap detail={detail} />
 
-          {/* 감성은 아직 실데이터가 없다 — 리뷰 수집기가 미구현이고(review_crawler),
-              블로그 코퍼스는 거점 단위 광고성 스니펫이라 구역 단위 감성으로 못 내린다.
-              "리뷰/SNS 근거"라고 쓰면 없는 근거를 주장하는 것이라 표기를 바로잡았다. */}
-          <h2 className="sec">감성 구역 <small>
-            Platform · <b>전부 추정치다</b> — 리뷰 수집 미착수라 점수·건수·증감 모두 시드값이다
+          {/* 2026-09-05: 손으로 적은 감성 구역을 **행정동 실측 구역**으로 갈았다.
+              공실률·점포·건물은 실측이고, 감성만 여전히 없다(좌표를 가진 점포 리뷰
+              채널 부재 — docs/feature-platform.md §0-K). 색은 공실 축을 쓴다 —
+              감성 축(sentHex)을 쓰면 못 잰 값이 색을 갖는 것처럼 읽힌다. */}
+          <h2 className="sec">구역 <small>
+            Platform · <b>행정동 실측</b> — 점포·건물·공실은 실측, <b>감성은 아직 못 잰다</b>
           </small></h2>
+          {detail.zones.length === 0 && (
+            <div className="loading">이 거점의 구역 산출물이 아직 없다 (build_district_zones 미실행).</div>
+          )}
           <div className="zones">
             {detail.zones.map((z) => (
-              <div key={z.id} className="zone" style={{ borderTopColor: sentHex(z.s) }}>
+              <div key={z.id} className="zone"
+                   style={{ borderTopColor: z.vacancy_rate === null ? undefined : vacHex(z.vacancy_rate) }}>
                 <div className="zhead">
                   <span className="zname">{z.n}</span>
-                  <span className="zscore" style={{ color: sentHex(z.s) }}>{z.s.toFixed(1)}</span>
-                  <Src src="seed" />
+                  <span className="zscore"
+                        style={{ color: z.vacancy_rate === null ? undefined : vacHex(z.vacancy_rate) }}>
+                    {z.vacancy_rate === null ? "—" : `${z.vacancy_rate.toFixed(1)}%`}
+                  </span>
+                  <Src src="gold" />
                 </div>
-                {/* "리뷰 N건"으로 쓰면 실제로 센 것처럼 읽힌다 — 센 적이 없다 */}
-                <div className="zmeta">{z.grp} · 가정 표본 {z.r.toLocaleString()}건 · {z.d >= 0 ? "▲" : "▼"}{Math.abs(z.d).toFixed(1)}</div>
-                <div className="zkw">
-                  {z.f.map(([label, delta], i) => <span key={i} className="kw">{label} {delta}</span>)}
+                <div className="zmeta">
+                  {z.grp} · 점포 {z.stores?.toLocaleString() ?? "—"} · 건물 {z.buildings ?? "—"}동
+                  {z.capacity !== null && ` · 상업 ${z.capacity.toLocaleString()}호`}
                 </div>
+                {/* 없는 것을 빈 칸으로 두지 않는다 — "0 인가 없는 건가"를 화면이 말해야 한다 */}
+                <div className="zmeta">
+                  {z.s === null
+                    ? <span className="value-absent">감성 실측 없음</span>
+                    : <>감성 {z.s.toFixed(1)}</>}
+                </div>
+                {z.f.length > 0 && (
+                  <div className="zkw">
+                    {z.f.map(([label, delta], i) => <span key={i} className="kw">{label} {delta}</span>)}
+                  </div>
+                )}
               </div>
             ))}
           </div>

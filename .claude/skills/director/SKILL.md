@@ -12,7 +12,7 @@ description: 상위 목표를 PPPP+Design 트랙으로 분해하고 전문 에�
 | 트랙 | 의미 | 위임 대상 |
 |------|------|-----------|
 | Platform | 상권 AI 추천(GNN·감성) | 모델 → `ml-engineer`, 피처 → `data-engineer`, API → 직접/`/backend-dev` |
-| Page | 공실 히트맵+3D/네이버지도 | FE → `fe-designer`, 히트맵 API → 직접/`/backend-dev` |
+| Page | 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 | FE → `fe-designer`, 히트맵 API → 직접/`/backend-dev` |
 | Posting | 입점 비용효용 3축·ROI | 모델 → `ml-engineer`, 서비스 → 직접, FE 소비 → `fe-designer` |
 | Program | 마케팅 자동화·LLM | 서비스/LLM → 직접/`/backend-dev`, FE 소비 → `fe-designer` |
 | Design | 토큰·대시보드 통합 | `fe-designer` |
@@ -29,7 +29,7 @@ description: 상위 목표를 PPPP+Design 트랙으로 분해하고 전문 에�
    - 각 위임에 대상 경로(화이트리스트)·완료 기준·`# TODO: 실제 연동` 규칙을 명시.
 3. **통합·일관성**: 산출물이 `apps/frontend/src/lib/api.ts` 계약과 디자인 토큰 단일출처에 맞는지 점검·조정.
 4. **검증**: 마치면 `/verify` 로 백엔드 pytest + 프론트 타입체크 + ML import 통과 확인.
-5. **보고**: KPI 기준 진척 요약 — ① 기술 완성도(데모 가능 / 정확도 70%+ / 3D 로딩 <3초) ② PMF(B2B 파일럿 5~10건).
+5. **보고**: KPI 기준 진척 요약 — ① 기술 완성도(데모 가능 / 정확도 70%+ / 지도·건물 상세 로딩 <3초) ② PMF(B2B 파일럿 5~10건).
 
 ## 원칙
 - 데이터 기반·추측 최소화·논리적 구조(`CLAUDE.md`). 더미엔 반드시 `TODO`.

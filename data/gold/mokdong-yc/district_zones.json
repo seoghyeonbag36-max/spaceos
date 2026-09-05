@@ -1,0 +1,100 @@
+{
+ "slug": "mokdong-yc",
+ "built_at": "2026-09-05T11:04:15+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 259,
+  "knn_vs_pnu_compared": 259,
+  "knn_vs_pnu_agree_pct": 99.6
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "신정4동",
+   "grp": "신정동",
+   "lat": 37.525823,
+   "lng": 126.86201,
+   "stores": 1672,
+   "buildings": 198,
+   "capacity": 542,
+   "active": 455,
+   "vacancy_rate": 16.05,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "목1동",
+   "grp": "목동",
+   "lat": 37.525557,
+   "lng": 126.867908,
+   "stores": 613,
+   "buildings": 29,
+   "capacity": 76,
+   "active": 61,
+   "vacancy_rate": 19.74,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "신정1동",
+   "grp": "신정동",
+   "lat": 37.521823,
+   "lng": 126.861182,
+   "stores": 188,
+   "buildings": 10,
+   "capacity": 39,
+   "active": 34,
+   "vacancy_rate": 12.82,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "화곡4동",
+   "grp": "화곡동",
+   "lat": 37.530182,
+   "lng": 126.861376,
+   "stores": 186,
+   "buildings": 17,
+   "capacity": 33,
+   "active": 23,
+   "vacancy_rate": 30.3,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  },
+  {
+   "n": "목4동",
+   "grp": "목동",
+   "lat": 37.530395,
+   "lng": 126.865341,
+   "stores": 113,
+   "buildings": 5,
+   "capacity": 12,
+   "active": 7,
+   "vacancy_rate": 41.67,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z5"
+  }
+ ]
+}

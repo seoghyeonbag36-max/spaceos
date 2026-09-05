@@ -1,0 +1,84 @@
+{
+ "slug": "hwagok",
+ "built_at": "2026-09-05T11:04:15+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 301,
+  "knn_vs_pnu_compared": 301,
+  "knn_vs_pnu_agree_pct": 99.7
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "화곡본동",
+   "grp": "화곡동",
+   "lat": 37.542672,
+   "lng": 126.843794,
+   "stores": 658,
+   "buildings": 95,
+   "capacity": 225,
+   "active": 187,
+   "vacancy_rate": 16.89,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "화곡1동",
+   "grp": "화곡동",
+   "lat": 37.539083,
+   "lng": 126.838333,
+   "stores": 666,
+   "buildings": 86,
+   "capacity": 204,
+   "active": 162,
+   "vacancy_rate": 20.59,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "화곡3동",
+   "grp": "화곡동",
+   "lat": 37.542721,
+   "lng": 126.837113,
+   "stores": 659,
+   "buildings": 63,
+   "capacity": 180,
+   "active": 158,
+   "vacancy_rate": 12.22,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "우장산동",
+   "grp": "화곡동",
+   "lat": 37.543819,
+   "lng": 126.841473,
+   "stores": 397,
+   "buildings": 57,
+   "capacity": 146,
+   "active": 117,
+   "vacancy_rate": 19.86,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  }
+ ]
+}

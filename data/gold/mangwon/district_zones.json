@@ -1,0 +1,100 @@
+{
+ "slug": "mangwon",
+ "built_at": "2026-09-05T11:04:06+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 580,
+  "knn_vs_pnu_compared": 580,
+  "knn_vs_pnu_agree_pct": 99.3
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "망원1동",
+   "grp": "망원동",
+   "lat": 37.55537,
+   "lng": 126.907102,
+   "stores": 1495,
+   "buildings": 255,
+   "capacity": 564,
+   "active": 532,
+   "vacancy_rate": 5.67,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "서교동",
+   "grp": "서교동",
+   "lat": 37.555421,
+   "lng": 126.912719,
+   "stores": 986,
+   "buildings": 124,
+   "capacity": 351,
+   "active": 288,
+   "vacancy_rate": 17.95,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "성산1동",
+   "grp": "성산동",
+   "lat": 37.55912,
+   "lng": 126.909555,
+   "stores": 533,
+   "buildings": 84,
+   "capacity": 217,
+   "active": 181,
+   "vacancy_rate": 16.59,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "망원2동",
+   "grp": "망원동",
+   "lat": 37.55918,
+   "lng": 126.90523,
+   "stores": 624,
+   "buildings": 90,
+   "capacity": 208,
+   "active": 180,
+   "vacancy_rate": 13.46,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  },
+  {
+   "n": "합정동",
+   "grp": "합정동",
+   "lat": 37.553028,
+   "lng": 126.909651,
+   "stores": 417,
+   "buildings": 27,
+   "capacity": 67,
+   "active": 56,
+   "vacancy_rate": 16.42,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z5"
+  }
+ ]
+}

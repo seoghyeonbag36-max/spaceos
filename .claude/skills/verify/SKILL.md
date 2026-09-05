@@ -128,10 +128,10 @@ curl.exe -s "http://localhost:5173/api/v1/heatmap/buildings?district=gangnam-gar
 앵커는 **거점별 R-ONE 중대형상가 공실률**이다(`calibration.json.anchor_pct`,
 garosugil = 17.6%). 예전에 쓰던 공통 41.6% 는 부동산원 통계가 아니라 가로수길 가두
 1층 실태조사(2024) 값을 잘못 표기한 것이라 2026-07-28 폐기했다.
-API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — **54/54 전 거점**이 앵커를
-가진다. 모집단이 달라(우리는 호실·전수, R-ONE 은 면적·표본) 격차 0 은 목표가 아니다.
+API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — **서빙 66거점 전부**가 앵커를
+가진다(2026-09-05 기준 · `pppp_status.py` 의 `R-ONE 앵커 대조 보유` 게이트가 센다). 모집단이 달라(우리는 호실·전수, R-ONE 은 면적·표본) 격차 0 은 목표가 아니다.
 
-**2026-08-30 전수 재측정**(TestClient 로 54거점 `GET /heatmap/vacancy` 전부 호출):
+**2026-08-30 전수 재측정**(TestClient 로 당시 54거점 `GET /heatmap/vacancy` 전부 호출):
 격차 **-10.66 ~ +21.77%p** (최소 cheongdam -10.66 / 최대 nokdu +21.77 / garosugil -1.78).
 가드레일 30%p 를 넘는 거점은 **0곳**이고 `pytest -k anchor` **3건 전부 통과**한다.
 

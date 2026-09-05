@@ -1,0 +1,100 @@
+{
+ "slug": "yeonsinnae",
+ "built_at": "2026-09-05T11:04:15+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 503,
+  "knn_vs_pnu_compared": 503,
+  "knn_vs_pnu_agree_pct": 99.4
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "갈현1동",
+   "grp": "갈현동",
+   "lat": 37.620917,
+   "lng": 126.918579,
+   "stores": 894,
+   "buildings": 180,
+   "capacity": 479,
+   "active": 374,
+   "vacancy_rate": 21.92,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "갈현2동",
+   "grp": "갈현동",
+   "lat": 37.618244,
+   "lng": 126.917752,
+   "stores": 688,
+   "buildings": 121,
+   "capacity": 281,
+   "active": 228,
+   "vacancy_rate": 18.86,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "대조동",
+   "grp": "대조동",
+   "lat": 37.616699,
+   "lng": 126.921542,
+   "stores": 650,
+   "buildings": 99,
+   "capacity": 235,
+   "active": 180,
+   "vacancy_rate": 23.4,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "불광2동",
+   "grp": "불광동",
+   "lat": 37.620875,
+   "lng": 126.923671,
+   "stores": 581,
+   "buildings": 65,
+   "capacity": 144,
+   "active": 116,
+   "vacancy_rate": 19.44,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  },
+  {
+   "n": "불광1동",
+   "grp": "불광동",
+   "lat": 37.618857,
+   "lng": 126.924332,
+   "stores": 347,
+   "buildings": 38,
+   "capacity": 80,
+   "active": 67,
+   "vacancy_rate": 16.25,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z5"
+  }
+ ]
+}

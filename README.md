@@ -7,7 +7,7 @@
 | 경로 | 내용 | 스택 |
 |------|------|------|
 | `apps/backend` | API 서버 | FastAPI · PostgreSQL/PostGIS · Redis · Celery |
-| `apps/frontend` | 3D 디지털 트윈 UI | React · TypeScript · Vite · Three.js/@react-three/fiber · **네이버 지도**(`lib/naverMap.ts`) |
+| `apps/frontend` | 공실 지도 UI (히트맵 + 층별 매물 목록 + 거리뷰) | React · TypeScript · Vite · **네이버 지도**(`lib/naverMap.ts` — 지도 + 거리뷰 파노라마) · D3/Plotly |
 | `ml` | AI 모델 | PyTorch · LSTM(공실 예측) · GNN(업종 추천) · MLflow |
 | `data` | ETL·크롤링 | Airflow · Playwright · Bronze/Silver/Gold |
 | `infra` | 배포 | Docker · k8s · GitHub Actions |
@@ -62,8 +62,10 @@ vercel --prod        # 상세: docs/deploy-vercel.md
 python scripts/pppp_status.py     # 트랙별 진행률 + 게이트 ([자동] = 산출물 실측, [선언] = 사람이 적은 값)
 ```
 
-거점은 **54곳**(전부 Tier1 = 건축물대장 실측)이며 `data/gold/*/coverage.json` 의 `tier` 가
-그 근거다. 트랙별 상세는 [docs/README.md](docs/README.md) 에서 시작한다.
+서빙 거점은 **서울 66곳**(전부 Tier1 = 건축물대장 실측)이다. 근거는 위 스크립트가 찍는 값이고,
+목록의 단일 출처는 `data/config/page_hubs.ACTIVE_HUBS` 다.
+⚠ `data/gold/*/coverage.json` 을 세면 **73** 이 나온다 — 서빙 66 + 경기(고양·파주) 보류 거점 중
+산출물이 선 7 이다. 보류 거점은 **20곳**이고 게이트가 세지 않는다. 트랙별 상세는 [docs/README.md](docs/README.md) 에서 시작한다.
 
 ## Claude Code
 
