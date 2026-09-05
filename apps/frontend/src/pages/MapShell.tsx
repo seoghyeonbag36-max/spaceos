@@ -21,7 +21,8 @@ import { colors } from "@/design/tokens/colors";
 import "@/styles/tokens.css";
 import "./MapShell.css";
 
-const BuildingTwin = lazy(() => import("@/components/BuildingTwin"));
+// 거리뷰 SDK·층 스택을 끌고 들어오므로 눌렀을 때만 받는다.
+const BuildingViewer = lazy(() => import("@/components/BuildingViewer"));
 
 // 가로수길 코어 (강남구 신사동) — poc-building-vacancy.md §0.5. 거점 목록이 오기 전 초기 중심.
 const GAROSU = { lat: 37.5205, lng: 127.023 };
@@ -47,7 +48,7 @@ const STATUS: Record<VacStatus, { color: string; label: string }> = {
 
 interface Building {
   id: string; name: string; status: VacStatus; capacity: number; active: number; industry: string;
-  floors?: number;   // 대장 지상 층수 — 3D 트윈 층 스택용. capacity(호 수)와 단위가 다르다.
+  floors?: number;   // 대장 지상 층수 — 층 스택의 높이. capacity(호 수)와 단위가 다르다.
   // 층 실배치 — 층 근거(건축물대장 층별개요 + 상가정보 flrNo)가 있는 건물에만 실린다.
   comFloors?: number[]; occFloors?: number[]; unknownN?: number;
   center: { lat: number; lng: number };
@@ -434,7 +435,7 @@ export default function MapShell() {
               </div>
             )}
 
-            <button className="b-twin" onClick={() => setTwinOpen(true)}>3D 디지털 트윈 보기</button>
+            <button className="b-twin" onClick={() => setTwinOpen(true)}>층별 공실 · 거리뷰 보기</button>
           </div>
         )}
       </div>
@@ -494,47 +495,24 @@ export default function MapShell() {
         )}
       </div>
 
-      {/* 3D 디지털 트윈 모달 */}
+      {/* 건물 상세 — 2D 층 스택 + 네이버 거리뷰 (2026-09-05 에 3D 트윈을 대체했다) */}
       {twinOpen && selected && (
         <div className="twin-modal" onClick={() => setTwinOpen(false)}>
           <div className="twin-box" onClick={(e) => e.stopPropagation()}>
             <div className="twin-head">
-              <span>{selected.name} · 3D 디지털 트윈</span>
+              <span>{selected.name} · 층별 공실 · 거리뷰</span>
               <button onClick={() => setTwinOpen(false)}>✕</button>
             </div>
             <div className="twin-canvas">
-              <Suspense fallback={<div className="twin-load">3D 로딩…</div>}>
-                <BuildingTwin b={{
+              <Suspense fallback={<div className="twin-load">불러오는 중…</div>}>
+                <BuildingViewer b={{
                   name: selected.name, capacity: selected.capacity, active: selected.active,
                   floors: selected.floors, statusColor: STATUS[selected.status].color,
+                  statusLabel: STATUS[selected.status].label, center: selected.center,
                   comFloors: selected.comFloors, occFloors: selected.occFloors,
                   unknownN: selected.unknownN,
                 }} />
               </Suspense>
-            </div>
-            <div className="twin-foot">
-              {selected.comFloors?.length ? (
-                <>
-                  녹색 = 영업 확인 층({selected.occFloors?.join("·") || "없음"})
-                  {selected.unknownN ? ` · 노란색 = 층 미상 점포 ${selected.unknownN}곳이 앉을 수 있는 층` : ""}
-                  {" · "}{STATUS[selected.status].label}색 = 공실 · 회색 = 비상업 층(공실률 분모 밖)
-                  {" · "}상업 {selected.comFloors.length}개 층 중 {selected.active}개 영업
-                  {selected.floors ? ` · 지상 ${selected.floors}층` : ""}
-                  <br />
-                  <span style={{ opacity: 0.75 }}>
-                    근거: 건축물대장 층별개요 + 상가정보 층 표기 — 층 배치는 실측이다
-                  </span>
-                </>
-              ) : (
-                <>
-                  녹색 = 영업 층(점유율 환산) · {STATUS[selected.status].label}색 = 공실(추정) · {selected.active}/{selected.capacity}호
-                  {selected.floors ? ` · 지상 ${selected.floors}층` : ""}
-                  <br />
-                  <span style={{ opacity: 0.75 }}>
-                    이 건물은 층 근거가 없어 <b>아래부터 채운 근사</b>다 — 실제 공실 층과 다를 수 있다
-                  </span>
-                </>
-              )}
             </div>
           </div>
         </div>

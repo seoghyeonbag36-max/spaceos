@@ -38,7 +38,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from app.services import vacant_inventory
+from app.services import industry_fit, vacant_inventory
 
 _GOLD_DIR = Path(__file__).resolve().parents[4] / "data" / "gold"
 
@@ -113,6 +113,11 @@ def listing(district_id: str | None, *, certainty: str | None = None,
             by_floor[f] = by_floor.get(f, 0) + 1
 
     page = units[offset:offset + limit] if limit > 0 else units[offset:]
+    # 업종 적합도는 **내보내는 페이지에만** 붙인다. 전 유닛에 붙이면 응답이 몇 배로
+    # 커지는데 화면은 보이는 것만 쓴다. 근거가 없으면 키를 비운 채 둔다 — 빈 목록을
+    # 주면 "이 자리에 들어갈 업종이 없다"로 읽힌다.
+    page = [u | {"fit": f} if (f := industry_fit.fit_for(u.get("floor"), u.get("purps")))
+            else u for u in page]
     return {
         "district_id": district_id,
         "total": len(units),
@@ -122,5 +127,7 @@ def listing(district_id: str | None, *, certainty: str | None = None,
         "built_at": d.get("built_at"),
         "source": d.get("source"),
         "note": d.get("note"),
+        # 적합도 표 자체의 근거·한계(조인율 등). 유닛마다 반복하지 않고 한 번만 싣는다.
+        "fit_meta": industry_fit.meta(),
         "units": page,
     }

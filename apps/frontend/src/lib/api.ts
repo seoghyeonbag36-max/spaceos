@@ -335,6 +335,17 @@ export const getPostings = (id: string) => getJSON<Posting[]>(`/commercial-distr
  *  ⚠ `Posting`(건물 단위 유닛 + 3-Tier 시나리오)과 **다른 것을 센다**. 여기는 목록이라
  *     임대료·ROI 가 없고, 일부 층만 빈 건물(`partial`)이 들어온다. 층으로 쪼갠 표본을
  *     ROI 계산에 쓰면 프리미엄 트립와이어가 부호를 넘는다 → feature-posting.md §0-Q·§0-T */
+/** 같은 조건(대장 용도·층)의 자리에서 **실제 영업 중인** 업종 분포.
+ *  ⚠ 추천이 아니라 관측이다 — 그 자리에서 잘 된다는 뜻이 아니고(매출·생존 미고려),
+ *     GNN 업종 추천(`recommendIndustry`)과도 다른 축이다(저쪽은 좌표 기준 7종 라벨). */
+export interface IndustryFit {
+  /** "purps_floor" 용도+층 관측 · "floor" 용도 표본이 얇아 층만 본 폴백 */
+  basis: "purps_floor" | "floor" | string;
+  n: number;
+  top: Array<{ industry: string; share: number; n: number }>;
+  note: string;
+}
+
 export interface FloorVacancyUnit {
   id: string;
   building_id?: string | null;
@@ -355,6 +366,9 @@ export interface FloorVacancyUnit {
   bld_vacancy_rate?: number | null;
   com_floors: number[]; occ_floors: number[]; unknown_n: number;
   was: string;
+  /** 근거가 없으면 **없다**. 빈 배열이 아니라 부재로 온다 —
+   *  빈 목록을 주면 "이 자리에 들어갈 업종이 없다"로 읽힌다. */
+  fit?: IndustryFit | null;
 }
 
 export interface FloorVacancyList {
@@ -368,6 +382,9 @@ export interface FloorVacancyList {
   built_at?: string | null;
   source?: string | null;
   note?: string | null;
+  /** 적합도 표 자체의 근거·한계(조인율 약 30% 등) */
+  fit_meta?: { built_at?: string; note?: string; min_sample?: number;
+    stats?: Record<string, number> } | null;
   units: FloorVacancyUnit[];
 }
 

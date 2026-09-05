@@ -178,3 +178,13 @@
  .pagedash .tiers{grid-template-columns:1fr}
  .pagedash .fv-list{grid-template-columns:1fr}
 }
+
+/* 업종 관측 분포 — 추천이 아니라 관측이라 카드 안에서 **부차 정보**로 둔다.
+   층만 본 폴백(.weak)은 채도를 낮춰, 용도까지 좁힌 관측과 같아 보이지 않게 한다. */
+.pagedash .fv-fit{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:6px 0 4px;
+  padding:6px 8px;background:#f4f8fb;border-radius:8px;font-size:11px}
+.pagedash .fv-fit.weak{background:#f7f8fa;opacity:.85}
+.pagedash .fv-fit-k{font-weight:800;color:#5a6b85}
+.pagedash .fv-fit-v{background:#fff;border:1px solid #dde5ef;border-radius:6px;padding:1px 6px;font-weight:700}
+.pagedash .fv-fit-v em{font-style:normal;color:var(--blue);margin-left:2px}
+.pagedash .fv-fit-n{color:#8494a8;margin-left:auto;font-size:10px}

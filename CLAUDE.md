@@ -10,7 +10,7 @@
 | 기능 | 전환 | 의미 |
 |------|------|------|
 | **Platform** | Place → Platform | 상권 AI 추천 엔진 (각 상권을 하나의 플랫폼화) |
-| **Page** | Product/Price → Page | 공실 히트맵 + 3D 디지털 트윈 (어떤 업장이 어디에) |
+| **Page** | Product/Price → Page | 공실 히트맵 + **층별 매물 목록 + 네이버 거리뷰** (어느 건물 몇 층이 비었나) — 3D 트윈은 2026-09-05 폐기 |
 | **Posting** | Promotion → Posting | 입점 솔루션 — **외부 AI 창업 코파일럿 연동**(어댑터) + 3-Tier 비용-효용 폴백 |
 | **Program** | Promotion → Program | 마케팅 자동화 — **대상은 Platform(상권) 내 빈 Page(공실 건물)에 Posting(창업)할 기업**이다. 그 기업에게 온/오프라인으로 어떻게 마케팅·홍보할지 알려준다 (2026-08-16 대상 재정의) |
 
@@ -24,7 +24,10 @@
 → 상세: memory/projects/
 
 ## Tech Stack (확정)
-- **FE**: React + TypeScript + Three.js/@react-three/fiber + **네이버 지도**(`lib/naverMap.ts`) + Tailwind
+- **FE**: React + TypeScript + **네이버 지도**(`lib/naverMap.ts` — 지도 + 거리뷰 파노라마) + Tailwind
+  - **Three.js/@react-three/fiber 는 제거됐다**(2026-09-05). 3D 트윈이 그리던 절차적 박스는 실측 형상이
+    아니라 층 상태를 색으로 말하던 것뿐이라, 2D 층 스택 + 네이버 거리뷰로 대체했다(번들 832KB → 4KB).
+    다시 끌어오지 말 것 → docs/feature-posting.md §0-V
   - `mapbox-gl` 은 **제거됐다**(2026-08-25 커밋 1979bb4 · package.json·lock 모두 정리 완료). 베이스맵은 네이버뿐이니 다시 끌어오지 말 것
 - **BE**: FastAPI + PostgreSQL/PostGIS + Redis + Celery
 - **ML**: PyTorch + PyTorch Geometric (GNN) + LSTM + MLflow + LangChain
@@ -49,7 +52,7 @@
 → 전체 용어집: memory/glossary.md
 
 ## KPI Priorities (사용자 선택)
-1. **기술 완성도** — MVP 데모 가능, AI 정확도 70%+, 3D 트윈 로딩 3초 이내
+1. **기술 완성도** — MVP 데모 가능, AI 정확도 70%+, 지도·건물 상세 로딩 3초 이내
 2. **고객 검증(PMF)** — B2B 파일럿 5~10건, 유료 전환 의향 30%+, NPS 30+
 
 ## Preferences
@@ -90,7 +93,7 @@
 ### 디렉토리 구조
 ```
 apps/backend     FastAPI API 서버 (Python 3.11)
-apps/frontend    React + TypeScript + Vite (3D 디지털 트윈 UI)
+apps/frontend    React + TypeScript + Vite (네이버 지도 + 층 스택 + 거리뷰 UI)
 ml               PyTorch LSTM(공실 예측) / GNN(업종 추천) + MLflow
 data             Airflow DAG + 크롤러 + Bronze/Silver/Gold 레이어
 infra            docker-compose / Dockerfile / k8s / GitHub Actions
@@ -147,4 +150,4 @@ python scripts/quota_preflight.py
 - 데이터 기반·추측 최소화 원칙은 코드에도 적용 — 더미 데이터에는 반드시 `TODO` 주석으로 실제 연동 지점을 명시.
 
 ### 성능 목표 (참고)
-AI 공실 예측 정확도 70%+(Phase1), 3D 맵 로딩 <3초, API p95 <200ms.
+AI 공실 예측 정확도 70%+(Phase1), 지도 로딩 <3초, API p95 <200ms.

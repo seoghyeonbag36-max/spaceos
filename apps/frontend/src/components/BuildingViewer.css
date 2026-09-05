@@ -1,0 +1,38 @@
+/* BuildingViewer — 2D 층 스택 + 네이버 거리뷰.
+   두 화면(MapShell·PageDashboard)이 같은 모달 안에서 같은 것을 보므로 스타일도 한 벌이다.
+   페이지 스코프(.mapshell / .pagedash) 없이 컴포넌트 클래스로만 건다. */
+
+.bviewer { display: flex; flex-direction: column; gap: 10px; }
+.bviewer-cols { display: grid; grid-template-columns: minmax(150px, 210px) 1fr; gap: 12px; }
+.bviewer-stack { max-height: 340px; overflow-y: auto; padding-right: 2px; }
+.bviewer-street { min-height: 300px; }
+.bviewer-legend { font-size: 11.5px; line-height: 1.6; color: #5a6b85; }
+.bviewer-legend .dim { opacity: .8; }
+
+/* 층 스택 — 위가 꼭대기다. 한 줄이 한 층이고, 막대 길이가 아니라 **색**이 상태다
+   (길이로 뭔가를 말하면 면적으로 오독된다 — 여기 실린 값은 상태뿐이다). */
+.fstack { display: flex; flex-direction: column; gap: 3px; }
+.fstack-row { display: flex; align-items: center; gap: 6px; }
+.fstack-no { font-size: 10.5px; font-weight: 800; color: #5a6b85; width: 30px; text-align: right; flex-shrink: 0; }
+.fstack-bar { height: 15px; flex: 1; border-radius: 3px; }
+.fstack-lb { font-size: 10px; color: #7b8aa0; width: 38px; flex-shrink: 0; }
+/* 비상업 층은 분모 밖이라 눈에 덜 걸리게 — 색만으로는 "빈 층"으로 읽힌다. */
+.fstack-row.noncom .fstack-bar { opacity: .5; }
+.fstack-row.noncom .fstack-no,
+.fstack-row.noncom .fstack-lb { opacity: .6; }
+
+/* 거리뷰 */
+.sview { position: relative; width: 100%; height: 100%; min-height: 300px;
+  border-radius: 10px; overflow: hidden; background: #eef2f8; }
+.sview-canvas { width: 100%; height: 100%; min-height: 300px; }
+.sview-msg { display: flex; align-items: center; justify-content: center; text-align: center;
+  height: 100%; min-height: 300px; padding: 0 18px; font-size: 12px; color: #6b7a90; line-height: 1.6; }
+.sview-msg.err { color: #b45309; }
+.sview-meta { position: absolute; left: 0; right: 0; bottom: 0; padding: 7px 10px;
+  font-size: 10.5px; line-height: 1.5; color: #fff; background: rgba(17, 24, 39, .72); }
+.sview-meta .dim { opacity: .8; }
+
+@media (max-width: 720px) {
+  .bviewer-cols { grid-template-columns: 1fr; }
+  .bviewer-stack { max-height: 200px; }
+}

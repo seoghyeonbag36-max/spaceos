@@ -57,6 +57,10 @@ data/gold/*
 !data/gold/platform_vacancy_forecast.json
 # 예외: Platform GNN 업종 추천(~8.0MB, 40,388노드) — recommend-industry 가 정적 서빙.
 !data/gold/platform_industry_recommend.json
+# 예외: 층·용도별 업종 관측 분포(66거점 69,735건 조인) — services/industry_fit 이 읽어
+# 층 매물 응답의 `fit` 을 만든다. 빠지면 매물 카드에서 업종 줄이 통째로 사라지는데
+# 화면은 멀쩡해 보인다(형제 파일들과 같은 실패 양식). → docs/feature-posting.md §0-U
+!data/gold/platform_industry_floor_fit.json
 # 예외: Posting 3-Tier 실데이터 입력(~7KB) — services/posting_inputs.py 가 정적 서빙.
 !data/gold/platform_posting_inputs.json
 # 예외: Posting 매출계수의 실측 근거(28KB) — 상권×업종 점포당 월매출.

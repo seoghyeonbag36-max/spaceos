@@ -154,3 +154,52 @@ def test_json_shape_matches_the_gold_artifact() -> None:
     assert d["total"] == len(raw["units"])
     assert d["units"][0]["id"] == raw["units"][0]["id"]
     assert d["built_at"] == raw["built_at"]
+
+
+def test_industry_fit_is_observation_not_recommendation() -> None:
+    """매물에 붙는 업종은 **관측 분포**다 — 근거·표본·한계가 같이 온다.
+
+    이 값이 "추천"으로 읽히면 안 된다. 그 자리에서 잘 된다는 뜻이 아니고(매출·생존
+    미고려), GNN 업종 추천과도 다른 축이다(저쪽은 좌표 기준 7종 라벨).
+    """
+    d = _get(limit=40)
+    fits = [u["fit"] for u in d["units"] if u.get("fit")]
+    if not fits:
+        pytest.skip("platform_industry_floor_fit.json 미빌드 — "
+                    "python -m data.pipelines.build_industry_floor_fit")
+
+    for f in fits:
+        assert f["basis"] in ("purps_floor", "floor")
+        # 표본 수 없이 비중만 주면 "3건 중 2건"이 67% 로 읽힌다
+        assert f["n"] >= (d["fit_meta"] or {}).get("min_sample", 30)
+        assert f["top"] and all(0 < t["share"] <= 1 and t["n"] > 0 for t in f["top"])
+        # 응답 스스로 **한계**를 말한다 — 파일에만 적어 두면 API 만 보는 쪽은 못 본다.
+        # 좁힌 관측이면 "잘 된다는 뜻이 아니다", 폴백이면 폴백이라고 밝혀야 한다.
+        assert "뜻이 아니다" in f["note"] or "폴백" in f["note"]
+
+    # 폴백은 폴백이라고 밝힌다
+    for f in fits:
+        if f["basis"] == "floor":
+            assert "폴백" in f["note"]
+
+
+def test_fit_absent_means_no_evidence_not_empty_list() -> None:
+    """근거가 없으면 `fit` 키 자체가 없다.
+
+    빈 목록을 주면 "이 자리에 들어갈 업종이 없다"로 읽힌다 — 그건 우리가 관측한
+    것이 아니라 표본이 얇다는 뜻이다.
+    """
+    d = _get(limit=40)
+    for u in d["units"]:
+        assert u.get("fit") is None or u["fit"]["top"]
+
+
+def test_fit_meta_discloses_the_join_rate() -> None:
+    """표의 한계(조인율)가 목록에 같이 온다 — 부분 표본을 전수로 읽으면 안 된다."""
+    d = _get(limit=1)
+    meta = d.get("fit_meta")
+    if not meta:
+        pytest.skip("platform_industry_floor_fit.json 미빌드")
+    st = meta.get("stats") or {}
+    assert st.get("joined", 0) > 0 and st.get("stores", 0) > st.get("joined", 0)
+    assert "관측" in (meta.get("note") or "")

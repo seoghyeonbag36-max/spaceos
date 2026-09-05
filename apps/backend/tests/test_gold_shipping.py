@@ -35,6 +35,8 @@ _SHIPPED = [
     "platform_posting_cost_rates.json",
     "platform_posting_inputs.json",
     "platform_industry_recommend.json",
+    # 2026-09-05 추가 — services/industry_fit 이 읽는 층·용도별 업종 관측 분포.
+    "platform_industry_floor_fit.json",
     "platform_vacancy_forecast.json",
     "platform_events.json",
     "platform_page_footfall.json",

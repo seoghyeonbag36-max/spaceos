@@ -13,7 +13,8 @@ import { loadNaverMaps, describeNaverMapError } from "@/lib/naverMap";
 import { colors } from "@/design/tokens/colors";
 import "./PageDashboard.css";
 
-const BuildingTwin = lazy(() => import("@/components/BuildingTwin"));
+// 거리뷰 SDK·층 스택을 끌고 들어오므로 눌렀을 때만 받는다.
+const BuildingViewer = lazy(() => import("@/components/BuildingViewer"));
 
 // 건물 공실 상태 → 색·라벨 (design 토큰 vacancy 색계열 재사용 — MapShell 과 동일 규칙)
 const B_STATUS: Record<string, { color: string; label: string }> = {
@@ -26,7 +27,9 @@ const B_STATUS: Record<string, { color: string; label: string }> = {
 interface TwinSel {
   name: string; capacity: number; active: number; status: string;
   floors?: number;
-  // 층 실배치 — 층 근거가 있는 건물에만 실린다(없으면 트윈이 근사로 폴백).
+  /** 거리뷰가 바라볼 대상. 없으면 거리뷰 자리에 "이 자리에는 거리뷰가 없다"가 뜬다. */
+  center?: { lat: number; lng: number };
+  // 층 실배치 — 층 근거가 있는 건물에만 실린다(없으면 층 스택이 근사로 폴백).
   comFloors?: number[]; occFloors?: number[]; unknownN?: number;
 }
 
@@ -295,7 +298,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
   const [layer, setLayer] = useState<"buildings" | "grid">("buildings");
   const [mapReady, setMapReady] = useState(false);
   const [mapErr, setMapErr] = useState<string | null>(null);
-  const [sel, setSel] = useState<TwinSel | null>(null);   // 클릭한 건물(3D 트윈 대상)
+  const [sel, setSel] = useState<TwinSel | null>(null);   // 클릭한 건물(층 스택·거리뷰 대상)
   const [twinOpen, setTwinOpen] = useState(false);
 
   const clearOverlays = () => {
@@ -365,7 +368,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
 
     if (layer === "buildings" && bld) {
       // 공실 지도: 공실의심(empty) 건물만 개별 red dot 으로 — "어디가 비었나".
-      // 만실·부분공실·고공실은 숨긴다(SpaceOS 공실 개별값 목표: 진짜 빈 건물만). 점 클릭 → 상세+3D.
+      // 만실·부분공실·고공실은 숨긴다(SpaceOS 공실 개별값 목표: 진짜 빈 건물만). 점 클릭 → 상세+거리뷰.
       bld.features.forEach((f) => {
         const p = f.properties;
         if (p.status !== "empty") return;
@@ -398,6 +401,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
           setSel({
             name: p.name || "건물", capacity: p.capacity, active: p.active, status: p.status,
             floors: p.floors,
+            center: { lat: c.lat(), lng: c.lng() },
             comFloors: p.com_floors ?? undefined, occFloors: p.occ_floors ?? undefined,
             unknownN: p.unknown_n ?? undefined,
           });
@@ -447,7 +451,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
           onClick={() => setLayer("buildings")}>공실 건물</button>
         <button className={layer === "grid" ? "on" : ""} onClick={() => setLayer("grid")}>100m 그리드</button>
         {sel && layer === "buildings" && (
-          <button className="twinbtn" onClick={() => setTwinOpen(true)}>🏢 {sel.name} · 3D 트윈</button>
+          <button className="twinbtn" onClick={() => setTwinOpen(true)}>🏢 {sel.name} · 층별 공실 · 거리뷰</button>
         )}
       </div>
 
@@ -459,7 +463,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
             <span className="ml-chip"><i style={{ background: B_STATUS.empty.color }} />공실의심</span>
             {bld && (() => {
               const vac = bld.features.filter((f) => f.properties.status === "empty").length;
-              return <span className="ml-stat">공실의심 {vac.toLocaleString()}동(추정) · 점 클릭 시 상세·3D</span>;
+              return <span className="ml-stat">공실의심 {vac.toLocaleString()}동(추정) · 점 클릭 시 상세·거리뷰</span>;
             })()}
           </>
         ) : (
@@ -488,37 +492,23 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
         )}
       </div>
 
-      {/* 3D 디지털 트윈 모달 */}
+      {/* 건물 상세 — 2D 층 스택 + 네이버 거리뷰 (2026-09-05 에 3D 트윈을 대체했다) */}
       {twinOpen && sel && (
         <div className="twinmodal" onClick={() => setTwinOpen(false)}>
           <div className="twinbox" onClick={(e) => e.stopPropagation()}>
             <div className="twinhead">
-              <span>{sel.name} · 3D 디지털 트윈</span>
+              <span>{sel.name} · 층별 공실 · 거리뷰</span>
               <button onClick={() => setTwinOpen(false)}>✕</button>
             </div>
             <div className="twincanvas">
-              <Suspense fallback={<div className="twinload">3D 로딩…</div>}>
-                <BuildingTwin b={{
+              <Suspense fallback={<div className="twinload">불러오는 중…</div>}>
+                <BuildingViewer b={{
                   name: sel.name, capacity: sel.capacity, active: sel.active, floors: sel.floors,
                   statusColor: B_STATUS[sel.status]?.color ?? colors.vacancy[4],
+                  statusLabel: B_STATUS[sel.status]?.label, center: sel.center,
                   comFloors: sel.comFloors, occFloors: sel.occFloors, unknownN: sel.unknownN,
                 }} />
               </Suspense>
-            </div>
-            <div className="twinfoot">
-              {sel.comFloors?.length ? (
-                <>
-                  녹색 = 영업 확인 층({sel.occFloors?.join("·") || "없음"})
-                  {sel.unknownN ? ` · 노란색 = 층 미상 점포 ${sel.unknownN}곳이 앉을 수 있는 층` : ""}
-                  {" · "}{B_STATUS[sel.status]?.label ?? ""}색 = 공실 · 회색 = 비상업 층
-                  {" · "}상업 {sel.comFloors.length}개 층 중 {sel.active}개 영업
-                </>
-              ) : (
-                <>
-                  녹색 = 영업 층(점유율 환산) · {B_STATUS[sel.status]?.label ?? ""}색 = 공실(추정) · {sel.active}/{sel.capacity}호
-                  <span style={{ opacity: 0.75 }}> · 층 근거가 없어 아래부터 채운 근사다</span>
-                </>
-              )}
             </div>
           </div>
         </div>
@@ -597,6 +587,17 @@ function FloorVacancies({ list }: { list: FloorVacancyList | null }) {
       )}
 
       <div className="fv-note">
+        {list.fit_meta && (
+          <>
+            업종은 <b>추천이 아니라 관측</b>이다 — 상가정보 × 건축물대장 층별개요를
+            (지번, 층)으로 조인해 "같은 조건의 자리에 실제로 무엇이 들어와 있는가"를 센 것이고,
+            그 자리에서 <b>잘 된다는 뜻이 아니다</b>(매출·생존은 안 봤다).
+            {list.fit_meta.stats && <> 조인 {list.fit_meta.stats.joined?.toLocaleString()}건
+              / 점포 {list.fit_meta.stats.stores?.toLocaleString()}건 —
+              상가정보 층 공란과 층별개요 미수집분이 빠진 부분 표본이다.</>}
+            <br />
+          </>
+        )}
         <b>확정</b> = 층 미상 점포를 낮은 층부터 다 앉히고도 남은 층이라 비었음이 확정이다.
         {" "}<b>추정</b> = 그 배정에 먹힌 층이라, 층 미상 점포가 다른 층에 있으면 빈다 —
         괄호의 원인은 상가정보 층 표기 공란(약 30%)이다.
@@ -626,6 +627,19 @@ function FloorVacancyCard({ u }: { u: FloorVacancyUnit }) {
         {u.purps ? <> · 대장 용도 <b>{u.purps}</b></> : null}
         {u.was ? <> · 건물 주업종 {u.was}</> : null}
       </div>
+      {u.fit && (
+        <div className={"fv-fit" + (u.fit.basis === "purps_floor" ? "" : " weak")}>
+          <span className="fv-fit-k">
+            {u.fit.basis === "purps_floor" ? "같은 용도·층에서 영업 중" : "같은 층에서 영업 중"}
+          </span>
+          {u.fit.top.map((t) => (
+            <span key={t.industry} className="fv-fit-v">
+              {t.industry} <em>{Math.round(t.share * 100)}%</em>
+            </span>
+          ))}
+          <span className="fv-fit-n">표본 {u.fit.n.toLocaleString()}건</span>
+        </div>
+      )}
       <div className="fv-sub">
         상업층 {u.com_floors.join("·")}
         {u.occ_floors.length ? <> · 영업 확인 {u.occ_floors.join("·")}층</> : <> · 영업 확인 층 없음</>}

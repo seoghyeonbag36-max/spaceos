@@ -10,6 +10,25 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 
+class IndustryFitEntry(BaseModel):
+    industry: str
+    share: float          # 그 칸에서 이 업종이 차지한 **관측 비중**(확률이 아니다)
+    n: int
+
+
+class IndustryFit(BaseModel):
+    """이 매물과 같은 조건(대장 용도·층)의 자리에서 실제 영업 중인 업종 분포.
+
+    ⚠ **추천이 아니라 관측이다.** 그 자리에서 잘 된다는 뜻이 아니며(매출·생존은 안 봤다),
+       GNN 업종 추천과도 다른 축이다(저쪽은 좌표 기준 7종 라벨).
+    """
+    # "purps_floor" 용도+층으로 좁힌 관측 · "floor" 용도 표본이 얇아 층만 본 폴백
+    basis: str
+    n: int                # 이 칸의 표본 수 — 없으면 비중을 못 읽는다
+    top: list[IndustryFitEntry]
+    note: str
+
+
 class FloorVacancyUnit(BaseModel):
     id: str
     building_id: str | None = None
@@ -37,6 +56,8 @@ class FloorVacancyUnit(BaseModel):
     occ_floors: list[int] = []
     unknown_n: int = 0
     was: str = ""
+    # 근거가 없으면 **키가 없다**. 빈 목록을 주면 "들어갈 업종이 없다"로 읽힌다.
+    fit: IndustryFit | None = None
 
 
 class FloorVacancyList(BaseModel):
@@ -48,4 +69,6 @@ class FloorVacancyList(BaseModel):
     built_at: str | None = None
     source: str | None = None
     note: str | None = None
+    # 적합도 표 자체의 근거·한계(조인율 약 30% 등). 유닛마다 반복하지 않는다.
+    fit_meta: dict | None = None
     units: list[FloorVacancyUnit]
