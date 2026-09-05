@@ -33,5 +33,6 @@ description: 상위 목표를 PPPP+Design 트랙으로 분해하고 전문 에�
 
 ## 원칙
 - 데이터 기반·추측 최소화·논리적 구조(`CLAUDE.md`). 더미엔 반드시 `TODO`.
-- 핵심 가설 "Place→Platform"·Humanistic Authority(균형·공생·공감)를 의사결정 기준으로 유지.
+- 핵심 가설 "Place ▶ Platform"·Humanistic Authority(균형·공생·공감)를 의사결정 기준으로 유지.
+- 4P 대응은 **2026-09-05 에 1:1 로 재정의**됐다 — Place▶Platform · Product▶Page · Price▶Posting · Promotion▶Program (정본 `CLAUDE.md` §PPPP Framework).
 - 한 트랙 깊은 작업은 해당 슬래시 명령(`/platform` `/page` `/posting` `/program` `/design`)으로 전환을 권고.

@@ -123,10 +123,10 @@ Claude Code는 이미지·스케치를 보고 코드로 옮길 수 있다.
 
 | 화면 | 기능 | 참고 |
 |------|------|------|
-| 공실 히트맵·3D 트윈 맵 | Page | [feature-page.md](feature-page.md) |
-| AI 업종 추천·매출 시뮬 결과 | Platform | [feature-platform.md](feature-platform.md) |
-| 입점 전략 비교(ROI) 화면 | Posting | [feature-posting.md](feature-posting.md) |
-| 마케팅 콘텐츠 생성 UI | Program | [feature-program.md](feature-program.md) |
+| 공실 히트맵·층 스택·거리뷰 | Page (`Product ▶ Page`) | [feature-page.md](feature-page.md) |
+| AI 업종 추천·상권 정체성 | Platform (`Place ▶ Platform`) | [feature-platform.md](feature-platform.md) |
+| 입점 전략 비교(가격대·ROI) 화면 | Posting (`Price ▶ Posting`) | [feature-posting.md](feature-posting.md) |
+| 마케팅 콘텐츠 생성 UI | Program (`Promotion ▶ Program`) | [feature-program.md](feature-program.md) |
 
 ---
 

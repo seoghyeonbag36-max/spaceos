@@ -243,8 +243,8 @@ export default function ProgramStudio() {
   return (
     <div className="progstudio"><div className="wrap">
       <div className="hd">
-        <div className="ey">SpaceOS · Program</div>
-        <h1>가게 단위 마케팅 솔루션</h1>
+        <div className="ey">SpaceOS · Program <span className="conv4p">PROMOTION ▶ PROGRAM</span></div>
+        <h1>어떤 홍보 program 을 돌릴까 — 가게 단위</h1>
         <div className="sub">
           가게의 리뷰·사진·메뉴·기본정보를 넣으면 온라인/오프라인 광고 솔루션을 근거와 함께 생성한다.
           상호를 검색하면 카카오 로컬(기본정보)과 네이버 블로그(리뷰성 스니펫)로 절반쯤 자동으로 채워진다.

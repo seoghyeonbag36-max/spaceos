@@ -120,7 +120,7 @@ export default function PlatformConsole() {
   return (
     <div className="platconsole"><div className="wrap">
       <div className="hd">
-        <div className="ey">SPACEOS · PLATFORM</div>
+        <div className="ey">SPACEOS · PLATFORM <span className="conv4p">PLACE ▶ PLATFORM</span></div>
         <h1>이 상권은 어떤 플랫폼인가</h1>
         <div className="sub">
           상권을 하나의 플랫폼으로 본다. 무엇이 모여 있고, 누가·언제 오고, 밖에서 뭐라고

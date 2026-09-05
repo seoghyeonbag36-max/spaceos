@@ -7,15 +7,15 @@
 
 | # | PPPP | 결과물 성격 | 실행 세션 |
 |---|------|-----------|----------|
-| 1 | **Platform** — 상권 AI 추천 엔진 | 코드 (백엔드 API) | Claude Code |
-| 2 | **Page** — 공실 히트맵 + 3D 트윈 | 코드 (프론트엔드) | Claude Code |
-| 3 | **Posting** — 입점 솔루션 비용-효용 | 분석 보고서 (docx) | Cowork |
-| 4 | **Program** — 마케팅 자동화 | 콘텐츠 패키지 (docx) | Cowork |
+| 1 | **Platform** (`Place ▶ Platform`) — 상권 AI 추천 엔진 | 코드 (백엔드 API) | Claude Code |
+| 2 | **Page** (`Product ▶ Page`) — 공실 히트맵 + 층 스택 + 거리뷰 | 코드 (프론트엔드) | Claude Code |
+| 3 | **Posting** (`Price ▶ Posting`) — 어느 가격대의 page 를 올릴까(비용-효용) | 분석 보고서 (docx) | Cowork |
+| 4 | **Program** (`Promotion ▶ Program`) — 마케팅 자동화 | 콘텐츠 패키지 (docx) | Cowork |
 | 5 | **디자인** — PPPP UX/UI 시스템 | UI 표준화 + HTML 목업 | Claude Code |
 
 ---
 
-## 1. Platform — 서울 25구 상권 AI 추천 엔진 (Claude Code)
+## 1. Platform (Place ▶ Platform) — 서울 25구 상권 AI 추천 엔진 (Claude Code)
 
 ```
 SpaceOS 저장소에서 Claude Code 세션으로 작업해줘.
@@ -33,7 +33,7 @@ SpaceOS 저장소에서 Claude Code 세션으로 작업해줘.
 
 ---
 
-## 2. Page — 서울 25구 공실 히트맵 + 3D 디지털 트윈 (Claude Code)
+## 2. Page (Product ▶ Page) — 서울 25구 공실 히트맵 + 층 스택·거리뷰 (Claude Code)
 
 ```
 SpaceOS 저장소에서 Claude Code 세션으로 작업해줘.
@@ -50,7 +50,7 @@ npm run build(타입체크 통과)까지 확인하고, 변경 파일과 스크�
 
 ---
 
-## 3. Posting — 강남구 입점 솔루션 비용-효용 분석 (Cowork → docx)
+## 3. Posting (Price ▶ Posting) — 강남구 입점 솔루션 비용-효용 분석 (Cowork → docx)
 
 ```
 SpaceOS 폴더 기준 Cowork 작업.
@@ -68,7 +68,7 @@ SpaceOS 폴더에 저장하고 파일 위치를 알려줘.
 
 ---
 
-## 4. Program — 마포구 마케팅 자동화 패키지 (Cowork → docx)
+## 4. Program (Promotion ▶ Program) — 마포구 마케팅 자동화 패키지 (Cowork → docx)
 
 ```
 SpaceOS 폴더 기준 Cowork 작업.

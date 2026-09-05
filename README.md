@@ -1,6 +1,16 @@
 # SpaceOS — 상권 디지털 트윈 플랫폼
 
-물리적 상권의 리뷰 데이터와 공실 히스토리를 결합해 "Place → Platform"으로 전환하는 디지털 트윈 SaaS. 모노레포로 구성되어 있으며 Claude Code 기반 개발을 전제로 셋업되어 있다.
+물리적 상권의 리뷰 데이터와 공실 히스토리를 결합해 **"Place ▶ Platform"** 으로 전환하는 디지털 트윈 SaaS. 모노레포로 구성되어 있으며 Claude Code 기반 개발을 전제로 셋업되어 있다.
+
+4대 기능 **PPPP** 는 전통 마케팅 4P 와 **1:1** 로 대응한다 (2026-09-05 재정의):
+
+| 전환 | 트랙 | 묻는 질문 |
+|------|------|-----------|
+| **Place ▶ Platform** | Platform | 이 입지·상권은 어떤 플랫폼인가? |
+| **Product ▶ Page** | Page | 이 platform 안에 어떤 page 가 만들어져야 하는가? |
+| **Price ▶ Posting** | Posting | 어떤 가격대의 page 가 이 platform 에 posting 되어야 하는가? |
+| **Promotion ▶ Program** | Program | posting 한 page 를 어떤 홍보 program 으로 돌릴 것인가? |
+
 
 ## 구조
 

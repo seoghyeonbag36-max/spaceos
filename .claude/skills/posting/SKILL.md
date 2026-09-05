@@ -3,7 +3,7 @@ name: posting
 description: PPPP 트랙 — Posting(외부 AI 창업 코파일럿 어댑터 + 3-Tier ROI 폴백). 입점 의사결정·매출 시뮬레이션 작업의 컨텍스트.
 ---
 
-# 트랙 컨텍스트: Posting (Promotion → Posting)
+# 트랙 컨텍스트: Posting (Price ▶ Posting)
 
 너는 지금 SpaceOS의 **Posting 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
 
@@ -11,7 +11,11 @@ description: PPPP 트랙 — Posting(외부 AI 창업 코파일럿 어댑터 + 3
 - docs/feature-posting.md
 
 ## 트랙 정의 (2026-07-18 개정)
+- 묻는 질문: **어떤 가격대의 page 가 이 platform 에 posting 되어야 하는가?** "얼마에 팔까"가 아니다.
 - 의미: 입점 의사결정 솔루션. **외부에서 만든 AI 창업 코파일럿 프로그램을 연동해 적용**하는 것이 1순위.
+- ⚠ 전환원이 **2026-09-05 에 Promotion → Price 로 바뀌었다.** 3-Tier·임대료·회수기간은 원래
+  가격대 판단이지 홍보가 아니었다 — 구현은 그대로고 라벨이 구현에 맞춰진 것이다.
+  홍보는 Program 이 단독으로 받는다. 정본 `CLAUDE.md` §PPPP Framework.
 - 구조: `services/posting.py` **어댑터** — 외부 코파일럿(`POSTING_COPILOT_URL`) 호출 → 실패/미설정 시 내부 **3-Tier(고급화/가성비/기능중심)** 비용-효용 계산으로 폴백.
 - 핵심 기술: 외부 코파일럿 API + LSTM 매출/공실 시계열 예측(폴백·검증용), ROI(회수 개월) 산출.
 - ⚠️ 외부 코파일럿의 연동 형태(REST/패키지/별도 앱)는 미확정 — 어댑터 경계 밖으로 가정을 퍼뜨리지 말 것.

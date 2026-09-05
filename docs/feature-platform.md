@@ -1,6 +1,12 @@
 # Platform — 상권 AI 추천 엔진
 
-> PPPP: **Place → Platform**. 각 상권을 데이터·AI가 작동하는 하나의 플랫폼으로 전환. 공실 예측(LSTM)과 업종 추천(GNN)이 핵심.
+> PPPP: **Place ▶ Platform** — *이 입지·상권은 어떤 플랫폼인가?* 물리적 공간을 SNS·디지털
+> 관점에서 하나의 공간/플랫폼으로 읽는다. 각 상권을 데이터·AI가 작동하는 플랫폼으로 전환하고,
+> 공실 예측(LSTM)과 업종 추천(GNN)이 그 답을 낸다.
+>
+> ⚠ **2026-09-05 — 4P 대응이 1:1 로 재정의됐다.** Platform 의 전환원(Place)은 그대로지만,
+> Page 는 `Product/Price` 가 아니라 **Product**, Posting 은 `Promotion` 이 아니라 **Price**,
+> Program 이 **Promotion** 을 단독으로 받는다. 정본은 `CLAUDE.md` §PPPP Framework.
 
 ## 0. 구현 현황 (서빙 **66거점** 기준 — LSTM 2026-09-04 · GNN 117열 서빙본)
 

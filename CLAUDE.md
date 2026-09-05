@@ -4,15 +4,22 @@
 **sh.pac** (seoghyeonbag36@gmail.com) — SpaceOS 창업자 겸 디지털 트윈 AI/IT 개발자. 지역 상권의 리뷰 데이터와 공실 히스토리를 결합해 물리적 상권을 디지털 트윈 SaaS로 플랫폼화하는 프로젝트를 진행 중.
 
 ## Project Identity
-**SpaceOS** — 물리적 상권의 디지털 트윈 플랫폼. "Place의 Platform화" 가설 검증. 18~24개월 내 네이버/카카오/직방 대상 M&A Exit 목표.
+**SpaceOS** — 물리적 상권의 디지털 트윈 플랫폼. "Place ▶ Platform" 가설 검증(물리적 공간을 디지털·SNS 관점의 플랫폼으로 읽는다). 18~24개월 내 네이버/카카오/직방 대상 M&A Exit 목표.
 
 ## PPPP Framework (핵심 4기능)
-| 기능 | 전환 | 의미 |
-|------|------|------|
-| **Platform** | Place → Platform | 상권 AI 추천 엔진 (각 상권을 하나의 플랫폼화) |
-| **Page** | Product/Price → Page | 공실 히트맵 + **층별 매물 목록 + 네이버 거리뷰** (어느 건물 몇 층이 비었나) — 3D 트윈은 2026-09-05 폐기 |
-| **Posting** | Promotion → Posting | 입점 솔루션 — **외부 AI 창업 코파일럿 연동**(어댑터) + 3-Tier 비용-효용 폴백 |
-| **Program** | Promotion → Program | 마케팅 자동화 — **대상은 Platform(상권) 내 빈 Page(공실 건물)에 Posting(창업)할 기업**이다. 그 기업에게 온/오프라인으로 어떻게 마케팅·홍보할지 알려준다 (2026-08-16 대상 재정의) |
+
+**2026-09-05 재정의 — 4P 를 1:1 로 갈아끼웠다.** 종전에는 Page 가 `Product/Price` 를 겸하고
+Posting·Program 이 `Promotion` 하나를 나눠 가졌다. 지금은 **4P 가 네 트랙에 하나씩** 대응한다.
+Price 는 Posting 으로, Promotion 은 Program 으로만 간다.
+
+| 기능 | 전환 | 묻는 질문 | 구현 |
+|------|------|------|------|
+| **Platform** | **Place ▶ Platform** | 이 입지·상권은 **어떤 플랫폼인가?** 이 물리적 공간을 SNS·디지털 관점에서 하나의 공간/플랫폼으로 읽는다 | 상권 AI 추천 엔진 (LSTM 공실 예측 · GNN 업종 추천 · 상권 정체성) |
+| **Page** | **Product ▶ Page** | 제품·상품이 아니라, 이 platform 안에 **어떤 page 가 만들어져야 하는가?** | 공실 히트맵 + **층별 매물 목록 + 네이버 거리뷰** (어느 건물 몇 층이 비었나 = 어디에 page 자리가 있나) — 3D 트윈은 2026-09-05 폐기 |
+| **Posting** | **Price ▶ Posting** | "얼마에 팔 것인가"가 아니라, **어떤 가격대의 page 가 이 platform 에 posting 되어야 하는가?** | 입점 솔루션 — **외부 AI 창업 코파일럿 연동**(어댑터) + 3-Tier(고급화/가성비/기능중심) 비용-효용 폴백. 임대료·회수기간이 곧 가격대 판단이다 |
+| **Program** | **Promotion ▶ Program** | 이 platform 에 posting 한 page 를 **온라인·오프라인에서 어떤 홍보 program 으로 돌릴 것인가?** | 마케팅 자동화 — **대상은 Platform(상권) 내 빈 Page(공실 건물)에 Posting(입점)할 기업**이다. 그 기업에게 온/오프라인 홍보 방법을 알려준다 (2026-08-16 대상 재정의) |
+
+한 줄로: **어떤 플랫폼인가 → 어떤 page 를 놓을까 → 어느 가격대로 posting 할까 → 어떻게 program 을 돌릴까.**
 
 ## Active Projects
 | 이름 | 내용 |
@@ -40,7 +47,7 @@
 ## Key Terms
 | 용어 | 의미 |
 |------|------|
-| **PPPP** | Platform·Page·Posting·Program (디지털 4P 프레임워크) |
+| **PPPP** | Platform·Page·Posting·Program (디지털 4P 프레임워크). 전통 4P 와 1:1 — Place▶Platform · Product▶Page · Price▶Posting · Promotion▶Program (2026-09-05 재정의) |
 | **바이브 코딩** | 자연어 PRD → AI 코드 생성 → 검증 사이클 (Cursor + Claude Code) |
 | **거점 상권** | MVP 검증할 1개 상권. 1순위 신사동 가로수길, 2순위 홍대·연남동 |
 | **Bronze/Silver/Gold** | 데이터 레이크 3계층 (원본/정제/분석용) |

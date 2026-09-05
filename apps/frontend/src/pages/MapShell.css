@@ -114,6 +114,9 @@
   padding: 14px 16px 10px; border-bottom: 1px solid var(--line, #e3e9f2);
 }
 .mapshell .side-panel .sp-title { font-size: 15px; font-weight: 800; }
+/* 4P 전환 라벨 — Page 트랙이 무엇의 디지털 전환인지 화면에서 밝힌다(2026-09-05 재정의). */
+.mapshell .side-panel .sp-track { font-size: 10px; font-weight: 700; letter-spacing: .9px;
+  color: #2BC8D9; margin-bottom: 2px; }
 .mapshell .side-panel .sp-sub { font-size: 12px; color: var(--muted, #6b7280); margin-top: 2px; }
 /* R-ONE 앵커 대조 — 판정이 아니라 참고 지표라 중립색(PageDashboard .anchorchip 과 동일 규칙) */
 .mapshell .side-panel .sp-anchor {

@@ -39,7 +39,10 @@ type View = "seoul" | "hubs" | "platform" | "map" | "posting" | "program";
 const NAV: { key: View; label: string; icon: JSX.Element }[] = [
   { key: "seoul", label: "서울", icon: <IconGrid /> },
   { key: "hubs", label: "거점", icon: <IconLayers /> },
-  // PPPP 네 트랙 — 순서가 곧 프레임워크 순서다(Platform → Page → Posting → Program)
+  // PPPP 네 트랙 — 순서가 곧 프레임워크 순서다(Platform → Page → Posting → Program).
+  // 전통 4P 와 1:1 대응한다(2026-09-05 재정의): Place▶Platform · Product▶Page ·
+  // Price▶Posting · Promotion▶Program. 종전엔 Page 가 Product/Price 를 겸하고
+  // Posting·Program 이 Promotion 하나를 나눠 가졌다 — 라벨을 되돌리지 말 것.
   { key: "platform", label: "Platform", icon: <IconSpark /> },
   { key: "map", label: "Page", icon: <IconPin /> },
   { key: "posting", label: "Posting", icon: <IconKey /> },

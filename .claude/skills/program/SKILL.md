@@ -3,7 +3,7 @@ name: program
 description: PPPP 트랙 — Program(가게·상권 단위 마케팅 솔루션 자동 생성). LLM 콘텐츠 생성과 데이터 채널 제약(크롤링 금지선)을 다룰 때.
 ---
 
-# 트랙 컨텍스트: Program (Promotion → Program)
+# 트랙 컨텍스트: Program (Promotion ▶ Program)
 
 너는 지금 SpaceOS의 **Program 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
 
@@ -11,6 +11,9 @@ description: PPPP 트랙 — Program(가게·상권 단위 마케팅 솔루션 �
 - docs/feature-program.md
 
 ## 트랙 정의 (2026-07-18 개정 — 2단계)
+- 묻는 질문: **이 platform 에 posting 한 page 를 온·오프라인에서 어떤 홍보 program 으로 돌릴 것인가?**
+- ⚠ **2026-09-05 재정의로 Promotion 은 이 트랙이 단독으로 받는다**(종전엔 Posting 과 나눠 가졌다).
+  정본 `CLAUDE.md` §PPPP Framework.
 1. **가게 단위(우선)**: 네이버 지도에 노출되는 상가의 **사진·정보·이미지·리뷰** 데이터를 활용해 그 가게의 **온/오프라인 마케팅 광고 솔루션을 자동 생성**.
 2. **상권 단위(후속)**: **Platform에서 수집한 정보**(상권분석 시계열·감성·리뷰 키워드, `gold/program_content_context`)를 바탕으로 상권 마케팅 솔루션 생성.
 - 윤리 기준(필수): **Humanistic Authority** — 균형(Balance)·공생(Symbiosis)·공감(Empathy).

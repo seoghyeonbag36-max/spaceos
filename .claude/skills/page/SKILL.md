@@ -3,7 +3,7 @@ name: page
 description: PPPP 트랙 — Page(공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰). 히트맵·건물 레이어·지도 화면 작업의 컨텍스트와 화이트리스트 경로.
 ---
 
-# 트랙 컨텍스트: Page (Product/Price → Page)
+# 트랙 컨텍스트: Page (Product ▶ Page)
 
 너는 지금 SpaceOS의 **Page 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
 
@@ -12,7 +12,11 @@ description: PPPP 트랙 — Page(공실 히트맵 + 층별 매물 목록 + 네�
 - docs/feature-naver-integration.md
 
 ## 트랙 정의
-- 의미: "어떤 업장이 어디에" — **공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰**로 가치를 인터페이스화.
+- 묻는 질문: **이 platform 안에 어떤 page 가 만들어져야 하는가?** 제품·상품이 아니라 page 다.
+- 의미: "어떤 업장이 어디에, 어디가 비었나" — **공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰**로
+  page 가 놓일 자리를 인터페이스화.
+- ⚠ **가격대 판단은 이 트랙이 아니다.** 2026-09-05 재정의로 `Price` 는 Posting 으로 넘어갔다
+  (종전 라벨은 `Product/Price → Page`). 정본 `CLAUDE.md` §PPPP Framework.
 - 핵심 기술: **네이버 지도**(`naverMap.ts`, ncpKeyId — 지도 + 거리뷰 파노라마),
   **2D 층 스택**(`BuildingViewer.tsx`), 100m 그리드.
   ⚠ 3D 트윈(@react-three/fiber)은 **2026-09-05 에 제거됐다** — 다시 끌어오지 말 것(feature-posting.md §0-V).

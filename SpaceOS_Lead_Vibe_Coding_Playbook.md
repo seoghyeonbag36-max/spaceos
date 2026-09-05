@@ -115,6 +115,9 @@ SpaceOS/
 ### 2.2 리드의 지도 — PPPP ↔ 폴더 · 엔드포인트 · api.ts (핵심)
 트랙을 오갈 때 "어디를 건드리는가"를 한 장으로. (현 코드 실제값)
 
+> 트랙 이름의 뜻: **Place ▶ Platform · Product ▶ Page · Price ▶ Posting · Promotion ▶ Program**
+> (2026-09-05 에 4P 와 1:1 로 재정의 — 정본 `CLAUDE.md` §PPPP Framework)
+
 | 트랙 | 슬래시 | 주 편집 폴더 | 백엔드 엔드포인트 | FE 호출 (`src/lib/api.ts`) |
 |------|--------|-------------|-------------------|----------------------------|
 | **Platform** | `/platform` | `ml/models/gnn`, `app/api/v1/ai.py` | `POST /ai/recommend-industry` · `POST /ai/predict-vacancy` · `GET /commercial-districts/{id}/sentiment` | `getSentiment(id)` |
