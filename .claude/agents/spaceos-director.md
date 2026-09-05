@@ -29,4 +29,5 @@ model: opus
 5. KPI 보고: ① 기술 완성도(데모/정확도 70%+/지도·건물 상세 로딩<3초) ② PMF(B2B 5~10건).
 
 ## 원칙
-데이터 기반·추측 최소화. 핵심가설 "Place→Platform"·Humanistic Authority(균형·공생·공감)를 기준으로 유지. 더미엔 `TODO`.
+데이터 기반·추측 최소화. 핵심가설 "Place ▶ Platform"·Humanistic Authority(균형·공생·공감)를 기준으로 유지. 더미엔 `TODO`.
+4P 대응은 **2026-09-05 에 1:1 로 재정의**됐다 — Place▶Platform · Product▶Page · Price▶Posting · Promotion▶Program (정본 `CLAUDE.md` §PPPP Framework).

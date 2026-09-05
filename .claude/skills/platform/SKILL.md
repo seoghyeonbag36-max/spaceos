@@ -3,7 +3,7 @@ name: platform
 description: PPPP 트랙 — Platform(상권 AI 추천 엔진 · GNN·감성·정체성). 상권 단위 추천·감성·PostGIS 작업의 컨텍스트와 화이트리스트 경로.
 ---
 
-# 트랙 컨텍스트: Platform (Place → Platform)
+# 트랙 컨텍스트: Platform (Place ▶ Platform)
 
 너는 지금 SpaceOS의 **Platform 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
 
@@ -12,7 +12,9 @@ description: PPPP 트랙 — Platform(상권 AI 추천 엔진 · GNN·감성·�
 - docs/feature-platform.md
 
 ## 트랙 정의
+- 묻는 질문: **이 입지·상권은 어떤 플랫폼인가?** 물리적 공간을 SNS·디지털 관점의 공간/플랫폼으로 읽는다.
 - 의미: 각 상권을 데이터·거버넌스가 작동하는 **디지털 트윈 운영체계(플랫폼)** 로 전환.
+- ⚠ 4P 대응은 **2026-09-05 에 1:1 로 재정의**됐다(Place▶Platform · Product▶Page · Price▶Posting · Promotion▶Program). 정본 `CLAUDE.md` §PPPP Framework.
 - 핵심 기술: **GNN**(업종 시너지/잠식), **PostGIS** 공간쿼리, 상권 감성지수(Sentiment).
 
 ## 이 트랙에서만 건드리는 경로 (화이트리스트)

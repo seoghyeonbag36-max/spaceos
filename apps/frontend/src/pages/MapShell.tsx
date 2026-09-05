@@ -371,6 +371,9 @@ export default function MapShell() {
       {/* 좌측 리스트 패널 (모바일: 하단 시트) */}
       <div className="overlay side-panel">
         <div className="sp-head">
+          {/* PPPP: Product ▶ Page — 이 platform 안에 어떤 page 가 놓일 자리인지를 본다.
+              가격대 판단은 Posting(Price ▶ Posting) 의 몫이라 여기서 답하지 않는다. */}
+          <div className="sp-track">PRODUCT ▶ PAGE</div>
           <div className="sp-title">{hub?.name ?? "가로수길"} · 건물 공실</div>
           <div className="sp-sub">
             {hub ? `${hub.gu} · ` : ""}{filtered.length.toLocaleString()}동 · {src === "api" ? "실측" : "샘플"}(추정)

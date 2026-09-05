@@ -79,9 +79,9 @@ SpaceOS는 "자연어 PRD → AI 코드 생성 → 검증" 사이클로 개발�
 
 | 기능 | 의미 | 주요 코드 영역 | 가이드 |
 |------|------|--------------|--------|
-| **Platform** | 상권 AI 추천 엔진 | `ml/`, `apps/backend/app/api/v1/ai.py` | [feature-platform.md](feature-platform.md) |
-| **Page** | 공실 히트맵 + 3D 디지털 트윈 | `apps/frontend/`, `apps/backend`(buildings/heatmap) | [feature-page.md](feature-page.md) |
-| **Posting** | 입점 솔루션(비용-효용 분석) | `apps/backend`(services), `ml`(시뮬) | [feature-posting.md](feature-posting.md) |
-| **Program** | LLM 마케팅 자동화 + 행사 추천 | `apps/backend`(marketing), LLM 연동 | [feature-program.md](feature-program.md) |
+| **Platform**<br>`Place ▶ Platform` | 이 상권은 어떤 플랫폼인가 — 상권 AI 추천 엔진 | `ml/`, `apps/backend/app/api/v1/ai.py` | [feature-platform.md](feature-platform.md) |
+| **Page**<br>`Product ▶ Page` | 어떤 page 를 놓을 자리인가 — 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 (3D 트윈은 2026-09-05 폐기) | `apps/frontend/`, `apps/backend`(buildings/heatmap) | [feature-page.md](feature-page.md) |
+| **Posting**<br>`Price ▶ Posting` | 어느 가격대의 page 를 올리나 — 입점 솔루션(비용-효용 분석) | `apps/backend`(services), `ml`(시뮬) | [feature-posting.md](feature-posting.md) |
+| **Program**<br>`Promotion ▶ Program` | 어떤 홍보 program 을 도나 — LLM 마케팅 자동화 + 행사 추천 | `apps/backend`(marketing), LLM 연동 | [feature-program.md](feature-program.md) |
 
 공통 데이터 기반은 `data/`(Bronze→Silver→Gold)이며 모든 기능이 Gold 레이어(PostGIS)를 소비한다.

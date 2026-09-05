@@ -17,7 +17,7 @@ from app.core.config import settings
 
 app = FastAPI(
     title="SpaceOS API",
-    description="물리적 상권의 디지털 트윈 플랫폼 (Place → Platform)",
+    description="물리적 상권의 디지털 트윈 플랫폼 (Place ▶ Platform · Product ▶ Page · Price ▶ Posting · Promotion ▶ Program)",
     version="0.1.0",
 )
 

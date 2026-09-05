@@ -9,6 +9,11 @@
 > 거점의 산출물 7 이 섞이기 때문이다. 서빙 목록은 `page_hubs.ACTIVE_HUBS` 가 단일 출처다.
 >
 > 진행률을 손으로 세지 말 것 — `python scripts/pppp_status.py` 가 산출물을 세어 찍는다.
+>
+> **트랙 이름의 뜻(2026-09-05 재정의)** — 4P 가 네 트랙에 1:1 로 붙는다:
+> `Place ▶ Platform` · `Product ▶ Page` · `Price ▶ Posting` · `Promotion ▶ Program`.
+> 종전에는 Page 가 Product/Price 를 겸하고 Posting·Program 이 Promotion 하나를 나눠 가졌다.
+> **구현·진행률은 바뀌지 않았다** — 아래 Phase 구성도 그대로다. 정본 `CLAUDE.md` §PPPP Framework.
 
 ## 현재 위치 요약 (2026-09-05)
 

@@ -1,6 +1,11 @@
 # Program — 마케팅 광고 솔루션 자동 생성 (가게 단위 → 상권 단위)
 
-> PPPP: **Promotion → Program**. Humanistic Authority(균형·공생·공감)를 윤리 기준으로 적용.
+> PPPP: **Promotion ▶ Program** — *이 platform 에 posting 한 page 를 온라인·오프라인에서
+> 어떤 홍보 program 으로 돌릴 것인가?* Humanistic Authority(균형·공생·공감)를 윤리 기준으로 적용.
+>
+> ⚠ **2026-09-05 — Program 이 Promotion 을 단독으로 받는다.** 종전에는 Posting 과
+> Promotion 하나를 나눠 가졌으나, Posting 이 **Price** 로 옮겨가면서 홍보는 전부 여기다.
+> 아래 **2026-08-16 대상 재정의**는 그대로 유효하다. 정본은 `CLAUDE.md` §PPPP Framework.
 >
 > ## ⚠ 2026-08-16 대상 재정의 — 아래 07-18 구조는 대상이 다르다
 >

@@ -38,6 +38,7 @@
   .sec-title { font-size:22px; font-weight:bold; color:#FFF; margin-bottom:4px; }
   .sec-why { font-size:14.5px; color:#8FA8BC; margin-bottom:14px; }
   .sec-why b { color:#E8F1F8; }
+  .q4p { font-size:12px; color:#8FA8BC; line-height:1.45; margin-top:3px; }
 
   /* connector */
   .conn { text-align:center; margin:10px 0 -8px; }
@@ -209,14 +210,15 @@
 <div class="sec">
   <div class="sec-tag">2 — 무엇을 만드는가</div>
   <div class="sec-title">PPPP Framework — 마케팅 4P의 디지털 전환</div>
-  <div class="sec-why">전개 순서 = <b>Page → Platform → Posting → Program</b>. 눈에 보이는 지도(Page)로 신뢰를 만들고, 지능(Platform)을 얹고, 의사결정(Posting)과 실행(Program)으로 확장한다.</div>
+  <div class="sec-why">4P 는 네 트랙에 <b>1:1</b> 로 붙는다 — <b>Place▶Platform · Product▶Page · Price▶Posting · Promotion▶Program</b> (2026-09-05 재정의: 종전엔 Page 가 Product/Price 를 겸하고 Posting·Program 이 Promotion 을 나눠 가졌다).<br>구축 전개 순서는 <b>Page → Platform → Posting → Program</b>. 눈에 보이는 지도(Page)로 신뢰를 만들고, 지능(Platform)을 얹고, 가격대 판단(Posting)과 홍보 실행(Program)으로 확장한다.</div>
   <div class="pppp-grid">
 
     <div class="pcard pc2">
       <div class="head">
         <div class="seq">STEP 1 · 지금 구축 중</div>
         <h3>Page</h3>
-        <div class="conv">Product/Price → Page</div>
+        <div class="conv">Product ▶ Page</div>
+        <div class="q4p">이 platform 안에 어떤 page 가 만들어져야 하는가?</div>
       </div>
       <div class="body">
         <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">"건물이 비었다"는 데이터는 세상에 존재하지 않는다. <b>결합해서 만들어야</b> 하고, 만들어야 눈에 보인다. 보여야 신뢰가 생긴다.</span></div>
@@ -232,7 +234,8 @@
       <div class="head">
         <div class="seq">STEP 2 · 지능화</div>
         <h3>Platform</h3>
-        <div class="conv">Place → Platform</div>
+        <div class="conv">Place ▶ Platform</div>
+        <div class="q4p">이 입지·상권은 어떤 플랫폼인가?</div>
       </div>
       <div class="body">
         <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">상권에 대한 <b>첫 인식·정보·평가가 일어나는 디지털 공간</b>을 운영하는 것 — 분석 도구가 아니라 스킨십 루프의 입구이자 출구.</span></div>
@@ -248,10 +251,11 @@
       <div class="head">
         <div class="seq">STEP 3 · 의사결정</div>
         <h3>Posting</h3>
-        <div class="conv">Promotion → Posting</div>
+        <div class="conv">Price ▶ Posting</div>
+        <div class="q4p">어떤 가격대의 page 가 posting 되어야 하는가?</div>
       </div>
       <div class="body">
-        <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">추천만으로는 아무도 계약하지 않는다. <b>비용-효용을 숫자로</b> 보여줘야 입점 의사결정이 일어난다 — 분석을 '실행'으로 잇는 관문.</span></div>
+        <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">추천만으로는 아무도 계약하지 않는다. <b>어느 가격대(Price)의 page 를 이 자리에 올릴지</b>를 숫자로 보여줘야 입점 의사결정이 일어난다 — 분석을 '실행'으로 잇는 관문.</span></div>
         <div class="pf"><span class="k how-k">구현</span><span class="txt"><b>LSTM 매출 시뮬레이터</b> + ROI 계산기. 전략 3종: 고급화(객단가 3만·회전 3회) / 가성비(1.2만·8회) / 기능중심(배달·임대료 80%↓)</span></div>
         <div class="pf"><span class="k dat-k">데이터</span><span class="txt">공정위 가맹정보(가맹금·인테리어 비용·평균매출) · 상권분석 추정매출/소득소비 · 부동산원 임대료 CSV</span></div>
         <div class="pf"><span class="k out-k">출력</span><span class="txt">3개 시나리오 × <b>12개월 매출·회수기간·리스크</b> + PDF 1-pager (B2B 영업 무기)</span></div>
@@ -264,7 +268,8 @@
       <div class="head">
         <div class="seq">STEP 4 · 실행/회수</div>
         <h3>Program</h3>
-        <div class="conv">Promotion → Program</div>
+        <div class="conv">Promotion ▶ Program</div>
+        <div class="q4p">posting 한 page 를 어떤 홍보 program 으로 돌릴 것인가?</div>
       </div>
       <div class="body">
         <div class="pf"><span class="k why-k">이유</span><span class="txt why-txt">입점 후 생존은 마케팅이 결정한다. 고객의 ③기록(리뷰·사진)을 <b>만들어내는 촉진자</b> — 폐루프를 완성해 데이터가 되돌아오게 한다.</span></div>

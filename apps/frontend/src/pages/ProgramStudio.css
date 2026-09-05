@@ -5,6 +5,7 @@
 .progstudio .wrap{max-width:1240px;margin:0 auto}
 .progstudio .hd{margin-bottom:14px}
 .progstudio .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+.progstudio .conv4p{margin-left:8px;padding:1px 7px;border-radius:99px;border:1px solid rgba(43,200,217,.45);color:#2BC8D9;font-size:10px;letter-spacing:.8px}
 .progstudio h1{font-size:27px;font-weight:800;margin:6px 0 4px;letter-spacing:-.5px}
 .progstudio .sub{font-size:13px;color:var(--sub);line-height:1.6;max-width:820px}
 

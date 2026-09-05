@@ -20,45 +20,64 @@
 
 ## 1.0 큰 그림 — PPPP + 디자인 파이프라인
 
-SpaceOS는 전통 마케팅 4P(Place·Product/Price·Promotion)를 **디지털 4P(PPPP)** 로 전환하고, 그 결과물을 하나의 앱으로 묶는 **디자인 과정**을 더해 5개 트랙으로 구성된다.
+SpaceOS는 전통 마케팅 4P(**Place · Product · Price · Promotion**)를 **디지털 4P(PPPP)** 로 전환하고, 그 결과물을 하나의 앱으로 묶는 **디자인 과정**을 더해 5개 트랙으로 구성된다.
+
+> ⚠ **2026-09-05 재정의 — 4P 가 네 트랙에 1:1 로 붙는다.** 종전에는 Page 가 `Product/Price` 를
+> 겸하고 Posting·Program 이 `Promotion` 하나를 나눠 가졌다. 지금은 **Price ▶ Posting**,
+> **Promotion ▶ Program** 으로 갈라져 겹치는 칸이 없다. 아래 1.1~1.4 의 "의미" 문장은 이
+> 재정의를 반영한 것이고, 구현 항목은 바뀌지 않았다.
 
 ```
 [데이터 수집] → P1 Platform → P2 Page → P3 Posting → P4 Program → [Design: 하나의 앱으로 통합]
-   Bronze         GNN 추천      공실 3D맵     입점 솔루션    마케팅 자동화      UX/UI · React FE
+   Bronze          Place▶         Product▶      Price▶         Promotion▶        UX/UI · React FE
+                   GNN 추천       공실 지도      입점 솔루션     마케팅 자동화
+                 어떤 플랫폼?   어떤 page?    어느 가격대?     어떤 홍보?
 ```
 
-| 트랙 | 전환(기존 4P → 디지털) | SpaceOS 구현 기능 | 핵심 기술 |
-|------|------------------------|-------------------|-----------|
-| **Platform** | Place → Platform | 상권 AI 추천 엔진 (각 상권을 하나의 플랫폼으로) | GNN, PostGIS |
-| **Page** | Product/Price → Page | 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 | 네이버 지도 SDK (Three.js·Mapbox 는 제거됨) |
-| **Posting** | Promotion → Posting | 입점 솔루션 (고급화/가성비/기능중심 비용-효용 분석) | LSTM, Scikit-learn |
-| **Program** | Promotion → Program | 온·오프라인 마케팅 자동화 (LLM 콘텐츠 + 행사 추천) | LangChain, LLM |
-| **Design** | — (통합 레이어) | 디자인 시스템 + 화면 설계 + React 구현·배포 | React, Tailwind, Figma |
+| 트랙 | 전환(기존 4P → 디지털) | 묻는 질문 | SpaceOS 구현 기능 | 핵심 기술 |
+|------|------------------------|-----------|-------------------|-----------|
+| **Platform** | **Place ▶ Platform** | 이 입지·상권은 **어떤 플랫폼인가?** | 상권 AI 추천 엔진 (각 상권을 하나의 플랫폼으로) | GNN, PostGIS |
+| **Page** | **Product ▶ Page** | 이 platform 안에 **어떤 page 가 만들어져야 하는가?** | 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 | 네이버 지도 SDK (Three.js·Mapbox 는 제거됨) |
+| **Posting** | **Price ▶ Posting** | **어떤 가격대의 page** 가 이 platform 에 posting 되어야 하는가? | 입점 솔루션 (고급화/가성비/기능중심 비용-효용 분석) | LSTM, Scikit-learn |
+| **Program** | **Promotion ▶ Program** | posting 한 page 를 **어떤 홍보 program** 으로 돌릴 것인가? | 온·오프라인 마케팅 자동화 (LLM 콘텐츠 + 행사 추천) | LangChain, LLM |
+| **Design** | — (통합 레이어) | 네 트랙을 **하나의 앱으로 어떻게 묶는가?** | 디자인 시스템 + 화면 설계 + React 구현·배포 | React, Tailwind, Figma |
 
 ## 1.1 Platform (플랫폼화)
 
-- **의미** — 물리적 *장소(Place)* 를 데이터와 거버넌스가 작동하는 **디지털 트윈 운영 체계**로 전환한다. 각 상권 자체를 하나의 "플랫폼"으로 본다.
+- **의미(Place ▶ Platform)** — **이 입지·상권은 어떤 플랫폼인가?** 물리적 *장소(Place)* 를
+  SNS·디지털 관점에서 하나의 공간/플랫폼으로 읽고, 데이터와 거버넌스가 작동하는
+  **디지털 트윈 운영 체계**로 전환한다.
 - **SpaceOS 구현** — 리뷰·유동인구·개폐업 데이터를 그래프로 모델링해, 특정 입지에 **최적 업종을 추천**하는 AI 엔진.
 - **핵심 기술** — **GNN(Graph Neural Network)**: 업종 간 *시너지(synergy)* 와 *잠식(cannibalization)* 효과를 학습. PostgreSQL/**PostGIS** 공간 쿼리.
 - **산출물** — `/api/v1/ai/recommend` 업종 추천 API, 상권 점수(Commercial District Score).
 
 ## 1.2 Page (페이지화)
 
-- **의미** — 개별 상가·업종의 *가치(Product/Price)* 를 신뢰도 높은 **디지털 인터페이스**로 표현한다. "어떤 업장이 어디에" 있는지를 한눈에.
+- **의미(Product ▶ Page)** — **이 platform 안에 어떤 page 가 만들어져야 하는가?** 제품·상품이
+  아니라 **page** 를 묻는다. 개별 상가·업종의 *상품성(Product)* 을 신뢰도 높은
+  **디지털 인터페이스**로 표현해 "어떤 업장이 어디에, 어디가 비었나"를 한눈에 보인다.
+  ⚠ **가격대는 여기서 답하지 않는다** — Price 는 1.3 Posting 의 몫이다.
 - **SpaceOS 구현** — **공실 히트맵(Vacancy Heatmap)** + **3D 디지털 트윈 맵**. 건물의 과거 10년 업종 변천사(공실 히스토리)를 시각화.
 - **핵심 기술** — **Three.js / @react-three/fiber**(3D 렌더링), **Mapbox GL JS**(2D 지도 위 3D 배치), 100m×100m 공실 그리드.
 - **산출물** — `/api/v1/heatmap`, `/api/v1/buildings/{id}/history`, 3D 트윈 뷰어.
 
 ## 1.3 Posting (포스팅화)
 
-- **의미** — *홍보(Promotion)* 를 **알고리즘 기반 자동화된 반복 정보 발행**으로 전환. 입점 의사결정에 필요한 정보를 구조화해 "게시".
+- **의미(Price ▶ Posting)** — **어떤 가격대의 page 가 이 platform 에 posting 되어야 하는가?**
+  *가격(Price)* 을 "얼마에 팔 것인가"가 아니라 **어느 가격대의 page 를 이 자리에 올릴 것인가**로
+  전환한다. 입점 의사결정에 필요한 정보를 구조화해 "게시"한다.
+  ⚠ 종전 라벨은 `Promotion → Posting` 이었다 — 3축 비용-효용·ROI 는 원래 가격대 판단이라
+  2026-09-05 에 전환원을 Price 로 맞췄다(구현 변경 없음).
 - **SpaceOS 구현** — **입점 솔루션**: 후보 업종을 **고급화 / 가성비 / 기능중심** 3축으로 **비용-효용(cost-benefit)** 분석해 제시.
 - **핵심 기술** — **LSTM**(예상 매출·공실 위험도 시계열 예측), **Scikit-learn**(피처 엔지니어링), ROI(투자 회수 기간) 산출.
 - **산출물** — 입점 시뮬레이션 리포트(PDF), `/api/v1/ai/simulate` 매출 시뮬레이터.
 
 ## 1.4 Program (프로그램화)
 
-- **의미** — *홍보(Promotion)* 를 상인-건물주-소비자 간 **지속 가능한 관계·참여 구조**로 전환. 일회성 광고가 아닌 "프로그램".
+- **의미(Promotion ▶ Program)** — **이 platform 에 posting 한 page 를 온라인·오프라인에서
+  어떤 홍보 program 으로 돌릴 것인가?** *홍보(Promotion)* 를 상인-건물주-소비자 간
+  **지속 가능한 관계·참여 구조**로 전환한다. 일회성 광고가 아닌 "프로그램".
+  2026-09-05 재정의로 **Promotion 은 이 트랙이 단독으로 받는다.**
 - **SpaceOS 구현** — **마케팅 자동화**: 분석 결과 연계 **LLM 콘텐츠 자동 생성** + **지역 행사/팝업 기획** 추천.
 - **핵심 기술** — **LangChain** + LLM, 상권 감성 키워드(Sentiment) 기반 톤앤매너 매칭.
 - **산출물** — 자동 생성 SNS 포스팅·축제 기획안, `/api/v1/marketing/generate`.

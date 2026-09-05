@@ -2,8 +2,14 @@
 
 **여기가 작업 루트다.** `.git` 이 이 디렉터리에 있다. 상위 폴더에서는 아무것도 만들지 않는다.
 
-SpaceOS는 물리적 상권의 디지털 트윈 SaaS다. 4대 기능을 **PPPP** 라 부른다 —
-Platform(상권 AI 추천) · Page(공실 히트맵·층별 매물 목록·네이버 거리뷰) · Posting(입점 솔루션) · Program(마케팅 자동화).
+SpaceOS는 물리적 상권의 디지털 트윈 SaaS다. 4대 기능을 **PPPP** 라 부르고, 전통 마케팅 4P 와
+**1:1** 로 대응한다 (2026-09-05 재정의 — 종전엔 Page 가 Product/Price 를 겸하고 Posting·Program 이
+Promotion 을 나눠 가졌다):
+
+- **Place ▶ Platform** — 이 상권은 어떤 플랫폼인가 (상권 AI 추천)
+- **Product ▶ Page** — 이 platform 에 어떤 page 를 놓을까 (공실 히트맵·층별 매물 목록·네이버 거리뷰)
+- **Price ▶ Posting** — 어느 가격대의 page 를 posting 할까 (입점 솔루션·3-Tier·회수기간)
+- **Promotion ▶ Program** — 어떤 홍보 program 을 돌릴까 (마케팅 자동화)
 
 > 이 문서는 Codex 등 외부 에이전트용 요약이다. 설계 배경·판단 이력은
 > [CLAUDE.md](CLAUDE.md) 와 [docs/spaceos-vibe-build-sequence.md](docs/spaceos-vibe-build-sequence.md) 에 있다.

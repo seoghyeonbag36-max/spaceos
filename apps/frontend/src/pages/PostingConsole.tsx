@@ -125,9 +125,10 @@ export default function PostingConsole() {
   return (
     <div className="postconsole"><div className="wrap">
       <div className="hd">
-        <div className="ey">SPACEOS · POSTING</div>
-        <h1>이 자리에 들어가면 얼마가 남나</h1>
+        <div className="ey">SPACEOS · POSTING <span className="conv4p">PRICE ▶ POSTING</span></div>
+        <h1>어느 가격대의 page 를 이 자리에 올릴까</h1>
         <div className="sub">
+          "얼마에 팔까"가 아니라 <b>어느 가격대를 이 자리에 posting 할까</b>를 답한다.
           실측 공실 자리를 골라 <b>업종·권리금</b>을 넣으면 세 전략(고급화·가성비·기능중심)의
           월 순익과 회수기간을 낸다. 임대료는 R-ONE 실측, 면적은 건축물대장이며,
           <b> 권리금은 공개 통계가 없어 기업이 넣는 입력</b>이다 — 비워 두면 0 을 전제로 계산하고
