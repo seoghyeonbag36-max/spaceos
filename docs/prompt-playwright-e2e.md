@@ -1,5 +1,21 @@
 # 내일 작업용 프롬프트 — Playwright e2e 구축 (13거점 red dot 렌더 검증)
 
+> ⛔ **만료됨 (2026-09-05 표시). 이 프롬프트를 그대로 실행하지 말 것 — 이력이다.**
+>
+> 세 전제가 전부 깨졌다:
+> 1. **거점 13 → 66.** 아래 slug 목록은 2026-07-27 판이다. 현재 목록의 단일 기준은
+>    `app.services.districts.PAGES` 이고, 상태는 `python scripts/chain_status.py --all`.
+> 2. **`BuildingTwin`(3D 트윈)은 2026-09-05 에 삭제됐다.** 클릭 대상은 이제
+>    `components/BuildingViewer.tsx`(2D 층 스택 + 네이버 거리뷰)다 → `feature-posting.md` §0-V.
+>    `PageDashboard.tsx` 의 `VacancyMap` 도 `pages/MapShell.tsx` 로 옮겨갔다.
+> 3. **화면 검증은 이미 있다.** `@playwright/test`(Node)를 새로 깔 게 아니라,
+>    `/verify` 스킬이 Python `playwright`(2026-07-24 설치)로 백엔드+Vite 를 띄워
+>    지도 픽셀까지 본다. 실제로 커밋 fd04852 의 결함 둘(거리뷰 미렌더·토글 무반응)을
+>    그 경로로 잡았다. **새 e2e 를 짜기 전에 `/verify` 를 먼저 읽을 것.**
+>
+> 아래 §"참고" 의 검증 항목 네 가지(마커 수 > 0 · 콘솔 에러 0 · 클릭 → 상세 · 토글)는
+> 여전히 옳다. 살릴 것이 있다면 그 목록이지 프롬프트가 아니다.
+
 2026-07-27 밤에 13거점 Tier1 대장 수집과 `build_page_master` 재빌드를 끝냈고,
 검증은 **데이터 수준(red dot 수 비교)까지만** 했다. 시각 검증은 Playwright가
 저장소에 없어서 미뤘다. 아래 프롬프트를 새 세션에 그대로 붙여 넣으면 된다.

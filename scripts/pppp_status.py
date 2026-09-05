@@ -6,7 +6,7 @@
 
 진행률을 문서에 손으로 적으면 **쿼터를 소진한 날마다 낡는다.** 실제로
 `docs/spaceos-vibe-build-sequence.md` 는 두 번 낡았다 — 08-02 에 멈춰 Tier1 을 13거점으로,
-08-09 에 멈춰 22거점으로 적고 있었다(현재 54). 숫자 하나가 아니라 **그 숫자에 기대는
+08-09 에 멈춰 22거점으로 적고 있었다(현재 66). 숫자 하나가 아니라 **그 숫자에 기대는
 진술이 같이** 낡는다는 게 문제라, 세는 일을 코드로 내렸다.
 
 ## 진행률을 정직하게 만드는 법
@@ -238,6 +238,23 @@ def page_track(total: int) -> Track:
 
     # 4대 레이어는 엔드포인트 유무로는 판정이 안 된다 — 유동인구는 라우트가 있어도
     # 프론트가 SAMPLE 상수를 그린다. 그래서 실데이터 여부는 선언으로 둔다.
+    #
+    # 다만 **입도(resolution)는 세어서 붙인다.** 아래 선언문은 08-26 에 "54/54거점 전부
+    # 덮였다"고 적혔는데, 그 뒤 거점이 66 으로 늘면서 조용히 틀린 문장이 됐다(09-05 발견).
+    # 선언은 낡아도 아무도 모르지만 센 값은 다음 실행에서 바로 어긋난다.
+    _jg = (_load(GOLD / "page_footfall_jipgyegu.json") or {}).get("districts") or {}
+    _jg_n = len([k for k in _jg if (GOLD / k).is_dir()])
+    _jg_fallback = max(total - _jg_n, 0)
+    _jg_note = (
+        f" ⚠ **2026-09-05 정정 — 집계구는 {_jg_n}/{total}거점이다.** 위 '54/54 전부 덮였다'는 "
+        f"08-26 시점(거점 54)의 참말이었고 지금은 아니다. 나머지 {_jg_fallback}거점은 "
+        "`page_footfall_jipgyegu.json` 에 없어 **상권(trdar)·행정동 경로로 폴백**한다 — "
+        "응답이 `resolution:\"trdar\"` · `time_source:\"adong_hourly\"` 로 스스로 밝히므로 "
+        "거짓을 그리지는 않지만, **한 화면 안이 아니라 거점 사이에서 눈금이 갈린다**. "
+        "즉 이 게이트의 100% 는 '네 레이어가 어디서나 실데이터'라는 뜻이지 "
+        "'어디서나 같은 입도'라는 뜻이 아니다. 집계구를 새 거점까지 넓히려면 "
+        "`scripts/build_cell_jipgyegu.py` 를 다시 돌린다"
+    )
     t.gates.append(Gate(
         "4대 히트맵 레이어 실데이터", 4 / 4,
         "공실 ✅ · 임대 ✅(R-ONE) · 유동 ✅ · 밀도 ✅ — 네 레이어가 같은 100m 격자 "
@@ -269,7 +286,8 @@ def page_track(total: int) -> Track:
           "⚠ 입도가 올라간 것이지 **격자 실측이 된 것은 아니다**(집계구 22,407㎡ > 셀 "
           "10,000㎡). ⚠ 점포 밀도(`stor`)는 집계구 원천이 없어 **상권에 남았다** — 같은 "
           "레이어인데 metric 에 따라 `resolution` 이 다를 수 있다. ⚠ 밀도는 분자 정의가 "
-          "경로마다 다르다(집계구 24시간 평균 ↔ 상권 일 총량) — `density_basis` 를 볼 것",
+          "경로마다 다르다(집계구 24시간 평균 ↔ 상권 일 총량) — `density_basis` 를 볼 것"
+        + _jg_note,
         auto=False,
         evidence=("docs/feature-page.md §유동·밀도 · services/footfall_layer.py · "
                   "data/pipelines/build_page_footfall_jipgyegu.py · "
@@ -278,10 +296,23 @@ def page_track(total: int) -> Track:
                   "data/tests/test_page_footfall_hourly.py (12건)"),
     ))
     t.gates.append(Gate(
-        "지도·건물상세·3D 트윈 표면", 1.0,
-        "MapShell 지도 + 건물 클릭 패널 + BuildingTwin 동작",
+        "지도·건물상세 표면 (2D 층 스택 + 거리뷰)", 1.0,
+        "MapShell 지도 + 건물 클릭 패널 + BuildingViewer(2D 층 스택 + 네이버 거리뷰) 동작. "
+        "⚠ **2026-09-05 정정** — 이 게이트는 그날까지 `3D 트윈 표면` 이라는 이름으로 "
+        "삭제된 `BuildingTwin` 을 근거로 100% 를 선언하고 있었다(커밋 8dfeceb 이 "
+        "@react-three/fiber 를 걷어냈는데 게이트만 남았다). 트윈이 그리던 절차적 박스는 "
+        "실측 형상이 아니라 **층 상태를 색으로 말하던 것뿐**이라 2D 로 더 정확하고 싸게 "
+        "그려진다(번들 832KB → 4KB). 3D 를 없앤 것이지 층 표현을 없앤 것이 아니다 — "
+        "층 근거(com_floors·occ_floors)를 가진 건물 31,782동의 실측이 그대로 화면에 "
+        "남는다. ⚠ 거리뷰는 촬영 시점이 몇 년 전일 수 있어 **공실 판정의 근거가 아니다**. "
+        "그래서 촬영일을 반드시 같이 그린다. ⚠ 이건 선언 게이트다 — 화면이 실제로 "
+        "그려지는지는 `/verify` 로만 확인된다(fd04852 가 거리뷰 미렌더·토글 무반응 둘을 "
+        "그렇게 잡았다). 프론트에 단위 테스트가 없으므로 이 자리는 자동화되지 않는다",
         auto=False,
-        evidence="apps/frontend/src/pages/MapShell.tsx",
+        evidence=("apps/frontend/src/pages/MapShell.tsx · "
+                  "apps/frontend/src/components/BuildingViewer.tsx · "
+                  "apps/frontend/src/lib/naverMap.ts · "
+                  "docs/feature-posting.md §0-V · /verify 2026-09-05 (커밋 fd04852)"),
     ))
     return t
 

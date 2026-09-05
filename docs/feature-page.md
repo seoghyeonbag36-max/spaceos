@@ -1,8 +1,23 @@
-# Page — 공실 히트맵 + 3D 디지털 트윈
+# Page — 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰
 
-> PPPP: **Product/Price → Page**. 어떤 업장이 어디에 있는지를 신뢰도 높은 시각 인터페이스로 표현. 공실 히트맵과 3D 건물 디지털 트윈이 핵심.
+> PPPP: **Product/Price → Page**. 어떤 업장이 어디에 있는지를 신뢰도 높은 시각 인터페이스로
+> 표현. 공실 히트맵과 **건물 상세(2D 층 스택 + 거리뷰)** 가 핵심.
 
 ## 0. 구현 현황
+
+⚠ **2026-09-05 — 3D 디지털 트윈은 폐기됐다. 이 문서 아래쪽은 그 전에 쓰였다.**
+`BuildingTwin`(@react-three/fiber)이 그리던 절차적 박스는 실측 형상이 아니라 **층 상태를
+색으로 말하던 것뿐**이라, 2D 층 스택 + 네이버 거리뷰(`components/BuildingViewer.tsx`)로
+갈았다(번들 832KB → 4KB). **3D 를 없앤 것이지 층 표현을 없앤 것이 아니다** — 층
+근거(`com_floors`·`occ_floors`)를 가진 31,782동의 실측은 그대로 화면에 남는다.
+
+경위와 무엇을 잃고 얻었는지는 `docs/feature-posting.md` **§0-V** 에 적혀 있다(같은 커밋이
+Posting 의 업종 관측까지 건드려서 그쪽에 남았다). 아래 §0 이후에서 "트윈"을 읽을 때는
+**2D 층 스택**으로 옮겨 읽고, `BuildingTwin` 이라는 이름이 나오면 이력이다.
+
+- 지금 표면: `pages/MapShell.tsx` → `components/BuildingViewer.tsx` → `lib/naverMap.ts`
+- ⚠ 거리뷰는 촬영 시점이 몇 년 전일 수 있어 **공실 판정의 근거가 아니다.** 그래서 촬영일을
+  반드시 같이 그린다 — 안 밝히면 사용자가 눈으로 본 셔터를 현재 상태로 읽는다.
 
 **층별개요 수집 종결 — 잔여 650동은 "회수할 것"이 아니다 (2026-08-19 · 08-20).**
 `--only-approx` 로 50거점 672동에 재호출해 **22동, 4거점만** 회수했다
@@ -65,7 +80,8 @@ bronze raw 262MB 를 파싱해 11초 걸리지만 수천 콜을 가르는 판단
   어긋나면 트윈의 녹색 층 수와 카드의 `vacancy_rate` 가 서로 안 맞는다.
 - 층 근거가 없는 건물은 **종전 근사로 폴백**하되, 캡션에 "아래부터 채운 근사"라고 밝힌다.
 - 배선: `_aggregate` → gold 마스터 properties → `services/building_vacancy` 는 gold 를 그대로
-  통과시키므로 **백엔드 변경 없음** → `MapShell` · `PageDashboard` → `BuildingTwin`.
+  통과시키므로 **백엔드 변경 없음** → `MapShell` · `PageDashboard` → `BuildingTwin`
+  (⚠ 2026-09-05 이후 이 끝점은 `BuildingViewer` 다 — 층 4색 규칙은 그대로 옮겨갔다).
 - 재산출 영향: 54거점 coverage.json 이 전부 `built_at` 한 줄만 바뀌었다 — **수치 드리프트 0**.
   마스터 합계 29.7 → 30.7MB (+3.4%).
 
@@ -223,10 +239,14 @@ TRDAR 과 생활인구는 어느 하나가 낫다기보다 **축이 반대**다:
 (`api/v1/heatmap.py::footfall` 과 `MapShell` 슬라이더는 08-23 에 섰다 — 생활인구를
 붙일 때는 `footfall_layer` 의 시간 축만 갈아끼우면 된다.)
 
-⚠ 아래 **§3·§4 는 착수 시점의 계획**이라 Mapbox 를 전제한다 — 이력으로만 읽을 것.
+⚠ 아래 **§3·§4 는 착수 시점의 계획**이라 Mapbox 와 3D 트윈을 전제한다 — 이력으로만 읽을 것.
 실제 베이스맵은 네이버 지도(`lib/naverMap.ts`)이고 `mapbox-gl` 은 2026-08-25 에
 의존성에서 제거됐다(`docs/decision-infra-layer-2026-08-25.md`). §2 의 실행 절차는
-2026-09-04 에 현재 값으로 고쳤다.
+2026-09-04 에 현재 값으로 고쳤다. **§3 의 4번 항목(`BuildingTwin` · @react-three/fiber ·
+GLTFLoader · Mapbox custom layer)은 통째로 무효다** — 2026-09-05 에 폐기하고
+`BuildingViewer`(2D 층 스택 + 거리뷰)로 갈았다(§0 머리말 · feature-posting.md §0-V).
+2·3번의 `DistrictMap.tsx`·`VacancyHeatmap.tsx` 도 그 이름으로 만들어지지 않았다 —
+`MapShell.tsx` 한 곳에 들어 있다.
 
 ### 분모에서 고시원·독서실·주거를 걷어냈다 (2026-08-23)
 
