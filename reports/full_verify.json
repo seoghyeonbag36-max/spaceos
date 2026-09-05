@@ -1,11 +1,11 @@
 {
-  "started": "2026-08-24T21:36:01",
+  "started": "2026-09-05T13:36:48",
   "results": [
     {
       "step": "backend-pytest",
       "status": "pass",
       "exit": 0,
-      "seconds": 60.2,
+      "seconds": 95.7,
       "log": "reports\\logs\\verify_backend-pytest.log"
     },
     {
@@ -19,14 +19,14 @@
       "step": "pppp-status",
       "status": "pass",
       "exit": 0,
-      "seconds": 1.4,
+      "seconds": 0.9,
       "log": "reports\\logs\\verify_pppp-status.log"
     },
     {
       "step": "frontend-build",
       "status": "pass",
       "exit": 0,
-      "seconds": 24.9,
+      "seconds": 8.2,
       "log": "reports\\logs\\verify_frontend-build.log"
     }
   ]

@@ -538,9 +538,16 @@ function FloorVacancies({ list }: { list: FloorVacancyList | null }) {
     [list],
   );
   const shown = useMemo(() => {
-    const u = list?.units ?? [];
-    return u.filter((x) => (!onlyConfirmed || x.certainty === "confirmed")
-      && (floor === null || x.floor === floor));
+    const u = (list?.units ?? []).filter(
+      (x) => (!onlyConfirmed || x.certainty === "confirmed")
+        && (floor === null || x.floor === floor));
+    // 산출물은 **확정 우선**으로 정렬돼 온다. 그대로 60건에서 자르면 확정이 앞을 다
+    // 채워 추정이 한 장도 안 그려진다 — '확정만 보기'를 꺼도 화면이 그대로여서
+    // 토글이 고장난 것처럼 보였다(2026-09-05 /verify 에서 실측). 확정만 볼 때는
+    // 그 순서가 맞지만, 둘 다 볼 때는 certainty 를 정렬 키에서 빼고 **층 순서**로
+    // 읽는다 — 매물 목록은 원래 그렇게 읽는다. certainty 는 배지로 남는다.
+    return onlyConfirmed ? u
+      : [...u].sort((a, z) => a.floor - z.floor || z.area - a.area);
   }, [list, onlyConfirmed, floor]);
 
   if (!list) return null;   // 404 = 이 거점에 아직 층 산출물이 없다. 빈 섹션을 그리지 않는다.

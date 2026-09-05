@@ -115,10 +115,21 @@ export function StreetView({ center, name }: { center?: { lat: number; lng: numb
 
   useEffect(() => {
     if (!center || !ref.current) { setState("none"); return; }
+    // ⚠ 파노라마는 **이 이펙트만의 자식 div** 위에 만든다. 컨테이너를 공유하면
+    //    StrictMode 의 이중 마운트에서 경합이 난다: 마운트1이 A 를 만들고 즉시
+    //    언마운트되는데, 그 사이 마운트2가 같은 element 에 B 를 만들고, 뒤늦게
+    //    A 의 Promise 가 풀리며 `destroy()` 가 공유 컨테이너를 비워 **B 의 DOM 까지**
+    //    지운다. 메타(B의 init)는 남고 그림만 사라져서 "거리뷰가 느리다"로 보인다
+    //    (2026-09-05 /verify 에서 자식 노드 0개로 실측). 자식을 나누면 A 의 정리가
+    //    A 것만 걷어간다.
+    const host = document.createElement("div");
+    host.style.cssText = "width:100%;height:100%";
+    ref.current.appendChild(host);
+
     let live = true;
     let cleanup: (() => void) | null = null;
     setState("loading");
-    renderStreetView(ref.current, center)
+    renderStreetView(host, center)
       .then(({ info: i, destroy }) => {
         cleanup = destroy;
         if (!live) { destroy(); return; }
@@ -126,19 +137,23 @@ export function StreetView({ center, name }: { center?: { lat: number; lng: numb
         setState(i ? "ok" : "none");
       })
       .catch((e) => { if (live) { setErr(describeNaverMapError(e)); setState("error"); } });
-    return () => { live = false; cleanup?.(); };
+    return () => { live = false; cleanup?.(); host.remove(); };
   }, [center?.lat, center?.lng]);
 
   return (
     <div className="sview">
-      <div ref={ref} className="sview-canvas" style={{ display: state === "ok" ? "block" : "none" }} />
-      {state === "loading" && <div className="sview-msg">거리뷰 불러오는 중…</div>}
+      {/* ⚠ 이 컨테이너를 **숨기지 않는다.** `display:none` 인 채로 Panorama 를 만들면
+          SDK 가 크기를 0 으로 보고 타일을 한 장도 안 심는다 — 메타(촬영일·거리)는
+          정상으로 오는데 그림만 없어서, 화면상 "거리뷰가 좀 느리네"로 보인다
+          (2026-09-05 /verify 에서 자식 노드 0개로 실측). 상태 문구는 위에 덮는다. */}
+      <div ref={ref} className="sview-canvas" />
+      {state === "loading" && <div className="sview-msg over">거리뷰 불러오는 중…</div>}
       {state === "none" && (
-        <div className="sview-msg">
+        <div className="sview-msg over">
           이 자리에는 거리뷰가 없다 — 도로에서 떨어진 골목·부지에서 정상적으로 일어난다.
         </div>
       )}
-      {state === "error" && <div className="sview-msg err">{err}</div>}
+      {state === "error" && <div className="sview-msg over err">{err}</div>}
       {state === "ok" && (
         <div className="sview-meta">
           {/* 촬영일을 안 밝히면 사용자가 본 셔터를 현재 상태로 읽는다. 이 목록의
