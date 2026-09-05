@@ -1,0 +1,84 @@
+{
+ "slug": "dosan",
+ "built_at": "2026-09-05T11:04:10+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 757,
+  "knn_vs_pnu_compared": 757,
+  "knn_vs_pnu_agree_pct": 100.0
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "압구정동",
+   "grp": "신사동",
+   "lat": 37.524287,
+   "lng": 127.034296,
+   "stores": 3344,
+   "buildings": 495,
+   "capacity": 1819,
+   "active": 1536,
+   "vacancy_rate": 15.56,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "논현2동",
+   "grp": "논현동",
+   "lat": 37.520097,
+   "lng": 127.034248,
+   "stores": 1762,
+   "buildings": 205,
+   "capacity": 671,
+   "active": 555,
+   "vacancy_rate": 17.29,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "신사동",
+   "grp": "신사동",
+   "lat": 37.523962,
+   "lng": 127.027928,
+   "stores": 1245,
+   "buildings": 42,
+   "capacity": 207,
+   "active": 178,
+   "vacancy_rate": 14.01,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "논현1동",
+   "grp": "논현동",
+   "lat": 37.518354,
+   "lng": 127.028058,
+   "stores": 122,
+   "buildings": 15,
+   "capacity": 47,
+   "active": 38,
+   "vacancy_rate": 19.15,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  }
+ ]
+}

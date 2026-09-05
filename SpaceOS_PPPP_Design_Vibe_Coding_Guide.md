@@ -30,7 +30,7 @@ SpaceOS는 전통 마케팅 4P(Place·Product/Price·Promotion)를 **디지털 4
 | 트랙 | 전환(기존 4P → 디지털) | SpaceOS 구현 기능 | 핵심 기술 |
 |------|------------------------|-------------------|-----------|
 | **Platform** | Place → Platform | 상권 AI 추천 엔진 (각 상권을 하나의 플랫폼으로) | GNN, PostGIS |
-| **Page** | Product/Price → Page | 공실 히트맵 + 3D 디지털 트윈 맵 | Three.js, Mapbox |
+| **Page** | Product/Price → Page | 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 | 네이버 지도 SDK (Three.js·Mapbox 는 제거됨) |
 | **Posting** | Promotion → Posting | 입점 솔루션 (고급화/가성비/기능중심 비용-효용 분석) | LSTM, Scikit-learn |
 | **Program** | Promotion → Program | 온·오프라인 마케팅 자동화 (LLM 콘텐츠 + 행사 추천) | LangChain, LLM |
 | **Design** | — (통합 레이어) | 디자인 시스템 + 화면 설계 + React 구현·배포 | React, Tailwind, Figma |

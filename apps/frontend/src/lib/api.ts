@@ -74,10 +74,22 @@ export interface DistrictSummary {
   predicted_direction: "up" | "down" | null;
 }
 
-/** 감성 구역(Zone) — f: [키워드, 증감, 방향(up|dn)][] */
+/** 거점 안의 **행정동 단위 실측 구역**(2026-09-05 부터).
+ *
+ *  종전에는 손으로 적은 감성 구역이었다(54거점 × 6구역 = 324개). 지금은
+ *  `gold/{거점}/district_zones.json` 에서 오고 값의 성격이 둘로 갈린다:
+ *
+ *  - **실측**: `stores`·`buildings`·`capacity`·`active`·`vacancyRate`.
+ *    공실률은 거점 대표값과 같은 규칙으로 세므로 합계가 맞는다.
+ *  - **미측정**: `s`·`d`·`r` 은 **null**, `f` 는 빈 배열이다. 0 으로 그리면
+ *    "쟀더니 0" 으로 읽힌다 — 좌표를 가진 점포 리뷰 채널이 없어 못 잰 것이다.
+ *    ⚠ 공실률을 감성 자리에 옮겨 그리지 말 것(docs/feature-platform.md §0-K).
+ */
 export interface Zone {
   id: string; n: string; grp: string; lat: number; lng: number;
-  s: number; d: number; r: number; f: [string, string, string][];
+  stores: number | null; buildings: number | null;
+  capacity: number | null; active: number | null; vacancy_rate: number | null;
+  s: number | null; d: number | null; r: number | null; f: [string, string, string][];
 }
 
 /** 거점 전체 원천 데이터 — GET /commercial-districts/{id} */
@@ -305,17 +317,17 @@ export const getBuildingVacancy = (district: string) =>
 export interface BuildingProps {
   id: string; name: string; status: "full" | "partial" | "high" | "empty";
   capacity: number; active: number; industry: string; vacancy_rate: number;
-  /** 건축물대장 지상 층수(V-World). 0 또는 누락 가능 — 3D 트윈 층 스택의 근거.
+  /** 건축물대장 지상 층수(V-World). 0 또는 누락 가능 — 2D 층 스택의 실제 높이 근거.
    *  capacity(호 수)와 단위가 다르므로 층 수가 필요한 곳에서 capacity 를 대신 쓰지 말 것. */
   floors?: number;
   /** 건물 높이(m). 미사용 시 무시 가능. */
   height?: number;
   /** 상업 용도 층 번호 — 공실률의 분모가 되는 층. 층 근거(건축물대장 층별개요)가
-   *  있는 건물에만 실린다. 없으면 3D 트윈이 '아래부터 채우기' 근사로 폴백한다. */
+   *  있는 건물에만 실린다. 없으면 `BuildingViewer` 가 '아래부터 채우기' 근사로 폴백한다. */
   com_floors?: number[] | null;
   /** 점포(상가정보 flrNo)·인허가로 **확인된** 영업 층 번호 — 분자의 하한. */
   occ_floors?: number[] | null;
-  /** 층 미상 점포로 빈 상업층에 배정된 층 수(상한 − 하한). 트윈의 '불확실' 층. */
+  /** 층 미상 점포로 빈 상업층에 배정된 층 수(상한 − 하한). 층 스택의 '불확실'(노란) 층. */
   unknown_n?: number | null;
 }
 export interface GeoJSONFC {

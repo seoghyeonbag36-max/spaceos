@@ -16,7 +16,7 @@
 
 | 축 | 서울 시드 거점 | 실측 거점(고양·파주) | 왜 |
 |---|---|---|---|
-| `sentiment` · `reviews` · `risk_zones` | 값 있음 | **None** | 감성구역 시드가 없다 |
+| `sentiment` · `reviews` · `risk_zones` | ~~값 있음~~ → **None**(2026-09-05) | **None** | ⚠ **이 행은 08-30 기준이다.** 09-05 에 손으로 적은 감성 구역을 행정동 실측 구역으로 갈면서 그 입력이 사라져 **66거점 전부 None** 이 됐다 — 시드/실측의 구분이 이 축에서는 없어졌다 |
 | `predicted_rate` · `predicted_direction` | 값 있음 | **None** | LSTM 이 서울 54거점 pooled 라 경기 예측이 없다 |
 | `vacancy_source` | gold/synthetic | **gold** (둘 다 Tier1) | Gold 대표 집계가 실제로 산출된다 |
 

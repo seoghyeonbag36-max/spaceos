@@ -7,7 +7,7 @@ description: 건축HUB 일일 쿼터를 하루치 다 태우는 런북 — 프�
 
 > 체인에서의 위치: `hub-chain` 3단계(대장). 자리를 비운 채 돌릴 때는 `autorun`.
 
-> ✅ **대장(전유부) 수집은 2026-08-17 에 54/54 로 완주했다 — 이 커맨드의 원래 목적은
+> ✅ **대장(전유부) 수집은 2026-08-17 에 당시 54/54 로 완주했다(현재 서빙 66거점도 전부 Tier1) — 이 커맨드의 원래 목적은
 > 달성됐다.** 더 이상 Page 트랙을 막는 쿼터 병목은 없다. 지금 이 커맨드가 쓰이는 자리는
 > 둘뿐이다: ① **신규 거점을 추가**할 때 ② 층별개요(`floor_ouln`) 잔여를 더 채울 때.
 > 기존 54거점에 대해 습관적으로 돌리지 말 것 — 아래 §회수율 표대로 **이미 층별개요를
@@ -166,7 +166,8 @@ python -m data.pipelines.recalc_capacity <slug ...>
 python -m data.pipelines.build_page_master <slug ...>
 python -m data.analyze_anchor_population --rebuild <slug ...>   # 앵커 대조
 ```
-⚠ 두 파이프라인은 인자가 없으면 **54거점 전부**를 돈다. 거점을 명시한다.
+⚠ 두 파이프라인은 인자가 없으면 **`page_hubs.ACTIVE_HUBS` 전부**를 돈다(2026-09-05 기준 서울 66거점).
+거점을 명시한다. — 개수를 여기 박지 않는 이유는 서빙 판단이 바뀌면 이 줄이 낡기 때문이다.
 `build_page_master` 가 `coverage.json` 의 `tier` 를 `Tier1(대장)` 로 올린다 —
 승격은 코드 변경이 아니라 산출물 갱신이다.
 

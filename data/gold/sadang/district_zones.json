@@ -1,0 +1,68 @@
+{
+ "slug": "sadang",
+ "built_at": "2026-09-05T11:04:14+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 238,
+  "knn_vs_pnu_compared": 238,
+  "knn_vs_pnu_agree_pct": 100.0
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "방배2동",
+   "grp": "방배동",
+   "lat": 37.478615,
+   "lng": 126.983666,
+   "stores": 1002,
+   "buildings": 124,
+   "capacity": 362,
+   "active": 342,
+   "vacancy_rate": 5.52,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "사당1동",
+   "grp": "사당동",
+   "lat": 37.478696,
+   "lng": 126.980565,
+   "stores": 849,
+   "buildings": 93,
+   "capacity": 250,
+   "active": 234,
+   "vacancy_rate": 6.4,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "남현동",
+   "grp": "남현동",
+   "lat": 37.475764,
+   "lng": 126.980546,
+   "stores": 414,
+   "buildings": 21,
+   "capacity": 96,
+   "active": 84,
+   "vacancy_rate": 12.5,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  }
+ ]
+}

@@ -124,6 +124,14 @@ data/gold/*/*
 # 형제 파일들과 같은 이유로 예외를 준다 — 빠지면 배포에서 층별 매물이 통째로 비고,
 # 화면은 "이 거점엔 층 단위 매물이 없다"처럼 멀쩡해 보인다.
 !data/gold/*/vacant_floor_units.json
+# 예외: 행정동 실측 구역(66거점 221구역, 거점당 ~1KB) — `services/district_zones` 가
+# 디스크에서 읽어 `GET /commercial-districts/{id}/sentiment` 와 거점 상세로 내려보낸다.
+# 형제 파일들과 **정확히 같은 이유**로 예외를 준다: 빠지면 배포에서 구역이 통째로 비고,
+# 화면은 "구역 산출물이 아직 없다"로 멀쩡해 보인다(calibration.json 40거점 None ·
+# vacant_units.json 배선 막힘과 같은 실패 양식이 이 저장소에서 네 번째다).
+# ⚠ 이건 시드를 **대체한** 산출물이라 빠지면 되돌아갈 자리가 없다 — 손으로 적은 감성
+# 구역 324개는 2026-09-05 에 삭제했다(docs/feature-platform.md §0-M).
+!data/gold/*/district_zones.json
 # 예외: TRDAR 상권 수요신호(190행 96KB) — ml/training/train_gnn.py 가 GNN 노드 피처로 읽는다.
 # 빠지면 재학습이 조용히 수요 피처 없이(58열) 돌아 lift 가 +4.4% → +3.1% 로 되돌아간다.
 # 서빙(recommend json)은 영향 없지만 **재현이 불가능해진다**.

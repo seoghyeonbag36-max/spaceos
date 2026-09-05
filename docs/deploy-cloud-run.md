@@ -63,7 +63,10 @@ $g = "$env:LOCALAPPDATA\Google\Cloud SDK\google-cloud-sdk\bin\gcloud.cmd"
 
 `Dockerfile` 이 이미지 안에서 확인한다. 하나라도 어긋나면 **이미지를 만들지 않는다**:
 
-- `data/gold/*/page_building_master.geojson` 이 50개 이상인가 (54거점 기준)
+- `data/gold/*/page_building_master.geojson` 이 50개 이상인가
+  (임계는 **일부러 느슨하다** — 잡으려는 것은 0, 즉 gold 가 통째로 안 실린 경우이지 정확한
+  거점 수가 아니다. 정확한 수를 박으면 서빙 판단이 바뀔 때마다 배포가 깨진다.
+  2026-09-05 실측 73개 = 서빙 서울 66 + 경기 보류 7)
 - 프론트 `dist/index.html` 이 있는가
 - `VITE_NAVER_MAPS_KEY_ID` 가 비어 있지 않은가
 
@@ -88,7 +91,11 @@ docker rm -f spaceos-smoke
 
 실측(2026-08-28): 이미지 **775MB** · gold 106MB(거점 56 디렉터리 · master 54개) ·
 프론트 dist 포함 · 네이버 키가 `MapShell-*.js` 번들에 인라인됨. 로컬 컨테이너가
-프로덕션과 동일하게 상권 54곳 전부 `gold` 로 응답한다.
+프로덕션과 동일하게 당시 상권 54곳 전부 `gold` 로 응답했다.
+
+> **갱신 2026-09-05**: 저장소의 gold 는 **거점 75 디렉터리 · master 73개**로 늘었고,
+> 서빙은 **서울 66거점이 전부 `gold`** 로 응답한다(전 거점 `GET /heatmap/vacancy` 호출로 확인).
+> 이미지 크기는 그 뒤 재측정하지 않았다 — 위 775MB 는 08-28 값이다.
 
 ## 모니터링
 

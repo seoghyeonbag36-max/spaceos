@@ -1,6 +1,6 @@
 ---
 name: page
-description: PPPP 트랙 — Page(공실 히트맵 + 네이버지도/3D 디지털 트윈). 히트맵·건물 레이어·지도 화면 작업의 컨텍스트와 화이트리스트 경로.
+description: PPPP 트랙 — Page(공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰). 히트맵·건물 레이어·지도 화면 작업의 컨텍스트와 화이트리스트 경로.
 ---
 
 # 트랙 컨텍스트: Page (Product/Price → Page)
@@ -12,8 +12,10 @@ description: PPPP 트랙 — Page(공실 히트맵 + 네이버지도/3D 디지�
 - docs/feature-naver-integration.md
 
 ## 트랙 정의
-- 의미: "어떤 업장이 어디에" — **공실 히트맵 + 3D 디지털 트윈**으로 가치를 인터페이스화.
-- 핵심 기술: **네이버 지도**(`naverMap.ts`, ncpKeyId), **@react-three/fiber** 3D, 100m 그리드.
+- 의미: "어떤 업장이 어디에" — **공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰**로 가치를 인터페이스화.
+- 핵심 기술: **네이버 지도**(`naverMap.ts`, ncpKeyId — 지도 + 거리뷰 파노라마),
+  **2D 층 스택**(`BuildingViewer.tsx`), 100m 그리드.
+  ⚠ 3D 트윈(@react-three/fiber)은 **2026-09-05 에 제거됐다** — 다시 끌어오지 말 것(feature-posting.md §0-V).
 - 색상 규칙: 공실 위험도 저→고 = 디자인 토큰 `vacancy` 배열 (#22B07D … #E03E36).
 
 ## 화이트리스트 경로

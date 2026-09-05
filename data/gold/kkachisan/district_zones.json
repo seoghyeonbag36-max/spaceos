@@ -1,0 +1,76 @@
+{
+ "slug": "kkachisan",
+ "built_at": "2026-09-05T11:04:15+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 282,
+  "knn_vs_pnu_compared": 282,
+  "knn_vs_pnu_agree_pct": 99.6
+ },
+ "dropped_spillover": [
+  {
+   "n": "신정4동",
+   "buildings": 2,
+   "stores": 13,
+   "capacity": 3,
+   "active": 2
+  }
+ ],
+ "residual": {
+  "buildings": 2,
+  "capacity": 3,
+  "active": 2
+ },
+ "zones": [
+  {
+   "n": "화곡1동",
+   "grp": "화곡동",
+   "lat": 37.530479,
+   "lng": 126.844446,
+   "stores": 1085,
+   "buildings": 140,
+   "capacity": 348,
+   "active": 277,
+   "vacancy_rate": 20.4,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "화곡8동",
+   "grp": "화곡동",
+   "lat": 37.532319,
+   "lng": 126.848104,
+   "stores": 860,
+   "buildings": 131,
+   "capacity": 298,
+   "active": 250,
+   "vacancy_rate": 16.11,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "화곡2동",
+   "grp": "화곡동",
+   "lat": 37.531351,
+   "lng": 126.85167,
+   "stores": 184,
+   "buildings": 9,
+   "capacity": 28,
+   "active": 19,
+   "vacancy_rate": 32.14,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  }
+ ]
+}

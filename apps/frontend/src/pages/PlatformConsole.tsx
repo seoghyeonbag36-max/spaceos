@@ -728,43 +728,75 @@ function RecommendCard({ rec, err }: { rec: IndustryRecommend | null; err: strin
 
 /* ───────────────── 감성 (시드) ───────────────── */
 
+/** 구역 공실률 색 — 거점 카드와 같은 눈금을 쓴다(두 화면이 다른 색을 내면 안 된다). */
+function zoneVacHex(v: number): string {
+  if (v >= 25) return "#D95C4A";
+  if (v >= 15) return "#E0A03A";
+  return "#22B07D";
+}
+
 function SentimentSection({ zones, hub }: { zones: Zone[] | null; hub?: DistrictSummary }) {
+  // 감성을 실제로 가진 구역이 하나라도 있나. 지금은 어느 거점에도 없지만, 채널이
+  // 생기면 이 자리가 그대로 살아난다 — 값이 들어오면 화면이 저절로 그린다.
+  const scored = (zones ?? []).filter((z) => z.s !== null);
   return (
-    <section className="seedwrap">
-      <div className="seedhd">
-        <h2>감성 구역 <span className="badge is-seed">시드</span></h2>
-        <div className="seednote">
-          <b>전부 추정치다.</b> 리뷰 수집기가 아직 없어 점수·표본 수·증감이 모두 손으로 넣은
-          시드값이고, 블로그 코퍼스는 상권 단위 광고성 스니펫이라 구역 단위 감성으로 못 내린다.
-          그래서 <b>위 정체성의 근거에 넣지 않았다</b> — 리뷰 수집이 붙으면 &ldquo;밖에서 뭐라고
-          불리나&rdquo;가 언급 빈도에서 감성으로 올라선다.
+    <section className="zonewrap">
+      <div className="zonehd">
+        <h2>구역 <span className="badge is-measured">행정동 실측</span></h2>
+        <div className="zonenote">
+          거점을 <b>행정동</b>으로 갈라 각 구역의 점포·건물·공실을 실측으로 센다. 구역 수가
+          거점마다 다른 것은(1~11개) <b>거점이 실제로 몇 개 행정동에 걸쳐 있느냐</b>가 정하기
+          때문이다 — 예전에 전 거점이 똑같이 6구역이던 것은 실측이 아니라 서식이었다.
+          공실률은 거점 대표값과 <b>같은 규칙</b>으로 세므로 구역 합계가 거점 값과 맞는다.
+          <br />
+          <b>감성 점수는 싣지 않는다.</b> 블로그 원문에 좌표가 없어 구역까지 내려오지 못하고,
+          점포명 귀속은 3.18%이며 부정어는 0.53%다(2026-08-25 실측). 좌표를 가진 점포 리뷰
+          채널이 생기기 전에는 못 재는 값이라, <b>공실률을 감성 자리에 옮겨 놓지 않았다.</b>
         </div>
       </div>
       {hub && <CaveatNote district={hub} />}
       {hub && (
-        <div className="seedsum">
+        <div className="zonesum">
           거점 감성 <MeasuredValue value={hub.sentiment} unit="pt" /> ·
-          위험 구역 {hub.risk_zones ?? "—"}곳 ·
-          가정 표본 {hub.reviews === null || hub.reviews === undefined
+          리뷰 표본 {hub.reviews === null || hub.reviews === undefined
             ? <span className="value-absent">없음</span> : `${hub.reviews.toLocaleString()}건`}
+          {scored.length === 0 && " — 감성 채널이 아직 없다"}
         </div>
       )}
-      {!zones && <div className="empty">감성 구역 불러오는 중…</div>}
-      {zones && zones.length === 0 && <div className="empty">이 거점의 감성 구역이 없다.</div>}
+      {!zones && <div className="empty">구역 불러오는 중…</div>}
+      {zones && zones.length === 0 && (
+        <div className="empty">이 거점의 구역 산출물이 아직 없다 (build_district_zones 미실행).</div>
+      )}
+      {zones && zones.length === 1 && (
+        <div className="zonesum">이 거점은 <b>행정동 하나</b> 안에 있다 — 구역이 거점 전체와 같다.</div>
+      )}
       <div className="zones">
         {(zones ?? []).map((z) => (
           <div key={z.id} className="zone">
             <div className="zhead">
               <span className="zname">{z.n}</span>
-              <span className="zscore">{z.s.toFixed(1)}</span>
+              <span className="zscore"
+                    style={{ color: z.vacancy_rate === null ? undefined : zoneVacHex(z.vacancy_rate) }}>
+                {z.vacancy_rate === null ? "—" : `${z.vacancy_rate.toFixed(1)}%`}
+              </span>
             </div>
             <div className="zmeta">
-              {z.grp} · 가정 표본 {z.r.toLocaleString()}건 · {z.d >= 0 ? "▲" : "▼"}
-              {Math.abs(z.d).toFixed(1)}
+              {z.grp} · 점포 {z.stores?.toLocaleString() ?? "—"} · 건물 {z.buildings ?? "—"}동
+              {z.capacity !== null && ` · 상업 ${z.capacity.toLocaleString()}호`}
             </div>
-            <div className="zkw">
-              {z.f.map(([label, delta], i) => <span key={i} className="kw">{label} {delta}</span>)}
+            {/* 감성이 들어오면 그때 그린다. 지금은 없다는 사실을 그린다 — 빈 칸으로 두면
+                "0 인가 없는 건가"를 화면이 말해 주지 않는다. */}
+            <div className="zsent">
+              {z.s === null
+                ? <span className="value-absent">감성 실측 없음</span>
+                : <>감성 {z.s.toFixed(1)}
+                    {z.d !== null && <> · {z.d >= 0 ? "▲" : "▼"}{Math.abs(z.d).toFixed(1)}</>}</>}
             </div>
+            {z.f.length > 0 && (
+              <div className="zkw">
+                {z.f.map(([label, delta], i) => <span key={i} className="kw">{label} {delta}</span>)}
+              </div>
+            )}
           </div>
         ))}
       </div>

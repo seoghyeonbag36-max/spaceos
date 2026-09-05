@@ -1,0 +1,68 @@
+{
+ "slug": "cityhall",
+ "built_at": "2026-09-05T11:04:12+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 305,
+  "knn_vs_pnu_compared": 305,
+  "knn_vs_pnu_agree_pct": 98.7
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "소공동",
+   "grp": "북창동",
+   "lat": 37.56288,
+   "lng": 126.976688,
+   "stores": 2444,
+   "buildings": 194,
+   "capacity": 691,
+   "active": 641,
+   "vacancy_rate": 7.24,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "명동",
+   "grp": "다동",
+   "lat": 37.566482,
+   "lng": 126.980455,
+   "stores": 2138,
+   "buildings": 83,
+   "capacity": 336,
+   "active": 320,
+   "vacancy_rate": 4.76,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "회현동",
+   "grp": "남창동",
+   "lat": 37.560322,
+   "lng": 126.978578,
+   "stores": 2370,
+   "buildings": 28,
+   "capacity": 93,
+   "active": 84,
+   "vacancy_rate": 9.68,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  }
+ ]
+}

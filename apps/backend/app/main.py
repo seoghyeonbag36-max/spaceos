@@ -1,7 +1,7 @@
 """SpaceOS Backend — FastAPI 진입점.
 
 물리적 상권의 디지털 트윈 플랫폼 API 서버.
-- 공실 히스토리 / 3D 모델 / 상권 데이터 제공
+- 공실 히스토리 / 상권 데이터 제공
 - AI 추론 API (LSTM 공실 예측, GNN 업종 추천)
 - /maps 에서 지구별 HTML 대시보드 서빙 (StaticFiles)
 """

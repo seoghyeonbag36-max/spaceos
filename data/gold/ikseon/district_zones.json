@@ -1,0 +1,68 @@
+{
+ "slug": "ikseon",
+ "built_at": "2026-09-05T11:04:03+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 927,
+  "knn_vs_pnu_compared": 927,
+  "knn_vs_pnu_agree_pct": 99.8
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "종로1.2.3.4가동",
+   "grp": "낙원동",
+   "lat": 37.572865,
+   "lng": 126.989353,
+   "stores": 5334,
+   "buildings": 864,
+   "capacity": 2468,
+   "active": 1755,
+   "vacancy_rate": 28.89,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "가회동",
+   "grp": "재동",
+   "lat": 37.577675,
+   "lng": 126.986108,
+   "stores": 280,
+   "buildings": 41,
+   "capacity": 63,
+   "active": 62,
+   "vacancy_rate": 1.59,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "삼청동",
+   "grp": "안국동",
+   "lat": 37.576942,
+   "lng": 126.984734,
+   "stores": 137,
+   "buildings": 22,
+   "capacity": 37,
+   "active": 33,
+   "vacancy_rate": 10.81,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  }
+ ]
+}

@@ -62,15 +62,34 @@ class DistrictSummary(BaseModel):
 
 
 class Zone(BaseModel):
+    """거점 안의 **행정동 단위 실측 구역**(2026-09-05 부터).
+
+    종전에는 손으로 적은 감성 구역이었다. 지금은 `gold/{거점}/district_zones.json`
+    에서 오고, 값의 성격이 둘로 갈린다:
+
+    - **실측**: `stores`·`buildings`·`capacity`·`active`·`vacancy_rate`.
+      공실률은 거점 대표값과 **같은 규칙**으로 세므로 합계가 맞는다.
+    - **미측정**: `s`(감성)·`d`(증감)·`r`(리뷰수)·`f`(키워드)는 **null/빈 배열**이다.
+      0 으로 채우면 "쟀더니 0"으로 읽힌다 — 좌표를 가진 점포 리뷰 채널이 없어서
+      못 잰 것이다(docs/feature-platform.md §0-K).
+    """
     id: str
-    n: str
-    grp: str
+    n: str                      # 행정동명 — 실측
+    grp: str                    # 법정동명 — 실측
     lat: float
     lng: float
-    s: float
-    d: float
-    r: int
-    f: list[list[str]]
+    # ── 실측 ────────────────────────────────────────────────────────────
+    stores: int | None = None       # 그 행정동의 점포 수(소상공인 상가정보)
+    buildings: int | None = None    # 대표 집계에 든 건물 수(지번 중복 제거 후)
+    capacity: int | None = None     # 상업 호실 수 — 공실률 분모
+    active: int | None = None       # 영업 호실 수 — 공실률 분자의 여집합
+    vacancy_rate: float | None = None
+    # ── 미측정 (감성) ───────────────────────────────────────────────────
+    # None 이 정상이다. 화면이 "감성 실측 없음"으로 그린다.
+    s: float | None = None
+    d: float | None = None
+    r: int | None = None
+    f: list[list[str]] = []
 
 
 class Cell(BaseModel):

@@ -1,0 +1,100 @@
+{
+ "slug": "myeongdong",
+ "built_at": "2026-09-05T11:04:04+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 610,
+  "knn_vs_pnu_compared": 610,
+  "knn_vs_pnu_agree_pct": 98.5
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "명동",
+   "grp": "명동2가",
+   "lat": 37.562854,
+   "lng": 126.985213,
+   "stores": 3641,
+   "buildings": 412,
+   "capacity": 1538,
+   "active": 1306,
+   "vacancy_rate": 15.08,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "을지로동",
+   "grp": "저동2가",
+   "lat": 37.565057,
+   "lng": 126.990354,
+   "stores": 1112,
+   "buildings": 90,
+   "capacity": 264,
+   "active": 231,
+   "vacancy_rate": 12.5,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "회현동",
+   "grp": "충무로1가",
+   "lat": 37.560938,
+   "lng": 126.982978,
+   "stores": 1225,
+   "buildings": 55,
+   "capacity": 234,
+   "active": 197,
+   "vacancy_rate": 15.81,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "필동",
+   "grp": "충무로3가",
+   "lat": 37.561644,
+   "lng": 126.990525,
+   "stores": 685,
+   "buildings": 38,
+   "capacity": 109,
+   "active": 85,
+   "vacancy_rate": 22.02,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  },
+  {
+   "n": "소공동",
+   "grp": "소공동",
+   "lat": 37.563712,
+   "lng": 126.980911,
+   "stores": 886,
+   "buildings": 15,
+   "capacity": 92,
+   "active": 86,
+   "vacancy_rate": 6.52,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z5"
+  }
+ ]
+}

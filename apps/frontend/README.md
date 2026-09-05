@@ -1,6 +1,11 @@
 # SpaceOS Frontend (React + TypeScript + Vite)
 
-3D 디지털 트윈 맵 UI. Three.js / @react-three/fiber + **네이버 지도** + D3/Plotly.
+공실 지도 UI. **네이버 지도**(지도 + 거리뷰 파노라마) + D3/Plotly.
+
+⚠ **Three.js / @react-three/fiber 는 2026-09-05 에 제거됐다.** 3D 트윈이 그리던
+절차적 박스는 실측 형상이 아니라 층 상태를 색으로 말하던 것뿐이라, 건물 상세를
+**2D 층 스택 + 네이버 거리뷰**(`components/BuildingViewer.tsx`)로 갈았다
+(번들 832KB → 4KB). 다시 끌어오지 말 것 — 경위는 `docs/feature-posting.md` §0-V.
 
 ## 실행
 
@@ -18,7 +23,7 @@ npm run dev
 
 ## 구조
 
-- `src/components/` — 재사용 컴포넌트 (3D 맵, 히트맵, 차트)
+- `src/components/` — 재사용 컴포넌트 (`BuildingViewer` = 2D 층 스택 + 거리뷰, 차트)
 - `src/pages/` — 페이지
 - `src/lib/api.ts` — 백엔드 API 클라이언트
 - `src/hooks/` — 커스텀 훅

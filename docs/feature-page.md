@@ -584,7 +584,7 @@ apps/backend/app/api/v1/districts.py 상권 정보 + /heatmap GeoJSON
 
 ```bash
 cd apps/frontend
-npm install                 # react, three, @react-three/fiber, d3, plotly
+npm install                 # react, d3, plotly (three 계열은 2026-09-05 제거됨)
 npm run dev                 # http://localhost:5173
 
 # 네이버 지도 키 (.env) — NCP 콘솔 Web 서비스 URL 에 http://localhost:5173 등록 필수

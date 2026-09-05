@@ -249,7 +249,7 @@ Platform(상권) 내 빈 Page(아직 입점하지 않은 공실 건물)에 Posti
 ### 입력 — 3층
 
 1. **자리(Site)** 자동 — `unit_id` `lat/lng` `area` `floor` `was`(직전 업종) `건물 공실률`
-   출처: `vacant_units.json`(**54거점 580유닛** — 08-22 완주) → `page_building_master.geojson` 폴백
+   출처: `vacant_units.json`(**서빙 66거점 664유닛** — 2026-09-05 실측. 08-22 완주 당시엔 54거점 580유닛) → `page_building_master.geojson` 폴백
    ✅ **배선 완료 2026-08-23** — `services/program_site` + `GET /marketing/sites`,
    `StoreProfile.unit_id` 로 생성 입력에 합류. 선결이던 `.gitignore` 추적 예외도 같이 넣었다
 2. **상권(Market)** 자동 — 임대료·유동등급·업종분포·블로그키워드·공실전망·행사
@@ -366,7 +366,7 @@ allowed_text 에는 넣되, 컨텍스트에 "기업 주장, 검증된 사실 아
 
 리뷰가 없는 대상에게 근거를 대는 자리. `data/pipelines/build_program_demand.py` 가
 `gold/features/trdar_demand.parquet`(190상권×46열)을 거점 단위로 접어
-`{거점}/program_content_context.csv` 에 `demand` 행 27개로 얹는다(54/54거점).
+`{거점}/program_content_context.csv` 에 `demand` 행 27개로 얹는다(**66/66거점** — 09-04 에 2차 12거점까지 확장. 배선 당시엔 54/54).
 
 **파케이를 런타임에 들이지 않는다.** §0-5 사고와 같은 조합이라 서빙은 CSV·표준
 라이브러리만 쓴다. 학습(파케이)과 서빙(CSV)이 갈리지 않게 **같은 파일에서 파생**시키고

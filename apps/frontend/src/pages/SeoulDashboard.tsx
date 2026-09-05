@@ -7,7 +7,7 @@ import "./SeoulDashboard.css";
  * 서울 25개 자치구 진입 로드맵 보드.
  * 데이터 출처: lib/seoul/districts.ts (gold SSOT에서 _build/gen_seoul_fe_data.py로 생성).
  * phase/순서는 PHASE_PLAN 단일 출처. 지도 없이 Phase별 그룹 + 점수바로 표현.
- * TODO: 거점 심층(공실·리뷰·3D)은 서울 데이터 수집 후 onOpenDistrict로 연결.
+ * TODO: 거점 심층(공실·리뷰·층 스택)은 서울 데이터 수집 후 onOpenDistrict로 연결.
  */
 type Metric = "phase" | "total" | "b2c" | "b2b";
 type ValueMetric = Exclude<Metric, "phase">;
@@ -114,7 +114,7 @@ export default function SeoulDashboard() {
 
         <div className="foot">
           데이터: gold(SSOT) seoul_district_scores.json · 생성 {SEOUL_GENERATED_AT.slice(0, 10)} · 점수·Phase는 PHASE_PLAN 단일 출처<br />
-          거점별 심층(공실·리뷰·3D 트윈)은 서울 데이터 수집 후 연결 예정.
+          거점별 심층(공실·리뷰·층 스택)은 서울 데이터 수집 후 연결 예정.
         </div>
       </div>
     </div>

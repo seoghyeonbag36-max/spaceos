@@ -1,0 +1,84 @@
+{
+ "slug": "cheongnyangni",
+ "built_at": "2026-09-05T11:04:09+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 645,
+  "knn_vs_pnu_compared": 645,
+  "knn_vs_pnu_agree_pct": 99.7
+ },
+ "dropped_spillover": [],
+ "residual": {
+  "buildings": 0,
+  "capacity": 0,
+  "active": 0
+ },
+ "zones": [
+  {
+   "n": "제기동",
+   "grp": "제기동",
+   "lat": 37.581422,
+   "lng": 127.039665,
+   "stores": 1663,
+   "buildings": 360,
+   "capacity": 664,
+   "active": 543,
+   "vacancy_rate": 18.22,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "청량리동",
+   "grp": "청량리동",
+   "lat": 37.58359,
+   "lng": 127.04556,
+   "stores": 908,
+   "buildings": 149,
+   "capacity": 322,
+   "active": 269,
+   "vacancy_rate": 16.46,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "전농1동",
+   "grp": "전농동",
+   "lat": 37.578801,
+   "lng": 127.047841,
+   "stores": 908,
+   "buildings": 62,
+   "capacity": 154,
+   "active": 131,
+   "vacancy_rate": 14.94,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "용두동",
+   "grp": "용두동",
+   "lat": 37.577106,
+   "lng": 127.039822,
+   "stores": 790,
+   "buildings": 74,
+   "capacity": 123,
+   "active": 114,
+   "vacancy_rate": 7.32,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  }
+ ]
+}
