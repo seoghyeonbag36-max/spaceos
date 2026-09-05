@@ -143,7 +143,38 @@
 .pagedash .halist{margin:5px 0 0;padding-left:16px}
 .pagedash .halist li{margin:3px 0}
 
+/* 층별 공실 매물 — 확정과 추정을 **모양으로** 가른다. 색만 다르면 스캔할 때 같아 보이고,
+   추정이 실측처럼 읽히는 것이 이 저장소가 반복해 잡아 온 결함이다. 추정 카드는 테두리를
+   점선으로 두고 채도를 낮춘다. */
+.pagedash .fv-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 9px}
+.pagedash .fv-counts{font-size:12px;color:var(--sub)}
+.pagedash .fv-counts b{color:var(--fg)}
+.pagedash .fv-toggle{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;cursor:pointer}
+.pagedash .fv-floors{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 11px}
+.pagedash .fv-floors button{font-size:11.5px;font-weight:700;color:#5a6b85;background:#f1f4f8;
+  border:1px solid transparent;border-radius:7px;padding:4px 9px;cursor:pointer}
+.pagedash .fv-floors button.on{color:#fff;background:var(--blue);border-color:var(--blue)}
+.pagedash .fv-floors button em{font-style:normal;opacity:.7;margin-left:3px;font-size:10.5px}
+.pagedash .fv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:9px}
+.pagedash .fv-card{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+.pagedash .fv-card.probable{border-style:dashed;background:#fbfcfd}
+.pagedash .fv-head{display:flex;align-items:center;gap:7px}
+.pagedash .fv-floor{font-size:13px;font-weight:800;color:var(--blue);background:#eef4fb;
+  border-radius:6px;padding:2px 8px;flex-shrink:0}
+.pagedash .fv-name{font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pagedash .fv-badge{font-size:10px;font-weight:800;border-radius:6px;padding:2px 7px;flex-shrink:0}
+.pagedash .fv-badge.ok{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.pagedash .fv-badge.maybe{color:#8a6d3b;background:#fdf8ec;border:1px solid #f3e6c4}
+.pagedash .fv-meta{font-size:12px;margin:6px 0 3px}
+.pagedash .fv-meta .dim{color:var(--sub);font-size:11px;margin-left:3px}
+.pagedash .fv-sub{font-size:11px;color:var(--sub);line-height:1.5}
+.pagedash .fv-warn{color:#8a6d3b}
+.pagedash .fv-empty{font-size:12px;color:var(--sub);background:#f8fafc;border:1px dashed var(--line);
+  border-radius:10px;padding:12px 14px}
+.pagedash .fv-note{font-size:11px;color:var(--sub);line-height:1.6;margin:9px 0 4px}
+
 @media(max-width:920px){
  .pagedash .kpis{grid-template-columns:repeat(2,1fr)}
  .pagedash .tiers{grid-template-columns:1fr}
+ .pagedash .fv-list{grid-template-columns:1fr}
 }

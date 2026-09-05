@@ -3,10 +3,11 @@ import { CaveatNote, MeasuredValue } from "@/components/DistrictPicker";
 import {
   BASIS_LABEL,
   listDistricts, getDistrict, getPostings, getMarketing, getVacancyHeatmap, getBuildingVacancy,
+  getFloorVacancies,
 } from "@/lib/api";
 import type {
   DistrictSummary, DistrictDetail, Posting, Marketing, TierScenario, VacancyHeatmap, GeoJSONFC,
-  VacancySource,
+  VacancySource, FloorVacancyList, FloorVacancyUnit,
 } from "@/lib/api";
 import { loadNaverMaps, describeNaverMapError } from "@/lib/naverMap";
 import { colors } from "@/design/tokens/colors";
@@ -526,10 +527,125 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
   );
 }
 
+/** 층 단위 공실 매물 목록 — "이 건물 **몇 층**이 비었고 몇 평인가".
+ *
+ * 아래 「공실 유닛 · 3-Tier」 섹션과 **다른 것을 센다.** 저쪽은 통째로 빈 건물 1동이
+ * 유닛 1개인 ROI 표본이고, 여기는 (지번, 층)이 매물 1개라 **일부 층만 빈 건물**이
+ * 들어온다(그래서 수가 훨씬 많다). 층으로 쪼갠 표본을 ROI 계산에 쓰면 프리미엄
+ * 트립와이어가 부호를 넘는 것이 확인돼 있어(§0-Q) 두 목록은 계속 갈라져 있다.
+ *
+ * 확정과 추정을 **한 모양으로 그리지 않는다.** 추정은 상가정보 층 표기 공란(약 30%)
+ * 때문에 생기는 괄호이고, 확정처럼 보이면 그게 이 저장소가 반복해 잡아 온 결함이다.
+ */
+function FloorVacancies({ list }: { list: FloorVacancyList | null }) {
+  const [onlyConfirmed, setOnlyConfirmed] = useState(true);
+  const [floor, setFloor] = useState<number | null>(null);
+
+  // 층 선택기는 **필터 전** 분포로 그린다 — 필터 뒤 분포로 그리면 층을 고른 순간
+  // 나머지 층이 사라져 "원래 없다"와 "걸러서 없다"가 같아 보인다.
+  const floors = useMemo(
+    () => Object.keys(list?.by_floor ?? {}).map(Number).sort((a, b) => a - b),
+    [list],
+  );
+  const shown = useMemo(() => {
+    const u = list?.units ?? [];
+    return u.filter((x) => (!onlyConfirmed || x.certainty === "confirmed")
+      && (floor === null || x.floor === floor));
+  }, [list, onlyConfirmed, floor]);
+
+  if (!list) return null;   // 404 = 이 거점에 아직 층 산출물이 없다. 빈 섹션을 그리지 않는다.
+
+  const all = list.counts_all;
+  return (
+    <>
+      <h2 className="sec">층별 공실 매물 <small>
+        Page · 건축물대장 층별개요 + 상가정보 층 표기 실측 — 어느 층이 비었고 몇 평인가.
+        {" "}면적은 <b>그 층의</b> 대장 실측이다(건물 평균을 나눈 값이 아니다)
+      </small></h2>
+
+      <div className="fv-bar">
+        <div className="fv-counts">
+          거점 전체 <b>{all.units ?? list.total}</b>건
+          {" · "}확정 <b>{all.confirmed ?? list.counts.confirmed}</b>
+          {" · "}추정 {all.probable ?? list.counts.probable}
+          {all.buildings ? <> · 건물 {all.buildings}동</> : null}
+        </div>
+        <label className="fv-toggle">
+          <input type="checkbox" checked={onlyConfirmed}
+                 onChange={(e) => setOnlyConfirmed(e.target.checked)} />
+          확정만 보기
+        </label>
+      </div>
+
+      <div className="fv-floors">
+        <button className={floor === null ? "on" : ""} onClick={() => setFloor(null)}>전체</button>
+        {floors.map((f) => (
+          <button key={f} className={floor === f ? "on" : ""} onClick={() => setFloor(f)}>
+            {f}F <em>{list.by_floor[String(f)]}</em>
+          </button>
+        ))}
+      </div>
+
+      {shown.length === 0 ? (
+        <div className="fv-empty">
+          이 조건에 맞는 매물이 없다. {onlyConfirmed && "‘확정만 보기’를 끄면 추정 매물까지 나온다."}
+        </div>
+      ) : (
+        <div className="fv-list">
+          {shown.slice(0, 60).map((u) => <FloorVacancyCard key={u.id} u={u} />)}
+        </div>
+      )}
+
+      <div className="fv-note">
+        <b>확정</b> = 층 미상 점포를 낮은 층부터 다 앉히고도 남은 층이라 비었음이 확정이다.
+        {" "}<b>추정</b> = 그 배정에 먹힌 층이라, 층 미상 점포가 다른 층에 있으면 빈다 —
+        괄호의 원인은 상가정보 층 표기 공란(약 30%)이다.
+        {shown.length > 60 && <> · 목록은 60건까지만 그린다(조건에 맞는 것 {shown.length}건).</>}
+        <br />
+        <span style={{ opacity: 0.75 }}>
+          이 목록에는 임대료·회수기간이 없다 — 그 계산의 표본은 아래 「공실 유닛 · 3-Tier」다.
+          층으로 쪼갠 표본을 ROI 에 쓰면 추정이 실측처럼 굳는다(2026-08-26 실측·되돌림).
+        </span>
+      </div>
+    </>
+  );
+}
+
+function FloorVacancyCard({ u }: { u: FloorVacancyUnit }) {
+  const conf = u.certainty === "confirmed";
+  return (
+    <div className={"fv-card" + (conf ? "" : " probable")}>
+      <div className="fv-head">
+        <span className="fv-floor">{u.floor_label}</span>
+        <span className="fv-name">{u.n}</span>
+        <span className={"fv-badge " + (conf ? "ok" : "maybe")}>{conf ? "확정" : "추정"}</span>
+      </div>
+      <div className="fv-meta">
+        <b>{u.area}평</b>
+        <span className="dim">({u.area_m2}㎡)</span>
+        {u.purps ? <> · 대장 용도 <b>{u.purps}</b></> : null}
+        {u.was ? <> · 건물 주업종 {u.was}</> : null}
+      </div>
+      <div className="fv-sub">
+        상업층 {u.com_floors.join("·")}
+        {u.occ_floors.length ? <> · 영업 확인 {u.occ_floors.join("·")}층</> : <> · 영업 확인 층 없음</>}
+        {u.unknown_n ? <> · 층 미상 점포 {u.unknown_n}곳</> : null}
+        {u.bld_floors ? <> · 지상 {u.bld_floors}층</> : null}
+        {/* 층 근거는 지번 단위라, 한 지번에 동이 여럿이면 어느 동인지 말할 수 없다.
+            숨기면 "이 건물 3층"으로 읽히므로 드러낸다. */}
+        {u.bldgs_on_pnu > 1 && (
+          <span className="fv-warn"> · 같은 지번 {u.bldgs_on_pnu}동 — 어느 동인지는 미상</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: () => void }) {
   const [detail, setDetail] = useState<DistrictDetail | null>(null);
   const [postings, setPostings] = useState<Posting[] | null>(null);
   const [marketing, setMarketing] = useState<Marketing | null>(null);
+  const [floorVac, setFloorVac] = useState<FloorVacancyList | null>(null);
   const [error, setError] = useState<string | null>(null);
   const marketingContentGold = marketing?.source === "llm";
   const marketingContentSourceLabel = marketingContentGold ? "Gold 생성" : "시드";
@@ -545,6 +661,13 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
     Promise.all([getDistrict(summary.id), getPostings(summary.id), getMarketing(summary.id)])
       .then(([d, p, m]) => { if (live) { setDetail(d); setPostings(p); setMarketing(m); } })
       .catch((e) => live && setError(String(e)));
+    // 층별 매물은 **따로** 받는다. 404(이 거점에 층 산출물이 없다)는 정상 상태이고,
+    // 위 Promise.all 에 묶으면 그 하나가 거점 심층 뷰 전체를 에러로 떨어뜨린다.
+    // 한 벌 통째로 받아 필터는 화면에서 건다 — 층 선택기가 **필터 전** 층 분포를
+    // 보여줘야 "3층은 원래 없다"와 "3층을 걸러서 없다"가 구분된다.
+    getFloorVacancies(summary.id, { limit: 2000 })
+      .then((v) => { if (live) setFloorVac(v); })
+      .catch(() => { if (live) setFloorVac(null); });
     return () => { live = false; };
   }, [summary.id]);
 
@@ -600,6 +723,8 @@ function DistrictDeep({ summary, onBack }: { summary: DistrictSummary; onBack: (
               </div>
             ))}
           </div>
+
+          <FloorVacancies list={floorVac} />
 
           {postings && (
             <>

@@ -328,6 +328,62 @@ export interface GeoJSONFC {
 }
 /** 거점 공실 유닛 + 3-Tier 시나리오(Posting) */
 export const getPostings = (id: string) => getJSON<Posting[]>(`/commercial-districts/${id}/postings`);
+
+/* ===== 층 단위 공실 매물 목록(Page) — GET /commercial-districts/{id}/floor-vacancies ===== */
+
+/** 매물 하나 = (지번, 층).
+ *  ⚠ `Posting`(건물 단위 유닛 + 3-Tier 시나리오)과 **다른 것을 센다**. 여기는 목록이라
+ *     임대료·ROI 가 없고, 일부 층만 빈 건물(`partial`)이 들어온다. 층으로 쪼갠 표본을
+ *     ROI 계산에 쓰면 프리미엄 트립와이어가 부호를 넘는다 → feature-posting.md §0-Q·§0-T */
+export interface FloorVacancyUnit {
+  id: string;
+  building_id?: string | null;
+  pnu?: string | null;
+  /** 한 지번에 접힌 동 수. 2 이상이면 **어느 동인지는 모른다**(층 근거가 지번 단위). */
+  bldgs_on_pnu: number;
+  n: string; lat: number; lng: number;
+  floor: number; floor_label: string;
+  /** "confirmed" 비었음이 확정 · "probable" 층 미상 점포가 다른 층이면 빈다.
+   *  둘을 같은 모양으로 그리면 추정이 실측처럼 읽힌다 — 반드시 구분할 것. */
+  certainty: "confirmed" | "probable";
+  /** 평 — 그 **층의** 건축물대장 실측이다(균등분할이 아니라 층마다 다르다). */
+  area: number; area_m2: number;
+  /** 대장이 그 층에 허용한 용도. 업종 후보를 거르는 근거이지 현재 영업 업종이 아니다. */
+  purps: string;
+  bld_status?: string | null;
+  bld_floors: number;
+  bld_vacancy_rate?: number | null;
+  com_floors: number[]; occ_floors: number[]; unknown_n: number;
+  was: string;
+}
+
+export interface FloorVacancyList {
+  district_id: string;
+  /** 필터 적용 **뒤** 유닛 수 */
+  total: number;
+  counts: { confirmed: number; probable: number };
+  /** 필터 **전** 거점 전체 — 목록이 잘린 것인지 원래 없는 것인지 가르는 분모 */
+  counts_all: { units?: number; confirmed?: number; probable?: number; buildings?: number };
+  by_floor: Record<string, number>;
+  built_at?: string | null;
+  source?: string | null;
+  note?: string | null;
+  units: FloorVacancyUnit[];
+}
+
+/** 층 단위 공실 매물 목록. 404 = 이 거점에 층 산출물이 없다(거점을 모른다가 아니다). */
+export const getFloorVacancies = (
+  id: string,
+  opt: { certainty?: "confirmed" | "probable"; floor?: number; minArea?: number; maxArea?: number; limit?: number } = {},
+) => {
+  const q = new URLSearchParams();
+  if (opt.certainty) q.set("certainty", opt.certainty);
+  if (opt.floor != null) q.set("floor", String(opt.floor));
+  if (opt.minArea != null) q.set("min_area", String(opt.minArea));
+  if (opt.maxArea != null) q.set("max_area", String(opt.maxArea));
+  q.set("limit", String(opt.limit ?? 300));
+  return getJSON<FloorVacancyList>(`/commercial-districts/${id}/floor-vacancies?${q}`);
+};
 /** 거점(상권) 마케팅 — 온라인 콘텐츠는 Gold 기반 생성(Program), 행사는 시드 */
 export const getMarketing = (id: string) => getJSON<Marketing>(`/marketing/${id}`);
 

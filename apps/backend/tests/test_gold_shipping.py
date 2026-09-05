@@ -43,6 +43,10 @@ _SHIPPED = [
     # 빠지면 foot 서열이 조용히 상권(입도 절반)으로 내려간다.
     "platform_unit_foot.json",
     "garosugil/vacant_units.json",
+    # 2026-09-05 추가 — services/floor_vacancy 가 읽는 층 단위 매물 목록.
+    # 빠지면 배포 환경에서 `/floor-vacancies` 가 전 거점 404 라, 화면은 층별 매물
+    # 섹션을 통째로 안 그린다(= "이 거점엔 층 매물이 없다"처럼 멀쩡해 보인다).
+    "garosugil/vacant_floor_units.json",
     "garosugil/page_building_master.geojson",
     "garosugil/calibration.json",
     "garosugil/program_content_context.csv",

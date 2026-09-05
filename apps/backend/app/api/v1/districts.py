@@ -3,11 +3,12 @@
 거점별 데이터를 백엔드 단일 소스(app/data + app/services/districts)로 제공한다.
 프론트엔드는 이 엔드포인트로 정적 임베드를 대체할 수 있다.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from app.schemas.district import DistrictSummary, Posting, Zone
+from app.schemas.floor_vacancy import FloorVacancyList
 from app.services import districts as svc
-from app.services import platform_profile
+from app.services import floor_vacancy, platform_profile
 
 router = APIRouter()
 
@@ -77,3 +78,35 @@ async def get_postings(district_id: str) -> list[dict]:
     if p is None:
         raise HTTPException(status_code=404, detail=f"unknown district: {district_id}")
     return p
+
+
+@router.get("/{district_id}/floor-vacancies", response_model=FloorVacancyList)
+async def get_floor_vacancies(
+    district_id: str,
+    certainty: str | None = Query(None, pattern="^(confirmed|probable)$"),
+    floor: int | None = Query(None, ge=-5, le=100),
+    min_area: int | None = Query(None, ge=0),
+    max_area: int | None = Query(None, ge=0),
+    limit: int = Query(200, ge=1, le=2000),
+    offset: int = Query(0, ge=0),
+) -> dict:
+    """층 단위 공실 매물 목록 — "이 건물 **몇 층**이 비었고 몇 평인가".
+
+    `/postings` 와 **다른 것을 센다.** 저쪽은 통째로 빈 건물 1동 = 유닛 1개이고
+    3-Tier 시나리오가 붙는 ROI 표본이다. 여기는 (지번, 층) = 유닛 1개이고
+    `partial` 건물이 들어오며 시나리오가 붙지 않는다 — 층으로 쪼갠 표본을 ROI 에
+    쓰면 프라임 프리미엄 트립와이어가 부호를 넘는다(docs/feature-posting.md §0-Q·§0-T).
+
+    `certainty` 로 확정만 좁힐 수 있다. 기본은 둘 다 주되 유닛마다 표시되므로,
+    화면이 추정을 확정처럼 그리지 않는 것은 호출부 책임이다.
+
+    404 는 "이 거점을 모른다"가 아니라 **"이 거점에 층 단위 산출물이 없다"** 는 뜻이다.
+    """
+    out = floor_vacancy.listing(district_id, certainty=certainty, floor=floor,
+                                min_area=min_area, max_area=max_area,
+                                limit=limit, offset=offset)
+    if out is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"no floor-level vacancy inventory for district: {district_id}")
+    return out
