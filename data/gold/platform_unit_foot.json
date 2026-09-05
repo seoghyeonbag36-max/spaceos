@@ -1,6 +1,6 @@
 {
   "source": "서울 열린데이터광장 OA-14979 집계구 단위 생활인구(내국인) × SGIS 과거집계구 2016 4Q 경계 PIP 배정",
-  "built_at": "2026-08-25T13:17:20+00:00",
+  "built_at": "2026-09-05T05:42:12+00:00",
   "sample_days": [
     "2026-07-01",
     "2026-07-02",
@@ -18,10 +18,10 @@
   ],
   "note": "foot_value 는 주간대(10~20시) 생활인구의 7일 가중평균이다. 표본을 1주로 잡은 이유는 크기가 아니라 **평일/주말 구조 차이**다 — 계절 ρ 0.976~1.000, 일간 ρ 최소 0.959 로 둘 다 서열을 안 바꾸지만, cityhall 은 평일↔주말 서열이 완전히 뒤집힌다(ρ=−1.00, 주말비 0.37/0.58/0.69). 그래서 weekday·weekend 를 함께 싣는다. ⚠ 이 계열은 2026-07-31 로 생산 종료(국가표준격자 250m 전환) — 갱신되지 않는 대표값이다.",
   "stats": {
-    "units": 528,
-    "districts": 54,
-    "districts_resolvable": 51,
-    "oa_per_district_median": 6
+    "units": 664,
+    "districts": 66,
+    "districts_resolvable": 63,
+    "oa_per_district_median": 7
   },
   "units": {
     "anam|vu-1129012700100180000-1": {
@@ -194,6 +194,114 @@
       "weekday": 4697.0,
       "weekend": 3462.4,
       "weekend_ratio": 0.737
+    },
+    "bulgwang|vu-1138010300102850019-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010300102850019-1",
+      "oa_code": "1112052060002",
+      "foot_value": 573.0,
+      "weekday": 566.2,
+      "weekend": 590.1,
+      "weekend_ratio": 1.042
+    },
+    "bulgwang|vu-1138010200101090020-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010200101090020-1",
+      "oa_code": "1112051020019",
+      "foot_value": 15.1,
+      "weekday": 15.0,
+      "weekend": 15.4,
+      "weekend_ratio": 1.027
+    },
+    "bulgwang|vu-1138010600100840006-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010600100840006-1",
+      "oa_code": "1112058030005",
+      "foot_value": 2864.9,
+      "weekday": 2915.6,
+      "weekend": 2738.3,
+      "weekend_ratio": 0.939
+    },
+    "bulgwang|vu-1138010200101170005-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010200101170005-1",
+      "oa_code": "1112051040011",
+      "foot_value": 71.7,
+      "weekday": 72.8,
+      "weekend": 69.0,
+      "weekend_ratio": 0.948
+    },
+    "bulgwang|vu-1138010600100140063-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010600100140063-1",
+      "oa_code": "1112058020001",
+      "foot_value": 700.4,
+      "weekday": 681.4,
+      "weekend": 747.8,
+      "weekend_ratio": 1.097
+    },
+    "bulgwang|vu-1138010300102750001-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010300102750001-1",
+      "oa_code": "1112052050004",
+      "foot_value": 2316.5,
+      "weekday": 2155.8,
+      "weekend": 2718.3,
+      "weekend_ratio": 1.261
+    },
+    "bulgwang|vu-1138010300102430002-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010300102430002-1",
+      "oa_code": "1112052050006",
+      "foot_value": 301.2,
+      "weekday": 279.6,
+      "weekend": 355.3,
+      "weekend_ratio": 1.271
+    },
+    "bulgwang|vu-1138010300102550004-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010300102550004-1",
+      "oa_code": "1112052050002",
+      "foot_value": 783.9,
+      "weekday": 741.5,
+      "weekend": 889.9,
+      "weekend_ratio": 1.2
+    },
+    "bulgwang|vu-1138010200100980026-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010200100980026-1",
+      "oa_code": "1112051020012",
+      "foot_value": 231.4,
+      "weekday": 239.1,
+      "weekend": 212.3,
+      "weekend_ratio": 0.888
+    },
+    "bulgwang|vu-1138010200101310075-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010200101310075-1",
+      "oa_code": "1112051020010",
+      "foot_value": 1349.0,
+      "weekday": 1262.0,
+      "weekend": 1566.5,
+      "weekend_ratio": 1.241
+    },
+    "bulgwang|vu-1138010600100040001-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010600100040001-1",
+      "oa_code": "1112058030007",
+      "foot_value": 1283.3,
+      "weekday": 1320.7,
+      "weekend": 1189.8,
+      "weekend_ratio": 0.901
+    },
+    "bulgwang|vu-1138010300102850029-1": {
+      "district_id": "bulgwang",
+      "unit_id": "vu-1138010300102850029-1",
+      "oa_code": "1112052060002",
+      "foot_value": 573.0,
+      "weekday": 566.2,
+      "weekend": 590.1,
+      "weekend_ratio": 1.042
     },
     "cheongdam|vu-1168010400100160002-1": {
       "district_id": "cheongdam",
@@ -410,6 +518,114 @@
       "weekday": 533.7,
       "weekend": 634.7,
       "weekend_ratio": 1.189
+    },
+    "cheonho|vu-1174010800101450006-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010800101450006-1",
+      "oa_code": "1125066020006",
+      "foot_value": 139.1,
+      "weekday": 129.9,
+      "weekend": 162.0,
+      "weekend_ratio": 1.247
+    },
+    "cheonho|vu-1174010800101120065-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010800101120065-1",
+      "oa_code": "1125066010003",
+      "foot_value": 526.6,
+      "weekday": 537.8,
+      "weekend": 498.5,
+      "weekend_ratio": 0.927
+    },
+    "cheonho|vu-1174010900103580011-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010900103580011-1",
+      "oa_code": "1125073030010",
+      "foot_value": 1165.6,
+      "weekday": 1144.9,
+      "weekend": 1217.3,
+      "weekend_ratio": 1.063
+    },
+    "cheonho|vu-1174010900105500007-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010900105500007-1",
+      "oa_code": "1125063010019",
+      "foot_value": 770.9,
+      "weekday": 701.5,
+      "weekend": 944.4,
+      "weekend_ratio": 1.346
+    },
+    "cheonho|vu-1174010900104540022-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010900104540022-1",
+      "oa_code": "1125073030012",
+      "foot_value": 5217.9,
+      "weekday": 4903.9,
+      "weekend": 6002.8,
+      "weekend_ratio": 1.224
+    },
+    "cheonho|vu-1174010900104540063-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010900104540063-1",
+      "oa_code": "1125073030012",
+      "foot_value": 5217.9,
+      "weekday": 4903.9,
+      "weekend": 6002.8,
+      "weekend_ratio": 1.224
+    },
+    "cheonho|vu-1174010900104540008-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010900104540008-1",
+      "oa_code": "1125073030012",
+      "foot_value": 5217.9,
+      "weekday": 4903.9,
+      "weekend": 6002.8,
+      "weekend_ratio": 1.224
+    },
+    "cheonho|vu-1174010900103400035-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010900103400035-1",
+      "oa_code": "1125073020001",
+      "foot_value": 2232.8,
+      "weekday": 2198.1,
+      "weekend": 2319.4,
+      "weekend_ratio": 1.055
+    },
+    "cheonho|vu-1174010900103400035-2": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010900103400035-2",
+      "oa_code": "1125073020001",
+      "foot_value": 2232.8,
+      "weekday": 2198.1,
+      "weekend": 2319.4,
+      "weekend_ratio": 1.055
+    },
+    "cheonho|vu-1171010300104910004-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1171010300104910004-1",
+      "oa_code": "1124051010020",
+      "foot_value": 507.5,
+      "weekday": 528.7,
+      "weekend": 454.6,
+      "weekend_ratio": 0.86
+    },
+    "cheonho|vu-1174010900103570004-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010900103570004-1",
+      "oa_code": "1125073030006",
+      "foot_value": 580.4,
+      "weekday": 591.1,
+      "weekend": 553.8,
+      "weekend_ratio": 0.937
+    },
+    "cheonho|vu-1174010900103540006-1": {
+      "district_id": "cheonho",
+      "unit_id": "vu-1174010900103540006-1",
+      "oa_code": "1125073020001",
+      "foot_value": 2232.8,
+      "weekday": 2198.1,
+      "weekend": 2319.4,
+      "weekend_ratio": 1.055
     },
     "chungmuro|vu-1114013900100620007-1": {
       "district_id": "chungmuro",
@@ -653,6 +869,51 @@
       "weekday": 2884.9,
       "weekend": 2895.8,
       "weekend_ratio": 1.004
+    },
+    "doksan|vu-1154510200110060055-1": {
+      "district_id": "doksan",
+      "unit_id": "vu-1154510200110060055-1",
+      "oa_code": "1118052040004",
+      "foot_value": 376.6,
+      "weekday": 346.6,
+      "weekend": 451.7,
+      "weekend_ratio": 1.303
+    },
+    "doksan|vu-1154510200110030000-1": {
+      "district_id": "doksan",
+      "unit_id": "vu-1154510200110030000-1",
+      "oa_code": "1118052040006",
+      "foot_value": 1761.7,
+      "weekday": 1805.2,
+      "weekend": 1653.1,
+      "weekend_ratio": 0.916
+    },
+    "doksan|vu-1154510200110030000-2": {
+      "district_id": "doksan",
+      "unit_id": "vu-1154510200110030000-2",
+      "oa_code": "1118052040006",
+      "foot_value": 1761.7,
+      "weekday": 1805.2,
+      "weekend": 1653.1,
+      "weekend_ratio": 0.916
+    },
+    "doksan|vu-1154510200110030000-3": {
+      "district_id": "doksan",
+      "unit_id": "vu-1154510200110030000-3",
+      "oa_code": "1118052040006",
+      "foot_value": 1761.7,
+      "weekday": 1805.2,
+      "weekend": 1653.1,
+      "weekend_ratio": 0.916
+    },
+    "doksan|vu-1154510200103000005-1": {
+      "district_id": "doksan",
+      "unit_id": "vu-1154510200103000005-1",
+      "oa_code": "1118052020003",
+      "foot_value": 4090.8,
+      "weekday": 4236.1,
+      "weekend": 3727.4,
+      "weekend_ratio": 0.88
     },
     "dongdaemun|vu-1114016200101970012-1": {
       "district_id": "dongdaemun",
@@ -1698,6 +1959,114 @@
       "weekend": 9018.0,
       "weekend_ratio": 1.37
     },
+    "hwagok|vu-1150010300110760024-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300110760024-1",
+      "oa_code": "1116055010001",
+      "foot_value": 1022.7,
+      "weekday": 939.8,
+      "weekend": 1230.0,
+      "weekend_ratio": 1.309
+    },
+    "hwagok|vu-1150010300110760024-2": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300110760024-2",
+      "oa_code": "1116055010001",
+      "foot_value": 1022.7,
+      "weekday": 939.8,
+      "weekend": 1230.0,
+      "weekend_ratio": 1.309
+    },
+    "hwagok|vu-1150010300103790068-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300103790068-1",
+      "oa_code": "1116073010010",
+      "foot_value": 362.1,
+      "weekday": 351.3,
+      "weekend": 389.1,
+      "weekend_ratio": 1.108
+    },
+    "hwagok|vu-1150010300100240322-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300100240322-1",
+      "oa_code": "1116055010007",
+      "foot_value": 48.2,
+      "weekday": 53.5,
+      "weekend": 35.1,
+      "weekend_ratio": 0.656
+    },
+    "hwagok|vu-1150010300110700044-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300110700044-1",
+      "oa_code": "1116073010018",
+      "foot_value": 963.6,
+      "weekday": 885.1,
+      "weekend": 1159.9,
+      "weekend_ratio": 1.31
+    },
+    "hwagok|vu-1150010300103790001-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300103790001-1",
+      "oa_code": "1116073010010",
+      "foot_value": 362.1,
+      "weekday": 351.3,
+      "weekend": 389.1,
+      "weekend_ratio": 1.108
+    },
+    "hwagok|vu-1150010300101430036-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300101430036-1",
+      "oa_code": "1116055010001",
+      "foot_value": 1022.7,
+      "weekday": 939.8,
+      "weekend": 1230.0,
+      "weekend_ratio": 1.309
+    },
+    "hwagok|vu-1150010300107420005-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300107420005-1",
+      "oa_code": "1116055010005",
+      "foot_value": 1216.2,
+      "weekday": 1186.1,
+      "weekend": 1291.6,
+      "weekend_ratio": 1.089
+    },
+    "hwagok|vu-1150010300100950054-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300100950054-1",
+      "oa_code": "1116074040004",
+      "foot_value": 274.5,
+      "weekday": 255.0,
+      "weekend": 323.4,
+      "weekend_ratio": 1.268
+    },
+    "hwagok|vu-1150010300110630016-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300110630016-1",
+      "oa_code": "1116074040007",
+      "foot_value": 484.4,
+      "weekday": 477.9,
+      "weekend": 500.7,
+      "weekend_ratio": 1.048
+    },
+    "hwagok|vu-1150010300110320000-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300110320000-1",
+      "oa_code": "1116058010001",
+      "foot_value": 1672.4,
+      "weekday": 1582.3,
+      "weekend": 1897.5,
+      "weekend_ratio": 1.199
+    },
+    "hwagok|vu-1150010300103680001-1": {
+      "district_id": "hwagok",
+      "unit_id": "vu-1150010300103680001-1",
+      "oa_code": "1116073020002",
+      "foot_value": 67.3,
+      "weekday": 55.1,
+      "weekend": 97.7,
+      "weekend_ratio": 1.773
+    },
     "hyehwa|vu-1129011100101780000-1": {
       "district_id": "hyehwa",
       "unit_id": "vu-1129011100101780000-1",
@@ -2202,6 +2571,114 @@
       "weekend": 696.1,
       "weekend_ratio": 1.046
     },
+    "kkachisan|vu-1150010300108730013-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300108730013-1",
+      "oa_code": "1116057020007",
+      "foot_value": 140.3,
+      "weekday": 143.7,
+      "weekend": 131.8,
+      "weekend_ratio": 0.917
+    },
+    "kkachisan|vu-1150010300109150002-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300109150002-1",
+      "oa_code": "1116073039101",
+      "foot_value": 50.1,
+      "weekday": 53.2,
+      "weekend": 42.3,
+      "weekend_ratio": 0.795
+    },
+    "kkachisan|vu-1150010300109150032-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300109150032-1",
+      "oa_code": "1116073030006",
+      "foot_value": 247.2,
+      "weekday": 215.7,
+      "weekend": 326.1,
+      "weekend_ratio": 1.512
+    },
+    "kkachisan|vu-1150010300109140028-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300109140028-1",
+      "oa_code": "1116073039101",
+      "foot_value": 50.1,
+      "weekday": 53.2,
+      "weekend": 42.3,
+      "weekend_ratio": 0.795
+    },
+    "kkachisan|vu-1150010300109000020-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300109000020-1",
+      "oa_code": "1116073030017",
+      "foot_value": 374.2,
+      "weekday": 376.9,
+      "weekend": 367.4,
+      "weekend_ratio": 0.975
+    },
+    "kkachisan|vu-1150010300108870016-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300108870016-1",
+      "oa_code": "1116063020003",
+      "foot_value": 24163.0,
+      "weekday": 25704.9,
+      "weekend": 20308.4,
+      "weekend_ratio": 0.79
+    },
+    "kkachisan|vu-1150010300103330002-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300103330002-1",
+      "oa_code": "1116063010034",
+      "foot_value": 343.2,
+      "weekday": 299.4,
+      "weekend": 452.6,
+      "weekend_ratio": 1.512
+    },
+    "kkachisan|vu-1150010300103420049-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300103420049-1",
+      "oa_code": "1116063010023",
+      "foot_value": 15690.1,
+      "weekday": 16127.0,
+      "weekend": 14598.0,
+      "weekend_ratio": 0.905
+    },
+    "kkachisan|vu-1150010300108960019-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300108960019-1",
+      "oa_code": "1116063020002",
+      "foot_value": 182.9,
+      "weekday": 190.9,
+      "weekend": 162.8,
+      "weekend_ratio": 0.853
+    },
+    "kkachisan|vu-1150010300108960019-2": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300108960019-2",
+      "oa_code": "1116063020002",
+      "foot_value": 182.9,
+      "weekday": 190.9,
+      "weekend": 162.8,
+      "weekend_ratio": 0.853
+    },
+    "kkachisan|vu-1150010300103380032-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300103380032-1",
+      "oa_code": "1116063010033",
+      "foot_value": 158.9,
+      "weekday": 130.8,
+      "weekend": 229.0,
+      "weekend_ratio": 1.751
+    },
+    "kkachisan|vu-1150010300101590039-1": {
+      "district_id": "kkachisan",
+      "unit_id": "vu-1150010300101590039-1",
+      "oa_code": "1116063010012",
+      "foot_value": 44.6,
+      "weekday": 42.7,
+      "weekend": 49.3,
+      "weekend_ratio": 1.155
+    },
     "konkuk|vu-1121510500100020015-1": {
       "district_id": "konkuk",
       "unit_id": "vu-1121510500100020015-1",
@@ -2435,6 +2912,222 @@
       "weekday": 153.8,
       "weekend": 214.0,
       "weekend_ratio": 1.391
+    },
+    "miasageori|vu-1130510100100540255-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100100540255-1",
+      "oa_code": "1109071040003",
+      "foot_value": 342.4,
+      "weekday": 370.8,
+      "weekend": 271.5,
+      "weekend_ratio": 0.732
+    },
+    "miasageori|vu-1130510100100750089-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100100750089-1",
+      "oa_code": "1109071040003",
+      "foot_value": 342.4,
+      "weekday": 370.8,
+      "weekend": 271.5,
+      "weekend_ratio": 0.732
+    },
+    "miasageori|vu-1130510100100490160-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100100490160-1",
+      "oa_code": "1109071030007",
+      "foot_value": 583.0,
+      "weekday": 569.7,
+      "weekend": 616.1,
+      "weekend_ratio": 1.081
+    },
+    "miasageori|vu-1130510100100710005-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100100710005-1",
+      "oa_code": "1109071040007",
+      "foot_value": 4671.2,
+      "weekday": 4588.9,
+      "weekend": 4876.8,
+      "weekend_ratio": 1.063
+    },
+    "miasageori|vu-1130510100100450004-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100100450004-1",
+      "oa_code": "1109071040004",
+      "foot_value": 1897.3,
+      "weekday": 1888.6,
+      "weekend": 1919.2,
+      "weekend_ratio": 1.016
+    },
+    "miasageori|vu-1130510100108620002-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100108620002-1",
+      "oa_code": "1109072050002",
+      "foot_value": 1462.3,
+      "weekday": 1490.5,
+      "weekend": 1391.9,
+      "weekend_ratio": 0.934
+    },
+    "miasageori|vu-1130510100108620002-2": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100108620002-2",
+      "oa_code": "1109072050002",
+      "foot_value": 1462.3,
+      "weekday": 1490.5,
+      "weekend": 1391.9,
+      "weekend_ratio": 0.934
+    },
+    "miasageori|vu-1130510100108620002-3": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100108620002-3",
+      "oa_code": "1109072050002",
+      "foot_value": 1462.3,
+      "weekday": 1490.5,
+      "weekend": 1391.9,
+      "weekend_ratio": 0.934
+    },
+    "miasageori|vu-1130510100100830002-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100100830002-1",
+      "oa_code": "1109071030004",
+      "foot_value": 432.8,
+      "weekday": 436.1,
+      "weekend": 424.5,
+      "weekend_ratio": 0.973
+    },
+    "miasageori|vu-1129013400100320000-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1129013400100320000-1",
+      "oa_code": "1108068010003",
+      "foot_value": 1697.9,
+      "weekday": 1647.4,
+      "weekend": 1824.1,
+      "weekend_ratio": 1.107
+    },
+    "miasageori|vu-1129013600101460000-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1129013600101460000-1",
+      "oa_code": "1108071050002",
+      "foot_value": 1755.7,
+      "weekday": 1672.5,
+      "weekend": 1963.7,
+      "weekend_ratio": 1.174
+    },
+    "miasageori|vu-1130510100103730054-1": {
+      "district_id": "miasageori",
+      "unit_id": "vu-1130510100103730054-1",
+      "oa_code": "1109072030023",
+      "foot_value": 39.3,
+      "weekday": 41.7,
+      "weekend": 33.4,
+      "weekend_ratio": 0.801
+    },
+    "mokdong-yc|vu-1147010100108850014-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010100108850014-1",
+      "oa_code": "1115072010005",
+      "foot_value": 272.2,
+      "weekday": 241.1,
+      "weekend": 349.9,
+      "weekend_ratio": 1.451
+    },
+    "mokdong-yc|vu-1147010100109810013-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010100109810013-1",
+      "oa_code": "1115072030003",
+      "foot_value": 683.5,
+      "weekday": 642.4,
+      "weekend": 786.1,
+      "weekend_ratio": 1.224
+    },
+    "mokdong-yc|vu-1147010100109890011-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010100109890011-1",
+      "oa_code": "1115072030017",
+      "foot_value": 553.3,
+      "weekday": 528.2,
+      "weekend": 616.1,
+      "weekend_ratio": 1.166
+    },
+    "mokdong-yc|vu-1147010100108880042-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010100108880042-1",
+      "oa_code": "1115072010007",
+      "foot_value": 1119.2,
+      "weekday": 1211.4,
+      "weekend": 888.7,
+      "weekend_ratio": 0.734
+    },
+    "mokdong-yc|vu-1147010100110060005-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010100110060005-1",
+      "oa_code": "1115072030037",
+      "foot_value": 2519.1,
+      "weekday": 2600.5,
+      "weekend": 2315.7,
+      "weekend_ratio": 0.89
+    },
+    "mokdong-yc|vu-1147010100109910006-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010100109910006-1",
+      "oa_code": "1115072030031",
+      "foot_value": 1536.0,
+      "weekday": 1616.6,
+      "weekend": 1334.6,
+      "weekend_ratio": 0.826
+    },
+    "mokdong-yc|vu-1147010100109910006-2": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010100109910006-2",
+      "oa_code": "1115072030031",
+      "foot_value": 1536.0,
+      "weekday": 1616.6,
+      "weekend": 1334.6,
+      "weekend_ratio": 0.826
+    },
+    "mokdong-yc|vu-1147010200108080001-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010200108080001-1",
+      "oa_code": "1115051010007",
+      "foot_value": 214.8,
+      "weekday": 173.3,
+      "weekend": 318.6,
+      "weekend_ratio": 1.838
+    },
+    "mokdong-yc|vu-1147010100109050001-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010100109050001-1",
+      "oa_code": "1115072030015",
+      "foot_value": 338.4,
+      "weekday": 321.8,
+      "weekend": 379.9,
+      "weekend_ratio": 1.181
+    },
+    "mokdong-yc|vu-1150010300107820004-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1150010300107820004-1",
+      "oa_code": "1116059020002",
+      "foot_value": 1043.6,
+      "weekday": 1044.7,
+      "weekend": 1040.7,
+      "weekend_ratio": 0.996
+    },
+    "mokdong-yc|vu-1147010200108060019-1": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010200108060019-1",
+      "oa_code": "1115054030003",
+      "foot_value": 506.7,
+      "weekday": 515.8,
+      "weekend": 483.9,
+      "weekend_ratio": 0.938
+    },
+    "mokdong-yc|vu-1147010200108060019-2": {
+      "district_id": "mokdong-yc",
+      "unit_id": "vu-1147010200108060019-2",
+      "oa_code": "1115054030003",
+      "foot_value": 506.7,
+      "weekday": 515.8,
+      "weekend": 483.9,
+      "weekend_ratio": 0.938
     },
     "mullae|vu-1156012000100360006-1": {
       "district_id": "mullae",
@@ -3138,6 +3831,105 @@
       "weekend": 3284.4,
       "weekend_ratio": 0.866
     },
+    "oryudong|vu-1153010800101350011-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800101350011-1",
+      "oa_code": "1117068020009",
+      "foot_value": 701.8,
+      "weekday": 665.9,
+      "weekend": 791.6,
+      "weekend_ratio": 1.189
+    },
+    "oryudong|vu-1153010800101560023-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800101560023-1",
+      "oa_code": "1117068020017",
+      "foot_value": 116.6,
+      "weekday": 91.2,
+      "weekend": 180.2,
+      "weekend_ratio": 1.976
+    },
+    "oryudong|vu-1153010800101560023-2": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800101560023-2",
+      "oa_code": "1117068020017",
+      "foot_value": 116.6,
+      "weekday": 91.2,
+      "weekend": 180.2,
+      "weekend_ratio": 1.976
+    },
+    "oryudong|vu-1153010800101350057-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800101350057-1",
+      "oa_code": "1117068020006",
+      "foot_value": 784.9,
+      "weekday": 759.4,
+      "weekend": 848.5,
+      "weekend_ratio": 1.117
+    },
+    "oryudong|vu-1153010800101460004-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800101460004-1",
+      "oa_code": "1117068020003",
+      "foot_value": 69.4,
+      "weekday": 72.5,
+      "weekend": 61.8,
+      "weekend_ratio": 0.852
+    },
+    "oryudong|vu-1153010800100400001-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800100400001-1",
+      "oa_code": "1117067010002",
+      "foot_value": 1498.0,
+      "weekday": 1502.1,
+      "weekend": 1487.7,
+      "weekend_ratio": 0.99
+    },
+    "oryudong|vu-1153010800100810026-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800100810026-1",
+      "oa_code": "1117067020007",
+      "foot_value": 231.9,
+      "weekday": 199.6,
+      "weekend": 312.5,
+      "weekend_ratio": 1.566
+    },
+    "oryudong|vu-1153010800100810030-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800100810030-1",
+      "oa_code": "1117067020003",
+      "foot_value": 464.7,
+      "weekday": 444.9,
+      "weekend": 514.3,
+      "weekend_ratio": 1.156
+    },
+    "oryudong|vu-1153010800100330049-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800100330049-1",
+      "oa_code": "1117067030005",
+      "foot_value": 3455.5,
+      "weekday": 2983.7,
+      "weekend": 4635.1,
+      "weekend_ratio": 1.553
+    },
+    "oryudong|vu-1153010800101350028-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800101350028-1",
+      "oa_code": "1117068020006",
+      "foot_value": 784.9,
+      "weekday": 759.4,
+      "weekend": 848.5,
+      "weekend_ratio": 1.117
+    },
+    "oryudong|vu-1153010800101350067-1": {
+      "district_id": "oryudong",
+      "unit_id": "vu-1153010800101350067-1",
+      "oa_code": "1117068020009",
+      "foot_value": 701.8,
+      "weekday": 665.9,
+      "weekend": 791.6,
+      "weekend_ratio": 1.189
+    },
     "sadang|vu-1165010100104670006-1": {
       "district_id": "sadang",
       "unit_id": "vu-1165010100104670006-1",
@@ -3236,6 +4028,222 @@
       "weekday": 860.2,
       "weekend": 1056.0,
       "weekend_ratio": 1.228
+    },
+    "sangbong|vu-1126010300102950023-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010300102950023-1",
+      "oa_code": "1107061020003",
+      "foot_value": 470.2,
+      "weekday": 475.5,
+      "weekend": 457.1,
+      "weekend_ratio": 0.961
+    },
+    "sangbong|vu-1126010200101000032-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010200101000032-1",
+      "oa_code": "1107059020008",
+      "foot_value": 2122.8,
+      "weekday": 2045.2,
+      "weekend": 2316.7,
+      "weekend_ratio": 1.133
+    },
+    "sangbong|vu-1126010200101160025-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010200101160025-1",
+      "oa_code": "1107059020008",
+      "foot_value": 2122.8,
+      "weekday": 2045.2,
+      "weekend": 2316.7,
+      "weekend_ratio": 1.133
+    },
+    "sangbong|vu-1126010100101320001-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010100101320001-1",
+      "oa_code": "1107052020017",
+      "foot_value": 325.3,
+      "weekday": 340.2,
+      "weekend": 287.9,
+      "weekend_ratio": 0.846
+    },
+    "sangbong|vu-1126010200100880123-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010200100880123-1",
+      "oa_code": "1107060020003",
+      "foot_value": 828.4,
+      "weekday": 783.3,
+      "weekend": 941.0,
+      "weekend_ratio": 1.201
+    },
+    "sangbong|vu-1126010200101250000-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010200101250000-1",
+      "oa_code": "1107060030014",
+      "foot_value": 618.7,
+      "weekday": 588.4,
+      "weekend": 694.5,
+      "weekend_ratio": 1.18
+    },
+    "sangbong|vu-1126010300102940007-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010300102940007-1",
+      "oa_code": "1107061020003",
+      "foot_value": 470.2,
+      "weekday": 475.5,
+      "weekend": 457.1,
+      "weekend_ratio": 0.961
+    },
+    "sangbong|vu-1126010200101260017-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010200101260017-1",
+      "oa_code": "1107060030013",
+      "foot_value": 371.9,
+      "weekday": 322.1,
+      "weekend": 496.4,
+      "weekend_ratio": 1.541
+    },
+    "sangbong|vu-1126010200101040061-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010200101040061-1",
+      "oa_code": "1107060010003",
+      "foot_value": 194.9,
+      "weekday": 201.1,
+      "weekend": 179.5,
+      "weekend_ratio": 0.893
+    },
+    "sangbong|vu-1126010100100900031-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010100100900031-1",
+      "oa_code": "1107071020014",
+      "foot_value": 172.6,
+      "weekday": 157.4,
+      "weekend": 210.6,
+      "weekend_ratio": 1.338
+    },
+    "sangbong|vu-1126010300102910037-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010300102910037-1",
+      "oa_code": "1107061020007",
+      "foot_value": 321.2,
+      "weekday": 322.2,
+      "weekend": 318.6,
+      "weekend_ratio": 0.989
+    },
+    "sangbong|vu-1126010100100900011-1": {
+      "district_id": "sangbong",
+      "unit_id": "vu-1126010100100900011-1",
+      "oa_code": "1107071020010",
+      "foot_value": 136.4,
+      "weekday": 130.1,
+      "weekend": 152.2,
+      "weekend_ratio": 1.17
+    },
+    "sanggye|vu-1135010500103890355-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010500103890355-1",
+      "oa_code": "1111069020002",
+      "foot_value": 791.9,
+      "weekday": 716.3,
+      "weekend": 980.9,
+      "weekend_ratio": 1.369
+    },
+    "sanggye|vu-1135010500101690055-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010500101690055-1",
+      "oa_code": "1111069010009",
+      "foot_value": 519.8,
+      "weekday": 509.8,
+      "weekend": 544.7,
+      "weekend_ratio": 1.068
+    },
+    "sanggye|vu-1135010500103890692-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010500103890692-1",
+      "oa_code": "1111066010007",
+      "foot_value": 1111.0,
+      "weekday": 1063.3,
+      "weekend": 1230.3,
+      "weekend_ratio": 1.157
+    },
+    "sanggye|vu-1135010500103890488-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010500103890488-1",
+      "oa_code": "1111066010007",
+      "foot_value": 1111.0,
+      "weekday": 1063.3,
+      "weekend": 1230.3,
+      "weekend_ratio": 1.157
+    },
+    "sanggye|vu-1135010600104340016-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010600104340016-1",
+      "oa_code": "1111064040001",
+      "foot_value": 1364.2,
+      "weekday": 1355.9,
+      "weekend": 1385.0,
+      "weekend_ratio": 1.021
+    },
+    "sanggye|vu-1135010600104340049-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010600104340049-1",
+      "oa_code": "1111064040001",
+      "foot_value": 1364.2,
+      "weekday": 1355.9,
+      "weekend": 1385.0,
+      "weekend_ratio": 1.021
+    },
+    "sanggye|vu-1135010600103690009-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010600103690009-1",
+      "oa_code": "1111064020605",
+      "foot_value": 184.0,
+      "weekday": 177.5,
+      "weekend": 200.1,
+      "weekend_ratio": 1.127
+    },
+    "sanggye|vu-1135010500101430003-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010500101430003-1",
+      "oa_code": "1111069010014",
+      "foot_value": 195.4,
+      "weekday": 174.7,
+      "weekend": 247.3,
+      "weekend_ratio": 1.416
+    },
+    "sanggye|vu-1135010600101570047-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010600101570047-1",
+      "oa_code": "1111064020003",
+      "foot_value": 1057.6,
+      "weekday": 1024.9,
+      "weekend": 1139.3,
+      "weekend_ratio": 1.112
+    },
+    "sanggye|vu-1135010500101690509-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010500101690509-1",
+      "oa_code": "1111069010009",
+      "foot_value": 519.8,
+      "weekday": 509.8,
+      "weekend": 544.7,
+      "weekend_ratio": 1.068
+    },
+    "sanggye|vu-1135010500101690084-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010500101690084-1",
+      "oa_code": "1111069010009",
+      "foot_value": 519.8,
+      "weekday": 509.8,
+      "weekend": 544.7,
+      "weekend_ratio": 1.068
+    },
+    "sanggye|vu-1135010500103890687-1": {
+      "district_id": "sanggye",
+      "unit_id": "vu-1135010500103890687-1",
+      "oa_code": "1111066010007",
+      "foot_value": 1111.0,
+      "weekday": 1063.3,
+      "weekend": 1230.3,
+      "weekend_ratio": 1.157
     },
     "seochon|vu-1111011200102120000-1": {
       "district_id": "seochon",
@@ -4299,6 +5307,114 @@
       "weekend": 24.6,
       "weekend_ratio": 0.676
     },
+    "suyu|vu-1130510300101720208-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510300101720208-1",
+      "oa_code": "1109065010004",
+      "foot_value": 322.9,
+      "weekday": 346.2,
+      "weekend": 264.6,
+      "weekend_ratio": 0.764
+    },
+    "suyu|vu-1130510300101770022-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510300101770022-1",
+      "oa_code": "1109065010003",
+      "foot_value": 1080.4,
+      "weekday": 1069.7,
+      "weekend": 1107.3,
+      "weekend_ratio": 1.035
+    },
+    "suyu|vu-1130510300101920010-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510300101920010-1",
+      "oa_code": "1109065020002",
+      "foot_value": 6809.7,
+      "weekday": 6797.6,
+      "weekend": 6840.0,
+      "weekend_ratio": 1.006
+    },
+    "suyu|vu-1130510200104430008-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510200104430008-1",
+      "oa_code": "1109060020003",
+      "foot_value": 858.9,
+      "weekday": 873.8,
+      "weekend": 821.8,
+      "weekend_ratio": 0.94
+    },
+    "suyu|vu-1130510300101740012-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510300101740012-1",
+      "oa_code": "1109065010004",
+      "foot_value": 322.9,
+      "weekday": 346.2,
+      "weekend": 264.6,
+      "weekend_ratio": 0.764
+    },
+    "suyu|vu-1130510300101740012-2": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510300101740012-2",
+      "oa_code": "1109065010004",
+      "foot_value": 322.9,
+      "weekday": 346.2,
+      "weekend": 264.6,
+      "weekend_ratio": 0.764
+    },
+    "suyu|vu-1130510300100390007-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510300100390007-1",
+      "oa_code": "1109065030020",
+      "foot_value": 594.0,
+      "weekday": 556.5,
+      "weekend": 687.9,
+      "weekend_ratio": 1.236
+    },
+    "suyu|vu-1130510200104460060-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510200104460060-1",
+      "oa_code": "1109060020007",
+      "foot_value": 1888.2,
+      "weekday": 1998.1,
+      "weekend": 1613.5,
+      "weekend_ratio": 0.808
+    },
+    "suyu|vu-1130510200104480008-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510200104480008-1",
+      "oa_code": "1109060020003",
+      "foot_value": 858.9,
+      "weekday": 873.8,
+      "weekend": 821.8,
+      "weekend_ratio": 0.94
+    },
+    "suyu|vu-1130510300101910006-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510300101910006-1",
+      "oa_code": "1109065020002",
+      "foot_value": 6809.7,
+      "weekday": 6797.6,
+      "weekend": 6840.0,
+      "weekend_ratio": 1.006
+    },
+    "suyu|vu-1130510200104180025-1": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510200104180025-1",
+      "oa_code": "1109060020007",
+      "foot_value": 1888.2,
+      "weekday": 1998.1,
+      "weekend": 1613.5,
+      "weekend_ratio": 0.808
+    },
+    "suyu|vu-1130510200104180025-2": {
+      "district_id": "suyu",
+      "unit_id": "vu-1130510200104180025-2",
+      "oa_code": "1109060020007",
+      "foot_value": 1888.2,
+      "weekday": 1998.1,
+      "weekend": 1613.5,
+      "weekend_ratio": 0.808
+    },
     "teheran|vu-1168010100106670015-1": {
       "district_id": "teheran",
       "unit_id": "vu-1168010100106670015-1",
@@ -4730,6 +5846,114 @@
       "weekday": 4338.9,
       "weekend": 3888.5,
       "weekend_ratio": 0.896
+    },
+    "yeonsinnae|vu-1138010300103270001-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010300103270001-1",
+      "oa_code": "1112052020005",
+      "foot_value": 2482.4,
+      "weekday": 2424.2,
+      "weekend": 2627.8,
+      "weekend_ratio": 1.084
+    },
+    "yeonsinnae|vu-1138010300104840141-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010300104840141-1",
+      "oa_code": "1112072010007",
+      "foot_value": 564.5,
+      "weekday": 569.7,
+      "weekend": 551.5,
+      "weekend_ratio": 0.968
+    },
+    "yeonsinnae|vu-1138010400104000002-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010400104000002-1",
+      "oa_code": "1112055030006",
+      "foot_value": 5282.4,
+      "weekday": 5249.6,
+      "weekend": 5364.5,
+      "weekend_ratio": 1.022
+    },
+    "yeonsinnae|vu-1138010400103960008-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010400103960008-1",
+      "oa_code": "1112055030006",
+      "foot_value": 5282.4,
+      "weekday": 5249.6,
+      "weekend": 5364.5,
+      "weekend_ratio": 1.022
+    },
+    "yeonsinnae|vu-1138010600102010020-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010600102010020-1",
+      "oa_code": "1112058010001",
+      "foot_value": 1415.4,
+      "weekday": 1350.3,
+      "weekend": 1578.3,
+      "weekend_ratio": 1.169
+    },
+    "yeonsinnae|vu-1138010600101850024-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010600101850024-1",
+      "oa_code": "1112058010003",
+      "foot_value": 1868.0,
+      "weekday": 1917.3,
+      "weekend": 1744.7,
+      "weekend_ratio": 0.91
+    },
+    "yeonsinnae|vu-1138010400103950013-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010400103950013-1",
+      "oa_code": "1112055030001",
+      "foot_value": 605.0,
+      "weekday": 604.0,
+      "weekend": 607.6,
+      "weekend_ratio": 1.006
+    },
+    "yeonsinnae|vu-1138010400104560027-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010400104560027-1",
+      "oa_code": "1112056020001",
+      "foot_value": 641.5,
+      "weekday": 702.5,
+      "weekend": 489.0,
+      "weekend_ratio": 0.696
+    },
+    "yeonsinnae|vu-1138010400104560027-2": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010400104560027-2",
+      "oa_code": "1112056020001",
+      "foot_value": 641.5,
+      "weekday": 702.5,
+      "weekend": 489.0,
+      "weekend_ratio": 0.696
+    },
+    "yeonsinnae|vu-1138010300102900008-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010300102900008-1",
+      "oa_code": "1112052020015",
+      "foot_value": 51.2,
+      "weekday": 53.8,
+      "weekend": 44.7,
+      "weekend_ratio": 0.831
+    },
+    "yeonsinnae|vu-1138010300102900008-2": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010300102900008-2",
+      "oa_code": "1112052020015",
+      "foot_value": 51.2,
+      "weekday": 53.8,
+      "weekend": 44.7,
+      "weekend_ratio": 0.831
+    },
+    "yeonsinnae|vu-1138010400104300002-1": {
+      "district_id": "yeonsinnae",
+      "unit_id": "vu-1138010400104300002-1",
+      "oa_code": "1112055030009",
+      "foot_value": 392.2,
+      "weekday": 382.1,
+      "weekend": 417.4,
+      "weekend_ratio": 1.092
     },
     "yeouido|vu-1156011000100340006-1": {
       "district_id": "yeouido",
