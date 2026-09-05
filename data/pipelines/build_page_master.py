@@ -470,7 +470,7 @@ def run(hub: PageHub) -> bool:
                 "source": "stores+ledger" + ("+pip" if pip_n else ""),
                 "capacity_method": agg["capacity_method"],
                 "active_pip": pip_n, "licensed": lic_n,
-                # 층 실배치(BuildingTwin) — 층 근거가 있는 행에만 실린다.
+                # 층 실배치(프론트 BuildingViewer 의 층 스택) — 층 근거가 있는 행에만 실린다.
                 # 없는 건물은 프론트가 종전 근사(아래부터 채우기)로 폴백한다.
                 "com_floors": agg.get("com_floors"),
                 "occ_floors": agg.get("occ_floors"),
