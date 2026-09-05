@@ -195,7 +195,10 @@ def run() -> dict:
     _OUT.parent.mkdir(parents=True, exist_ok=True)
     _OUT.write_text(json.dumps(out, ensure_ascii=False), encoding="utf-8")
     s = out["stats"]
-    print(f"[page-foot-jipgyegu] 거점 {s['districts']}/54 · 셀 {s['cells']} · "
+    # 분모를 54 로 박아 두어 09-05 에 "거점 66/54" 라는 말이 안 되는 줄이 찍혔다.
+    # 시드 수가 아니라 **배정표가 실제로 담은 거점 수**를 분모로 쓴다.
+    _total = (doc.get("stats") or {}).get("districts") or s["districts"]
+    print(f"[page-foot-jipgyegu] 거점 {s['districts']}/{_total} · 셀 {s['cells']} · "
           f"집계구 {s['oa_used']}곳 · 거점당 중앙 {s['oa_per_district_median']}곳 · "
           f"집계구 면적 중앙 {s['oa_area_m2_median']:,.0f}㎡ → {_OUT.name}")
     if partial:

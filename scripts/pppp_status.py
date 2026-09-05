@@ -245,15 +245,32 @@ def page_track(total: int) -> Track:
     _jg = (_load(GOLD / "page_footfall_jipgyegu.json") or {}).get("districts") or {}
     _jg_n = len([k for k in _jg if (GOLD / k).is_dir()])
     _jg_fallback = max(total - _jg_n, 0)
+    _jg_stats = (_load(GOLD / "page_footfall_jipgyegu.json") or {}).get("stats") or {}
+    _jg_cells = _jg_stats.get("cells") or 0
+    _jg_oa = _jg_stats.get("oa_used") or 0
+    _jg_area = f'{round(_jg_stats.get("oa_area_m2_median") or 0):,}'
     _jg_note = (
-        f" ⚠ **2026-09-05 정정 — 집계구는 {_jg_n}/{total}거점이다.** 위 '54/54 전부 덮였다'는 "
-        f"08-26 시점(거점 54)의 참말이었고 지금은 아니다. 나머지 {_jg_fallback}거점은 "
-        "`page_footfall_jipgyegu.json` 에 없어 **상권(trdar)·행정동 경로로 폴백**한다 — "
-        "응답이 `resolution:\"trdar\"` · `time_source:\"adong_hourly\"` 로 스스로 밝히므로 "
-        "거짓을 그리지는 않지만, **한 화면 안이 아니라 거점 사이에서 눈금이 갈린다**. "
-        "즉 이 게이트의 100% 는 '네 레이어가 어디서나 실데이터'라는 뜻이지 "
-        "'어디서나 같은 입도'라는 뜻이 아니다. 집계구를 새 거점까지 넓히려면 "
-        "`scripts/build_cell_jipgyegu.py` 를 다시 돌린다"
+        f" ⚠ **집계구 입도는 {_jg_n}/{total}거점.** 위 '54/54 전부 덮였다'는 08-26 시점"
+        "(거점 54)의 참말이었고, 그 뒤 거점이 늘면서 조용히 거짓이 됐다 — 09-05 에 "
+        "발견해 숫자를 선언에서 **계산으로 내렸다**(아래 값은 산출물을 센 것이다)."
+    ) + (
+        " **2026-09-05 그 격차를 닫았다.** 원인은 수집이 아니라 **배선**이었다: "
+        "`build_cell_jipgyegu` 가 `PAGES`(서빙 66)가 아니라 시드 `DISTRICTS_BY_ID`(54)를 "
+        "돌아 3차 12거점이 배정표에 아예 안 들어왔고, 그래서 `target_codes()` keep-list 가 "
+        "좁아 생활인구를 안 받았다. **같은 시드 버그가 09-04 `pppp_status` 에서 한 번 "
+        "잡혔는데 이 빌더가 빠져 있었다** — 이 저장소에서 반복되는 양식이라 적어 둔다. "
+        f"고치고 재수집(7일·284MB)·재빌드하니 셀 3,699 → {_jg_cells:,} · 집계구 1,303 → "
+        f"{_jg_oa:,} · 폴백 잔존 **0**. ⚠ 그래도 **격자 실측은 아니다** — 집계구 면적 중앙 "
+        f"{_jg_area}㎡ > 셀 10,000㎡ 이고, 점포 밀도(`stor`)는 집계구 원천이 없어 여전히 "
+        "상권이다"
+        if _jg_fallback == 0 else
+        f" 나머지 {_jg_fallback}거점은 `page_footfall_jipgyegu.json` 에 없어 "
+        "**상권(trdar)·행정동으로 폴백**한다 — 응답이 `resolution:\"trdar\"` · "
+        "`time_source:\"adong_hourly\"` 로 스스로 밝히므로 거짓을 그리지는 않지만, "
+        "**거점 사이에서 눈금이 갈린다**. 즉 이 게이트의 100% 는 '어디서나 실데이터'라는 "
+        "뜻이지 '어디서나 같은 입도'라는 뜻이 아니다. 넓히려면 "
+        "`scripts/build_cell_jipgyegu.py` → 생활인구 재수집 → "
+        "`build_page_footfall_jipgyegu` 순으로 돈다"
     )
     t.gates.append(Gate(
         "4대 히트맵 레이어 실데이터", 4 / 4,

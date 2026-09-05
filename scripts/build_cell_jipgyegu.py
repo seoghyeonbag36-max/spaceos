@@ -54,7 +54,15 @@ def run() -> dict:
     dids: list[str] = []
     keys: list[str] = []
     per_cells: dict[str, int] = {}
-    for did in districts.DISTRICTS_BY_ID:
+    # ⚠ `DISTRICTS_BY_ID` 가 아니라 `PAGES` 를 돈다. DISTRICTS 는 **시드 54거점**이라
+    #   서울 3차 12거점(bulgwang·cheonho·doksan·hwagok·kkachisan·miasageori·mokdong-yc·
+    #   oryudong·sangbong·sanggye·suyu·yeonsinnae)이 배정표에 아예 안 들어왔다. 그 결과
+    #   `target_codes()` 의 keep-list 가 좁아 생활인구를 안 받았고, 유동·밀도 레이어가
+    #   그 12거점에서 조용히 상권(trdar)으로 폴백했다 — 화면은 멀쩡해 보였다.
+    #   **같은 버그가 2026-09-04 `pppp_status._precision_hubs` 에서 한 번 잡혔는데
+    #   여기가 빠졌다**(2026-09-05 발견). 셀을 도는 곳은 전부 PAGES 여야 한다.
+    for _p in getattr(districts, "PAGES", None) or districts.DISTRICTS:
+        did = _p["id"]
         hm = districts.get_vacancy_heatmap(did)
         if not hm:
             continue
