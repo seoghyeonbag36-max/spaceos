@@ -20,6 +20,14 @@ Claude Code(CLI) 기반 SpaceOS 개발 가이드. PPPP 프레임워크 4기능�
 | [decision-infra-layer-2026-08-25.md](decision-infra-layer-2026-08-25.md) | **결정·구현 기록** — PPPP 게이트가 세지 않는 층(DB·인증·과금·오케스트레이션) |
 | [prep-sgis-application.md](prep-sgis-application.md) | SGIS 집계구 경계 취득 기록 (막힘 5 해소 · 재신청 절차 보존) |
 
+### 계획 (plan-*) — 무엇을 어떤 순서로 할 것인가
+
+| 문서 | 내용 |
+|------|------|
+| [plan-mvp-3hubs-2026-09.md](plan-mvp-3hubs-2026-09.md) | **9월 미션** — 연남동·신촌·홍대 3거점 MVP → 66거점 화면 루프 엔지니어링. 데이터는 이미 9/9 라 미션은 화면 과제다 |
+| [plan-design-upgrade-2026-09.md](plan-design-upgrade-2026-09.md) | **디자인 고도화** — 2026-09-06 디자이너 피드백을 코드 작업으로 번역. 기획안→PRD→디자인재료→앱 개편(D0~D6). 랜딩만 Lovable, 앱은 이식 |
+| [plan-gyeonggi-expansion-2026-08-29.md](plan-gyeonggi-expansion-2026-08-29.md) | 경기(고양·파주) 확장 계획 — 서빙 보류 상태 |
+
 ### 실측 기록 (finding-*) — 판단의 근거가 남은 곳
 
 | 문서 | 무엇을 결론지었나 |
