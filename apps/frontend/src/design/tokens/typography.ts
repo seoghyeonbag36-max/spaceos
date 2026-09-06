@@ -6,12 +6,12 @@
 //
 // 스케일은 본문 15px / 줄간격 1.5 를 기준점으로 잡은 비율 1.25 모듈러 스케일이다:
 // 12 → 15 → 19 → 24 → 30. 하한 12px 아래로는 한글 받침이 뭉개져 쓰지 않는다.
-// 웨이트는 400 · 700 두 개만 자체 호스팅한다(public/fonts) — 그 사이 값을 적어도
-// 브라우저는 둘 중 가까운 쪽으로 떨어뜨린다.
+// 웨이트는 400 · 600 · 700 셋을 자체 호스팅한다(public/fonts). 그 밖의 값은 브라우저
+// 폰트매칭이 가까운 쪽으로 떨어뜨린다 — 500→400, 800·900→700.
 
 export const typography = {
   fontFamily: "'Pretendard', -apple-system, 'Apple SD Gothic Neo', system-ui, sans-serif",
-  weight: { regular: 400, bold: 700 },
+  weight: { regular: 400, semibold: 600, bold: 700 },
 
   /** 5단 타입스케일 — size(px) / lh(배수) / CSS 변수명 */
   scale: {
