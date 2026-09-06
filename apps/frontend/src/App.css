@@ -19,7 +19,7 @@
   width: 34px; height: 34px; flex: 0 0 34px; margin-bottom: 6px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 10px; background: #3a5a98; color: #fff;
-  font-size: 15px; font-weight: 800; letter-spacing: -.5px;
+  font-size: 15px; font-weight: 700; letter-spacing: -.5px;
   user-select: none;
 }
 .appshell .rail-btn {

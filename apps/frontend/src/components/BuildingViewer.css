@@ -13,7 +13,7 @@
    (길이로 뭔가를 말하면 면적으로 오독된다 — 여기 실린 값은 상태뿐이다). */
 .fstack { display: flex; flex-direction: column; gap: 3px; }
 .fstack-row { display: flex; align-items: center; gap: 6px; }
-.fstack-no { font-size: 10.5px; font-weight: 800; color: #5a6b85; width: 30px; text-align: right; flex-shrink: 0; }
+.fstack-no { font-size: 10.5px; font-weight: 700; color: #5a6b85; width: 30px; text-align: right; flex-shrink: 0; }
 .fstack-bar { height: 15px; flex: 1; border-radius: 3px; }
 .fstack-lb { font-size: 10px; color: #7b8aa0; width: 38px; flex-shrink: 0; }
 /* 비상업 층은 분모 밖이라 눈에 덜 걸리게 — 색만으로는 "빈 층"으로 읽힌다. */
