@@ -104,7 +104,7 @@ apps/frontend    React + TypeScript + Vite (네이버 지도 + 층 스택 + 거�
 ml               PyTorch LSTM(공실 예측) / GNN(업종 추천) + MLflow
 data             Airflow DAG + 크롤러 + Bronze/Silver/Gold 레이어
 infra            docker-compose / Dockerfile / k8s / GitHub Actions
-docs             설계 문서
+docs             설계 문서 (docs/papers/ = 학술 논문 뼈대·근거 인덱스)
 memory           프로젝트 메모리 (전략·용어집 — 기존 유지)
 ```
 
