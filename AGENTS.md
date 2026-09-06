@@ -14,6 +14,34 @@ Promotion 을 나눠 가졌다):
 > 이 문서는 Codex 등 외부 에이전트용 요약이다. 설계 배경·판단 이력은
 > [CLAUDE.md](CLAUDE.md) 와 [docs/spaceos-vibe-build-sequence.md](docs/spaceos-vibe-build-sequence.md) 에 있다.
 
+하위 디렉터리에도 AGENTS.md 가 있다 — 파일을 고치기 전에 그 파일을 덮는 것을 읽는다:
+[apps/backend](apps/backend/AGENTS.md) · [apps/frontend](apps/frontend/AGENTS.md) ·
+[data](data/AGENTS.md) · [ml](ml/AGENTS.md) · [docs/papers](docs/papers/AGENTS.md).
+
+---
+
+## 세션 시작 — 상태는 문서가 아니라 산출물에서 읽는다
+
+**거점 수·진행률·Tier 를 문서에서 읽지 말 것.** 이 저장소의 문서는 실제로 두 번 낡았다
+(08-02 에 Tier1 13거점, 08-09 에 22거점으로 멈춰 있었다). 단일 출처는 스크립트다:
+
+```powershell
+# 진행률·게이트 (전체 출력은 ~56KB 라 근거 줄을 걷어낸다 → ~5KB)
+python scripts/pppp_status.py | Select-String -NotMatch '└'
+
+# 거점별 체인 진행
+python scripts/chain_status.py --all
+```
+
+```bash
+# bash 를 쓸 때
+python scripts/pppp_status.py | grep -v '└'
+```
+
+**서빙 거점 목록의 단일 출처는 [data/config/page_hubs.py](data/config/page_hubs.py) 의 `ACTIVE_HUBS`** 다.
+`data/gold/*/coverage.json` 을 세면 **다른 값이 나온다** — 서빙 목록 밖(경기 보류)의 산출물이
+섞이기 때문이다. 그건 서빙 거점 수가 아니다.
+
 ---
 
 ## 0. 이 저장소의 제1원칙 — 근거 없는 값을 채우지 않는다
