@@ -1,0 +1,5994 @@
+[
+  {
+    "hub": "anam",
+    "lot_key": "1123010200107400001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1123010300111530016",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129011700102370000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012100100430000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012100100510000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012100100620000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012100100780000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012100100970000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012100102450003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012100103170006",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012100103180005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012100103460000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012200100610000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012200100810000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012200100820000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012200100960001",
+    "polygons": 16,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012200100970001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012200100970016",
+    "polygons": 6,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012200101390014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012200101390033",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012300100820001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012300100860000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012300100970000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012300100990000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012300101010000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012300101300009",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012300101350000",
+    "polygons": 6,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500100120011",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500100150057",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500100150060",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101040045",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101260016",
+    "polygons": 43,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101260083",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101340007",
+    "polygons": 5,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101340024",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101340043",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101360006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101360007",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101460007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101460055",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012500101470005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012600100090001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012600100540000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012600100630000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012600100900002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012700100770000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129012700101110000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129013000101970001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "anam",
+    "lot_key": "1129013100101160000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "apgujeong-rodeo",
+    "lot_key": "1168010400100020000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "bulgwang",
+    "lot_key": "1138010300102640004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "bulgwang",
+    "lot_key": "1138010300105500001",
+    "polygons": 11,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongdam",
+    "lot_key": "1168010400100050014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongdam",
+    "lot_key": "1168010400100310011",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongdam",
+    "lot_key": "1168010400100980010",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongdam",
+    "lot_key": "1168010400101240007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010200100090003",
+    "polygons": 15,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010200100260014",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010200100390551",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300102880000",
+    "polygons": 5,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300104280000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300104860007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300104860012",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300105400000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300105770000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300105880000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300106280000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300107140000",
+    "polygons": 10,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300107150000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300107190003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300107970003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300108220014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300108770000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300108860014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300108860016",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300108870192",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300109610002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300109620001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300110110000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300110820000",
+    "polygons": 11,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300111240005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300111410021",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010300112060000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010400104970077",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010400105880001",
+    "polygons": 6,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010400105970015",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010400106200010",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010400106200051",
+    "polygons": 10,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010400106220011",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010700102240000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010700102250014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheongnyangni",
+    "lot_key": "1123010700105670000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheonho",
+    "lot_key": "1171010300104810002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheonho",
+    "lot_key": "1174010800101110024",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheonho",
+    "lot_key": "1174010900103380023",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cheonho",
+    "lot_key": "1174010900104230139",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013200100240014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013300100190019",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013300100790002",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013300100820005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013500100530004",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013500100700017",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013500101260000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013600100010019",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013600100290002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013600100310004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114013700100030001",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114014000100230008",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114014200100030008",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114014200100040001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114014200100080019",
+    "polygons": 8,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114014200100080020",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114015000100280000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114015400100900004",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114015400100900005",
+    "polygons": 9,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114015400100900006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114015400100900012",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114015500102720004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "chungmuro",
+    "lot_key": "1114016100100620001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cityhall",
+    "lot_key": "1114010400100630000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cityhall",
+    "lot_key": "1114012700100920003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cityhall",
+    "lot_key": "1114016700100010017",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cityhall",
+    "lot_key": "1114016700100010066",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cityhall",
+    "lot_key": "1114016700100040000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cityhall",
+    "lot_key": "1114016700100340016",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cityhall",
+    "lot_key": "1114016700100340018",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "cityhall",
+    "lot_key": "1114016800102120001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "doksan",
+    "lot_key": "1154510200109980006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111016200103180002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111016300100060001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111016300100320000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111016300100500003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111016300101820007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111016300103210006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111016400100160006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111016400102380006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111017400103300004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111017400103950005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111017400104020009",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111017400104120002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111017400104220009",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1111017400104590006",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014300100310005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014300100370011",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014300100440018",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014300100590002",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014400101860054",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014400101860082",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014500101690000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014500102790000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014600100420000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014700100220013",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114014700102760010",
+    "polygons": 7,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114015100100720002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114015400101390007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114015400101390010",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016200101130006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016200101930029",
+    "polygons": 8,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016200102330019",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016200102360081",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016200102470013",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016200102510078",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016200102900162",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016200103040253",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016200103050037",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dongdaemun",
+    "lot_key": "1114016400100500005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dosan",
+    "lot_key": "1168010700106260076",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "dosan",
+    "lot_key": "1168010800100620013",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1111013600100790000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1111013600101170000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1111015300101600000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1111015400101560001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1111015500101600002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1111015800101260003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1111016100100590002",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114013200100240014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114013700100030001",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114015000100280000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114015500102270000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114015500102720004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114015600100970004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114015600101130000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114015600102160005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114015700100430001",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114015700100490002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "euljiro",
+    "lot_key": "1114016100100620001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gangnam",
+    "lot_key": "1165010800113030034",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gangnam",
+    "lot_key": "1165010800116790005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gangnam",
+    "lot_key": "1168010100106470014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "garak",
+    "lot_key": "1171010800101500017",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "garosugil",
+    "lot_key": "1168010700105600004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "garosugil",
+    "lot_key": "1168010800100060000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "garosugil",
+    "lot_key": "1168010800100100024",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gongdeok",
+    "lot_key": "1144010400102010056",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gunja",
+    "lot_key": "1121510900100530008",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111015400101560001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111015700100480057",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111015800101260003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111015800101770000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111015800101790002",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111015800102560000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111015900101890001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111015900102500000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016000101360012",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016000102380005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016100100590002",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016200100980000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016300100060001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016300100320000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016300100500003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016300101820007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016300103210006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016400102380006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1111016700101700000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1114015100100120001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1114015200100430006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1114015200103180000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1114015700100200000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1114015700100430001",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "gwangjang",
+    "lot_key": "1114015700100490002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hannam",
+    "lot_key": "1117013000101260013",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hannam",
+    "lot_key": "1117013100106570032",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hannam",
+    "lot_key": "1117013100106700001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hannam",
+    "lot_key": "1117013100106830031",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hannam",
+    "lot_key": "1117013100106860020",
+    "polygons": 9,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hannam",
+    "lot_key": "1117013100107320001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hannam",
+    "lot_key": "1117013100107370067",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hannam",
+    "lot_key": "1117013100107390006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hannam",
+    "lot_key": "1117013600102650299",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hapjeong",
+    "lot_key": "1144012200103720025",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hapjeong",
+    "lot_key": "1144012200103780035",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hapjeong",
+    "lot_key": "1144012200103800001",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hapjeong",
+    "lot_key": "1144012200103950003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hongdae",
+    "lot_key": "1144012000103540001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hongdae",
+    "lot_key": "1144012000103590000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hongdae",
+    "lot_key": "1144012000103950112",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hongdae",
+    "lot_key": "1144012100101700030",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hwagok",
+    "lot_key": "1150010300110320011",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111016600100440008",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111016800100010005",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111016800100010132",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111016800100010138",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111016800101290333",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111016800101300024",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111016800101690009",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111016800101950006",
+    "polygons": 6,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111017100100290000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "hyehwa",
+    "lot_key": "1111017200100170004",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111012800100020001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013100101800000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013200101140008",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013300100340008",
+    "polygons": 5,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013300101580001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013400100960018",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013600100080002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013600100790000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013600101170000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013600101330000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111013700102800000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111015100100590005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111015200100020000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "ikseon",
+    "lot_key": "1111015300101600000",
+    "polygons": 5,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "itaewon",
+    "lot_key": "1117013000101160012",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "itaewon",
+    "lot_key": "1117013000101260013",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "itaewon",
+    "lot_key": "1117013000101300012",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "itaewon",
+    "lot_key": "1117013000101310008",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "itaewon",
+    "lot_key": "1117013000101310034",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "itaewon",
+    "lot_key": "1117013100106860020",
+    "polygons": 9,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "itaewon",
+    "lot_key": "1117013100107320001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "itaewon",
+    "lot_key": "1117013100107370067",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "itaewon",
+    "lot_key": "1117013600102650299",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "jamsil",
+    "lot_key": "1171010100100270004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "jamsil",
+    "lot_key": "1171010200100200000",
+    "polygons": 60,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "jamsil",
+    "lot_key": "1171010200100290005",
+    "polygons": 7,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "jamsil",
+    "lot_key": "1171011100100670001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "lot_key": "1171010100101830005",
+    "polygons": 5,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "lot_key": "1171010100101870019",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "lot_key": "1171010100102030009",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "lot_key": "1171010100102240000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "kkachisan",
+    "lot_key": "1150010300109050023",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "kkachisan",
+    "lot_key": "1150010300109140004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "kkachisan",
+    "lot_key": "1150010300201720004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mangwon",
+    "lot_key": "1144012300100570167",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mangwon",
+    "lot_key": "1144012300103860013",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mangwon",
+    "lot_key": "1144012300103990040",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mangwon",
+    "lot_key": "1144012500102600002",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mokdong-yc",
+    "lot_key": "1147010100108900025",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156010700101210009",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156011100100200000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156011100101040001",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156011900100180004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156011900100230001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156011900100370013",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156011900100640000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156011900100740000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012000100020000",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012000100220001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012000100260000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012000100580003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012100100090000",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012100100160001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012100100540005",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012100100540035",
+    "polygons": 9,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012100100540060",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012100100710000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012100100800001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "mullae",
+    "lot_key": "1156012400100010001",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114010400100630000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114011500100050000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114012500100660022",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114012600100740001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114012700100920003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114014000100230008",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114014200100030008",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114014200100040001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114014200100080019",
+    "polygons": 8,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114014200100080020",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "myeongdong",
+    "lot_key": "1114016100100620001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nambu",
+    "lot_key": "1165010800114200018",
+    "polygons": 9,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nambu",
+    "lot_key": "1165010800114360014",
+    "polygons": 10,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nambu",
+    "lot_key": "1165010800114430026",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nambu",
+    "lot_key": "1165010800114540029",
+    "polygons": 9,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nambu",
+    "lot_key": "1165010800116050003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nambu",
+    "lot_key": "1165010800116060005",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nambu",
+    "lot_key": "1165010800116310001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "namdaemun",
+    "lot_key": "1114011200102050008",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "namdaemun",
+    "lot_key": "1114011200102160001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "namdaemun",
+    "lot_key": "1114011800101310000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nonhyeon",
+    "lot_key": "1165010700107070005",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nonhyeon",
+    "lot_key": "1165010700107220002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "nonhyeon",
+    "lot_key": "1168010800101400023",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "noryangjin",
+    "lot_key": "1159010100100130017",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "noryangjin",
+    "lot_key": "1159010100100720035",
+    "polygons": 5,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "noryangjin",
+    "lot_key": "1159010100102660006",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "noryangjin",
+    "lot_key": "1159010100102730007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "noryangjin",
+    "lot_key": "1159010100102890041",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "noryangjin",
+    "lot_key": "1159010100102940155",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sadang",
+    "lot_key": "1159010700110410021",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sadang",
+    "lot_key": "1165010100105050002",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "samcheong",
+    "lot_key": "1111011900100010000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "samcheong",
+    "lot_key": "1111013900100650000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "samcheong",
+    "lot_key": "1111014200100600008",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sangbong",
+    "lot_key": "1126010200101010003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sangbong",
+    "lot_key": "1126010200101010004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sangbong",
+    "lot_key": "1126010200101090028",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sangbong",
+    "lot_key": "1126010200101160008",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sangbong",
+    "lot_key": "1126010300102920017",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sanggye",
+    "lot_key": "1135010500103890483",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sanggye",
+    "lot_key": "1135010500104370009",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sanggye",
+    "lot_key": "1135010600101600000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seochon",
+    "lot_key": "1111010500100670000",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seochon",
+    "lot_key": "1111011300101550000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seochon",
+    "lot_key": "1111011500102620020",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seochon",
+    "lot_key": "1111011500102620083",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seochon",
+    "lot_key": "1111011900100010001",
+    "polygons": 21,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seolleung",
+    "lot_key": "1168010100107020022",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seolleung",
+    "lot_key": "1168010100107080007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seolleung",
+    "lot_key": "1168010500101560000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seolleung",
+    "lot_key": "1168010600108980004",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seongsu",
+    "lot_key": "1120011500102550001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seongsu",
+    "lot_key": "1120011500102750021",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seongsu",
+    "lot_key": "1120011500102780001",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seongsu",
+    "lot_key": "1120011500102800027",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seongsu",
+    "lot_key": "1120011500102890142",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seongsu",
+    "lot_key": "1120011500102890279",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seongsu",
+    "lot_key": "1120011500103330139",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seoulsup",
+    "lot_key": "1120011400106560047",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seoulsup",
+    "lot_key": "1120011400106560894",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seoulsup",
+    "lot_key": "1120011400106561044",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seoulsup",
+    "lot_key": "1120011400106760005",
+    "polygons": 6,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seoulsup",
+    "lot_key": "1120011400106850006",
+    "polygons": 5,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "seoulsup",
+    "lot_key": "1120011400106850411",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sharosugil",
+    "lot_key": "1162010100116250007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sharosugil",
+    "lot_key": "1162010100116630005",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sillim",
+    "lot_key": "1162010100109610015",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sillim",
+    "lot_key": "1162010200114170001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sillim",
+    "lot_key": "1162010200114250025",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sillim",
+    "lot_key": "1162010200114280009",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sillim",
+    "lot_key": "1162010200114500043",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sillim",
+    "lot_key": "1162010200114650017",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1141011200100560119",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1141011400100740012",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1141011600100020006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1141011600100050050",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1141011600100300001",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1141011600100310091",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1141011600100460003",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1141011600100470039",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1144010800100120001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1144011000100010023",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1144011000100190125",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1144011000100310006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sinchon",
+    "lot_key": "1144011000100310074",
+    "polygons": 5,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "songridan",
+    "lot_key": "1171011100100670001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sukmyung",
+    "lot_key": "1117010400100590004",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sukmyung",
+    "lot_key": "1117010400100860002",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sukmyung",
+    "lot_key": "1117010500100240008",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sukmyung",
+    "lot_key": "1117010500100370001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sukmyung",
+    "lot_key": "1117010500100620005",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sukmyung",
+    "lot_key": "1117010900101900000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sukmyung",
+    "lot_key": "1117011000101200023",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sukmyung",
+    "lot_key": "1117011100100240044",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "sukmyung",
+    "lot_key": "1117011200101040000",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "suyu",
+    "lot_key": "1130510300100450007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "suyu",
+    "lot_key": "1130510300100480014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "teheran",
+    "lot_key": "1168010100106470014",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010300102970000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010400100430001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010400102010001",
+    "polygons": 4,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010400102700000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010700100280007",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010700101920028",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010700102460002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010700102920045",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010700102970006",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "wangsimni",
+    "lot_key": "1120010700103200001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yeonhui",
+    "lot_key": "1141011700100860002",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yeonhui",
+    "lot_key": "1141011700100950035",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yeonhui",
+    "lot_key": "1141011700103010001",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yeonnam",
+    "lot_key": "1141011600104900000",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yeonnam",
+    "lot_key": "1144012400102230113",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yeonsinnae",
+    "lot_key": "1138010400104270025",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yeonsinnae",
+    "lot_key": "1138010400104600030",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yongsan",
+    "lot_key": "1117012800100400227",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yongsan",
+    "lot_key": "1117012800100400950",
+    "polygons": 3,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yongsan",
+    "lot_key": "1117012800100520000",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yongsan",
+    "lot_key": "1117012800100650154",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "polygon_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  },
+  {
+    "hub": "yongsan",
+    "lot_key": "1117012800100650182",
+    "polygons": 2,
+    "eligible_polygons": 0,
+    "methods": [
+      "floor_approx"
+    ],
+    "sources": [
+      "pip_only"
+    ],
+    "assessment": "scope_mismatch_in_broad_rule_not_confirmed_error",
+    "why": "polygon-derived approximations need not have identical capacity across buildings sharing a parcel; serving excludes them"
+  }
+]

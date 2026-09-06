@@ -1,0 +1,4755 @@
+[
+  {
+    "hub": "anam",
+    "entity_key": "1129012700100770000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012600100900002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012600100540000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012700101110000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012600100630000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012300100990000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012300101300009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012300101350000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012300101300009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012300101010000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012300101350000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129013100101160000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012300100860000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012300100970000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129013000101970001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012600100090001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012300100820001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1123010200107400001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101340024",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101340043",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101360007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1123010300111530016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101340024",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101360006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101040045",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101340007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200100810000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200101390014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100102450003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200100820000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200101390033",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200100610000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200100960001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200100970001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200100970016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100100780000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100100430000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100100510000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100100620000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129011700102370000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100100970000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100100430000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200100960001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012200100960001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100103460000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100103170006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012100103180005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500100120011",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101460055",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500100150060",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500100150057",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101460007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101470005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101460055",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260083",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "1129012500101260016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "anam",
+    "entity_key": "anam",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "apgujeong-rodeo",
+    "entity_key": "1168010400100020000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "apgujeong-rodeo",
+    "entity_key": "apgujeong-rodeo",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "banpo",
+    "entity_key": "banpo",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "bulgwang",
+    "entity_key": "1138010300102640004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "bulgwang",
+    "entity_key": "1138010300105500001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "bulgwang",
+    "entity_key": "1138010300105500001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "bulgwang",
+    "entity_key": "1138010300105500001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "bulgwang",
+    "entity_key": "1138010300105500001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "bulgwang",
+    "entity_key": "1138010300105500001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "bulgwang",
+    "entity_key": "1138010300105500001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "bulgwang",
+    "entity_key": "1138010300105500001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "bulgwang",
+    "entity_key": "bulgwang",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongdam",
+    "entity_key": "1168010400100980010",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongdam",
+    "entity_key": "1168010400100050014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongdam",
+    "entity_key": "1168010400100310011",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongdam",
+    "entity_key": "1168010400101240007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongdam",
+    "entity_key": "cheongdam",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100260014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100260014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100260014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100390551",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300111240005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300110820000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300110820000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300111410021",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300106280000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300110110000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010400106220011",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010200100090003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010400104970077",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010400104970077",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010400106200010",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010400106200051",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010400106200051",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010400105880001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300109610002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300108870192",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300109620001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300107970003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300108220014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300108860016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300108860014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300104280000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300105880000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300104860012",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300104860007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300105770000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300105400000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300107140000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300107190003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300107150000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300108770000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300112060000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300102880000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300102880000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300102880000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010300102880000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010700105670000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010700102250014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010700102240000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "1123010400105970015",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheongnyangni",
+    "entity_key": "cheongnyangni",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheonho",
+    "entity_key": "1174010800101110024",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheonho",
+    "entity_key": "1171010300104810002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheonho",
+    "entity_key": "1174010900103380023",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheonho",
+    "entity_key": "1174010900104230139",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cheonho",
+    "entity_key": "cheonho",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114014000100230008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114014200100040001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114014200100030008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114014200100080019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114014200100080019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114014200100030008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114014200100080020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013300100790002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013600100010019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013600100310004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013600100290002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114016100100620001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013700100030001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013700100030001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015500102720004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013200100240014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013500101260000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013300100820005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013300100190019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015400100900004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015400100900005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015400100900005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015400100900005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015400100900006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015400100900005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015400100900005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015400100900005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013600100010019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013500100700017",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013300100190019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015000100280000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015000100280000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114013500100530004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "1114015400100900012",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "chungmuro",
+    "entity_key": "chungmuro",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114010400100630000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114016700100340016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114016700100340016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114016700100340018",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114016700100340016",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114016700100010066",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114016800102120001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114010400100630000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114016700100040000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114016700100010017",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "1114012700100920003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "cityhall",
+    "entity_key": "cityhall",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dangsan",
+    "entity_key": "dangsan",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "doksan",
+    "entity_key": "1154510200109980006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "doksan",
+    "entity_key": "doksan",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014400101860082",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014300100590002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014300100590002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014400101860054",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014300100370011",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014300100310005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014300100440018",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114015400101390010",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114015400101390007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014700100220013",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014500102790000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014700102760010",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014700102760010",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014500101690000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114014600100420000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200103040253",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200102360081",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200103040253",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200103050037",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200103040253",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200102900162",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200102330019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016400100500005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200102470013",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200101130006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114015100100720002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111016300100500003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111016300103210006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111016200103180002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111016300101820007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111016300100320000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111016400102380006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111016300100060001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111016400100160006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200102510078",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200101930029",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200101930029",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200101930029",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200101930029",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200101930029",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1114016200101930029",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111017400104590006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111017400103950005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111017400104020009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111017400104220009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111017400104120002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "1111017400103300004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dongdaemun",
+    "entity_key": "dongdaemun",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dosan",
+    "entity_key": "1168010800100620013",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dosan",
+    "entity_key": "1168010700106260076",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "dosan",
+    "entity_key": "dosan",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114016100100620001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114013700100030001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114013700100030001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114013200100240014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114015500102720004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1111013600100790000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1111015500101600002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1111013600101170000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1111015300101600000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1111015800101260003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114015600102160005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114015600101130000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114015600100970004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114015500102270000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114015700100430001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114015000100280000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114015700100490002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1114015000100280000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1111016100100590002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1111015400101560001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1111016100100590002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "1111016100100590002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "euljiro",
+    "entity_key": "euljiro",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gangnam",
+    "entity_key": "1165010800116790005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gangnam",
+    "entity_key": "1168010100106470014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gangnam",
+    "entity_key": "1165010800113030034",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gangnam",
+    "entity_key": "gangnam",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "garak",
+    "entity_key": "1171010800101500017",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "garak",
+    "entity_key": "garak",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "garosugil",
+    "entity_key": "1168010800100100024",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "garosugil",
+    "entity_key": "1168010700105600004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "garosugil",
+    "entity_key": "1168010800100060000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "garosugil",
+    "entity_key": "garosugil",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gongdeok",
+    "entity_key": "1144010400102010056",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gongdeok",
+    "entity_key": "gongdeok",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gunja",
+    "entity_key": "1121510900100530008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gunja",
+    "entity_key": "gunja",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1114015700100430001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111015800101790002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016100100590002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1114015700100490002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1114015700100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111015800102560000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111015400101560001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111015800101260003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111015800101770000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1114015200100430006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1114015100100120001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1114015200103180000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016300101820007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016300103210006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111015700100480057",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111015900101890001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111015900102500000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111015700100480057",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016300100060001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016000101360012",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016200100980000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016400102380006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016700101700000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016000102380005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016300100320000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "1111016300100500003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "gwangjang",
+    "entity_key": "gwangjang",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013600102650299",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013000101260013",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100107320001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106570032",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100107370067",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106830031",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106830031",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100107390006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "1117013100106700001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hannam",
+    "entity_key": "hannam",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hapjeong",
+    "entity_key": "1144012200103950003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hapjeong",
+    "entity_key": "1144012200103800001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hapjeong",
+    "entity_key": "1144012200103780035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hapjeong",
+    "entity_key": "1144012200103720025",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hapjeong",
+    "entity_key": "hapjeong",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hongdae",
+    "entity_key": "1144012000103540001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hongdae",
+    "entity_key": "1144012000103950112",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hongdae",
+    "entity_key": "1144012000103590000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hongdae",
+    "entity_key": "1144012100101700030",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hongdae",
+    "entity_key": "hongdae",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hwagok",
+    "entity_key": "1150010300110320011",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hwagok",
+    "entity_key": "hwagok",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111017200100170004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111017200100170004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111017200100170004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016600100440008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800101950006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800101950006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800101690009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800101690009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800101690009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800101290333",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800101300024",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800100010138",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800100010132",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111017100100290000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800100010005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "1111016800100010005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "hyehwa",
+    "entity_key": "hyehwa",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013600101330000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013700102800000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111012800100020001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013700102800000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013600100790000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013600101170000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013600100080002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111015100100590005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013300101580001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111015200100020000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111015200100020000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111015300101600000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013400100960018",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013300100340008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013200101140008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "1111013100101800000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "ikseon",
+    "entity_key": "ikseon",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013000101310034",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013000101300012",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013600102650299",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013000101260013",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013000101310008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013100107320001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013100106860020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013000101160012",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "1117013100107370067",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "itaewon",
+    "entity_key": "itaewon",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010100100270004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171011100100670001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100290005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "1171010200100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsil",
+    "entity_key": "jamsil",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "entity_key": "1171010100102240000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "entity_key": "1171010100101870019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "entity_key": "1171010100101830005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "entity_key": "1171010100102030009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "entity_key": "jamsilsaenae",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "jangan",
+    "entity_key": "jangan",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "kkachisan",
+    "entity_key": "1150010300109140004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "kkachisan",
+    "entity_key": "1150010300109050023",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "kkachisan",
+    "entity_key": "1150010300201720004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "kkachisan",
+    "entity_key": "kkachisan",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "konkuk",
+    "entity_key": "konkuk",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "kyunghee",
+    "entity_key": "kyunghee",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mangwon",
+    "entity_key": "1144012300103990040",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mangwon",
+    "entity_key": "1144012300100570167",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mangwon",
+    "entity_key": "1144012300103860013",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mangwon",
+    "entity_key": "1144012500102600002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mangwon",
+    "entity_key": "mangwon",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "miasageori",
+    "entity_key": "miasageori",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mokdong-yc",
+    "entity_key": "1147010100108900025",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mokdong-yc",
+    "entity_key": "mokdong-yc",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012000100220001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012000100580003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156011900100740000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012000100260000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156011900100180004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156011900100230001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100540060",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100540035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100540035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100540035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100540005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156011900100640000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100540035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156011900100370013",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100540035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012000100020000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100800001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100710000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012400100010001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156011100100200000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156011100101040001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156011100101040001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100090000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156010700101210009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156011100101040001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100160001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "1156012100100090000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "mullae",
+    "entity_key": "mullae",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114012700100920003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114012500100660022",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114014200100080019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114014200100080019",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114014200100040001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114014200100030008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114014200100080020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114014000100230008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114014200100030008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114012600100740001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114011500100050000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114010400100630000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "1114016100100620001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "myeongdong",
+    "entity_key": "myeongdong",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800114540029",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800114540029",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800114360014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800114430026",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800114360014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800114200018",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800114200018",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800114360014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800116310001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800116050003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800116060005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "1165010800116060005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nambu",
+    "entity_key": "nambu",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "namdaemun",
+    "entity_key": "1114011200102160001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "namdaemun",
+    "entity_key": "1114011200102050008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "namdaemun",
+    "entity_key": "1114011800101310000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "namdaemun",
+    "entity_key": "namdaemun",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nokdu",
+    "entity_key": "nokdu",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nonhyeon",
+    "entity_key": "1168010800101400023",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nonhyeon",
+    "entity_key": "1165010700107220002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nonhyeon",
+    "entity_key": "1165010700107070005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "nonhyeon",
+    "entity_key": "nonhyeon",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "noryangjin",
+    "entity_key": "1159010100102940155",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "noryangjin",
+    "entity_key": "1159010100102890041",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "noryangjin",
+    "entity_key": "1159010100102730007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "noryangjin",
+    "entity_key": "1159010100100720035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "noryangjin",
+    "entity_key": "1159010100102660006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "noryangjin",
+    "entity_key": "1159010100100720035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "noryangjin",
+    "entity_key": "1159010100100720035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "noryangjin",
+    "entity_key": "1159010100100130017",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "noryangjin",
+    "entity_key": "noryangjin",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "oryudong",
+    "entity_key": "oryudong",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sadang",
+    "entity_key": "1165010100105050002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sadang",
+    "entity_key": "1165010100105050002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sadang",
+    "entity_key": "1159010700110410021",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sadang",
+    "entity_key": "sadang",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "samcheong",
+    "entity_key": "1111014200100600008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "samcheong",
+    "entity_key": "1111011900100010000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "samcheong",
+    "entity_key": "1111013900100650000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "samcheong",
+    "entity_key": "samcheong",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sangbong",
+    "entity_key": "1126010200101090028",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sangbong",
+    "entity_key": "1126010200101160008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sangbong",
+    "entity_key": "1126010200101010003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sangbong",
+    "entity_key": "1126010200101010004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sangbong",
+    "entity_key": "1126010300102920017",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sangbong",
+    "entity_key": "sangbong",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sanggye",
+    "entity_key": "1135010500103890483",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sanggye",
+    "entity_key": "1135010600101600000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sanggye",
+    "entity_key": "1135010500104370009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sanggye",
+    "entity_key": "sanggye",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "1111011300101550000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "1111011500102620020",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "1111011500102620083",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "1111011900100010001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "1111010500100670000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "1111010500100670000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "1111010500100670000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "1111011900100010001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "1111011900100010001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seochon",
+    "entity_key": "seochon",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seolleung",
+    "entity_key": "1168010100107020022",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seolleung",
+    "entity_key": "1168010100107080007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seolleung",
+    "entity_key": "1168010600108980004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seolleung",
+    "entity_key": "1168010500101560000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seolleung",
+    "entity_key": "seolleung",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seongsu",
+    "entity_key": "1120011500103330139",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seongsu",
+    "entity_key": "1120011500102550001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seongsu",
+    "entity_key": "1120011500102750021",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seongsu",
+    "entity_key": "1120011500102890279",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seongsu",
+    "entity_key": "1120011500102890142",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seongsu",
+    "entity_key": "1120011500102780001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seongsu",
+    "entity_key": "1120011500102800027",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seongsu",
+    "entity_key": "1120011500102800027",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seongsu",
+    "entity_key": "seongsu",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "1120011400106850006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "1120011400106850006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "1120011400106760005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "1120011400106760005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "1120011400106850411",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "1120011400106760005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "1120011400106560894",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "1120011400106561044",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "1120011400106560047",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "seoulsup",
+    "entity_key": "seoulsup",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sharosugil",
+    "entity_key": "1162010100116630005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sharosugil",
+    "entity_key": "1162010100116630005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sharosugil",
+    "entity_key": "1162010100116250007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sharosugil",
+    "entity_key": "sharosugil",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sillim",
+    "entity_key": "1162010200114650017",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sillim",
+    "entity_key": "1162010200114650017",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sillim",
+    "entity_key": "1162010200114650017",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sillim",
+    "entity_key": "1162010200114500043",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sillim",
+    "entity_key": "1162010200114280009",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sillim",
+    "entity_key": "1162010200114250025",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sillim",
+    "entity_key": "1162010200114170001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sillim",
+    "entity_key": "1162010100109610015",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sillim",
+    "entity_key": "sillim",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1144011000100310074",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011600100300001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011600100300001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1144011000100310006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011600100300001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1144011000100190125",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1144011000100190125",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1144011000100010023",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1144010800100120001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011600100470039",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011600100050050",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011600100020006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011600100460003",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011600100310091",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011400100740012",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "1141011200100560119",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sinchon",
+    "entity_key": "sinchon",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "songridan",
+    "entity_key": "1171011100100670001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "songridan",
+    "entity_key": "songridan",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117011200101040000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117011100100240044",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117010500100370001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117010500100620005",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117010400100860002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117010500100240008",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117010400100860002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117010900101900000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117011000101200023",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117010400100590004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "1117010400100590004",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sukmyung",
+    "entity_key": "sukmyung",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "sungshin",
+    "entity_key": "sungshin",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "suyu",
+    "entity_key": "1130510300100450007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "suyu",
+    "entity_key": "1130510300100480014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "suyu",
+    "entity_key": "suyu",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "teheran",
+    "entity_key": "1168010100106470014",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "teheran",
+    "entity_key": "teheran",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010700102920045",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010700102970006",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010700103200001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010700102460002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010700100280007",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010400100430001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010400102700000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010300102970000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010400102010001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "1120010700101920028",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "wangsimni",
+    "entity_key": "wangsimni",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonhui",
+    "entity_key": "1141011700103010001",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonhui",
+    "entity_key": "1141011700100950035",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonhui",
+    "entity_key": "1141011700100860002",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonhui",
+    "entity_key": "yeonhui",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonnam",
+    "entity_key": "1141011600104900000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonnam",
+    "entity_key": "1141011600104900000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonnam",
+    "entity_key": "1144012400102230113",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonnam",
+    "entity_key": "yeonnam",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonsinnae",
+    "entity_key": "1138010400104600030",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonsinnae",
+    "entity_key": "1138010400104270025",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeonsinnae",
+    "entity_key": "yeonsinnae",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yeouido",
+    "entity_key": "yeouido",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yongsan",
+    "entity_key": "1117012800100400227",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yongsan",
+    "entity_key": "1117012800100400950",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yongsan",
+    "entity_key": "1117012800100520000",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yongsan",
+    "entity_key": "1117012800100650154",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yongsan",
+    "entity_key": "1117012800100650182",
+    "rule": "within_lot_values_consistent",
+    "result": "fail",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  },
+  {
+    "hub": "yongsan",
+    "entity_key": "yongsan",
+    "rule": "temporal_observation_alignment",
+    "result": "not_evaluable",
+    "interpretation": "structural_check_not_independent_ground_truth"
+  }
+]

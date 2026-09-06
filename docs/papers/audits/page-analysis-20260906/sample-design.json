@@ -1,0 +1,68 @@
+{
+  "seed": 20260906,
+  "target_budget": 200,
+  "actual_sample": 211,
+  "frame_size": 40125,
+  "frame_sha256": "32bfe3650c49862addf6e2ab82597fced2241ff91c9c854be263eead8d1e9aa8",
+  "strata": [
+    {
+      "stratum": "floor+unit|eligible=True|flagged=False",
+      "population": 5,
+      "sample": 2,
+      "inclusion_probability": 0.4
+    },
+    {
+      "stratum": "floor+unknown_or_proxy|eligible=True|flagged=False",
+      "population": 22,
+      "sample": 2,
+      "inclusion_probability": 0.09090909090909091
+    },
+    {
+      "stratum": "floor+unknown_or_proxy|eligible=True|flagged=True",
+      "population": 2,
+      "sample": 2,
+      "inclusion_probability": 1.0
+    },
+    {
+      "stratum": "floor|eligible=True|flagged=False",
+      "population": 23547,
+      "sample": 118,
+      "inclusion_probability": 0.005011254087569542
+    },
+    {
+      "stratum": "unit+unknown_or_proxy|eligible=False|flagged=False",
+      "population": 2,
+      "sample": 2,
+      "inclusion_probability": 1.0
+    },
+    {
+      "stratum": "unit|eligible=False|flagged=False",
+      "population": 2775,
+      "sample": 14,
+      "inclusion_probability": 0.005045045045045045
+    },
+    {
+      "stratum": "unknown_or_proxy|eligible=False|flagged=False",
+      "population": 13333,
+      "sample": 67,
+      "inclusion_probability": 0.005025125628140704
+    },
+    {
+      "stratum": "unknown_or_proxy|eligible=False|flagged=True",
+      "population": 392,
+      "sample": 2,
+      "inclusion_probability": 0.00510204081632653
+    },
+    {
+      "stratum": "unknown_or_proxy|eligible=True|flagged=False",
+      "population": 47,
+      "sample": 2,
+      "inclusion_probability": 0.0425531914893617
+    }
+  ],
+  "review_status": "not_performed",
+  "error_rate": null,
+  "reason": "human_or_temporally_matched_reference_unavailable",
+  "scope": "master_global_lots_only; unmatched_raw_entities_not_sampled_in_this_run",
+  "plan_deviation": "operational pilot allocation; no claimed target precision; strata fixed in code before execution"
+}

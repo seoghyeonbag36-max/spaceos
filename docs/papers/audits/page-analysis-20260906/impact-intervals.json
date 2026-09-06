@@ -1,0 +1,662 @@
+[
+  {
+    "hub": "anam",
+    "eligible_lots": 113,
+    "floor_lots": 113,
+    "floor_capacity": 343,
+    "floor_vacancy_lower_pct": 3.790087463556846,
+    "floor_vacancy_upper_pct": 21.57434402332361,
+    "range_width_pp": 17.784256559766764,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "apgujeong-rodeo",
+    "eligible_lots": 583,
+    "floor_lots": 583,
+    "floor_capacity": 2225,
+    "floor_vacancy_lower_pct": 16.85393258426966,
+    "floor_vacancy_upper_pct": 31.056179775280903,
+    "range_width_pp": 14.202247191011235,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "banpo",
+    "eligible_lots": 55,
+    "floor_lots": 55,
+    "floor_capacity": 266,
+    "floor_vacancy_lower_pct": 9.774436090225569,
+    "floor_vacancy_upper_pct": 27.819548872180455,
+    "range_width_pp": 18.045112781954888,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "bulgwang",
+    "eligible_lots": 264,
+    "floor_lots": 264,
+    "floor_capacity": 658,
+    "floor_vacancy_lower_pct": 23.404255319148938,
+    "floor_vacancy_upper_pct": 39.96960486322189,
+    "range_width_pp": 16.565349544072948,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "cheongdam",
+    "eligible_lots": 393,
+    "floor_lots": 393,
+    "floor_capacity": 1399,
+    "floor_vacancy_lower_pct": 19.22802001429592,
+    "floor_vacancy_upper_pct": 33.73838456040028,
+    "range_width_pp": 14.51036454610436,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "cheongnyangni",
+    "eligible_lots": 645,
+    "floor_lots": 645,
+    "floor_capacity": 1263,
+    "floor_vacancy_lower_pct": 16.31037212984956,
+    "floor_vacancy_upper_pct": 41.17181314330958,
+    "range_width_pp": 24.861441013460016,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "cheonho",
+    "eligible_lots": 355,
+    "floor_lots": 355,
+    "floor_capacity": 811,
+    "floor_vacancy_lower_pct": 18.249075215782984,
+    "floor_vacancy_upper_pct": 34.5252774352651,
+    "range_width_pp": 16.27620221948212,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "chungmuro",
+    "eligible_lots": 739,
+    "floor_lots": 739,
+    "floor_capacity": 2030,
+    "floor_vacancy_lower_pct": 13.00492610837438,
+    "floor_vacancy_upper_pct": 33.00492610837439,
+    "range_width_pp": 20.0,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "cityhall",
+    "eligible_lots": 305,
+    "floor_lots": 305,
+    "floor_capacity": 1120,
+    "floor_vacancy_lower_pct": 6.696428571428569,
+    "floor_vacancy_upper_pct": 28.660714285714285,
+    "range_width_pp": 21.964285714285715,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "dangsan",
+    "eligible_lots": 116,
+    "floor_lots": 116,
+    "floor_capacity": 339,
+    "floor_vacancy_lower_pct": 11.504424778761058,
+    "floor_vacancy_upper_pct": 25.663716814159287,
+    "range_width_pp": 14.15929203539823,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "doksan",
+    "eligible_lots": 40,
+    "floor_lots": 40,
+    "floor_capacity": 96,
+    "floor_vacancy_lower_pct": 26.041666666666664,
+    "floor_vacancy_upper_pct": 52.08333333333333,
+    "range_width_pp": 26.041666666666668,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "dongdaemun",
+    "eligible_lots": 1152,
+    "floor_lots": 1152,
+    "floor_capacity": 2737,
+    "floor_vacancy_lower_pct": 16.87979539641944,
+    "floor_vacancy_upper_pct": 42.01680672268907,
+    "range_width_pp": 25.13701132626964,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "dosan",
+    "eligible_lots": 757,
+    "floor_lots": 757,
+    "floor_capacity": 2744,
+    "floor_vacancy_lower_pct": 15.925655976676389,
+    "floor_vacancy_upper_pct": 30.174927113702623,
+    "range_width_pp": 14.24927113702624,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "euljiro",
+    "eligible_lots": 697,
+    "floor_lots": 688,
+    "floor_capacity": 2107,
+    "floor_vacancy_lower_pct": 11.770289511153297,
+    "floor_vacancy_upper_pct": 31.98860939724727,
+    "range_width_pp": 20.218319886093973,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "gangnam",
+    "eligible_lots": 534,
+    "floor_lots": 534,
+    "floor_capacity": 2327,
+    "floor_vacancy_lower_pct": 10.270734851740437,
+    "floor_vacancy_upper_pct": 24.666953158573268,
+    "range_width_pp": 14.396218306832832,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "garak",
+    "eligible_lots": 16,
+    "floor_lots": 16,
+    "floor_capacity": 86,
+    "floor_vacancy_lower_pct": 12.790697674418606,
+    "floor_vacancy_upper_pct": 34.883720930232556,
+    "range_width_pp": 22.093023255813954,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "garosugil",
+    "eligible_lots": 612,
+    "floor_lots": 607,
+    "floor_capacity": 2124,
+    "floor_vacancy_lower_pct": 15.160075329566858,
+    "floor_vacancy_upper_pct": 31.167608286252356,
+    "range_width_pp": 16.0075329566855,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "gongdeok",
+    "eligible_lots": 187,
+    "floor_lots": 187,
+    "floor_capacity": 474,
+    "floor_vacancy_lower_pct": 9.071729957805907,
+    "floor_vacancy_upper_pct": 22.995780590717295,
+    "range_width_pp": 13.924050632911392,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "gunja",
+    "eligible_lots": 287,
+    "floor_lots": 287,
+    "floor_capacity": 741,
+    "floor_vacancy_lower_pct": 11.740890688259109,
+    "floor_vacancy_upper_pct": 27.935222672064775,
+    "range_width_pp": 16.194331983805668,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "gwangjang",
+    "eligible_lots": 560,
+    "floor_lots": 560,
+    "floor_capacity": 1434,
+    "floor_vacancy_lower_pct": 21.96652719665272,
+    "floor_vacancy_upper_pct": 46.792189679218964,
+    "range_width_pp": 24.825662482566248,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "hannam",
+    "eligible_lots": 340,
+    "floor_lots": 340,
+    "floor_capacity": 856,
+    "floor_vacancy_lower_pct": 13.668224299065423,
+    "floor_vacancy_upper_pct": 33.41121495327103,
+    "range_width_pp": 19.742990654205606,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "hapjeong",
+    "eligible_lots": 149,
+    "floor_lots": 149,
+    "floor_capacity": 383,
+    "floor_vacancy_lower_pct": 10.704960835509137,
+    "floor_vacancy_upper_pct": 22.976501305483033,
+    "range_width_pp": 12.27154046997389,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "hongdae",
+    "eligible_lots": 959,
+    "floor_lots": 958,
+    "floor_capacity": 2989,
+    "floor_vacancy_lower_pct": 14.519906323185017,
+    "floor_vacancy_upper_pct": 26.865172298427563,
+    "range_width_pp": 12.345265975242556,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "hwagok",
+    "eligible_lots": 301,
+    "floor_lots": 301,
+    "floor_capacity": 755,
+    "floor_vacancy_lower_pct": 17.350993377483448,
+    "floor_vacancy_upper_pct": 32.31788079470199,
+    "range_width_pp": 14.966887417218542,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "hyehwa",
+    "eligible_lots": 459,
+    "floor_lots": 459,
+    "floor_capacity": 1141,
+    "floor_vacancy_lower_pct": 13.672217353198945,
+    "floor_vacancy_upper_pct": 33.04119193689746,
+    "range_width_pp": 19.36897458369851,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "ikseon",
+    "eligible_lots": 927,
+    "floor_lots": 896,
+    "floor_capacity": 2128,
+    "floor_vacancy_lower_pct": 14.708646616541355,
+    "floor_vacancy_upper_pct": 41.02443609022557,
+    "range_width_pp": 26.31578947368421,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "itaewon",
+    "eligible_lots": 400,
+    "floor_lots": 400,
+    "floor_capacity": 990,
+    "floor_vacancy_lower_pct": 12.424242424242426,
+    "floor_vacancy_upper_pct": 28.787878787878785,
+    "range_width_pp": 16.363636363636363,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "jamsil",
+    "eligible_lots": 255,
+    "floor_lots": 255,
+    "floor_capacity": 811,
+    "floor_vacancy_lower_pct": 10.604192355117137,
+    "floor_vacancy_upper_pct": 21.454993834771884,
+    "range_width_pp": 10.850801479654747,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "jamsilsaenae",
+    "eligible_lots": 238,
+    "floor_lots": 238,
+    "floor_capacity": 730,
+    "floor_vacancy_lower_pct": 8.21917808219178,
+    "floor_vacancy_upper_pct": 22.191780821917806,
+    "range_width_pp": 13.972602739726028,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "jangan",
+    "eligible_lots": 142,
+    "floor_lots": 142,
+    "floor_capacity": 445,
+    "floor_vacancy_lower_pct": 11.910112359550562,
+    "floor_vacancy_upper_pct": 30.112359550561795,
+    "range_width_pp": 18.202247191011235,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "kkachisan",
+    "eligible_lots": 282,
+    "floor_lots": 282,
+    "floor_capacity": 677,
+    "floor_vacancy_lower_pct": 19.054652880354507,
+    "floor_vacancy_upper_pct": 36.63220088626292,
+    "range_width_pp": 17.57754800590842,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "konkuk",
+    "eligible_lots": 411,
+    "floor_lots": 411,
+    "floor_capacity": 1034,
+    "floor_vacancy_lower_pct": 7.833655705996135,
+    "floor_vacancy_upper_pct": 26.112185686653778,
+    "range_width_pp": 18.27852998065764,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "kyunghee",
+    "eligible_lots": 307,
+    "floor_lots": 307,
+    "floor_capacity": 664,
+    "floor_vacancy_lower_pct": 11.445783132530119,
+    "floor_vacancy_upper_pct": 26.204819277108438,
+    "range_width_pp": 14.759036144578314,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "mangwon",
+    "eligible_lots": 580,
+    "floor_lots": 580,
+    "floor_capacity": 1407,
+    "floor_vacancy_lower_pct": 12.08244491826581,
+    "floor_vacancy_upper_pct": 23.169864960909734,
+    "range_width_pp": 11.087420042643924,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "miasageori",
+    "eligible_lots": 375,
+    "floor_lots": 375,
+    "floor_capacity": 833,
+    "floor_vacancy_lower_pct": 19.447779111644657,
+    "floor_vacancy_upper_pct": 34.57382953181273,
+    "range_width_pp": 15.126050420168067,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "mokdong-yc",
+    "eligible_lots": 259,
+    "floor_lots": 259,
+    "floor_capacity": 702,
+    "floor_vacancy_lower_pct": 17.37891737891738,
+    "floor_vacancy_upper_pct": 30.76923076923077,
+    "range_width_pp": 13.39031339031339,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "mullae",
+    "eligible_lots": 336,
+    "floor_lots": 336,
+    "floor_capacity": 690,
+    "floor_vacancy_lower_pct": 14.347826086956516,
+    "floor_vacancy_upper_pct": 29.71014492753623,
+    "range_width_pp": 15.36231884057971,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "myeongdong",
+    "eligible_lots": 610,
+    "floor_lots": 608,
+    "floor_capacity": 2201,
+    "floor_vacancy_lower_pct": 13.58473421172195,
+    "floor_vacancy_upper_pct": 34.257155838255336,
+    "range_width_pp": 20.672421626533392,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "nambu",
+    "eligible_lots": 220,
+    "floor_lots": 220,
+    "floor_capacity": 670,
+    "floor_vacancy_lower_pct": 12.537313432835816,
+    "floor_vacancy_upper_pct": 29.850746268656714,
+    "range_width_pp": 17.313432835820894,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "namdaemun",
+    "eligible_lots": 169,
+    "floor_lots": 169,
+    "floor_capacity": 499,
+    "floor_vacancy_lower_pct": 14.228456913827658,
+    "floor_vacancy_upper_pct": 43.48697394789579,
+    "range_width_pp": 29.258517034068138,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "nokdu",
+    "eligible_lots": 173,
+    "floor_lots": 173,
+    "floor_capacity": 438,
+    "floor_vacancy_lower_pct": 27.397260273972602,
+    "floor_vacancy_upper_pct": 46.57534246575342,
+    "range_width_pp": 19.17808219178082,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "nonhyeon",
+    "eligible_lots": 549,
+    "floor_lots": 549,
+    "floor_capacity": 1796,
+    "floor_vacancy_lower_pct": 12.639198218262804,
+    "floor_vacancy_upper_pct": 29.064587973273948,
+    "range_width_pp": 16.425389755011135,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "noryangjin",
+    "eligible_lots": 235,
+    "floor_lots": 235,
+    "floor_capacity": 585,
+    "floor_vacancy_lower_pct": 20.512820512820518,
+    "floor_vacancy_upper_pct": 49.23076923076923,
+    "range_width_pp": 28.71794871794872,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "oryudong",
+    "eligible_lots": 162,
+    "floor_lots": 162,
+    "floor_capacity": 368,
+    "floor_vacancy_lower_pct": 14.945652173913048,
+    "floor_vacancy_upper_pct": 39.402173913043484,
+    "range_width_pp": 24.456521739130434,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "sadang",
+    "eligible_lots": 238,
+    "floor_lots": 238,
+    "floor_capacity": 708,
+    "floor_vacancy_lower_pct": 6.779661016949157,
+    "floor_vacancy_upper_pct": 18.36158192090396,
+    "range_width_pp": 11.581920903954803,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "samcheong",
+    "eligible_lots": 278,
+    "floor_lots": 278,
+    "floor_capacity": 474,
+    "floor_vacancy_lower_pct": 11.814345991561181,
+    "floor_vacancy_upper_pct": 46.20253164556962,
+    "range_width_pp": 34.38818565400844,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "sangbong",
+    "eligible_lots": 274,
+    "floor_lots": 274,
+    "floor_capacity": 580,
+    "floor_vacancy_lower_pct": 18.103448275862068,
+    "floor_vacancy_upper_pct": 37.41379310344828,
+    "range_width_pp": 19.310344827586206,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "sanggye",
+    "eligible_lots": 323,
+    "floor_lots": 323,
+    "floor_capacity": 675,
+    "floor_vacancy_lower_pct": 19.703703703703702,
+    "floor_vacancy_upper_pct": 35.25925925925926,
+    "range_width_pp": 15.555555555555555,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "seochon",
+    "eligible_lots": 442,
+    "floor_lots": 442,
+    "floor_capacity": 860,
+    "floor_vacancy_lower_pct": 11.860465116279073,
+    "floor_vacancy_upper_pct": 36.51162790697674,
+    "range_width_pp": 24.651162790697676,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "seolleung",
+    "eligible_lots": 520,
+    "floor_lots": 520,
+    "floor_capacity": 2104,
+    "floor_vacancy_lower_pct": 11.45437262357415,
+    "floor_vacancy_upper_pct": 24.762357414448665,
+    "range_width_pp": 13.307984790874524,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "seongsu",
+    "eligible_lots": 324,
+    "floor_lots": 324,
+    "floor_capacity": 852,
+    "floor_vacancy_lower_pct": 11.150234741784038,
+    "floor_vacancy_upper_pct": 30.63380281690141,
+    "range_width_pp": 19.483568075117372,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "seoulsup",
+    "eligible_lots": 326,
+    "floor_lots": 326,
+    "floor_capacity": 807,
+    "floor_vacancy_lower_pct": 11.524163568773238,
+    "floor_vacancy_upper_pct": 23.420074349442377,
+    "range_width_pp": 11.895910780669144,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "sharosugil",
+    "eligible_lots": 306,
+    "floor_lots": 306,
+    "floor_capacity": 797,
+    "floor_vacancy_lower_pct": 13.048933500627358,
+    "floor_vacancy_upper_pct": 26.47427854454203,
+    "range_width_pp": 13.42534504391468,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "sillim",
+    "eligible_lots": 550,
+    "floor_lots": 550,
+    "floor_capacity": 1409,
+    "floor_vacancy_lower_pct": 14.83321504613201,
+    "floor_vacancy_upper_pct": 30.589070262597584,
+    "range_width_pp": 15.755855216465578,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "sinchon",
+    "eligible_lots": 690,
+    "floor_lots": 690,
+    "floor_capacity": 1972,
+    "floor_vacancy_lower_pct": 17.190669371196755,
+    "floor_vacancy_upper_pct": 33.92494929006086,
+    "range_width_pp": 16.734279918864097,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "songridan",
+    "eligible_lots": 301,
+    "floor_lots": 301,
+    "floor_capacity": 866,
+    "floor_vacancy_lower_pct": 9.006928406466507,
+    "floor_vacancy_upper_pct": 22.401847575057733,
+    "range_width_pp": 13.394919168591224,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "sukmyung",
+    "eligible_lots": 301,
+    "floor_lots": 301,
+    "floor_capacity": 673,
+    "floor_vacancy_lower_pct": 15.453194650817236,
+    "floor_vacancy_upper_pct": 29.123328380386326,
+    "range_width_pp": 13.670133729569093,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "sungshin",
+    "eligible_lots": 353,
+    "floor_lots": 353,
+    "floor_capacity": 876,
+    "floor_vacancy_lower_pct": 12.671232876712324,
+    "floor_vacancy_upper_pct": 32.534246575342465,
+    "range_width_pp": 19.863013698630137,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "suyu",
+    "eligible_lots": 578,
+    "floor_lots": 578,
+    "floor_capacity": 1388,
+    "floor_vacancy_lower_pct": 18.01152737752162,
+    "floor_vacancy_upper_pct": 31.772334293948123,
+    "range_width_pp": 13.760806916426512,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "teheran",
+    "eligible_lots": 534,
+    "floor_lots": 534,
+    "floor_capacity": 1959,
+    "floor_vacancy_lower_pct": 11.485451761102606,
+    "floor_vacancy_upper_pct": 24.45125063808066,
+    "range_width_pp": 12.96579887697805,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "wangsimni",
+    "eligible_lots": 469,
+    "floor_lots": 469,
+    "floor_capacity": 1072,
+    "floor_vacancy_lower_pct": 13.339552238805974,
+    "floor_vacancy_upper_pct": 28.638059701492537,
+    "range_width_pp": 15.298507462686567,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "yeonhui",
+    "eligible_lots": 240,
+    "floor_lots": 240,
+    "floor_capacity": 613,
+    "floor_vacancy_lower_pct": 14.355628058727564,
+    "floor_vacancy_upper_pct": 35.23654159869495,
+    "range_width_pp": 20.880913539967374,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "yeonnam",
+    "eligible_lots": 770,
+    "floor_lots": 770,
+    "floor_capacity": 2123,
+    "floor_vacancy_lower_pct": 12.52943947244466,
+    "floor_vacancy_upper_pct": 23.127649552520026,
+    "range_width_pp": 10.598210080075365,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "yeonsinnae",
+    "eligible_lots": 503,
+    "floor_lots": 503,
+    "floor_capacity": 1219,
+    "floor_vacancy_lower_pct": 20.836751435602952,
+    "floor_vacancy_upper_pct": 33.63412633305989,
+    "range_width_pp": 12.797374897456931,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "yeouido",
+    "eligible_lots": 73,
+    "floor_lots": 73,
+    "floor_capacity": 346,
+    "floor_vacancy_lower_pct": 8.670520231213874,
+    "floor_vacancy_upper_pct": 24.56647398843931,
+    "range_width_pp": 15.895953757225433,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  },
+  {
+    "hub": "yongsan",
+    "eligible_lots": 149,
+    "floor_lots": 149,
+    "floor_capacity": 305,
+    "floor_vacancy_lower_pct": 10.163934426229504,
+    "floor_vacancy_upper_pct": 24.91803278688525,
+    "range_width_pp": 14.754098360655737,
+    "interpretation": "existing_unknown_floor_assignment_range_not_confidence_interval"
+  }
+]

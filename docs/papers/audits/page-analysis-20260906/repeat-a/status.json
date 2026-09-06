@@ -1,0 +1,332 @@
+[
+  {
+    "hub": "anam",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "apgujeong-rodeo",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "banpo",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "bulgwang",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "cheongdam",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "cheongnyangni",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "cheonho",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "chungmuro",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "cityhall",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "dangsan",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "doksan",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "dongdaemun",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "dosan",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "euljiro",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "gangnam",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "garak",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "garosugil",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "gongdeok",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "gunja",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "gwangjang",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "hannam",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "hapjeong",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "hongdae",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "hwagok",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "hyehwa",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "ikseon",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "itaewon",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "jamsil",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "jamsilsaenae",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "jangan",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "kkachisan",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "konkuk",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "kyunghee",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "mangwon",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "miasageori",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "mokdong-yc",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "mullae",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "myeongdong",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "nambu",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "namdaemun",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "nokdu",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "nonhyeon",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "noryangjin",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "oryudong",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "sadang",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "samcheong",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "sangbong",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "sanggye",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "seochon",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "seolleung",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "seongsu",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "seoulsup",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "sharosugil",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "sillim",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "sinchon",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "songridan",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "sukmyung",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "sungshin",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "suyu",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "teheran",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "wangsimni",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "yeonhui",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "yeonnam",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "yeonsinnae",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "yeouido",
+    "status": "completed",
+    "synthetic_fallback": false
+  },
+  {
+    "hub": "yongsan",
+    "status": "completed",
+    "synthetic_fallback": false
+  }
+]
