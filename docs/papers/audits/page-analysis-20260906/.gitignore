@@ -1,0 +1,4 @@
+# 전체 입력/재생성 사본은 로컬 검증용이다. 비교표·해시·서빙 결과를 추적한다.
+/repeat-*/gold/
+/repeat-b-interrupted/
+/*.log

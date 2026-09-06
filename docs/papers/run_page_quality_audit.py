@@ -350,13 +350,14 @@ def compare():
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--worker",choices=["repeat-a","repeat-b"])
+    parser.add_argument("--resume",action="store_true",help="완료된 repeat-a를 보존하고 중단된 repeat-b를 새 프로세스로 재실행")
     args=parser.parse_args();m=read(MANIFEST)
     if args.worker:
         worker(m,args.worker);return
-    if BASE.exists():raise RuntimeError("기존 실행 폴더가 있습니다. 덮어쓰지 않습니다")
+    if BASE.exists() and not args.resume:raise RuntimeError("기존 실행 폴더가 있습니다. 덮어쓰지 않습니다")
     print("manifest 입력 및 코드 재해시",flush=True)
     verification=verify_manifest(m)
-    BASE.mkdir(parents=True)
+    BASE.mkdir(parents=True,exist_ok=args.resume)
     plan={"created_at_utc":datetime.now(timezone.utc).isoformat(),"manifest_sha256":sha(MANIFEST),
         "runner_sha256":sha(__file__),"targets":"this runner and analysis run directory only",
         "structural_checks":"master identity, basic geometry, arithmetic, floor semantics, same-lot consistency, coverage, current polygon provenance; raw store diagnostics",
@@ -366,17 +367,29 @@ def main():
         "normalization":"master feature map keyed by unique id; coverage drops only built_at; actual file hashes also retained",
         "sampling":{"seed":20260906,"target":200,"allocation":"min(Nh,max(2,ceil(200*Nh/N)))","labels":"unresolved until independent review"},
         "gates":"pre/post hash equality, audit-vs-serving crosscheck, fresh-process output comparisons"}
-    write(BASE/"analysis-plan.json",plan);write(BASE/"input-verification-before.json",verification)
+    if args.resume:
+        status=read(BASE/"repeat-a/status.json")
+        if {r["hub"] for r in status if r["status"]=="completed"}!=set(ACTIVE_HUBS):
+            raise RuntimeError("repeat-a 미완료: 재개 불가")
+        if (BASE/"repeat-b-interrupted").exists():raise RuntimeError("중단 기록 폴더가 이미 존재")
+        plan["amendment"]="control-flow recovery only; original transformations and analysis plan retained; repeat-b restarted from scratch"
+        plan["repeat_a_frozen_hashes"]={p.relative_to(BASE).as_posix():sha(p) for p in (BASE/"repeat-a").rglob("*") if p.is_file()}
+        write(BASE/"resume-plan.json",plan);write(BASE/"input-verification-resume.json",verification)
+        if (BASE/"repeat-b").exists():(BASE/"repeat-b").rename(BASE/"repeat-b-interrupted")
+    else:
+        write(BASE/"analysis-plan.json",plan);write(BASE/"input-verification-before.json",verification)
     protect_writes()
-    audit(m)
+    if not args.resume:audit(m)
     env=dict(os.environ,PYTHONDONTWRITEBYTECODE="1",PYTHONIOENCODING="utf-8")
-    for tag in ("repeat-a","repeat-b"):
+    for tag in (("repeat-b",) if args.resume else ("repeat-a","repeat-b")):
         print("격리 재실행 시작: "+tag,flush=True)
         with (BASE/(tag+".log")).open("w",encoding="utf-8") as log:
             result=subprocess.run([sys.executable,str(Path(__file__).resolve()),"--worker",tag],cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT)
         if result.returncode:raise RuntimeError(tag+" 실패; 로그 확인")
         print("격리 재실행 완료: "+tag,flush=True)
     compare()
+    if args.resume and any(sha(BASE/p)!=h for p,h in plan["repeat_a_frozen_hashes"].items()):
+        raise RuntimeError("재개 중 repeat-a 변경")
     print("원본 보존 사후 재해시",flush=True)
     write(BASE/"input-verification-after.json",verify_manifest(m))
     paths=sorted(p for p in BASE.rglob("*") if p.is_file())
