@@ -1,0 +1,3046 @@
+[
+  {
+    "path": ".gitignore",
+    "sha256": "4b59e4f53915424470a845574bd1339d57917a21e5236a838a9a1d0e5f2f2255"
+  },
+  {
+    "path": "analysis-plan.json",
+    "sha256": "5584322aa16c8cdc4c4f03ce4a2ab4e439ec46edb23133907e70837c63d43f1d"
+  },
+  {
+    "path": "baseline-serving/anam.json",
+    "sha256": "a05b91833aeab25896697337e1062334dfd514c4f06dec5984317b0e50a991c0"
+  },
+  {
+    "path": "baseline-serving/apgujeong-rodeo.json",
+    "sha256": "46e41f984e781133c1e33eea6b01deb9d5f68f5cf83416c523cbcd1ef90550b8"
+  },
+  {
+    "path": "baseline-serving/banpo.json",
+    "sha256": "8f6ccecfe0a87585d2605f82cc2ac5e6a3280f19b57c682a613f20e58043fcb5"
+  },
+  {
+    "path": "baseline-serving/bulgwang.json",
+    "sha256": "eb8181c84d13bf24ea4439d423abe5568e358ef1c738949ef7c63d8df3a7159d"
+  },
+  {
+    "path": "baseline-serving/cheongdam.json",
+    "sha256": "1f8728d039380aa4b3bdc4723e576ad2f1b34d532580f6ab5c97b828cb9ec90c"
+  },
+  {
+    "path": "baseline-serving/cheongnyangni.json",
+    "sha256": "8c8b72f8e66fbaac614b3de81835fcd91156fda7df6f42853e268eaf93e92fbc"
+  },
+  {
+    "path": "baseline-serving/cheonho.json",
+    "sha256": "3db963d8f19008e2f2de6c0f6d9a55ef68f0798c15a20331e8d31398f56fc833"
+  },
+  {
+    "path": "baseline-serving/chungmuro.json",
+    "sha256": "119a72a64274824b2763c26b689627532ca8944ffcc9b7bc727ee99d136de4f1"
+  },
+  {
+    "path": "baseline-serving/cityhall.json",
+    "sha256": "68fddaf338718ed9868c1933beefe20dc0037f98563a06c9bcaf1b220730f963"
+  },
+  {
+    "path": "baseline-serving/dangsan.json",
+    "sha256": "4a7179417ccc31710560a1035114aa14d0534d504e89b659387527c8f5193bbd"
+  },
+  {
+    "path": "baseline-serving/doksan.json",
+    "sha256": "af4d6db8d4b5f83f4ddd0639dbbbc3814ea615472c81ac3cfb0488afc357f6bc"
+  },
+  {
+    "path": "baseline-serving/dongdaemun.json",
+    "sha256": "f60a3134a7eba416c12e0f4a46862e948520739078a89724b3f3387548ce74da"
+  },
+  {
+    "path": "baseline-serving/dosan.json",
+    "sha256": "362344519bb4591a6ca90c7f8e3d6906249cd523c8662a94102ef029fe866bdb"
+  },
+  {
+    "path": "baseline-serving/euljiro.json",
+    "sha256": "57cbd4bbe62033e36351ce23c596c8e8d6f54c63a708b59a623ccf5212571607"
+  },
+  {
+    "path": "baseline-serving/gangnam.json",
+    "sha256": "07382a5b77692c9f41aeb5be9e099148ae5bbf9b5cb437825152618b1358e7c1"
+  },
+  {
+    "path": "baseline-serving/garak.json",
+    "sha256": "4e6bb09e4958876df1e772b173f5bd479e097329bf715e4bdaad12cc49ae0871"
+  },
+  {
+    "path": "baseline-serving/garosugil.json",
+    "sha256": "56450bd9264eb6730fd0d842228d53fcb596c852d13c228a6bf56bee3d6098f8"
+  },
+  {
+    "path": "baseline-serving/gongdeok.json",
+    "sha256": "4724ed25f5957cac96c93440f3379fe134e4e8b0cfccc05f5e0545300ddc495d"
+  },
+  {
+    "path": "baseline-serving/gunja.json",
+    "sha256": "41bb1bb1352952c7d02f565ff30581c6deba94a967305e892774abca3502544b"
+  },
+  {
+    "path": "baseline-serving/gwangjang.json",
+    "sha256": "b4e2303fdf2c1863d4c7345a64f96c6035f91facd25fc4c57f41acf76174f43a"
+  },
+  {
+    "path": "baseline-serving/hannam.json",
+    "sha256": "48983b2d8be10df6a754aa6bbfec4897ea943dda9362c1a23b5deeaa4e2b8136"
+  },
+  {
+    "path": "baseline-serving/hapjeong.json",
+    "sha256": "f928f5f4f8c303838f2ea11f529b239d759865975f25d88becb532eecf820857"
+  },
+  {
+    "path": "baseline-serving/hongdae.json",
+    "sha256": "d6e6dfe902a16740caf3b6164fa63830d97bde8ee687acf1352dfc115c6e9b06"
+  },
+  {
+    "path": "baseline-serving/hwagok.json",
+    "sha256": "a51ec4da90fe8d8e492c2d7b4fff1082aaf16731971d3300e673cc9d57b105e8"
+  },
+  {
+    "path": "baseline-serving/hyehwa.json",
+    "sha256": "fcb70c6df3414b05f7b0e8ab9bf14ac62561501c2acde6005744d1e84d58eb9a"
+  },
+  {
+    "path": "baseline-serving/ikseon.json",
+    "sha256": "cecff7ec913262d0e055c87f85ff18ad1574b5435249b74a3223d8e0fcd2d999"
+  },
+  {
+    "path": "baseline-serving/itaewon.json",
+    "sha256": "7e6d8e22293cdb2f16c8e5a3b9789954173b7a1b7cd648eb18ab1e870acdefde"
+  },
+  {
+    "path": "baseline-serving/jamsil.json",
+    "sha256": "fe7618f31d4482531f847b6abbd99d9c8da93acf5b296d8f9f8dee84539b6328"
+  },
+  {
+    "path": "baseline-serving/jamsilsaenae.json",
+    "sha256": "9bfa02e54063cf143ba3810ad4c5cedb9b47d8807fdad152f09aa32e9223530e"
+  },
+  {
+    "path": "baseline-serving/jangan.json",
+    "sha256": "ae06429f18151e735ea4cd5e639479c89acf24c74b4fc028ae6e552df0fcfad9"
+  },
+  {
+    "path": "baseline-serving/kkachisan.json",
+    "sha256": "45006565ba0edb0bd491ca69702cb9414835d9d3835b04de27453545f0d50c22"
+  },
+  {
+    "path": "baseline-serving/konkuk.json",
+    "sha256": "ffc8f3c552e886b23ef99c7a605df2c717815786f7e06e267839f639b7ab0c43"
+  },
+  {
+    "path": "baseline-serving/kyunghee.json",
+    "sha256": "f1e29d419cf541cd5c4d7a55685090e6dc66e9e76e2986d0a18217f395ba99aa"
+  },
+  {
+    "path": "baseline-serving/mangwon.json",
+    "sha256": "b244bbc64ca20e06b3159ffdfe6f3d0f5356ed96d5eeb9254f350bdd2da268a8"
+  },
+  {
+    "path": "baseline-serving/miasageori.json",
+    "sha256": "e095809ba5730f3be5d77f009ed5830c931521f043c68be90f275b3367df259d"
+  },
+  {
+    "path": "baseline-serving/mokdong-yc.json",
+    "sha256": "547ffe600df106c7e3ef52ff4b9216478592894788dfb8d15774399ff7166044"
+  },
+  {
+    "path": "baseline-serving/mullae.json",
+    "sha256": "7f4027427064e089bf55b946566da40050d31c3c6d41002f75b5fba63505859b"
+  },
+  {
+    "path": "baseline-serving/myeongdong.json",
+    "sha256": "9dad78344b719603628d953a319b24bfcca0743cfc8a643021776338242198b6"
+  },
+  {
+    "path": "baseline-serving/nambu.json",
+    "sha256": "52d79631c77ced3e4ac34b7d940f654b822c67b2c0d768cb80cfdaa7e42eddd9"
+  },
+  {
+    "path": "baseline-serving/namdaemun.json",
+    "sha256": "9f81b1d6d52f6579a5a23b12c823d9a9482400a9c8dc1b344dfae0b13c6f51ae"
+  },
+  {
+    "path": "baseline-serving/nokdu.json",
+    "sha256": "168faade711477a8851d07095df3b11ad91c65c9597144764014cb44725085d6"
+  },
+  {
+    "path": "baseline-serving/nonhyeon.json",
+    "sha256": "db59154574cf8ecf44d5367ce45f1668e1238204114c27227efa695039f25802"
+  },
+  {
+    "path": "baseline-serving/noryangjin.json",
+    "sha256": "f2ccc7543bf22ee13a564adbc511f80c015d254b5be2902e927e62b83b923192"
+  },
+  {
+    "path": "baseline-serving/oryudong.json",
+    "sha256": "67f63f2454a0c0df7b877929b06d19f3dad36090c06fc84b9d671e75a292207f"
+  },
+  {
+    "path": "baseline-serving/sadang.json",
+    "sha256": "a8606bfe180bb5412e6f0b0e85c6cc602939ebbf2ade43cf51236ea1a7466992"
+  },
+  {
+    "path": "baseline-serving/samcheong.json",
+    "sha256": "595754c0326fe327d22ebedf14f7665c95259d45ab0a0978fe60a0826fcdb323"
+  },
+  {
+    "path": "baseline-serving/sangbong.json",
+    "sha256": "687c4e10916e7d37aab218244888d9d3cac7734fd9c9e3d3368cb0a5a683f577"
+  },
+  {
+    "path": "baseline-serving/sanggye.json",
+    "sha256": "051d727464f210f3ae797927dbe1a85bc5551b11df2d651683d3630d27a90e5b"
+  },
+  {
+    "path": "baseline-serving/seochon.json",
+    "sha256": "0d6467ba5aa3cc8741d118b0e8dc638f758735fbf0c198f8d6046a388cc140bd"
+  },
+  {
+    "path": "baseline-serving/seolleung.json",
+    "sha256": "03a416e0b149ccd9fb0aebf1f580af39bd8b1448789eef9739e1cce3bb56a18d"
+  },
+  {
+    "path": "baseline-serving/seongsu.json",
+    "sha256": "d444017965a9c1ba962c757a325ca372e23a44c058d727af0df0de212fde0933"
+  },
+  {
+    "path": "baseline-serving/seoulsup.json",
+    "sha256": "75c147f3b940592e353d3266b764ed6a303890e69fd563a6198e1b6b211fccda"
+  },
+  {
+    "path": "baseline-serving/sharosugil.json",
+    "sha256": "82d854c54f795c41ddb69ac1ebcc741071a8993cbfc53ddde79efd02f3959b90"
+  },
+  {
+    "path": "baseline-serving/sillim.json",
+    "sha256": "ab5c3016c6bdda05a414a21a82fd8dd49bb39d46716fefcab30cf63901c710ec"
+  },
+  {
+    "path": "baseline-serving/sinchon.json",
+    "sha256": "60e45a6b05f9b1dd8a66ef3aed1370a14bee71e506a5177ba1066bd3afe2b5a5"
+  },
+  {
+    "path": "baseline-serving/songridan.json",
+    "sha256": "da2c41d611960d816726084f7d126da29a514530ebed4b742cf835fab43da6b9"
+  },
+  {
+    "path": "baseline-serving/sukmyung.json",
+    "sha256": "d9bc3bdeef364ee925def7de7871cf6db896f28f063f27d0707923f0c5f81712"
+  },
+  {
+    "path": "baseline-serving/sungshin.json",
+    "sha256": "c928b225ef5fd13947803e970846a08ad95ec1ade3b5442e6368ff7ae1529009"
+  },
+  {
+    "path": "baseline-serving/suyu.json",
+    "sha256": "e4f1a52919c83759fd3058f4fdcf3093794a531f19202a551676d339e9b5e2bc"
+  },
+  {
+    "path": "baseline-serving/teheran.json",
+    "sha256": "e31ad3939ce3831999475d6051387ca265335280b3dc6662d4a667db43526687"
+  },
+  {
+    "path": "baseline-serving/wangsimni.json",
+    "sha256": "a87b1be735cdf8de45bbb2e39d125ca0dce5ec99aebbf2b2f06e17201299a312"
+  },
+  {
+    "path": "baseline-serving/yeonhui.json",
+    "sha256": "1f47b385c1e1f891234e7b3ba98cab9f39ebfc82418b6e290ef3fa94215f738e"
+  },
+  {
+    "path": "baseline-serving/yeonnam.json",
+    "sha256": "b1b1afc70d3f696edd1057e0fd4acb6ef01fd3b45f5987ece64f563dde855751"
+  },
+  {
+    "path": "baseline-serving/yeonsinnae.json",
+    "sha256": "3db1398cb2afec4e0783fe313b1d8a1ed6587944f009a0fabe839802196afac8"
+  },
+  {
+    "path": "baseline-serving/yeouido.json",
+    "sha256": "ca6f4374e80daf72551a3c37c22021d211cf370a09964a0d3bc9074abfb6d28a"
+  },
+  {
+    "path": "baseline-serving/yongsan.json",
+    "sha256": "d0500ef135787c436b6843c0f2d9a0d9fd0a3886195b762fd6da72b63c8138fb"
+  },
+  {
+    "path": "changed-polygons.json",
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  {
+    "path": "exploratory-order-plan.json",
+    "sha256": "a453d55494291229f4aed6a447cbd000eba6edd79ed2561bf680d5d1d60a7a48"
+  },
+  {
+    "path": "findings.json",
+    "sha256": "957ccf707924aea17f3e7b034d6088396dbe910e06cd7c5af26972b2cf1dec90"
+  },
+  {
+    "path": "hub-summary.csv",
+    "sha256": "4aa177ae92cc44b247aab2fa79bc1ab07cf410edd7bff1eabb99eb899b3eeb73"
+  },
+  {
+    "path": "impact-intervals.csv",
+    "sha256": "b1c10fa14d20080c7d5347b60c7d86e7587d6bbf142daafc5dee4d720e552d4e"
+  },
+  {
+    "path": "impact-intervals.json",
+    "sha256": "81ae1caae7c3125752e4bed39aeb75dee7b105a55b9e55c0557fa3b3de898fa8"
+  },
+  {
+    "path": "independent-review-sample.csv",
+    "sha256": "52fbf76f41e3560a76e86f8672dcffce5621c40ce4cc444e31986cad9b9b5bc4"
+  },
+  {
+    "path": "input-verification-after.json",
+    "sha256": "430f6f05fa9286ae0d6f2e06285f5a40d8d56ccc1e2c2f4dd9ccb34e64df8c59"
+  },
+  {
+    "path": "input-verification-before.json",
+    "sha256": "430f6f05fa9286ae0d6f2e06285f5a40d8d56ccc1e2c2f4dd9ccb34e64df8c59"
+  },
+  {
+    "path": "input-verification-resume.json",
+    "sha256": "430f6f05fa9286ae0d6f2e06285f5a40d8d56ccc1e2c2f4dd9ccb34e64df8c59"
+  },
+  {
+    "path": "legacy-review-evidence.json",
+    "sha256": "4c4b755195b59ce297d39fa41a4c8d37f5832a6f55579227332a3d96be63d807"
+  },
+  {
+    "path": "order-sensitivity.json",
+    "sha256": "2bfbcfce07d3241f4872001322011556123a860020443d5380e7c43bd0ed4a58"
+  },
+  {
+    "path": "README.md",
+    "sha256": "c27b4410842a95b7349dbd6d0acfec929d0d406f7cc92fdcf5e06b99dce05d25"
+  },
+  {
+    "path": "release-comparison.json",
+    "sha256": "89849642b83c098e1ea9384414499b6db170ffe481f82469930d5afe6a7bb1b9"
+  },
+  {
+    "path": "repeat-a/gold/anam/building_vacancy.json",
+    "sha256": "d046b44ab1a44251cd662161165ba0bebb3dab45101fae80f9498d19c5214466"
+  },
+  {
+    "path": "repeat-a/gold/anam/calibration.json",
+    "sha256": "82babad69f5c3efa54d81ea39d259f0abfd847db22bf7024818284cb83934b0f"
+  },
+  {
+    "path": "repeat-a/gold/anam/coverage.json",
+    "sha256": "d02c6a3a49aa655b3161ab1166a7f30e67f8abcff79c32dc037b9b62bef1638f"
+  },
+  {
+    "path": "repeat-a/gold/anam/page_building_master.geojson",
+    "sha256": "0433202cad91a84c8532af4c744f0e735e9f8299b4463405e98a98cc09b8e6f6"
+  },
+  {
+    "path": "repeat-a/gold/apgujeong-rodeo/building_vacancy.json",
+    "sha256": "112f9ffeade05c444c3516f8e372e5fd480ff137d793948f71444f00bc14e45f"
+  },
+  {
+    "path": "repeat-a/gold/apgujeong-rodeo/calibration.json",
+    "sha256": "18d948a2e232a329ef8e2376fc1bc137fca8a156745e75a1bf20dc97aa0aedbe"
+  },
+  {
+    "path": "repeat-a/gold/apgujeong-rodeo/coverage.json",
+    "sha256": "2ad64ca23a7f8cfb065cbd795f53b3a7f8281d7fe5246110265582cdb1941d89"
+  },
+  {
+    "path": "repeat-a/gold/apgujeong-rodeo/page_building_master.geojson",
+    "sha256": "079d1c40dec03caee282864c4af31d5a672301ae6110687ada75c0e9924a9581"
+  },
+  {
+    "path": "repeat-a/gold/banpo/building_vacancy.json",
+    "sha256": "4132b814301818a750bd63264ca0db95f7c1711bc4f06da486ba8acfb8824218"
+  },
+  {
+    "path": "repeat-a/gold/banpo/calibration.json",
+    "sha256": "98a5fef02ceb3073987da22994e242440b0bb791877689b04e76704803ca7630"
+  },
+  {
+    "path": "repeat-a/gold/banpo/coverage.json",
+    "sha256": "2b64c76f00c76932df64fecc9078037c948b80aa51743120a2205b6ceb4d3509"
+  },
+  {
+    "path": "repeat-a/gold/banpo/page_building_master.geojson",
+    "sha256": "63d8928117d51c9aacf30f0b613f327ffff1b89b533dae187a10df6f51bdcd31"
+  },
+  {
+    "path": "repeat-a/gold/bulgwang/building_vacancy.json",
+    "sha256": "fdcbad03e0ca47e2f1dd14deaf6345fac15a07af8fb20ab6e8ecb7cefbee1ef8"
+  },
+  {
+    "path": "repeat-a/gold/bulgwang/calibration.json",
+    "sha256": "8381d30c8fd0b0cbb28297e3a70d81f338a967df82f02714788b42b37375d405"
+  },
+  {
+    "path": "repeat-a/gold/bulgwang/coverage.json",
+    "sha256": "b7b31b5a9d502192951ef050401f773af8f7a0f5656934431a3cb97f7e8a4156"
+  },
+  {
+    "path": "repeat-a/gold/bulgwang/page_building_master.geojson",
+    "sha256": "f83c4483477968f7abd1785d5dbfb87d28d2a7805ee28737ed5431c0d98de140"
+  },
+  {
+    "path": "repeat-a/gold/cheongdam/building_vacancy.json",
+    "sha256": "e14c1d00daa375b9bc6ce38391812a3ddb92eb926f159551d7ea22027981acbc"
+  },
+  {
+    "path": "repeat-a/gold/cheongdam/calibration.json",
+    "sha256": "88885d4e4bd34b23d2df1052de456da1a4b6e353c002aea50d7e21b459c7b1f7"
+  },
+  {
+    "path": "repeat-a/gold/cheongdam/coverage.json",
+    "sha256": "14c521acf4b29b21d011f225ffc900d50947be430eaec57d456aa1b7b7d33eef"
+  },
+  {
+    "path": "repeat-a/gold/cheongdam/page_building_master.geojson",
+    "sha256": "8b5f810870e591c95e28e90a9c1434d1d9f17e38258b0c1d8d8cf98b67ab2ee4"
+  },
+  {
+    "path": "repeat-a/gold/cheongnyangni/building_vacancy.json",
+    "sha256": "02f1d7f5f850c23ca2a6ed83a6b10f5ed85ca82ffbe61962269a869424515d85"
+  },
+  {
+    "path": "repeat-a/gold/cheongnyangni/calibration.json",
+    "sha256": "6f7b1e1ae4a08f569ec66e1213edaf04941c0704724096bb1ead9dcef814c4f6"
+  },
+  {
+    "path": "repeat-a/gold/cheongnyangni/coverage.json",
+    "sha256": "a8ec640960840964387e584ca3e422f17e2535d03238b5b12bfdb720f5448516"
+  },
+  {
+    "path": "repeat-a/gold/cheongnyangni/page_building_master.geojson",
+    "sha256": "a334991318e2b548dbc4420ebf3dbd21526ead78e7cec09506067eeff6d02845"
+  },
+  {
+    "path": "repeat-a/gold/cheonho/building_vacancy.json",
+    "sha256": "65fdf0f7cce1db9ff1e00c8ab2a3a7bce614edb8c2bb05ae18f7b347c5b647d0"
+  },
+  {
+    "path": "repeat-a/gold/cheonho/calibration.json",
+    "sha256": "8bba83a849b3c99341cc0738f82faf5a4cfd82128d0caa654ad6aa321f446854"
+  },
+  {
+    "path": "repeat-a/gold/cheonho/coverage.json",
+    "sha256": "4515dd44e3b93b02300fc5dd3a8b3e4e0ded91197e90fc11ac8b4324998f4ee9"
+  },
+  {
+    "path": "repeat-a/gold/cheonho/page_building_master.geojson",
+    "sha256": "405c0b6f97cc8cf0b9be7990371d20625a28a1045e220278730ab5db97accd2e"
+  },
+  {
+    "path": "repeat-a/gold/chungmuro/building_vacancy.json",
+    "sha256": "57fc750dcd0710772d1d90c9ac6647c360c7a0f9af583b21c992dd4885106b24"
+  },
+  {
+    "path": "repeat-a/gold/chungmuro/calibration.json",
+    "sha256": "ea5806715bcdcb754f5c972e5d53423bdd4aee07f7fc3a37dd85f8a1a0d1a6a0"
+  },
+  {
+    "path": "repeat-a/gold/chungmuro/coverage.json",
+    "sha256": "7c6c164efb80f14f7b335979cf7bed17dffaee45fd9cf40a98aa694b87929df5"
+  },
+  {
+    "path": "repeat-a/gold/chungmuro/page_building_master.geojson",
+    "sha256": "ac3a9c3dc4c020bddc83c6eb0bf696eae7586627bc0caf7c3d4f67ecf3af1a15"
+  },
+  {
+    "path": "repeat-a/gold/cityhall/building_vacancy.json",
+    "sha256": "fc889e643c34306ec7b793bd7ddf09d680f73fe7d4fdf6915a1bde3a915cc828"
+  },
+  {
+    "path": "repeat-a/gold/cityhall/calibration.json",
+    "sha256": "06cf184744f70d7320b7642b39382cb8e4911e8c237a87b37470365d9bcf417d"
+  },
+  {
+    "path": "repeat-a/gold/cityhall/coverage.json",
+    "sha256": "0e133db619a94f16f35893bdc3e1fd7f0ebf89e98542bac8f993c770080299dd"
+  },
+  {
+    "path": "repeat-a/gold/cityhall/page_building_master.geojson",
+    "sha256": "e4351fe428a36da4e184f473ea81fa2b3273c024e3e287d8d218f7009fc3de94"
+  },
+  {
+    "path": "repeat-a/gold/dangsan/building_vacancy.json",
+    "sha256": "da3eb4545d82ab82ae218ce3bd7fa4589ef7ee8713aafe38312547a3f8c5a434"
+  },
+  {
+    "path": "repeat-a/gold/dangsan/calibration.json",
+    "sha256": "2e267abf588d2e4bec30f19375ffe9740bc9e6066f60eaade1faeec336e70532"
+  },
+  {
+    "path": "repeat-a/gold/dangsan/coverage.json",
+    "sha256": "de5ddc806f69311571f7a714d7e5897d123de2e4bbce25322a3dc63b935d3e97"
+  },
+  {
+    "path": "repeat-a/gold/dangsan/page_building_master.geojson",
+    "sha256": "7fe57be0498e527c5d2c80b36f0c56ff2ee273bbd2f6438b436650fd3e517964"
+  },
+  {
+    "path": "repeat-a/gold/doksan/building_vacancy.json",
+    "sha256": "c31face0d88fe8b74ab5d64530ee01c56b28da1980fcb56da7d3b64d04e5d861"
+  },
+  {
+    "path": "repeat-a/gold/doksan/calibration.json",
+    "sha256": "300efdcdfc70a9b186bb7825ce25f97e15755fb5cd0c83dace19bba2038794e5"
+  },
+  {
+    "path": "repeat-a/gold/doksan/coverage.json",
+    "sha256": "8635c89b24c7138ec2028f7c7a85216214b5d34c3bc0a2ca4a912405f69ca6b2"
+  },
+  {
+    "path": "repeat-a/gold/doksan/page_building_master.geojson",
+    "sha256": "88cd0298f859f32868ad0dfa7ec3270b90a95fd5d93314ebba8b0d3d22b2ffbf"
+  },
+  {
+    "path": "repeat-a/gold/dongdaemun/building_vacancy.json",
+    "sha256": "dc99f13e42765b2ded43b7b5b9d1dca3cd76f8c03e94c42332de6b9614b9db6d"
+  },
+  {
+    "path": "repeat-a/gold/dongdaemun/calibration.json",
+    "sha256": "82b06b767653c2bd2fd799ea82c7a6f3bd205ee32dc46a4bb4340b3d2db8fb71"
+  },
+  {
+    "path": "repeat-a/gold/dongdaemun/coverage.json",
+    "sha256": "0db8633ffaf203e18ca463c9da79993437a510525c26bc839eed6d2ea4d33795"
+  },
+  {
+    "path": "repeat-a/gold/dongdaemun/page_building_master.geojson",
+    "sha256": "46d02eb0e911e79144ce2314856dbc3887abe1f5e549c46762ec4aef2ed8d23e"
+  },
+  {
+    "path": "repeat-a/gold/dosan/building_vacancy.json",
+    "sha256": "f3fb11580db9c399a685a1718355861f80290036b2876b7abd9dcccd59a96be8"
+  },
+  {
+    "path": "repeat-a/gold/dosan/calibration.json",
+    "sha256": "0d452e2f7d0d73260ebe64be79cd64b63b3c5df2d1303d3f35aab688cb94b6f9"
+  },
+  {
+    "path": "repeat-a/gold/dosan/coverage.json",
+    "sha256": "a2b526f8af78c6a9bb7d42755017081f9c9778a1f345bf48d0e3a6ee7146d5c3"
+  },
+  {
+    "path": "repeat-a/gold/dosan/page_building_master.geojson",
+    "sha256": "0d85fb1998b80bca006a836b98f6e0e3e8cb18d265d6b0d86e09e93945a53794"
+  },
+  {
+    "path": "repeat-a/gold/euljiro/building_vacancy.json",
+    "sha256": "a4484366c145903fb03dd8361418677e2f9b4edc4589975f29d7ec6d93f6fd6c"
+  },
+  {
+    "path": "repeat-a/gold/euljiro/calibration.json",
+    "sha256": "d53de4b3b81abe7761ad12230e4a811e82b42b021dff5b8ddcaf5246eb416b90"
+  },
+  {
+    "path": "repeat-a/gold/euljiro/coverage.json",
+    "sha256": "d51a525a348bdea13396d05292f19ac097dc05fc6a94ac1bdd365b2c58fe1537"
+  },
+  {
+    "path": "repeat-a/gold/euljiro/page_building_master.geojson",
+    "sha256": "44b967986b4b557276e01aa71f57567e5ad519f506192a4251b136236a66f267"
+  },
+  {
+    "path": "repeat-a/gold/gangnam/building_vacancy.json",
+    "sha256": "eb3691af8571339b033b30f1c31aa5057c8a4ad7230eac8e9abafdb636309091"
+  },
+  {
+    "path": "repeat-a/gold/gangnam/calibration.json",
+    "sha256": "5a63430692c80e7ccf3ff2235a97639c51d8b9954e98cfcbaadee45ab26f3672"
+  },
+  {
+    "path": "repeat-a/gold/gangnam/coverage.json",
+    "sha256": "2791ed727d1fe97600a5b29f127e455ab57819a1bdd1a248da3788c4ca3afc31"
+  },
+  {
+    "path": "repeat-a/gold/gangnam/page_building_master.geojson",
+    "sha256": "951a8f7abf7da1f7be0f3ecf8741b25096ac487e9b432c273a7a98bb88802192"
+  },
+  {
+    "path": "repeat-a/gold/garak/building_vacancy.json",
+    "sha256": "7dd41d85b281cd3d0a02bb2ffce8156c2e000efc023f3c7e287f91ec7ae4a9d8"
+  },
+  {
+    "path": "repeat-a/gold/garak/calibration.json",
+    "sha256": "dda0e3db95bc43351d32ed63563acdb1a346388172d95f1b13aab26a6390489c"
+  },
+  {
+    "path": "repeat-a/gold/garak/coverage.json",
+    "sha256": "969e1760915aa17335c5844e85d4d8e6d7ef5b3759de107ff00fb3fc243da1a2"
+  },
+  {
+    "path": "repeat-a/gold/garak/page_building_master.geojson",
+    "sha256": "455d4d9ea8396fb5abf0213eb72fc11e98761f0d16b69fe7c9e04b0f19d68ad6"
+  },
+  {
+    "path": "repeat-a/gold/garosugil/building_vacancy.json",
+    "sha256": "c09719476e9806e577a0791b5cd8c694a2bea70a8c8f0dbb608507e2becd98cc"
+  },
+  {
+    "path": "repeat-a/gold/garosugil/calibration.json",
+    "sha256": "9016776a19cafbe3cfdf074e3e36d0b56aeeb8cf9d65923bee01dd8d2d3b2b4b"
+  },
+  {
+    "path": "repeat-a/gold/garosugil/coverage.json",
+    "sha256": "63b12caf547f2fee346c90956b701792e883f57dff42b3490ca798ab61beeca0"
+  },
+  {
+    "path": "repeat-a/gold/garosugil/page_building_master.geojson",
+    "sha256": "4fbf8cd259f6967361a892e413a6df5f3d850a0b8c39ed4a17445e237b96b8d0"
+  },
+  {
+    "path": "repeat-a/gold/gongdeok/building_vacancy.json",
+    "sha256": "46604e79c956ee28dfb1ce29898c3855f1c04f91baaeed0a9edc1410de7021f2"
+  },
+  {
+    "path": "repeat-a/gold/gongdeok/calibration.json",
+    "sha256": "d41d0718308f119837dd687e7743980557548a1b9442e5d2f51e92e1a04e81b4"
+  },
+  {
+    "path": "repeat-a/gold/gongdeok/coverage.json",
+    "sha256": "edb17b4ac1e558ca5cb58f252ce221849c2c7c292dfac8fb63a5b0e7d21bb887"
+  },
+  {
+    "path": "repeat-a/gold/gongdeok/page_building_master.geojson",
+    "sha256": "9debbb2c0b34d1f3b08ae77b985e6b901f506a447a316bc4a1a69ebc7285d65d"
+  },
+  {
+    "path": "repeat-a/gold/gunja/building_vacancy.json",
+    "sha256": "095a48bf5d758ec9a78d1d5d563ff998c5d355c07753a0347e95013e2f3eb0aa"
+  },
+  {
+    "path": "repeat-a/gold/gunja/calibration.json",
+    "sha256": "d18e0dfb92f8c9a7fdc81231c30d0b184c0321a2a3c7ccef93ce26ca6e59828c"
+  },
+  {
+    "path": "repeat-a/gold/gunja/coverage.json",
+    "sha256": "8109cbee398b4194c0bb721c70ead53408dbd92a99e0c8d92514dc3d1eb6377c"
+  },
+  {
+    "path": "repeat-a/gold/gunja/page_building_master.geojson",
+    "sha256": "e7b683409775f647d35ed35148e719db3cf4019528e8eb75f077a10ffd5c5f8c"
+  },
+  {
+    "path": "repeat-a/gold/gwangjang/building_vacancy.json",
+    "sha256": "bd45c780c77513d298072f47807cc398be441e04705d2e0d839102e761e4dbb1"
+  },
+  {
+    "path": "repeat-a/gold/gwangjang/calibration.json",
+    "sha256": "489803a1a467d561b763781892f6b2d5e5ab4639547a6e4509467242f80a16ca"
+  },
+  {
+    "path": "repeat-a/gold/gwangjang/coverage.json",
+    "sha256": "9d56e9b9b0fff441ccad98a6c91b8a2e5bb792a098478374e15bac4246272c68"
+  },
+  {
+    "path": "repeat-a/gold/gwangjang/page_building_master.geojson",
+    "sha256": "f438c5f6578ba2f53c72556131439cd818b733e8ffe4d580cd68022fcd61da88"
+  },
+  {
+    "path": "repeat-a/gold/hannam/building_vacancy.json",
+    "sha256": "750a8581fb60ae794cfd70d56385036a4c71210b645d4f7a524834e0c2cbc0cd"
+  },
+  {
+    "path": "repeat-a/gold/hannam/calibration.json",
+    "sha256": "ea05fd1b92effec33bf103ad8fc78ca46592fc8d43a8b0499136fbde64e16f27"
+  },
+  {
+    "path": "repeat-a/gold/hannam/coverage.json",
+    "sha256": "c45a38a28bc687b3ec09fd57200f74c44bc7c5db15821f50172c71bef1f75343"
+  },
+  {
+    "path": "repeat-a/gold/hannam/page_building_master.geojson",
+    "sha256": "82d379989af62c42b04e3b879522e8608e87e8ddcd3b0c93765fd8ab03d4722a"
+  },
+  {
+    "path": "repeat-a/gold/hapjeong/building_vacancy.json",
+    "sha256": "597928ead99cc8f6b70f835944180745c009b772e20d456a9dfa298400bb9b2e"
+  },
+  {
+    "path": "repeat-a/gold/hapjeong/calibration.json",
+    "sha256": "0e211f50f9ae6852b6779767ff7765fdd3ce59264dfee20ab1de26d06892ef77"
+  },
+  {
+    "path": "repeat-a/gold/hapjeong/coverage.json",
+    "sha256": "87248c913c7c8268cbe3a5937bddc1023b66393a2111e4d081523e13b4cd2552"
+  },
+  {
+    "path": "repeat-a/gold/hapjeong/page_building_master.geojson",
+    "sha256": "894b97d415cb6bbe9287b9037d3ee4d80c47efa56525c387a79320dd4a3bca7c"
+  },
+  {
+    "path": "repeat-a/gold/hongdae/building_vacancy.json",
+    "sha256": "73ca402a7e3f604c604a36065b923b66d86885f51f9d6d85517131df5a96db9c"
+  },
+  {
+    "path": "repeat-a/gold/hongdae/calibration.json",
+    "sha256": "bf3dd5d87c2a00704f6124e6f390cc4438c633a0271a5d8e1671ea9c9efd6663"
+  },
+  {
+    "path": "repeat-a/gold/hongdae/coverage.json",
+    "sha256": "ee4d75a8b6e1602480ba3a625a4bf41dc0f40eb4c31b40fb7a45695f21364774"
+  },
+  {
+    "path": "repeat-a/gold/hongdae/page_building_master.geojson",
+    "sha256": "9c4f38b2809a485f1f6cf710960f5f1d48b321e9b8eaf44a452dab69eb94ba24"
+  },
+  {
+    "path": "repeat-a/gold/hwagok/building_vacancy.json",
+    "sha256": "c11d7ee98877dae05fb0c500e471bfb854e9ae5a87e7b2e059bd58f623cd1354"
+  },
+  {
+    "path": "repeat-a/gold/hwagok/calibration.json",
+    "sha256": "f7c9d43e0b7ecab88b171763f9d469ecb3fbfd671218fa14c026c96954e9af6c"
+  },
+  {
+    "path": "repeat-a/gold/hwagok/coverage.json",
+    "sha256": "4d5cc7a056b4b8b2700fc573f77d8d172420afeab96236d99907573a86e84d08"
+  },
+  {
+    "path": "repeat-a/gold/hwagok/page_building_master.geojson",
+    "sha256": "70f95b349f46d2c427f357a0e3c63dc9ee49326ef34e3ef946a7ddfed321999d"
+  },
+  {
+    "path": "repeat-a/gold/hyehwa/building_vacancy.json",
+    "sha256": "8f9a329ecb18dfb75a6b9d5ad5cf16c8b50f53960b40668618a4e27d4fa237cb"
+  },
+  {
+    "path": "repeat-a/gold/hyehwa/calibration.json",
+    "sha256": "806d6f073aa971d757b7fee97c353d9c650dcb6ee8086781fa52bb03f4dd3d68"
+  },
+  {
+    "path": "repeat-a/gold/hyehwa/coverage.json",
+    "sha256": "38c5f2c6d9f00f6ea37ad67ce2e2db0ad6b130655e3a3fbd526abdaa12072521"
+  },
+  {
+    "path": "repeat-a/gold/hyehwa/page_building_master.geojson",
+    "sha256": "b86912540e15713a3f2b2ad9c721861a0fbb1bf2d30ab810b04ffc92829aab68"
+  },
+  {
+    "path": "repeat-a/gold/ikseon/building_vacancy.json",
+    "sha256": "de53c6034148fadd12fd8c648e7d440aecf86404d6061a10c172539d3faf3df4"
+  },
+  {
+    "path": "repeat-a/gold/ikseon/calibration.json",
+    "sha256": "8d59ff7ba1c592234f0385d349eb18abb6ef60a7fdca88b5bb5f53147f19d6de"
+  },
+  {
+    "path": "repeat-a/gold/ikseon/coverage.json",
+    "sha256": "4d90e311e561cf43669b990ea37bc70a4013da71a1b0e6590b152f9ca4599b12"
+  },
+  {
+    "path": "repeat-a/gold/ikseon/page_building_master.geojson",
+    "sha256": "84637aa6042483c57f9b3a9a446ddd856ee813e1126c351a5fcd4ff8c77fa9cc"
+  },
+  {
+    "path": "repeat-a/gold/itaewon/building_vacancy.json",
+    "sha256": "498bcac96f51cfadcad839811b8a804cfb33da89870f4116843d0b3e08268465"
+  },
+  {
+    "path": "repeat-a/gold/itaewon/calibration.json",
+    "sha256": "06514ed8e3e3903ce8cff2e552b3ef0811960cd34e9664e716a466be0965148d"
+  },
+  {
+    "path": "repeat-a/gold/itaewon/coverage.json",
+    "sha256": "737cdaadfa090f7caf3f561e20b69bea1ecc4352df647542b4d56ca7a5002aa6"
+  },
+  {
+    "path": "repeat-a/gold/itaewon/page_building_master.geojson",
+    "sha256": "7f522f7f5f7071b2df1f76c4f96169df578822204786fd666ab8f435d63cbd99"
+  },
+  {
+    "path": "repeat-a/gold/jamsil/building_vacancy.json",
+    "sha256": "a8384aa0d47446721e8421af137f1ac2cbaef54c434307141e72caa38c20283b"
+  },
+  {
+    "path": "repeat-a/gold/jamsil/calibration.json",
+    "sha256": "8c9946e2b4a4cd530768743ee3321d6bc238e9db315604284141927e301b6af5"
+  },
+  {
+    "path": "repeat-a/gold/jamsil/coverage.json",
+    "sha256": "c72742189416824cf277a15e56e164c9e13854a163f0320ac839c3f7f465b4c9"
+  },
+  {
+    "path": "repeat-a/gold/jamsil/page_building_master.geojson",
+    "sha256": "e1116d8cc8109d4bebe19dbf4d7cb04b2c843ed00f79fed4119fe88d42605c33"
+  },
+  {
+    "path": "repeat-a/gold/jamsilsaenae/building_vacancy.json",
+    "sha256": "0296a11f0887d1640aa23da7562b9b6b488f23316bdda0d605b6d1e1751891dd"
+  },
+  {
+    "path": "repeat-a/gold/jamsilsaenae/calibration.json",
+    "sha256": "1ebd0e0473b23e76fae1a3826180abf321016f865efe2d9e729b5d3a24c78141"
+  },
+  {
+    "path": "repeat-a/gold/jamsilsaenae/coverage.json",
+    "sha256": "3903ba7937d0f857a7e0891f517c9c96cf4d2aff9a04fa91df5e698f96325f38"
+  },
+  {
+    "path": "repeat-a/gold/jamsilsaenae/page_building_master.geojson",
+    "sha256": "6f735ea1b259c36bfc0cc42968b92a7446a03922310145760e63d4cb7e54024a"
+  },
+  {
+    "path": "repeat-a/gold/jangan/building_vacancy.json",
+    "sha256": "1237107639289c11b0f29c3e94b8a1ca800383d1035dfd703ce588f8ca56f5d6"
+  },
+  {
+    "path": "repeat-a/gold/jangan/calibration.json",
+    "sha256": "903b1c2292c41788f7247350fe69bf4c243e9a4065e966f0e3869a9deb84ccf9"
+  },
+  {
+    "path": "repeat-a/gold/jangan/coverage.json",
+    "sha256": "7c7502cc06748ee6bbb8622c034d8dfd83ef01e6e4762a0297a3dbc68de56500"
+  },
+  {
+    "path": "repeat-a/gold/jangan/page_building_master.geojson",
+    "sha256": "fb1038d153e151c0779ae43a5c0d87bc18027c56c71ab510378b9a29de278c9e"
+  },
+  {
+    "path": "repeat-a/gold/kkachisan/building_vacancy.json",
+    "sha256": "d92603769324bbbb0d9719ce83866a0e7919969fa78fe9e83299bfec4c93fbfa"
+  },
+  {
+    "path": "repeat-a/gold/kkachisan/calibration.json",
+    "sha256": "66ce50806427cc4ba6810edc066ab5633e7446a9b8e55a63a128b80e96a3f4e7"
+  },
+  {
+    "path": "repeat-a/gold/kkachisan/coverage.json",
+    "sha256": "89fc5ba618d5c88933a7c87fc53de42912e379848ce9b336a2b145e6f90b2031"
+  },
+  {
+    "path": "repeat-a/gold/kkachisan/page_building_master.geojson",
+    "sha256": "bdabebec1e21d3508bb77694a7ec03d472fec0a05f72ad04f2a9d4f312dd946c"
+  },
+  {
+    "path": "repeat-a/gold/konkuk/building_vacancy.json",
+    "sha256": "8c968726a6cba7f800945d1deffa9668d1ef871b9e8ebbe7c60dfe47e679eb49"
+  },
+  {
+    "path": "repeat-a/gold/konkuk/calibration.json",
+    "sha256": "221a2de44dcd79059f55b4f308d4afb12c2d8a4312519d7c8802d078b879d210"
+  },
+  {
+    "path": "repeat-a/gold/konkuk/coverage.json",
+    "sha256": "2f3b61afe42b0643311daee0b77459a4ffc881ba3ef17b6951999e93a895ff71"
+  },
+  {
+    "path": "repeat-a/gold/konkuk/page_building_master.geojson",
+    "sha256": "91d7d39b8ad6fa03135e55684873f3c8442ebdb1b41b7aea3650d856cf418b48"
+  },
+  {
+    "path": "repeat-a/gold/kyunghee/building_vacancy.json",
+    "sha256": "e2098329d770b19a194444820a47161b2bb40a5ca7239dc237570fc9f1afccbc"
+  },
+  {
+    "path": "repeat-a/gold/kyunghee/calibration.json",
+    "sha256": "42c01d004dc95ee5f4c717063058c8c38eebd9031dc0cee0c4e24ce91f35f6a8"
+  },
+  {
+    "path": "repeat-a/gold/kyunghee/coverage.json",
+    "sha256": "6bc1aa73bcb456d8ed5fde3ca71880f03712a3d41b6e78bd1262bc01f99adbd6"
+  },
+  {
+    "path": "repeat-a/gold/kyunghee/page_building_master.geojson",
+    "sha256": "67fcae6bf93d09cb178b61e2700479f9145f53df6e70d6cf37000774ae2e11a7"
+  },
+  {
+    "path": "repeat-a/gold/mangwon/building_vacancy.json",
+    "sha256": "188c1b1c07c809fb412a4157cbf1bb94c3f003f48d401295997780e7f1f4661e"
+  },
+  {
+    "path": "repeat-a/gold/mangwon/calibration.json",
+    "sha256": "0e60c8a36ea641486c839fb82c552e23dcfbf3fc79bab6cae7557df152ff46e9"
+  },
+  {
+    "path": "repeat-a/gold/mangwon/coverage.json",
+    "sha256": "59175347e3fc1ea623f3f8a28f8f963e76db10f8d77e39ab17d154e31ed53a10"
+  },
+  {
+    "path": "repeat-a/gold/mangwon/page_building_master.geojson",
+    "sha256": "05c5729a454cbfe254326366b3b7799712f62a91ad27d4253446450ba1cc1a95"
+  },
+  {
+    "path": "repeat-a/gold/miasageori/building_vacancy.json",
+    "sha256": "1399e56f7542e717a9318b8086e8235fec3ef1e9efe939c8134afd27113a0fc3"
+  },
+  {
+    "path": "repeat-a/gold/miasageori/calibration.json",
+    "sha256": "468dcfad3a748fa757c0009771342b4ee9b1fe7e5e51ea9a4815fce475499189"
+  },
+  {
+    "path": "repeat-a/gold/miasageori/coverage.json",
+    "sha256": "a984622f0a76548c96f560812ff310b4e3b624177f733fa8f872eb01af56fa98"
+  },
+  {
+    "path": "repeat-a/gold/miasageori/page_building_master.geojson",
+    "sha256": "fe687b3db7803cc8498941828d895fe4f529db485b49138dbd1f45919acf0812"
+  },
+  {
+    "path": "repeat-a/gold/mokdong-yc/building_vacancy.json",
+    "sha256": "560bb1efd4aaa93c544c55625af7491fd333a6f305341c5e735e5b86c74dd8cf"
+  },
+  {
+    "path": "repeat-a/gold/mokdong-yc/calibration.json",
+    "sha256": "4d80fa8d6c1e7d1cb89c4947afbe95219e30f39eb1b06921e993049634ce5162"
+  },
+  {
+    "path": "repeat-a/gold/mokdong-yc/coverage.json",
+    "sha256": "c7ebeacb322c207f744280922ae7814a491d335a206a7e0b3b200d4ed9753e19"
+  },
+  {
+    "path": "repeat-a/gold/mokdong-yc/page_building_master.geojson",
+    "sha256": "6742a2d1bfe0477daf4f0b134892fe3f2c5b53f98a4c693bea6cf0942ce70b3b"
+  },
+  {
+    "path": "repeat-a/gold/mullae/building_vacancy.json",
+    "sha256": "5b197c93f7da625578895d32f889fa2d54a7c1e255ad7ec526719b98b27ba07e"
+  },
+  {
+    "path": "repeat-a/gold/mullae/calibration.json",
+    "sha256": "b0335299c615fcd14a1ba099b75193e0ad22671d6203e4e0f201c8d6f16e7ee6"
+  },
+  {
+    "path": "repeat-a/gold/mullae/coverage.json",
+    "sha256": "a803c6e098add84e9feb0cacbc2f41a6bd53e377158c5cf780709bc7b0a0587e"
+  },
+  {
+    "path": "repeat-a/gold/mullae/page_building_master.geojson",
+    "sha256": "0bf2adcf614e08783cb01ad6d6e4c82b3286bfc354cfcf6cfbf5ada184bbcb90"
+  },
+  {
+    "path": "repeat-a/gold/myeongdong/building_vacancy.json",
+    "sha256": "da581d1ce14db9f96574ed45d4cbdde55cac9b51cf263ff46779b4db1d6acdea"
+  },
+  {
+    "path": "repeat-a/gold/myeongdong/calibration.json",
+    "sha256": "1fe1edf18b643afaf8ba5db47d62f23f0ce803f4e4c5ee88a4d30ded14283450"
+  },
+  {
+    "path": "repeat-a/gold/myeongdong/coverage.json",
+    "sha256": "8f34f3fcd4c577c1c75c5bdcdea621ee8e0a23a48e1934d0424a66baf79bff44"
+  },
+  {
+    "path": "repeat-a/gold/myeongdong/page_building_master.geojson",
+    "sha256": "5ecca3d6d3cccf8788fd5fae678d6e310aa1b87d084da8b61cf21e527fb764c6"
+  },
+  {
+    "path": "repeat-a/gold/nambu/building_vacancy.json",
+    "sha256": "f2457e52d708a7c9dfa715ea81c781bb94b97dbb15cc8ac09d660ebf81fa84ba"
+  },
+  {
+    "path": "repeat-a/gold/nambu/calibration.json",
+    "sha256": "f50c4e69118a482bd219a5d3c9a6932313e925b98ccdd1f5ec08788c1c83b27c"
+  },
+  {
+    "path": "repeat-a/gold/nambu/coverage.json",
+    "sha256": "8db65108a0c7cf15d628047d26aa582591a4744a2d9581ccf96bf893a654e29c"
+  },
+  {
+    "path": "repeat-a/gold/nambu/page_building_master.geojson",
+    "sha256": "cdd8202a8dadcc77fe3a5eb9357a7daa5f6a9e1238da1827d631775fd44aa2d4"
+  },
+  {
+    "path": "repeat-a/gold/namdaemun/building_vacancy.json",
+    "sha256": "7d0a9040cd0e7c59673b0d85895fdf33f6912dc2003fd1259ce3800dc1e42196"
+  },
+  {
+    "path": "repeat-a/gold/namdaemun/calibration.json",
+    "sha256": "6212fd32064f3096fb2acde0e240799ad19fa3c6f2e5bcde998538d17bc5c4e3"
+  },
+  {
+    "path": "repeat-a/gold/namdaemun/coverage.json",
+    "sha256": "ca657b08b88a758d37a5f4b189ec22a78a3624ed0c9027816ea8bb1d5f437ab1"
+  },
+  {
+    "path": "repeat-a/gold/namdaemun/page_building_master.geojson",
+    "sha256": "02c3267401785861d06565f716b6ee85e80f9b99b4ada7465c07e64d395725d5"
+  },
+  {
+    "path": "repeat-a/gold/nokdu/building_vacancy.json",
+    "sha256": "90e975df6e4df460e1bda3fc5f3621913cf7352fa801dfbd70c913a15e4b6e7f"
+  },
+  {
+    "path": "repeat-a/gold/nokdu/calibration.json",
+    "sha256": "798f7a8c6757fe9c1475372a7513d02574e01121bf8987891f882996ec1202d0"
+  },
+  {
+    "path": "repeat-a/gold/nokdu/coverage.json",
+    "sha256": "477055e5b606a493d150f3ff69bfc30aeee5d2513b3c72cb0c1edda765cb6136"
+  },
+  {
+    "path": "repeat-a/gold/nokdu/page_building_master.geojson",
+    "sha256": "099c3308caab6c7037a81951919cffbd69ce8122f080c05c5f4e95293b4a384d"
+  },
+  {
+    "path": "repeat-a/gold/nonhyeon/building_vacancy.json",
+    "sha256": "6366757bb99d6bab1b168561cbe2d9a81b3c2adf64aa3908efe6280b754c0d71"
+  },
+  {
+    "path": "repeat-a/gold/nonhyeon/calibration.json",
+    "sha256": "880f93feee531e02dd05bc4c49ea475d572bad31d26772a935715436cbf93b3c"
+  },
+  {
+    "path": "repeat-a/gold/nonhyeon/coverage.json",
+    "sha256": "e40c47684903065009d7145756b038b91080b64dd529a074030eac939a4d28dc"
+  },
+  {
+    "path": "repeat-a/gold/nonhyeon/page_building_master.geojson",
+    "sha256": "1e73347cf6c90f3fe734f76fc354209b33181a397801bd1c0d9667e133ce8ba1"
+  },
+  {
+    "path": "repeat-a/gold/noryangjin/building_vacancy.json",
+    "sha256": "fd15424d3ec6abe0b941a90d8f231f63891e708b11eb18e378fc289e824e1497"
+  },
+  {
+    "path": "repeat-a/gold/noryangjin/calibration.json",
+    "sha256": "ce567889eb9dd325f10569c8942692e71cc7eab716bf85c988be3c1758f117f7"
+  },
+  {
+    "path": "repeat-a/gold/noryangjin/coverage.json",
+    "sha256": "ee05e6474f77335a59d8ffec32e2d3dba28696ba5ee8411c52d2cfbdd3d18a78"
+  },
+  {
+    "path": "repeat-a/gold/noryangjin/page_building_master.geojson",
+    "sha256": "b72a727a417ee1653bc1dfb9a3bebed94c706fac54c761391864c8ad85529843"
+  },
+  {
+    "path": "repeat-a/gold/oryudong/building_vacancy.json",
+    "sha256": "09926aa3927a82e16af29b69bb89cf78a1021ee0ee5770bd9e5da3c45a31729a"
+  },
+  {
+    "path": "repeat-a/gold/oryudong/calibration.json",
+    "sha256": "602324080a49db09dd63307c7e6ab942e93ca50ad97c4480c13abf61cf8bb93e"
+  },
+  {
+    "path": "repeat-a/gold/oryudong/coverage.json",
+    "sha256": "049e8ab2487614334fc25e464c9afb788b07ccdf89c1a639725fb82afbc119f9"
+  },
+  {
+    "path": "repeat-a/gold/oryudong/page_building_master.geojson",
+    "sha256": "5f5ba7faf2730860595ede5089af5bd760dfac8a2e5bfa1363ebe7f60d04f208"
+  },
+  {
+    "path": "repeat-a/gold/sadang/building_vacancy.json",
+    "sha256": "8e05e53aa059e7c7abf183b720ad9643e05cdcbeec4b909f079f56ca63c2cb66"
+  },
+  {
+    "path": "repeat-a/gold/sadang/calibration.json",
+    "sha256": "4c0c3e843db958731cc9827fe39cb43575885316303df57faac03b80f55cd669"
+  },
+  {
+    "path": "repeat-a/gold/sadang/coverage.json",
+    "sha256": "ad1779a49177f9e58a0286cad0dc69db08835483522f195083f5025dc7b2e1e0"
+  },
+  {
+    "path": "repeat-a/gold/sadang/page_building_master.geojson",
+    "sha256": "595fe2956b74976cfd3fe5b19ee8b76fc516ccf93aa16432c6a269cf8cbcede8"
+  },
+  {
+    "path": "repeat-a/gold/samcheong/building_vacancy.json",
+    "sha256": "0a2d135f633990d57c071e026ac68d2bc27ada4dd7a582037360cc83fa41e16a"
+  },
+  {
+    "path": "repeat-a/gold/samcheong/calibration.json",
+    "sha256": "bf5d56a342e4a8c993216a7a03dc1de2f9215a8b221498590a09fe3a9fee68ce"
+  },
+  {
+    "path": "repeat-a/gold/samcheong/coverage.json",
+    "sha256": "e3aabf1b9c074673fd597ad58388963c1b0a1b42533a198cea8fe0e9c9cce387"
+  },
+  {
+    "path": "repeat-a/gold/samcheong/page_building_master.geojson",
+    "sha256": "c0045ffee644515a2a840b691744e82ce595ba9a43b54ecda702c3b8e87e02fc"
+  },
+  {
+    "path": "repeat-a/gold/sangbong/building_vacancy.json",
+    "sha256": "42d31db4fc8d324a2da80f19da30ed373775c8b209724f4757e0205f7fd17c0b"
+  },
+  {
+    "path": "repeat-a/gold/sangbong/calibration.json",
+    "sha256": "2807b836cace4c208b56e95c9ac0a2af470b7b98f6b935d130ebcf9bb65941f2"
+  },
+  {
+    "path": "repeat-a/gold/sangbong/coverage.json",
+    "sha256": "0a3b97f83a44dfac92009eb289835d994f57fe87d49ca79b80cf5948008ec0e7"
+  },
+  {
+    "path": "repeat-a/gold/sangbong/page_building_master.geojson",
+    "sha256": "2e8399263c9957bb03873cb16ac45648ff5c195b419e83d214d5b1428d9bcffa"
+  },
+  {
+    "path": "repeat-a/gold/sanggye/building_vacancy.json",
+    "sha256": "a7cc034fa643360f9a2c6de8dda7bd20d1de8a8c6c049f6e27ceb6b274da18e3"
+  },
+  {
+    "path": "repeat-a/gold/sanggye/calibration.json",
+    "sha256": "5253dc47819c79c816632a3e171fc3e4c0191d3aae8df8e3e80176d116096f9f"
+  },
+  {
+    "path": "repeat-a/gold/sanggye/coverage.json",
+    "sha256": "1f3965ae9907998b93655b345ae1c67c8dcaeabc20c932de8309e01c46a4fc7f"
+  },
+  {
+    "path": "repeat-a/gold/sanggye/page_building_master.geojson",
+    "sha256": "0b2b9d5bd4ab89c42c5262b36d6d8e1742880444fbde7d855e319f44ce57863d"
+  },
+  {
+    "path": "repeat-a/gold/seochon/building_vacancy.json",
+    "sha256": "2ddadb9a4f2e106922a3f1dd5c657860dbfc099fe7ecd04479bb434bafa00fe5"
+  },
+  {
+    "path": "repeat-a/gold/seochon/calibration.json",
+    "sha256": "b6df157a3197ee9991e7f685f24bddbdab55010c73cdee43cb69291b4c4a76dc"
+  },
+  {
+    "path": "repeat-a/gold/seochon/coverage.json",
+    "sha256": "34e723f26c8f99d97a42da1772f984dbdf3c8c8ab60cf2871cfa8a5bca343d85"
+  },
+  {
+    "path": "repeat-a/gold/seochon/page_building_master.geojson",
+    "sha256": "d1f90aa8d3223acd8387be259f0e089684fe455af7418e6ac1c741adb251cf7c"
+  },
+  {
+    "path": "repeat-a/gold/seolleung/building_vacancy.json",
+    "sha256": "2b2fc0593a573cba4b14f9ee51b8b9e7ef1eb985c8fe5ce8e00a2d0a2a87b699"
+  },
+  {
+    "path": "repeat-a/gold/seolleung/calibration.json",
+    "sha256": "1824c2ac884a24a2db0c70410e29a654e5e5d517f2741e328b077069bd2c2d97"
+  },
+  {
+    "path": "repeat-a/gold/seolleung/coverage.json",
+    "sha256": "2c37190accc56f4a49cafddd333264f4be04a47584412b34674dfff35c19765b"
+  },
+  {
+    "path": "repeat-a/gold/seolleung/page_building_master.geojson",
+    "sha256": "6e5cf6b69f60c79451a90c13696cc268f53f5fd8f846c2f60c5ca201f5db5698"
+  },
+  {
+    "path": "repeat-a/gold/seongsu/building_vacancy.json",
+    "sha256": "57aa7174121a94d909ad7dea0e9707d861b3dc1c017d79186e21a84ecd665b0f"
+  },
+  {
+    "path": "repeat-a/gold/seongsu/calibration.json",
+    "sha256": "a49091657932919b2f09db70916d68389a787dd0f590983fb2b4dc9dbe4cff97"
+  },
+  {
+    "path": "repeat-a/gold/seongsu/coverage.json",
+    "sha256": "e0ec9be00c65ef2b708e6ac699464eaf94e0cd1abea68b91e284a0826d561910"
+  },
+  {
+    "path": "repeat-a/gold/seongsu/page_building_master.geojson",
+    "sha256": "9623c2a115839f7b13a26904933aad56b0f30ffe7f8a3eb985c1dedab38efa5c"
+  },
+  {
+    "path": "repeat-a/gold/seoulsup/building_vacancy.json",
+    "sha256": "4b0bbc20516bd1f53bcae02c789603f00043677df9ca50ec31285d0b9aa0eca2"
+  },
+  {
+    "path": "repeat-a/gold/seoulsup/calibration.json",
+    "sha256": "0b45a3d628e6627a9330c904fde36e5982fcc7a2f6cce786eaa41fa075d580d3"
+  },
+  {
+    "path": "repeat-a/gold/seoulsup/coverage.json",
+    "sha256": "8b54bdaadace1bc82e80d22b73e989e055ac0d0f6dcb6866e07ce13da0a267bb"
+  },
+  {
+    "path": "repeat-a/gold/seoulsup/page_building_master.geojson",
+    "sha256": "5f4e22d037628e1ce7ea72652b6c29d688ea530c7a4e2b81b08cd133b80f1084"
+  },
+  {
+    "path": "repeat-a/gold/sharosugil/building_vacancy.json",
+    "sha256": "3b9aa8c8c14899b23ae8587f10cc7e5e418de3290255fab559fc8e55d27763af"
+  },
+  {
+    "path": "repeat-a/gold/sharosugil/calibration.json",
+    "sha256": "49a80f7f8c6a342402410b8d145b8396fdbf22a5056162d57b768c1d838b2107"
+  },
+  {
+    "path": "repeat-a/gold/sharosugil/coverage.json",
+    "sha256": "cf9cc664bf9e713562437e3fd9c74dce20f1003db2436e4dca5da4f91df5fbb7"
+  },
+  {
+    "path": "repeat-a/gold/sharosugil/page_building_master.geojson",
+    "sha256": "ba1ef0f8aabf4a42b1c6a5a6961d7aaa296d05783cb9566366814a41b9bcaeb2"
+  },
+  {
+    "path": "repeat-a/gold/sillim/building_vacancy.json",
+    "sha256": "3cda32a58dedb33562b9f437e68f73b109ff0bb7d669cfe640c640777c3935e7"
+  },
+  {
+    "path": "repeat-a/gold/sillim/calibration.json",
+    "sha256": "bb07859d1851dfac6fcaf6c0e90ed3abfe5f2ea1c227698d1966ee4686ae88e8"
+  },
+  {
+    "path": "repeat-a/gold/sillim/coverage.json",
+    "sha256": "25da1ded4cdc9d71ab319ffc4061cf5dfa2ef3d440a5491089b1c91cec566c9a"
+  },
+  {
+    "path": "repeat-a/gold/sillim/page_building_master.geojson",
+    "sha256": "5659f435a0c97df90a876b30f2c0b81b2a6f254a1b4b185c9354aab8bdfa185d"
+  },
+  {
+    "path": "repeat-a/gold/sinchon/building_vacancy.json",
+    "sha256": "99f441c95c02d686e6dc5f7f8b09825c3742aea80a238344cc8abdbcf63e458b"
+  },
+  {
+    "path": "repeat-a/gold/sinchon/calibration.json",
+    "sha256": "532b475f68e19fe5ee68543a99d6a1a46c4e99cf66d0621b3b8f89816c2969c4"
+  },
+  {
+    "path": "repeat-a/gold/sinchon/coverage.json",
+    "sha256": "86bb973a4a6077c132a12c331ec4bb82fd0ac6339049c3d118a10ceeee5f581d"
+  },
+  {
+    "path": "repeat-a/gold/sinchon/page_building_master.geojson",
+    "sha256": "741732b159ec47002e97671027143c97b7f7c8776b738318254b5636ff7f22df"
+  },
+  {
+    "path": "repeat-a/gold/songridan/building_vacancy.json",
+    "sha256": "331ad54f8330b9fb1b0d4197935e352325dbfb5fe78aec7eec8a14c38c908ad2"
+  },
+  {
+    "path": "repeat-a/gold/songridan/calibration.json",
+    "sha256": "fc6a0049dda0a131a484731d9d92e156d975dfd9fbc85ff90c1fd999cdd0d17d"
+  },
+  {
+    "path": "repeat-a/gold/songridan/coverage.json",
+    "sha256": "5d73e23c8bc2f7e9d0d4dc7f1a1abbb4beceb2abbb4f117a36250cb187a5f848"
+  },
+  {
+    "path": "repeat-a/gold/songridan/page_building_master.geojson",
+    "sha256": "803da9fea003ac091a45f427bd17b42b37acefed2590073ee01b2d51749d5597"
+  },
+  {
+    "path": "repeat-a/gold/sukmyung/building_vacancy.json",
+    "sha256": "aca59f9985bac1abc69d8c5f1a423a0f4ec48cf050b755df25e19656eb441c86"
+  },
+  {
+    "path": "repeat-a/gold/sukmyung/calibration.json",
+    "sha256": "02b54cc78dbfdf0000bd1e2fff95b2f681f318f8732e9458ec26c40a28804b49"
+  },
+  {
+    "path": "repeat-a/gold/sukmyung/coverage.json",
+    "sha256": "d82f0b344434708cbdc669be8d0fdd1dae48e3fb8f6e431c2c914787cf8c9f28"
+  },
+  {
+    "path": "repeat-a/gold/sukmyung/page_building_master.geojson",
+    "sha256": "db443ce50d8d819d0d5614b492297e2fefcd40b4e4bc2f3ac95c828bbf2eecc4"
+  },
+  {
+    "path": "repeat-a/gold/sungshin/building_vacancy.json",
+    "sha256": "9db1e4c2ec769fe5542459672fe698db2cb52fe752c44c824ead0609fcc8287e"
+  },
+  {
+    "path": "repeat-a/gold/sungshin/calibration.json",
+    "sha256": "7024b7bec46961b9cfaabffbca2a971bba492aff3734e4c08024c9c5de82da00"
+  },
+  {
+    "path": "repeat-a/gold/sungshin/coverage.json",
+    "sha256": "5778f0cee316a9c83999b528ab5ee7a1dd45b39aec4ef8875270fa65150c5856"
+  },
+  {
+    "path": "repeat-a/gold/sungshin/page_building_master.geojson",
+    "sha256": "9f7e0214d032638b9781424f354204d225b1ff8aa9748da0c9d26e4647dab46c"
+  },
+  {
+    "path": "repeat-a/gold/suyu/building_vacancy.json",
+    "sha256": "28e810f8b0be4b6447ce64b3bce33b6ba1c175a1f9c30500f5e338f709b91917"
+  },
+  {
+    "path": "repeat-a/gold/suyu/calibration.json",
+    "sha256": "79334139476c76b0024bd49b4c71cb705b9a9a95c4653314b08ff3387e2814f2"
+  },
+  {
+    "path": "repeat-a/gold/suyu/coverage.json",
+    "sha256": "ea58bbc64e10ba32cfb01f3e2930a12138c2e4ac67185e929b2d50d0c5c38052"
+  },
+  {
+    "path": "repeat-a/gold/suyu/page_building_master.geojson",
+    "sha256": "f5e05f6ff810d4063b48c9e561a86acefb19eebd259139d29c65d145ad2308d9"
+  },
+  {
+    "path": "repeat-a/gold/teheran/building_vacancy.json",
+    "sha256": "b85189730a57dfa01acd9024e66480144703c27819e032d58f8b794f3d917102"
+  },
+  {
+    "path": "repeat-a/gold/teheran/calibration.json",
+    "sha256": "ad5132d80099822faaf0644dfefff82a0784ac67f885faf4a4fbc25703275a8b"
+  },
+  {
+    "path": "repeat-a/gold/teheran/coverage.json",
+    "sha256": "16c3b148ccd777107dbbf0effeb26ef3a50c9349f2d6ed1f0642d51751c488d7"
+  },
+  {
+    "path": "repeat-a/gold/teheran/page_building_master.geojson",
+    "sha256": "e4d90f4b04cd6bc1eb588687098e856a3ad97cd66a0ca60f3fa88fd733464555"
+  },
+  {
+    "path": "repeat-a/gold/wangsimni/building_vacancy.json",
+    "sha256": "f5798543d375de3616de228a0939dd57dbea3795286675293eed9dde35d408a3"
+  },
+  {
+    "path": "repeat-a/gold/wangsimni/calibration.json",
+    "sha256": "cfc3d01f7d5e412410cd20e82859ab978b8ecb07964aa0f8f295fd1868653b8d"
+  },
+  {
+    "path": "repeat-a/gold/wangsimni/coverage.json",
+    "sha256": "82520209ad869f7aac483e49cdc7924bb6bad3042e91f240f6b3dcbe60dbfefe"
+  },
+  {
+    "path": "repeat-a/gold/wangsimni/page_building_master.geojson",
+    "sha256": "13a1c363192039e25f6a99e2bd51144fec120a8b9cab06df204ab9f98ed94b3f"
+  },
+  {
+    "path": "repeat-a/gold/yeonhui/building_vacancy.json",
+    "sha256": "667e57481f35c50ddf1907c37069d054ddd384494e506c0aded78dbc972bd348"
+  },
+  {
+    "path": "repeat-a/gold/yeonhui/calibration.json",
+    "sha256": "ca43d1b9d482a6e2a8f9fee6c1c3abe4aeaba77d56cb6547d0221506b3b6d649"
+  },
+  {
+    "path": "repeat-a/gold/yeonhui/coverage.json",
+    "sha256": "186dc8f98d6a408a400fa3fb8121a9c71958cf1f834516c375bd7e39e36d62ca"
+  },
+  {
+    "path": "repeat-a/gold/yeonhui/page_building_master.geojson",
+    "sha256": "80d358627aef4f79bceecf56d4192a23d907caa7f4ee2582d45db55866e3b224"
+  },
+  {
+    "path": "repeat-a/gold/yeonnam/building_vacancy.json",
+    "sha256": "fc8ef359170462f886ab8a04f913eff8ba2ae251f9730352f1ee008be4fbbda4"
+  },
+  {
+    "path": "repeat-a/gold/yeonnam/calibration.json",
+    "sha256": "6983bc0568ac9ca4c5e6916e0a253331cbb1e848d9b81b0fe3a0676ae814a167"
+  },
+  {
+    "path": "repeat-a/gold/yeonnam/coverage.json",
+    "sha256": "a24febf885b39a6cc2797443255e3522e6f3ee7745b6cc14d5f44087f2779de2"
+  },
+  {
+    "path": "repeat-a/gold/yeonnam/page_building_master.geojson",
+    "sha256": "5299cfa418466079170e85e129acc83f091efdc473030ffa3887953abd512f9f"
+  },
+  {
+    "path": "repeat-a/gold/yeonsinnae/building_vacancy.json",
+    "sha256": "82b7cab2fcb0c53b703017b95ad52e6c6ae317036ea3e86918c40b8ef062574c"
+  },
+  {
+    "path": "repeat-a/gold/yeonsinnae/calibration.json",
+    "sha256": "47e8e874cc10e6a21d7d87e906a3e787236ab0878416fdb3cb3f5dd1dfa3cba3"
+  },
+  {
+    "path": "repeat-a/gold/yeonsinnae/coverage.json",
+    "sha256": "d603c54fc05301881e4ef1e75514691fe33980a4b78572ee28c5a4db00878722"
+  },
+  {
+    "path": "repeat-a/gold/yeonsinnae/page_building_master.geojson",
+    "sha256": "7e1a98f7854559bcf29d95d6bbb3fdc29b523928afaeec6e369e56b6b2842e97"
+  },
+  {
+    "path": "repeat-a/gold/yeouido/building_vacancy.json",
+    "sha256": "a9c2288a1d0074c4334349b843446bdc228d79b199e9b6a10d37bb452bab519a"
+  },
+  {
+    "path": "repeat-a/gold/yeouido/calibration.json",
+    "sha256": "6e3e47b3e660fe17b1e40a81cfe31d0d28255f7cbe10b06d726daa71a789d955"
+  },
+  {
+    "path": "repeat-a/gold/yeouido/coverage.json",
+    "sha256": "16827a3467a44431dd9e6f213b6246a5505de4d54e453d6d8c1c85680e490c9f"
+  },
+  {
+    "path": "repeat-a/gold/yeouido/page_building_master.geojson",
+    "sha256": "2dc62fc8060bfdbe99a7118c56084a0747854cde4e75e81e8adce2f3dcf5cc72"
+  },
+  {
+    "path": "repeat-a/gold/yongsan/building_vacancy.json",
+    "sha256": "98d0f57984e394c665de88bb260f5edfa577905ec08b621ece75920a864e61f9"
+  },
+  {
+    "path": "repeat-a/gold/yongsan/calibration.json",
+    "sha256": "89d29295b3fba25ec8e83fe516c8628b9eac28e9731f2d2c16422f4fa1618645"
+  },
+  {
+    "path": "repeat-a/gold/yongsan/coverage.json",
+    "sha256": "214311995ffdc76bde47d6e26ed34ba5427c01db2f09643b6719df25aad764fd"
+  },
+  {
+    "path": "repeat-a/gold/yongsan/page_building_master.geojson",
+    "sha256": "ea6ac3e06fcb725269168404ba940230edf693b7a4a8a002a682f4c4988137f2"
+  },
+  {
+    "path": "repeat-a/serving/anam.json",
+    "sha256": "a05b91833aeab25896697337e1062334dfd514c4f06dec5984317b0e50a991c0"
+  },
+  {
+    "path": "repeat-a/serving/apgujeong-rodeo.json",
+    "sha256": "46e41f984e781133c1e33eea6b01deb9d5f68f5cf83416c523cbcd1ef90550b8"
+  },
+  {
+    "path": "repeat-a/serving/banpo.json",
+    "sha256": "8f6ccecfe0a87585d2605f82cc2ac5e6a3280f19b57c682a613f20e58043fcb5"
+  },
+  {
+    "path": "repeat-a/serving/bulgwang.json",
+    "sha256": "eb8181c84d13bf24ea4439d423abe5568e358ef1c738949ef7c63d8df3a7159d"
+  },
+  {
+    "path": "repeat-a/serving/cheongdam.json",
+    "sha256": "1f8728d039380aa4b3bdc4723e576ad2f1b34d532580f6ab5c97b828cb9ec90c"
+  },
+  {
+    "path": "repeat-a/serving/cheongnyangni.json",
+    "sha256": "8c8b72f8e66fbaac614b3de81835fcd91156fda7df6f42853e268eaf93e92fbc"
+  },
+  {
+    "path": "repeat-a/serving/cheonho.json",
+    "sha256": "3db963d8f19008e2f2de6c0f6d9a55ef68f0798c15a20331e8d31398f56fc833"
+  },
+  {
+    "path": "repeat-a/serving/chungmuro.json",
+    "sha256": "119a72a64274824b2763c26b689627532ca8944ffcc9b7bc727ee99d136de4f1"
+  },
+  {
+    "path": "repeat-a/serving/cityhall.json",
+    "sha256": "68fddaf338718ed9868c1933beefe20dc0037f98563a06c9bcaf1b220730f963"
+  },
+  {
+    "path": "repeat-a/serving/dangsan.json",
+    "sha256": "4a7179417ccc31710560a1035114aa14d0534d504e89b659387527c8f5193bbd"
+  },
+  {
+    "path": "repeat-a/serving/doksan.json",
+    "sha256": "af4d6db8d4b5f83f4ddd0639dbbbc3814ea615472c81ac3cfb0488afc357f6bc"
+  },
+  {
+    "path": "repeat-a/serving/dongdaemun.json",
+    "sha256": "f60a3134a7eba416c12e0f4a46862e948520739078a89724b3f3387548ce74da"
+  },
+  {
+    "path": "repeat-a/serving/dosan.json",
+    "sha256": "362344519bb4591a6ca90c7f8e3d6906249cd523c8662a94102ef029fe866bdb"
+  },
+  {
+    "path": "repeat-a/serving/euljiro.json",
+    "sha256": "57cbd4bbe62033e36351ce23c596c8e8d6f54c63a708b59a623ccf5212571607"
+  },
+  {
+    "path": "repeat-a/serving/gangnam.json",
+    "sha256": "07382a5b77692c9f41aeb5be9e099148ae5bbf9b5cb437825152618b1358e7c1"
+  },
+  {
+    "path": "repeat-a/serving/garak.json",
+    "sha256": "4e6bb09e4958876df1e772b173f5bd479e097329bf715e4bdaad12cc49ae0871"
+  },
+  {
+    "path": "repeat-a/serving/garosugil.json",
+    "sha256": "56450bd9264eb6730fd0d842228d53fcb596c852d13c228a6bf56bee3d6098f8"
+  },
+  {
+    "path": "repeat-a/serving/gongdeok.json",
+    "sha256": "4724ed25f5957cac96c93440f3379fe134e4e8b0cfccc05f5e0545300ddc495d"
+  },
+  {
+    "path": "repeat-a/serving/gunja.json",
+    "sha256": "41bb1bb1352952c7d02f565ff30581c6deba94a967305e892774abca3502544b"
+  },
+  {
+    "path": "repeat-a/serving/gwangjang.json",
+    "sha256": "b4e2303fdf2c1863d4c7345a64f96c6035f91facd25fc4c57f41acf76174f43a"
+  },
+  {
+    "path": "repeat-a/serving/hannam.json",
+    "sha256": "48983b2d8be10df6a754aa6bbfec4897ea943dda9362c1a23b5deeaa4e2b8136"
+  },
+  {
+    "path": "repeat-a/serving/hapjeong.json",
+    "sha256": "f928f5f4f8c303838f2ea11f529b239d759865975f25d88becb532eecf820857"
+  },
+  {
+    "path": "repeat-a/serving/hongdae.json",
+    "sha256": "d6e6dfe902a16740caf3b6164fa63830d97bde8ee687acf1352dfc115c6e9b06"
+  },
+  {
+    "path": "repeat-a/serving/hwagok.json",
+    "sha256": "a51ec4da90fe8d8e492c2d7b4fff1082aaf16731971d3300e673cc9d57b105e8"
+  },
+  {
+    "path": "repeat-a/serving/hyehwa.json",
+    "sha256": "fcb70c6df3414b05f7b0e8ab9bf14ac62561501c2acde6005744d1e84d58eb9a"
+  },
+  {
+    "path": "repeat-a/serving/ikseon.json",
+    "sha256": "cecff7ec913262d0e055c87f85ff18ad1574b5435249b74a3223d8e0fcd2d999"
+  },
+  {
+    "path": "repeat-a/serving/itaewon.json",
+    "sha256": "7e6d8e22293cdb2f16c8e5a3b9789954173b7a1b7cd648eb18ab1e870acdefde"
+  },
+  {
+    "path": "repeat-a/serving/jamsil.json",
+    "sha256": "fe7618f31d4482531f847b6abbd99d9c8da93acf5b296d8f9f8dee84539b6328"
+  },
+  {
+    "path": "repeat-a/serving/jamsilsaenae.json",
+    "sha256": "9bfa02e54063cf143ba3810ad4c5cedb9b47d8807fdad152f09aa32e9223530e"
+  },
+  {
+    "path": "repeat-a/serving/jangan.json",
+    "sha256": "ae06429f18151e735ea4cd5e639479c89acf24c74b4fc028ae6e552df0fcfad9"
+  },
+  {
+    "path": "repeat-a/serving/kkachisan.json",
+    "sha256": "45006565ba0edb0bd491ca69702cb9414835d9d3835b04de27453545f0d50c22"
+  },
+  {
+    "path": "repeat-a/serving/konkuk.json",
+    "sha256": "ffc8f3c552e886b23ef99c7a605df2c717815786f7e06e267839f639b7ab0c43"
+  },
+  {
+    "path": "repeat-a/serving/kyunghee.json",
+    "sha256": "f1e29d419cf541cd5c4d7a55685090e6dc66e9e76e2986d0a18217f395ba99aa"
+  },
+  {
+    "path": "repeat-a/serving/mangwon.json",
+    "sha256": "b244bbc64ca20e06b3159ffdfe6f3d0f5356ed96d5eeb9254f350bdd2da268a8"
+  },
+  {
+    "path": "repeat-a/serving/miasageori.json",
+    "sha256": "e095809ba5730f3be5d77f009ed5830c931521f043c68be90f275b3367df259d"
+  },
+  {
+    "path": "repeat-a/serving/mokdong-yc.json",
+    "sha256": "547ffe600df106c7e3ef52ff4b9216478592894788dfb8d15774399ff7166044"
+  },
+  {
+    "path": "repeat-a/serving/mullae.json",
+    "sha256": "7f4027427064e089bf55b946566da40050d31c3c6d41002f75b5fba63505859b"
+  },
+  {
+    "path": "repeat-a/serving/myeongdong.json",
+    "sha256": "9dad78344b719603628d953a319b24bfcca0743cfc8a643021776338242198b6"
+  },
+  {
+    "path": "repeat-a/serving/nambu.json",
+    "sha256": "52d79631c77ced3e4ac34b7d940f654b822c67b2c0d768cb80cfdaa7e42eddd9"
+  },
+  {
+    "path": "repeat-a/serving/namdaemun.json",
+    "sha256": "9f81b1d6d52f6579a5a23b12c823d9a9482400a9c8dc1b344dfae0b13c6f51ae"
+  },
+  {
+    "path": "repeat-a/serving/nokdu.json",
+    "sha256": "168faade711477a8851d07095df3b11ad91c65c9597144764014cb44725085d6"
+  },
+  {
+    "path": "repeat-a/serving/nonhyeon.json",
+    "sha256": "db59154574cf8ecf44d5367ce45f1668e1238204114c27227efa695039f25802"
+  },
+  {
+    "path": "repeat-a/serving/noryangjin.json",
+    "sha256": "f2ccc7543bf22ee13a564adbc511f80c015d254b5be2902e927e62b83b923192"
+  },
+  {
+    "path": "repeat-a/serving/oryudong.json",
+    "sha256": "67f63f2454a0c0df7b877929b06d19f3dad36090c06fc84b9d671e75a292207f"
+  },
+  {
+    "path": "repeat-a/serving/sadang.json",
+    "sha256": "a8606bfe180bb5412e6f0b0e85c6cc602939ebbf2ade43cf51236ea1a7466992"
+  },
+  {
+    "path": "repeat-a/serving/samcheong.json",
+    "sha256": "595754c0326fe327d22ebedf14f7665c95259d45ab0a0978fe60a0826fcdb323"
+  },
+  {
+    "path": "repeat-a/serving/sangbong.json",
+    "sha256": "687c4e10916e7d37aab218244888d9d3cac7734fd9c9e3d3368cb0a5a683f577"
+  },
+  {
+    "path": "repeat-a/serving/sanggye.json",
+    "sha256": "051d727464f210f3ae797927dbe1a85bc5551b11df2d651683d3630d27a90e5b"
+  },
+  {
+    "path": "repeat-a/serving/seochon.json",
+    "sha256": "0d6467ba5aa3cc8741d118b0e8dc638f758735fbf0c198f8d6046a388cc140bd"
+  },
+  {
+    "path": "repeat-a/serving/seolleung.json",
+    "sha256": "03a416e0b149ccd9fb0aebf1f580af39bd8b1448789eef9739e1cce3bb56a18d"
+  },
+  {
+    "path": "repeat-a/serving/seongsu.json",
+    "sha256": "d444017965a9c1ba962c757a325ca372e23a44c058d727af0df0de212fde0933"
+  },
+  {
+    "path": "repeat-a/serving/seoulsup.json",
+    "sha256": "75c147f3b940592e353d3266b764ed6a303890e69fd563a6198e1b6b211fccda"
+  },
+  {
+    "path": "repeat-a/serving/sharosugil.json",
+    "sha256": "82d854c54f795c41ddb69ac1ebcc741071a8993cbfc53ddde79efd02f3959b90"
+  },
+  {
+    "path": "repeat-a/serving/sillim.json",
+    "sha256": "ab5c3016c6bdda05a414a21a82fd8dd49bb39d46716fefcab30cf63901c710ec"
+  },
+  {
+    "path": "repeat-a/serving/sinchon.json",
+    "sha256": "60e45a6b05f9b1dd8a66ef3aed1370a14bee71e506a5177ba1066bd3afe2b5a5"
+  },
+  {
+    "path": "repeat-a/serving/songridan.json",
+    "sha256": "da2c41d611960d816726084f7d126da29a514530ebed4b742cf835fab43da6b9"
+  },
+  {
+    "path": "repeat-a/serving/sukmyung.json",
+    "sha256": "d9bc3bdeef364ee925def7de7871cf6db896f28f063f27d0707923f0c5f81712"
+  },
+  {
+    "path": "repeat-a/serving/sungshin.json",
+    "sha256": "c928b225ef5fd13947803e970846a08ad95ec1ade3b5442e6368ff7ae1529009"
+  },
+  {
+    "path": "repeat-a/serving/suyu.json",
+    "sha256": "e4f1a52919c83759fd3058f4fdcf3093794a531f19202a551676d339e9b5e2bc"
+  },
+  {
+    "path": "repeat-a/serving/teheran.json",
+    "sha256": "e31ad3939ce3831999475d6051387ca265335280b3dc6662d4a667db43526687"
+  },
+  {
+    "path": "repeat-a/serving/wangsimni.json",
+    "sha256": "a87b1be735cdf8de45bbb2e39d125ca0dce5ec99aebbf2b2f06e17201299a312"
+  },
+  {
+    "path": "repeat-a/serving/yeonhui.json",
+    "sha256": "1f47b385c1e1f891234e7b3ba98cab9f39ebfc82418b6e290ef3fa94215f738e"
+  },
+  {
+    "path": "repeat-a/serving/yeonnam.json",
+    "sha256": "b1b1afc70d3f696edd1057e0fd4acb6ef01fd3b45f5987ece64f563dde855751"
+  },
+  {
+    "path": "repeat-a/serving/yeonsinnae.json",
+    "sha256": "3db1398cb2afec4e0783fe313b1d8a1ed6587944f009a0fabe839802196afac8"
+  },
+  {
+    "path": "repeat-a/serving/yeouido.json",
+    "sha256": "ca6f4374e80daf72551a3c37c22021d211cf370a09964a0d3bc9074abfb6d28a"
+  },
+  {
+    "path": "repeat-a/serving/yongsan.json",
+    "sha256": "d0500ef135787c436b6843c0f2d9a0d9fd0a3886195b762fd6da72b63c8138fb"
+  },
+  {
+    "path": "repeat-a/status.json",
+    "sha256": "1e9f2359ff69acf3d2c03246ee7ae1ec72796351b1d4d4ba5deadc82b76f76e8"
+  },
+  {
+    "path": "repeat-a.log",
+    "sha256": "e55a3dfb057fabaadb4666ac37da38eb83183bc91f220a7e9905089d3cea1a16"
+  },
+  {
+    "path": "repeat-b/gold/anam/building_vacancy.json",
+    "sha256": "d046b44ab1a44251cd662161165ba0bebb3dab45101fae80f9498d19c5214466"
+  },
+  {
+    "path": "repeat-b/gold/anam/calibration.json",
+    "sha256": "82babad69f5c3efa54d81ea39d259f0abfd847db22bf7024818284cb83934b0f"
+  },
+  {
+    "path": "repeat-b/gold/anam/coverage.json",
+    "sha256": "5963ab68b27595f5ffea754df4fa78d137005ad0b325ba039ab5373d2df468cd"
+  },
+  {
+    "path": "repeat-b/gold/anam/page_building_master.geojson",
+    "sha256": "0433202cad91a84c8532af4c744f0e735e9f8299b4463405e98a98cc09b8e6f6"
+  },
+  {
+    "path": "repeat-b/gold/apgujeong-rodeo/building_vacancy.json",
+    "sha256": "112f9ffeade05c444c3516f8e372e5fd480ff137d793948f71444f00bc14e45f"
+  },
+  {
+    "path": "repeat-b/gold/apgujeong-rodeo/calibration.json",
+    "sha256": "18d948a2e232a329ef8e2376fc1bc137fca8a156745e75a1bf20dc97aa0aedbe"
+  },
+  {
+    "path": "repeat-b/gold/apgujeong-rodeo/coverage.json",
+    "sha256": "d91e4eb9f1c44609ceac896a51f62dec672cb3d6e82cc591a2de405726f269a7"
+  },
+  {
+    "path": "repeat-b/gold/apgujeong-rodeo/page_building_master.geojson",
+    "sha256": "079d1c40dec03caee282864c4af31d5a672301ae6110687ada75c0e9924a9581"
+  },
+  {
+    "path": "repeat-b/gold/banpo/building_vacancy.json",
+    "sha256": "4132b814301818a750bd63264ca0db95f7c1711bc4f06da486ba8acfb8824218"
+  },
+  {
+    "path": "repeat-b/gold/banpo/calibration.json",
+    "sha256": "98a5fef02ceb3073987da22994e242440b0bb791877689b04e76704803ca7630"
+  },
+  {
+    "path": "repeat-b/gold/banpo/coverage.json",
+    "sha256": "68353951ccb55af442e2d7f6d73a97cd74ba83c1567e981040387d4205f31dae"
+  },
+  {
+    "path": "repeat-b/gold/banpo/page_building_master.geojson",
+    "sha256": "63d8928117d51c9aacf30f0b613f327ffff1b89b533dae187a10df6f51bdcd31"
+  },
+  {
+    "path": "repeat-b/gold/bulgwang/building_vacancy.json",
+    "sha256": "fdcbad03e0ca47e2f1dd14deaf6345fac15a07af8fb20ab6e8ecb7cefbee1ef8"
+  },
+  {
+    "path": "repeat-b/gold/bulgwang/calibration.json",
+    "sha256": "8381d30c8fd0b0cbb28297e3a70d81f338a967df82f02714788b42b37375d405"
+  },
+  {
+    "path": "repeat-b/gold/bulgwang/coverage.json",
+    "sha256": "c257bdf18fa559a9e30cb1f31eb35e3d5734986b8a8833862fcef1a261388a51"
+  },
+  {
+    "path": "repeat-b/gold/bulgwang/page_building_master.geojson",
+    "sha256": "f83c4483477968f7abd1785d5dbfb87d28d2a7805ee28737ed5431c0d98de140"
+  },
+  {
+    "path": "repeat-b/gold/cheongdam/building_vacancy.json",
+    "sha256": "e14c1d00daa375b9bc6ce38391812a3ddb92eb926f159551d7ea22027981acbc"
+  },
+  {
+    "path": "repeat-b/gold/cheongdam/calibration.json",
+    "sha256": "88885d4e4bd34b23d2df1052de456da1a4b6e353c002aea50d7e21b459c7b1f7"
+  },
+  {
+    "path": "repeat-b/gold/cheongdam/coverage.json",
+    "sha256": "31fb9319831c91e29ba4ecfecb1f6d237ac780f3ea4455be9e22405dbaacf5c3"
+  },
+  {
+    "path": "repeat-b/gold/cheongdam/page_building_master.geojson",
+    "sha256": "8b5f810870e591c95e28e90a9c1434d1d9f17e38258b0c1d8d8cf98b67ab2ee4"
+  },
+  {
+    "path": "repeat-b/gold/cheongnyangni/building_vacancy.json",
+    "sha256": "02f1d7f5f850c23ca2a6ed83a6b10f5ed85ca82ffbe61962269a869424515d85"
+  },
+  {
+    "path": "repeat-b/gold/cheongnyangni/calibration.json",
+    "sha256": "6f7b1e1ae4a08f569ec66e1213edaf04941c0704724096bb1ead9dcef814c4f6"
+  },
+  {
+    "path": "repeat-b/gold/cheongnyangni/coverage.json",
+    "sha256": "4a866a7adcdf7acdcf1b088df908b85c7b43d80c1cdf762c3ffbca52bd25bab9"
+  },
+  {
+    "path": "repeat-b/gold/cheongnyangni/page_building_master.geojson",
+    "sha256": "a334991318e2b548dbc4420ebf3dbd21526ead78e7cec09506067eeff6d02845"
+  },
+  {
+    "path": "repeat-b/gold/cheonho/building_vacancy.json",
+    "sha256": "65fdf0f7cce1db9ff1e00c8ab2a3a7bce614edb8c2bb05ae18f7b347c5b647d0"
+  },
+  {
+    "path": "repeat-b/gold/cheonho/calibration.json",
+    "sha256": "8bba83a849b3c99341cc0738f82faf5a4cfd82128d0caa654ad6aa321f446854"
+  },
+  {
+    "path": "repeat-b/gold/cheonho/coverage.json",
+    "sha256": "86b55c71daaab9ab2e166ecdf843f9479eff2430678f5f25241e816bff682c7c"
+  },
+  {
+    "path": "repeat-b/gold/cheonho/page_building_master.geojson",
+    "sha256": "405c0b6f97cc8cf0b9be7990371d20625a28a1045e220278730ab5db97accd2e"
+  },
+  {
+    "path": "repeat-b/gold/chungmuro/building_vacancy.json",
+    "sha256": "57fc750dcd0710772d1d90c9ac6647c360c7a0f9af583b21c992dd4885106b24"
+  },
+  {
+    "path": "repeat-b/gold/chungmuro/calibration.json",
+    "sha256": "ea5806715bcdcb754f5c972e5d53423bdd4aee07f7fc3a37dd85f8a1a0d1a6a0"
+  },
+  {
+    "path": "repeat-b/gold/chungmuro/coverage.json",
+    "sha256": "f329d76e22639885527bd7d8d55e483ab13d9188b723fe16708f5e52e549364c"
+  },
+  {
+    "path": "repeat-b/gold/chungmuro/page_building_master.geojson",
+    "sha256": "ac3a9c3dc4c020bddc83c6eb0bf696eae7586627bc0caf7c3d4f67ecf3af1a15"
+  },
+  {
+    "path": "repeat-b/gold/cityhall/building_vacancy.json",
+    "sha256": "fc889e643c34306ec7b793bd7ddf09d680f73fe7d4fdf6915a1bde3a915cc828"
+  },
+  {
+    "path": "repeat-b/gold/cityhall/calibration.json",
+    "sha256": "06cf184744f70d7320b7642b39382cb8e4911e8c237a87b37470365d9bcf417d"
+  },
+  {
+    "path": "repeat-b/gold/cityhall/coverage.json",
+    "sha256": "a647272652116abc4e70baab159e13be9fb0060a9912cf8e212cf6261c792f81"
+  },
+  {
+    "path": "repeat-b/gold/cityhall/page_building_master.geojson",
+    "sha256": "e4351fe428a36da4e184f473ea81fa2b3273c024e3e287d8d218f7009fc3de94"
+  },
+  {
+    "path": "repeat-b/gold/dangsan/building_vacancy.json",
+    "sha256": "da3eb4545d82ab82ae218ce3bd7fa4589ef7ee8713aafe38312547a3f8c5a434"
+  },
+  {
+    "path": "repeat-b/gold/dangsan/calibration.json",
+    "sha256": "2e267abf588d2e4bec30f19375ffe9740bc9e6066f60eaade1faeec336e70532"
+  },
+  {
+    "path": "repeat-b/gold/dangsan/coverage.json",
+    "sha256": "fb4ac2b7064a4502af909eb1f51ecb1476fd9db860a328131cc8848997e5a981"
+  },
+  {
+    "path": "repeat-b/gold/dangsan/page_building_master.geojson",
+    "sha256": "7fe57be0498e527c5d2c80b36f0c56ff2ee273bbd2f6438b436650fd3e517964"
+  },
+  {
+    "path": "repeat-b/gold/doksan/building_vacancy.json",
+    "sha256": "c31face0d88fe8b74ab5d64530ee01c56b28da1980fcb56da7d3b64d04e5d861"
+  },
+  {
+    "path": "repeat-b/gold/doksan/calibration.json",
+    "sha256": "300efdcdfc70a9b186bb7825ce25f97e15755fb5cd0c83dace19bba2038794e5"
+  },
+  {
+    "path": "repeat-b/gold/doksan/coverage.json",
+    "sha256": "fa93c2a88f030fb4759339a4ec4b08796d9488317b0b3cfdec865e30b585ac79"
+  },
+  {
+    "path": "repeat-b/gold/doksan/page_building_master.geojson",
+    "sha256": "88cd0298f859f32868ad0dfa7ec3270b90a95fd5d93314ebba8b0d3d22b2ffbf"
+  },
+  {
+    "path": "repeat-b/gold/dongdaemun/building_vacancy.json",
+    "sha256": "dc99f13e42765b2ded43b7b5b9d1dca3cd76f8c03e94c42332de6b9614b9db6d"
+  },
+  {
+    "path": "repeat-b/gold/dongdaemun/calibration.json",
+    "sha256": "82b06b767653c2bd2fd799ea82c7a6f3bd205ee32dc46a4bb4340b3d2db8fb71"
+  },
+  {
+    "path": "repeat-b/gold/dongdaemun/coverage.json",
+    "sha256": "b0a16172a4baf07befc5403e07566ecc35e60725dbb4c711601d1ee1869724b9"
+  },
+  {
+    "path": "repeat-b/gold/dongdaemun/page_building_master.geojson",
+    "sha256": "46d02eb0e911e79144ce2314856dbc3887abe1f5e549c46762ec4aef2ed8d23e"
+  },
+  {
+    "path": "repeat-b/gold/dosan/building_vacancy.json",
+    "sha256": "f3fb11580db9c399a685a1718355861f80290036b2876b7abd9dcccd59a96be8"
+  },
+  {
+    "path": "repeat-b/gold/dosan/calibration.json",
+    "sha256": "0d452e2f7d0d73260ebe64be79cd64b63b3c5df2d1303d3f35aab688cb94b6f9"
+  },
+  {
+    "path": "repeat-b/gold/dosan/coverage.json",
+    "sha256": "1b898d7ba066ee705d8ae83687ceac949a2f1dc10136942e3f222c369aa6f4cc"
+  },
+  {
+    "path": "repeat-b/gold/dosan/page_building_master.geojson",
+    "sha256": "0d85fb1998b80bca006a836b98f6e0e3e8cb18d265d6b0d86e09e93945a53794"
+  },
+  {
+    "path": "repeat-b/gold/euljiro/building_vacancy.json",
+    "sha256": "a4484366c145903fb03dd8361418677e2f9b4edc4589975f29d7ec6d93f6fd6c"
+  },
+  {
+    "path": "repeat-b/gold/euljiro/calibration.json",
+    "sha256": "d53de4b3b81abe7761ad12230e4a811e82b42b021dff5b8ddcaf5246eb416b90"
+  },
+  {
+    "path": "repeat-b/gold/euljiro/coverage.json",
+    "sha256": "ebeeedb0b15e4c4d4502608702c5df330345e963bba529844b8612399742d40b"
+  },
+  {
+    "path": "repeat-b/gold/euljiro/page_building_master.geojson",
+    "sha256": "44b967986b4b557276e01aa71f57567e5ad519f506192a4251b136236a66f267"
+  },
+  {
+    "path": "repeat-b/gold/gangnam/building_vacancy.json",
+    "sha256": "eb3691af8571339b033b30f1c31aa5057c8a4ad7230eac8e9abafdb636309091"
+  },
+  {
+    "path": "repeat-b/gold/gangnam/calibration.json",
+    "sha256": "5a63430692c80e7ccf3ff2235a97639c51d8b9954e98cfcbaadee45ab26f3672"
+  },
+  {
+    "path": "repeat-b/gold/gangnam/coverage.json",
+    "sha256": "0e32cd055d9e805b68f0cf54e9fda1744bf80bf967fa096ea0c4ea42fb921a0b"
+  },
+  {
+    "path": "repeat-b/gold/gangnam/page_building_master.geojson",
+    "sha256": "951a8f7abf7da1f7be0f3ecf8741b25096ac487e9b432c273a7a98bb88802192"
+  },
+  {
+    "path": "repeat-b/gold/garak/building_vacancy.json",
+    "sha256": "7dd41d85b281cd3d0a02bb2ffce8156c2e000efc023f3c7e287f91ec7ae4a9d8"
+  },
+  {
+    "path": "repeat-b/gold/garak/calibration.json",
+    "sha256": "dda0e3db95bc43351d32ed63563acdb1a346388172d95f1b13aab26a6390489c"
+  },
+  {
+    "path": "repeat-b/gold/garak/coverage.json",
+    "sha256": "6d5b1fc1dc502d5284a1b781a4c697cf4056612aee73ba3df90353cb4da46114"
+  },
+  {
+    "path": "repeat-b/gold/garak/page_building_master.geojson",
+    "sha256": "455d4d9ea8396fb5abf0213eb72fc11e98761f0d16b69fe7c9e04b0f19d68ad6"
+  },
+  {
+    "path": "repeat-b/gold/garosugil/building_vacancy.json",
+    "sha256": "c09719476e9806e577a0791b5cd8c694a2bea70a8c8f0dbb608507e2becd98cc"
+  },
+  {
+    "path": "repeat-b/gold/garosugil/calibration.json",
+    "sha256": "9016776a19cafbe3cfdf074e3e36d0b56aeeb8cf9d65923bee01dd8d2d3b2b4b"
+  },
+  {
+    "path": "repeat-b/gold/garosugil/coverage.json",
+    "sha256": "4e3fe20d2a51b8c0f6baaf135aad0f0b404dcce448a88eb5836969a65c069ecb"
+  },
+  {
+    "path": "repeat-b/gold/garosugil/page_building_master.geojson",
+    "sha256": "4fbf8cd259f6967361a892e413a6df5f3d850a0b8c39ed4a17445e237b96b8d0"
+  },
+  {
+    "path": "repeat-b/gold/gongdeok/building_vacancy.json",
+    "sha256": "46604e79c956ee28dfb1ce29898c3855f1c04f91baaeed0a9edc1410de7021f2"
+  },
+  {
+    "path": "repeat-b/gold/gongdeok/calibration.json",
+    "sha256": "d41d0718308f119837dd687e7743980557548a1b9442e5d2f51e92e1a04e81b4"
+  },
+  {
+    "path": "repeat-b/gold/gongdeok/coverage.json",
+    "sha256": "43add949c81a7d7ce058d516a5268683996bd4da43465ef905b45390c71f0a0c"
+  },
+  {
+    "path": "repeat-b/gold/gongdeok/page_building_master.geojson",
+    "sha256": "9debbb2c0b34d1f3b08ae77b985e6b901f506a447a316bc4a1a69ebc7285d65d"
+  },
+  {
+    "path": "repeat-b/gold/gunja/building_vacancy.json",
+    "sha256": "095a48bf5d758ec9a78d1d5d563ff998c5d355c07753a0347e95013e2f3eb0aa"
+  },
+  {
+    "path": "repeat-b/gold/gunja/calibration.json",
+    "sha256": "d18e0dfb92f8c9a7fdc81231c30d0b184c0321a2a3c7ccef93ce26ca6e59828c"
+  },
+  {
+    "path": "repeat-b/gold/gunja/coverage.json",
+    "sha256": "21a8d7d4012ec9f44ab6ff4da358aff89b70e717e3cf5cccb3728879d30e64d3"
+  },
+  {
+    "path": "repeat-b/gold/gunja/page_building_master.geojson",
+    "sha256": "e7b683409775f647d35ed35148e719db3cf4019528e8eb75f077a10ffd5c5f8c"
+  },
+  {
+    "path": "repeat-b/gold/gwangjang/building_vacancy.json",
+    "sha256": "bd45c780c77513d298072f47807cc398be441e04705d2e0d839102e761e4dbb1"
+  },
+  {
+    "path": "repeat-b/gold/gwangjang/calibration.json",
+    "sha256": "489803a1a467d561b763781892f6b2d5e5ab4639547a6e4509467242f80a16ca"
+  },
+  {
+    "path": "repeat-b/gold/gwangjang/coverage.json",
+    "sha256": "167bce4e589d2ca7c0f5798ce480c2f5b8eb5d499dab54da6cb08e6bd08ad9c8"
+  },
+  {
+    "path": "repeat-b/gold/gwangjang/page_building_master.geojson",
+    "sha256": "f438c5f6578ba2f53c72556131439cd818b733e8ffe4d580cd68022fcd61da88"
+  },
+  {
+    "path": "repeat-b/gold/hannam/building_vacancy.json",
+    "sha256": "750a8581fb60ae794cfd70d56385036a4c71210b645d4f7a524834e0c2cbc0cd"
+  },
+  {
+    "path": "repeat-b/gold/hannam/calibration.json",
+    "sha256": "ea05fd1b92effec33bf103ad8fc78ca46592fc8d43a8b0499136fbde64e16f27"
+  },
+  {
+    "path": "repeat-b/gold/hannam/coverage.json",
+    "sha256": "9356dc9ab4598d33c133748d80b7108cc270d85e8ab176dda4a992fe2a8a853c"
+  },
+  {
+    "path": "repeat-b/gold/hannam/page_building_master.geojson",
+    "sha256": "82d379989af62c42b04e3b879522e8608e87e8ddcd3b0c93765fd8ab03d4722a"
+  },
+  {
+    "path": "repeat-b/gold/hapjeong/building_vacancy.json",
+    "sha256": "597928ead99cc8f6b70f835944180745c009b772e20d456a9dfa298400bb9b2e"
+  },
+  {
+    "path": "repeat-b/gold/hapjeong/calibration.json",
+    "sha256": "0e211f50f9ae6852b6779767ff7765fdd3ce59264dfee20ab1de26d06892ef77"
+  },
+  {
+    "path": "repeat-b/gold/hapjeong/coverage.json",
+    "sha256": "090a74dfbefbf6dceef4fcac1fde51c32a8580bbb50e26f07216510c66bc55be"
+  },
+  {
+    "path": "repeat-b/gold/hapjeong/page_building_master.geojson",
+    "sha256": "894b97d415cb6bbe9287b9037d3ee4d80c47efa56525c387a79320dd4a3bca7c"
+  },
+  {
+    "path": "repeat-b/gold/hongdae/building_vacancy.json",
+    "sha256": "73ca402a7e3f604c604a36065b923b66d86885f51f9d6d85517131df5a96db9c"
+  },
+  {
+    "path": "repeat-b/gold/hongdae/calibration.json",
+    "sha256": "bf3dd5d87c2a00704f6124e6f390cc4438c633a0271a5d8e1671ea9c9efd6663"
+  },
+  {
+    "path": "repeat-b/gold/hongdae/coverage.json",
+    "sha256": "3906fd2d7c91ff11244bac833aec471972eb470b7c9ca3a7223eee31c470424e"
+  },
+  {
+    "path": "repeat-b/gold/hongdae/page_building_master.geojson",
+    "sha256": "9c4f38b2809a485f1f6cf710960f5f1d48b321e9b8eaf44a452dab69eb94ba24"
+  },
+  {
+    "path": "repeat-b/gold/hwagok/building_vacancy.json",
+    "sha256": "c11d7ee98877dae05fb0c500e471bfb854e9ae5a87e7b2e059bd58f623cd1354"
+  },
+  {
+    "path": "repeat-b/gold/hwagok/calibration.json",
+    "sha256": "f7c9d43e0b7ecab88b171763f9d469ecb3fbfd671218fa14c026c96954e9af6c"
+  },
+  {
+    "path": "repeat-b/gold/hwagok/coverage.json",
+    "sha256": "5f275870d3e644cec6c8f4e896ceeb7b5cb6d06273c891eab9332a967fd7e2e4"
+  },
+  {
+    "path": "repeat-b/gold/hwagok/page_building_master.geojson",
+    "sha256": "70f95b349f46d2c427f357a0e3c63dc9ee49326ef34e3ef946a7ddfed321999d"
+  },
+  {
+    "path": "repeat-b/gold/hyehwa/building_vacancy.json",
+    "sha256": "8f9a329ecb18dfb75a6b9d5ad5cf16c8b50f53960b40668618a4e27d4fa237cb"
+  },
+  {
+    "path": "repeat-b/gold/hyehwa/calibration.json",
+    "sha256": "806d6f073aa971d757b7fee97c353d9c650dcb6ee8086781fa52bb03f4dd3d68"
+  },
+  {
+    "path": "repeat-b/gold/hyehwa/coverage.json",
+    "sha256": "650bccddb2d0b107e336c0206915eeda412a6c92905b1e9169be50d207a8c974"
+  },
+  {
+    "path": "repeat-b/gold/hyehwa/page_building_master.geojson",
+    "sha256": "b86912540e15713a3f2b2ad9c721861a0fbb1bf2d30ab810b04ffc92829aab68"
+  },
+  {
+    "path": "repeat-b/gold/ikseon/building_vacancy.json",
+    "sha256": "de53c6034148fadd12fd8c648e7d440aecf86404d6061a10c172539d3faf3df4"
+  },
+  {
+    "path": "repeat-b/gold/ikseon/calibration.json",
+    "sha256": "8d59ff7ba1c592234f0385d349eb18abb6ef60a7fdca88b5bb5f53147f19d6de"
+  },
+  {
+    "path": "repeat-b/gold/ikseon/coverage.json",
+    "sha256": "4e523b193134346ff17c24171f547ec877eb8a432c1d088eeb785f01dfffc706"
+  },
+  {
+    "path": "repeat-b/gold/ikseon/page_building_master.geojson",
+    "sha256": "84637aa6042483c57f9b3a9a446ddd856ee813e1126c351a5fcd4ff8c77fa9cc"
+  },
+  {
+    "path": "repeat-b/gold/itaewon/building_vacancy.json",
+    "sha256": "498bcac96f51cfadcad839811b8a804cfb33da89870f4116843d0b3e08268465"
+  },
+  {
+    "path": "repeat-b/gold/itaewon/calibration.json",
+    "sha256": "06514ed8e3e3903ce8cff2e552b3ef0811960cd34e9664e716a466be0965148d"
+  },
+  {
+    "path": "repeat-b/gold/itaewon/coverage.json",
+    "sha256": "130ec906fc2e22fa428132796eba249dc0c234fe2fc909274d64c5def47ffe1c"
+  },
+  {
+    "path": "repeat-b/gold/itaewon/page_building_master.geojson",
+    "sha256": "7f522f7f5f7071b2df1f76c4f96169df578822204786fd666ab8f435d63cbd99"
+  },
+  {
+    "path": "repeat-b/gold/jamsil/building_vacancy.json",
+    "sha256": "a8384aa0d47446721e8421af137f1ac2cbaef54c434307141e72caa38c20283b"
+  },
+  {
+    "path": "repeat-b/gold/jamsil/calibration.json",
+    "sha256": "8c9946e2b4a4cd530768743ee3321d6bc238e9db315604284141927e301b6af5"
+  },
+  {
+    "path": "repeat-b/gold/jamsil/coverage.json",
+    "sha256": "1be624b5bcc6c4072ee777ee439008cde49ac272e817092f75d7a057df9666ae"
+  },
+  {
+    "path": "repeat-b/gold/jamsil/page_building_master.geojson",
+    "sha256": "e1116d8cc8109d4bebe19dbf4d7cb04b2c843ed00f79fed4119fe88d42605c33"
+  },
+  {
+    "path": "repeat-b/gold/jamsilsaenae/building_vacancy.json",
+    "sha256": "0296a11f0887d1640aa23da7562b9b6b488f23316bdda0d605b6d1e1751891dd"
+  },
+  {
+    "path": "repeat-b/gold/jamsilsaenae/calibration.json",
+    "sha256": "1ebd0e0473b23e76fae1a3826180abf321016f865efe2d9e729b5d3a24c78141"
+  },
+  {
+    "path": "repeat-b/gold/jamsilsaenae/coverage.json",
+    "sha256": "72853a5d5462f8c41053c0b7b772e67f64aa788f2802d61bc2c161ee30b06ca9"
+  },
+  {
+    "path": "repeat-b/gold/jamsilsaenae/page_building_master.geojson",
+    "sha256": "6f735ea1b259c36bfc0cc42968b92a7446a03922310145760e63d4cb7e54024a"
+  },
+  {
+    "path": "repeat-b/gold/jangan/building_vacancy.json",
+    "sha256": "1237107639289c11b0f29c3e94b8a1ca800383d1035dfd703ce588f8ca56f5d6"
+  },
+  {
+    "path": "repeat-b/gold/jangan/calibration.json",
+    "sha256": "903b1c2292c41788f7247350fe69bf4c243e9a4065e966f0e3869a9deb84ccf9"
+  },
+  {
+    "path": "repeat-b/gold/jangan/coverage.json",
+    "sha256": "58e9b79758c9478fd85b390b28f69d70ba85730cccd0979201e5bfbf82c233b1"
+  },
+  {
+    "path": "repeat-b/gold/jangan/page_building_master.geojson",
+    "sha256": "fb1038d153e151c0779ae43a5c0d87bc18027c56c71ab510378b9a29de278c9e"
+  },
+  {
+    "path": "repeat-b/gold/kkachisan/building_vacancy.json",
+    "sha256": "d92603769324bbbb0d9719ce83866a0e7919969fa78fe9e83299bfec4c93fbfa"
+  },
+  {
+    "path": "repeat-b/gold/kkachisan/calibration.json",
+    "sha256": "66ce50806427cc4ba6810edc066ab5633e7446a9b8e55a63a128b80e96a3f4e7"
+  },
+  {
+    "path": "repeat-b/gold/kkachisan/coverage.json",
+    "sha256": "dc173ce722cc561117906714a12a7584219bc7165b43171ab4b9d8e2d52b425e"
+  },
+  {
+    "path": "repeat-b/gold/kkachisan/page_building_master.geojson",
+    "sha256": "bdabebec1e21d3508bb77694a7ec03d472fec0a05f72ad04f2a9d4f312dd946c"
+  },
+  {
+    "path": "repeat-b/gold/konkuk/building_vacancy.json",
+    "sha256": "8c968726a6cba7f800945d1deffa9668d1ef871b9e8ebbe7c60dfe47e679eb49"
+  },
+  {
+    "path": "repeat-b/gold/konkuk/calibration.json",
+    "sha256": "221a2de44dcd79059f55b4f308d4afb12c2d8a4312519d7c8802d078b879d210"
+  },
+  {
+    "path": "repeat-b/gold/konkuk/coverage.json",
+    "sha256": "a644ed6a122ae304774f964d3cbe360dd3661b31a6e4de486518ce83d37ef9c5"
+  },
+  {
+    "path": "repeat-b/gold/konkuk/page_building_master.geojson",
+    "sha256": "91d7d39b8ad6fa03135e55684873f3c8442ebdb1b41b7aea3650d856cf418b48"
+  },
+  {
+    "path": "repeat-b/gold/kyunghee/building_vacancy.json",
+    "sha256": "e2098329d770b19a194444820a47161b2bb40a5ca7239dc237570fc9f1afccbc"
+  },
+  {
+    "path": "repeat-b/gold/kyunghee/calibration.json",
+    "sha256": "42c01d004dc95ee5f4c717063058c8c38eebd9031dc0cee0c4e24ce91f35f6a8"
+  },
+  {
+    "path": "repeat-b/gold/kyunghee/coverage.json",
+    "sha256": "9eedd9272b77333192c3bccce6d183050cb49bde0431ce3ddbcd88ffe3661ee7"
+  },
+  {
+    "path": "repeat-b/gold/kyunghee/page_building_master.geojson",
+    "sha256": "67fcae6bf93d09cb178b61e2700479f9145f53df6e70d6cf37000774ae2e11a7"
+  },
+  {
+    "path": "repeat-b/gold/mangwon/building_vacancy.json",
+    "sha256": "188c1b1c07c809fb412a4157cbf1bb94c3f003f48d401295997780e7f1f4661e"
+  },
+  {
+    "path": "repeat-b/gold/mangwon/calibration.json",
+    "sha256": "0e60c8a36ea641486c839fb82c552e23dcfbf3fc79bab6cae7557df152ff46e9"
+  },
+  {
+    "path": "repeat-b/gold/mangwon/coverage.json",
+    "sha256": "97983b205c0abeb2ed6f22aea49ad0fd9b60b5e4b55e6cab24d88237491754ba"
+  },
+  {
+    "path": "repeat-b/gold/mangwon/page_building_master.geojson",
+    "sha256": "05c5729a454cbfe254326366b3b7799712f62a91ad27d4253446450ba1cc1a95"
+  },
+  {
+    "path": "repeat-b/gold/miasageori/building_vacancy.json",
+    "sha256": "1399e56f7542e717a9318b8086e8235fec3ef1e9efe939c8134afd27113a0fc3"
+  },
+  {
+    "path": "repeat-b/gold/miasageori/calibration.json",
+    "sha256": "468dcfad3a748fa757c0009771342b4ee9b1fe7e5e51ea9a4815fce475499189"
+  },
+  {
+    "path": "repeat-b/gold/miasageori/coverage.json",
+    "sha256": "ffb703bb0c63ddc7761e21e97ec1e53f7010321794ba9faff42375bbcc0a273d"
+  },
+  {
+    "path": "repeat-b/gold/miasageori/page_building_master.geojson",
+    "sha256": "fe687b3db7803cc8498941828d895fe4f529db485b49138dbd1f45919acf0812"
+  },
+  {
+    "path": "repeat-b/gold/mokdong-yc/building_vacancy.json",
+    "sha256": "560bb1efd4aaa93c544c55625af7491fd333a6f305341c5e735e5b86c74dd8cf"
+  },
+  {
+    "path": "repeat-b/gold/mokdong-yc/calibration.json",
+    "sha256": "4d80fa8d6c1e7d1cb89c4947afbe95219e30f39eb1b06921e993049634ce5162"
+  },
+  {
+    "path": "repeat-b/gold/mokdong-yc/coverage.json",
+    "sha256": "ade270a92b418c02e8abf5b3bdfac9c809946627beb6773c1625130a2de0a19b"
+  },
+  {
+    "path": "repeat-b/gold/mokdong-yc/page_building_master.geojson",
+    "sha256": "6742a2d1bfe0477daf4f0b134892fe3f2c5b53f98a4c693bea6cf0942ce70b3b"
+  },
+  {
+    "path": "repeat-b/gold/mullae/building_vacancy.json",
+    "sha256": "5b197c93f7da625578895d32f889fa2d54a7c1e255ad7ec526719b98b27ba07e"
+  },
+  {
+    "path": "repeat-b/gold/mullae/calibration.json",
+    "sha256": "b0335299c615fcd14a1ba099b75193e0ad22671d6203e4e0f201c8d6f16e7ee6"
+  },
+  {
+    "path": "repeat-b/gold/mullae/coverage.json",
+    "sha256": "bc2d00fa73e486def9704b60e7cf92072849f37581af40bd1408d417e1f98076"
+  },
+  {
+    "path": "repeat-b/gold/mullae/page_building_master.geojson",
+    "sha256": "0bf2adcf614e08783cb01ad6d6e4c82b3286bfc354cfcf6cfbf5ada184bbcb90"
+  },
+  {
+    "path": "repeat-b/gold/myeongdong/building_vacancy.json",
+    "sha256": "da581d1ce14db9f96574ed45d4cbdde55cac9b51cf263ff46779b4db1d6acdea"
+  },
+  {
+    "path": "repeat-b/gold/myeongdong/calibration.json",
+    "sha256": "1fe1edf18b643afaf8ba5db47d62f23f0ce803f4e4c5ee88a4d30ded14283450"
+  },
+  {
+    "path": "repeat-b/gold/myeongdong/coverage.json",
+    "sha256": "5ad1f8c6a277f36ae5c7fdcd5e4bbefef76e08f71fcdb63d50ab3c8917bdf679"
+  },
+  {
+    "path": "repeat-b/gold/myeongdong/page_building_master.geojson",
+    "sha256": "5ecca3d6d3cccf8788fd5fae678d6e310aa1b87d084da8b61cf21e527fb764c6"
+  },
+  {
+    "path": "repeat-b/gold/nambu/building_vacancy.json",
+    "sha256": "f2457e52d708a7c9dfa715ea81c781bb94b97dbb15cc8ac09d660ebf81fa84ba"
+  },
+  {
+    "path": "repeat-b/gold/nambu/calibration.json",
+    "sha256": "f50c4e69118a482bd219a5d3c9a6932313e925b98ccdd1f5ec08788c1c83b27c"
+  },
+  {
+    "path": "repeat-b/gold/nambu/coverage.json",
+    "sha256": "4f33bbefe37b1321559be7960be70b9d570707724bae76ae3360e344938937df"
+  },
+  {
+    "path": "repeat-b/gold/nambu/page_building_master.geojson",
+    "sha256": "cdd8202a8dadcc77fe3a5eb9357a7daa5f6a9e1238da1827d631775fd44aa2d4"
+  },
+  {
+    "path": "repeat-b/gold/namdaemun/building_vacancy.json",
+    "sha256": "7d0a9040cd0e7c59673b0d85895fdf33f6912dc2003fd1259ce3800dc1e42196"
+  },
+  {
+    "path": "repeat-b/gold/namdaemun/calibration.json",
+    "sha256": "6212fd32064f3096fb2acde0e240799ad19fa3c6f2e5bcde998538d17bc5c4e3"
+  },
+  {
+    "path": "repeat-b/gold/namdaemun/coverage.json",
+    "sha256": "78435a66d210dce555b5311354d95ffc8e811bc74d89cb5de8c31f5db4ad5ed2"
+  },
+  {
+    "path": "repeat-b/gold/namdaemun/page_building_master.geojson",
+    "sha256": "02c3267401785861d06565f716b6ee85e80f9b99b4ada7465c07e64d395725d5"
+  },
+  {
+    "path": "repeat-b/gold/nokdu/building_vacancy.json",
+    "sha256": "90e975df6e4df460e1bda3fc5f3621913cf7352fa801dfbd70c913a15e4b6e7f"
+  },
+  {
+    "path": "repeat-b/gold/nokdu/calibration.json",
+    "sha256": "798f7a8c6757fe9c1475372a7513d02574e01121bf8987891f882996ec1202d0"
+  },
+  {
+    "path": "repeat-b/gold/nokdu/coverage.json",
+    "sha256": "8ad634326f53768d5275b7fa5ffb554715b0fecc59331efdb238bb7e4790b2eb"
+  },
+  {
+    "path": "repeat-b/gold/nokdu/page_building_master.geojson",
+    "sha256": "099c3308caab6c7037a81951919cffbd69ce8122f080c05c5f4e95293b4a384d"
+  },
+  {
+    "path": "repeat-b/gold/nonhyeon/building_vacancy.json",
+    "sha256": "6366757bb99d6bab1b168561cbe2d9a81b3c2adf64aa3908efe6280b754c0d71"
+  },
+  {
+    "path": "repeat-b/gold/nonhyeon/calibration.json",
+    "sha256": "880f93feee531e02dd05bc4c49ea475d572bad31d26772a935715436cbf93b3c"
+  },
+  {
+    "path": "repeat-b/gold/nonhyeon/coverage.json",
+    "sha256": "b103be91d2d2d1231787efc2f10fc57a1190976bb3284ba1957b812756a802fb"
+  },
+  {
+    "path": "repeat-b/gold/nonhyeon/page_building_master.geojson",
+    "sha256": "1e73347cf6c90f3fe734f76fc354209b33181a397801bd1c0d9667e133ce8ba1"
+  },
+  {
+    "path": "repeat-b/gold/noryangjin/building_vacancy.json",
+    "sha256": "fd15424d3ec6abe0b941a90d8f231f63891e708b11eb18e378fc289e824e1497"
+  },
+  {
+    "path": "repeat-b/gold/noryangjin/calibration.json",
+    "sha256": "ce567889eb9dd325f10569c8942692e71cc7eab716bf85c988be3c1758f117f7"
+  },
+  {
+    "path": "repeat-b/gold/noryangjin/coverage.json",
+    "sha256": "b67e7d30a9d44533eaee330076d66abd9a920c7aea71e8c631d57e5bab16317d"
+  },
+  {
+    "path": "repeat-b/gold/noryangjin/page_building_master.geojson",
+    "sha256": "b72a727a417ee1653bc1dfb9a3bebed94c706fac54c761391864c8ad85529843"
+  },
+  {
+    "path": "repeat-b/gold/oryudong/building_vacancy.json",
+    "sha256": "09926aa3927a82e16af29b69bb89cf78a1021ee0ee5770bd9e5da3c45a31729a"
+  },
+  {
+    "path": "repeat-b/gold/oryudong/calibration.json",
+    "sha256": "602324080a49db09dd63307c7e6ab942e93ca50ad97c4480c13abf61cf8bb93e"
+  },
+  {
+    "path": "repeat-b/gold/oryudong/coverage.json",
+    "sha256": "bc16196b7a09238d294f696c996dd0ec5a578f1fbc7aa973462aee26ac72fcc2"
+  },
+  {
+    "path": "repeat-b/gold/oryudong/page_building_master.geojson",
+    "sha256": "5f5ba7faf2730860595ede5089af5bd760dfac8a2e5bfa1363ebe7f60d04f208"
+  },
+  {
+    "path": "repeat-b/gold/sadang/building_vacancy.json",
+    "sha256": "8e05e53aa059e7c7abf183b720ad9643e05cdcbeec4b909f079f56ca63c2cb66"
+  },
+  {
+    "path": "repeat-b/gold/sadang/calibration.json",
+    "sha256": "4c0c3e843db958731cc9827fe39cb43575885316303df57faac03b80f55cd669"
+  },
+  {
+    "path": "repeat-b/gold/sadang/coverage.json",
+    "sha256": "78c7422666bfe7bbd709408bb47cc67a00551c2ca0554f5afc3b3304e19b19bf"
+  },
+  {
+    "path": "repeat-b/gold/sadang/page_building_master.geojson",
+    "sha256": "595fe2956b74976cfd3fe5b19ee8b76fc516ccf93aa16432c6a269cf8cbcede8"
+  },
+  {
+    "path": "repeat-b/gold/samcheong/building_vacancy.json",
+    "sha256": "0a2d135f633990d57c071e026ac68d2bc27ada4dd7a582037360cc83fa41e16a"
+  },
+  {
+    "path": "repeat-b/gold/samcheong/calibration.json",
+    "sha256": "bf5d56a342e4a8c993216a7a03dc1de2f9215a8b221498590a09fe3a9fee68ce"
+  },
+  {
+    "path": "repeat-b/gold/samcheong/coverage.json",
+    "sha256": "0a1fe15ed5403fb8c9c61373d563a70bda0809ca261ca7aab8f40311eccfeaa0"
+  },
+  {
+    "path": "repeat-b/gold/samcheong/page_building_master.geojson",
+    "sha256": "c0045ffee644515a2a840b691744e82ce595ba9a43b54ecda702c3b8e87e02fc"
+  },
+  {
+    "path": "repeat-b/gold/sangbong/building_vacancy.json",
+    "sha256": "42d31db4fc8d324a2da80f19da30ed373775c8b209724f4757e0205f7fd17c0b"
+  },
+  {
+    "path": "repeat-b/gold/sangbong/calibration.json",
+    "sha256": "2807b836cace4c208b56e95c9ac0a2af470b7b98f6b935d130ebcf9bb65941f2"
+  },
+  {
+    "path": "repeat-b/gold/sangbong/coverage.json",
+    "sha256": "0cbbac5ac6834bb7872669fc0e4531247370c3c2b78bb7628356f97d8480d588"
+  },
+  {
+    "path": "repeat-b/gold/sangbong/page_building_master.geojson",
+    "sha256": "2e8399263c9957bb03873cb16ac45648ff5c195b419e83d214d5b1428d9bcffa"
+  },
+  {
+    "path": "repeat-b/gold/sanggye/building_vacancy.json",
+    "sha256": "a7cc034fa643360f9a2c6de8dda7bd20d1de8a8c6c049f6e27ceb6b274da18e3"
+  },
+  {
+    "path": "repeat-b/gold/sanggye/calibration.json",
+    "sha256": "5253dc47819c79c816632a3e171fc3e4c0191d3aae8df8e3e80176d116096f9f"
+  },
+  {
+    "path": "repeat-b/gold/sanggye/coverage.json",
+    "sha256": "23a67b4304502f5153f714fa7cda21ec624fc1e940b880de8a8ee85dc888c25d"
+  },
+  {
+    "path": "repeat-b/gold/sanggye/page_building_master.geojson",
+    "sha256": "0b2b9d5bd4ab89c42c5262b36d6d8e1742880444fbde7d855e319f44ce57863d"
+  },
+  {
+    "path": "repeat-b/gold/seochon/building_vacancy.json",
+    "sha256": "2ddadb9a4f2e106922a3f1dd5c657860dbfc099fe7ecd04479bb434bafa00fe5"
+  },
+  {
+    "path": "repeat-b/gold/seochon/calibration.json",
+    "sha256": "b6df157a3197ee9991e7f685f24bddbdab55010c73cdee43cb69291b4c4a76dc"
+  },
+  {
+    "path": "repeat-b/gold/seochon/coverage.json",
+    "sha256": "a13221e9be700383a047d9ad170af57fcc0f83649abb6273fdfcee89ee4d559c"
+  },
+  {
+    "path": "repeat-b/gold/seochon/page_building_master.geojson",
+    "sha256": "d1f90aa8d3223acd8387be259f0e089684fe455af7418e6ac1c741adb251cf7c"
+  },
+  {
+    "path": "repeat-b/gold/seolleung/building_vacancy.json",
+    "sha256": "2b2fc0593a573cba4b14f9ee51b8b9e7ef1eb985c8fe5ce8e00a2d0a2a87b699"
+  },
+  {
+    "path": "repeat-b/gold/seolleung/calibration.json",
+    "sha256": "1824c2ac884a24a2db0c70410e29a654e5e5d517f2741e328b077069bd2c2d97"
+  },
+  {
+    "path": "repeat-b/gold/seolleung/coverage.json",
+    "sha256": "dd7d94fc5e8f99bb7e215b77918131de080ecb52b3fbcb0e52bcafb626be1d5d"
+  },
+  {
+    "path": "repeat-b/gold/seolleung/page_building_master.geojson",
+    "sha256": "6e5cf6b69f60c79451a90c13696cc268f53f5fd8f846c2f60c5ca201f5db5698"
+  },
+  {
+    "path": "repeat-b/gold/seongsu/building_vacancy.json",
+    "sha256": "57aa7174121a94d909ad7dea0e9707d861b3dc1c017d79186e21a84ecd665b0f"
+  },
+  {
+    "path": "repeat-b/gold/seongsu/calibration.json",
+    "sha256": "a49091657932919b2f09db70916d68389a787dd0f590983fb2b4dc9dbe4cff97"
+  },
+  {
+    "path": "repeat-b/gold/seongsu/coverage.json",
+    "sha256": "f32cd82850e93d125ab95fd02deed7d87c6b17326c42614e937fe80581cf50e8"
+  },
+  {
+    "path": "repeat-b/gold/seongsu/page_building_master.geojson",
+    "sha256": "9623c2a115839f7b13a26904933aad56b0f30ffe7f8a3eb985c1dedab38efa5c"
+  },
+  {
+    "path": "repeat-b/gold/seoulsup/building_vacancy.json",
+    "sha256": "4b0bbc20516bd1f53bcae02c789603f00043677df9ca50ec31285d0b9aa0eca2"
+  },
+  {
+    "path": "repeat-b/gold/seoulsup/calibration.json",
+    "sha256": "0b45a3d628e6627a9330c904fde36e5982fcc7a2f6cce786eaa41fa075d580d3"
+  },
+  {
+    "path": "repeat-b/gold/seoulsup/coverage.json",
+    "sha256": "e7f6c313b82270a7816bc0d6d2ffc10273f659ba6b0769d620959a4c8adc679b"
+  },
+  {
+    "path": "repeat-b/gold/seoulsup/page_building_master.geojson",
+    "sha256": "5f4e22d037628e1ce7ea72652b6c29d688ea530c7a4e2b81b08cd133b80f1084"
+  },
+  {
+    "path": "repeat-b/gold/sharosugil/building_vacancy.json",
+    "sha256": "3b9aa8c8c14899b23ae8587f10cc7e5e418de3290255fab559fc8e55d27763af"
+  },
+  {
+    "path": "repeat-b/gold/sharosugil/calibration.json",
+    "sha256": "49a80f7f8c6a342402410b8d145b8396fdbf22a5056162d57b768c1d838b2107"
+  },
+  {
+    "path": "repeat-b/gold/sharosugil/coverage.json",
+    "sha256": "efa4e8d075800078dca17901c474e86e6e4b015974380aa0b85e1b96d9656363"
+  },
+  {
+    "path": "repeat-b/gold/sharosugil/page_building_master.geojson",
+    "sha256": "ba1ef0f8aabf4a42b1c6a5a6961d7aaa296d05783cb9566366814a41b9bcaeb2"
+  },
+  {
+    "path": "repeat-b/gold/sillim/building_vacancy.json",
+    "sha256": "3cda32a58dedb33562b9f437e68f73b109ff0bb7d669cfe640c640777c3935e7"
+  },
+  {
+    "path": "repeat-b/gold/sillim/calibration.json",
+    "sha256": "bb07859d1851dfac6fcaf6c0e90ed3abfe5f2ea1c227698d1966ee4686ae88e8"
+  },
+  {
+    "path": "repeat-b/gold/sillim/coverage.json",
+    "sha256": "52c965a538a052bb1521e11ca30c9dd007cbb80780f361394048ef72b9797272"
+  },
+  {
+    "path": "repeat-b/gold/sillim/page_building_master.geojson",
+    "sha256": "5659f435a0c97df90a876b30f2c0b81b2a6f254a1b4b185c9354aab8bdfa185d"
+  },
+  {
+    "path": "repeat-b/gold/sinchon/building_vacancy.json",
+    "sha256": "99f441c95c02d686e6dc5f7f8b09825c3742aea80a238344cc8abdbcf63e458b"
+  },
+  {
+    "path": "repeat-b/gold/sinchon/calibration.json",
+    "sha256": "532b475f68e19fe5ee68543a99d6a1a46c4e99cf66d0621b3b8f89816c2969c4"
+  },
+  {
+    "path": "repeat-b/gold/sinchon/coverage.json",
+    "sha256": "a68b495231a8327383d312252cc119703376c625d7092f11aa98eebcb829172c"
+  },
+  {
+    "path": "repeat-b/gold/sinchon/page_building_master.geojson",
+    "sha256": "741732b159ec47002e97671027143c97b7f7c8776b738318254b5636ff7f22df"
+  },
+  {
+    "path": "repeat-b/gold/songridan/building_vacancy.json",
+    "sha256": "331ad54f8330b9fb1b0d4197935e352325dbfb5fe78aec7eec8a14c38c908ad2"
+  },
+  {
+    "path": "repeat-b/gold/songridan/calibration.json",
+    "sha256": "fc6a0049dda0a131a484731d9d92e156d975dfd9fbc85ff90c1fd999cdd0d17d"
+  },
+  {
+    "path": "repeat-b/gold/songridan/coverage.json",
+    "sha256": "3a036f5a5f2139e4eb32779d38a5741e8e7ddb6e5118a958974b76595ebbefe7"
+  },
+  {
+    "path": "repeat-b/gold/songridan/page_building_master.geojson",
+    "sha256": "803da9fea003ac091a45f427bd17b42b37acefed2590073ee01b2d51749d5597"
+  },
+  {
+    "path": "repeat-b/gold/sukmyung/building_vacancy.json",
+    "sha256": "aca59f9985bac1abc69d8c5f1a423a0f4ec48cf050b755df25e19656eb441c86"
+  },
+  {
+    "path": "repeat-b/gold/sukmyung/calibration.json",
+    "sha256": "02b54cc78dbfdf0000bd1e2fff95b2f681f318f8732e9458ec26c40a28804b49"
+  },
+  {
+    "path": "repeat-b/gold/sukmyung/coverage.json",
+    "sha256": "25b51caa7fd78b52864d6b3eeaf961a42e34059c199f3378e1aea75f23da1d27"
+  },
+  {
+    "path": "repeat-b/gold/sukmyung/page_building_master.geojson",
+    "sha256": "db443ce50d8d819d0d5614b492297e2fefcd40b4e4bc2f3ac95c828bbf2eecc4"
+  },
+  {
+    "path": "repeat-b/gold/sungshin/building_vacancy.json",
+    "sha256": "9db1e4c2ec769fe5542459672fe698db2cb52fe752c44c824ead0609fcc8287e"
+  },
+  {
+    "path": "repeat-b/gold/sungshin/calibration.json",
+    "sha256": "7024b7bec46961b9cfaabffbca2a971bba492aff3734e4c08024c9c5de82da00"
+  },
+  {
+    "path": "repeat-b/gold/sungshin/coverage.json",
+    "sha256": "aef6b6d53ba2c0ede5ccfc4d9f2064bf6c765b31f6c83c21415411ac93f1b6de"
+  },
+  {
+    "path": "repeat-b/gold/sungshin/page_building_master.geojson",
+    "sha256": "9f7e0214d032638b9781424f354204d225b1ff8aa9748da0c9d26e4647dab46c"
+  },
+  {
+    "path": "repeat-b/gold/suyu/building_vacancy.json",
+    "sha256": "28e810f8b0be4b6447ce64b3bce33b6ba1c175a1f9c30500f5e338f709b91917"
+  },
+  {
+    "path": "repeat-b/gold/suyu/calibration.json",
+    "sha256": "79334139476c76b0024bd49b4c71cb705b9a9a95c4653314b08ff3387e2814f2"
+  },
+  {
+    "path": "repeat-b/gold/suyu/coverage.json",
+    "sha256": "8bfa4edae114d5f47853ab6522e15663981d0575d5a93c50722dce1cbdeae668"
+  },
+  {
+    "path": "repeat-b/gold/suyu/page_building_master.geojson",
+    "sha256": "f5e05f6ff810d4063b48c9e561a86acefb19eebd259139d29c65d145ad2308d9"
+  },
+  {
+    "path": "repeat-b/gold/teheran/building_vacancy.json",
+    "sha256": "b85189730a57dfa01acd9024e66480144703c27819e032d58f8b794f3d917102"
+  },
+  {
+    "path": "repeat-b/gold/teheran/calibration.json",
+    "sha256": "ad5132d80099822faaf0644dfefff82a0784ac67f885faf4a4fbc25703275a8b"
+  },
+  {
+    "path": "repeat-b/gold/teheran/coverage.json",
+    "sha256": "bbbd0dcbe335c79339724fcf971e9550b650d9b14d4cd8c0e18728e18bc06932"
+  },
+  {
+    "path": "repeat-b/gold/teheran/page_building_master.geojson",
+    "sha256": "e4d90f4b04cd6bc1eb588687098e856a3ad97cd66a0ca60f3fa88fd733464555"
+  },
+  {
+    "path": "repeat-b/gold/wangsimni/building_vacancy.json",
+    "sha256": "f5798543d375de3616de228a0939dd57dbea3795286675293eed9dde35d408a3"
+  },
+  {
+    "path": "repeat-b/gold/wangsimni/calibration.json",
+    "sha256": "cfc3d01f7d5e412410cd20e82859ab978b8ecb07964aa0f8f295fd1868653b8d"
+  },
+  {
+    "path": "repeat-b/gold/wangsimni/coverage.json",
+    "sha256": "f6744d330f599316d40c54a712777d207b93f1e8b3dbebab3195e4efa25d8dcf"
+  },
+  {
+    "path": "repeat-b/gold/wangsimni/page_building_master.geojson",
+    "sha256": "13a1c363192039e25f6a99e2bd51144fec120a8b9cab06df204ab9f98ed94b3f"
+  },
+  {
+    "path": "repeat-b/gold/yeonhui/building_vacancy.json",
+    "sha256": "667e57481f35c50ddf1907c37069d054ddd384494e506c0aded78dbc972bd348"
+  },
+  {
+    "path": "repeat-b/gold/yeonhui/calibration.json",
+    "sha256": "ca43d1b9d482a6e2a8f9fee6c1c3abe4aeaba77d56cb6547d0221506b3b6d649"
+  },
+  {
+    "path": "repeat-b/gold/yeonhui/coverage.json",
+    "sha256": "ab94eac80d252670e6e65f1aa241dce0ab4113ec692126f1a542851a5394f264"
+  },
+  {
+    "path": "repeat-b/gold/yeonhui/page_building_master.geojson",
+    "sha256": "80d358627aef4f79bceecf56d4192a23d907caa7f4ee2582d45db55866e3b224"
+  },
+  {
+    "path": "repeat-b/gold/yeonnam/building_vacancy.json",
+    "sha256": "fc8ef359170462f886ab8a04f913eff8ba2ae251f9730352f1ee008be4fbbda4"
+  },
+  {
+    "path": "repeat-b/gold/yeonnam/calibration.json",
+    "sha256": "6983bc0568ac9ca4c5e6916e0a253331cbb1e848d9b81b0fe3a0676ae814a167"
+  },
+  {
+    "path": "repeat-b/gold/yeonnam/coverage.json",
+    "sha256": "89822d1b40d9af9d73f776a94222cd239afd1274f277b58efbf3844d9af058bf"
+  },
+  {
+    "path": "repeat-b/gold/yeonnam/page_building_master.geojson",
+    "sha256": "5299cfa418466079170e85e129acc83f091efdc473030ffa3887953abd512f9f"
+  },
+  {
+    "path": "repeat-b/gold/yeonsinnae/building_vacancy.json",
+    "sha256": "82b7cab2fcb0c53b703017b95ad52e6c6ae317036ea3e86918c40b8ef062574c"
+  },
+  {
+    "path": "repeat-b/gold/yeonsinnae/calibration.json",
+    "sha256": "47e8e874cc10e6a21d7d87e906a3e787236ab0878416fdb3cb3f5dd1dfa3cba3"
+  },
+  {
+    "path": "repeat-b/gold/yeonsinnae/coverage.json",
+    "sha256": "de08ada26c38561211d267b3c953bdf33c74246bbb677a64feab992adf9536da"
+  },
+  {
+    "path": "repeat-b/gold/yeonsinnae/page_building_master.geojson",
+    "sha256": "7e1a98f7854559bcf29d95d6bbb3fdc29b523928afaeec6e369e56b6b2842e97"
+  },
+  {
+    "path": "repeat-b/gold/yeouido/building_vacancy.json",
+    "sha256": "a9c2288a1d0074c4334349b843446bdc228d79b199e9b6a10d37bb452bab519a"
+  },
+  {
+    "path": "repeat-b/gold/yeouido/calibration.json",
+    "sha256": "6e3e47b3e660fe17b1e40a81cfe31d0d28255f7cbe10b06d726daa71a789d955"
+  },
+  {
+    "path": "repeat-b/gold/yeouido/coverage.json",
+    "sha256": "933cb6e4cbbb53a638eec264b5cf605089d94194cc10f53e81ef1e1cbd4f584e"
+  },
+  {
+    "path": "repeat-b/gold/yeouido/page_building_master.geojson",
+    "sha256": "2dc62fc8060bfdbe99a7118c56084a0747854cde4e75e81e8adce2f3dcf5cc72"
+  },
+  {
+    "path": "repeat-b/gold/yongsan/building_vacancy.json",
+    "sha256": "98d0f57984e394c665de88bb260f5edfa577905ec08b621ece75920a864e61f9"
+  },
+  {
+    "path": "repeat-b/gold/yongsan/calibration.json",
+    "sha256": "89d29295b3fba25ec8e83fe516c8628b9eac28e9731f2d2c16422f4fa1618645"
+  },
+  {
+    "path": "repeat-b/gold/yongsan/coverage.json",
+    "sha256": "f1f6a8ca4010b659400c9cd05c1eb5b5c9011a4ce7052b9fffb203416948c345"
+  },
+  {
+    "path": "repeat-b/gold/yongsan/page_building_master.geojson",
+    "sha256": "ea6ac3e06fcb725269168404ba940230edf693b7a4a8a002a682f4c4988137f2"
+  },
+  {
+    "path": "repeat-b/serving/anam.json",
+    "sha256": "a05b91833aeab25896697337e1062334dfd514c4f06dec5984317b0e50a991c0"
+  },
+  {
+    "path": "repeat-b/serving/apgujeong-rodeo.json",
+    "sha256": "46e41f984e781133c1e33eea6b01deb9d5f68f5cf83416c523cbcd1ef90550b8"
+  },
+  {
+    "path": "repeat-b/serving/banpo.json",
+    "sha256": "8f6ccecfe0a87585d2605f82cc2ac5e6a3280f19b57c682a613f20e58043fcb5"
+  },
+  {
+    "path": "repeat-b/serving/bulgwang.json",
+    "sha256": "eb8181c84d13bf24ea4439d423abe5568e358ef1c738949ef7c63d8df3a7159d"
+  },
+  {
+    "path": "repeat-b/serving/cheongdam.json",
+    "sha256": "1f8728d039380aa4b3bdc4723e576ad2f1b34d532580f6ab5c97b828cb9ec90c"
+  },
+  {
+    "path": "repeat-b/serving/cheongnyangni.json",
+    "sha256": "8c8b72f8e66fbaac614b3de81835fcd91156fda7df6f42853e268eaf93e92fbc"
+  },
+  {
+    "path": "repeat-b/serving/cheonho.json",
+    "sha256": "3db963d8f19008e2f2de6c0f6d9a55ef68f0798c15a20331e8d31398f56fc833"
+  },
+  {
+    "path": "repeat-b/serving/chungmuro.json",
+    "sha256": "119a72a64274824b2763c26b689627532ca8944ffcc9b7bc727ee99d136de4f1"
+  },
+  {
+    "path": "repeat-b/serving/cityhall.json",
+    "sha256": "68fddaf338718ed9868c1933beefe20dc0037f98563a06c9bcaf1b220730f963"
+  },
+  {
+    "path": "repeat-b/serving/dangsan.json",
+    "sha256": "4a7179417ccc31710560a1035114aa14d0534d504e89b659387527c8f5193bbd"
+  },
+  {
+    "path": "repeat-b/serving/doksan.json",
+    "sha256": "af4d6db8d4b5f83f4ddd0639dbbbc3814ea615472c81ac3cfb0488afc357f6bc"
+  },
+  {
+    "path": "repeat-b/serving/dongdaemun.json",
+    "sha256": "f60a3134a7eba416c12e0f4a46862e948520739078a89724b3f3387548ce74da"
+  },
+  {
+    "path": "repeat-b/serving/dosan.json",
+    "sha256": "362344519bb4591a6ca90c7f8e3d6906249cd523c8662a94102ef029fe866bdb"
+  },
+  {
+    "path": "repeat-b/serving/euljiro.json",
+    "sha256": "57cbd4bbe62033e36351ce23c596c8e8d6f54c63a708b59a623ccf5212571607"
+  },
+  {
+    "path": "repeat-b/serving/gangnam.json",
+    "sha256": "07382a5b77692c9f41aeb5be9e099148ae5bbf9b5cb437825152618b1358e7c1"
+  },
+  {
+    "path": "repeat-b/serving/garak.json",
+    "sha256": "4e6bb09e4958876df1e772b173f5bd479e097329bf715e4bdaad12cc49ae0871"
+  },
+  {
+    "path": "repeat-b/serving/garosugil.json",
+    "sha256": "56450bd9264eb6730fd0d842228d53fcb596c852d13c228a6bf56bee3d6098f8"
+  },
+  {
+    "path": "repeat-b/serving/gongdeok.json",
+    "sha256": "4724ed25f5957cac96c93440f3379fe134e4e8b0cfccc05f5e0545300ddc495d"
+  },
+  {
+    "path": "repeat-b/serving/gunja.json",
+    "sha256": "41bb1bb1352952c7d02f565ff30581c6deba94a967305e892774abca3502544b"
+  },
+  {
+    "path": "repeat-b/serving/gwangjang.json",
+    "sha256": "b4e2303fdf2c1863d4c7345a64f96c6035f91facd25fc4c57f41acf76174f43a"
+  },
+  {
+    "path": "repeat-b/serving/hannam.json",
+    "sha256": "48983b2d8be10df6a754aa6bbfec4897ea943dda9362c1a23b5deeaa4e2b8136"
+  },
+  {
+    "path": "repeat-b/serving/hapjeong.json",
+    "sha256": "f928f5f4f8c303838f2ea11f529b239d759865975f25d88becb532eecf820857"
+  },
+  {
+    "path": "repeat-b/serving/hongdae.json",
+    "sha256": "d6e6dfe902a16740caf3b6164fa63830d97bde8ee687acf1352dfc115c6e9b06"
+  },
+  {
+    "path": "repeat-b/serving/hwagok.json",
+    "sha256": "a51ec4da90fe8d8e492c2d7b4fff1082aaf16731971d3300e673cc9d57b105e8"
+  },
+  {
+    "path": "repeat-b/serving/hyehwa.json",
+    "sha256": "fcb70c6df3414b05f7b0e8ab9bf14ac62561501c2acde6005744d1e84d58eb9a"
+  },
+  {
+    "path": "repeat-b/serving/ikseon.json",
+    "sha256": "cecff7ec913262d0e055c87f85ff18ad1574b5435249b74a3223d8e0fcd2d999"
+  },
+  {
+    "path": "repeat-b/serving/itaewon.json",
+    "sha256": "7e6d8e22293cdb2f16c8e5a3b9789954173b7a1b7cd648eb18ab1e870acdefde"
+  },
+  {
+    "path": "repeat-b/serving/jamsil.json",
+    "sha256": "fe7618f31d4482531f847b6abbd99d9c8da93acf5b296d8f9f8dee84539b6328"
+  },
+  {
+    "path": "repeat-b/serving/jamsilsaenae.json",
+    "sha256": "9bfa02e54063cf143ba3810ad4c5cedb9b47d8807fdad152f09aa32e9223530e"
+  },
+  {
+    "path": "repeat-b/serving/jangan.json",
+    "sha256": "ae06429f18151e735ea4cd5e639479c89acf24c74b4fc028ae6e552df0fcfad9"
+  },
+  {
+    "path": "repeat-b/serving/kkachisan.json",
+    "sha256": "45006565ba0edb0bd491ca69702cb9414835d9d3835b04de27453545f0d50c22"
+  },
+  {
+    "path": "repeat-b/serving/konkuk.json",
+    "sha256": "ffc8f3c552e886b23ef99c7a605df2c717815786f7e06e267839f639b7ab0c43"
+  },
+  {
+    "path": "repeat-b/serving/kyunghee.json",
+    "sha256": "f1e29d419cf541cd5c4d7a55685090e6dc66e9e76e2986d0a18217f395ba99aa"
+  },
+  {
+    "path": "repeat-b/serving/mangwon.json",
+    "sha256": "b244bbc64ca20e06b3159ffdfe6f3d0f5356ed96d5eeb9254f350bdd2da268a8"
+  },
+  {
+    "path": "repeat-b/serving/miasageori.json",
+    "sha256": "e095809ba5730f3be5d77f009ed5830c931521f043c68be90f275b3367df259d"
+  },
+  {
+    "path": "repeat-b/serving/mokdong-yc.json",
+    "sha256": "547ffe600df106c7e3ef52ff4b9216478592894788dfb8d15774399ff7166044"
+  },
+  {
+    "path": "repeat-b/serving/mullae.json",
+    "sha256": "7f4027427064e089bf55b946566da40050d31c3c6d41002f75b5fba63505859b"
+  },
+  {
+    "path": "repeat-b/serving/myeongdong.json",
+    "sha256": "9dad78344b719603628d953a319b24bfcca0743cfc8a643021776338242198b6"
+  },
+  {
+    "path": "repeat-b/serving/nambu.json",
+    "sha256": "52d79631c77ced3e4ac34b7d940f654b822c67b2c0d768cb80cfdaa7e42eddd9"
+  },
+  {
+    "path": "repeat-b/serving/namdaemun.json",
+    "sha256": "9f81b1d6d52f6579a5a23b12c823d9a9482400a9c8dc1b344dfae0b13c6f51ae"
+  },
+  {
+    "path": "repeat-b/serving/nokdu.json",
+    "sha256": "168faade711477a8851d07095df3b11ad91c65c9597144764014cb44725085d6"
+  },
+  {
+    "path": "repeat-b/serving/nonhyeon.json",
+    "sha256": "db59154574cf8ecf44d5367ce45f1668e1238204114c27227efa695039f25802"
+  },
+  {
+    "path": "repeat-b/serving/noryangjin.json",
+    "sha256": "f2ccc7543bf22ee13a564adbc511f80c015d254b5be2902e927e62b83b923192"
+  },
+  {
+    "path": "repeat-b/serving/oryudong.json",
+    "sha256": "67f63f2454a0c0df7b877929b06d19f3dad36090c06fc84b9d671e75a292207f"
+  },
+  {
+    "path": "repeat-b/serving/sadang.json",
+    "sha256": "a8606bfe180bb5412e6f0b0e85c6cc602939ebbf2ade43cf51236ea1a7466992"
+  },
+  {
+    "path": "repeat-b/serving/samcheong.json",
+    "sha256": "595754c0326fe327d22ebedf14f7665c95259d45ab0a0978fe60a0826fcdb323"
+  },
+  {
+    "path": "repeat-b/serving/sangbong.json",
+    "sha256": "687c4e10916e7d37aab218244888d9d3cac7734fd9c9e3d3368cb0a5a683f577"
+  },
+  {
+    "path": "repeat-b/serving/sanggye.json",
+    "sha256": "051d727464f210f3ae797927dbe1a85bc5551b11df2d651683d3630d27a90e5b"
+  },
+  {
+    "path": "repeat-b/serving/seochon.json",
+    "sha256": "0d6467ba5aa3cc8741d118b0e8dc638f758735fbf0c198f8d6046a388cc140bd"
+  },
+  {
+    "path": "repeat-b/serving/seolleung.json",
+    "sha256": "03a416e0b149ccd9fb0aebf1f580af39bd8b1448789eef9739e1cce3bb56a18d"
+  },
+  {
+    "path": "repeat-b/serving/seongsu.json",
+    "sha256": "d444017965a9c1ba962c757a325ca372e23a44c058d727af0df0de212fde0933"
+  },
+  {
+    "path": "repeat-b/serving/seoulsup.json",
+    "sha256": "75c147f3b940592e353d3266b764ed6a303890e69fd563a6198e1b6b211fccda"
+  },
+  {
+    "path": "repeat-b/serving/sharosugil.json",
+    "sha256": "82d854c54f795c41ddb69ac1ebcc741071a8993cbfc53ddde79efd02f3959b90"
+  },
+  {
+    "path": "repeat-b/serving/sillim.json",
+    "sha256": "ab5c3016c6bdda05a414a21a82fd8dd49bb39d46716fefcab30cf63901c710ec"
+  },
+  {
+    "path": "repeat-b/serving/sinchon.json",
+    "sha256": "60e45a6b05f9b1dd8a66ef3aed1370a14bee71e506a5177ba1066bd3afe2b5a5"
+  },
+  {
+    "path": "repeat-b/serving/songridan.json",
+    "sha256": "da2c41d611960d816726084f7d126da29a514530ebed4b742cf835fab43da6b9"
+  },
+  {
+    "path": "repeat-b/serving/sukmyung.json",
+    "sha256": "d9bc3bdeef364ee925def7de7871cf6db896f28f063f27d0707923f0c5f81712"
+  },
+  {
+    "path": "repeat-b/serving/sungshin.json",
+    "sha256": "c928b225ef5fd13947803e970846a08ad95ec1ade3b5442e6368ff7ae1529009"
+  },
+  {
+    "path": "repeat-b/serving/suyu.json",
+    "sha256": "e4f1a52919c83759fd3058f4fdcf3093794a531f19202a551676d339e9b5e2bc"
+  },
+  {
+    "path": "repeat-b/serving/teheran.json",
+    "sha256": "e31ad3939ce3831999475d6051387ca265335280b3dc6662d4a667db43526687"
+  },
+  {
+    "path": "repeat-b/serving/wangsimni.json",
+    "sha256": "a87b1be735cdf8de45bbb2e39d125ca0dce5ec99aebbf2b2f06e17201299a312"
+  },
+  {
+    "path": "repeat-b/serving/yeonhui.json",
+    "sha256": "1f47b385c1e1f891234e7b3ba98cab9f39ebfc82418b6e290ef3fa94215f738e"
+  },
+  {
+    "path": "repeat-b/serving/yeonnam.json",
+    "sha256": "b1b1afc70d3f696edd1057e0fd4acb6ef01fd3b45f5987ece64f563dde855751"
+  },
+  {
+    "path": "repeat-b/serving/yeonsinnae.json",
+    "sha256": "3db1398cb2afec4e0783fe313b1d8a1ed6587944f009a0fabe839802196afac8"
+  },
+  {
+    "path": "repeat-b/serving/yeouido.json",
+    "sha256": "ca6f4374e80daf72551a3c37c22021d211cf370a09964a0d3bc9074abfb6d28a"
+  },
+  {
+    "path": "repeat-b/serving/yongsan.json",
+    "sha256": "d0500ef135787c436b6843c0f2d9a0d9fd0a3886195b762fd6da72b63c8138fb"
+  },
+  {
+    "path": "repeat-b/status.json",
+    "sha256": "1e9f2359ff69acf3d2c03246ee7ae1ec72796351b1d4d4ba5deadc82b76f76e8"
+  },
+  {
+    "path": "repeat-b-interrupted/gold/anam/building_vacancy.json",
+    "sha256": "d046b44ab1a44251cd662161165ba0bebb3dab45101fae80f9498d19c5214466"
+  },
+  {
+    "path": "repeat-b-interrupted/gold/anam/calibration.json",
+    "sha256": "82babad69f5c3efa54d81ea39d259f0abfd847db22bf7024818284cb83934b0f"
+  },
+  {
+    "path": "repeat-b-interrupted/gold/anam/coverage.json",
+    "sha256": "322309b9c242de47bb7fb0996f9e50bb5913bd25621b5fb94af1b551b1f48707"
+  },
+  {
+    "path": "repeat-b-interrupted/gold/anam/page_building_master.geojson",
+    "sha256": "0433202cad91a84c8532af4c744f0e735e9f8299b4463405e98a98cc09b8e6f6"
+  },
+  {
+    "path": "repeat-b-interrupted/gold/apgujeong-rodeo/building_vacancy.json",
+    "sha256": "112f9ffeade05c444c3516f8e372e5fd480ff137d793948f71444f00bc14e45f"
+  },
+  {
+    "path": "repeat-b-interrupted/gold/apgujeong-rodeo/calibration.json",
+    "sha256": "18d948a2e232a329ef8e2376fc1bc137fca8a156745e75a1bf20dc97aa0aedbe"
+  },
+  {
+    "path": "repeat-b-interrupted/serving/anam.json",
+    "sha256": "a05b91833aeab25896697337e1062334dfd514c4f06dec5984317b0e50a991c0"
+  },
+  {
+    "path": "repeat-b.log",
+    "sha256": "e55a3dfb057fabaadb4666ac37da38eb83183bc91f220a7e9905089d3cea1a16"
+  },
+  {
+    "path": "reproduction-comparison.json",
+    "sha256": "75956061943cce7503e0788ce675fcd0f8d95f340b0862756517cf92c6eea745"
+  },
+  {
+    "path": "reproduction-summary.csv",
+    "sha256": "3b6ef7bddb89cb9da6e8793040ddc5e39887507d475beebd52e8bcfe08849fe7"
+  },
+  {
+    "path": "resume-plan.json",
+    "sha256": "fbcd8d4e31ebfc988eb5ab537bd045c3f43c28ce9694e87daae71bc59bbbaddc"
+  },
+  {
+    "path": "same-lot-flag-qualification.json",
+    "sha256": "c1811ad32c73576b6322265ec8b2245e05d2d3c4a5fa6e8547a9c932ad925893"
+  },
+  {
+    "path": "sample-design.json",
+    "sha256": "233372bbc5e12a6c79c8da28e3bbad3658e9fd6c9d95d00b7ef28da8dfac8730"
+  },
+  {
+    "path": "serving-crosscheck.json",
+    "sha256": "4f53e12758c6f4464e524f95572443e3d4e3f6a7b4a9409b66c5fd1ad667b6f8"
+  },
+  {
+    "path": "structural-audit.json",
+    "sha256": "5edfaf6a5048450533d28cc3144e35fe35d34523f3c07219ffb3fc9ceee8ff2d"
+  },
+  {
+    "path": "verification-summary.json",
+    "sha256": "5d82919cc56f690e8e79e34ea1950b04dac6aa5fd80a40d9c1b36e8f8bc6c4c9"
+  }
+]
