@@ -1,6 +1,6 @@
 # SpaceOS 디자인 시스템 (네이버 호환)
 
-> 바이브 코딩으로 UX/UI를 만든다. 디자인도 코드처럼 토큰→컴포넌트→Storybook 순서로 단일 출처를 둔다.
+> 바이브 코딩으로 UX/UI를 만든다. 디자인도 코드처럼 토큰→컴포넌트 순서로 단일 출처를 둔다.
 > 목표: "네이버 지도/네이버페이와 한 화면에 있어도 자연스러운" 한국형 앱 디자인.
 
 ## 1. 담당 폴더
@@ -10,7 +10,6 @@ design/tokens/tokens.json            토큰 export 본 (색·타이포·간격)
 apps/frontend/src/design/tokens/     colors·typography·layout (TS 단일 출처)
 apps/frontend/src/styles/tokens.css  CSS 변수(화면 전역 · 지도 오버레이) + Pretendard @font-face
 apps/frontend/src/design/components/ Button·Card·BottomSheet·MapMarkerPin·VacancyLegend·NaverPayButton
-apps/frontend/.storybook/            Storybook(문서화·a11y 대비검사·공유)
 ```
 
 ## 2. 네이버 연동 디자인 모델 (핵심 규칙)
@@ -37,6 +36,9 @@ apps/frontend/.storybook/            Storybook(문서화·a11y 대비검사·공
   - `src/styles/tokens.css` — 실제 화면에 먹는 CSS 변수. 컴포넌트는 이 `var(--…)` 를 쓴다
   - ⚠ Tailwind 는 쓰지 않는다. `tailwind.config.ts` 는 설치도 되지 않은 라이브러리의 죽은 설정이라
     2026-09-06 에 삭제했다(`@tailwind` 지시문 0개). 다시 끌어오지 말 것
-- 컴포넌트는 `*.stories.tsx` 로 Storybook에 기록. `npm run build-storybook` → `storybook-static/`.
-- 공유: Storybook 정적 빌드를 GitHub Pages/사내 링크 배포, 화면 캡처는 docs/ 또는 Notion/Drive.
+- 컴포넌트 기록의 단일 출처는 `src/design/components/` 의 코드다.
+  ⚠ Storybook 은 **설치된 적이 없다**(`.storybook/main.ts` 첫 줄이 `// TODO: 설치` 였고
+  `build-storybook` 스크립트도 없었다) → 2026-09-06 삭제. 다시 쓰려면 설치가 먼저다.
+  대비(AA)를 강제하던 a11y 애드온도 같이 사라졌으니, 색 조합 변경 시 직접 확인한다.
+- 공유: 화면 캡처는 docs/ 또는 Notion/Drive.
 - 코드는 GitHub PR. 디자인 토큰/컴포넌트 변경은 PR 설명에 Before/After 캡처 첨부.

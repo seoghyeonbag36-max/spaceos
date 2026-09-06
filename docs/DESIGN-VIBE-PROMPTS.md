@@ -1,13 +1,13 @@
 # 디자인 바이브 코딩 프롬프트 모음 (Claude Code 복붙용)
 
-> SpaceOS 폴더에서 `claude` 실행 후 붙여넣는다. 원칙: 토큰 먼저 → 컴포넌트 → 화면 → Storybook.
+> SpaceOS 폴더에서 `claude` 실행 후 붙여넣는다. 원칙: 토큰 먼저 → 컴포넌트 → 화면.
 > 모든 디자인은 docs/feature-design-system.md 의 네이버 연동 규칙을 따른다.
 
 ## 0. 디자인 시스템 부트스트랩
 ```
 docs/feature-design-system.md 와 design/README.md, design/brand/naver-brand.md 를 읽어줘.
-apps/frontend 에 Storybook 을 설치하고, 토큰은 CSS 변수 체계로만 간다. Tailwind 는 설치하지 마라
-(설치도 안 된 채 설정만 남아 있던 tailwind.config.ts 는 2026-09-06 에 삭제했다).
+토큰은 CSS 변수 체계로만 간다. Tailwind·Storybook 을 설치하지 마라
+(설치도 안 된 채 설정만 남아 있던 tailwind.config.ts 와 .storybook/ 은 2026-09-06 에 삭제했다).
 토큰은 세 곳을 동기화한다 — design/tokens/tokens.json ⇄ apps/frontend/src/design/tokens/*.ts
 ⇄ apps/frontend/src/styles/tokens.css. 컴포넌트는 tokens.css 의 var(--…) 를 쓴다.
 Pretendard 폰트를 public/fonts 에 넣고 tokens.css 의 @font-face 를 연결.
@@ -54,6 +54,6 @@ design/assets/naverpay 의 공식 버튼 에셋으로 NaverPayButton 을 실제 
 
 ## 6. 품질 — 접근성·일관성 검수
 ```
-Storybook 의 a11y 애드온으로 모든 컴포넌트 대비(AA)·포커스 링을 점검하고,
+모든 컴포넌트의 대비(AA)·포커스 링을 직접 점검하고(Storybook a11y 애드온은 없다),
 토큰을 벗어난 하드코딩 색/폰트가 있으면 tokens.css 의 var(--…) 로 치환해줘. 변경은 Before/After 캡처와 함께 PR.
 ```

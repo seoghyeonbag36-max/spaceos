@@ -669,11 +669,18 @@ export default function VacancyHeatmap({ district }: { district: string }) {
     return () => map.remove();
   }, [district]);
 
-  return <div ref={ref} className="w-full h-[600px] rounded-xl" />;
+  // 크기·모서리는 tokens.css 의 CSS 변수로 — 유틸리티 클래스는 쓰지 않는다
+  return <div ref={ref} style={{ width: "100%", height: 600, borderRadius: "var(--radius-lg)" }} />;
 }
 ```
 
 ### 코드 — 3D 건물 트윈 (react-three-fiber)
+
+> ⚠ **이 예시도 낡았다(2026-09-06 확인).** 3D 트윈은 2026-09-05 에 폐기했고
+> `three`/`@react-three/fiber`/`@react-three/drei` 는 의존성에서 **제거됐다**
+> (번들 832KB → 4KB). 절차적 박스는 실측 형상이 아니라 층 상태를 색으로
+> 말하던 것뿐이라, **2D 층 스택 + 네이버 거리뷰**로 대체했다. 아래 코드를
+> 복사하지 말 것 → docs/feature-posting.md §0-V
 
 ```tsx
 // apps/frontend/src/components/BuildingTwin.tsx
@@ -684,7 +691,7 @@ type Floor = { level: number; industry: string; vacant: boolean };
 
 export default function BuildingTwin({ floors }: { floors: Floor[] }) {
   return (
-    <Canvas camera={{ position: [6, 6, 6], fov: 45 }} className="h-[480px]">
+    <Canvas camera={{ position: [6, 6, 6], fov: 45 }} style={{ height: 480 }}>
       <ambientLight intensity={0.6} />
       <directionalLight position={[5, 10, 5]} />
       {floors.map((f, i) => (

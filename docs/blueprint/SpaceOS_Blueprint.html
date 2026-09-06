@@ -329,7 +329,7 @@
 <div class="sec">
   <div class="sec-tag">4 — Claude Design (통합 레이어)</div>
   <div class="sec-title">Design 트랙 — 4개 산출물을 "하나의 앱"으로 묶는다</div>
-  <div class="sec-why">디자인도 코드처럼 <b>토큰 → 컴포넌트 → Storybook</b>의 단일 출처. 목표: "네이버 지도·네이버페이와 한 화면에 있어도 자연스러운" 한국형 앱.</div>
+  <div class="sec-why">디자인도 코드처럼 <b>토큰 → 컴포넌트</b>의 단일 출처. 목표: "네이버 지도·네이버페이와 한 화면에 있어도 자연스러운" 한국형 앱.</div>
   <div class="design-grid">
     <div class="dcard">
       <h4>색의 역할 분리 (핵심 규칙)</h4>
@@ -352,7 +352,7 @@
       <ul>
         <li>지도 위 정보는 <b>바텀시트</b>로 (네이버지도·당근 패턴)</li>
         <li>한글 가독성: Pretendard · 본문 15px · 행간 1.5</li>
-        <li>접근성 <b>WCAG AA</b> 대비 — Storybook a11y 검사로 강제</li>
+        <li>접근성 <b>WCAG AA</b> 대비 — 토큰 색 조합 변경 시 직접 확인</li>
       </ul>
     </div>
     <div class="dcard">
@@ -360,7 +360,7 @@
       <ul>
         <li><b>1화면에서 4트랙</b>: 감성(Platform)·히트맵(Page)·입점(Posting)·마케팅(Program)</li>
         <li>차별화 지표 <b>Humanistic Authority</b> — 균형·공생·공감</li>
-        <li>산출물 기록·공유는 Storybook 정적 빌드</li>
+        <li>산출물 기록의 단일 출처는 <code>src/design/components/</code> 코드</li>
       </ul>
     </div>
   </div>

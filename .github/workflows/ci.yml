@@ -155,3 +155,12 @@ jobs:
       - name: 빌드
         working-directory: apps/frontend
         run: npm run build
+
+      # ⚠ 2026-09-06 이전에는 이 잡이 build 만 돌았고, `lint` 스크립트는 eslint 가
+      #   devDependencies 에 **없는** 죽은 스크립트였다(tailwind.config.ts 와 같은 종류).
+      #   되살렸으니 여기서 돌린다 — 안 돌리면 다시 썩는다.
+      #   tsc 가 못 보는 것을 본다: 특히 react-hooks 규칙(지도 이펙트의 의존성·ref 접근).
+      #   경고는 통과시키고 에러만 막는다 — 경고 목록은 eslint.config.js 의 주석 참조.
+      - name: 린트
+        working-directory: apps/frontend
+        run: npm run lint

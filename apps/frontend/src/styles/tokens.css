@@ -1,5 +1,5 @@
 /* 디자인 토큰 — CSS 변수 (화면 전역 · 지도 오버레이). 토큰의 실제 적용층은 여기 하나다 */
-/* TODO: Pretendard 폰트 public/fonts 에 배치 후 @font-face 연결 */
+/* Pretendard woff2 는 public/fonts/ 에 있다(npm pretendard 1.3.9 의 static woff2). */
 @font-face {
   font-family: "Pretendard";
   src: url("/fonts/Pretendard-Regular.woff2") format("woff2");

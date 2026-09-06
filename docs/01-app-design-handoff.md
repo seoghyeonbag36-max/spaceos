@@ -113,7 +113,8 @@ Claude Code는 이미지·스케치를 보고 코드로 옮길 수 있다.
    ```
    /frontend-dev 첨부 시안(@docs/design-refs/home.png)을 기반으로
      상권 대시보드 홈 화면을 만들어줘. 좌측에 공실 히트맵 지도,
-     우측에 선택 건물의 공실 히스토리 패널. Tailwind 스타일.
+     우측에 선택 건물의 공실 히스토리 패널.
+     스타일은 src/styles/tokens.css 의 CSS 변수(var(--…))로 — Tailwind 는 쓰지 않는다.
    ```
 3. **반복(바이브 코딩)** — "여백을 더 넓게", "카드 그림자 제거", "모바일에서 1열로" 처럼 자연어로 수정 → 즉시 코드 반영 → `localhost:5173`에서 확인.
 4. **컴포넌트 규칙 준수** — 컴포넌트는 `src/components/`, 페이지는 `src/pages/`, API 호출은 `src/lib/api.ts`로 일원화, 경로 별칭 `@/` 사용 (CLAUDE.md 규칙).
