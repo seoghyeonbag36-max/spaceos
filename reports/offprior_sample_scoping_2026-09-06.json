@@ -1,0 +1,42 @@
+{
+  "probe": "offprior-sample-scoping",
+  "date": "2026-09-06",
+  "nodes": 47442,
+  "districts": 66,
+  "top_k": 3,
+  "levels": {
+    "group": {
+      "level": "group",
+      "classes": 7,
+      "test_nodes": 9493,
+      "offprior_nodes": 1011,
+      "offprior_share_of_test_pct": 10.6,
+      "se_pp": 1.52,
+      "min_detectable_pp_approx": 3.05
+    },
+    "category2": {
+      "level": "category2",
+      "classes": 32,
+      "test_nodes": 9501,
+      "offprior_nodes": 4399,
+      "offprior_share_of_test_pct": 46.3,
+      "se_pp": 0.73,
+      "min_detectable_pp_approx": 1.46
+    }
+  },
+  "label_axis": {
+    "sample_multiplier": 4.35,
+    "min_detectable_pp": [
+      3.05,
+      1.46
+    ],
+    "already_implemented": "--label-level category2 (train_gnn.py)",
+    "caveat": "라벨 체계가 바뀌므로 train() 이 산출물 저장을 강제로 끈다 — 서빙 교체가 아니라 계측 도구다"
+  },
+  "hub_axis": {
+    "offprior_per_hub": 15.3,
+    "hubs_for_half_se": 264,
+    "paused_hubs_would_add": 306,
+    "caveat": "고양·파주 20거점은 서빙 보류 — 이 스코핑은 수만 세고 서빙 결정을 하지 않는다"
+  }
+}

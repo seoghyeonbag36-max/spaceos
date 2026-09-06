@@ -1,0 +1,56 @@
+{
+  "probe": "posting-unit-area-flrno",
+  "date": "2026-09-06",
+  "served_hubs": 66,
+  "units_total": 664,
+  "no_floor_mix": 0,
+  "floor_count_dist": {
+    "1": 30,
+    "2": 158,
+    "3": 199,
+    "4": 152,
+    "5": 67,
+    "6": 30,
+    "7": 10,
+    "8": 6,
+    "9": 5,
+    "10": 4,
+    "11": 3
+  },
+  "capacity_dist": {
+    "1": 30,
+    "2": 25,
+    "3": 193,
+    "4": 205,
+    "5": 115,
+    "6": 43,
+    "7": 28,
+    "8": 8,
+    "9": 2,
+    "10": 7,
+    "11": 1,
+    "12": 5,
+    "13": 2
+  },
+  "single_floor_units": 30,
+  "single_floor_pct": 4.5,
+  "multi_floor_units": 634,
+  "single_floor_capacity_dist": {
+    "1": 30
+  },
+  "delta_pyeong_on_single": {
+    "n": 30,
+    "min": 0,
+    "max": 0,
+    "median": 0.0,
+    "changed_gt_1py": 0
+  },
+  "ratio_new_over_cur_median": 1.0,
+  "forgone_granularity": {
+    "multi_floor_buildings": 3671,
+    "ratio_median": 1.177,
+    "ratio_p90": 3.416,
+    "ratio_max": 25.9,
+    "pct_over_1_2x": 48.3
+  }
+}
