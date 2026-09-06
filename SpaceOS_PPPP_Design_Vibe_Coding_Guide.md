@@ -40,7 +40,7 @@ SpaceOS는 전통 마케팅 4P(**Place · Product · Price · Promotion**)를 **
 | **Page** | **Product ▶ Page** | 이 platform 안에 **어떤 page 가 만들어져야 하는가?** | 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 | 네이버 지도 SDK (Three.js·Mapbox 는 제거됨) |
 | **Posting** | **Price ▶ Posting** | **어떤 가격대의 page** 가 이 platform 에 posting 되어야 하는가? | 입점 솔루션 (고급화/가성비/기능중심 비용-효용 분석) | LSTM, Scikit-learn |
 | **Program** | **Promotion ▶ Program** | posting 한 page 를 **어떤 홍보 program** 으로 돌릴 것인가? | 온·오프라인 마케팅 자동화 (LLM 콘텐츠 + 행사 추천) | LangChain, LLM |
-| **Design** | — (통합 레이어) | 네 트랙을 **하나의 앱으로 어떻게 묶는가?** | 디자인 시스템 + 화면 설계 + React 구현·배포 | React, Tailwind, Figma |
+| **Design** | — (통합 레이어) | 네 트랙을 **하나의 앱으로 어떻게 묶는가?** | 디자인 시스템 + 화면 설계 + React 구현·배포 | React, CSS 변수 토큰, Figma |
 
 ## 1.1 Platform (플랫폼화)
 
@@ -88,7 +88,7 @@ PPPP 4개 트랙의 산출물(추천·히트맵·시뮬레이션·콘텐츠)을 
 
 - **디자인 시스템(Design System)** — 색·타이포·간격·컴포넌트를 **디자인 토큰(Design Token)** 으로 정의해 일관성 확보.
 - **화면 설계** — 정보구조(IA) → 와이어프레임 → 유저 플로우 → 고해상도 프로토타입.
-- **FE 구현·배포** — React + TypeScript + Tailwind로 토큰을 코드화, 3D 트윈/대시보드 화면 구현 후 배포.
+- **FE 구현·배포** — React + TypeScript + **CSS 변수 토큰**으로 토큰을 코드화, 대시보드 화면 구현 후 배포.
 - **차별화 지표 — Humanistic Authority** — 디자인·콘텐츠가 지켜야 할 3대 윤리 기준: **균형(Balance)** · **공생(Symbiosis)** · **공감(Empathy)**.
 
 ## 1.6 공통 핵심 용어
@@ -192,7 +192,7 @@ apps/backend  FastAPI  |  apps/frontend  React+Vite
 ml  LSTM/GNN+MLflow    |  data  Airflow+크롤러+Bronze/Silver/Gold
 
 ## 기술 스택 (확정)
-FE: React+TS+Three.js/@react-three/fiber+Mapbox GL+Tailwind
+FE: React+TS+네이버 지도 SDK+CSS 변수 토큰
 BE: FastAPI+PostgreSQL/PostGIS+Redis+Celery
 ML: PyTorch+PyTorch Geometric(GNN)+LSTM+MLflow+LangChain
 Data: Airflow+Selenium/Playwright+Bronze/Silver/Gold
@@ -603,7 +603,7 @@ async def recommend(req: RecommendRequest) -> list[IndustryScore]:
 - GET /api/v1/heatmap?district=garosugil → [{grid_id, lng, lat, vacancy_rate}]
 - GET /api/v1/buildings/{id}/history → [{level, industry, vacant}]
 # 제약
-- React+TS, @react-three/fiber, Mapbox GL, Tailwind. API 호출은 src/lib/api.ts로 일원화
+- React+TS, 네이버 지도 SDK, CSS 변수 토큰. API 호출은 src/lib/api.ts로 일원화
 - 3D 맵 로딩 < 3초
 # 산출물
 - apps/frontend/src/components/VacancyHeatmap.tsx
@@ -853,7 +853,7 @@ if __name__ == "__main__":
 
 ## 4.5 Design — 디자인 시스템 + 화면 설계 + FE
 
-> 📌 **디자인 토큰** — 색·폰트·간격을 변수로 정의한 것(한 곳만 바꾸면 전체 반영). **Atomic Design** — Atom→Molecule→…→Page 단계로 쌓는 컴포넌트 설계. **Tailwind config** — 토큰을 Tailwind 클래스로 연결하는 설정.
+> 📌 **디자인 토큰** — 색·폰트·간격을 변수로 정의한 것(한 곳만 바꾸면 전체 반영). **Atomic Design** — Atom→Molecule→…→Page 단계로 쌓는 컴포넌트 설계. **토큰 3중 동기화** — `design/tokens/tokens.json` ⇄ `apps/frontend/src/design/tokens/*.ts` ⇄ `apps/frontend/src/styles/tokens.css` 세 곳을 같은 커밋에서 맞추는 규칙.
 
 ### 프롬프트
 
@@ -863,23 +863,23 @@ if __name__ == "__main__":
 # 목표
 PPPP 산출물을 하나의 앱으로 묶는 디자인 시스템(토큰+컴포넌트)과 상권 대시보드 레이아웃을 만든다.
 # 입력
-- data/assets/design-tokens/tokens.json (색·타이포·간격)
+- design/tokens/tokens.json (색·타이포·간격)
 - 화면: 대시보드(좌: 히트맵, 우: 추천/시뮬레이션 패널)
 # 제약
-- React+TS+Tailwind. Atomic Design. 접근성(색대비 AA)·반응형
+- React+TS+CSS 변수 토큰. Atomic Design. 접근성(색대비 AA)·반응형
 # 산출물
-- data/assets/design-tokens/tokens.json
-- apps/frontend/tailwind.config.js (토큰 연결)
+- design/tokens/tokens.json
+- apps/frontend/src/styles/tokens.css (CSS 변수 — 토큰 연결)
 - apps/frontend/src/components/ui/Card.tsx (Atom)
 - apps/frontend/src/pages/Dashboard.tsx (Template)
 # 검증
-- npm run build 통과, 토큰이 Tailwind 클래스로 적용
+- npm run build 통과, 토큰이 var(--…) 로 화면에 적용
 ```
 
 ### 코드 — 디자인 토큰
 
 ```json
-// data/assets/design-tokens/tokens.json
+// design/tokens/tokens.json
 {
   "color": {
     "primary":   "#2563eb",
@@ -894,23 +894,42 @@ PPPP 산출물을 하나의 앱으로 묶는 디자인 시스템(토큰+컴포�
 }
 ```
 
-### 코드 — Tailwind 연결
+### 코드 — 토큰 연결 (CSS 변수)
 
-```js
-// apps/frontend/tailwind.config.js
-import tokens from "../../data/assets/design-tokens/tokens.json";
+> ⚠ **여기 있던 Tailwind 예시는 폐기했다(2026-09-06).** `tailwindcss` 는 이 저장소에
+> **설치된 적이 없고** 소스의 `@tailwind` 지시문도 0개였다. `tailwind.config.ts` 는
+> 설정만 남은 죽은 파일이라 삭제했다. 토큰은 **CSS 변수**로만 화면에 먹는다 —
+> Tailwind 를 다시 끌어오지 말 것.
 
-export default {
-  content: ["./index.html", "./src/**/*.{ts,tsx}"],
-  theme: {
-    extend: {
-      colors: { primary: tokens.color.primary, vacant: tokens.color.vacant },
-      fontFamily: { sans: tokens.font.sans.split(", ") },
-      borderRadius: { card: tokens.radius.card },
-    },
-  },
-  plugins: [],
-};
+**토큰 동기화는 세 곳이다.** 한 곳을 고치면 나머지 두 곳을 같은 커밋에서 맞춘다.
+
+```
+design/tokens/tokens.json            export 본 (디자인 툴·문서가 읽는 원천)
+   ⇅
+apps/frontend/src/design/tokens/*.ts  colors·typography·layout (코드가 값으로 읽는 TS 단일 출처)
+   ⇅
+apps/frontend/src/styles/tokens.css   CSS 변수 — 실제 화면에 먹는 층
+```
+
+```css
+/* apps/frontend/src/styles/tokens.css */
+:root {
+  --naver-green: #03C75A;
+  --brand: #0EA5B7;
+  --ink: #1C2533; --muted: #6B7280; --line: #E3E9F2; --surface: #FFFFFF; --bg: #F4F7FB;
+  --radius-md: 12px; --radius-lg: 16px;
+  --font-sans: "Pretendard", system-ui, sans-serif;
+}
+```
+
+```css
+/* 컴포넌트는 var(--…) 만 쓴다 — 하드코딩 색·폰트 금지 */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+}
 ```
 
 ### 코드 — 컴포넌트 (Atom) + 대시보드 (Template)
@@ -918,14 +937,31 @@ export default {
 ```tsx
 // apps/frontend/src/components/ui/Card.tsx — Atom
 import type { ReactNode } from "react";
+import "./Card.css";
 
 export default function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="bg-white rounded-card shadow-sm p-6" aria-label={title}>
-      <h3 className="font-sans font-semibold mb-3 text-slate-900">{title}</h3>
+    <section className="ui-card" aria-label={title}>
+      <h3 className="ui-card__title">{title}</h3>
       {children}
     </section>
   );
+}
+```
+
+```css
+/* apps/frontend/src/components/ui/Card.css — 값은 전부 토큰 var(--…) 에서 온다 */
+.ui-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+}
+.ui-card__title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 12px;
 }
 ```
 
@@ -936,19 +972,36 @@ import Card from "@/components/ui/Card";
 
 export default function Dashboard({ district = "garosugil" }: { district?: string }) {
   return (
-    <main className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 bg-slate-50 min-h-screen">
-      <div className="lg:col-span-2">
+    <main className="dashboard">
+      <div className="dashboard__main">
         <Card title="공실 히트맵 (Page)">
           <VacancyHeatmap district={district} />
         </Card>
       </div>
-      <aside className="space-y-6">
+      <aside className="dashboard__side">
         <Card title="AI 업종 추천 (Platform)">{/* TODO: /ai/recommend 연결 */}</Card>
         <Card title="입점 시뮬레이션 (Posting)">{/* TODO: /ai/simulate 연결 */}</Card>
         <Card title="마케팅 자동 생성 (Program)">{/* TODO: /marketing/generate 연결 */}</Card>
       </aside>
     </main>
   );
+}
+```
+
+```css
+/* apps/frontend/src/pages/Dashboard.css */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 24px;
+  min-height: 100vh;
+  background: var(--bg);
+}
+.dashboard__side { display: grid; gap: 24px; align-content: start; }
+@media (min-width: 1024px) {
+  .dashboard { grid-template-columns: repeat(3, 1fr); }
+  .dashboard__main { grid-column: span 2; }
 }
 ```
 

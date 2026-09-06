@@ -9,7 +9,7 @@ design/
 │   ├── naverpay/     ⚠ 네이버페이 공식 버튼 에셋 (임의 변경 금지 — 원본 그대로 보관)
 │   └── navermap/     네이버 지도 마커·지도 스타일(style JSON)·컨트롤 캡처
 ├── references/       잘 만든 한국형 앱 UI 패턴 캡처 (바텀시트·지도오버레이 등)
-├── tokens/           디자인 토큰 export (tokens.json — 색·타이포·간격의 단일 출처)
+├── tokens/           디자인 토큰 export (tokens.json — 색·타이포·간격). 코드 쪽 두 곳과 동기화
 └── README.md
 ```
 
@@ -29,7 +29,10 @@ design/
 → 디자인 시스템에서 네이버페이 버튼은 "고정 슬롯"으로 취급하고, 주변 레이아웃만 우리 토큰으로 맞춘다.
 
 ## 저장·기록·공유 규칙
-- 토큰의 단일 출처는 `apps/frontend/tailwind.config.ts` + `src/design/tokens/`. export 본은 `design/tokens/tokens.json`.
+- **토큰 동기화는 세 곳이다** — 한 곳을 고치면 나머지 두 곳을 같은 커밋에서 맞춘다.
+  `design/tokens/tokens.json` ⇄ `apps/frontend/src/design/tokens/*.ts` ⇄ `apps/frontend/src/styles/tokens.css`
+  (export 본 ⇄ 코드가 읽는 TS 단일 출처 ⇄ 화면에 먹는 CSS 변수).
+  ⚠ Tailwind 는 쓰지 않는다 — `tailwind.config.ts` 는 설치되지 않은 라이브러리의 죽은 설정이라 2026-09-06 에 삭제했다.
 - 컴포넌트 산출물은 **Storybook**으로 기록 → `npm run build-storybook` → 정적 사이트(`storybook-static/`).
 - 공유: Storybook 정적 빌드를 GitHub Pages/사내 링크로 배포, 캡처는 docs/ 또는 Notion/Drive.
 - 원본 브랜드 에셋(naverpay 등)은 git 포함 가능하나 **수정본은 만들지 않는다**.

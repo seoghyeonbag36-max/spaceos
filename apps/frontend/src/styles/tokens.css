@@ -1,4 +1,4 @@
-/* 디자인 토큰 — CSS 변수 (Tailwind 미사용 영역/지도 오버레이용) */
+/* 디자인 토큰 — CSS 변수 (화면 전역 · 지도 오버레이). 토큰의 실제 적용층은 여기 하나다 */
 /* TODO: Pretendard 폰트 public/fonts 에 배치 후 @font-face 연결 */
 @font-face {
   font-family: "Pretendard";

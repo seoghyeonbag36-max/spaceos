@@ -6,9 +6,9 @@
 ## 1. 담당 폴더
 ```
 design/                              디자인 원천 데이터(브랜드·에셋·참조·토큰 export)
-apps/frontend/tailwind.config.ts     토큰 → Tailwind 매핑
-apps/frontend/src/styles/tokens.css  CSS 변수(지도 오버레이용) + Pretendard @font-face
+design/tokens/tokens.json            토큰 export 본 (색·타이포·간격)
 apps/frontend/src/design/tokens/     colors·typography·layout (TS 단일 출처)
+apps/frontend/src/styles/tokens.css  CSS 변수(화면 전역 · 지도 오버레이) + Pretendard @font-face
 apps/frontend/src/design/components/ Button·Card·BottomSheet·MapMarkerPin·VacancyLegend·NaverPayButton
 apps/frontend/.storybook/            Storybook(문서화·a11y 대비검사·공유)
 ```
@@ -30,7 +30,13 @@ apps/frontend/.storybook/            Storybook(문서화·a11y 대비검사·공
 | 참조 UI 패턴 | 네이버지도·당근·배민 캡처 | design/references/ |
 
 ## 4. 산출물 저장·기록·공유
-- 토큰 변경 → `src/design/tokens` + `tailwind.config.ts` 수정 → `design/tokens/tokens.json` 동기화.
+- **토큰 동기화는 세 곳이다.** 한 곳을 고치면 나머지 두 곳을 같은 커밋에서 맞춘다.
+  `design/tokens/tokens.json` ⇄ `apps/frontend/src/design/tokens/*.ts` ⇄ `apps/frontend/src/styles/tokens.css`
+  - `tokens.json` — export 본(디자인 툴·문서가 읽는 원천)
+  - `src/design/tokens/*.ts` — 코드가 값으로 읽는 TS 단일 출처
+  - `src/styles/tokens.css` — 실제 화면에 먹는 CSS 변수. 컴포넌트는 이 `var(--…)` 를 쓴다
+  - ⚠ Tailwind 는 쓰지 않는다. `tailwind.config.ts` 는 설치도 되지 않은 라이브러리의 죽은 설정이라
+    2026-09-06 에 삭제했다(`@tailwind` 지시문 0개). 다시 끌어오지 말 것
 - 컴포넌트는 `*.stories.tsx` 로 Storybook에 기록. `npm run build-storybook` → `storybook-static/`.
 - 공유: Storybook 정적 빌드를 GitHub Pages/사내 링크 배포, 화면 캡처는 docs/ 또는 Notion/Drive.
 - 코드는 GitHub PR. 디자인 토큰/컴포넌트 변경은 PR 설명에 Before/After 캡처 첨부.

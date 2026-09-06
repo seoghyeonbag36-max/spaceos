@@ -31,7 +31,11 @@ Price 는 Posting 으로, Promotion 은 Program 으로만 간다.
 → 상세: memory/projects/
 
 ## Tech Stack (확정)
-- **FE**: React + TypeScript + **네이버 지도**(`lib/naverMap.ts` — 지도 + 거리뷰 파노라마) + Tailwind
+- **FE**: React + TypeScript + **네이버 지도**(`lib/naverMap.ts` — 지도 + 거리뷰 파노라마) + **CSS 변수 토큰**
+  - `tailwindcss` 는 **설치된 적이 없다**. `tailwind.config.ts` 만 토큰 1:1 매핑을 든 채 남아 있었는데
+    소스의 `@tailwind` 지시문이 0개라 그 설정은 아무 일도 하지 않았다 → 2026-09-06 삭제. 스타일은
+    CSS 변수 한 체계로만 간다(`src/styles/tokens.css` 의 `var(--…)`). 다시 끌어오지 말 것
+    → docs/feature-design-system.md §4
   - **Three.js/@react-three/fiber 는 제거됐다**(2026-09-05). 3D 트윈이 그리던 절차적 박스는 실측 형상이
     아니라 층 상태를 색으로 말하던 것뿐이라, 2D 층 스택 + 네이버 거리뷰로 대체했다(번들 832KB → 4KB).
     다시 끌어오지 말 것 → docs/feature-posting.md §0-V
