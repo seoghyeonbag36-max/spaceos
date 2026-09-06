@@ -13,6 +13,27 @@
 :root {
   --naver-green: #03C75A; --naver-green-pressed: #02B350;
   --brand: #0EA5B7; --brand-pressed: #0B8294;
+
+  /* ── PPPP 네 트랙 색 (2026-09-06) ────────────────────────────────────────────
+     색 축이 naver-green·brand 둘뿐이라 레일·헤더·범례가 "지금 어느 트랙인지"를
+     색으로 말하지 못했다. 네 트랙에 하나씩 준다. 고르는 규칙은 세 개다:
+       ① 자유 색상각은 242~338도 한 구간뿐이다. 나머지는 이미 임자가 있다 —
+          공실 축 3~160도(#E03E36·#F2682C·#EFA50F·#9CCB3B·#22B07D),
+          네이버 147도, brand teal 186도, 그리고 화면 곳곳의 UI 남색 #3A5A98 220도.
+          그래서 넷을 242·272·302·332 로 30도씩 벌렸다(공실 축과 최소 31도).
+       ② 채도는 전부 S46% — brand teal(S86%)의 절반이다. 주색을 이기지 않는다.
+          #3A5A98(S45%)과 같은 단이라 앱의 크롬 채도와도 어긋나지 않는다.
+       ③ 밝기는 일부러 층을 뒀다. 넷을 같은 명도로 맞추면 색맹·흑백에서 구분이
+          사라진다 — 인접 트랙끼리 명도대비 1.24 이상이 되게 어긋냈다.
+     네 base 모두 --bg(#F4F7FB)·--surface(#FFFFFF)·자기 soft 위에서 AA 4.5:1 통과.
+     ⚠ #03C75A 를 트랙 색으로 쓰지 말 것(네이버 연동 맥락 전용).
+     ⚠ 값은 세 파일이 같아야 한다 — design/tokens/tokens.json ·
+        src/design/tokens/colors.ts · 여기. */
+  --track-platform: #6460C4; --track-platform-pressed: #4945B9; --track-platform-soft: #F0F0FB;
+  --track-page:     #753DA6; --track-page-pressed:     #61338A; --track-page-soft:     #F6F0FB;
+  --track-posting:  #A23C9F; --track-posting-pressed:  #863284; --track-posting-soft:  #FBF0FB;
+  --track-program:  #7E2F53; --track-program-pressed:  #622541; --track-program-soft:  #FBF0F5;
+
   --ink: #1C2533; --muted: #6B7280; --line: #E3E9F2; --surface: #FFFFFF; --bg: #F4F7FB;
   --radius-md: 12px; --radius-lg: 16px;
   --shadow-card: 0 1px 3px rgba(11,27,51,.08), 0 4px 12px rgba(11,27,51,.06);
