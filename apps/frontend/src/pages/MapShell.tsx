@@ -19,6 +19,7 @@ import { useMapHost } from "@/components/MapHost";
 import { getBuildingVacancy, getDensityHeatmap, getFootfallHeatmap, getRentHeatmap, listDistricts, recommendIndustry,
   type DensityHeatmap, type DistrictSummary, type FootfallHeatmap, type GeoJSONFC, type IndustryRecommend, type RentHeatmap } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
+import { vacancyDotAnchor, vacancyDotHTML } from "@/design/components/MapMarkerPin";
 import "@/styles/tokens.css";
 import "./MapShell.css";
 
@@ -38,6 +39,17 @@ const LAYERS: { key: Layer; label: string }[] = [
   { key: "rent", label: "임대시세" },
   { key: "density", label: "인구밀도" },
 ];
+
+// 공실 표현이 갈리는 줌 경계 (2026-09-06 디자이너 피드백 「공실을 red-dot 혹은 핀으로」).
+//
+// 왜 두 표현인가: 종전에는 줌과 무관하게 **4상태를 전부 폴리곤으로 칠했다.** 거점 하나에
+// 건물이 840~1,443동이라 멀리서 보면 화면이 색으로 꽉 차 "어디가 비었나"가 안 읽힌다.
+// 멀리서는 **공실의심(empty)만 점으로** 찍어 답을 먼저 주고, 가까이 가면 폴리곤으로
+// 건물 형상과 나머지 상태(만실·부분공실·고공실)를 보여준다.
+//
+// ⚠ 점 표현은 새로 만든 것이 아니라 `PageDashboard.tsx` 에 있던 구현을 옮긴 것이다.
+//   그 화면이 `#board` 해시로 밀려나면서 red dot 도 같이 안 보이게 돼 있었다.
+const PIN_MAX_ZOOM = 15;   // 이 줌 **이하**면 점, 초과면 폴리곤
 
 // 공실 상태 → 색 (design 토큰 vacancy 색계열 재사용, 단일 출처)
 const STATUS: Record<VacStatus, { color: string; label: string }> = {
@@ -134,6 +146,9 @@ export default function MapShell() {
   const [q, setQ] = useState("");
   const [hour, setHour] = useState(18);
   const [twinOpen, setTwinOpen] = useState(false);
+  // 줌 자체가 아니라 **모드**를 담는다. 줌 값을 state 에 두면 휠을 굴릴 때마다
+  // 리렌더가 나고 오버레이 840개를 매 틱 다시 그린다. 불리언이라 전환은 두 번뿐이다.
+  const [pinMode, setPinMode] = useState(false);
   // 건물 폴리곤이 있는 거점만 고른다 — vacancy_source === "gold" 가 곧 "Gold 마스터 보유"다.
   // 합성 거점을 열면 /heatmap/buildings 가 404 라 빈 지도가 된다.
   const [hubs, setHubs] = useState<DistrictSummary[]>([]);
@@ -226,6 +241,17 @@ export default function MapShell() {
     map.setCenter(new naver.maps.LatLng(center.lat, center.lng));
   }, [ready, map, hub, center.lat, center.lng]);
 
+  // 줌 → 표현 모드. 지도는 MapHost 소유라 여기서 만들지 않으므로 리스너만 붙였다 뗀다.
+  // 초기값을 한 번 읽어 두지 않으면 사용자가 줌을 건드리기 전까지 모드가 틀린 채로 그려진다.
+  useEffect(() => {
+    if (!ready || !map) return;
+    const naver = (window as any).naver;
+    const sync = () => setPinMode(map.getZoom() <= PIN_MAX_ZOOM);
+    sync();
+    const h = naver.maps.Event.addListener(map, "zoom_changed", sync);
+    return () => naver.maps.Event.removeListener(h);
+  }, [ready, map]);
+
   const clearOverlays = () => {
     overlaysRef.current.forEach((o) => o.setMap?.(null));
     overlaysRef.current = [];
@@ -247,8 +273,27 @@ export default function MapShell() {
     const naver = (window as any).naver;
     clearOverlays();
 
-    if (layer === "vacancy") {
-      // 공실: 건물 footprint 폴리곤을 상태색으로 채움 + 클릭 상세
+    if (layer === "vacancy" && pinMode) {
+      // 멀리서 볼 때: **공실의심(empty)만** 점으로. 만실·부분공실·고공실은 숨긴다 —
+      // 이 축척에서 답해야 하는 질문은 "어디가 비었나" 하나이고, 840~1,443동을 전부
+      // 칠하면 그 답이 색에 묻힌다. 점 클릭은 폴리곤과 같은 상세를 연다.
+      const size = 13;
+      const anchor = vacancyDotAnchor(size);
+      buildings.forEach((b) => {
+        if (b.status !== "empty") return;
+        const dot = new naver.maps.Marker({
+          map, position: new naver.maps.LatLng(b.center.lat, b.center.lng), zIndex: 60,
+          icon: {
+            content: vacancyDotHTML(STATUS[b.status].color, size),
+            anchor: new naver.maps.Point(anchor, anchor),
+          },
+        });
+        naver.maps.Event.addListener(dot, "click", () => focus(b));
+        overlaysRef.current.push(dot);
+      });
+    } else if (layer === "vacancy") {
+      // 가까이서 볼 때: 건물 footprint 폴리곤을 상태색으로 채움 + 클릭 상세.
+      // 여기서는 4상태를 다 그린다 — 건물 형상이 보이는 축척이라 색이 서로를 덮지 않는다.
       buildings.forEach((b) => {
         const poly = new naver.maps.Polygon({
           map,
@@ -317,7 +362,7 @@ export default function MapShell() {
         overlaysRef.current.push(poly);
       });
     }
-  }, [layer, ready, map, buildings, rentHm, footHm, densHm, center.lat, center.lng]);
+  }, [layer, pinMode, ready, map, buildings, rentHm, footHm, densHm, center.lat, center.lng]);
 
   const filtered = useMemo(() => buildings.filter((b) => !q || b.name.includes(q)), [buildings, q]);
 
@@ -427,9 +472,17 @@ export default function MapShell() {
 
       {/* 범례 */}
       <div className="overlay legend">
-        {layer === "vacancy" && (Object.keys(STATUS) as VacStatus[]).map((k) => (
-          <span key={k} className="chip"><span className="sw" style={{ background: STATUS[k].color }} />{STATUS[k].label}</span>
+        {/* 범례는 **지금 화면에 그려진 것만** 말한다. 점 모드에서 만실·부분공실 칩을
+            띄우면 "그 색도 어딘가 있다"는 거짓말이 된다(줌을 당겨야 나온다). */}
+        {layer === "vacancy" && (pinMode ? ["empty"] : (Object.keys(STATUS) as VacStatus[])).map((k) => (
+          <span key={k} className="chip">
+            <span className={"sw" + (pinMode ? " dot" : "")} style={{ background: STATUS[k as VacStatus].color }} />
+            {STATUS[k as VacStatus].label}
+          </span>
         ))}
+        {layer === "vacancy" && pinMode && (
+          <span className="note">공실의심만 표시 · 확대하면 건물별 상태</span>
+        )}
         {layer === "footfall" && (
           <span className="note">
             {footHm
