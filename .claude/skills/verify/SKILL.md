@@ -145,15 +145,49 @@ API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — **
 
 ## 지도 뷰(MapShell) 검증
 
-App.tsx 네비 **"지도"** 탭이 진입점이다(2026-08-01 연결). 거점 선택은 실측 거점만 나온다
-— **2026-08-17 대장 완주로 54곳 전부**가 목록에 뜬다(종전에는 미수집분이 빠져 있었다).
+⚠ **탭 이름이 바뀌었다(2026-09-06 실측).** 이 절은 `"지도"` 탭을 진입점이라고 적고 있었는데
+그런 탭은 이제 없다 — 217d469 가 네비를 갈면서 **`"지도"` → `"Page"`** 가 됐고, 별도로
+**`"거점"`**(HubExplorer) 이 새로 생겼다. 낡은 이름으로 `get_by_role` 을 부르면 30초 타임아웃만
+난다. 현재 네비: `서울 · 거점 · Platform · Page · Posting · Program`.
+
+| 탭 | 컴포넌트 | 무엇 |
+|---|---|---|
+| `Page` | MapShell | 공실 4레이어 + 건물 클릭 패널 + 층 스택·거리뷰 (종전 "지도") |
+| `거점` | HubExplorer | 거점 목록 + 실측범위 경계 + 요약 |
+
+지도는 더 이상 MapShell 이 만들지 않는다 — `MapHost` 가 앱 전체에서 하나만 만들어 들고,
+탭 전환 때 `visibility` 로 숨긴다. 그래서 **탭을 옮겨도 언마운트되지 않는다**(카메라 유지).
 
 ```python
-pg.get_by_role('button', name='지도').click()
-pg.wait_for_timeout(7000)          # 네이버 SDK + 폴리곤 렌더까지 넉넉히
-pg.locator('.hub-select').select_option('hongdae')
+pg.get_by_role('button', name='Page').first.click()
+pg.wait_for_timeout(9000)          # 네이버 SDK + 폴리곤 렌더까지 넉넉히
+pg.select_option('.hub-select', 'garosugil')
 ```
 
-- `.hub-select` 옵션 수 = `vacancy_source === "gold"` 인 거점 수(2026-08-15 현재 40)
-- `.b-item` 수 = 그 거점 건물 수(가로수길 836, 홍대 1,329) — 0 이면 API 404 폴백을 탄 것
+- `.hub-select` 옵션 수 = 서빙 거점 수(**2026-09-06 실측 66**)
+- `.b-item` 수 = 그 거점 건물 수(**가로수길 840**) — 0 이면 API 404 폴백을 탄 것.
+  `/heatmap/buildings` payload 의 `features` 수와 **같아야 한다**(다르면 필터가 먹은 것)
 - `.map-canvas` 의 높이가 0 이 아닌지 반드시 확인(위 함정 참조)
+- ⚠ **`.b-name` 은 목록행과 상세패널 양쪽에 있다.** `querySelector('.b-name')` 은 목록 첫 행을
+  집으므로 선택한 건물을 확인하려면 **`.b-detail .b-name`** 으로 좁힐 것. 이걸 모르면 패널이
+  엉뚱한 건물을 그린다고 오진한다(2026-09-06 실제로 그렇게 한 번 헛짚었다)
+
+### 건물 상세(층 스택 + 거리뷰) — 게이트가 선언만 하는 자리
+
+`pppp_status.py` 의 `지도·건물상세 표면` 은 **선언 게이트**라 여기서만 참·거짓이 갈린다.
+층이 하나뿐인 건물을 고르면 스택이 한 줄만 나와 증거가 얇으니, **세 종류가 다 나오는
+건물**을 고른다(payload 에서 `com_floors` 길이가 크고 `active < capacity` 인 것).
+
+```python
+i = pg.evaluate("t => [...document.querySelectorAll('.b-item')].findIndex(e => e.innerText.includes(t))", '동남빌딩')
+pg.query_selector_all('.b-item')[i].click()
+pg.click('.b-twin')                # 「층별 공실 · 거리뷰 보기」
+pg.wait_for_timeout(9000)          # 거리뷰 파노라마까지
+```
+
+볼 것 — 2026-09-06 가로수길 동남빌딩 실측값:
+
+- `.fstack-row` **7행** · 색 **3종**(`vacant` 주황 / `occupied` 초록 / `uncertain` 노랑)
+- `.sview-canvas` 의 자식이 **1 이상**(0 이면 파노라마가 안 붙은 것 — fd04852 가 잡은 결함)
+- `.sview-meta` 에 **촬영일**이 있을 것(`2026-01-20 촬영 · … 에서 9m`). 촬영일 없이 거리뷰만
+  그리면 게이트 주장이 깨진다 — 거리뷰는 공실 판정의 근거가 아니라는 표식이 그 문구다
