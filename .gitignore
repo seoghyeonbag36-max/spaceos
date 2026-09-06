@@ -208,3 +208,11 @@ reports/logs/
 
 # Playwright MCP 세션 부산물 (스냅샷·콘솔 로그) — 산출물이 아니다
 .playwright-mcp/
+
+# 논문 audit 의 전체 Gold 스냅샷 — `data/gold` 와 **바이트 동일한** 66거점 사본(75MB)이라
+# 커밋하지 않는다. 이미 추적 중인 파일을 복제하는 것이고, git 히스토리에 한 번 들어가면
+# 모든 클론(클라우드 세션·Cloud Run 빌드 포함)이 영구히 그 값을 치른다.
+# 재현성은 사본이 아니라 해시가 보증한다 — `audits/*/analysis-plan.json` 의
+# `manifest_sha256`(데이터 946 + 코드 164 파일) + `input-verification-before.json` 의 pass.
+# 비교군 `repeat-b`(1.4MB · 2거점)는 남긴다 — 재빌드가 저장된 Gold 를 재현하는지가 결론이다.
+docs/papers/audits/**/repeat-a/gold/

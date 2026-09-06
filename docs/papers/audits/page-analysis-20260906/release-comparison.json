@@ -1,0 +1,21 @@
+[
+  {
+    "hub": "garosugil",
+    "old": "data/bronze/garosugil/2026-07-08/stores_raw.json",
+    "new": "data/bronze/garosugil/2026-07-19/stores_raw.json",
+    "common_unique_ids": 2926,
+    "entered_ids": 2338,
+    "exited_ids": 0,
+    "changed_common_ids": 0,
+    "changes_by_field": {
+      "lnoCd": 0,
+      "bldMngNo": 0,
+      "flrNo": 0,
+      "hoNo": 0,
+      "lon": 0,
+      "lat": 0,
+      "indsLclsCd": 0
+    },
+    "claim": "release_difference_only_not_error_or_business_turnover"
+  }
+]

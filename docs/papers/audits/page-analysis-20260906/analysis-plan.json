@@ -1,0 +1,18 @@
+{
+  "created_at_utc": "2026-09-06T12:04:43.804767+00:00",
+  "manifest_sha256": "76f6743047877450c2123d839e3f5c4b99efe070ea0b13a43d3a42682659d4e6",
+  "runner_sha256": "f3ce00901d1f6a50594789c5be5188455f9a8fb0e0e5fa3e31a738582e3b84c9",
+  "targets": "this runner and analysis run directory only",
+  "structural_checks": "master identity, basic geometry, arithmetic, floor semantics, same-lot consistency, coverage, current polygon provenance; raw store diagnostics",
+  "not_claimed": "complete ledger audit, all join-edge reconstruction, independently confirmed occupancy accuracy",
+  "impact": "existing floor-uncertainty interval; current rebuild vs stored Gold (noncausal)",
+  "reproduction": "two fresh subprocesses with pinned selected Bronze, stored Gold capacity and stored Silver attrs; master/coverage/serving only",
+  "normalization": "master feature map keyed by unique id; coverage drops only built_at; actual file hashes also retained",
+  "sampling": {
+    "seed": 20260906,
+    "target": 200,
+    "allocation": "min(Nh,max(2,ceil(200*Nh/N)))",
+    "labels": "unresolved until independent review"
+  },
+  "gates": "pre/post hash equality, audit-vs-serving crosscheck, fresh-process output comparisons"
+}

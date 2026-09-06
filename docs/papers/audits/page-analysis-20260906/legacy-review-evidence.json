@@ -1,0 +1,34 @@
+[
+  {
+    "path": "data/validation/roadview_capacity_ikseon.csv",
+    "sha256": "ea93a42b893a01dc7d68cbf049df6c1f68cf7c74504185ddc31ad5feff6b4478",
+    "rows": 30,
+    "nonempty_labels": 0,
+    "ai_marked_memos": 0,
+    "independent_current_truth": "not_established"
+  },
+  {
+    "path": "data/validation/roadview_capacity_myeongdong.csv",
+    "sha256": "92567d665e1c97b5d26ac2e2ae15722a89c1815641c81e863ad2fcb003d28865",
+    "rows": 30,
+    "nonempty_labels": 0,
+    "ai_marked_memos": 0,
+    "independent_current_truth": "not_established"
+  },
+  {
+    "path": "data/validation/roadview_capacity_yeonnam.csv",
+    "sha256": "8211bd390c8db22c1efdd62f49f8419c0fdf78180b7a26bf38a7e2f9a48d6d72",
+    "rows": 29,
+    "nonempty_labels": 0,
+    "ai_marked_memos": 0,
+    "independent_current_truth": "not_established"
+  },
+  {
+    "path": "data/validation/roadview_sample.csv",
+    "sha256": "76cdcbee94f80fa79ef57c55f046dadde34fde9f0c0b8d5057420188f54f2543",
+    "rows": 30,
+    "nonempty_labels": 30,
+    "ai_marked_memos": 30,
+    "independent_current_truth": "not_established"
+  }
+]

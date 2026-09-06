@@ -1,0 +1,1572 @@
+{
+  "rules": {
+    "master_id_unique": {
+      "pass": 52642
+    },
+    "master_pnu_in_current_polygon_source": {
+      "pass": 52642
+    },
+    "geometry_basic": {
+      "pass": 52642
+    },
+    "capacity_active_range": {
+      "pass": 52642
+    },
+    "vacancy_formula": {
+      "pass": 52642
+    },
+    "status_formula": {
+      "pass": 52642
+    },
+    "floor_semantics": {
+      "pass": 30912
+    },
+    "floor_interval_formula": {
+      "pass": 30912
+    },
+    "within_lot_values_consistent": {
+      "pass": 44140,
+      "fail": 613
+    },
+    "coverage_shown_equals_master": {
+      "pass": 66
+    },
+    "temporal_observation_alignment": {
+      "not_evaluable": 66
+    }
+  },
+  "hubs": [
+    {
+      "hub": "anam",
+      "polygons": 988,
+      "lots": 782,
+      "eligible_lots": 113,
+      "capacity": 343,
+      "active": 330,
+      "vacancy_pct": 3.79,
+      "unit_counts": {
+        "floor": 113
+      },
+      "conflicting_duplicate_rows": 96
+    },
+    {
+      "hub": "apgujeong-rodeo",
+      "polygons": 769,
+      "lots": 726,
+      "eligible_lots": 583,
+      "capacity": 2225,
+      "active": 1850,
+      "vacancy_pct": 16.85,
+      "unit_counts": {
+        "floor": 583
+      },
+      "conflicting_duplicate_rows": 1
+    },
+    {
+      "hub": "banpo",
+      "polygons": 134,
+      "lots": 89,
+      "eligible_lots": 55,
+      "capacity": 266,
+      "active": 240,
+      "vacancy_pct": 9.77,
+      "unit_counts": {
+        "floor": 55
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "bulgwang",
+      "polygons": 559,
+      "lots": 445,
+      "eligible_lots": 264,
+      "capacity": 658,
+      "active": 504,
+      "vacancy_pct": 23.4,
+      "unit_counts": {
+        "floor": 264
+      },
+      "conflicting_duplicate_rows": 8
+    },
+    {
+      "hub": "cheongdam",
+      "polygons": 636,
+      "lots": 575,
+      "eligible_lots": 393,
+      "capacity": 1399,
+      "active": 1130,
+      "vacancy_pct": 19.23,
+      "unit_counts": {
+        "floor": 393
+      },
+      "conflicting_duplicate_rows": 4
+    },
+    {
+      "hub": "cheongnyangni",
+      "polygons": 2110,
+      "lots": 1508,
+      "eligible_lots": 645,
+      "capacity": 1263,
+      "active": 1057,
+      "vacancy_pct": 16.31,
+      "unit_counts": {
+        "floor": 645
+      },
+      "conflicting_duplicate_rows": 53
+    },
+    {
+      "hub": "cheonho",
+      "polygons": 642,
+      "lots": 586,
+      "eligible_lots": 355,
+      "capacity": 811,
+      "active": 663,
+      "vacancy_pct": 18.25,
+      "unit_counts": {
+        "floor": 355
+      },
+      "conflicting_duplicate_rows": 4
+    },
+    {
+      "hub": "chungmuro",
+      "polygons": 2041,
+      "lots": 1755,
+      "eligible_lots": 739,
+      "capacity": 2030,
+      "active": 1766,
+      "vacancy_pct": 13.0,
+      "unit_counts": {
+        "floor": 739
+      },
+      "conflicting_duplicate_rows": 34
+    },
+    {
+      "hub": "cityhall",
+      "polygons": 635,
+      "lots": 472,
+      "eligible_lots": 305,
+      "capacity": 1120,
+      "active": 1045,
+      "vacancy_pct": 6.7,
+      "unit_counts": {
+        "floor": 305
+      },
+      "conflicting_duplicate_rows": 11
+    },
+    {
+      "hub": "dangsan",
+      "polygons": 244,
+      "lots": 193,
+      "eligible_lots": 116,
+      "capacity": 339,
+      "active": 300,
+      "vacancy_pct": 11.5,
+      "unit_counts": {
+        "floor": 116
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "doksan",
+      "polygons": 230,
+      "lots": 137,
+      "eligible_lots": 40,
+      "capacity": 96,
+      "active": 71,
+      "vacancy_pct": 26.04,
+      "unit_counts": {
+        "floor": 40
+      },
+      "conflicting_duplicate_rows": 1
+    },
+    {
+      "hub": "dongdaemun",
+      "polygons": 2813,
+      "lots": 2408,
+      "eligible_lots": 1152,
+      "capacity": 2737,
+      "active": 2275,
+      "vacancy_pct": 16.88,
+      "unit_counts": {
+        "floor": 1152
+      },
+      "conflicting_duplicate_rows": 47
+    },
+    {
+      "hub": "dosan",
+      "polygons": 1096,
+      "lots": 1029,
+      "eligible_lots": 757,
+      "capacity": 2744,
+      "active": 2307,
+      "vacancy_pct": 15.93,
+      "unit_counts": {
+        "floor": 757
+      },
+      "conflicting_duplicate_rows": 2
+    },
+    {
+      "hub": "euljiro",
+      "polygons": 1972,
+      "lots": 1753,
+      "eligible_lots": 697,
+      "capacity": 2251,
+      "active": 1871,
+      "vacancy_pct": 16.88,
+      "unit_counts": {
+        "floor": 688,
+        "unknown_or_proxy": 9
+      },
+      "conflicting_duplicate_rows": 22
+    },
+    {
+      "hub": "gangnam",
+      "polygons": 987,
+      "lots": 894,
+      "eligible_lots": 534,
+      "capacity": 2327,
+      "active": 2088,
+      "vacancy_pct": 10.27,
+      "unit_counts": {
+        "floor": 534
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "garak",
+      "polygons": 284,
+      "lots": 25,
+      "eligible_lots": 16,
+      "capacity": 86,
+      "active": 75,
+      "vacancy_pct": 12.79,
+      "unit_counts": {
+        "floor": 16
+      },
+      "conflicting_duplicate_rows": 1
+    },
+    {
+      "hub": "garosugil",
+      "polygons": 840,
+      "lots": 816,
+      "eligible_lots": 612,
+      "capacity": 2146,
+      "active": 1806,
+      "vacancy_pct": 15.84,
+      "unit_counts": {
+        "floor": 607,
+        "unknown_or_proxy": 5
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "gongdeok",
+      "polygons": 426,
+      "lots": 281,
+      "eligible_lots": 187,
+      "capacity": 474,
+      "active": 431,
+      "vacancy_pct": 9.07,
+      "unit_counts": {
+        "floor": 187
+      },
+      "conflicting_duplicate_rows": 1
+    },
+    {
+      "hub": "gunja",
+      "polygons": 435,
+      "lots": 415,
+      "eligible_lots": 287,
+      "capacity": 741,
+      "active": 654,
+      "vacancy_pct": 11.74,
+      "unit_counts": {
+        "floor": 287
+      },
+      "conflicting_duplicate_rows": 1
+    },
+    {
+      "hub": "gwangjang",
+      "polygons": 1742,
+      "lots": 1590,
+      "eligible_lots": 560,
+      "capacity": 1434,
+      "active": 1119,
+      "vacancy_pct": 21.97,
+      "unit_counts": {
+        "floor": 560
+      },
+      "conflicting_duplicate_rows": 26
+    },
+    {
+      "hub": "hannam",
+      "polygons": 714,
+      "lots": 609,
+      "eligible_lots": 340,
+      "capacity": 856,
+      "active": 739,
+      "vacancy_pct": 13.67,
+      "unit_counts": {
+        "floor": 340
+      },
+      "conflicting_duplicate_rows": 16
+    },
+    {
+      "hub": "hapjeong",
+      "polygons": 292,
+      "lots": 240,
+      "eligible_lots": 149,
+      "capacity": 383,
+      "active": 342,
+      "vacancy_pct": 10.7,
+      "unit_counts": {
+        "floor": 149
+      },
+      "conflicting_duplicate_rows": 4
+    },
+    {
+      "hub": "hongdae",
+      "polygons": 1325,
+      "lots": 1242,
+      "eligible_lots": 959,
+      "capacity": 3007,
+      "active": 2557,
+      "vacancy_pct": 14.97,
+      "unit_counts": {
+        "floor": 958,
+        "unknown_or_proxy": 1
+      },
+      "conflicting_duplicate_rows": 4
+    },
+    {
+      "hub": "hwagok",
+      "polygons": 557,
+      "lots": 512,
+      "eligible_lots": 301,
+      "capacity": 755,
+      "active": 624,
+      "vacancy_pct": 17.35,
+      "unit_counts": {
+        "floor": 301
+      },
+      "conflicting_duplicate_rows": 1
+    },
+    {
+      "hub": "hyehwa",
+      "polygons": 864,
+      "lots": 712,
+      "eligible_lots": 459,
+      "capacity": 1141,
+      "active": 985,
+      "vacancy_pct": 13.67,
+      "unit_counts": {
+        "floor": 459
+      },
+      "conflicting_duplicate_rows": 16
+    },
+    {
+      "hub": "ikseon",
+      "polygons": 1748,
+      "lots": 1423,
+      "eligible_lots": 927,
+      "capacity": 2568,
+      "active": 1850,
+      "vacancy_pct": 27.96,
+      "unit_counts": {
+        "floor": 896,
+        "unknown_or_proxy": 31
+      },
+      "conflicting_duplicate_rows": 16
+    },
+    {
+      "hub": "itaewon",
+      "polygons": 845,
+      "lots": 696,
+      "eligible_lots": 400,
+      "capacity": 990,
+      "active": 867,
+      "vacancy_pct": 12.42,
+      "unit_counts": {
+        "floor": 400
+      },
+      "conflicting_duplicate_rows": 15
+    },
+    {
+      "hub": "jamsil",
+      "polygons": 579,
+      "lots": 394,
+      "eligible_lots": 255,
+      "capacity": 811,
+      "active": 725,
+      "vacancy_pct": 10.6,
+      "unit_counts": {
+        "floor": 255
+      },
+      "conflicting_duplicate_rows": 36
+    },
+    {
+      "hub": "jamsilsaenae",
+      "polygons": 415,
+      "lots": 329,
+      "eligible_lots": 238,
+      "capacity": 730,
+      "active": 670,
+      "vacancy_pct": 8.22,
+      "unit_counts": {
+        "floor": 238
+      },
+      "conflicting_duplicate_rows": 4
+    },
+    {
+      "hub": "jangan",
+      "polygons": 315,
+      "lots": 252,
+      "eligible_lots": 142,
+      "capacity": 445,
+      "active": 392,
+      "vacancy_pct": 11.91,
+      "unit_counts": {
+        "floor": 142
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "kkachisan",
+      "polygons": 553,
+      "lots": 478,
+      "eligible_lots": 282,
+      "capacity": 677,
+      "active": 548,
+      "vacancy_pct": 19.05,
+      "unit_counts": {
+        "floor": 282
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "konkuk",
+      "polygons": 585,
+      "lots": 543,
+      "eligible_lots": 411,
+      "capacity": 1034,
+      "active": 953,
+      "vacancy_pct": 7.83,
+      "unit_counts": {
+        "floor": 411
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "kyunghee",
+      "polygons": 513,
+      "lots": 452,
+      "eligible_lots": 307,
+      "capacity": 664,
+      "active": 588,
+      "vacancy_pct": 11.45,
+      "unit_counts": {
+        "floor": 307
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "mangwon",
+      "polygons": 959,
+      "lots": 867,
+      "eligible_lots": 580,
+      "capacity": 1407,
+      "active": 1237,
+      "vacancy_pct": 12.08,
+      "unit_counts": {
+        "floor": 580
+      },
+      "conflicting_duplicate_rows": 4
+    },
+    {
+      "hub": "miasageori",
+      "polygons": 745,
+      "lots": 596,
+      "eligible_lots": 375,
+      "capacity": 833,
+      "active": 671,
+      "vacancy_pct": 19.45,
+      "unit_counts": {
+        "floor": 375
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "mokdong-yc",
+      "polygons": 476,
+      "lots": 390,
+      "eligible_lots": 259,
+      "capacity": 702,
+      "active": 580,
+      "vacancy_pct": 17.38,
+      "unit_counts": {
+        "floor": 259
+      },
+      "conflicting_duplicate_rows": 1
+    },
+    {
+      "hub": "mullae",
+      "polygons": 1247,
+      "lots": 944,
+      "eligible_lots": 336,
+      "capacity": 690,
+      "active": 591,
+      "vacancy_pct": 14.35,
+      "unit_counts": {
+        "floor": 336
+      },
+      "conflicting_duplicate_rows": 27
+    },
+    {
+      "hub": "myeongdong",
+      "polygons": 1084,
+      "lots": 923,
+      "eligible_lots": 610,
+      "capacity": 2237,
+      "active": 1905,
+      "vacancy_pct": 14.84,
+      "unit_counts": {
+        "floor": 608,
+        "unknown_or_proxy": 2
+      },
+      "conflicting_duplicate_rows": 13
+    },
+    {
+      "hub": "nambu",
+      "polygons": 490,
+      "lots": 412,
+      "eligible_lots": 220,
+      "capacity": 670,
+      "active": 586,
+      "vacancy_pct": 12.54,
+      "unit_counts": {
+        "floor": 220
+      },
+      "conflicting_duplicate_rows": 12
+    },
+    {
+      "hub": "namdaemun",
+      "polygons": 385,
+      "lots": 338,
+      "eligible_lots": 169,
+      "capacity": 499,
+      "active": 428,
+      "vacancy_pct": 14.23,
+      "unit_counts": {
+        "floor": 169
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "nokdu",
+      "polygons": 282,
+      "lots": 235,
+      "eligible_lots": 173,
+      "capacity": 438,
+      "active": 318,
+      "vacancy_pct": 27.4,
+      "unit_counts": {
+        "floor": 173
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "nonhyeon",
+      "polygons": 843,
+      "lots": 813,
+      "eligible_lots": 549,
+      "capacity": 1796,
+      "active": 1569,
+      "vacancy_pct": 12.64,
+      "unit_counts": {
+        "floor": 549
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "noryangjin",
+      "polygons": 497,
+      "lots": 390,
+      "eligible_lots": 235,
+      "capacity": 585,
+      "active": 465,
+      "vacancy_pct": 20.51,
+      "unit_counts": {
+        "floor": 235
+      },
+      "conflicting_duplicate_rows": 8
+    },
+    {
+      "hub": "oryudong",
+      "polygons": 342,
+      "lots": 293,
+      "eligible_lots": 162,
+      "capacity": 368,
+      "active": 313,
+      "vacancy_pct": 14.95,
+      "unit_counts": {
+        "floor": 162
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "sadang",
+      "polygons": 349,
+      "lots": 307,
+      "eligible_lots": 238,
+      "capacity": 708,
+      "active": 660,
+      "vacancy_pct": 6.78,
+      "unit_counts": {
+        "floor": 238
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "samcheong",
+      "polygons": 614,
+      "lots": 554,
+      "eligible_lots": 278,
+      "capacity": 474,
+      "active": 418,
+      "vacancy_pct": 11.81,
+      "unit_counts": {
+        "floor": 278
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "sangbong",
+      "polygons": 573,
+      "lots": 480,
+      "eligible_lots": 274,
+      "capacity": 580,
+      "active": 475,
+      "vacancy_pct": 18.1,
+      "unit_counts": {
+        "floor": 274
+      },
+      "conflicting_duplicate_rows": 5
+    },
+    {
+      "hub": "sanggye",
+      "polygons": 642,
+      "lots": 475,
+      "eligible_lots": 323,
+      "capacity": 675,
+      "active": 542,
+      "vacancy_pct": 19.7,
+      "unit_counts": {
+        "floor": 323
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "seochon",
+      "polygons": 846,
+      "lots": 696,
+      "eligible_lots": 442,
+      "capacity": 860,
+      "active": 758,
+      "vacancy_pct": 11.86,
+      "unit_counts": {
+        "floor": 442
+      },
+      "conflicting_duplicate_rows": 9
+    },
+    {
+      "hub": "seolleung",
+      "polygons": 848,
+      "lots": 803,
+      "eligible_lots": 520,
+      "capacity": 2104,
+      "active": 1863,
+      "vacancy_pct": 11.45,
+      "unit_counts": {
+        "floor": 520
+      },
+      "conflicting_duplicate_rows": 4
+    },
+    {
+      "hub": "seongsu",
+      "polygons": 831,
+      "lots": 539,
+      "eligible_lots": 324,
+      "capacity": 852,
+      "active": 757,
+      "vacancy_pct": 11.15,
+      "unit_counts": {
+        "floor": 324
+      },
+      "conflicting_duplicate_rows": 8
+    },
+    {
+      "hub": "seoulsup",
+      "polygons": 698,
+      "lots": 474,
+      "eligible_lots": 326,
+      "capacity": 807,
+      "active": 714,
+      "vacancy_pct": 11.52,
+      "unit_counts": {
+        "floor": 326
+      },
+      "conflicting_duplicate_rows": 9
+    },
+    {
+      "hub": "sharosugil",
+      "polygons": 570,
+      "lots": 497,
+      "eligible_lots": 306,
+      "capacity": 797,
+      "active": 693,
+      "vacancy_pct": 13.05,
+      "unit_counts": {
+        "floor": 306
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "sillim",
+      "polygons": 1183,
+      "lots": 1095,
+      "eligible_lots": 550,
+      "capacity": 1409,
+      "active": 1200,
+      "vacancy_pct": 14.83,
+      "unit_counts": {
+        "floor": 550
+      },
+      "conflicting_duplicate_rows": 8
+    },
+    {
+      "hub": "sinchon",
+      "polygons": 1443,
+      "lots": 1131,
+      "eligible_lots": 690,
+      "capacity": 1972,
+      "active": 1633,
+      "vacancy_pct": 17.19,
+      "unit_counts": {
+        "floor": 690
+      },
+      "conflicting_duplicate_rows": 16
+    },
+    {
+      "hub": "songridan",
+      "polygons": 453,
+      "lots": 423,
+      "eligible_lots": 301,
+      "capacity": 866,
+      "active": 788,
+      "vacancy_pct": 9.01,
+      "unit_counts": {
+        "floor": 301
+      },
+      "conflicting_duplicate_rows": 1
+    },
+    {
+      "hub": "sukmyung",
+      "polygons": 600,
+      "lots": 528,
+      "eligible_lots": 301,
+      "capacity": 673,
+      "active": 569,
+      "vacancy_pct": 15.45,
+      "unit_counts": {
+        "floor": 301
+      },
+      "conflicting_duplicate_rows": 11
+    },
+    {
+      "hub": "sungshin",
+      "polygons": 714,
+      "lots": 524,
+      "eligible_lots": 353,
+      "capacity": 876,
+      "active": 765,
+      "vacancy_pct": 12.67,
+      "unit_counts": {
+        "floor": 353
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "suyu",
+      "polygons": 1095,
+      "lots": 852,
+      "eligible_lots": 578,
+      "capacity": 1388,
+      "active": 1138,
+      "vacancy_pct": 18.01,
+      "unit_counts": {
+        "floor": 578
+      },
+      "conflicting_duplicate_rows": 2
+    },
+    {
+      "hub": "teheran",
+      "polygons": 871,
+      "lots": 835,
+      "eligible_lots": 534,
+      "capacity": 1959,
+      "active": 1734,
+      "vacancy_pct": 11.49,
+      "unit_counts": {
+        "floor": 534
+      },
+      "conflicting_duplicate_rows": 1
+    },
+    {
+      "hub": "wangsimni",
+      "polygons": 987,
+      "lots": 721,
+      "eligible_lots": 469,
+      "capacity": 1072,
+      "active": 929,
+      "vacancy_pct": 13.34,
+      "unit_counts": {
+        "floor": 469
+      },
+      "conflicting_duplicate_rows": 10
+    },
+    {
+      "hub": "yeonhui",
+      "polygons": 477,
+      "lots": 434,
+      "eligible_lots": 240,
+      "capacity": 613,
+      "active": 525,
+      "vacancy_pct": 14.36,
+      "unit_counts": {
+        "floor": 240
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "yeonnam",
+      "polygons": 1133,
+      "lots": 1048,
+      "eligible_lots": 770,
+      "capacity": 2123,
+      "active": 1857,
+      "vacancy_pct": 12.53,
+      "unit_counts": {
+        "floor": 770
+      },
+      "conflicting_duplicate_rows": 3
+    },
+    {
+      "hub": "yeonsinnae",
+      "polygons": 816,
+      "lots": 718,
+      "eligible_lots": 503,
+      "capacity": 1219,
+      "active": 965,
+      "vacancy_pct": 20.84,
+      "unit_counts": {
+        "floor": 503
+      },
+      "conflicting_duplicate_rows": 2
+    },
+    {
+      "hub": "yeouido",
+      "polygons": 250,
+      "lots": 155,
+      "eligible_lots": 73,
+      "capacity": 346,
+      "active": 316,
+      "vacancy_pct": 8.67,
+      "unit_counts": {
+        "floor": 73
+      },
+      "conflicting_duplicate_rows": 0
+    },
+    {
+      "hub": "yongsan",
+      "polygons": 411,
+      "lots": 289,
+      "eligible_lots": 149,
+      "capacity": 305,
+      "active": 274,
+      "vacancy_pct": 10.16,
+      "unit_counts": {
+        "floor": 149
+      },
+      "conflicting_duplicate_rows": 5
+    }
+  ],
+  "raw_store_diagnostics": [
+    {
+      "hub": "anam",
+      "stores": 1927,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1357,
+      "outside_same_pnu_footprint": 206,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "apgujeong-rodeo",
+      "stores": 4520,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3117,
+      "outside_same_pnu_footprint": 129,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "banpo",
+      "stores": 3428,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2743,
+      "outside_same_pnu_footprint": 1052,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "bulgwang",
+      "stores": 2088,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1788,
+      "outside_same_pnu_footprint": 145,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "cheongdam",
+      "stores": 3301,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2067,
+      "outside_same_pnu_footprint": 73,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "cheongnyangni",
+      "stores": 4273,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3349,
+      "outside_same_pnu_footprint": 535,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "cheonho",
+      "stores": 3543,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2484,
+      "outside_same_pnu_footprint": 103,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "chungmuro",
+      "stores": 6577,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 4527,
+      "outside_same_pnu_footprint": 453,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "cityhall",
+      "stores": 7178,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 4302,
+      "outside_same_pnu_footprint": 911,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "dangsan",
+      "stores": 1318,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1000,
+      "outside_same_pnu_footprint": 80,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "doksan",
+      "stores": 1949,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1648,
+      "outside_same_pnu_footprint": 240,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "dongdaemun",
+      "stores": 8178,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 5719,
+      "outside_same_pnu_footprint": 570,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "dosan",
+      "stores": 6783,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 4112,
+      "outside_same_pnu_footprint": 250,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "euljiro",
+      "stores": 8100,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 4534,
+      "outside_same_pnu_footprint": 390,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "gangnam",
+      "stores": 11677,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 8070,
+      "outside_same_pnu_footprint": 740,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "garak",
+      "stores": 1029,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 552,
+      "outside_same_pnu_footprint": 123,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "garosugil",
+      "stores": 5264,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3522,
+      "outside_same_pnu_footprint": 67,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "gongdeok",
+      "stores": 3224,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2258,
+      "outside_same_pnu_footprint": 265,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "gunja",
+      "stores": 2330,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1644,
+      "outside_same_pnu_footprint": 60,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "gwangjang",
+      "stores": 4276,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2376,
+      "outside_same_pnu_footprint": 395,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "hannam",
+      "stores": 2545,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1669,
+      "outside_same_pnu_footprint": 164,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "hapjeong",
+      "stores": 2466,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1016,
+      "outside_same_pnu_footprint": 8,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "hongdae",
+      "stores": 7758,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 5383,
+      "outside_same_pnu_footprint": 136,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "hwagok",
+      "stores": 2456,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1885,
+      "outside_same_pnu_footprint": 55,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "hyehwa",
+      "stores": 2194,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1825,
+      "outside_same_pnu_footprint": 149,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "ikseon",
+      "stores": 5765,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3884,
+      "outside_same_pnu_footprint": 399,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "itaewon",
+      "stores": 3014,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2115,
+      "outside_same_pnu_footprint": 170,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "jamsil",
+      "stores": 4678,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3709,
+      "outside_same_pnu_footprint": 1050,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "jamsilsaenae",
+      "stores": 2754,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2182,
+      "outside_same_pnu_footprint": 69,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "jangan",
+      "stores": 1594,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1074,
+      "outside_same_pnu_footprint": 135,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "kkachisan",
+      "stores": 2177,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1683,
+      "outside_same_pnu_footprint": 74,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "konkuk",
+      "stores": 3138,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2127,
+      "outside_same_pnu_footprint": 133,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "kyunghee",
+      "stores": 1623,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1262,
+      "outside_same_pnu_footprint": 141,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "mangwon",
+      "stores": 4055,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3029,
+      "outside_same_pnu_footprint": 66,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "miasageori",
+      "stores": 2532,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2077,
+      "outside_same_pnu_footprint": 132,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "mokdong-yc",
+      "stores": 2926,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1934,
+      "outside_same_pnu_footprint": 124,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "mullae",
+      "stores": 4353,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3334,
+      "outside_same_pnu_footprint": 359,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "myeongdong",
+      "stores": 7964,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 4590,
+      "outside_same_pnu_footprint": 994,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "nambu",
+      "stores": 4096,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2877,
+      "outside_same_pnu_footprint": 94,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "namdaemun",
+      "stores": 3476,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1811,
+      "outside_same_pnu_footprint": 279,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "nokdu",
+      "stores": 1416,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 664,
+      "outside_same_pnu_footprint": 10,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "nonhyeon",
+      "stores": 5660,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3718,
+      "outside_same_pnu_footprint": 126,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "noryangjin",
+      "stores": 2154,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1157,
+      "outside_same_pnu_footprint": 116,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "oryudong",
+      "stores": 1281,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1094,
+      "outside_same_pnu_footprint": 55,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "sadang",
+      "stores": 2354,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1368,
+      "outside_same_pnu_footprint": 84,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "samcheong",
+      "stores": 1349,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 854,
+      "outside_same_pnu_footprint": 163,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "sangbong",
+      "stores": 2324,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1522,
+      "outside_same_pnu_footprint": 156,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "sanggye",
+      "stores": 2291,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1903,
+      "outside_same_pnu_footprint": 91,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "seochon",
+      "stores": 2217,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1764,
+      "outside_same_pnu_footprint": 319,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "seolleung",
+      "stores": 9198,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 6777,
+      "outside_same_pnu_footprint": 181,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "seongsu",
+      "stores": 4622,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3383,
+      "outside_same_pnu_footprint": 781,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "seoulsup",
+      "stores": 2772,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1788,
+      "outside_same_pnu_footprint": 282,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "sharosugil",
+      "stores": 2728,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1934,
+      "outside_same_pnu_footprint": 82,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "sillim",
+      "stores": 4017,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3247,
+      "outside_same_pnu_footprint": 125,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "sinchon",
+      "stores": 4659,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3702,
+      "outside_same_pnu_footprint": 308,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "songridan",
+      "stores": 3465,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2180,
+      "outside_same_pnu_footprint": 384,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "sukmyung",
+      "stores": 1900,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1319,
+      "outside_same_pnu_footprint": 82,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "sungshin",
+      "stores": 2171,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1480,
+      "outside_same_pnu_footprint": 47,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "suyu",
+      "stores": 4050,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 3322,
+      "outside_same_pnu_footprint": 115,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "teheran",
+      "stores": 8284,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 5468,
+      "outside_same_pnu_footprint": 253,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "wangsimni",
+      "stores": 3096,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2334,
+      "outside_same_pnu_footprint": 115,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "yeonhui",
+      "stores": 1550,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1199,
+      "outside_same_pnu_footprint": 14,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "yeonnam",
+      "stores": 5969,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 4161,
+      "outside_same_pnu_footprint": 128,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "yeonsinnae",
+      "stores": 3160,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 2432,
+      "outside_same_pnu_footprint": 124,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "yeouido",
+      "stores": 5423,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 4714,
+      "outside_same_pnu_footprint": 766,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    },
+    {
+      "hub": "yongsan",
+      "stores": 2400,
+      "missing_store_ids": 0,
+      "duplicate_store_id_excess": 0,
+      "store_rows_with_matching_pnu": 1373,
+      "outside_same_pnu_footprint": 202,
+      "coordinates_not_evaluable": 0,
+      "note": "coordinate_disagreement_not_confirmed_misassignment; point_on_boundary_may_count_outside"
+    }
+  ],
+  "excluded_checks": [
+    "full_geometry_topology",
+    "independent_ground_truth",
+    "all_ledger_rows",
+    "reconstructed_all_join_edges"
+  ],
+  "legacy_lineage_status": "not_verified"
+}
