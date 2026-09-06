@@ -29,22 +29,57 @@ ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 echo "[install_pkgs] repo root: $ROOT"
 
 # --- backend ---------------------------------------------------------------
-# 이미 있으면 건너뛴다. 훅은 매 세션 도는데 setup script 와 달리 환경 캐시의
-# 이득을 못 받으므로, 재설치를 피하는 이 검사가 세션 시작 지연을 좌우한다.
-if python -c "import fastapi" 2>/dev/null; then
+# ⚠ 2026-09-06: 처음엔 `pip install -q` 로 적었다가 실패 이유를 통째로 가렸다.
+#    "WARN 설치 실패"만 남고 무엇이 왜 안 됐는지가 없어 한 사이클을 더 태웠다.
+#    설치 로그는 실패했을 때만, 그러나 반드시 보인다.
+#
+# 인터프리터 선택: 이 프로젝트는 requires-python = ~=3.11.0 이고 CI 도 3.11 로 돈다.
+# 클라우드 VM 의 기본 python 이 더 최신이면 requirements.txt 의 핀 고정 버전에
+# 그 버전용 휠이 없어(psycopg2-binary==2.9.9 가 대표적이다) 소스 빌드로 넘어가고
+# libpq 헤더가 없어 죽는다. 그래서 3.11 이 있으면 그것을 먼저 쓴다.
+echo "[install_pkgs] 기본 python: $(python -V 2>&1) at $(command -v python || echo '?')"
+
+PY=python
+for cand in python3.11 /usr/bin/python3.11 /usr/local/bin/python3.11; do
+  if command -v "$cand" >/dev/null 2>&1; then
+    PY="$cand"
+    echo "[install_pkgs] 3.11 발견: $cand — 이것으로 설치한다"
+    break
+  fi
+done
+
+if "$PY" -c "import fastapi" 2>/dev/null; then
+  # 훅은 매 세션 도는데 setup script 와 달리 환경 캐시 이득을 못 받는다.
+  # 재설치를 피하는 이 검사가 세션 시작 지연을 좌우한다.
   echo "[install_pkgs] backend: 이미 설치됨 — 건너뜀"
 else
   REQ="$ROOT/apps/backend/requirements.txt"
   if [ ! -f "$REQ" ]; then
     echo "[install_pkgs] WARN backend: $REQ 가 없다 — 루트 판정이 틀렸다"
   else
-    echo "[install_pkgs] backend: 설치 시작"
-    # Ubuntu 24.04 는 시스템 파이썬에 pip install 을 막는다(PEP 668).
-    # 먼저 평범하게 시도하고, 그 차단에만 걸리면 --break-system-packages 로 넘는다.
-    python -m pip install -q -r "$REQ" \
-      || python -m pip install -q --break-system-packages -r "$REQ" \
-      || echo "[install_pkgs] WARN backend 설치 실패 — pytest 는 못 돈다"
+    echo "[install_pkgs] backend: $PY 로 설치 시작"
+    LOG="$(mktemp)"
+    # ① 평범하게 → ② PEP 668(externally-managed) 차단이면 그것만 넘어서
+    # → ③ uv(사전 설치돼 있다)로 마지막 시도. uv 는 해석기가 달라 가끔 통과한다.
+    if "$PY" -m pip install -r "$REQ" >"$LOG" 2>&1 \
+       || "$PY" -m pip install --break-system-packages -r "$REQ" >>"$LOG" 2>&1 \
+       || { command -v uv >/dev/null 2>&1 \
+            && uv pip install --python "$PY" -r "$REQ" >>"$LOG" 2>&1; }; then
+      echo "[install_pkgs] backend: 설치 완료"
+    else
+      echo "[install_pkgs] WARN backend 설치 실패 — pytest 는 못 돈다. 로그 마지막 40줄:"
+      tail -40 "$LOG"
+    fi
+    rm -f "$LOG"
   fi
+fi
+
+# 기본 python 과 설치에 쓴 인터프리터가 다르면 `python -m pytest` 로는 못 찾는다.
+# 어떤 명령을 써야 하는지 여기서 알려 준다 — 모르면 "또 설치 실패"로 읽힌다.
+if [ "$PY" != "python" ] && "$PY" -c "import fastapi" 2>/dev/null \
+   && ! python -c "import fastapi" 2>/dev/null; then
+  echo "[install_pkgs] ⚠ 백엔드 의존성은 $PY 에만 있다."
+  echo "[install_pkgs]   테스트: cd apps/backend && $PY -m pytest -q"
 fi
 
 # --- frontend --------------------------------------------------------------
