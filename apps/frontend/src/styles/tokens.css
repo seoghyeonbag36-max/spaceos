@@ -15,6 +15,11 @@
   --brand: #0EA5B7; --brand-pressed: #0B8294;
   --ink: #1C2533; --muted: #6B7280; --line: #E3E9F2; --surface: #FFFFFF; --bg: #F4F7FB;
   --radius-md: 12px; --radius-lg: 16px;
+  /* 간격(spacing) 4px 그리드 — padding·margin·gap 의 단일 출처.
+     기존 CSS 에는 5·7·9·11·13px 처럼 그리드를 벗어난 값이 많다. 그건 여기서
+     반올림하지 않는다(픽셀이 움직이면 리팩터가 아니다) — 정리는 값을 정한 뒤에. */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
   --shadow-card: 0 1px 3px rgba(11,27,51,.08), 0 4px 12px rgba(11,27,51,.06);
   --shadow-sheet: 0 -4px 24px rgba(11,27,51,.12);
   --font-sans: "Pretendard", system-ui, sans-serif;

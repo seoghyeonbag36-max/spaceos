@@ -11,7 +11,7 @@
   /* 지도를 덮지 않는다 — 자식 오버레이만 이벤트를 받는다. */
   pointer-events: none;
   font-family: var(--font-sans, system-ui, sans-serif);
-  color: var(--ink, #1c2533);
+  color: var(--ink);
 }
 .mapshell > * { pointer-events: auto; }
 
@@ -21,7 +21,7 @@
 /* 상단: 검색 + 레이어 토글 */
 .mapshell .overlay-top {
   top: 12px; left: 12px; right: 12px;
-  display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start;
+  display: flex; gap: var(--sp-2); flex-wrap: wrap; align-items: flex-start;
   pointer-events: none; /* 빈 영역은 지도 드래그 통과 */
 }
 .mapshell .overlay-top > * { pointer-events: auto; }
@@ -29,69 +29,69 @@
 /* 거점 선택 — 건물 폴리곤이 있는 실측 거점만 담긴다 */
 .mapshell .hub-select {
   flex: 0 0 auto; height: 40px; padding: 0 10px;
-  border: 1px solid var(--line, #e3e9f2); border-radius: 10px;
-  background: #fff; box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
-  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--ink, #1c2533);
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--ink);
   cursor: pointer; outline: none; max-width: 240px;
 }
-.mapshell .hub-select:focus { border-color: var(--brand, #0ea5b7); }
+.mapshell .hub-select:focus { border-color: var(--brand); }
 
 .mapshell .search {
   flex: 0 1 260px; min-width: 160px;
   height: 40px; padding: 0 14px;
-  border: 1px solid var(--line, #e3e9f2); border-radius: 10px;
-  background: #fff; box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
   font-size: 13px; outline: none;
 }
-.mapshell .search:focus { border-color: var(--brand, #0ea5b7); }
+.mapshell .search:focus { border-color: var(--brand); }
 
 /* 세그먼트 토글 (유동인구/공실/임대/인구밀도) */
 .mapshell .seg {
-  display: flex; background: #fff;
-  border: 1px solid var(--line, #e3e9f2); border-radius: 10px; overflow: hidden;
+  display: flex; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
   box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
 }
 .mapshell .seg button {
   appearance: none; border: 0; background: transparent; cursor: pointer;
-  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--muted, #6b7280);
+  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--muted);
   padding: 0 14px; height: 40px; white-space: nowrap;
-  border-left: 1px solid var(--line, #e3e9f2);
+  border-left: 1px solid var(--line);
 }
 .mapshell .seg button:first-child { border-left: 0; }
-.mapshell .seg button.active { background: var(--brand, #0ea5b7); color: #fff; }
+.mapshell .seg button.active { background: var(--brand); color: var(--surface); }
 
 /* 우하단 범례 */
 .mapshell .legend {
   right: 12px; bottom: 12px;
-  display: flex; gap: 12px; align-items: center;
-  background: rgba(255,255,255,.94); padding: 8px 12px;
-  border: 1px solid var(--line, #e3e9f2); border-radius: 10px;
+  display: flex; gap: var(--sp-3); align-items: center;
+  background: rgba(255,255,255,.94); padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line); border-radius: 10px;
   box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
-  font-size: 11px; color: var(--muted, #6b7280);
+  font-size: 11px; color: var(--muted);
 }
 .mapshell .legend .chip { display: inline-flex; align-items: center; gap: 5px; }
 .mapshell .legend .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
 /* 점 모드(줌 15 이하)의 범례 스와치는 지도 위 마커와 같은 모양이어야 한다 —
    네모 칩을 두고 지도에는 동그란 점을 찍으면 둘이 같은 것인지 읽히지 않는다. */
-.mapshell .legend .sw.dot { border-radius: 50%; border: 1.5px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .12); }
-.mapshell .legend .note { color: var(--ink, #1c2533); font-weight: 700; }
+.mapshell .legend .sw.dot { border-radius: 50%; border: 1.5px solid var(--surface); box-shadow: 0 0 0 1px rgba(0, 0, 0, .12); }
+.mapshell .legend .note { color: var(--ink); font-weight: 700; }
 
 /* 좌측 리스트 패널 (데스크탑) */
 .mapshell .side-panel {
   top: 64px; left: 12px; bottom: 12px; width: 320px;
   display: flex; flex-direction: column;
-  background: #fff; border: 1px solid var(--line, #e3e9f2);
+  background: var(--surface); border: 1px solid var(--line);
   border-radius: 14px; box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
   overflow: hidden;
 }
 .mapshell .side-panel .sp-head {
-  padding: 14px 16px 10px; border-bottom: 1px solid var(--line, #e3e9f2);
+  padding: 14px var(--sp-4) 10px; border-bottom: 1px solid var(--line);
 }
 .mapshell .side-panel .sp-title { font-size: 15px; font-weight: 800; }
 /* 4P 전환 라벨 — Page 트랙이 무엇의 디지털 전환인지 화면에서 밝힌다(2026-09-05 재정의). */
 .mapshell .side-panel .sp-track { font-size: 10px; font-weight: 700; letter-spacing: .9px;
   color: #2BC8D9; margin-bottom: 2px; }
-.mapshell .side-panel .sp-sub { font-size: 12px; color: var(--muted, #6b7280); margin-top: 2px; }
+.mapshell .side-panel .sp-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 /* R-ONE 앵커 대조 — 판정이 아니라 참고 지표라 중립색(PageDashboard .anchorchip 과 동일 규칙) */
 .mapshell .side-panel .sp-anchor {
   display: inline-block; margin-top: 6px; padding: 1px 6px; border-radius: 5px;
@@ -101,43 +101,43 @@
 
 .mapshell .b-item {
   display: flex; align-items: center; gap: 10px; width: 100%;
-  padding: 12px 16px; border: 0; border-bottom: 1px solid #f1f4f9;
+  padding: var(--sp-3) var(--sp-4); border: 0; border-bottom: 1px solid #f1f4f9;
   background: transparent; cursor: pointer; text-align: left; font-family: inherit;
 }
 .mapshell .b-item:hover { background: #f7faff; }
 .mapshell .b-item.active { background: var(--brand-soft, #e6f7f9); }
 .mapshell .b-dot { width: 12px; height: 12px; border-radius: 50%; flex: 0 0 auto; }
-.mapshell .b-name { font-size: 13px; font-weight: 700; color: var(--ink, #1c2533); }
-.mapshell .b-meta { font-size: 11px; color: var(--muted, #6b7280); margin-top: 1px; }
+.mapshell .b-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+.mapshell .b-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
 .mapshell .b-vac { margin-left: auto; font-size: 13px; font-weight: 800; }
 
 /* 선택 건물 상세 (패널 하단) */
-.mapshell .b-detail { border-top: 1px solid var(--line, #e3e9f2); padding: 14px 16px; }
+.mapshell .b-detail { border-top: 1px solid var(--line); padding: 14px var(--sp-4); }
 .mapshell .b-detail .row { display: flex; justify-content: space-between; font-size: 12px; margin-top: 6px; }
-.mapshell .b-detail .row span:first-child { color: var(--muted, #6b7280); }
+.mapshell .b-detail .row span:first-child { color: var(--muted); }
 .mapshell .b-detail .row span:last-child { font-weight: 700; }
 /* GNN 업종 추천 블록 — 실측 공실 수치와 시각적으로 구분한다(추천은 모델 산출물이다) */
 .mapshell .b-rec {
-  margin-top: 12px; padding-top: 10px;
-  border-top: 1px dashed var(--line, #e3e9f2);
+  margin-top: var(--sp-3); padding-top: 10px;
+  border-top: 1px dashed var(--line);
 }
 .mapshell .b-rec-h {
   display: flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 700; color: var(--ink, #1c2533);
+  font-size: 12px; font-weight: 700; color: var(--ink);
 }
 .mapshell .b-rec-badge {
   font-size: 10px; font-weight: 800; letter-spacing: .3px;
   padding: 1px 6px; border-radius: 999px;
-  background: var(--brand-soft, #e6f7f9); color: var(--brand-pressed, #0b8294);
+  background: var(--brand-soft, #e6f7f9); color: var(--brand-pressed);
 }
 /* 성능을 정직하게 — Top-3 만 보면 과대평가된다(베이스라인 0.89, lift +3.1%) */
 .mapshell .b-rec-note {
-  margin-top: 8px; font-size: 11px; line-height: 1.5;
-  color: var(--muted, #6b7280);
+  margin-top: var(--sp-2); font-size: 11px; line-height: 1.5;
+  color: var(--muted);
 }
 .mapshell .b-twin {
-  margin-top: 12px; width: 100%; height: 36px; border: 0; border-radius: 9px;
-  background: var(--ink, #1c2533); color: #fff; font-weight: 700; font-size: 13px;
+  margin-top: var(--sp-3); width: 100%; height: 36px; border: 0; border-radius: 9px;
+  background: var(--ink); color: var(--surface); font-weight: 700; font-size: 13px;
   cursor: pointer; font-family: inherit;
 }
 
@@ -145,12 +145,12 @@
 .mapshell .time-bar {
   left: 50%; bottom: 12px; transform: translateX(-50%);
   display: flex; align-items: center; gap: 10px;
-  background: rgba(255,255,255,.94); padding: 8px 14px;
-  border: 1px solid var(--line, #e3e9f2); border-radius: 999px;
+  background: rgba(255,255,255,.94); padding: var(--sp-2) 14px;
+  border: 1px solid var(--line); border-radius: 999px;
   box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
 }
 .mapshell .time-bar input { width: 200px; }
-.mapshell .time-bar .t { font-size: 13px; font-weight: 800; color: var(--brand-pressed, #0b8294); min-width: 44px; text-align: center; }
+.mapshell .time-bar .t { font-size: 13px; font-weight: 800; color: var(--brand-pressed); min-width: 44px; text-align: center; }
 
 /* 모바일: 좌측 패널 → 하단 바텀시트, 범례/슬라이더 위치 보정 */
 @media (max-width: 768px) {
@@ -171,24 +171,24 @@
 .mapshell .twin-box {
   width: min(560px, 92vw); height: min(460px, 80vh);
   display: flex; flex-direction: column;
-  background: #fff; border-radius: 16px; overflow: hidden;
+  background: var(--surface); border-radius: 16px; overflow: hidden;
   box-shadow: 0 20px 60px rgba(11, 27, 51, 0.35);
 }
 .mapshell .twin-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; border-bottom: 1px solid var(--line, #e3e9f2);
+  padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--line);
   font-size: 14px; font-weight: 800;
 }
 .mapshell .twin-head button {
   border: 0; background: transparent; cursor: pointer;
-  font-size: 16px; color: var(--muted, #6b7280); line-height: 1;
+  font-size: 16px; color: var(--muted); line-height: 1;
 }
 .mapshell .twin-canvas { flex: 1; min-height: 0; background: #eef2f8; }
 .mapshell .twin-load {
   width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-  color: var(--muted, #6b7280); font-size: 13px;
+  color: var(--muted); font-size: 13px;
 }
 .mapshell .twin-foot {
-  padding: 10px 16px; border-top: 1px solid var(--line, #e3e9f2);
-  font-size: 12px; color: var(--muted, #6b7280);
+  padding: 10px var(--sp-4); border-top: 1px solid var(--line);
+  font-size: 12px; color: var(--muted);
 }

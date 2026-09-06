@@ -9,105 +9,105 @@
 /* ── A 상단: 거점 검색 ── */
 .maphost > .hx-top {
   top: 12px; left: 12px; right: 12px;
-  display: flex; gap: 8px;
+  display: flex; gap: var(--sp-2);
   pointer-events: none;             /* 빈 영역은 지도 드래그가 통과한다 */
 }
 .maphost > .hx-top > * { pointer-events: auto; }
 .hx-search {
   flex: 0 1 260px; min-width: 160px; height: 40px; padding: 0 14px;
-  border: 1px solid var(--line, #e3e9f2); border-radius: 10px;
-  background: #fff; box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
-  font-family: inherit; font-size: 13px; color: var(--ink, #1c2533); outline: none;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+  font-family: inherit; font-size: 13px; color: var(--ink); outline: none;
 }
-.hx-search:focus { border-color: var(--brand, #0ea5b7); }
+.hx-search:focus { border-color: var(--brand); }
 
 /* ── B 좌측: 거점 목록 ── */
 .maphost > .hx-list {
   top: 64px; left: 12px; bottom: 12px; width: 320px;
   display: flex; flex-direction: column;
-  background: #fff; border: 1px solid var(--line, #e3e9f2);
+  background: var(--surface); border: 1px solid var(--line);
   border-radius: 14px; box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
   overflow: hidden;
 }
-.hx-list-head { padding: 14px 16px 10px; border-bottom: 1px solid var(--line, #e3e9f2); }
+.hx-list-head { padding: 14px var(--sp-4) 10px; border-bottom: 1px solid var(--line); }
 /* PPPP 트랙 표식 — 이 화면이 4P 중 어디에 서 있는지 밝힌다 */
 .hx-track {
   font-size: 10px; font-weight: 800; letter-spacing: .6px;
-  color: var(--brand-pressed, #0b8294);
+  color: var(--brand-pressed);
 }
 .hx-title { font-size: 15px; font-weight: 800; margin-top: 2px; }
-.hx-sub { font-size: 12px; color: var(--muted, #6b7280); margin-top: 2px; }
+.hx-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .hx-list-body { flex: 1; overflow-y: auto; }
 
 .hx-city {
   position: sticky; top: 0; z-index: 1;
-  padding: 7px 16px; background: #f7faff;
+  padding: 7px var(--sp-4); background: #f7faff;
   border-bottom: 1px solid #eef2f8;
-  font-size: 11px; font-weight: 800; color: var(--muted, #6b7280);
+  font-size: 11px; font-weight: 800; color: var(--muted);
 }
 .hx-item {
   display: flex; align-items: center; gap: 10px; width: 100%;
-  padding: 10px 16px; border: 0; border-bottom: 1px solid #f1f4f9;
+  padding: 10px var(--sp-4); border: 0; border-bottom: 1px solid #f1f4f9;
   background: transparent; cursor: pointer; text-align: left; font-family: inherit;
 }
 .hx-item:hover { background: #f7faff; }
 .hx-item.active { background: var(--brand-soft, #e6f7f9); }
 .hx-item-main { display: flex; flex-direction: column; min-width: 0; }
 .hx-item-name {
-  font-size: 13px; font-weight: 700; color: var(--ink, #1c2533);
+  font-size: 13px; font-weight: 700; color: var(--ink);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 /* 예외 표식 — 목록에서 눈에 띄되 이름을 밀어내지 않게 */
-.hx-mark { margin-right: 4px; color: var(--muted, #6b7280); }
-.hx-item-meta { font-size: 11px; color: var(--muted, #6b7280); margin-top: 1px; }
+.hx-mark { margin-right: var(--sp-1); color: var(--muted); }
+.hx-item-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
 .hx-item-vac { margin-left: auto; font-size: 13px; font-weight: 800; white-space: nowrap; }
-.hx-empty { padding: 20px 16px; font-size: 12px; color: var(--muted, #6b7280); }
+.hx-empty { padding: 20px var(--sp-4); font-size: 12px; color: var(--muted); }
 
 /* ── C 우측: 거점 요약 ──
    bottom 68 = 범례 44 + 여백 24. 범례를 덮으면 근거 배지가 가려진다. */
 .maphost > .hx-summary {
   top: 64px; right: 12px; bottom: 68px; width: 340px;
   display: flex; flex-direction: column; gap: 10px;
-  padding: 14px 16px 16px;
-  background: #fff; border: 1px solid var(--line, #e3e9f2);
+  padding: 14px var(--sp-4) var(--sp-4);
+  background: var(--surface); border: 1px solid var(--line);
   border-radius: 14px; box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
   overflow-y: auto;
 }
-.hx-placeholder { font-size: 12.5px; line-height: 1.6; color: var(--muted, #6b7280); }
+.hx-placeholder { font-size: 12.5px; line-height: 1.6; color: var(--muted); }
 
-.hx-sum-head { position: relative; padding-right: 24px; }
+.hx-sum-head { position: relative; padding-right: var(--sp-5); }
 .hx-sum-name { font-size: 16px; font-weight: 800; }
-.hx-sum-where { font-size: 12px; color: var(--muted, #6b7280); margin-top: 2px; }
+.hx-sum-where { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .hx-close {
   position: absolute; top: -2px; right: -4px;
   width: 24px; height: 24px; border: 0; border-radius: 6px;
-  background: transparent; color: var(--muted, #6b7280);
+  background: transparent; color: var(--muted);
   font-size: 13px; cursor: pointer; font-family: inherit;
 }
-.hx-close:hover { background: #f4f7fb; }
+.hx-close:hover { background: var(--bg); }
 
 .hx-err {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  padding: 8px 10px; border-radius: var(--radius-md, 12px);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding: var(--sp-2) 10px; border-radius: var(--radius-md, 12px);
   background: rgba(224, 62, 54, .06); border: 1px solid rgba(224, 62, 54, .30);
   font-size: 12px;
 }
 .hx-err button {
-  border: 0; border-radius: 6px; padding: 4px 8px; cursor: pointer;
-  background: var(--ink, #1c2533); color: #fff; font-size: 11px; font-weight: 700;
+  border: 0; border-radius: 6px; padding: var(--sp-1) var(--sp-2); cursor: pointer;
+  background: var(--ink); color: var(--surface); font-size: 11px; font-weight: 700;
   font-family: inherit;
 }
 
 /* 대표 공실률 — 이 화면에서 가장 큰 숫자 */
 .hx-figure {
-  padding: 10px 12px; border-radius: var(--radius-md, 12px);
-  background: var(--bg, #f4f7fb); border: 1px solid var(--line, #e3e9f2);
+  padding: 10px var(--sp-3); border-radius: var(--radius-md, 12px);
+  background: var(--bg); border: 1px solid var(--line);
 }
 .hx-figure-label {
   display: flex; align-items: center; gap: 6px;
-  font-size: 11.5px; font-weight: 700; color: var(--muted, #6b7280);
+  font-size: 11.5px; font-weight: 700; color: var(--muted);
 }
-.hx-figure-value { font-size: 26px; font-weight: 800; margin-top: 4px; }
+.hx-figure-value { font-size: 26px; font-weight: 800; margin-top: var(--sp-1); }
 /* 값이 없는 것이 아니라 **대표하지 못해 내린** 것이다 — 숫자꼴을 쓰지 않는다 */
 .hx-withheld { font-size: 16px; font-weight: 800; color: #b3261e; }
 
@@ -117,10 +117,10 @@
   padding: 7px 0; border-bottom: 1px solid #f1f4f9; font-size: 12px;
 }
 .hx-row:last-child { border-bottom: 0; }
-.hx-row dt { color: var(--muted, #6b7280); margin: 0; }
+.hx-row dt { color: var(--muted); margin: 0; }
 .hx-row dd { margin: 0; font-weight: 700; text-align: right; }
 .hx-gap { color: #5a6b85; font-weight: 800; }
-.hx-dir { color: var(--brand-pressed, #0b8294); }
+.hx-dir { color: var(--brand-pressed); }
 /* 커버리지가 낮으면 대표값을 믿을 이유가 준다 */
 .hx-warn { color: #8a6100; }
 
@@ -130,36 +130,36 @@
   background: #f1f4f8; color: #5a6b85; font-size: 10px; font-weight: 800;
 }
 .hx-badge-src {
-  background: var(--brand-soft, #e6f7f9); color: var(--brand-pressed, #0b8294);
+  background: var(--brand-soft, #e6f7f9); color: var(--brand-pressed);
 }
 
 .hx-foot {
-  margin: 2px 0 0; font-size: 11px; line-height: 1.6; color: var(--muted, #6b7280);
+  margin: 2px 0 0; font-size: 11px; line-height: 1.6; color: var(--muted);
 }
 
 .maphost > .hx-reopen {
   top: 64px; right: 12px;
-  height: 36px; padding: 0 14px; border: 1px solid var(--line, #e3e9f2);
-  border-radius: 10px; background: #fff; cursor: pointer;
+  height: 36px; padding: 0 14px; border: 1px solid var(--line);
+  border-radius: 10px; background: var(--surface); cursor: pointer;
   box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
-  font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--ink, #1c2533);
+  font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--ink);
 }
 
 /* ── D 범례: 경계 근거 ──
    "실측 범위"라고 말한다. 상권 경계라고 말하지 않는다. */
 .maphost > .hx-legend {
   right: 12px; bottom: 12px;
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,.94); padding: 8px 12px;
-  border: 1px solid var(--line, #e3e9f2); border-radius: 10px;
+  display: flex; align-items: center; gap: var(--sp-2);
+  background: rgba(255,255,255,.94); padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line); border-radius: 10px;
   box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
   font-size: 11px;
 }
 .hx-legend-line {
   width: 18px; height: 0; display: inline-block;
-  border-top: 2px solid var(--brand, #0ea5b7);
+  border-top: 2px solid var(--brand);
 }
-.hx-legend-text { color: var(--ink, #1c2533); font-weight: 700; }
+.hx-legend-text { color: var(--ink); font-weight: 700; }
 
 /* 스크린리더 전용 — 거점이 바뀌면 한 줄 알린다 */
 .hx-live {
@@ -200,8 +200,8 @@
    검색 바(top:12, h40) 아래 왼쪽에 둔다 — 범례는 같은 높이 오른쪽이라 부딪히지 않는다. */
 .maphost > .hx-list-toggle {
   left: 12px; top: 60px;
-  height: 36px; padding: 0 14px; border: 1px solid var(--line, #e3e9f2);
-  border-radius: 999px; background: #fff; cursor: pointer;
+  height: 36px; padding: 0 14px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--surface); cursor: pointer;
   box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
-  font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--ink, #1c2533);
+  font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--ink);
 }
