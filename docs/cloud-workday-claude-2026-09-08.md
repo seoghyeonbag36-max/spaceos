@@ -66,6 +66,9 @@
 ## 인계 방식
 
 - 저장소: `seoghyeonbag36-max/spaceos`, PR base 는 `main`.
+- **이 작업표는 `main` 에 없다.** 브랜치 `docs/cloud-workday-2026-09-08` 에만 있다 —
+  `deploy.yml` 에 경로 필터가 없어서 문서 한 줄이라도 main 에 들어가면 Cloud Run 배포가
+  통째로 돈다. 그래서 프롬프트마다 읽을 브랜치를 적어 뒀다. 코드 작업 브랜치는 `main` 에서 딴다.
 - **작업마다 별도 브랜치·별도 PR.** C1~C5 는 만지는 파일이 다르므로 순차 대기가 필요 없다.
   앞 작업이 늦어져도 다음 시각에 다음 작업을 보내면 된다.
 - 브랜치 이름은 각 항목에 적어 뒀다. 클라우드가 다른 이름을 쓰면 그대로 두고 PR URL 만 챙긴다.
@@ -121,7 +124,7 @@
 **읽기 전용 진단이다. 코드를 고치지 않는다.** 원인을 틀리게 짚고 수정부터 하면 되돌리기 어렵다.
 
 ```text
-seoghyeonbag36-max/spaceos 의 main 에서 작업한다. docs/cloud-workday-claude-2026-09-08.md 의
+seoghyeonbag36-max/spaceos 의 main 에서 작업한다. 브랜치 docs/cloud-workday-2026-09-08 의 docs/cloud-workday-claude-2026-09-08.md 의
 공통 계약을 적용하라. 브랜치는 chore/cloud-c1-map-hubswitch-diagnosis 다.
 
 [문제]
@@ -176,7 +179,7 @@ C1_NO_EDIT: apps/ 아래 소스가 하나도 바뀌지 않았다. 새 문서 1�
 말고 C3 로 넘어간다.
 
 ```text
-seoghyeonbag36-max/spaceos 에서 작업한다. docs/cloud-workday-claude-2026-09-08.md 의 공통 계약을
+seoghyeonbag36-max/spaceos 에서 작업한다. 브랜치 docs/cloud-workday-2026-09-08 의 docs/cloud-workday-claude-2026-09-08.md 의 공통 계약을
 적용하라. 브랜치 chore/cloud-c1-map-hubswitch-diagnosis 의 docs/finding-map-hubswitch-2026-09-08.md
 를 먼저 읽어라. 없으면 진행하지 말고 그 사실을 보고하라.
 
@@ -210,7 +213,7 @@ C2_UNVERIFIED: PR 본문 맨 위에 "화면 미확인 — PC 에서 scripts/scre
 ## C3 — 13:00 · 조작 실패 10건은 같은 뿌리인가
 
 ```text
-seoghyeonbag36-max/spaceos 의 main 에서 작업한다. docs/cloud-workday-claude-2026-09-08.md 의
+seoghyeonbag36-max/spaceos 의 main 에서 작업한다. 브랜치 docs/cloud-workday-2026-09-08 의 docs/cloud-workday-claude-2026-09-08.md 의
 공통 계약을 적용하라. 브랜치는 chore/cloud-c3-s0-operation-failures 다.
 
 [문제]
@@ -248,7 +251,7 @@ C3_NO_EDIT: apps/ 와 scripts/ 아래가 바뀌지 않았다. 새 문서 1개만
 ## C4 — 14:30 · 합정에서 heatmap 을 안 부른다 · 사이드패널 제목이 없다
 
 ```text
-seoghyeonbag36-max/spaceos 의 main 에서 작업한다. docs/cloud-workday-claude-2026-09-08.md 의
+seoghyeonbag36-max/spaceos 의 main 에서 작업한다. 브랜치 docs/cloud-workday-2026-09-08 의 docs/cloud-workday-claude-2026-09-08.md 의
 공통 계약을 적용하라. 브랜치는 chore/cloud-c4-map-panel-and-heatmap 이다.
 
 [문제] 화면 회귀에서 map 탭의 판정 실패 2건이다.
@@ -287,7 +290,7 @@ screen_loop.py·reports/* 변경, 백엔드 데이터 계약 변경, 거점 등�
 ⚠ C1~C4 가 밀렸으면 **보내지 않는다.** 이건 급하지 않다.
 
 ```text
-seoghyeonbag36-max/spaceos 의 main 에서 작업한다. docs/cloud-workday-claude-2026-09-08.md 의
+seoghyeonbag36-max/spaceos 의 main 에서 작업한다. 브랜치 docs/cloud-workday-2026-09-08 의 docs/cloud-workday-claude-2026-09-08.md 의
 공통 계약을 적용하라. 브랜치는 chore/cloud-c5-frontend-test-runner 다.
 
 [문제]
