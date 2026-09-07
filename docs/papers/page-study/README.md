@@ -4,7 +4,7 @@
 
 ## 작업 계약
 
-- 대상: 이 디렉터리의 문헌·검증 산출물, `../literature-candidates.md`의 확인된 설계 설명, `../evidence-index.md`의 새 감사 근거, `../paper-page.md`의 방법론 절 하나. 원천·제품 코드·기존 감사 결과는 변경하지 않는다.
+- 대상: 문헌 등록·읽기 장부·이 README·검증 기록, `../literature-candidates.md`, `../evidence-index.md`, `../paper-page.md`의 조건 D 결과 절 하나. 원천·제품 코드·기존 감사 결과는 변경하지 않는다.
 - 입력: 저자 공개본과 공식 출판 기록, 기존 Page 프로토콜, 동결 감사 JSON·CSV와 해시 목록. 가공값과 현실 정답은 구분한다.
 - 확인: `source_identity_and_page_coverage`, `method_claim_traceability`, `artifact_hash_integrity`, `independent_reaggregation`, `manuscript_evidence_links`, `unknowns_preserved`.
 - 금지: 미확인 페이지·출판본·부록을 확인 완료로 표기, 독립 정답 생성, 출처 계약 변경, 사후 분석을 사전등록 연구로 소급 표기, 논문 전체 일괄 작성, 무허가 원문 재배포.
@@ -19,14 +19,20 @@
 | 페이지별 정독·방법 추출 | 공개본 8페이지 텍스트·시각 대조. 본문·표 불일치와 부록 공백 기록 | [읽기 장부·방법 근거표](reading-ledger.md) |
 | SpaceOS 변수 대응·설계 | 계산적 질문·검증 단위·지표·미평가 범위 확정 | [설계와 변수](design-and-variables.md) |
 | 보존 근거 검산·계산 재현 | 감사 파일 224개 해시 일치. 서빙 사본·셀 재합산·새 체크아웃 Gold→서빙 각각 66/66 통과 | [실행 결과](evidence-verification.json) |
-| 근거 등록·집필 | 조건 D 등록 및 원고 §2.4 방법론 작성. 다른 절은 기존 뼈대 | [근거 인덱스](../evidence-index.md#page-condition-d), [Page 원고](../paper-page.md) |
+| 근거 등록·집필 | 조건 D 등록, 원고 §2.4 방법론 및 §3 결과 작성. 다른 절은 기존 뼈대 | [근거 인덱스](../evidence-index.md#page-condition-d), [Page 원고](../paper-page.md) |
 
 기존 순서 시험 198회에서 거점 집계 변화는 없었으나 65거점의 격자 소속 또는 분자·분모에 영향이 있었다. 이는 기존 사후 탐색 결과를 재집계한 수치이며 이번에 새로운 독립 표본을 확보한 결과가 아니다. 새 체크아웃에는 원본 인벤토리 946개 중 265개가 있고 681개는 없다. 전체 Bronze→Gold 재현·클라우드 실행을 완료했다고 주장하지 않는다.
 
 검증 실행: 저장소 루트에서 `python docs/papers/page-study/verify_evidence.py`. 기존 연구 폴더·원천에 쓰거나 네트워크에 연결하는 동작을 차단한다. 실행 결과에는 체크아웃 커밋·실행기·입력·로드한 저장소 코드 해시와 Python 버전이 포함된다.
 
-문헌의 원본·추출문·페이지 이미지는 `private/`에 보존하고 `.gitignore`로 제외한다. 공개 연구 패키지는 파일 출처·해시·읽기 범위를 제공한다. 이 연구 작업은 `chore/papers-method-review`의 별도 worktree에 있으며 기존 작업 브랜치를 변경하지 않았다. 커밋·푸시·머지는 이번 단계에서 실행하지 않았다.
+문헌의 원본·추출문·페이지 이미지는 `private/`에 보존하고 `.gitignore`로 제외한다. 공개 연구 패키지는 파일 출처·해시·읽기 범위를 제공한다. 이전 방법론 작업은 `chore/papers-method-review`의 별도 worktree에서 수행했다. 이번 PC 작업은 사용자 승인에 따라 `chore/papers-page-condition-d-results`에서 진행하며, 기존 `reports/full_verify.json` 변경은 보존한다.
 
-## 다음 집필 범위
+## PC 세션 결과 — 2026-09-07
 
-다음 절은 조건 D만 사용하는 결과 절이다. 구조 검사 통과, 계산 재현, 순서 민감도를 구분해 쓰고 현실 공실 정확도·인과적 개선·원문 실험 재현을 주장하지 않는다. 현재 원고의 기존 유동·해상도 절은 다른 모집단의 뼈대이므로 자동 결합하지 않는다.
+공개본을 재확보하여 기존 SHA-256과 일치함을 확인하고 p.3–6·8의 텍스트·이미지를 대조했다. 최종본·별도 accepted manuscript·부록·저자 원자료·코드는 미확보이며, 네 불일치는 모두 `판본 또는 부록 미확보로 판정 불가`다. 출판사 PC 접근은 HTTP 403이었다. 보조문헌 전체 본문도 미확보다. UGent의 기관 전용 표시는 웹에서 확인했으며 PC Python 접근의 인증서 실패와 구분해 [장부](reading-ledger.md)에 남겼다. 새 통계 가정·분포·임계값은 도입하지 않았다.
+
+`verify_evidence.py`는 성공했다. 이번 PC는 감사 파일 761개와 원본 946개를 보유하고 해시가 일치했다. 이전 새 체크아웃의 224개·265개 보유 및 원본 681개 미보유 기록은 그대로 유지한다. 두 실행의 소비 입력 해시·보존 서빙 객체·Gold 서빙 의미 해시·계산 결과는 같지만, 파일 가용성과 실행 커밋·실행기 및 로드 코드 해시는 달랐다. 따라서 생성시각만 제외해 동일하다고 처리하지 않고 `evidence-verification.json`의 `pc_session_recheck`에 PC 실행을 분리했다. 실행기의 `fresh_gold_to_serving_matches`라는 필드명만으로 이번 작업 디렉터리를 새 체크아웃이라고 부르지 않는다. 전체 Bronze→Silver→Gold 파이프라인은 실행하지 않았다.
+
+원고 §3은 구조 일관성, 고정 입력 계산 재현, 순서 민감도, 층 정보에 따른 계산 범위, 미평가 항목으로 구성했다. 기존 유동·해상도 장은 번호만 이동했으며 조건 D와 결합하지 않았다. 현실 공실 정확도·오류 수정 효과·관측 시점·독립 팀 재현은 여전히 미평가다.
+
+검사: `python docs/papers/page-study/private/check_pc_session.py`로 작업 계약의 여섯 검사를 통과했다. 문장별 근거 링크·수치·원문 해시·읽은 범위·미확보 상태·이전 검증 기록 보존을 대조하고, 실행기의 네트워크·경계 밖 쓰기 가드가 예외를 내는지도 검사했다. 이 세션 검산기는 로컬 연구 파일이므로 Git에서 제외한다. JSON 두 파일의 `python -m json.tool` 파싱과 `git diff --check`도 통과했다. 초기 문헌 검사는 새 JSON 설명의 파이프 인코딩 손상을 발견했고, 이를 수정했다. 계산 검증기의 실패나 기대값 변경은 없었다.

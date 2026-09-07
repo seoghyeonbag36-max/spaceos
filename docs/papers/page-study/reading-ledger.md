@@ -51,3 +51,18 @@
 - Timmerman·Bronselaer, [Measuring data quality in information systems research](https://biblio.ugent.be/publication/8634924), DOI `10.1016/j.dss.2019.113138`: 저자 소속 대학의 초록·서지 확인. PDF는 UGent only 표시로 미확보. 확률·가능성 분포나 임계값을 원문 확인 없이 도입하지 않는다.
 
 논문 본문에는 실제 읽은 핵심 공개본의 확인 범위만 인용한다. 두 보조문헌은 다음 원문 확보 목록에 남긴다.
+
+## PC 세션 재확인 — 2026-09-07
+
+이번 작업 디렉터리에는 처음에 `private/` 파일이 없었다. 공개본을 공식 URL에서 다시 내려받아 위 SHA-256과 일치함을 확인했다. 위의 전 페이지 정독 기록은 이전 세션의 기록이며, 이번 세션에서는 PDF p.3–6 및 p.8의 텍스트와 페이지 이미지를 대조했다(p.3 표 2, p.4 §3.1·그림 2, p.5 §3.1–3.2·부록 언급, p.6 §4·표 4, p.8 참고문헌 끝). 이번 이미지 경로는 `private/pc-page-03.png` 등의 형식이다. 이전 `page-01.png` 등의 파일이 이번 PC에 있다고 주장하지 않는다.
+
+| 공개본 대조 항목 | 최종본 대조 판정 |
+|---|---|
+| p.4 그림 2 캡션 343 / 본문 344 | 판본 또는 부록 미확보로 판정 불가 |
+| p.6 본문 34·22 / 표 4 33·23 | 판본 또는 부록 미확보로 판정 불가 |
+| p.6 표 4의 6/500 = 1.1% 표기 | 판본 또는 부록 미확보로 판정 불가 |
+| p.3 표 2 및 p.6 표 4의 3/2263 = 1.3% 표기 | 판본 또는 부록 미확보로 판정 불가 |
+
+공개본의 표기 차이는 다시 확인했지만 어느 숫자도 정답으로 선택하지 않았다. [출판사 본문](https://www.sciencedirect.com/science/article/pii/S0167923620302086)과 PDF 경로(`/pdfft`)는 PC 네트워크에서 HTTP 403이었다. [저자 소속 기관의 출판 기록](https://psau.sa.elsevierpure.com/en/publications/incorrect-data-in-the-widely-used-inside-airbnb-dataset/)은 DOI와 출판 서지를 제공하지만 별도 accepted manuscript·부록·원자료·저자 코드 파일을 확보할 수 있는 링크는 확인하지 못했다. 이는 자료가 존재하지 않는다는 판정이 아니다. arXiv의 `/src/2007.03019v2` 응답도 동일 크기의 PDF였으며 별도 소스 묶음이나 부록 확보로 세지 않는다. p.8의 Tom Slee 수집기 인용은 다른 저자의 코드이므로 이 연구의 저자 공개 코드로 대체하지 않는다.
+
+Marsden·Pingry의 출판사 PDF 경로도 HTTP 403이었다. 전체 본문 미확보 상태를 유지하며, 기존 초록·일부 절 확인 기록을 전체 정독으로 승격하지 않는다. Timmerman·Bronselaer는 [UGent Downloads](https://biblio.ugent.be/publication/8634924)에 `full text (Published version)`·`UGent only`가 표시됨을 웹에서 재확인했다. PC Python 접근은 인증서 검증 실패, 출판사 PDF는 HTTP 403이었다. 두 보조문헌 모두 전체 본문에 근거한 연구 질문·품질 정의·분석 단위·표집·검증·통계 가정의 페이지별 추출은 수행하지 않았고, 새 방법·분포·임계값도 도입하지 않았다. 원문 파일이 없으므로 그 파일의 로컬 경로·SHA-256·읽은 PDF 페이지는 미확보로 기록한다.
