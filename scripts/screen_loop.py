@@ -169,14 +169,17 @@ TABS: tuple[TabSpec, ...] = (
         hub_select=".platconsole .picker select",
         gate="/commercial-districts/{hub}/platform",
         nodes=(
-            # ⚠ 이 화면에는 거점 이름이 든 노드가 없다. 대신 PlatformConsole 이 거점이
-            #    바뀔 때 `setProf(null)` 로 결론을 **내린다**(소스 확인 2026-09-07) —
-            #    그래서 이 노드를 기다리는 것이 곧 새 거점의 결론을 기다리는 것이다.
-            #    그 성질이 깨지면 여기가 낡은 화면을 통과시킨다.
-            # 결론 문장 — "이 상권의 유형". 근거가 없으면 "판정할 업종 근거가 없다"가
-            # 들어오는데 그것도 결론이다(없음을 밝히는 문장). 노드가 아예 없으면 실패다.
-            Node(".platconsole .hero .heroarch", why="상권 정체성 결론"),
-            Node(".platconsole .hero .herorule", why="그 판정의 근거 규칙"),
+            # 결론과 근거는 화면 맨 위 Verdict 가 낸다(2026-09-07 텍스트 축약).
+            # 종전의 `.hero .heroarch`·`.herorule` 은 「정체성 원자료」Fold 안으로
+            # 들어갔고 그 Fold 는 기본으로 접혀 있다 — state="visible" 로 기다리는
+            # 이 검사기에는 안 보이므로 여기서 그것을 재면 안 된다.
+            # `.vone` 에는 거점 이름이 들어간다(headline() 의 `name`) — 다른 탭처럼
+            # 이름을 먼저 기다리는 것이 곧 **새 거점의** 결론을 기다리는 것이다.
+            # 근거가 없으면 "업종 근거가 없어 유형을 판정하지 않는다"가 들어오는데
+            # 그것도 결론이다(없음을 밝히는 문장). 노드가 아예 없으면 실패다.
+            Node(".platconsole .verdict .vone", contains="{name}",
+                 why="상권 정체성 결론 — 이 거점의 화면인가"),
+            Node(".platconsole .verdict .vgrounds .gv", why="그 판정을 받치는 근거 값"),
         ),
     ),
     TabSpec(
