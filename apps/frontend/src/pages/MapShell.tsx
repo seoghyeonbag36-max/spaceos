@@ -135,6 +135,9 @@ export default function MapShell() {
   // 지도는 MapHost 소유다 — 여기서는 빌려 쓰기만 한다.
   const { map, ready } = useMapHost();
   const overlaysRef = useRef<any[]>([]);
+  // 오버레이에 붙인 이벤트 리스너 핸들. 오버레이 배열과 **짝을 이뤄** 같이 비운다 —
+  // 왜 따로 들고 있나는 clearOverlays 주석에 있다.
+  const listenersRef = useRef<any[]>([]);
   const [layer, setLayer] = useState<Layer>("vacancy");
   const [buildings, setBuildings] = useState<Building[]>(LOCAL_BUILDINGS);
   const [rentHm, setRentHm] = useState<RentHeatmap | null>(null);
@@ -253,6 +256,17 @@ export default function MapShell() {
   }, [ready, map]);
 
   const clearOverlays = () => {
+    const naver = (window as any).naver;
+    // ⚠ 리스너를 **먼저** 뗀다. `setMap(null)` 은 오버레이를 지도에서 내릴 뿐이고
+    //   그 위에 붙인 click 리스너는 그대로 남는다. 리스너 클로저가 `focus`(→ map)와
+    //   `Building` 을 통째로(ring 좌표쌍 배열까지) 붙잡으므로, 안 떼면 거점을 한 번
+    //   바꿀 때마다 그 거점 건물 수(453~2,813동)만큼이 그대로 남는다.
+    //   걷어낼 자리가 여기밖에 없는 이유: 지도는 MapHost 가 앱 수명 동안 하나만 만들어
+    //   들고 있어(MapHost.tsx) 탭을 옮겨도 죽지 않고, 회귀 루프는 페이지를 한 번만 열고
+    //   거점 전부를 그 위에서 돈다. 즉 언마운트도 새로고침도 이것을 대신 치워주지 않는다.
+    //   → docs/finding-map-hubswitch-2026-09-08.md §3-B(짝 없는 자리) · §5 후보 1
+    listenersRef.current.forEach((h) => naver?.maps?.Event?.removeListener(h));
+    listenersRef.current = [];
     overlaysRef.current.forEach((o) => o.setMap?.(null));
     overlaysRef.current = [];
   };
@@ -288,7 +302,8 @@ export default function MapShell() {
             anchor: new naver.maps.Point(anchor, anchor),
           },
         });
-        naver.maps.Event.addListener(dot, "click", () => focus(b));
+        // 핸들을 버리면 뗄 방법이 없어진다 — clearOverlays 주석 참조.
+        listenersRef.current.push(naver.maps.Event.addListener(dot, "click", () => focus(b)));
         overlaysRef.current.push(dot);
       });
     } else if (layer === "vacancy") {
@@ -302,7 +317,8 @@ export default function MapShell() {
           strokeColor: STATUS[b.status].color, strokeWeight: 2, strokeOpacity: 0.95,
           clickable: true,
         });
-        naver.maps.Event.addListener(poly, "click", () => focus(b));
+        // 핸들을 버리면 뗄 방법이 없어진다 — clearOverlays 주석 참조.
+        listenersRef.current.push(naver.maps.Event.addListener(poly, "click", () => focus(b)));
         overlaysRef.current.push(poly);
       });
     } else if (layer === "footfall" && footHm) {
