@@ -7,7 +7,8 @@ design/
 ├── brand/            네이버·SpaceOS 브랜드 규칙 (컬러·로고 사용·금지사항)
 ├── assets/
 │   ├── naverpay/     ⚠ 네이버페이 공식 버튼 에셋 (임의 변경 금지 — 원본 그대로 보관)
-│   └── navermap/     네이버 지도 마커·지도 스타일(style JSON)·컨트롤 캡처
+│   ├── navermap/     네이버 지도 마커·지도 스타일(style JSON)·컨트롤 캡처
+│   └── illustrations/ 아이소메트릭 일러스트 (SVG 원본 + 생성기 스크립트)
 ├── references/       잘 만든 한국형 앱 UI 패턴 캡처 (바텀시트·지도오버레이 등)
 ├── tokens/           디자인 토큰 export (tokens.json — 색·타이포·간격). 코드 쪽 두 곳과 동기화
 └── README.md
