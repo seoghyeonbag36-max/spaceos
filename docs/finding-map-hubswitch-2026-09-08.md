@@ -1,0 +1,519 @@
+# finding — Page(map) 탭에서 거점을 바꿀수록 초기 렌더가 단조 증가한다
+
+- 날짜: 2026-09-08
+- 브랜치: `chore/cloud-c1-map-hubswitch-diagnosis`
+- 성격: **진단만.** `apps/` 아래 소스는 한 줄도 고치지 않았다. 이 문서 하나만 추가한다.
+- 방법: 코드 정독 + 저장소 안의 Gold 산출물 계수. **화면을 띄우지 않았다** —
+  이 문서에는 측정하지 않은 "빨라졌다/고쳤다" 류의 주장이 없다.
+
+---
+
+## 0. 한 줄 결론
+
+`MapShell` 이 거점마다 만드는 오버레이(건물 폴리곤·점)는 **`setMap(null)` 로 지도에서
+떼기만 하고 그 위에 붙인 클릭 리스너를 떼지 않는다**
+([MapShell.tsx:255-258](../apps/frontend/src/pages/MapShell.tsx#L255) ↔
+[:291](../apps/frontend/src/pages/MapShell.tsx#L291) ·
+[:305](../apps/frontend/src/pages/MapShell.tsx#L305)).
+그 오버레이가 얹히는 지도는 **앱 수명 동안 죽지 않는 단 하나의 인스턴스**이고
+([MapHost.tsx:69-85](../apps/frontend/src/components/MapHost.tsx#L69)),
+회귀 루프는 페이지를 **한 번만 열고 264조합을 그 위에서 다 돈다**
+([screen_loop.py:835](../scripts/screen_loop.py#L835)).
+그래서 map 탭에서 만든 것만 세션 내내 쌓일 자리가 있다 —
+Platform·Posting·Program 은 `naver` 를 **한 번도 참조하지 않으므로**(§4-A) 쌓일 자리가 없다.
+
+단, "짝이 없다"까지가 코드로 확정되는 범위다. **"짝이 없어서 GC 되지 않는다"는
+네이버 SDK 내부 동작이라 이 저장소에서 확정할 수 없다** — §6-1·§6-4 로 넘긴다.
+
+---
+
+## 1. 관측과 그 한계
+
+### 1-1. 받은 숫자
+
+map 탭 `hub-switch` 의 초기 렌더(ms, 관측 순서):
+
+```
+13234  18203  24172  29969  36234  37469  39422  40328
+43218  43219  48046  48860  234687
+```
+
+- 예산은 **3,000ms** ([screen_loop.py:107](../scripts/screen_loop.py#L107), KPI "지도 로딩 3초").
+  **첫 관측부터 이미 4.4배 초과**다. 누적은 그 위에 얹힌 별개의 문제다(§5-3).
+- 같은 실행의 `tab-open` 은 **4,750~7,375ms** — 1.55배 폭 안에 머물렀다.
+  같은 실행에서 hub-switch 는 **17.7배** 벌어졌다.
+- Platform 탭 hub-switch 는 **6,172ms 한 건**뿐이다.
+
+### 1-2. 한계 — 이 숫자로 할 수 없는 말
+
+1. **264조합 중 69조합에서 중단된 실행이다.** 66거점을 한 바퀴 돈 결과가 아니다.
+   조합 순서는 거점-major 다(`[(h, s) for h in hubs for s in specs]`,
+   [screen_loop.py:808](../scripts/screen_loop.py#L808)) — 즉 거점 하나마다
+   Platform→Page→Posting→Program 을 돌고 다음 거점으로 간다.
+2. **`reports/screen_loop.json` 이 이 저장소에 없다.** 커밋된 적이 없고(PC 의 다른
+   세션에 미커밋으로 있다), 이 세션은 그 파일을 만들지도 고치지도 않는다. 따라서
+   **어느 숫자가 어느 거점인지 나는 모른다.** §2-3 의 대응은 *가정*이고 그렇게 표시했다.
+3. 69 = 17거점 × 4탭 + 1 이므로 map 조합은 **17개**여야 하는데 hub-switch 값은 13개다.
+   차이 4개(= tab-open 1개 + 관측이 남지 않은 3개)의 정체는 리포트 없이는 모른다.
+   조합이 `status: "error"` 로 끝나면 `obs` 가 `{}` 라 `render_ms` 자체가 없다
+   ([screen_loop.py:861-867](../scripts/screen_loop.py#L861)).
+4. "tab-open 4,750~7,375ms" 를 나는 **조합마다 기록되는 `tab_open_ms`**
+   ([screen_loop.py:459](../scripts/screen_loop.py#L459))의 범위로 읽었다. `trigger ==
+   "tab-open"` 인 조합은 기본 거점 하나뿐이라 범위가 나올 수 없기 때문이다.
+   이 독법이 틀리면 §5-2 의 판별 논거 하나가 무너진다 — §6-2 에서 확인할 것.
+
+### 1-3. 저장소에서 직접 센 것 (이건 실측이다)
+
+`data/gold/*/page_building_master.geojson` 의 feature 수 = map 탭이 한 거점에서 그리는
+건물 수. 73개 디렉터리(서빙 66 + 경기 보류 7 — CLAUDE.md 의 "73 은 서빙 거점 수가
+아니다"와 같은 수다):
+
+| 통계 | 값 |
+|---|---|
+| 중앙값 | 635 |
+| 평균 | 754 |
+| 최대 | 2,813 (`dongdaemun`) |
+| 최소 | 58 (`westerndom`, 보류) |
+| 합계 | 55,037 |
+
+> MapShell 주석의 "840~1,443동"([MapShell.tsx:46](../apps/frontend/src/pages/MapShell.tsx#L46))
+> 은 낡았다. 실제 범위는 58~2,813 이다.
+
+`app.services.districts.PAGES` 순서(= 루프가 도는 순서) 앞 18개:
+
+| # | 거점 | 건물 | 누적 |
+|---:|---|---:|---:|
+| 0 | garosugil | 840 | 840 |
+| 1 | apgujeong-rodeo | 769 | 1,609 |
+| 2 | hongdae | 1,325 | 2,934 |
+| 3 | yeonnam | 1,133 | 4,067 |
+| 4 | ikseon | 1,748 | 5,815 |
+| 5 | seochon | 846 | 6,661 |
+| 6 | myeongdong | 1,084 | 7,745 |
+| 7 | euljiro | 1,972 | 9,717 |
+| 8 | seongsu | 831 | 10,548 |
+| 9 | seoulsup | 698 | 11,246 |
+| 10 | itaewon | 845 | 12,091 |
+| 11 | hannam | 714 | 12,805 |
+| 12 | songridan | 453 | 13,258 |
+| 13 | gangnam | 987 | 14,245 |
+| 14 | hapjeong | 292 | 14,537 |
+| 15 | mangwon | 959 | 15,496 |
+| 16 | samcheong | 614 | 16,110 |
+| 17 | gwangjang | 1,742 | 17,852 |
+
+---
+
+## 2. 측정 창이 무엇을 재는가 — 먼저 이것부터
+
+원인을 고르기 전에 `render_ms` 가 무엇의 시간인지 고정해야 한다. 아니면 브라우저가
+느린 것과 검사기가 기다리는 것을 섞어 읽는다.
+
+### 2-1. 창의 경계
+
+`hub-switch` 의 `t0` 는 `select_option` **직전**이고, 끝은 명세 노드 3개를 다 읽은
+뒤다([screen_loop.py:474](../scripts/screen_loop.py#L474) →
+[:486-487](../scripts/screen_loop.py#L486)). 창 안에 들어오는 것:
+
+| 순서 | 무엇 | 상한 |
+|---|---|---|
+| 1 | `expect_response("/heatmap/buildings?district=…")` + `select_option` | 15,000ms ([:109](../scripts/screen_loop.py#L109)) |
+| 2 | 노드별 `wait_for(state="visible")` × 3 | 각 8,000ms ([:439](../scripts/screen_loop.py#L439)) |
+| 3 | 노드별 `loc.count()` × 3 | **상한 없음** ([:443](../scripts/screen_loop.py#L443)) |
+| 4 | 노드별 `inner_text()` × 3 | 각 8,000ms(기본값, [:832](../scripts/screen_loop.py#L832)) |
+
+상한이 있는 것만 다 터져도 15,000 + 3×(8,000+8,000) = **63,000ms** 다.
+관측이 43,000~48,000ms 에서 평평해지는 것은 이 천장에 붙은 모양이고,
+**234,687ms 는 상한 있는 항목만으로는 나올 수 없다.** 3번(`count()`)처럼 상한이 없는
+호출이 렌더러 메인스레드에 막혀 통째로 늘어졌다고 보는 것이 이 숫자에 맞는 유일한
+읽기다. (Playwright `Locator.count()` 에 timeout 인자가 없다는 것은 내 기억에 따른
+**추측**이다. 이 환경에는 playwright 가 설치돼 있지 않아 소스로 확인하지 못했다 → §6-6)
+
+### 2-2. 그래서 이 숫자는 "렌더 시간"이 아니라 "메인스레드가 막혀 있던 시간"에 가깝다
+
+명세 노드 3개 중 둘은 새 데이터를 기다리지 않아도 만족될 수 있다:
+`.sp-title` 은 `hub` 메모가 바뀌는 즉시([MapShell.tsx:396](../apps/frontend/src/pages/MapShell.tsx#L396)),
+`.b-item` 은 직전 거점의 행이 아직 남아 있어서
+([:412](../apps/frontend/src/pages/MapShell.tsx#L412)). 그런데도 수십 초가 걸린다는 것은
+**노드가 안 뜬 것이 아니라 Playwright 의 왕복 자체가 막혔다**는 뜻이다.
+= 자바스크립트 메인스레드가 그동안 계속 바빴다. 원인 후보는 전부 이 관점에서 본다.
+
+### 2-3. 시간이 "그 거점의 크기"를 따라가지 않는다 (가정 위의 계산)
+
+13개 숫자가 PAGES 순서의 거점 1~13 에 그대로 대응한다고 **가정**하면:
+
+| 거점 | 건물 | render_ms |
+|---|---:|---:|
+| apgujeong-rodeo | 769 | 13,234 |
+| hongdae | 1,325 | 18,203 |
+| yeonnam | 1,133 | 24,172 |
+| ikseon | 1,748 | 29,969 |
+| seochon | 846 | 36,234 |
+| myeongdong | 1,084 | 37,469 |
+| euljiro | **1,972** | 39,422 |
+| seongsu | 831 | 40,328 |
+| seoulsup | 698 | 43,218 |
+| itaewon | 845 | 43,219 |
+| hannam | 714 | 48,046 |
+| songridan | **453** | 48,860 |
+| gangnam | 987 | 234,687 |
+
+Spearman(render_ms, 그 거점 건물 수) = **-0.473** (음수다).
+가장 큰 거점(euljiro 1,972동)이 39초, 가장 작은 거점(songridan 453동)이 49초다.
+
+**이 결론은 위 가정에 크게 기대지 않는다.** 어떤 대응이든 거점 1~17 의 건물 수는
+292~1,972 사이(6.75배)에서 오르내리는데 PAGES 순서로는 단조가 아니고, 관측은 단조로
+17.7배 벌어졌다. 즉 **"어떤 거점은 원래 크다"로는 이 모양이 안 나온다.**
+시간을 결정하는 것은 그 거점이 무엇인지가 아니라 **몇 번째로 열렸는지**다.
+
+---
+
+## 3. 거점(districtId)이 바뀔 때 — 생성/정리 대응표
+
+`districtId` 가 바뀌면 도는 이펙트를 전부 짝지었다. 짝이 없는 칸이 후보다.
+
+### 3-A. naver.maps 오버레이
+
+| 만드는 자리 | 지우는 자리 | 짝 |
+|---|---|---|
+| `Marker`(공실의심 점) [MapShell.tsx:284-290](../apps/frontend/src/pages/MapShell.tsx#L284) | `clearOverlays()` 의 `o.setMap(null)` [:256](../apps/frontend/src/pages/MapShell.tsx#L256) | ⚠ **떼기만 한다.** `destroy()`·`clearInstanceListeners()` 없음 |
+| `Polygon`(건물 footprint) [:298-304](../apps/frontend/src/pages/MapShell.tsx#L298) | 같음 | ⚠ 같음 |
+| `Polygon`(density 셀) [:339-342](../apps/frontend/src/pages/MapShell.tsx#L339) | 같음 | ⚠ 같음 (루프에서는 안 그림 — 기본 레이어가 vacancy) |
+| `Polygon`(rent 셀) [:357-361](../apps/frontend/src/pages/MapShell.tsx#L357) | 같음 | ⚠ 같음 (루프에서는 안 그림) |
+| `Circle`(HeatMap 폴백) [:323-326](../apps/frontend/src/pages/MapShell.tsx#L323) | 같음 | ⚠ 같음 (루프에서는 안 그림) |
+
+`overlaysRef` 배열 자체는 매번 비워지므로([:257](../apps/frontend/src/pages/MapShell.tsx#L257))
+**MapShell 쪽 참조는 확실히 끊긴다.** 남는 참조가 있다면 SDK 쪽이다(§3-B).
+
+### 3-B. 이벤트 리스너 — **여기가 유일하게 짝이 비어 있다**
+
+| 만드는 자리 | 지우는 자리 | 짝 |
+|---|---|---|
+| `Event.addListener(map, "zoom_changed")` [:251](../apps/frontend/src/pages/MapShell.tsx#L251) | `Event.removeListener(h)` [:252](../apps/frontend/src/pages/MapShell.tsx#L252) | ✅ |
+| `Event.addListener(dot, "click", () => focus(b))` [:291](../apps/frontend/src/pages/MapShell.tsx#L291) | **없다** | ❌ |
+| `Event.addListener(poly, "click", () => focus(b))` [:305](../apps/frontend/src/pages/MapShell.tsx#L305) | **없다** | ❌ |
+
+핸들을 변수에 받지도 않는다. 리스너 클로저는 `focus`(→ `map`, `setSelected`)와
+**`b` 를 통째로** 붙잡는다. `b` 는 `ring`(좌표쌍 배열)까지 든 `Building` 이다
+([:62-69](../apps/frontend/src/pages/MapShell.tsx#L62) ·
+[:96-109](../apps/frontend/src/pages/MapShell.tsx#L96)).
+
+대조군이 저장소 안에 있다 — **같은 지도를 쓰는 `HubExplorer` 는 이 문제가 없다.**
+경계 폴리곤을 `clickable: false` 로 만들어 리스너를 아예 안 붙이고
+([HubExplorer.tsx:157](../apps/frontend/src/pages/HubExplorer.tsx#L157)),
+같은 이펙트에 정리 함수를 달아 둔다([:182-185](../apps/frontend/src/pages/HubExplorer.tsx#L182)).
+`MapShell` 의 재그리기 이펙트에는 **정리 함수가 아예 없다**
+([:271-365](../apps/frontend/src/pages/MapShell.tsx#L271)) — 다음 실행의 첫 줄
+`clearOverlays()`([:274](../apps/frontend/src/pages/MapShell.tsx#L274))가 그 역할을 대신하고,
+언마운트는 별도 이펙트([:262](../apps/frontend/src/pages/MapShell.tsx#L262))가 받는다.
+
+### 3-C. heatmap 인스턴스
+
+| 만드는 자리 | 지우는 자리 | 짝 |
+|---|---|---|
+| `visualization.HeatMap` [:316-319](../apps/frontend/src/pages/MapShell.tsx#L316) | `overlaysRef` 에 push 후 `setMap(null)` [:320](../apps/frontend/src/pages/MapShell.tsx#L320) | ⚠ 형식상 짝은 있으나 **이번 실행과 무관** — `layer` 기본값이 `"vacancy"`([:138](../apps/frontend/src/pages/MapShell.tsx#L138))이고 루프는 레이어를 바꾸지 않는다 |
+
+**이번 관측의 원인이 아니다.** 검사기가 유동/밀도/임대 레이어를 누르지 않기 때문이다.
+
+### 3-D. 거리뷰 파노라마
+
+| 만드는 자리 | 지우는 자리 | 짝 |
+|---|---|---|
+| `new naver.maps.Panorama` [naverMap.ts:129-134](../apps/frontend/src/lib/naverMap.ts#L129) | `destroy()` [:135](../apps/frontend/src/lib/naverMap.ts#L135), 호출부 [BuildingViewer.tsx:140](../apps/frontend/src/components/BuildingViewer.tsx#L140) | ✅ |
+| `Event.addListener(pano, 'pano_status'/'init')` [:138](../apps/frontend/src/lib/naverMap.ts#L138)·[:145](../apps/frontend/src/lib/naverMap.ts#L145) | **없다** (`destroy()` 가 대신 정리한다고 전제) | ⚠ |
+| 두 이벤트가 **하나도 안 오면** Promise 가 영영 안 풀린다 [:127-164](../apps/frontend/src/lib/naverMap.ts#L127) | 없음(타임아웃 없음) | ⚠ |
+
+**이번 관측의 원인이 아니다.** 검사기는 `.b-twin` 을 누르지 않는다 —
+`detail_click` 은 목록 첫 행만 누르고([screen_loop.py:500-511](../scripts/screen_loop.py#L500)),
+층 스택·거리뷰는 이 루프의 경계 밖이라고 명시돼 있다([screen_loop.py:70-71](../scripts/screen_loop.py#L70)).
+그래도 짝이 빈 자리라 적어 둔다.
+
+### 3-E. 비동기 응답
+
+| 만드는 자리 | 지우는 자리 | 짝 |
+|---|---|---|
+| `listDistricts()` [MapShell.tsx:161-173](../apps/frontend/src/pages/MapShell.tsx#L161) | `alive=false` 만 | ⚠ 요청은 계속 간다 |
+| `getBuildingVacancy(districtId)` [:176-183](../apps/frontend/src/pages/MapShell.tsx#L176) | `alive=false` 만 | ⚠ 같음 |
+| `getRentHeatmap(districtId)` [:185-192](../apps/frontend/src/pages/MapShell.tsx#L185) | `alive=false` 만 | ⚠ 같음 + **레이어 가드가 없다**(§4-C) |
+| `getFootfallHeatmap` [:196-203](../apps/frontend/src/pages/MapShell.tsx#L196) | `alive=false` + `layer` 가드 | ✅ |
+| `getDensityHeatmap` [:205-212](../apps/frontend/src/pages/MapShell.tsx#L205) | `alive=false` + `layer` 가드 | ✅ |
+| `recommendIndustry` [:222-235](../apps/frontend/src/pages/MapShell.tsx#L222) | `alive=false` 만 | ⚠ |
+
+`api.ts` 전체에 `AbortController` 가 **0개**다(`fetch` 호출은
+[api.ts:11](../apps/frontend/src/lib/api.ts#L11)·[:17](../apps/frontend/src/lib/api.ts#L17)·[:31](../apps/frontend/src/lib/api.ts#L31)·[:424](../apps/frontend/src/lib/api.ts#L424) 넷뿐이고
+넷 다 `signal` 을 안 받는다). `alive` 플래그는 **setState 만 막고 요청은 못 막는다.**
+루프는 조합을 직렬로 돌아 동시 요청이 1~2개뿐이므로 **이번 관측의 주범은 아니다.**
+
+### 3-F. React 컴포넌트·DOM
+
+| 만드는 자리 | 지우는 자리 | 짝 |
+|---|---|---|
+| 지도 인스턴스 [MapHost.tsx:76-81](../apps/frontend/src/components/MapHost.tsx#L76) | **없다 — 의도적으로 앱 수명 동안 산다** | ✅(설계) / ⚠(이 문제의 무대) |
+| `MapShell` 마운트/언마운트 [App.tsx:119](../apps/frontend/src/App.tsx#L119) + [MapHost.tsx:105](../apps/frontend/src/components/MapHost.tsx#L105) | 언마운트 시 `clearOverlays` [MapShell.tsx:262](../apps/frontend/src/pages/MapShell.tsx#L262) | ✅ |
+| 목록 행 `.b-item` × 전체 건물 수 [:412-425](../apps/frontend/src/pages/MapShell.tsx#L412) | React 가 뗀다 | ✅ (가상화 없음 → 매번 수천 노드 커밋) |
+
+---
+
+## 4. map 탭에서만 생기는 이유 (비대칭의 근거)
+
+### 4-A. 다른 탭은 지도를 건드리지 않는다 (실측)
+
+```
+PlatformConsole.tsx   naver 참조 0회
+PostingConsole.tsx    naver 참조 0회
+ProgramStudio.tsx     naver 참조 0회
+SeoulDashboard.tsx    naver 참조 0회
+```
+
+`naver` 를 쓰는 화면은 `MapShell` · `HubExplorer` · `PageDashboard` 셋뿐인데,
+`HubExplorer`(거점 탭)는 루프의 탭 명세에 없고([screen_loop.py:166-225](../scripts/screen_loop.py#L166)),
+`PageDashboard` 는 `#board` 해시로만 열린다([App.tsx:80](../apps/frontend/src/App.tsx#L80)).
+**이번 실행에서 지도를 만진 화면은 `MapShell` 하나뿐이다.**
+
+### 4-B. map 탭만 "컴포넌트보다 오래 사는 것"에 쓴다
+
+Platform 탭이 거점을 바꾸면 만든 것이 전부 그 컴포넌트의 DOM 안에 있고, 탭을 떠나면
+React 가 통째로 뗀다. map 탭이 거점을 바꾸면 만든 것이 **MapHost 의 지도 위에** 얹힌다.
+지도는 안 죽는다([MapHost.tsx:69-85](../apps/frontend/src/components/MapHost.tsx#L69)).
+페이지도 안 죽는다(`page.goto` 는 실행당 1회, [screen_loop.py:835](../scripts/screen_loop.py#L835)).
+**쌓일 자리가 map 탭에만 있다.**
+
+### 4-C. 거점 하나 바꿀 때 오버레이를 3~4번 다시 그린다
+
+재그리기 이펙트의 의존성 배열([:365](../apps/frontend/src/pages/MapShell.tsx#L365)):
+
+```
+[layer, pinMode, ready, map, buildings, rentHm, footHm, densHm, center.lat, center.lng]
+```
+
+`setDistrictId` 하나로 이 중 여러 개가 순차로 바뀐다:
+
+1. `hub` 메모 → `center` 가 즉시 바뀐다([:157-158](../apps/frontend/src/pages/MapShell.tsx#L157))
+   → **재그리기 #1 은 `buildings` 가 아직 직전 거점이다.** 남의 건물 수백~2천 동을
+   새 좌표에서 한 번 다 그린다.
+2. `setRentHm(null)`([:187](../apps/frontend/src/pages/MapShell.tsx#L187)) → **재그리기 #2**
+3. `getBuildingVacancy` 응답 → `setBuildings` → **재그리기 #3**
+4. `getRentHeatmap` 응답 → `setRentHm(값)` → **재그리기 #4**
+
+(1·2 는 React 배치에 따라 한 번으로 합쳐질 수 있다 → **3~4회**.)
+4번은 순수한 낭비다: `rentHm` 은 임대 레이어에서만 쓰이는데 **그 이펙트에만 레이어
+가드가 없다.** 형제 이펙트 둘은 있다 —
+`if (layer !== "footfall") return;`([:197](../apps/frontend/src/pages/MapShell.tsx#L197)) ·
+`if (layer !== "density") return;`([:206](../apps/frontend/src/pages/MapShell.tsx#L206)).
+[:195](../apps/frontend/src/pages/MapShell.tsx#L195) 의 주석("거점 전환마다 3번 호출할
+이유가 없다")이 rent 에는 적용되지 않은 채 남아 있다.
+
+이것은 **누적을 설명하지 않는다.** 다만 누적이 있다면 **그 적립 속도를 3~4배로
+곱한다**. 그리고 §5-3 의 "첫 회 13초"의 상당 부분이 여기서 나온다.
+
+### 4-D. 탭을 열 때마다 거점이 garosugil 로 되감긴다
+
+`districtId` 의 초기값은 `DEFAULT_DISTRICT`([:155](../apps/frontend/src/pages/MapShell.tsx#L155))다.
+`MapShell` 은 탭을 떠날 때 언마운트되므로([App.tsx:119](../apps/frontend/src/App.tsx#L119)),
+**map 조합마다 garosugil 840동을 먼저 한 번 그리고 나서 목표 거점으로 바꾼다.**
+`open_tab` 은 `.hub-select` 가 보이면 끝나는데([screen_loop.py:418](../scripts/screen_loop.py#L418))
+그 시점은 `listDistricts()` 만 오면 되는 시점이라
+([MapShell.tsx:375](../apps/frontend/src/pages/MapShell.tsx#L375)),
+**garosugil 렌더는 `tab_open_ms` 가 아니라 `render_ms` 창으로 새어 들어간다.**
+
+---
+
+## 5. 후보 원인 — 각각이 "단조 증가"를 설명하는가
+
+### 후보 1 — 오버레이 클릭 리스너가 짝 없이 쌓인다 ★ 유력
+
+- 근거: [MapShell.tsx:291](../apps/frontend/src/pages/MapShell.tsx#L291) ·
+  [:305](../apps/frontend/src/pages/MapShell.tsx#L305) 에서 만들고, 지우는 코드가
+  저장소 전체에 없다(`Event.removeListener` 는 [:252](../apps/frontend/src/pages/MapShell.tsx#L252)
+  한 곳뿐, `clearInstanceListeners`·`clearListeners` 는 **0회**).
+  `clearOverlays`([:255-258](../apps/frontend/src/pages/MapShell.tsx#L255))는
+  `setMap(null)` 만 한다.
+- 규모: 전환 1회당 3~4회 × 그 거점 건물 수(453~1,972) ≈ **1,800~7,900개**의
+  Polygon + 클로저 + `Building`(ring 포함). 13회 전환이면 **수만 개**다.
+- 단조 증가를 설명하는가: **설명한다.** 쌓이는 곳(지도)이 세션 내내 안 죽고
+  ([MapHost.tsx:69-85](../apps/frontend/src/components/MapHost.tsx#L69)),
+  페이지도 안 죽는다([screen_loop.py:835](../scripts/screen_loop.py#L835)).
+  힙이 커질수록 major GC 가 훑을 것이 늘고 새 할당이 느려지므로,
+  **"몇 번째 전환인가"가 시간을 결정하고 "그 거점이 얼마나 큰가"는 결정하지 않는다** —
+  §2-3 의 Spearman −0.473 이 정확히 그 모양이다.
+- **약한 고리**: `setMap(null)` 뒤에도 SDK 가 그 오버레이를 붙잡는지는
+  **네이버 SDK 내부라 이 저장소에서 확정할 수 없다.** SDK 파일을 받아 확인하려
+  했으나 이 환경에서 `oapi.map.naver.com` 이 막혀 실패했다(HTTP 000). → §6-1·§6-4
+
+### 후보 2 — 오버레이 DOM(SVG `path`)이 지워지지 않고 남는다
+
+- 근거: 코드에는 없다. `setMap(null)` 이 노드를 떼는지 여부는 SDK 몫이다.
+  검사기가 이미 그 원시 계수를 기록하고 있다 —
+  `paths`/`divs`/`children`/`canvases`([screen_loop.py:384-398](../scripts/screen_loop.py#L384)).
+- 단조 증가를 설명하는가: **설명은 하지만, 이번 관측과는 어긋나는 데가 있다.**
+  DOM 이 계속 쌓였다면 `.maphost` 를 다시 보이게 하는 순간
+  ([MapHost.tsx:89](../apps/frontend/src/components/MapHost.tsx#L89), `visibility` 토글)
+  거대한 레이아웃이 걸려 **`tab_open_ms` 도 같이 자라야 한다.** 관측은 4,750~7,375ms 로
+  거의 평평했다(§1-1). 그래서 나는 후보 2 보다 후보 1(힙 쪽)에 무게를 둔다.
+  단 이 논거는 §1-2-4 의 독법에 기대고 있다.
+- 판정: **리포트의 `obs.map.paths` 를 보면 즉시 갈린다** → §6-2.
+
+### 후보 3 — 목록 수천 행을 가상화 없이 매번 다시 커밋한다
+
+- 근거: [MapShell.tsx:412-425](../apps/frontend/src/pages/MapShell.tsx#L412) —
+  `filtered.map()` 이 건물 전부를 `<button>` 으로 그린다. 행마다 자식 5개다.
+  1,000동이면 커밋 한 번에 ~6,000노드.
+- 단조 증가를 설명하는가: **설명하지 못한다.** React 는 이전 행을 뗀다. 매번 같은
+  비용이지 자라는 비용이 아니다. **첫 회 13초의 큰 몫**이지만 13→234 의 이유는 아니다.
+
+### 후보 4 — 지도 타일·이미지 캐시가 서울 곳곳을 돌며 커진다
+
+- 근거: 거점이 바뀔 때마다 카메라를 옮긴다
+  ([MapShell.tsx:238-242](../apps/frontend/src/pages/MapShell.tsx#L238), zoom 16 고정
+  [MapHost.tsx:78](../apps/frontend/src/components/MapHost.tsx#L78)).
+- 단조 증가를 설명하는가: **일부만.** 새 지역을 볼수록 디코딩된 타일이 늘어 메모리
+  압력이 커지는 것은 맞지만, 타일 캐시는 보통 상한이 있어 **곧 평평해진다.** 13회
+  전환에서 17.7배는 이것만으로 안 나온다. **그리고 map 탭 특유라는 성질은 만족한다.**
+
+### 후보 5 — 취소되지 않는 fetch / 백엔드가 느려진다
+
+- 근거: `AbortController` 0개(§3-E).
+- 단조 증가를 설명하는가: **설명하지 못한다.** 두 가지가 반증한다.
+  (1) 루프는 조합을 직렬로 돌아 동시 요청이 1~2개다.
+  (2) **`tab_open_ms` 가 평평했다.** 그 구간은 `listDistricts()` 왕복이 지배하므로,
+  백엔드·네트워크가 세션 내내 느려졌다면 그것도 같이 자랐어야 한다.
+  느려진 것은 서버가 아니라 **브라우저**다.
+
+### 후보 6 — 검사기가 실제보다 크게 재고 있다 (측정계 문제)
+
+- 근거: §2-1 의 상한 표. 43~48초 평탄부는 상한 천장에 붙은 모양이고,
+  234,687ms 는 상한 없는 `count()`([screen_loop.py:443](../scripts/screen_loop.py#L443))가
+  막힌 모양이다.
+- 단조 증가를 설명하는가: **설명하지 못한다 — 이것은 원인이 아니라 확대경이다.**
+  검사기가 막히려면 메인스레드가 먼저 막혀야 한다. 다만 **숫자를 액면가로 읽으면
+  안 된다**는 뜻은 된다: 13,234ms 와 48,860ms 의 비(3.7배)는 실제 렌더 비용의 비가
+  아니라 "타임아웃 몇 개를 태웠나"에 가깝다.
+
+---
+
+## 6. 가장 유력한 원인 하나
+
+> **후보 1 — `MapShell` 이 거점마다 만드는 오버레이의 클릭 리스너에 짝이 없고
+> ([MapShell.tsx:291](../apps/frontend/src/pages/MapShell.tsx#L291) ·
+> [:305](../apps/frontend/src/pages/MapShell.tsx#L305)),
+> 그 오버레이가 얹히는 지도가 앱 수명 동안 죽지 않아
+> ([MapHost.tsx:69-85](../apps/frontend/src/components/MapHost.tsx#L69))
+> 페이지를 한 번도 새로 열지 않는 이 루프
+> ([screen_loop.py:835](../scripts/screen_loop.py#L835))에서 세션 내내 누적된다.**
+
+### 6-1. 왜 이것을 골랐나
+
+1. **저장소 안에서 유일하게 짝이 비어 있는 자리다.** §3 의 다섯 축을 다 짝지어 보면
+   빈 칸은 3-B 두 줄뿐이고, 나머지 빈 칸(3-D 파노라마, 3-E fetch)은 이번 실행에서
+   아예 실행되지 않거나(§3-D) 직렬 실행이라 쌓일 수 없다(§3-E).
+2. **비대칭이 맞는다.** map 탭만 컴포넌트보다 오래 사는 객체에 물건을 얹는다(§4-A·§4-B).
+   Platform 의 hub-switch 가 6,172ms 한 건으로 끝난 것과 정확히 대응한다.
+3. **거점 크기와 무관하다는 관측에 맞는다.** Spearman −0.473(§2-3). 누적 가설은
+   시간이 순번을 따라가고 크기를 안 따라가는 것을 예측하는데, 관측이 그렇다.
+4. **저장소 안에 대조군이 있다.** 같은 지도를 쓰는 `HubExplorer` 는 리스너를 안 붙이고
+   ([HubExplorer.tsx:157](../apps/frontend/src/pages/HubExplorer.tsx#L157)) 정리 함수를
+   달아 둔다([:182-185](../apps/frontend/src/pages/HubExplorer.tsx#L182)).
+   같은 팀이 같은 지도 위에서 한쪽은 짝을 맞췄고 한쪽은 안 맞췄다.
+
+### 6-2. "왜 첫 회 13초인데 마지막은 234초인가"에 답하는가 — 반은 답하고 반은 못 한다
+
+**13초(누적 없는 1회 비용) — 설명한다.** 후보 1 이 아니라 후보 3+4-C+4-D 의 합이다:
+
+- 탭을 열 때마다 거점이 garosugil 로 되감기고, 그 840동 렌더가 측정 창으로 샌다(§4-D)
+- 전환 1회에 오버레이를 3~4번 그린다 — 그중 최소 한 번은 **직전 거점 건물**이다(§4-C)
+- 목록 수천 행을 가상화 없이 커밋한다(후보 3)
+- 그 사이 메인스레드가 막혀 Playwright 왕복이 늘어진다(§2-2)
+
+**13초 → 49초(단조 증가) — 설명한다.** 지우지 않은 것이 죽지 않는 지도 위에 쌓이고,
+페이지가 한 번도 리셋되지 않는다. 힙이 커질수록 GC 와 할당이 느려지고, 느려질수록
+검사기의 대기 상한을 하나씩 더 태운다. 43~48초에서 평평해지는 것은
+**증상이 멈춘 게 아니라 측정계가 천장(63초, §2-1)에 다가간 것**이다.
+
+**49초 → 234초 — 설명하지 못한다. 미해결로 남긴다.**
+4.8배 점프는 그 앞의 완만한 곡선과 결이 다르다. 상한 없는 `count()` 가 막힌 모양이라는
+읽기(§2-1)는 *어떻게* 그 숫자가 나올 수 있었는지만 말하고, *왜 그 조합에서* 그랬는지는
+말하지 않는다. 가능한 갈래 — **전부 추측이고, 코드로는 어느 쪽도 못 고른다**:
+(a) 그 시점에 렌더러가 메모리 한계에 닿아 GC 가 폭주했다,
+(b) 그 조합이 실행의 마지막이라 중단(Ctrl-C·절전) 직전의 정지가 시간에 섞였다,
+(c) 그 거점 고유의 사건(응답 지연·데이터 이상)이 겹쳤다.
+→ §7-3 이 이 갈래를 가른다.
+
+### 6-3. 이 결론의 약한 고리 (숨기지 않는다)
+
+- "`setMap(null)` 만으로는 SDK 가 오버레이를 놓지 않는다"를 **나는 확인하지 못했다.**
+  `naver.maps.Event` 가 리스너를 대상 객체에 다는지, 모듈 전역 레지스트리에 다는지에
+  따라 결론이 갈린다. 전자면 후보 1 은 누수가 아니고, 그때 남는 것은 후보 2·4 다.
+  SDK 를 받아 보려 했으나 이 환경에서 네트워크가 막혔다.
+- 따라서 §6-1 은 **"짝이 없다"라는 확정 사실 + "그래서 샌다"라는 미확정 추론**의
+  합이다. 두 번째 마디는 §7-1 이 확정한다.
+
+---
+
+## 7. 코드만으로 판정할 수 없어 PC 실행이 필요한 항목
+
+우선순위 순. 1·2 는 **이미 PC 에 있는 데이터만으로** 끝날 수 있다.
+
+### 7-1. (결정적) 힙 스냅샷으로 오버레이가 실제로 남는지 본다
+
+거점을 5회 이상 바꾸며 전환 사이에 DevTools 힙 스냅샷을 찍는다. 확인할 것:
+
+- `Polygon` / `Marker` 인스턴스 수가 전환마다 **누적하는가**, 전환 후 GC 하면 **떨어지는가**
+- 남는다면 **retainer 경로**가 무엇인가 — `naver.maps.Event` 의 레지스트리인가,
+  `map` 인스턴스인가, 다른 것인가
+- 콘솔에서: `naver.maps.Event.hasListener(<setMap(null) 한 polygon>, 'click')`,
+  `typeof naver.maps.Event.clearInstanceListeners`
+
+→ 이것이 §6-3 의 약한 고리를 확정하거나 **후보 1 을 기각**한다.
+
+### 7-2. (데이터가 이미 있을 것) `reports/screen_loop.json` 을 읽는다
+
+이 세션은 그 파일을 만들지도 고치지도 않는다. PC 에서 **읽기만** 하면 된다.
+map 조합마다 다음을 시계열로 뽑는다:
+
+| 필드 | 어디서 | 무엇을 가른다 |
+|---|---|---|
+| `obs.map.paths` · `divs` · `children` | [screen_loop.py:384-398](../scripts/screen_loop.py#L384) | **후보 2**: 단조 증가하면 DOM 이 남는 것, 평평하면 힙만 새는 것 |
+| `obs.map.poly` · `dot` | 같음 | 매 전환 "우리가 그린 것"의 수가 그 거점 건물 수와 맞는가 |
+| `obs.tab_open_ms` | [:459](../scripts/screen_loop.py#L459) | **§1-2-4 의 독법 확정** + 후보 2·5 의 반증 논거 확정 |
+| `obs.gate_seen` | [:480](../scripts/screen_loop.py#L480) | 15초를 게이트가 먹었는지, 노드 대기가 먹었는지 |
+| `obs.hub` ↔ `obs.render_ms` | [:884-888](../scripts/screen_loop.py#L884) | **§2-3 의 가정 제거** — 실제 대응으로 Spearman 재계산 |
+| `console_errors` · `page_errors` | [:352-359](../scripts/screen_loop.py#L352) | 234초 조합에 OOM·SDK 예외가 있었는가(§6-2-c) |
+
+### 7-3. 234,687ms 를 재현한다
+
+같은 거점 목록을 **같은 순서로** 다시 돌려, 그 위치에서 다시 이상값이 나오는지 본다.
+나오면 §6-2 의 (a) 또는 (c), 안 나오면 (b)(실행 종료 부작용)다.
+
+### 7-4. 페이지 리셋 A/B — 누적 가설의 직접 검정
+
+조합마다 `page.reload()` 를 넣은 **일회용** 실행을 한다(스크립트를 커밋하지 말 것 —
+`scripts/screen_loop.py` 는 이 작업의 금지 대상이다).
+
+- 단조 증가가 **사라지고 13초 근처에서 평평**해지면 → 누적이 원인이다(후보 1/2/4).
+- 그대로 자라면 → 원인은 브라우저 세션 밖에 있다(후보 5 쪽을 다시 본다).
+
+**이 한 번의 실행이 §6 을 확정하거나 기각한다.** 코드를 고치기 전에 이것부터 한다.
+
+### 7-5. 첫 회 13초의 내역을 쪼갠다
+
+Performance 패널로 전환 1회를 녹화해 **오버레이 생성 / React 커밋 / GC** 가 각각 몇
+%인지 본다. 후보 3(목록 가상화)과 4-C(3~4회 재그리기) 중 어느 쪽이 큰지 여기서 갈린다.
+동시에 §4-C 의 "재그리기 3~4회"를 `console.count()` 로 실측한다 —
+**나는 이것을 코드에서 읽었을 뿐 세어 보지 않았다.**
+
+### 7-6. Playwright 타임아웃 표면 확인
+
+`Locator.count()` 에 timeout 이 없다는 §2-1 의 전제를 설치된 playwright 소스로 확인한다
+(이 환경에는 playwright 가 없다). 틀리면 234,687ms 의 읽기를 다시 세워야 한다.
+
+---
+
+## 8. 이 문서가 하지 않은 것
+
+- **코드를 고치지 않았다.** `apps/` 아래 변경 0건.
+- 예산 상수(`BUDGET_MS = 3000`)를 건드리지 않았다.
+- `scripts/screen_loop.py` · `reports/*` · `apps/frontend/tsconfig.tsbuildinfo` 를
+  건드리지 않았다(PC 에 다른 세션의 미커밋 변경이 있다).
+- **성능이 개선됐다는 주장을 하지 않았다.** 화면을 띄우지 않았으므로 그럴 근거가 없다.
+- 고칠 방법을 코드로 제안하지 않았다. §7-1·§7-4 가 원인을 확정하기 전에 고치면
+  "무엇을 고쳤는지 모르는 채 숫자만 좋아진" 변경이 된다.
