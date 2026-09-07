@@ -115,7 +115,7 @@ function fromGeoJSON(fc: GeoJSONFC): Building[] {
 // 같은 역할: 화면에서 출처와 해상도를 숨기지 않는다.
 const TRDAR_BADGE: React.CSSProperties = {
   color: "#3730a3", background: "#eef2ff", border: "1px solid #c7d2fe",
-  borderRadius: 5, padding: "1px 5px", fontSize: 10, fontWeight: 800,
+  borderRadius: 5, padding: "1px 5px", fontSize: 10, fontWeight: 700,
 };
 const DENSITY_COLORS = ["#EEF2FF", "#C7D2FE", "#A5B4FC", "#818CF8", "#4F46E5"];
 function rampColor(v: number, min: number, max: number, ramp: string[]) {
@@ -508,7 +508,7 @@ export default function MapShell() {
               : "유동인구 · 불러오는 중"}
           </span>
         )}
-        {layer === "rent" && <span className="note">평당 임대시세 · {rentHm?.unit ?? "만원/평"} <span style={{ color: "#0f7a55", background: "#e3f5ee", border: "1px solid #b7e3d2", borderRadius: 5, padding: "1px 5px", fontSize: 10, fontWeight: 800 }}>R-ONE</span></span>}
+        {layer === "rent" && <span className="note">평당 임대시세 · {rentHm?.unit ?? "만원/평"} <span style={{ color: "#0f7a55", background: "#e3f5ee", border: "1px solid #b7e3d2", borderRadius: 5, padding: "1px 5px", fontSize: 10, fontWeight: 700 }}>R-ONE</span></span>}
         {layer === "density" && (
           <span className="note">
             {densHm
