@@ -1,0 +1,127 @@
+{
+  "reviewed_on": "2026-09-07",
+  "core": {
+    "author": "Abdulkareem Alsudais",
+    "title": "Incorrect Data in the Widely Used Inside Airbnb Dataset",
+    "doi": "10.1016/j.dss.2020.113453",
+    "edition": "arXiv:2007.03019v2; author public manuscript; publisher version comparison incomplete",
+    "url": "https://arxiv.org/pdf/2007.03019v2",
+    "local_file": "private/alsudais-2007.03019v2.pdf",
+    "retrieved_at_utc": "2026-09-06T23:55:51.604950+00:00",
+    "bytes": 723457,
+    "sha256": "5095cd20909a238afdc756414d2f6267b1b6bf74f98564890926e9fbaeea4ade",
+    "pages": 8,
+    "embedded_files": 0,
+    "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/license.html",
+    "git_distribution": "excluded; no blanket redistribution permission established",
+    "publisher_full_text": "unavailable; API 200 contained coredata only",
+    "appendix": "referenced at PDF page 5 but not present in acquired PDF; external appendix not acquired"
+  },
+  "page_reviews": [
+    {
+      "page": 1,
+      "pymupdf_characters": 3663,
+      "pypdf_characters": 3471,
+      "images": 0,
+      "width_points": 576.0,
+      "height_points": 783.0,
+      "text_reviewed": true,
+      "page_image_reviewed": true,
+      "visual_file": "private/page-01.png"
+    },
+    {
+      "page": 2,
+      "pymupdf_characters": 5740,
+      "pypdf_characters": 5482,
+      "images": 0,
+      "width_points": 576.0,
+      "height_points": 783.0,
+      "text_reviewed": true,
+      "page_image_reviewed": true,
+      "visual_file": "private/page-02.png"
+    },
+    {
+      "page": 3,
+      "pymupdf_characters": 4797,
+      "pypdf_characters": 4330,
+      "images": 2,
+      "width_points": 576.0,
+      "height_points": 783.0,
+      "text_reviewed": true,
+      "page_image_reviewed": true,
+      "visual_file": "private/page-03.png"
+    },
+    {
+      "page": 4,
+      "pymupdf_characters": 4760,
+      "pypdf_characters": 3583,
+      "images": 1,
+      "width_points": 576.0,
+      "height_points": 783.0,
+      "text_reviewed": true,
+      "page_image_reviewed": true,
+      "visual_file": "private/page-04.png"
+    },
+    {
+      "page": 5,
+      "pymupdf_characters": 7806,
+      "pypdf_characters": 4967,
+      "images": 1,
+      "width_points": 576.0,
+      "height_points": 783.0,
+      "text_reviewed": true,
+      "page_image_reviewed": true,
+      "visual_file": "private/page-05.png"
+    },
+    {
+      "page": 6,
+      "pymupdf_characters": 5055,
+      "pypdf_characters": 4293,
+      "images": 1,
+      "width_points": 576.0,
+      "height_points": 783.0,
+      "text_reviewed": true,
+      "page_image_reviewed": true,
+      "visual_file": "private/page-06.png"
+    },
+    {
+      "page": 7,
+      "pymupdf_characters": 7486,
+      "pypdf_characters": 4984,
+      "images": 0,
+      "width_points": 576.0,
+      "height_points": 783.0,
+      "text_reviewed": true,
+      "page_image_reviewed": true,
+      "visual_file": "private/page-07.png"
+    },
+    {
+      "page": 8,
+      "pymupdf_characters": 3464,
+      "pypdf_characters": 3110,
+      "images": 0,
+      "width_points": 576.0,
+      "height_points": 783.0,
+      "text_reviewed": true,
+      "page_image_reviewed": true,
+      "visual_file": "private/page-08.png"
+    }
+  ],
+  "tools": {
+    "python": "3.11.9",
+    "pypdf": "6.17.0",
+    "pymupdf": "1.28.2"
+  },
+  "supporting_sources": [
+    {
+      "doi": "10.1016/j.dss.2018.10.007",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0167923618301647",
+      "status": "abstract_and_section_snippets_only"
+    },
+    {
+      "doi": "10.1016/j.dss.2019.113138",
+      "url": "https://biblio.ugent.be/publication/8634924",
+      "status": "abstract_and_metadata_only; full_text_UGent_only"
+    }
+  ]
+}

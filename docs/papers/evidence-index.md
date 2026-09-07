@@ -12,6 +12,8 @@
 | **B. 실험군(group)** | 54거점 | category_group 7종 | 105/115열 | 2026-08-19~26 |
 | **C. 실험군(category2)** | 54거점 | category 2단계 32클래스 | 105/115열 | 2026-08-27 |
 
+Page의 **조건 D(2026-09-06 동결 구조 감사)**는 아래 별도 절에 등재한다. 위 그래프 조건 A/B/C와 모집단·태스크가 다르며 합산하지 않는다.
+
 ⚠ B 의 off-prior 37.6% 와 A 의 33.8% 는 **성능 저하가 아니다** — 거점이 54→66 으로
 늘며 모집단이 바뀐 것이다(`docs/feature-platform.md` §0 이 직접 경고한다).
 
@@ -242,7 +244,7 @@ a_only 148 · b_only 149 · discordant 297 · 델타 **+0.03pp** · chi2 = 0.0 �
 - [ ] LSTM 공실 예측 성능 — 인덱스에 아직 없다. `feature-platform.md` §0 에서 확인 후 등재
 - [ ] Page 공실률의 R-ONE 앵커 대비 **격차 수치** — "앵커 대조 보유 66/66"은 보유일 뿐 격차가 아니다
 - [ ] Posting 감도 실험 32조합의 **결과 수치** — 조합 수만 인덱스에 있다
-- [ ] 선행연구 — **한 건도 확인하지 않았다.** 지어내지 말 것
+- [x] Page 핵심 문헌 Alsudais의 저자 공개본 v2: 8페이지 텍스트·시각 대조 완료. [읽기 장부](page-study/reading-ledger.md). 출판본·별도 부록·보조문헌 전체 본문은 미확인이고, 다른 P의 상태를 완료로 바꾸지 않는다.
 
 ---
 
@@ -251,3 +253,31 @@ a_only 148 · b_only 149 · discordant 297 · 델타 **+0.03pp** · chi2 = 0.0 �
 ⚠ `docs/feature-platform.md` 에 **`0-M` 이 두 번** 있다 (line 305 "감성 구역을 행정동
 실측 구역으로" · line 466 "집계구 배선 → 600ep → McNemar"). 앵커로 인용할 때 절 번호만
 쓰면 어느 쪽인지 알 수 없다 — **제목까지 함께 적는다.**
+
+---
+
+<a id="page-condition-d"></a>
+
+## P2 · Page — 조건 D: 동결 자료의 구조 감사·영향·계산 재현성
+
+등재일: 2026-09-07. 원 실행은 `audits/page-analysis-20260906`, 입력 명세는 `audits/page-inventory-20260906/manifest.json`이다. 이 절의 수치는 특정 입력 묶음에 대한 결과이며 현재 운영 전체·서울 전체·실제 공실 정확도로 확대하지 않는다. [추가 검증 결과](page-study/evidence-verification.json)의 `summary` 및 참조 파일 해시로 재확인했다.
+
+| 근거 ID | 수치·판정 | 원천 / 검증 경로 | 허용되는 해석 |
+|---|---|---|---|
+| PAGE-D01 | 66거점 · 52,642 마스터 폴리곤 | `structural-audit.json`의 `hubs`, `rules`; 추가 검증 `hubs/polygons` | 동결된 가공 마스터 검사 범위 |
+| PAGE-D02 | 층 정보 검사 30,912 폴리곤 | `rules.floor_semantics`, `rules.floor_interval_formula` | 해당 분모에서 계산 일관성 확인 |
+| PAGE-D03 | 원천 관측 시점 정렬 66거점 평가 불가 | `rules.temporal_observation_alignment` | 최신성·동시점 현실 검증 완료 아님 |
+| PAGE-D04 | 별도 프로세스 반복에서 마스터·커버리지·서빙 66/66 일치 | `reproduction-comparison.json`; 커버리지는 `built_at`만 제외 | 동일 선택 입력 반복. 바이트 비교는 마스터에만 해당 |
+| PAGE-D05 | 기존 행 순서 시험 198회 · 거점 집계 변경 0회 · 격자 소속 또는 분자·분모 영향 65거점 | `order-sensitivity.json`; 추가 검증 `order_*` | 동일 내용 순서 변형의 사후 탐색. 현실 위치 오차·독립 표본 수 아님 |
+| PAGE-D06 | 층 배정 범위 폭 중앙값 16.235267101643892%p · 최댓값 34.38818565400844%p | `impact-intervals.json`; 추가 검증 `floor_interval_*` | 정보 부족에 따른 범위. 통계적 신뢰구간·현실 공실 오차 아님 |
+| PAGE-D07 | 독립 검토 표본 211개 전부 `unresolved` | `sample-design.json`, `independent-review-sample.csv` | 사람 정답·오류율 미확보. 2026-09-07 사용자도 자료·검토자 부재 확인 |
+| PAGE-D08 | 보존 서빙 사본 비교 66/66 · 독립 셀 재합산 66/66 통과 | 추가 검증 `stored_serving_comparisons_pass/cell_reaggregation_pass` | 기존 검사 결과 JSON의 주장만 재인용하지 않고 응답 객체·셀 합계를 대조 |
+| PAGE-D09 | 새 Git 체크아웃 Gold→서빙 66/66 일치 | 추가 검증 `fresh_gold_to_serving_matches`와 거점별 의미 해시 | 새 로컬 체크아웃 실행. 원천부터 전체 파이프라인·클라우드 실행·독립 팀 재현 아님 |
+| PAGE-D10 | 보존 감사 파일 224개 해시 일치 · 목록 중 미보유 537개 | 추가 검증 `archived_file_availability` | Git 보존 범위의 무결성. 모든 로컬 사본의 재배포·보존을 뜻하지 않음 |
+| PAGE-D11 | 원본 인벤토리 946개 중 새 체크아웃 보유 265개 · 미보유 681개 | 추가 검증 `data_availability` | 현재 패키지로 Bronze→Gold 전체 재실행 불가. 원래 로컬 원본 소실을 뜻하지 않음 |
+
+**재검증 명령:** 저장소 루트에서 `python docs/papers/page-study/verify_evidence.py`. 표의 원 실행 결과를 다시 집계하고, 실제 Gold 서빙 함수를 호출한다. 원래 대장 파이프라인을 실행하는 명령이 아니다. 사용한 체크아웃 커밋, 실행기 해시, Python 및 로드한 저장소 코드 해시는 검증 JSON에 있다.
+
+마스터 키·계산식 등의 통과를 현실 정답으로 승격하지 않는다. 같은 지번에 대한 넓은 검사에서 표시된 613행·428그룹은 [후속 분류](audits/page-analysis-20260906/same-lot-flag-qualification.json)에 따라 **확정 오류로 등재하지 않는다**. 기존 코드의 집계 제외 규칙과 출처 표기를 유지한다. 기존 릴리스 변경을 신규 개업·폐업·수집 오류로 해석하지 않는다.
+
+문헌 근거: Alsudais, *Incorrect Data in the Widely Used Inside Airbnb Dataset*, 저자 공개본 `arXiv:2007.03019v2`, 관련 출판 DOI `10.1016/j.dss.2020.113453`, 출판연도 2021. [원문 등록·읽기 범위](page-study/source-register.json). 원문 내 수치 불일치는 읽기 장부에 남겼으며 원고에 해당 수치·검정 결과를 옮기지 않는다. 우리의 표집·해시·행 순서 검사가 원문에 그대로 있었던 것으로 서술하지 않는다.
