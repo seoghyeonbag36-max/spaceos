@@ -47,7 +47,14 @@ export function useMapHost(): MapHostValue {
 
 export default function MapHost({ active, children }: { active: boolean; children: ReactNode }) {
   const elRef = useRef<HTMLDivElement>(null);
+  // ⚠ 지도 인스턴스를 **두 곳**에 둔다. 하나로 줄이지 말 것.
+  //   mapRef  — 동기 중복생성 가드. StrictMode 는 이펙트를 두 번 부르는데,
+  //             state 는 비동기로 갱신되므로 가드로 쓰면 지도가 두 개 생긴다.
+  //   map     — 렌더가 읽는 값. ref 를 렌더에서 읽으면(종전 코드) 컨텍스트가
+  //             ref 변화에 반응하지 않는다. setReady 가 뒤따라서 우연히
+  //             맞았을 뿐이다(react-hooks/refs 가 이걸 잡았다).
   const mapRef = useRef<any>(null);
+  const [map, setMap] = useState<any>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // 지도 탭을 **한 번이라도** 열었는가. 한 번 켜지면 다시 꺼지지 않는다.
@@ -70,6 +77,7 @@ export default function MapHost({ active, children }: { active: boolean; childre
           center: new naver.maps.LatLng(GAROSU.lat, GAROSU.lng),
           zoom: 16, scaleControl: false, mapDataControl: false,
         });
+        setMap(mapRef.current);
         setReady(true);
       })
       .catch((e) => alive && setError(describeNaverMapError(e)));
@@ -77,7 +85,7 @@ export default function MapHost({ active, children }: { active: boolean; childre
   }, [everActive]);
 
   return (
-    <MapHostCtx.Provider value={{ map: mapRef.current, ready, error }}>
+    <MapHostCtx.Provider value={{ map, ready, error }}>
       <div className={"maphost" + (active ? "" : " is-hidden")} aria-hidden={!active}>
         {/* 지도 캔버스는 탭 순서에서 뺀다 — 키보드 사용자가 지도에 갇히지 않게 */}
         <div ref={elRef} className="map-canvas" tabIndex={-1} />

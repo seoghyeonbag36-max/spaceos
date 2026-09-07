@@ -60,7 +60,6 @@ node_modules
 /test_naver.py
 /apps/frontend/dist
 /apps/backend/tests
-/apps/frontend/.storybook
 
 # 로컬 `vercel build` 가 만들어 두는 스캐폴드 — **올리면 원격 빌드가 깨진다.**
 # uv 가 pyproject.toml 을 보면 requirements.txt 대신 프로젝트 모드로 가는데, 이 파일의

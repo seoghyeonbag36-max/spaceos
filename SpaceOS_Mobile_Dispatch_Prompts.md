@@ -79,7 +79,7 @@ apps/frontend 의 디자인 토큰을 단일 기준으로 정리한다.
 2. 6개 화면(MapShell · PageDashboard · PlatformConsole · PostingConsole ·
    ProgramStudio · HubExplorer)이 공유하는 셸을 컴포넌트로 뽑는다.
    기존 화면 동작을 바꾸지 않는다 — 순수 리팩터.
-3. .storybook 이 있으니 뽑아낸 컴포넌트의 story 를 갱신한다.
+3. Storybook 은 없다(2026-09-06 삭제). story 파일을 만들지 말 것.
 4. 정리한 기준을 docs/feature-design-system.md 에 적는다.
 
 npm run build 통과 확인. 화면 동작이 바뀌었다면 그건 실패다.

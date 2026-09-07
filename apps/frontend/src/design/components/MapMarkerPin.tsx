@@ -4,12 +4,13 @@
 //   - `vacancyDotHTML()` — 네이버 SDK 용. `naver.maps.Marker` 의 `icon.content` 는
 //     React 엘리먼트가 아니라 **HTML 문자열**을 받으므로 컴포넌트를 그대로 못 쓴다.
 //     지도 위 실제 마커는 이쪽이다.
-//   - `MapMarkerPin` — Storybook·일반 DOM 용 React 컴포넌트.
+//   - `MapMarkerPin` — 일반 DOM 용 React 컴포넌트.
 //   둘이 갈라지면 지도와 문서의 마커가 달라지므로 색·크기 계산을 한 곳에 둔다.
 //
 // ⚠ 종전 이 컴포넌트는 Tailwind 유틸리티 클래스(`flex flex-col items-center`,
 //   `px-2 h-6`, `text-[11px]`)로 짜여 있었는데 이 저장소에는 **tailwindcss 가 설치돼
-//   있지 않다**(`@tailwind` 지시문 0개 · 설정만 남은 죽은 파일). 그래서 그 클래스들은
+//   있지 않다**(`@tailwind` 지시문 0개). 설정만 남아 있던 `tailwind.config.ts` 는
+//   2026-09-06 에 삭제했다. 그래서 그 클래스들은
 //   아무것도 하지 않았고 컴포넌트는 스타일 없이 그려졌다. 인라인 스타일로 바꿨다.
 import { colors } from "../tokens/colors";
 
