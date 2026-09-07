@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import type { TrackKey } from "@/design/tokens/colors";
 import SeoulDashboard from "@/pages/SeoulDashboard";
 import PlatformConsole from "@/pages/PlatformConsole";
 import PostingConsole from "@/pages/PostingConsole";
@@ -38,17 +39,24 @@ const HubExplorer = lazy(() => import("@/pages/HubExplorer"));
  */
 type View = "seoul" | "hubs" | "platform" | "map" | "posting" | "program";
 
-const NAV: { key: View; label: string; icon: JSX.Element }[] = [
+/* 2026-09-06: 레일이 **어느 트랙인지 색으로** 말한다. 종전엔 활성 버튼이 여섯 개 다
+   같은 UI 남색(#3a5a98)이라, 눌린 자리만 알 뿐 트랙은 알 수 없었다.
+   track 을 단 넷은 활성일 때 자기 트랙 색으로 칠한다 — 값은 CSS 가 --track-* 토큰에서
+   가져오고(App.css), 여기서는 **이름만** 넘긴다(색 하드코딩 금지 — design skill 규칙).
+   서울·거점은 트랙이 아니므로 track 이 없다 → 기존 남색 그대로. 그래야 "PPPP 네 개"와
+   "그 밖의 화면 둘"이 색으로도 갈린다.
+   ⚠ view key 와 track 이름은 하나만 어긋난다 — Page 트랙의 화면 key 는 "map" 이다. */
+const NAV: { key: View; label: string; icon: JSX.Element; track?: TrackKey }[] = [
   { key: "seoul", label: "서울", icon: <IconGrid /> },
   { key: "hubs", label: "거점", icon: <IconLayers /> },
   // PPPP 네 트랙 — 순서가 곧 프레임워크 순서다(Platform → Page → Posting → Program).
   // 전통 4P 와 1:1 대응한다(2026-09-05 재정의): Place▶Platform · Product▶Page ·
   // Price▶Posting · Promotion▶Program. 종전엔 Page 가 Product/Price 를 겸하고
   // Posting·Program 이 Promotion 하나를 나눠 가졌다 — 라벨을 되돌리지 말 것.
-  { key: "platform", label: "Platform", icon: <IconSpark /> },
-  { key: "map", label: "Page", icon: <IconPin /> },
-  { key: "posting", label: "Posting", icon: <IconKey /> },
-  { key: "program", label: "Program", icon: <IconMegaphone /> },
+  { key: "platform", label: "Platform", icon: <IconSpark />, track: "platform" },
+  { key: "map", label: "Page", icon: <IconPin />, track: "page" },
+  { key: "posting", label: "Posting", icon: <IconKey />, track: "posting" },
+  { key: "program", label: "Program", icon: <IconMegaphone />, track: "program" },
 ];
 
 export default function App() {
@@ -85,6 +93,7 @@ export default function App() {
           <button
             key={n.key}
             className={"rail-btn" + (view === n.key ? " active" : "")}
+            data-track={n.track}
             aria-current={view === n.key ? "page" : undefined}
             onClick={() => setView(n.key)}
           >
