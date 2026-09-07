@@ -1,0 +1,325 @@
+{
+  "generated_for": "docs/finding-anchor-gap-2026-09.md",
+  "reproduce": "docs/finding-anchor-gap-2026-09.md 부록 A 의 heredoc 을 그대로 실행",
+  "inputs": [
+    "data/gold/<hub>/page_building_master.geojson",
+    "data/gold/<hub>/coverage.json",
+    "data/gold/<hub>/calibration.json"
+  ],
+  "hubs": {
+    "yeonnam": {
+      "gold_built_at": "2026-09-04T23:26:55",
+      "anchor_mid_pct": 5.0,
+      "anchor_small_pct": 0.0,
+      "served": {
+        "buildings": 770,
+        "active": 1857,
+        "capacity": 2123,
+        "vacancy_pct": 12.53,
+        "gap_pp": 7.53
+      },
+      "narrowed_bldg_floors_ge3": {
+        "buildings": 612,
+        "active": 1581,
+        "capacity": 1822,
+        "vacancy_pct": 13.23,
+        "gap_pp": 8.23
+      },
+      "narrowed_denom_floors_ge3": {
+        "buildings": 397,
+        "active": 1289,
+        "capacity": 1515,
+        "vacancy_pct": 14.92,
+        "gap_pp": 9.92
+      },
+      "narrowed_denom_floors_le2": {
+        "buildings": 373,
+        "active": 568,
+        "capacity": 608,
+        "vacancy_pct": 6.58,
+        "gap_pp": 1.58
+      },
+      "calibration_rone_aligned": {
+        "mid": {
+          "buildings": 836,
+          "vacancy_units_pct": 25.8,
+          "buildings_floor": 836,
+          "vacancy_floor_hi_pct": 15.2,
+          "vacancy_floor_lo_pct": 27.6,
+          "vacancy_area_pct": 20.8,
+          "anchor_pct": 5.0,
+          "gap_pp": 15.8
+        },
+        "small": {
+          "buildings": 200,
+          "vacancy_units_pct": 15.9,
+          "buildings_floor": 200,
+          "vacancy_floor_hi_pct": 9.3,
+          "vacancy_floor_lo_pct": 23.7,
+          "vacancy_area_pct": 5.6
+        },
+        "mall": {
+          "buildings": 76,
+          "vacancy_units_pct": 43.1
+        },
+        "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
+      },
+      "calibration_combined_pct": 50.4,
+      "coverage_mixed_pct": 50.4,
+      "coverage_by_capacity_method": {
+        "floor_ouln": {
+          "buildings": 770,
+          "active": 1857,
+          "capacity": 2123,
+          "vacancy_pct": 12.5
+        },
+        "expos_units": {
+          "buildings": 57,
+          "active": 162,
+          "capacity": 422,
+          "vacancy_pct": 61.6
+        }
+      }
+    },
+    "sinchon": {
+      "gold_built_at": "2026-09-04T23:28:30",
+      "anchor_mid_pct": 11.68,
+      "anchor_small_pct": 19.5356602590119,
+      "served": {
+        "buildings": 690,
+        "active": 1633,
+        "capacity": 1972,
+        "vacancy_pct": 17.19,
+        "gap_pp": 5.51
+      },
+      "narrowed_bldg_floors_ge3": {
+        "buildings": 487,
+        "active": 1214,
+        "capacity": 1488,
+        "vacancy_pct": 18.41,
+        "gap_pp": 6.73
+      },
+      "narrowed_denom_floors_ge3": {
+        "buildings": 337,
+        "active": 1143,
+        "capacity": 1435,
+        "vacancy_pct": 20.35,
+        "gap_pp": 8.67
+      },
+      "narrowed_denom_floors_le2": {
+        "buildings": 353,
+        "active": 490,
+        "capacity": 537,
+        "vacancy_pct": 8.75,
+        "gap_pp": -2.93
+      },
+      "calibration_rone_aligned": {
+        "mid": {
+          "buildings": 664,
+          "vacancy_units_pct": 29.8,
+          "buildings_floor": 664,
+          "vacancy_floor_hi_pct": 21.2,
+          "vacancy_floor_lo_pct": 36.6,
+          "vacancy_area_pct": 19.8,
+          "anchor_pct": 11.68,
+          "gap_pp": 8.1
+        },
+        "small": {
+          "buildings": 149,
+          "vacancy_units_pct": 13.5,
+          "buildings_floor": 149,
+          "vacancy_floor_hi_pct": 9.2,
+          "vacancy_floor_lo_pct": 27.1,
+          "vacancy_area_pct": 8.2,
+          "anchor_pct": 19.54,
+          "gap_pp": -11.3
+        },
+        "mall": {
+          "buildings": 125,
+          "vacancy_units_pct": 48.7,
+          "buildings_floor": 3,
+          "vacancy_floor_hi_pct": 0.0,
+          "vacancy_floor_lo_pct": 0.0,
+          "vacancy_area_pct": null
+        },
+        "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
+      },
+      "calibration_combined_pct": 24.1,
+      "coverage_mixed_pct": 24.1,
+      "coverage_by_capacity_method": {
+        "floor_ouln": {
+          "buildings": 690,
+          "active": 1633,
+          "capacity": 1972,
+          "vacancy_pct": 17.2
+        },
+        "expos_units": {
+          "buildings": 103,
+          "active": 727,
+          "capacity": 1119,
+          "vacancy_pct": 35.0
+        }
+      }
+    },
+    "hongdae": {
+      "gold_built_at": "2026-09-04T23:26:46",
+      "anchor_mid_pct": 8.1,
+      "anchor_small_pct": 14.908475883587,
+      "served": {
+        "buildings": 959,
+        "active": 2557,
+        "capacity": 3007,
+        "vacancy_pct": 14.97,
+        "gap_pp": 6.87
+      },
+      "narrowed_bldg_floors_ge3": {
+        "buildings": 777,
+        "active": 2224,
+        "capacity": 2628,
+        "vacancy_pct": 15.37,
+        "gap_pp": 7.27
+      },
+      "narrowed_denom_floors_ge3": {
+        "buildings": 598,
+        "active": 1990,
+        "capacity": 2368,
+        "vacancy_pct": 15.96,
+        "gap_pp": 7.86
+      },
+      "narrowed_denom_floors_le2": {
+        "buildings": 361,
+        "active": 567,
+        "capacity": 639,
+        "vacancy_pct": 11.27,
+        "gap_pp": 3.17
+      },
+      "calibration_rone_aligned": {
+        "mid": {
+          "buildings": 1129,
+          "vacancy_units_pct": 25.9,
+          "buildings_floor": 1129,
+          "vacancy_floor_hi_pct": 17.0,
+          "vacancy_floor_lo_pct": 29.5,
+          "vacancy_area_pct": 20.1,
+          "anchor_pct": 8.1,
+          "gap_pp": 12.0
+        },
+        "small": {
+          "buildings": 209,
+          "vacancy_units_pct": 16.0,
+          "buildings_floor": 209,
+          "vacancy_floor_hi_pct": 11.7,
+          "vacancy_floor_lo_pct": 28.5,
+          "vacancy_area_pct": 6.8,
+          "anchor_pct": 14.91,
+          "gap_pp": -8.1
+        },
+        "mall": {
+          "buildings": 79,
+          "vacancy_units_pct": 68.4,
+          "buildings_floor": 1,
+          "vacancy_floor_hi_pct": 0.0,
+          "vacancy_floor_lo_pct": 0.0,
+          "vacancy_area_pct": 0.0
+        },
+        "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
+      },
+      "calibration_combined_pct": 31.0,
+      "coverage_mixed_pct": 31.0,
+      "coverage_by_capacity_method": {
+        "floor_ouln": {
+          "buildings": 959,
+          "active": 2557,
+          "capacity": 3007,
+          "vacancy_pct": 15.0
+        },
+        "expos_units": {
+          "buildings": 51,
+          "active": 463,
+          "capacity": 1450,
+          "vacancy_pct": 68.1
+        }
+      }
+    },
+    "garosugil": {
+      "gold_built_at": "2026-09-04T23:26:34",
+      "anchor_mid_pct": 18.23,
+      "anchor_small_pct": 14.8760431186127,
+      "served": {
+        "buildings": 612,
+        "active": 1806,
+        "capacity": 2146,
+        "vacancy_pct": 15.84,
+        "gap_pp": -2.39
+      },
+      "narrowed_bldg_floors_ge3": {
+        "buildings": 570,
+        "active": 1722,
+        "capacity": 2046,
+        "vacancy_pct": 15.84,
+        "gap_pp": -2.39
+      },
+      "narrowed_denom_floors_ge3": {
+        "buildings": 429,
+        "active": 1527,
+        "capacity": 1814,
+        "vacancy_pct": 15.82,
+        "gap_pp": -2.41
+      },
+      "narrowed_denom_floors_le2": {
+        "buildings": 183,
+        "active": 279,
+        "capacity": 332,
+        "vacancy_pct": 15.96,
+        "gap_pp": -2.27
+      },
+      "calibration_rone_aligned": {
+        "mid": {
+          "buildings": 758,
+          "vacancy_units_pct": 33.7,
+          "buildings_floor": 757,
+          "vacancy_floor_hi_pct": 18.1,
+          "vacancy_floor_lo_pct": 34.0,
+          "vacancy_area_pct": 19.0,
+          "anchor_pct": 18.23,
+          "gap_pp": 0.8
+        },
+        "small": {
+          "buildings": 29,
+          "vacancy_units_pct": 24.5,
+          "buildings_floor": 28,
+          "vacancy_floor_hi_pct": 9.8,
+          "vacancy_floor_lo_pct": 27.5,
+          "vacancy_area_pct": 9.3,
+          "anchor_pct": 14.88,
+          "gap_pp": -5.6
+        },
+        "mall": {
+          "buildings": 79,
+          "vacancy_units_pct": 43.5,
+          "buildings_floor": 1,
+          "vacancy_floor_hi_pct": 0.0,
+          "vacancy_floor_lo_pct": 0.0,
+          "vacancy_area_pct": null
+        },
+        "note": "R-ONE 정렬 지표(2026-08-01). mid=중대형 앵커 대조 대상(일반건축물·상가 주용도·3층 이상 또는 330㎡ 초과), small=소규모 앵커, mall=집합건축물(**중대형 앵커 대조 금지** — R-ONE 집합상가는 별도 계열). 대표값 = vacancy_area_pct(면적가중·층 점유 상한). 층 밴드는 상가정보 flrNo 공란 약 30% 에서 오는 불확실성이며 lo/hi 사이가 참값 구간이다."
+      },
+      "calibration_combined_pct": 20.3,
+      "coverage_mixed_pct": 20.3,
+      "coverage_by_capacity_method": {
+        "floor_ouln": {
+          "buildings": 612,
+          "active": 1806,
+          "capacity": 2146,
+          "vacancy_pct": 15.8
+        },
+        "expos_units": {
+          "buildings": 61,
+          "active": 285,
+          "capacity": 432,
+          "vacancy_pct": 34.0
+        }
+      }
+    }
+  }
+}
