@@ -7,12 +7,7 @@
 .platconsole *{box-sizing:border-box}
 .platconsole .wrap{max-width:1240px;margin:0 auto}
 
-.platconsole .hd{margin-bottom:14px}
-.platconsole .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af}
-.platconsole .conv4p{margin-left:var(--sp-2);padding:1px 7px;border-radius:99px;border:1px solid rgba(43,200,217,.45);color:#2BC8D9;font-size:10px;letter-spacing:.8px}
-.platconsole h1{font-size:27px;font-weight:700;margin:6px 0 var(--sp-1);letter-spacing:-.5px}
-.platconsole .sub{font-size:13px;color:var(--sub);line-height:1.65;max-width:860px}
-.platconsole .sub b{color:var(--ink)}
+/* 머리말(eyebrow·질문·결론·근거 3줄·출처)은 공용 Verdict 가 그린다 — components/Verdict.css */
 
 .platconsole .err{background:#fef2f2;border:1px solid #fecaca;border-radius:13px;padding:var(--sp-4) 18px;font-size:13px;color:#7f1d1d;margin:var(--sp-4) 0;line-height:1.7}
 .platconsole .errdetail{font-size:11px;color:#b91c1c;margin-top:6px;word-break:break-all}
@@ -33,14 +28,10 @@
 .platconsole .chip .src.is-gold{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
 .platconsole .chip .src.is-syn{color:#8a93a0;background:#f6f7f9;border:1px dashed #cfd5dd}
 
-/* ── 섹션 제목 (PageDashboard .sec 규칙 계승) ── */
-.platconsole .sec{font-size:16px;font-weight:700;margin:22px 0 10px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
-.platconsole .sec small{font-size:11.5px;font-weight:700;color:#9aa3af;line-height:1.5}
-.platconsole .sec small b{color:var(--sub)}
+/* 섹션 제목은 Fold 의 요약줄(.vfold summary)이 대신한다 — 접힌 채로도 안에 든 것을 말한다 */
 .platconsole .loading{padding:34px 0;text-align:center;color:var(--sub);font-size:13px}
 
-/* ── ① 정체성: 이 상권은 어떤 플랫폼인가 ── */
-.platconsole .hero{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:var(--sp-4) 17px}
+/* ── ① 정체성: 이 상권은 어떤 플랫폼인가 (Fold 안) ── */
 .platconsole .herotop{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;
  padding-bottom:13px;border-bottom:1px solid var(--line)}
 .platconsole .herolabel{font-size:11px;font-weight:700;letter-spacing:.5px;color:#9aa3af}
@@ -228,11 +219,9 @@
    2026-09-05 이전에는 손으로 적은 감성 구역이라 회색 배경 + 점선으로 위 카드들과
    서열을 갈라 두었다. 지금은 값이 실측이라 실선으로 올린다 — 다만 **감성만은
    여전히 없고**, 그 사실은 배경색이 아니라 카드 안의 "감성 실측 없음"이 말한다. */
-.platconsole .zonewrap{margin-top:var(--sp-4);background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px var(--sp-4)}
-.platconsole .zonehd h2{font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px}
-.platconsole .zonenote{font-size:11.5px;color:var(--sub);line-height:1.65;margin-top:6px;max-width:860px}
+.platconsole .zonenote{font-size:11.5px;color:var(--sub);line-height:1.65;max-width:860px}
 .platconsole .zonesum{font-size:11px;font-weight:700;color:#8a93a0;margin-top:var(--sp-2)}
-.platconsole .zonewrap .empty{background:#f6f7f9;margin-top:10px}
+.platconsole .zones+.empty,.platconsole .zonenote~.empty{background:#f6f7f9;margin-top:10px}
 .platconsole .zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px;margin-top:11px}
 .platconsole .zone{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:10px 11px}
 .platconsole .zhead{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-2)}

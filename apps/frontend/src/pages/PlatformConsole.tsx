@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import DistrictPicker, { CaveatNote, MeasuredValue } from "@/components/DistrictPicker";
+import Verdict, { Fold, type Ground } from "@/components/Verdict";
 import {
   getPlatformProfile, getSentiment, listDistricts, predictVacancy, recommendIndustry,
 } from "@/lib/api";
@@ -11,7 +12,7 @@ import { Card } from "@/design/components/Card";
 import "./PlatformConsole.css";
 
 /**
- * Platform 콘솔 — "이 상권은 어떤 플랫폼인가" 를 답하는 화면.
+ * Platform 콘솔 — "이 입지·상권은 어떤 플랫폼인가" 를 답하는 화면.
  *
  * Platform 트랙의 본질은 모델 지표가 아니라 두 답이다(2026-08-29 방향 확정):
  *   ① **이 상권은 어떤 플랫폼인가** — 무엇이 모여 있고, 누가·언제 오고,
@@ -19,11 +20,22 @@ import "./PlatformConsole.css";
  *   ② **그 안 어느 자리에 어떤 업소가 들어오면 좋은가** — 실측 공실 자리마다
  *      GNN 최근접 노드 추천
  *
- * 그래서 화면 순서가 곧 답의 순서다: 정체성 → 자리 제안 → (그 답을 뒷받침하는)
- * 모델 근거 → 감성(시드). LSTM·GNN 지표는 근거 자리로 내려가 있다 — 지표가
- * 위에 오면 "이 상권이 어떤 곳인가"라는 질문에 MAE 로 답하는 화면이 된다.
+ * ## 화면이 한 번에 펴는 양 (2026-09-07)
  *
- * 값 옆에 그 값의 한계를 같이 싣는다:
+ * 종전에는 이 화면이 결론·근거·원자료를 **동시에** 폈다. 정체성 3패널·자리 카드
+ * 9장·모델 카드 2장·구역 카드가 전부 열린 채라, 답을 찾으려면 읽어야 할 것이
+ * 먼저 왔다. 그래서 규칙을 하나로 고정한다 — **결론 1줄 + 근거 3줄**:
+ *
+ *   · 맨 위 `Verdict` 가 질문(헤드라인) → 결론 한 문장 → 근거 세 줄 → 출처 줄을 낸다.
+ *     여기까지가 스크롤 없이 보이는 자리다.
+ *   · 정체성 원자료 · 자리 제안 · 모델 근거 · 구역은 전부 `Fold` 로 **접는다**.
+ *     지운 것이 아니다 — 접힌 요약줄이 안에 무엇이 몇 개 있는지 말하고, 한 번 누르면
+ *     종전 화면이 그대로 펴진다.
+ *   · **출처는 접지 않는다.** 아래가 전부 접혀 있어도 `Verdict` 의 출처 줄에
+ *     카카오 플레이스 · TRDAR · 네이버 데이터랩 · LSTM · GNN · R-ONE 앵커가 남는다.
+ *   · 값은 계산한 정밀도 그대로 싣는다. 자리를 아끼자고 반올림하지 않는다.
+ *
+ * 접힌 자리 안의 규칙은 종전과 같다 — 값 옆에 그 값의 한계를 같이 싣는다:
  *   · 유형 라벨은 규칙과 함께 — 묶음이 근거를 가리지 않게 군을 펼쳐 볼 수 있다.
  *   · 예측 단위는 vac_proxy 다. %는 delta 가산 **근사**로만 쓴다.
  *   · GNN 은 Top-3 만 보면 과대평가되므로 거점 사전확률 대비로 같이 읽힌다.
@@ -48,6 +60,23 @@ function quarterLabel(q?: string): string {
 }
 const pct = (v: number) => `${(v * 100).toFixed(1)}%`;
 const signed = (v: number, digits = 3) => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(digits)}`;
+
+/** 값들을 ` · ` 로 잇는다 — 구분자를 한 곳에서만 정한다 */
+function joinDot(parts: ReactNode[]): ReactNode {
+  return parts.map((p, i) => <span key={i}>{i > 0 ? " · " : null}{p}</span>);
+}
+
+/** 공실률(%) 환산 — 예측의 단위가 아니라 delta 를 현재 공실률에 가산한 **근사**다.
+ *  백엔드 services/districts._predicted 와 같은 식이라 거점 대시보드 값과 어긋나지 않는다.
+ *  대표 공실률이 없는 거점(미측정 · 대표값 미제공)은 기준선이 없어 환산이 성립하지
+ *  않는다 — 0 을 기준으로 더하면 없는 기준선을 지어내게 되므로 null 을 낸다. */
+function approxVacancyPct(fc: VacancyForecast | null, hub?: DistrictSummary): number | null {
+  const base = hub?.vacancy_rate ?? null;
+  if (!fc || base === null || !Number.isFinite(base)) return null;
+  return Math.max(0, Math.min(100, base + fc.delta));
+}
+
+const dirMark = (d: string) => (d === "up" ? "▲" : d === "down" ? "▼" : "—");
 
 export default function PlatformConsole() {
   const [districts, setDistricts] = useState<DistrictSummary[]>([]);
@@ -119,17 +148,27 @@ export default function PlatformConsole() {
     return () => { live = false; };
   }, [districtId]);
 
+  const head = useMemo(
+    () => headline({ hub, districtId, prof, profErr, fc, rec, zones }),
+    [hub, districtId, prof, profErr, fc, rec, zones],
+  );
+
   return (
     <div className="platconsole"><div className="wrap">
-      <div className="hd">
-        <div className="ey">SPACEOS · PLATFORM <span className="conv4p">PLACE ▶ PLATFORM</span></div>
-        <h1>이 상권은 어떤 플랫폼인가</h1>
-        <div className="sub">
-          상권을 하나의 플랫폼으로 본다. 무엇이 모여 있고, 누가·언제 오고, 밖에서 뭐라고
-          불리는지로 <b>정체성</b>을 세우고, 그 안 <b>어느 빈 자리에 어떤 업소</b>가 들어오면
-          좋은지까지 잇는다. LSTM·GNN 은 그 답을 뒷받침하는 근거로 아래에 둔다.
-        </div>
-      </div>
+      <Verdict
+        eyebrow="SpaceOS · Platform" conversion="PLACE ▶ PLATFORM"
+        question="이 입지·상권은 어떤 플랫폼인가"
+        verdict={head.verdict} grounds={head.grounds} sources={head.sources}
+        note={
+          <>
+            상권을 하나의 플랫폼으로 본다. 무엇이 모여 있고, 누가·언제 오고, 밖에서 뭐라고
+            불리는지로 <b>정체성</b>을 세우고, 그 안 <b>어느 빈 자리에 어떤 업소</b>가 들어오면
+            좋은지까지 잇는다. LSTM·GNN 은 그 답을 뒷받침하는 근거라 아래 접힌 자리에 둔다 —
+            지표가 위에 오면 &ldquo;이 상권이 어떤 곳인가&rdquo;라는 질문에 MAE 로 답하는 화면이 된다.
+            접힌 자리는 한 번 눌러 그대로 편다. 아무것도 지우지 않았다.
+          </>
+        }
+      />
 
       {listErr && (
         <div className="err">
@@ -180,22 +219,174 @@ export default function PlatformConsole() {
       {prof?.identity && <IdentitySection ident={prof.identity} hub={hub} />}
       {prof && <OpeningsSection openings={prof.openings} />}
 
-      {/* 근거 — 위 두 답을 만든 모델의 성능과 한계 */}
-      <h2 className="sec">
-        모델 근거
-        <small>위 두 답을 만든 모델이다. 지표가 아니라 <b>답</b>이 먼저 오도록 여기에 둔다</small>
-      </h2>
-      <div className="cols">
-        <ForecastCard fc={fc} err={fcErr} quarters={quarters} onQuarters={setQuarters} hub={hub} />
-        <RecommendCard rec={rec} err={recErr} />
-      </div>
+      {/* 근거 — 위 두 답을 만든 모델의 성능과 한계. 지표가 아니라 **답**이 먼저 오도록 접어 둔다 */}
+      <Fold title="모델 근거" badge="LSTM · GNN"
+        summary={modelFoldSummary(fc, rec)}>
+        <div className="cols">
+          <ForecastCard fc={fc} err={fcErr} quarters={quarters} onQuarters={setQuarters} hub={hub} />
+          <RecommendCard rec={rec} err={recErr} />
+        </div>
+      </Fold>
 
       <SentimentSection zones={zones} hub={hub} />
     </div></div>
   );
 }
 
-/* ───────────────── ① 이 상권은 어떤 플랫폼인가 ───────────────── */
+/* ───────────────── 결론 1줄 + 근거 3줄 ───────────────── */
+
+/**
+ * 이 화면이 답한 것과 그 답을 세운 값.
+ *
+ * 근거의 순서는 정체성의 정의 그대로다 — 무엇이 모여 있고(①), 누가·언제 오고(②),
+ * 밖에서 뭐라고 불리며(③), 어디로 가고 있나(④). 규칙이 세 줄이라 ④는 접힌다.
+ * 값이 없으면 지어내지 않고 **없다고 적는다** — 빈 칸은 0 과 구분되지 않는다.
+ */
+function headline({ hub, districtId, prof, profErr, fc, rec, zones }: {
+  hub?: DistrictSummary; districtId: string;
+  prof: PlatformProfile | null; profErr: string | null;
+  fc: VacancyForecast | null; rec: IndustryRecommend | null; zones: Zone[] | null;
+}): { verdict: ReactNode; grounds: Ground[]; sources: ReactNode[] } {
+  const name = hub?.name ?? districtId;
+  const ident = prof?.identity ?? null;
+  const groups = ident?.categories.groups ?? [];
+  const total = ident?.categories.total ?? 0;
+  const d = ident?.demand ?? {};
+
+  /* ── 결론 한 문장 ── */
+  let verdict: ReactNode;
+  if (profErr) {
+    verdict = <>{name} — <span className="value-absent">Platform 산출물이 없어 유형을 판정하지 않는다.</span></>;
+  } else if (!ident) {
+    verdict = <>{name} — <span className="value-absent">상권 정체성을 불러오는 중이다.</span></>;
+  } else if (!ident.archetype || groups.length === 0) {
+    verdict = <>{name} — <span className="value-absent">업종 근거가 없어 유형을 판정하지 않는다.</span></>;
+  } else {
+    verdict = (
+      <>
+        {name} — <b>「{ident.archetype}」</b> 플랫폼이다
+        ({groups[0].group} {pct(groups[0].share)} 최대 군 · 점포 {total.toLocaleString()}곳).
+      </>
+    );
+  }
+
+  /* ── 근거 ── */
+  const grounds: Ground[] = [];
+
+  // ① 무엇이 모여 있나
+  grounds.push({
+    label: "무엇이 모여 있나",
+    value: groups.length
+      ? joinDot([
+        ...groups.slice(0, 3).map((g) => <><b>{g.group}</b> {pct(g.share)} ({g.n.toLocaleString()}곳)</>),
+        <>총 {total.toLocaleString()}곳 / {groups.length}군</>,
+      ])
+      : <span className="value-absent">업종 라벨 없음</span>,
+    source: ident?.archetype_rule,
+  });
+
+  // ② 누가 · 언제 오나
+  const peak = d.bands?.find((b) => b.band === d.peak_band);
+  const gap = d.bands?.find((b) => b.band === d.gap_band);
+  const topAge = [...(d.ages ?? [])].sort((a, b) => b.share - a.share)[0];
+  const demandParts: ReactNode[] = [];
+  if (peak) demandParts.push(<><b>{peak.label}</b> 유동 최다</>);
+  if (gap) demandParts.push(<><b>{gap.label}</b> 빈틈</>);
+  if (topAge) demandParts.push(<>{topAge.band} {topAge.share.toFixed(1)}%</>);
+  if (d.female_share != null) demandParts.push(<>여성 {d.female_share.toFixed(1)}%</>);
+  if (d.weekend_flpop != null) demandParts.push(<>주말 유동 {d.weekend_flpop.toFixed(1)}%</>);
+  if (d.store_count != null) demandParts.push(<>점포 {Math.round(d.store_count).toLocaleString()}곳</>);
+  grounds.push({
+    label: "누가 · 언제 오나",
+    value: demandParts.length ? joinDot(demandParts) : <span className="value-absent">TRDAR 수요신호 없음</span>,
+    source: `서울 상권분석 TRDAR 상권 단위${d.trdar_n ? ` · TRDAR 상권 ${d.trdar_n}개` : ""}`
+      + " · 빈틈은 유동 대비 매출이 가장 낮은 구간(0~6시 제외)",
+  });
+
+  // ③ 밖에서 뭐라고 불리나
+  const words = ident?.keywords.words ?? [];
+  const trends = ident?.trends ?? [];
+  const repParts: ReactNode[] = words.slice(0, 3).map((w) => <>「{w.word}」 {w.n}회</>);
+  if (trends[0]) {
+    const t = trends[0];
+    repParts.push(
+      <>검색 「{t.keyword}」 <b className={`tr-${t.direction}`}>{dirMark(t.direction)} {t.change_pct > 0 ? "+" : ""}{t.change_pct}%</b></>,
+    );
+  }
+  grounds.push({
+    label: "밖에서 뭐라고 불리나",
+    value: repParts.length ? joinDot(repParts) : <span className="value-absent">블로그 언급 없음</span>,
+    source: ident
+      ? `네이버 블로그 언급 빈도 — 토큰 ${ident.keywords.scanned}개 중 일반어 ${ident.keywords.dropped}개 표시 제외`
+        + `(감성이 아니라 빈도다) · 트렌드 ${trends.length}계열은 네이버 데이터랩 최근 3개월 대 직전 3개월`
+      : undefined,
+  });
+
+  // ④ 어디로 가고 있나 — 네 줄째라 접힌다. 규칙이 세 줄이지 값이 셋인 것은 아니다.
+  if (fc && fc.model !== "lstm-stub") {
+    const approx = approxVacancyPct(fc, hub);
+    grounds.push({
+      label: "어디로 가고 있나",
+      value: (
+        <>
+          공실 프록시 <b>{fc.last_vac_proxy.toFixed(3)}</b> → <b>{fc.forecast_vac_proxy.toFixed(3)}</b>
+          {" "}({signed(fc.delta)})
+          {approx != null && hub?.vacancy_rate != null && (
+            <> · 공실률 환산 {hub.vacancy_rate.toFixed(1)}% → {approx.toFixed(1)}%</>
+          )}
+          {approx == null && hub?.vacancy_withheld && (
+            <> · <span className="value-absent">대표 공실률을 내린 거점이라 % 환산 없음</span></>
+          )}
+        </>
+      ),
+      source: `LSTM ${fc.model} · ${quarterLabel(fc.last_quarter)} 관측 → `
+        + `${quarterLabel(fc.forecast_quarter ?? fc.horizons[fc.horizon_quarters - 1]?.quarter)} 예측`
+        + " · 단위는 vac_proxy 다(%는 delta 를 현재 공실률에 더한 근사)",
+    });
+  }
+
+  /* ── 출처 — 아래가 전부 접혀도 남는다 ── */
+  const sources: ReactNode[] = [];
+  if (ident) sources.push(ident.source);
+  if (prof?.openings) sources.push(prof.openings.source);
+  if (fc && fc.model !== "lstm-stub") {
+    sources.push(`LSTM ${fc.model}${fc.trained_at ? ` · 학습 ${fc.trained_at.slice(0, 10)}` : ""}`);
+  }
+  if (fc?.ground_anchor) {
+    const a = fc.ground_anchor;
+    sources.push(
+      `R-ONE 앵커${a.anchor_street_pct != null ? ` ${a.anchor_street_pct.toFixed(1)}%` : ""}`
+      + ` · 건물 실측 ${a.estimated_vacancy_pct?.toFixed(1)}%`
+      + `${a.buildings_used ? ` (${a.buildings_used.toLocaleString()}동)` : ""} · ${a.source} ${a.as_of}`,
+    );
+  }
+  if (rec && rec.model !== "gnn-stub") {
+    sources.push(`GNN ${rec.model}${rec.metrics?.nodes ? ` · 노드 ${rec.metrics.nodes.toLocaleString()}개` : ""}`);
+  }
+  if (hub) {
+    sources.push(`거점 공실 ${hub.vacancy_source === "gold" ? "실측 건물 집계" : "합성 그리드"}`);
+  }
+  if (zones?.length) sources.push(`행정동 구역 ${zones.length}개 실측`);
+
+  return { verdict, grounds, sources };
+}
+
+/** 「모델 근거」가 접힌 채로도 무엇이 들어 있는지 — 두 모델의 대표 수치 한 줄. */
+function modelFoldSummary(fc: VacancyForecast | null, rec: IndustryRecommend | null): ReactNode {
+  const parts: ReactNode[] = [];
+  if (fc && fc.model !== "lstm-stub") {
+    parts.push(<>공실 <b>{fc.forecast_vac_proxy.toFixed(3)}</b> vac_proxy ({signed(fc.delta)})</>);
+  }
+  if (rec && rec.model !== "gnn-stub" && rec.recommendations.length) {
+    parts.push(<>추천 1위 <b>{rec.recommendations[0].industry}</b> {pct(rec.recommendations[0].score)}</>);
+    if (rec.metrics?.test_top3 != null) {
+      parts.push(<>Top-3 {pct(rec.metrics.test_top3)} / 사전확률 {rec.metrics.baseline_district_prior_top3 != null ? pct(rec.metrics.baseline_district_prior_top3) : "—"}</>);
+    }
+  }
+  return parts.length ? joinDot(parts) : "검증 근거 · 홀드아웃 · 지상검증 앵커";
+}
+
+/* ───────────────── ① 이 상권은 어떤 플랫폼인가 (원자료) ───────────────── */
 
 function IdentitySection({ ident, hub }: { ident: NonNullable<PlatformProfile["identity"]>; hub?: DistrictSummary }) {
   const { categories: cats, keywords, trends, demand } = ident;
@@ -207,7 +398,9 @@ function IdentitySection({ ident, hub }: { ident: NonNullable<PlatformProfile["i
   const maxAge = Math.max(...(demand.ages ?? []).map((a) => a.share), 1);
 
   return (
-    <section className="hero">
+    <Fold title="정체성 원자료" badge="Gold 컨텍스트"
+      summary={<>업종 {cats.total.toLocaleString()}곳 / {cats.groups.length}군 · 시간대 {bands.length}구간
+        · 키워드 {keywords.words.length}개 · 트렌드 {trends.length}계열</>}>
       <div className="herotop">
         <div>
           <div className="herolabel">이 상권의 유형</div>
@@ -362,7 +555,7 @@ function IdentitySection({ ident, hub }: { ident: NonNullable<PlatformProfile["i
       </div>
 
       <div className="herosrc">근거: {ident.source}</div>
-    </section>
+    </Fold>
   );
 }
 
@@ -398,15 +591,9 @@ function OpeningsSection({ openings }: { openings: PlatformProfile["openings"] }
   }, [sites]);
 
   return (
-    <>
-      <h2 className="sec">
-        어느 자리에 어떤 업소가 들어오면 좋나
-        <small>
-          공실 {openings.unit_count}곳 · 추천이 붙은 자리 {openings.matched_count}곳
-          (반경 {openings.match_radius_m}m 안 그래프 노드 기준) ·
-          <b> 상권 평균과 가장 다른 자리부터</b>
-        </small>
-      </h2>
+    <Fold title="어느 자리에 어떤 업소가 들어오면 좋나" badge="실측 공실"
+      summary={<>공실 <b>{openings.unit_count}곳</b> · 추천이 붙은 자리 <b>{openings.matched_count}곳</b>
+        {" "}(반경 {openings.match_radius_m}m 안 그래프 노드) · 상권 평균과 가장 다른 자리부터</>}>
 
       {sites.length === 0 && <div className="loading">이 상권에는 실측 공실 자리가 없다.</div>}
 
@@ -430,7 +617,7 @@ function OpeningsSection({ openings }: { openings: PlatformProfile["openings"] }
         ⚠ <b>직전 업종과 추천 업종은 눈금이 다르다</b> — 직전 업종은 상가정보 분류,
         추천은 GNN 7군이다. 둘이 다르다고 그 자체로 &ldquo;업종 전환&rdquo;을 뜻하지 않는다.
       </div>
-    </>
+    </Fold>
   );
 }
 
@@ -488,14 +675,8 @@ function ForecastCard({ fc, err, quarters, onQuarters, hub }: {
   quarters: number; onQuarters: (q: number) => void; hub?: DistrictSummary;
 }) {
   const stub = fc?.model === "lstm-stub";
-  // 공실률(%)은 예측의 단위가 아니다 — delta 를 현재 공실률에 가산한 **근사**로만 쓴다.
-  // 백엔드 services/districts._predicted 와 같은 식이라 거점 대시보드 값과 어긋나지 않는다.
-  // 대표 공실률이 없는 거점(미측정 · 대표값 미제공)은 환산 자체가 성립하지 않는다.
-  // 0 을 기준으로 더하면 없는 기준선을 지어내게 된다.
   const baseVac = hub?.vacancy_rate ?? null;
-  const approxPct = fc && baseVac !== null && Number.isFinite(baseVac)
-    ? Math.max(0, Math.min(100, baseVac + fc.delta))
-    : null;
+  const approxPct = approxVacancyPct(fc, hub);
   const maxAbs = fc
     ? Math.max(...fc.horizons.map((h) => Math.abs(h.forecast_vac_proxy)), 0.001)
     : 1;
@@ -742,19 +923,20 @@ function SentimentSection({ zones, hub }: { zones: Zone[] | null; hub?: District
   // 생기면 이 자리가 그대로 살아난다 — 값이 들어오면 화면이 저절로 그린다.
   const scored = (zones ?? []).filter((z) => z.s !== null);
   return (
-    <section className="zonewrap">
-      <div className="zonehd">
-        <h2>구역 <span className="badge is-measured">행정동 실측</span></h2>
-        <div className="zonenote">
-          거점을 <b>행정동</b>으로 갈라 각 구역의 점포·건물·공실을 실측으로 센다. 구역 수가
-          거점마다 다른 것은(1~11개) <b>거점이 실제로 몇 개 행정동에 걸쳐 있느냐</b>가 정하기
-          때문이다 — 예전에 전 거점이 똑같이 6구역이던 것은 실측이 아니라 서식이었다.
-          공실률은 거점 대표값과 <b>같은 규칙</b>으로 세므로 구역 합계가 거점 값과 맞는다.
-          <br />
-          <b>감성 점수는 싣지 않는다.</b> 블로그 원문에 좌표가 없어 구역까지 내려오지 못하고,
-          점포명 귀속은 3.18%이며 부정어는 0.53%다(2026-08-25 실측). 좌표를 가진 점포 리뷰
-          채널이 생기기 전에는 못 재는 값이라, <b>공실률을 감성 자리에 옮겨 놓지 않았다.</b>
-        </div>
+    <Fold title="구역" badge="행정동 실측"
+      summary={zones === null
+        ? "구역 불러오는 중…"
+        : <>구역 {zones.length}개 · 거점 감성 <MeasuredValue value={hub?.sentiment ?? null} unit="pt" />
+          {scored.length === 0 && " (감성 채널 없음)"}</>}>
+      <div className="zonenote">
+        거점을 <b>행정동</b>으로 갈라 각 구역의 점포·건물·공실을 실측으로 센다. 구역 수가
+        거점마다 다른 것은(1~11개) <b>거점이 실제로 몇 개 행정동에 걸쳐 있느냐</b>가 정하기
+        때문이다 — 예전에 전 거점이 똑같이 6구역이던 것은 실측이 아니라 서식이었다.
+        공실률은 거점 대표값과 <b>같은 규칙</b>으로 세므로 구역 합계가 거점 값과 맞는다.
+        <br />
+        <b>감성 점수는 싣지 않는다.</b> 블로그 원문에 좌표가 없어 구역까지 내려오지 못하고,
+        점포명 귀속은 3.18%이며 부정어는 0.53%다(2026-08-25 실측). 좌표를 가진 점포 리뷰
+        채널이 생기기 전에는 못 재는 값이라, <b>공실률을 감성 자리에 옮겨 놓지 않았다.</b>
       </div>
       {hub && <CaveatNote district={hub} />}
       {hub && (
@@ -802,6 +984,6 @@ function SentimentSection({ zones, hub }: { zones: Zone[] | null; hub?: District
           </div>
         ))}
       </div>
-    </section>
+    </Fold>
   );
 }
