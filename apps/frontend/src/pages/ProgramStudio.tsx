@@ -7,6 +7,8 @@ import {
 import type {
   ChannelPlan, DistrictSummary, StoreMarketing, StorePlace,
 } from "@/lib/api";
+import { Button } from "@/design/components/Button";
+import { Card } from "@/design/components/Card";
 import "./ProgramStudio.css";
 
 /**
@@ -259,18 +261,18 @@ export default function ProgramStudio() {
             {commercialMode ? "상용 입력 온보딩" : "가게 프로필"}
             <div className="ptools">
               {!commercialMode && (
-                <button type="button" className="ghost" onClick={() => setForm(SAMPLE)}>예시 채우기</button>
+                <Button variant="ghost" type="button" className="ghost" onClick={() => setForm(SAMPLE)}>예시 채우기</Button>
               )}
-              <button type="button" className={`ghost ${commercialMode ? "active" : ""}`}
+              <Button variant="ghost" type="button" className={`ghost ${commercialMode ? "active" : ""}`}
                 onClick={toggleCommercialMode}>
                 {commercialMode ? "공개 데모로" : "상용 온보딩"}
-              </button>
-              <button type="button" className="ghost" onClick={() => {
+              </Button>
+              <Button variant="ghost" type="button" className="ghost" onClick={() => {
                 setForm(EMPTY); setPublicReviews([]); setResult(null); setError(null);
                 setOnboardingReceipt(null);
                 setApiKey(""); setRightsConfirmed(false); setProcessingConsent(false);
                 setExternalConsent(false); setRetentionAcknowledged(false);
-              }}>비우기</button>
+              }}>비우기</Button>
             </div>
           </div>
 
@@ -291,10 +293,10 @@ export default function ProgramStudio() {
               ) : <div className="inputbtn">
                 <input value={form.name} onChange={set("name")} placeholder="예: 맡기다"
                   onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); searchPlaces(); } }} />
-                <button type="button" className="ghost" onClick={searchPlaces}
+                <Button variant="ghost" type="button" className="ghost" onClick={searchPlaces}
                   disabled={!form.name.trim() || lookupBusy}>
                   {lookupBusy ? "…" : "검색"}
-                </button>
+                </Button>
               </div>}
             </Field>
             <Field label="카테고리" required>
@@ -436,14 +438,14 @@ export default function ProgramStudio() {
             </div>
           )}
 
-          <button type="submit" className="primary" disabled={!canSubmit}>
+          <Button type="submit" className="primary" disabled={!canSubmit}>
             {busy ? `생성 중… ${elapsed}초` : commercialMode ? "동의하고 상용 생성" : "마케팅 솔루션 생성"}
-          </button>
+          </Button>
           {busy && <div className="note">Claude 실호출은 사진 포함 시 10~20초 걸린다.</div>}
         </form>
 
         {/* ── 결과 ── */}
-        <div className="panel">
+        <Card className="panel">
           <div className="ptitle">생성 결과</div>
 
           {error && (
@@ -469,7 +471,7 @@ export default function ProgramStudio() {
               상용 입력 동의 영수증 <code>{onboardingReceipt}</code> · 원문 DB 저장 없음
             </div>
           )}
-        </div>
+        </Card>
       </div>
 
       <div className="foot">

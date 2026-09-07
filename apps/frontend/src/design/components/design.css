@@ -1,0 +1,59 @@
+/* SpaceOS 디자인 컴포넌트 실제 스타일 (2026-09-06)
+ *
+ * ⚠ 왜 CSS 파일인가 — 이 저장소에는 **tailwindcss 가 설치돼 있지 않다**.
+ *   Card/Button 은 `bg-surface` `h-11` 같은 Tailwind 유틸리티 클래스만 갖고 있었고
+ *   그 클래스를 정의하는 곳이 어디에도 없어서(설정만 남은 죽은 tailwind.config.ts)
+ *   두 컴포넌트는 스타일이 **하나도 걸리지 않은 채** 그려졌다. MapMarkerPin 이
+ *   같은 이유로 인라인 스타일로 빠져나간 것과 같은 문제다.
+ *   다만 Button 은 :hover/:disabled 가 필요해 인라인 스타일로는 표현할 수 없어
+ *   MapMarkerPin 과 달리 실제 CSS 클래스로 낸다.
+ *
+ * 값은 styles/tokens.css 의 CSS 변수를 쓴다. 콘솔 3종(.platconsole·.postconsole·
+ * .progstudio)은 루트에서 --card/--line 을 각자 정의하는데, CSS 변수는 상속되므로
+ * 그 안에서는 콘솔의 값으로 자동 해석된다. 콘솔 밖 단독 사용을 위해 폴백을 둔다.
+ */
+
+/* ── Card — 콘솔 3종이 공유하던 카드 표면(#fff · 1px line · radius 13)의 단일 출처 ── */
+.ds-card {
+  box-sizing: border-box;
+  background: var(--card, var(--surface, #fff));
+  border: 1px solid var(--line, #e3e9f2);
+  border-radius: 13px;
+  padding: 15px 16px;
+}
+
+/* ── Button ──
+ * 화면 쪽 클래스(.run/.primary/.ghost 등)와 함께 쓰면 그쪽 선택자가
+ * (0,2,0) 으로 더 세서 색·여백을 계속 가져간다. 여기 base 는 그 아래에 깔린다. */
+/* ⚠ display / align-items / gap / transition 을 일부러 넣지 않는다.
+ * 화면 쪽 클래스가 display 를 정하지 않는 버튼(.ghost 등)에서 inline-block →
+ * inline-flex 로 바뀌어 레이아웃이 실제로 달라졌고, transition 은 즉시 바뀌던
+ * hover 색을 0.12s 페이드로 만들었다(계산 스타일 실측, 2026-09-06).
+ * 콘솔들이 디자인시스템 룩을 채택하면 그때 되살린다. */
+.ds-btn {
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 11px 20px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md, 12px);
+  cursor: pointer;
+}
+.ds-btn:disabled { cursor: not-allowed; }
+
+.ds-btn-brand { background: var(--brand, #0ea5b7); color: #fff; }
+.ds-btn-brand:hover:not(:disabled) { background: var(--brand-pressed, #0b8294); }
+.ds-btn-brand:disabled { opacity: .5; }
+
+/* naver variant 는 '네이버 연동 액션'(길찾기 등)에만. 결제는 NaverPayButton. */
+.ds-btn-naver { background: var(--naver-green, #03c75a); color: #fff; }
+.ds-btn-naver:hover:not(:disabled) { background: var(--naver-green-pressed, #02b350); }
+.ds-btn-naver:disabled { opacity: .5; }
+
+.ds-btn-ghost {
+  background: transparent; color: var(--ink, #1c2533);
+  border-color: var(--line, #e3e9f2);
+}
+.ds-btn-ghost:hover:not(:disabled) { background: var(--bg, #f4f7fb); }
+.ds-btn-ghost:disabled { opacity: .5; }
