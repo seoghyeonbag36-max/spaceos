@@ -121,7 +121,7 @@ Posting 화면이 12개만 보여주면 *"연남동에 빈 자리가 12개뿐?"*
 
 | 단계 | 내용 | 작업일 | 완료 판정 |
 |---|---|---|---|
-| **M1** | 시나리오 고정 — 페르소나 3개를 종이에 끝까지 그린다 | 1 | `design/planning/00-idea-map.md` 에 3개 여정 |
+| **M1** | 시나리오 고정 — 페르소나 3개를 종이에 끝까지 그린다 | 1 | 여정 3개 = [docs/ux-persona-journey-2026-09-07.md](ux-persona-journey-2026-09-07.md) · 기준 시나리오의 검증 가능판 = [design/planning/01-scenario-m1-yeonnam.md](../design/planning/01-scenario-m1-yeonnam.md) |
 | **M2** | 신뢰 확보 — §2 의 세 자리 | 2 | `docs/finding-anchor-gap-2026-09.md` + 화면 요건 3줄 |
 | **M3** | 화면 개편 — **디자인 고도화 D5 와 같은 작업이다** | 5~8 | [plan-design-upgrade-2026-09.md](plan-design-upgrade-2026-09.md) §7-1 통과 조건 7개 |
 | **M4** | 3거점 동시 검증 | 2 | §1-3 의 C1~C6 을 3거점 전부에서 |

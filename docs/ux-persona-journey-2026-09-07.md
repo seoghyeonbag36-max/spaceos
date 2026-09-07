@@ -3,6 +3,9 @@
 대상 화면은 앱에 **이미 있는 4개**뿐이다(`App.tsx` NAV: Platform · Page · Posting · Program).
 표의 값은 전부 실제 렌더링 필드에서 왔다 — 새 화면·새 지표를 만들지 않았다.
 
+> **후속**: 이 지도의 ①(소상공인)을 통과/실패로 판정할 수 있게 바꾼 것이
+> [design/planning/01-scenario-m1-yeonnam.md](../design/planning/01-scenario-m1-yeonnam.md) 다(M1 기준 시나리오).
+
 - Platform = `PlatformConsole.tsx` (정체성 → 자리별 추천 → 모델 근거 → 감성)
 - Page = `PageDashboard.tsx` (거점 보드 66장 → 거점 심층: 히트맵 · 층별 공실 매물 · 3-Tier · 상권 행사)
 - Posting = `PostingConsole.tsx` (자리 select → 업종·권리금 입력 → 3-Tier 회수기간)

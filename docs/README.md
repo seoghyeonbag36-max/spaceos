@@ -25,6 +25,7 @@ Claude Code(CLI) 기반 SpaceOS 개발 가이드. PPPP 프레임워크 4기능�
 | 문서 | 내용 |
 |------|------|
 | [plan-mvp-3hubs-2026-09.md](plan-mvp-3hubs-2026-09.md) | **9월 미션** — 연남동·신촌·홍대 3거점 MVP → 66거점 화면 루프 엔지니어링. 데이터는 이미 9/9 라 미션은 화면 과제다 |
+| [ux-persona-journey-2026-09-07.md](ux-persona-journey-2026-09-07.md) | **페르소나 3명 여정 지도** — PPPP 4화면에서 소상공인·프랜차이즈·지자체가 어디서 걸리나. 기준 시나리오의 검증 가능판은 `design/planning/01-scenario-m1-yeonnam.md` |
 | [plan-design-upgrade-2026-09.md](plan-design-upgrade-2026-09.md) | **디자인 고도화** — 2026-09-06 디자이너 피드백을 코드 작업으로 번역. 기획안→PRD→디자인재료→앱 개편(D0~D6). 랜딩만 Lovable, 앱은 이식 |
 | [plan-gyeonggi-expansion-2026-08-29.md](plan-gyeonggi-expansion-2026-08-29.md) | 경기(고양·파주) 확장 계획 — 서빙 보류 상태 |
 
