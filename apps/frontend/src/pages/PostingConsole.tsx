@@ -6,6 +6,8 @@ import {
 import type {
   DistrictSummary, IndustryRec, Posting, SimulateResult, TierScenario,
 } from "@/lib/api";
+import { Button } from "@/design/components/Button";
+import { Card } from "@/design/components/Card";
 import "./PostingConsole.css";
 
 /**
@@ -214,9 +216,9 @@ export default function PostingConsole() {
             </select>
           </label>
 
-          <button className="run" type="submit" disabled={busy || !unitId}>
+          <Button className="run" type="submit" disabled={busy || !unitId}>
             {busy ? "계산 중…" : "시뮬레이션"}
-          </button>
+          </Button>
         </form>
 
         {/* ── 결과 ── */}
@@ -289,7 +291,7 @@ export default function PostingConsole() {
 function TierCard({ tierKey, s }: { tierKey: string; s: TierScenario }) {
   const meta = TIER_LABEL[tierKey] ?? { name: s.name ?? tierKey, sub: s.sub ?? "" };
   return (
-    <div className={"tier" + (s.recommended ? " rec" : "") + (s.viable ? "" : " dead")}>
+    <Card className={"tier" + (s.recommended ? " rec" : "") + (s.viable ? "" : " dead")}>
       <div className="thd">
         <span className="tname">{meta.name}</span>
         {s.recommended && <span className="trec">추천</span>}
@@ -308,7 +310,7 @@ function TierCard({ tierKey, s }: { tierKey: string; s: TierScenario }) {
         {/* "모른다"와 "안 된다"는 다른 정보다 — 순익이 0 이하면 회수기간이 정의되지 않는다 */}
         <span>{s.viable ? `${s.roi_months}개월` : "회수 불가"}</span>
       </div>
-    </div>
+    </Card>
   );
 }
 

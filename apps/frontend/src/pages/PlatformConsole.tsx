@@ -6,6 +6,8 @@ import {
 import type {
   DistrictSummary, IndustryRecommend, OpeningSite, PlatformProfile, VacancyForecast, Zone,
 } from "@/lib/api";
+import { Button } from "@/design/components/Button";
+import { Card } from "@/design/components/Card";
 import "./PlatformConsole.css";
 
 /**
@@ -416,9 +418,9 @@ function OpeningsSection({ openings }: { openings: PlatformProfile["openings"] }
       </div>
 
       {sites.length > shown && (
-        <button className="more" onClick={() => setShown((n) => n + SITES_PAGE)}>
+        <Button variant="ghost" className="more" onClick={() => setShown((n) => n + SITES_PAGE)}>
           자리 {sites.length - shown}곳 더 보기
-        </button>
+        </Button>
       )}
 
       <div className="sitesrc">
@@ -435,7 +437,7 @@ function OpeningsSection({ openings }: { openings: PlatformProfile["openings"] }
 function SiteCard({ site, seq }: { site: OpeningSite; seq: string | null }) {
   const max = site.recommendations[0]?.score ?? 1;
   return (
-    <div className="site">
+    <Card className="site">
       <div className="sitehd">
         <span className="sname" title={site.name}>
           {site.name}{seq && <em> · 자리 {seq}</em>}
@@ -475,7 +477,7 @@ function SiteCard({ site, seq }: { site: OpeningSite; seq: string | null }) {
       )}
 
       {site.was && <div className="swas">직전 업종 <b>{site.was}</b></div>}
-    </div>
+    </Card>
   );
 }
 

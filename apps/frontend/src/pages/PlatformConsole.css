@@ -112,7 +112,8 @@
 
 /* ── ② 자리 제안 ── */
 .platconsole .sites{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:11px}
-.platconsole .site{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:var(--sp-3) 13px}
+/* 표면(#fff·line·radius13)은 design/components/Card(.ds-card) 가 낸다. 여기는 차이만. */
+.platconsole .site{padding:var(--sp-3) 13px}
 .platconsole .sitehd{display:flex;align-items:baseline;gap:var(--sp-2)}
 .platconsole .sname{font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .platconsole .sname em{font-style:normal;font-weight:700;color:#9aa3af}
@@ -134,7 +135,10 @@
 .platconsole .swas b{color:var(--sub)}
 .platconsole .more{display:block;margin:11px auto 0;font-family:inherit;font-size:12px;font-weight:700;color:var(--sub);
  background:var(--card);border:1px solid var(--line);border-radius:9px;padding:var(--sp-2) var(--sp-4);cursor:pointer}
-.platconsole .more:hover{color:var(--blue);border-color:var(--blue)}
+/* Button(design/components) 병합 시 .ds-btn-* 의 hover/disabled 가
+   (0,3,0)/(0,2,0) 으로 새어 들어온다. 이 버튼들은 브랜드 teal 이 아니라
+   콘솔 남색 계열이므로 상태색까지 화면 쪽에서 못박는다(요소선택자로 (0,3,1)). */
+.platconsole button.more:hover{color:var(--blue);border-color:var(--blue);background:var(--card)}
 .platconsole .sitesrc{font-size:10.5px;color:#9aa3af;line-height:1.7;margin-top:11px}
 .platconsole .sitesrc b{color:var(--sub)}
 

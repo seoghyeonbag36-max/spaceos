@@ -41,6 +41,11 @@
 .postconsole .run{width:100%;margin-top:var(--sp-1);font-family:inherit;font-size:13px;font-weight:700;color:var(--surface);
  background:#3a5a98;border:0;border-radius:9px;padding:10px;cursor:pointer}
 .postconsole .run:disabled{background:#c8d2e0;cursor:not-allowed}
+/* Button(design/components) 병합 시 .ds-btn-* 의 hover/disabled 가
+   (0,3,0)/(0,2,0) 으로 새어 들어온다. 이 버튼들은 브랜드 teal 이 아니라
+   콘솔 남색 계열이므로 상태색까지 화면 쪽에서 못박는다(요소선택자로 (0,3,1)). */
+.postconsole button.run:hover:not(:disabled){background:#3a5a98}
+.postconsole button.run:disabled{opacity:1}
 
 /* ── 결과 ── */
 .postconsole .results{min-height:120px}
@@ -70,7 +75,8 @@
 .postconsole .isrc.is-absent{color:#8a5a00;background:#fdf5e3;border:1px dashed #f0dcae}
 
 .postconsole .tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:11px}
-.postconsole .tier{background:var(--card);border:1px solid var(--line);border-top:4px solid #d4dde6;border-radius:13px;padding:13px 14px}
+/* 표면은 .ds-card(Card) 가 낸다. 여기는 상단 강조선과 여백만 — 티어 구분이 그 선이다. */
+.postconsole .tier{border-top:4px solid #d4dde6;padding:13px 14px}
 .postconsole .tier.rec{border-top-color:#3a5a98}
 .postconsole .tier.dead{opacity:.72;border-top-color:#e5b4b1}
 .postconsole .thd{display:flex;align-items:center;gap:7px}
