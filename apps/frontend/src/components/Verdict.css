@@ -1,0 +1,73 @@
+/* 결론 1줄 + 근거 3줄 — 스코프 .verdict / .vfold.
+   PPPP 네 탭이 같은 자를 쓰므로 페이지 스코프(.platconsole 등) 밖에 둔다.
+   글자 크기의 서열이 곧 읽는 순서다: 질문(27) → 결론(15.5) → 근거(12) → 출처(10.5). */
+.verdict{
+ --vink:#1f2937;--vsub:#6b7280;--vline:#e5e7eb;--vblue:#2E6FB7;
+ background:#fff;border:1px solid var(--vline);border-radius:13px;
+ padding:15px 18px 13px;margin-bottom:14px;color:var(--vink)}
+.verdict *{box-sizing:border-box}
+
+.verdict .vey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af;text-transform:uppercase}
+.verdict .vconv{margin-left:8px;padding:1px 7px;border-radius:99px;
+ border:1px solid rgba(43,200,217,.45);color:#2BC8D9;font-size:10px;letter-spacing:.8px;text-transform:none}
+.verdict .vq{font-size:27px;font-weight:800;margin:6px 0 0;letter-spacing:-.5px;line-height:1.25}
+
+/* 결론 — 이 화면에서 가장 굵은 한 문장. 스크롤 없이 보여야 한다. */
+.verdict .vone{font-size:15.5px;font-weight:700;line-height:1.55;margin:9px 0 0;color:#1e3a5f}
+.verdict .vone b{font-weight:800}
+/* 재지 않은 값은 결론 자리에서도 숫자꼴을 쓰지 않는다 — 전역 .value-absent 규칙(tokens.css) */
+
+/* 근거 3줄 — 이름 / 값 / 출처. 출처는 값에 붙어 다닌다. */
+.verdict .vgrounds{list-style:none;margin:11px 0 0;padding:0;display:flex;flex-direction:column;gap:1px}
+.verdict .vgrounds li{display:grid;grid-template-columns:112px minmax(0,1fr);gap:10px;
+ align-items:baseline;padding:6px 0;border-top:1px solid #f1f3f6}
+.verdict .vgrounds li:first-child{border-top:0}
+.verdict .gl{font-size:11px;font-weight:800;color:var(--vsub);letter-spacing:-.2px}
+.verdict .gv{font-size:12.5px;line-height:1.6;font-variant-numeric:tabular-nums}
+.verdict .gv b{font-weight:800;color:#1e3a5f}
+/* 검색 트렌드 방향 — 상승은 붉게, 하락은 파랗게(PlatformConsole .trdir 과 같은 축) */
+.verdict .gv .tr-up{color:#E03E36}
+.verdict .gv .tr-down{color:#2E6FB7}
+.verdict .gv .tr-flat{color:#8A93A0}
+.verdict .gs{grid-column:2;font-size:10px;color:#9aa3af;line-height:1.5;margin-top:2px}
+
+@media (max-width:620px){
+ .verdict .vgrounds li{grid-template-columns:minmax(0,1fr);gap:2px}
+ .verdict .gs{grid-column:1}
+}
+
+/* 출처 줄 — 아래 상세를 전부 접어도 남는다 */
+.verdict .vsrc{display:flex;flex-wrap:wrap;gap:5px;align-items:center;
+ margin-top:11px;padding-top:10px;border-top:1px solid var(--vline);font-size:10px;line-height:1.5}
+.verdict .vsrc b{font-size:9.5px;font-weight:800;letter-spacing:.5px;color:#9aa3af}
+.verdict .vsrc span{color:#5a6b85;background:#f4f6f9;border:1px solid #e8ecf1;border-radius:5px;padding:2px 7px}
+
+.verdict .vmore>summary,.verdict .vnote>summary{
+ font-size:10.5px;font-weight:700;color:#9aa3af;cursor:pointer;padding:6px 0 0;list-style:none}
+.verdict .vmore>summary::-webkit-details-marker,
+.verdict .vnote>summary::-webkit-details-marker{display:none}
+.verdict .vmore>summary::before,.verdict .vnote>summary::before{content:"▸ "}
+.verdict .vmore[open]>summary::before,.verdict .vnote[open]>summary::before{content:"▾ "}
+.verdict .vmore>summary:hover,.verdict .vnote>summary:hover{color:var(--vblue)}
+.verdict .vnote>div{font-size:11.5px;color:var(--vsub);line-height:1.65;max-width:860px;margin-top:5px}
+.verdict .vnote>div b{color:var(--vink)}
+
+/* ── 접는 상세 ─────────────────────────────────────────────────────────
+   접은 것이지 지운 것이 아니다. 접힌 채로도 안에 무엇이 몇 개 있는지 요약줄이 말한다. */
+.vfold{background:#fff;border:1px solid #e5e7eb;border-radius:13px;margin-bottom:10px}
+.vfold>summary{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+ padding:12px 16px;cursor:pointer;list-style:none;user-select:none}
+.vfold>summary::-webkit-details-marker{display:none}
+.vfold>summary:hover .ft{color:#2E6FB7}
+.vfold .ft{font-size:14.5px;font-weight:800;letter-spacing:-.3px;color:#1f2937}
+.vfold .fb{font-size:9.5px;font-weight:800;letter-spacing:.3px;border-radius:5px;padding:2px 6px;
+ color:#5a6b85;background:#f1f4f8;border:1px solid #e2e8f0}
+.vfold .fs{font-size:11px;font-weight:700;color:#9aa3af;line-height:1.5;font-variant-numeric:tabular-nums}
+.vfold .fs b{color:#5a6b85}
+/* 여닫이 표식 — 오른쪽 끝에 붙는다 */
+.vfold .fx{margin-left:auto;flex:0 0 auto;align-self:center;
+ width:8px;height:8px;border-right:2px solid #b6bec9;border-bottom:2px solid #b6bec9;
+ transform:rotate(45deg) translate(-2px,-2px);transition:transform .12s}
+.vfold[open]>summary .fx{transform:rotate(-135deg) translate(-2px,-2px)}
+.vfold[open]>summary{border-bottom:1px solid #eceff2}
+.vfold .vfoldbody{padding:14px 16px 16px}
