@@ -143,6 +143,35 @@ API 는 `anchor_pct`/`anchor_gap_pp` 로 대조를 함께 내려보낸다 — **
 ⚠ `calibration.json` 의 `gap_pp` 필드를 인용하지 말 것 — 그건 집합건물을 포함한 혼합
 추정(`estimated_vacancy_pct`) 기준이라 값이 훨씬 크다. 대표 집계 기준 격차는 API 가 준다.
 
+## 66거점 전수는 손으로 돌지 않는다 — `scripts/screen_loop.py`
+
+아래 절차는 **거점 하나**를 사람이 여는 방식이다. 거점 66 × 탭 4 = 264조합을 그렇게
+돌 수는 없어서, 반복되는 부분만 떼어 무인 루프로 만들었다(2026-09-07).
+
+```bash
+# 백엔드(:8000) + Vite(:5173) 를 먼저 띄운 뒤
+set PYTHONIOENCODING=utf-8
+python -u scripts/screen_loop.py                            # 66거점 × 4탭
+python -u scripts/screen_loop.py --hubs yeonnam,sinchon,hongdae
+python -u scripts/screen_loop.py --self-check               # 브라우저 없이 판정부만
+python -u scripts/screen_loop.py --hubs yeonnam --canary    # 없는 셀렉터를 넣어 실검사
+```
+
+거점마다 네 단계를 잰다 — S1 콘솔 에러·pageerror·API 5xx 0 / S2 지도 캔버스 + SDK 자식
+/ S3 공실 폴리곤 수 > 0 · 결론 문장 · 거점 목록 · 상세패널(`.b-detail .b-name`) / S4 렌더 3초.
+산출은 `reports/screen_loop.json` 과 **실패한 조합만** `reports/screens/*.png`.
+조합마다 리포트를 다시 쓰므로 중간에 끊겨도 다시 부르면 이어 받는다.
+
+경계 — 이 루프가 **하지 않는** 것은 아래 절차에 그대로 남는다:
+- 층 스택·거리뷰(`.b-twin`)는 열지 않는다 → 아래 "건물 상세" 절이 계속 맡는다.
+- Program 생성(`/marketing/generate`)은 부르지 않는다(Claude 실호출·크레딧).
+
+⚠ **아직 실제 앱에 대고 돌린 적이 없다**(2026-09-07 기준 코드까지). 검증한 것은
+판정부 자기검사(`--self-check`)·정적 셀렉터 대조(`scripts/test_screen_loop.py`)와,
+앱 DOM 을 흉내낸 가짜 페이지에 대한 전 경로 실행이다. 첫 실행에서 지도 오버레이 계수가
+0 으로 나오면 폴리곤이 SVG 가 아니라 canvas 로 그려진 것이다 — `screen_loop.py` 의
+`MAP_JS` 한 곳만 고친다(원시 계수 paths/divs/canvases 를 같이 남기는 이유다).
+
 ## 지도 뷰(MapShell) 검증
 
 ⚠ **탭 이름이 바뀌었다(2026-09-06 실측).** 이 절은 `"지도"` 탭을 진입점이라고 적고 있었는데
