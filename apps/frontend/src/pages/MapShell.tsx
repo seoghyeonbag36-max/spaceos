@@ -135,6 +135,12 @@ export default function MapShell() {
   // 지도는 MapHost 소유다 — 여기서는 빌려 쓰기만 한다.
   const { map, ready } = useMapHost();
   const overlaysRef = useRef<any[]>([]);
+  // 오버레이에 붙인 이벤트 핸들. **오버레이와 같은 수명**이라 같은 자리에서 걷는다.
+  // `setMap(null)` 은 지도에서 떼기만 하고 리스너 등록은 건드리지 않으므로, 핸들을
+  // 받아 두지 않으면 뗄 방법 자체가 없다 — 거점을 바꿀 때마다 등록이 그대로 남는다
+  // (2026-09-08 계측: 10회 전환에 addListener 1,710 / removeListener 0).
+  // 짝의 본보기는 아래 zoom_changed 리스너다.
+  const listenersRef = useRef<any[]>([]);
   const [layer, setLayer] = useState<Layer>("vacancy");
   const [buildings, setBuildings] = useState<Building[]>(LOCAL_BUILDINGS);
   const [rentHm, setRentHm] = useState<RentHeatmap | null>(null);
@@ -253,6 +259,10 @@ export default function MapShell() {
   }, [ready, map]);
 
   const clearOverlays = () => {
+    const naver = (window as any).naver;
+    // 리스너를 **먼저** 뗀다 — 오버레이 참조를 버린 뒤에는 짝을 찾을 자리가 없다.
+    listenersRef.current.forEach((h) => naver?.maps?.Event?.removeListener(h));
+    listenersRef.current = [];
     overlaysRef.current.forEach((o) => o.setMap?.(null));
     overlaysRef.current = [];
   };
@@ -288,7 +298,7 @@ export default function MapShell() {
             anchor: new naver.maps.Point(anchor, anchor),
           },
         });
-        naver.maps.Event.addListener(dot, "click", () => focus(b));
+        listenersRef.current.push(naver.maps.Event.addListener(dot, "click", () => focus(b)));
         overlaysRef.current.push(dot);
       });
     } else if (layer === "vacancy") {
@@ -302,7 +312,7 @@ export default function MapShell() {
           strokeColor: STATUS[b.status].color, strokeWeight: 2, strokeOpacity: 0.95,
           clickable: true,
         });
-        naver.maps.Event.addListener(poly, "click", () => focus(b));
+        listenersRef.current.push(naver.maps.Event.addListener(poly, "click", () => focus(b)));
         overlaysRef.current.push(poly);
       });
     } else if (layer === "footfall" && footHm) {
