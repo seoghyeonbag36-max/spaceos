@@ -291,6 +291,11 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
   const elRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const overlaysRef = useRef<any[]>([]);   // 레이어 전환마다 지우는 오버레이(그리드/건물)
+  // 오버레이에 붙인 이벤트 핸들 — 오버레이와 같은 수명이라 clearOverlays 에서 같이 걷는다.
+  // `setMap(null)` 은 지도에서 떼기만 하고 등록은 남기므로 핸들을 받아 둬야 뗄 수 있다.
+  const listenersRef = useRef<any[]>([]);
+  // 지도 자체에 붙인 핸들 — 지도와 같은 수명이라 지도를 destroy 하는 자리에서 걷는다.
+  const mapListenersRef = useRef<any[]>([]);
   const poiRef = useRef<any[]>([]);        // 거점 전환까지 유지되는 POI 마커
   const infoRef = useRef<any>(null);
   const [hm, setHm] = useState<VacancyHeatmap | null>(null);
@@ -302,6 +307,10 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
   const [twinOpen, setTwinOpen] = useState(false);
 
   const clearOverlays = () => {
+    const naver = (window as any).naver;
+    // 리스너를 먼저 뗀다 — 오버레이 참조를 버린 뒤에는 짝을 찾을 자리가 없다.
+    listenersRef.current.forEach((h) => naver?.maps?.Event?.removeListener(h));
+    listenersRef.current = [];
     overlaysRef.current.forEach((o) => o.setMap?.(null));
     overlaysRef.current = [];
   };
@@ -330,7 +339,8 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
         });
         mapRef.current = map;
         infoRef.current = new naver.maps.InfoWindow({ borderWidth: 0, disableAnchor: true, backgroundColor: "transparent" });
-        naver.maps.Event.addListener(map, "click", () => infoRef.current?.close());
+        mapListenersRef.current.push(
+          naver.maps.Event.addListener(map, "click", () => infoRef.current?.close()));
 
         // 역·랜드마크 POI 라벨 (레이어 전환과 무관하게 유지)
         poiRef.current.forEach((o) => o.setMap?.(null));
@@ -351,6 +361,9 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
     return () => {
       live = false;
       clearOverlays();
+      const naver = (window as any).naver;
+      mapListenersRef.current.forEach((h) => naver?.maps?.Event?.removeListener(h));
+      mapListenersRef.current = [];
       poiRef.current.forEach((o) => o.setMap?.(null)); poiRef.current = [];
       mapRef.current?.destroy?.(); mapRef.current = null;
     };
@@ -389,7 +402,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
             anchor: new naver.maps.Point(size / 2 + 1.5, size / 2 + 1.5),
           },
         });
-        naver.maps.Event.addListener(dot, "click", () => {
+        listenersRef.current.push(naver.maps.Event.addListener(dot, "click", () => {
           info.setContent(
             `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:9px;padding:8px 11px;`
             + `font:700 11.5px 'Pretendard','Malgun Gothic',sans-serif;color:#1f2937;box-shadow:0 2px 8px rgba(0,0,0,.12);max-width:200px">`
@@ -405,7 +418,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
             comFloors: p.com_floors ?? undefined, occFloors: p.occ_floors ?? undefined,
             unknownN: p.unknown_n ?? undefined,
           });
-        });
+        }));
         overlaysRef.current.push(dot);
       });
     } else if (layer === "grid" && hm) {
@@ -421,7 +434,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
           strokeColor: "#ffffff", strokeOpacity: 0.25, strokeWeight: 1,
           clickable: true,
         });
-        naver.maps.Event.addListener(rect, "click", () => {
+        listenersRef.current.push(naver.maps.Event.addListener(rect, "click", () => {
           info.setContent(
             `<div style="background:#fff;border:1px solid #e5e7eb;border-radius:9px;padding:7px 11px;`
             + `font:700 11.5px 'Pretendard','Malgun Gothic',sans-serif;color:#1f2937;box-shadow:0 2px 8px rgba(0,0,0,.12)">`
@@ -429,7 +442,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
             + `<span style="color:#6b7280;font-weight:600"> · 점포 ${c.stores} · 공실 ${c.vac_n}</span></div>`,
           );
           info.open(map, new naver.maps.LatLng(c.c_lat, c.c_lng));
-        });
+        }));
         overlaysRef.current.push(rect);
       });
     }
