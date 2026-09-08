@@ -30,6 +30,13 @@
 - 분기 갱신 운영: `python -m data.pipelines.refresh_platform` — 수집→Gold(platform13 한정)→엣지→재학습 원커맨드 (배포는 git push). 새 분기 추가 시 `platform_districts.QUARTERS` 갱신 필요
 - 산출: `ml/artifacts/vacancy_lstm.pt` + `data/gold/platform_vacancy_forecast.json`(2026Q2 예측) + `ml/mlruns`
 - 서빙: Vercel 서버리스에 torch 를 싣지 않으므로 **forecast json 정적 서빙이 기본 경로** — `apps/backend/app/services/vacancy_forecast.py` (인메모리 TTL 5분, json은 .gitignore/.vercelignore 예외로 배포 포함)
+  ⚠ **2026-09-08 정정 — 이 줄의 '왜'는 낡았고 '무엇'은 그대로다.** 프로덕션은 2026-08-28 에
+  **Cloud Run** 으로 옮겼다(`docs/deploy-cloud-run.md` · Firebase Hosting → Cloud Run).
+  Vercel 은 무료 플랜의 상업적 사용 금지로 내려왔고 `docs/deploy-vercel.md` 는 이력으로만
+  남았다. 그래도 **결론(forecast json 정적 서빙)은 유효하다** — `apps/backend/requirements.txt`
+  에 `torch` 가 없어서 런타임에 모델을 싣지 않는 것은 같다. 근거가 '서버리스 용량'에서
+  '컨테이너 의존성 선택'으로 바뀌었을 뿐이다. `.vercelignore` 파일 자체는 아직 저장소에
+  남아 있으므로 배포 포함 여부의 실제 기준은 `.gitignore` 예외 + Dockerfile 이다.
 - 노출: `/api/v1/ai/predict-vacancy`(스텁 교체 완료) + 대시보드·히트맵 응답의 `predicted_rate/delta/direction` + 프론트 **66거점** 카드·심층·범례 ▲▼ 배지
 
 **GNN 업종 추천 — 학습 완료·서빙 가동(2026-07-24, 현행 서빙본은 117열).** 현재 그래프는 **66거점 47,442노드 · 엣지 188,673 · 피처 117열**이다(`metrics` — 2026-09-05 산출물에서 읽음). 아래는 확장 경위 — 점포 그래프를 가로수길 209노드 → **27거점 23,250노드 + 엣지 89,709**(spatial_knn 73,774 + same_building 6,450 + same_chain 9,485)로 확장. 카카오 로컬 45건 상한을 `total_count` 재귀 격자 분할로 돌파해 실측 전수에 가깝게 수집(23,250건, 이전 45건-상한 노출은 5,646건 = 4.1배 확대). 수집기 세션 재사용+12스레드 병렬로 3.6분(순차 2시간+ 대비). 엣지 빌더는 cKDTree 로 교체(n² 거리행렬은 2만 노드에서 메모리 초과). same_chain 엣지가 150m 캡으로 거점별 단절돼 있던 그래프를 이어 연결 성분 27→22, 최대 성분 99%.
@@ -43,6 +50,12 @@
 - 라벨을 category 2단계(30클래스)로 내리면 lift +22%로 커지나 Top-3 57%로 KPI 미달 — 세분 업종일수록 그래프 정보가 더 필요하지만 절대 정확도는 낮다.
 - **리뷰 유사도 엣지는 데이터 부재로 불가.** 네이버 블로그 검색 API 가 본문이 아닌 ~150자 스니펫만 주어 27거점 8,554건 중 점포명 2개 이상 동시 언급이 15건(0.2%)뿐. 점포 단위 리뷰 원문(플레이스 리뷰)은 공식 API 부재 — 소스가 바뀌기 전엔 재시도 무의미.
 - 산출: `ml/artifacts/industry_gnn.pt` + `data/gold/platform_industry_recommend.json`(40,388노드 Top-3, ~8.4MB — **2026-08-19 105열본**) + `ml/mlruns`. 서빙: `apps/backend/app/services/industry_recommend.py`(좌표→최근접 노드 400m, 없으면 거점 평균) → `/api/v1/ai/recommend-industry`(스텁 교체 완료). json 은 .gitignore/.vercelignore 예외로 배포 포함.
+  ⚠ **2026-09-08 정정 — 이 줄의 괄호가 같은 절 머리말과 다른 말을 하고 있었다.** 오늘
+  산출물을 읽으면 `platform_industry_recommend.json` 은 **47,442노드 · 9.9MB ·
+  `metrics.features` 117** 이고, 이는 위 머리말("66거점 47,442노드 · 엣지 188,673 ·
+  피처 117열")과 같은 값이다. "40,388노드 · ~8.4MB · 105열본" 은 2026-08-19 판이고
+  2026-09-05 재산출로 교체됐다 — 괄호만 안 따라온 자리다. 서빙 경로는 안 바뀌었다.
+  `.vercelignore` 는 위 LSTM 서빙 줄의 정정과 같다(프로덕션은 Cloud Run).
 
 **공공 수요신호 주입 — 완료·재학습 반영 (2026-08-16). lift +3.1% → +4.4%.**
 `build_gold.py:124` 의 §9 TODO(생활인구·매출·SGIS 조인)를 GNN 쪽으로 구현한 것.
@@ -303,6 +316,11 @@ off-prior 만 올리고 본 지표를 무너뜨릴 수 있다(게이트가 `off-
 실측표: `reports/gnn_selectby_ablation.json` · 로그: `reports/logs/gnn_{arm}.log`
 
 ### 0-M. 감성 구역을 **행정동 실측 구역**으로 갈았다 (2026-09-05)
+
+⚠ **2026-09-08 — 절 라벨이 겹친다.** 아래 "0-M. 집계구 배선 → 600ep → McNemar"(2026-08-26)
+가 같은 `0-M` 을 쓴다. 다른 문서에서 "Platform §0-M" 을 인용하면 어느 쪽인지 갈리지
+않으므로, 인용할 때는 날짜를 같이 적을 것. 라벨 자체는 이미 여러 곳에서 참조되고 있어
+지우지 않고 남긴다.
 
 §0-K 가 "감성은 못 잰다"로 닫은 뒤에도 화면에는 감성 구역이 **남아 있었다** — 54거점 ×
 6구역 = **324개**가 전부 손으로 적은 값이었다(`seoul_pages.z(...)`: 감성 76.8 · 리뷰
@@ -674,6 +692,17 @@ banpo·jamsilsaenae 처럼 top-3 점유가 91~95% 인 곳이다. 방향은 해�
 Page 의 "R-ONE 앵커 대조 보유 54/54" 게이트가 숫자는 유지되면서 의미가 묽어진다.
 `rone_districts.py` 의 경고(신규 거점 미등재 시 pooled LSTM 이 전 거점 NaN 으로 붕괴)
 때문에 매핑 자체는 필수인데, 채울 독립 표본이 없다.
+
+⚠ **2026-09-08 후기 — 확장이 실제로 일어났고 이 예측이 맞았다.** 거점은 66 으로 늘었고
+`pppp_status.py` 의 Page 게이트는 **66/66** 으로 찍힌다. 그런데 `rone_districts.DISTRICT_RONE`
+을 오늘 세면 서빙 66거점이 올라탄 R-ONE 상권은 **55곳**이고 그중 **11곳을 2거점씩이
+공유**한다(22거점). 즉 게이트 숫자 66 뒤에 있는 독립 앵커는 55 다. "숫자는 유지되면서
+의미가 묽어진다"가 문자 그대로 실현된 자리이므로, 앵커 대조의 표본 크기를 인용할 때는
+66 이 아니라 **55** 를 쓴다. 공유 앵커 11곳 전수(각 2거점): 테헤란로(seolleung·teheran) ·
+뚝섬(seongsu·seoulsup) · 성신여대(anam·sungshin) · 신림역(nokdu·sillim) ·
+이태원(hannam·itaewon) · 잠실/송파(jamsil·songridan) · 광화문(samcheong·seochon) ·
+종로(gwangjang·ikseon) · 동교/연남(yeonhui·yeonnam) · 영등포역(mullae·yeouido) ·
+홍대/합정(hapjeong·hongdae).
 
 ### 결정 — off-prior 확대 레버 둘이 모두 소진됐다. 이 축의 작업을 종료한다
 

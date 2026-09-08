@@ -12,6 +12,18 @@
 
 ## 0. 구현 현황 (2026-08-29)
 
+⚠ **2026-09-08 정정 — 이 절의 머리 수치 둘이 낡았다. 아래 문단은 08-29 시점 기록이다.**
+진행률의 단일 기준은 `python scripts/pppp_status.py` 이고, 오늘 그 출력은 **Posting
+100.0%** 다. 97.6% 에서 오른 것은 구현이 아니라 **셈법**이다 — `유닛 면적 입도` 게이트가
+2026-09-05 에 폐기·관측 전용으로 내려가 평균에서 빠졌다(값은 여전히 **0.5** 이고, 아래
+현황표의 그 행은 이미 "관측 전용(09-05 게이트 폐기)" 로 고쳐져 있었다). **같은 절의 머리
+문단과 표가 다른 말을 하고 있었다.**
+인벤토리 수치도 오늘 산출물(`data/gold/*/vacant_units.json`)을 세면 **66거점 · 664
+거점-feature 후보행 · 572 (거점/PNU) 쌍 · 529 고유 PNU** 다(54거점 528행 · 450쌍 ·
+407PNU → 2026-09-04~05 서울 2차 12거점 반영). `area` 를 1.0 으로 올릴 소스가 없다는
+§0-S 의 결론은 그대로 유효하다 — 모집단만 넓어졌다.
+절 제목의 날짜(2026-08-29)도 실제 내용은 §0-W(2026-09-06)까지 이어진다.
+
 **Posting 진행률은 97.6%다.** 남은 2.4%는 구현 누락이 아니라 `area` 해상도 게이트가
 **0.5**에 머문 결과다. 2026-08-29 공식 공개 소스를 다시 탐색했지만 현재 54거점의
 528 거점-feature 후보행(450 거점/PNU 쌍·407 고유 PNU)을 실제 호실 인벤토리로
@@ -28,8 +40,8 @@
 | `rec` 추천 기준 | ✅ 정의 완료(08-16) | **회수 최단**. `districts.recommend_tier()` 가 계산 |
 | 반올림 결함 | ✅ **교정(08-22)** | 반올림 후 비교라 270건 중 **14건(5.2%)이 premium 으로 잘못 넘어가** 있었다 → 원값 비교 |
 | `viable` · `basis` · `unviable_note` | ✅ **신설(08-22)** | "회수 불가"를 명시. `roi_basis` 는 **구현된 적 없는 유령 필드**였다(§0-C) |
-| 공실 건물 후보 인벤토리 | ✅ **54/54거점 528 거점-feature 후보행** | 450 거점/PNU 쌍·407 고유 PNU, `services/vacant_inventory` 로 런타임 배선 완료 |
-| 3-Tier 입력 4종 | ✅ **수집 가능한 범위는 다 얻었다(09-05)** | `rent` ✅ R-ONE · `foot` ✅ 528/528 배정(525유닛 `flpop+jipgyegu`) · `area` ✅ 건물 단위 상업면적 실측 · `prem` ✅ 기업 입력 계약/미입력 0 전제 |
+| 공실 건물 후보 인벤토리 | ✅ ~~54/54거점 528 거점-feature 후보행~~ → **66/66거점 664행**(09-08 산출물 실측) | ~~450 거점/PNU 쌍·407 고유 PNU~~ → **572쌍 · 529 고유 PNU**, `services/vacant_inventory` 로 런타임 배선 완료 |
+| 3-Tier 입력 4종 | ✅ **수집 가능한 범위는 다 얻었다(09-05)** | `rent` ✅ R-ONE · `foot` ✅ ~~528/528~~ **664/664 배정**(09-08 실측 · `silver/unit_jipgyegu.json` — 09-05 재빌드로 12거점 136유닛이 상권→집계구로 올라와 전 유닛이 `flpop+jipgyegu` 다) · `area` ✅ 건물 단위 상업면적 실측 · `prem` ✅ 기업 입력 계약/미입력 0 전제 |
 | 유닛 면적 **입도** | ◐ 0.5 — **관측 전용(09-05 게이트 폐기)** | 건물 안 유닛 간 서열은 균등분할이라 **유닛 단위 면적 비교는 근거가 없다**(건물 간 비교는 실측). 층 2회(§0-M·§0-Q)·집합건물(§0-R)·외부 소스(§0-S) 세 레버가 다 닫혀 수집으로 안 채워진다 → 진행률 평균에서 제외, 값은 계속 관측 |
 | 외부 코파일럿 어댑터 | ✅ **계약·구현 완료(08-23)** | `spaceos.posting/1`; 실제 공급자 URL·키는 별도 운영 입력, 미설정 시 `fallback-3tier` |
 | 매출계수 근거 | ✅ **실측 배선** | `gold/platform_posting_revenue.json` + KOSIS·R-ONE 앵커(§0-B~§0-O) |
@@ -1402,7 +1414,8 @@ apps/backend/app/schemas/posting.py       시뮬레이션 요청/결과 스키�
 apps/backend/app/api/v1/ai.py             POST /simulate-revenue (현존)
 apps/backend/app/core/config.py           posting_copilot_url / posting_copilot_key
 data/pipelines/build_posting_inputs.py    → gold/platform_posting_inputs.json
-data/pipelines/build_vacant_units.py      → gold/{거점}/vacant_units.json (54거점·528 거점-feature 후보행)
+data/pipelines/build_vacant_units.py      → gold/{거점}/vacant_units.json
+                                          ⚠ 09-08 실측 66거점·664행 (54거점·528 은 08-24 배선 시점)
 data/validation/posting_unit_area_sources.py  호실 면적 공식 소스 적격성 계약
 data/tests/test_posting_unit_area_sources.py  부분 재고의 실측 승격 방지 테스트
 ml/inference/predictor.py                 매출 예측(LSTM) — 폴백·크로스체크 재사용
@@ -1424,7 +1437,9 @@ uvicorn app.main:app --reload
 끝났으며, `area` 를 1.0으로 올릴 적격 소스가 없다는 것이 결과다. 따라서 종전의
 “0번 비용 모델 보정이 다음”이라는 순서는 종료됐다.
 
-1. **현 상태 고정** — `area` 0.5, Posting 97.6%, 대장 상업면적÷`capacity` 균등분할,
+1. **현 상태 고정** — `area` 0.5, ~~Posting 97.6%~~ **Posting 100.0%**(⚠ 2026-09-08 —
+   09-05 게이트 폐기로 이 항목이 평균에서 빠졌다. `area` 값 0.5 자체는 그대로다),
+   대장 상업면적÷`capacity` 균등분할,
    `inputs_source["area"]="gold-ledger"`를 유지한다. 값이 없으면 채우지 않고 실패한다.
 2. **재개 입력 확인** — 공식 소스 또는 B2B 임대인 자료가 PNU·호실/층·전용면적·현재
    임대가능 상태·관측시점을 같은 행에서 주는지 확인한다. 하나라도 없으면 중단한다.

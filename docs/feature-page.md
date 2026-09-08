@@ -177,15 +177,43 @@ glTF 실측 모델은 자산 0개이며 `/buildings/{id}/model` 은 스텁이다
 | API | `GET /heatmap/footfall?district=..&hour=0~23` · `GET /heatmap/density?district=..&metric=flpop\|stor` |
 | 화면 | `MapShell` — 슬라이더가 실제 질의를 바꾼다. 범례에 `TRDAR 상권단위` 배지 |
 
+⚠ **2026-09-08 정정 — 위 표의 산출물 수치는 08-23 시점이다.** 오늘 산출물을 읽으면
+`gold/platform_page_footfall.json` 은 **99KB · 66거점 245상권**이다(81KB · 54거점 190상권
+→ 2026-09-04 서울 2차 12거점 반영). 표는 그날의 기록으로 남기고 값만 여기 적는다.
+
 **파케이를 런타임에 들이지 않는다.** `_district_context` 가 `import pandas` 로 시작해
 **배포에서 한 번도 돈 적이 없던** 사고(feature-program §0-5)와 같은 조합이다. 분석은
 파케이, 서빙은 JSON — 같은 파일에서 파생시키고 생성 경로는 하나다. 추적 예외도 걸었다.
 
-검증: `tests/test_footfall_layer.py` 13건. 그중 둘이 이 변경의 요점을 붙든다 —
+검증: `tests/test_footfall_layer.py` 13건(⚠ 2026-09-08 실측 **30건** — 08-24 시간축·
+08-26 집계구 배선이 각각 테스트를 더했다. 13 은 08-23 시점 수다). 그중 둘이 이 변경의
+요점을 붙든다 —
 `test_hour_changes_the_values`(슬라이더가 값을 바꾸는가)와
 `test_missing_artifact_disables_layer`(없을 때 0 으로 채우지 않는가).
 
 #### 남는 한계 — 숨기지 않는다
+
+⚠ **2026-09-08 정정 — 아래 '공간 해상도는 상권 단위' 는 이제 폴백 경로 설명이다.**
+공간 축은 2026-08-26 에 **집계구**로 올라갔고(`data/pipelines/build_page_footfall_jipgyegu.py`
+→ `gold/page_footfall_jipgyegu.json`), 2026-09-05 커밋 `b62365c` 가 그 배정표를 서빙
+66거점 전부로 넓혔다. 오늘 산출물에서 읽은 값: **66거점 · 집계구 1,821곳 · 셀 4,501개 ·
+거점당 집계구 중앙 27(4~66) · 집계구 면적 중앙 19,196.8㎡**. 서빙은 `footfall_layer` 가
+집계구를 **먼저** 보고(`resolution: "jipgyegu"`), 그 거점이 없을 때만 아래 상권 경로로
+물러난다(`resolution: "trdar"`). 아래 문단이 `resolution: "trdar"` 를 기본값처럼 적고 있는
+것이 낡은 자리다 — 지우지 않고 폴백 설명으로 읽는다.
+⚠ **Page 쪽(셀) 집계구 배선은 지금까지 docs 에 기록이 없었다** — 유닛 쪽 승격만
+`feature-posting.md` §0-P(2026-08-25)에 남아 있고, 셀 쪽은 `scripts/pppp_status.py` 의
+게이트 문구와 커밋 `b62365c` 메시지에만 있었다. 이 문단이 그 기록이다.
+
+⚠ 그래도 **격자 실측이 된 것은 아니다.** 집계구 면적 중앙 19,196.8㎡ 는 셀 10,000㎡ 보다
+넓어서, 한 집계구 안의 셀들은 여전히 같은 값을 공유한다. 입도가 올라간 것이지 격자가 된
+것이 아니다. 밀도 레이어의 `stor`(점포 밀도)는 집계구 원천이 없어 **상권에 남아 있다** —
+같은 레이어인데 `metric` 에 따라 눈금이 갈린다.
+
+⚠ 이 절이 낡아 있는 동안 `scripts/pppp_status.py` 의 히트맵 게이트 문구도 같이 낡았다 —
+그쪽은 아직 **"54/54거점 · 셀 3,699개 전부 덮였다"** 로 적혀 있는데 산출물은 위와 같이
+66거점 · 4,501셀이다. 코드 문구라 이 문서에서는 고치지 않고 기록만 남긴다(`b62365c`
+커밋 메시지가 셀 3,699 → 4,501 · 집계구 1,303 → 1,821 을 이미 적어 두었다).
 
 - ~~**시간 해상도 6구간.**~~ ✅ **해소(08-24).** 생활인구(행정동 × 24시간)로 시간 축을
   갈아끼웠다 — 아래 "다음 단계" 로 적어 둔 설계를 그대로 구현했다. 슬라이더 24개
@@ -586,6 +614,14 @@ apps/backend/app/api/v1/buildings.py 건물 히스토리/3D 모델 경로
 apps/backend/app/api/v1/districts.py 상권 정보 + /heatmap GeoJSON
 ```
 
+⚠ **2026-09-08 정정 — 이 블록은 3D 트윈 시절의 이름이다.** §0 머리말의 폐기 고지가
+아래 §3·§4 만 무효로 적어 두어 §1·§5 가 그대로 남아 있었다. `src/components/` 에 실제로
+있는 것은 `BuildingViewer`(2D 층 스택 + 거리뷰) · `MapHost` · `DistrictPicker` · `Verdict`
+넷이고 "3D 맵 / 히스토리 타임라인" 이라는 파일은 없다. 히트맵 레이어도 별도 컴포넌트가
+아니라 `pages/MapShell.tsx` 안에 있다. `buildings.py` 의 `/{building_id}/model` 은 살아
+있으나 **부르는 곳이 없는 죽은 stub** 이다 — 그 함수의 docstring 이 스스로 그렇게 적어
+두었고 `/static/models/*.glb` 는 한 번도 존재한 적이 없다.
+
 ## 2. Claude Code 설치/환경
 
 ```bash
@@ -596,6 +632,12 @@ npm run dev                 # http://localhost:5173
 # 네이버 지도 키 (.env) — NCP 콘솔 Web 서비스 URL 에 http://localhost:5173 등록 필수
 echo "VITE_NAVER_MAPS_KEY_ID=xxxx" > .env
 ```
+
+⚠ **2026-09-08 정정 — `d3`·`plotly` 는 `package.json` 에 없다.** 선언된 런타임 의존성은
+`react` · `react-dom` 둘뿐이고(`pretendard` 는 devDependencies), 소스의 `d3`·`plotly`
+import 도 0건이다. `node_modules` 에 남아 있는 것은 예전 설치의 잔재다 —
+`tailwind.config.ts` · Storybook 과 같은 양식이므로(`feature-design-system.md` §4) 이 줄을
+보고 다시 끌어오지 말 것. 아래 §3 의 6번(D3/Plotly 상세 차트)이 미착수라 그렇다.
 
 > 백엔드를 함께 띄워야 `/api` 프록시가 동작한다: `cd apps/backend && uvicorn app.main:app --reload`
 
@@ -624,6 +666,7 @@ echo "VITE_NAVER_MAPS_KEY_ID=xxxx" > .env
 ## 5. 검증
 
 - `cd apps/frontend && npm run build` — 타입체크 통과
-- 브라우저에서 히트맵 색상·3D 모델 렌더 확인, **로딩 3초 이내**
+- 브라우저에서 히트맵 색상·~~3D 모델~~ **2D 층 스택 + 거리뷰**(`BuildingViewer`) 렌더 확인,
+  **로딩 3초 이내** (⚠ 2026-09-08 정정 — 3D 트윈은 2026-09-05 폐기됐다. §0 머리말)
 - `cd apps/backend && pytest` — heatmap/buildings 응답 스키마(GeoJSON 유효성)
 - 네트워크 탭에서 API p95 <200ms 확인
