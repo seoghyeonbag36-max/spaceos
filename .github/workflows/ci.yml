@@ -164,3 +164,12 @@ jobs:
       - name: 린트
         working-directory: apps/frontend
         run: npm run lint
+
+      # ⚠ 2026-09-08 이전에는 프론트 회귀를 막는 수단이 Playwright 전수 실행(264조합·몇
+      #   시간)뿐이었다. tsc 는 타입을, eslint 는 훅 규칙을 보지만 **둘 다 동작은 안 본다** —
+      #   거점을 바꿨는데 이전 거점의 폴리곤이 안 걷히는 회귀는 타입도 린트도 통과한다.
+      #   여기 도는 vitest 스위트는 지도 SDK 와 fetch 를 전역 목으로 갈아끼우므로
+      #   네트워크도 지도도 부르지 않는다(수 초). 실제 표면 검증은 여전히 Playwright 몫이다.
+      - name: 테스트
+        working-directory: apps/frontend
+        run: npm run test
