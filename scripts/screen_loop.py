@@ -218,7 +218,13 @@ TABS: tuple[TabSpec, ...] = (
         # 거점을 골라도 API 를 부르지 않는다(생성할 때 프롬프트에 결합된다) → 게이트 없음.
         gate=None,
         nodes=(
-            Node(".progstudio .panel .ptitle", min_count=2, why="입력·결과 패널 두 개"),
+            # ⚠ 패널 수는 `.panel` 로 센다. 결과 패널(`<Card className="panel">`)에는
+            #   **제목 요소가 없다** — 제목은 입력 폼에만 있어서 `.ptitle` 로 2개를
+            #   요구하면 생성을 부르기 전에는 절대 채워지지 않는다. 그런데 이 루프는
+            #   Program 생성을 부르지 않기로 스스로 정했다(§경계) → 명세가 자기 경계와
+            #   모순이었다(2026-09-07 첫 실전 실행에서 드러났다).
+            Node(".progstudio .panel", min_count=2, why="입력·결과 패널 두 개"),
+            Node(".progstudio .panel .ptitle", why="입력 패널 제목"),
         ),
         extra_options=1,   # "— 결합 안 함 —"
     ),
@@ -458,12 +464,26 @@ def probe(page, spec: TabSpec, hub: dict, rec: Recorder, hexes: list[str],
     open_tab(page, spec, args.node_timeout_ms)
     tab_open_ms = round((time.monotonic() - t_click) * 1000)
 
-    cur = page.locator(spec.hub_select).input_value()
     gate = spec.gate.format(hub=hub["id"]) if spec.gate else None
     gate_seen: str | None = None
     # 목록에 없는 거점을 고르려 하면 playwright 가 예외를 던진다. 그건 조작 실패가
     # 아니라 **결과**(거점이 화면 목록에서 빠졌다)이므로, 고르지 않고 판정에 맡긴다.
-    has_option = page.locator(f'{spec.hub_select} option[value="{hub["id"]}"]').count() > 0
+    #
+    # ⚠ **옵션이 붙을 때까지 기다린 뒤에** 센다. `open_tab` 은 select 가 보이고
+    #   비활성이 아닌 것까지만 보는데, 거점 목록은 비동기로 와서 그 순간 `<select>` 는
+    #   비어 있을 수 있다. 기다리지 않고 세면 `missing-option` 으로 갈라져 **거점을
+    #   아예 고르지 않고 직전 거점 화면을 잰다** — 2026-09-07 첫 실전 실행에서 실제로
+    #   그랬다(같은 관측에 `trigger: missing-option` 과 `options: 66` 이 함께 찍혔다).
+    opt_sel = f'{spec.hub_select} option[value="{hub["id"]}"]'
+    try:
+        page.locator(opt_sel).first.wait_for(state="attached",
+                                             timeout=args.node_timeout_ms)
+    except PWError:
+        pass                            # 진짜로 없는 것일 수 있다 — 아래에서 센다
+    has_option = page.locator(opt_sel).count() > 0
+    # 현재 선택값도 **옵션이 붙은 뒤에** 읽는다 — 비어 있는 select 를 읽으면 기본
+    # 거점까지 hub-switch 로 오해해, 나지도 않을 change 응답을 기다리게 된다.
+    cur = page.locator(spec.hub_select).input_value()
     if not has_option:
         t0, trigger = t_click, "missing-option"
     elif cur == hub["id"]:
@@ -619,11 +639,26 @@ def save_report(path: Path, report: dict) -> None:
     """조합마다 다시 쓴다 — 도중에 세션이 죽어도 거기까지는 남는다(§제약 4).
 
     임시 파일에 쓰고 바꿔치기한다. 쓰는 중에 죽으면 원본이 반쯤 덮인 채 남는다.
+
+    ⚠ **Windows 에서는 바꿔치기가 순간 막힌다.** 이 저장소는 `Documents/` 아래에 있어
+      동기화·백신이 갓 쓴 `.tmp` 를 잠깐 붙잡는다. 재시도 없이 `os.replace` 를 부르면
+      `PermissionError [WinError 5]` 로 **실행 전체가 죽는다** — 2026-09-07 첫 전수
+      실행이 22번째 조합에서 그렇게 끝났다. 리포트 한 번 못 쓴 것이 264조합을 날릴
+      이유는 없으므로, 몇 번 다시 해 보고 그래도 안 되면 **알리고 계속 간다**(§제약 4).
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp.replace(path)
+    for wait in (0.0, 0.2, 0.5, 1.0, 2.0):
+        if wait:
+            time.sleep(wait)
+        try:
+            tmp.replace(path)
+            return
+        except PermissionError:
+            continue
+    print(f"[screen] ⚠ 리포트를 바꿔치기하지 못했다(잠김) — 이번 조합은 건너뛰고 간다: {tmp}",
+          flush=True)
 
 
 # ──────────────────────────── 자기 검사 ────────────────────────────
