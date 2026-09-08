@@ -8,6 +8,10 @@
 > 앞선 판: [runbook-desktop-2026-09-07.md](runbook-desktop-2026-09-07.md)(T1~T4) ·
 > 오늘 낮 트랙: [cloud-workday-claude-2026-09-08.md](cloud-workday-claude-2026-09-08.md) ·
 > 폰 트랙: [prompts-mobile-2026-09-08.md](prompts-mobile-2026-09-08.md)
+>
+> **붙여넣을 프롬프트만 필요하면** → [prompts-local-pc-L1-L7-2026-09-08.md](prompts-local-pc-L1-L7-2026-09-08.md).
+> L1~L7 을 **단독으로 서는** 프롬프트 일곱 개로 다시 썼다(새 세션에 하나씩 붙여넣는다).
+> 이 문서의 프롬프트는 그 축약본이다 — 둘이 어긋나면 저쪽이 기준이다.
 
 ---
 
