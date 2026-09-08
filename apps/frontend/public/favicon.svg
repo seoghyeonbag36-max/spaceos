@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- 레일 로고(App.css .rail-logo)와 같은 남색·같은 글자. 파비콘만 따로 놀지 않게. -->
+  <rect width="32" height="32" rx="8" fill="#3a5a98"/>
+  <text x="16" y="22" text-anchor="middle" fill="#fff"
+        font-family="Pretendard, 'Malgun Gothic', sans-serif"
+        font-size="18" font-weight="700" letter-spacing="-.5">S</text>
+</svg>

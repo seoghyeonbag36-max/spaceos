@@ -1,0 +1,480 @@
+{
+  "generated_at": "2026-09-08T08:05:16",
+  "base_url": "http://localhost:5173",
+  "canary": false,
+  "context": {
+    "hub_count": 66,
+    "hub_id": "garosugil",
+    "hub_name": "신사동 가로수길"
+  },
+  "ok": true,
+  "surfaces": [
+    {
+      "surface": "program",
+      "label": "ProgramStudio",
+      "checks": [
+        {
+          "stage": "R1",
+          "name": "콘솔 에러 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R1",
+          "name": "pageerror 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R1",
+          "name": "리소스 적재 실패 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R1",
+          "name": "API 5xx 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R2",
+          "name": "ProgramStudio 루트",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "stage": "R2",
+          "name": "결론 1줄(Verdict)",
+          "ok": true,
+          "detail": "아직 돌릴 program 이 없다 — 가게 프로필을 넣으면 온·오프라인 채널안을 근거와 함께 낸다 (현재 공개 데모 경로, 근거 0건 입력)."
+        },
+        {
+          "stage": "R2",
+          "name": "근거 3줄",
+          "ok": true,
+          "detail": 3
+        },
+        {
+          "stage": "R3",
+          "name": "거점 select 가 열려 있다",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "stage": "R3",
+          "name": "거점 옵션 66개",
+          "ok": true,
+          "detail": 66
+        },
+        {
+          "stage": "R3",
+          "name": "옵션이 실제 거점 이름",
+          "ok": true,
+          "detail": [
+            "신사동 가로수길 · 강남구",
+            "압구정로데오 · 강남구",
+            "홍대 · 마포구"
+          ]
+        },
+        {
+          "stage": "R3",
+          "name": "'불러오는 중' 잔류 없음",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "stage": "R3",
+          "name": "생성 결과 패널",
+          "ok": true,
+          "detail": "예시 카페 로우(가로수길점)"
+        },
+        {
+          "stage": "R3",
+          "name": "채널안 온라인·오프라인 둘 다",
+          "ok": true,
+          "detail": "온 2 · 오프 2"
+        },
+        {
+          "stage": "R3",
+          "name": "채널 카드에 빈 칸 없음",
+          "ok": true,
+          "detail": [
+            {
+              "channel": "인스타그램",
+              "content": "예시 카페 로우(가로수길점) — 시그니처 메뉴·공간 분위기을 담은 릴스/피드 주 2회 게시",
+              "rationale": "근거 리뷰 키워드(좋아요.·편.·원두를·매주·바꿔서) 기반 톤앤매너"
+            },
+            {
+              "channel": "네이버 블로그",
+              "content": "'예시 카페 로우(가로수길점)' 방문 후기형 포스팅 + 지역 키워드 최적화",
+              "rationale": "근거 네이버 지도 유입 동선(검색→플레이스) 강화"
+            }
+          ]
+        },
+        {
+          "stage": "R3",
+          "name": "생성 출처 표기",
+          "ok": true,
+          "detail": "규칙 기반 폴백"
+        }
+      ],
+      "observed": {
+        "root": true,
+        "option_texts": [
+          "— 결합 안 함 —",
+          "신사동 가로수길 · 강남구",
+          "압구정로데오 · 강남구",
+          "홍대 · 마포구",
+          "연남동 · 마포구",
+          "익선동 · 종로구",
+          "서촌 · 종로구",
+          "명동 · 중구",
+          "을지로(힙지로) · 중구",
+          "성수동 카페거리 · 성동구",
+          "서울숲 아틀리에길 · 성동구",
+          "이태원 · 용산구",
+          "한남동·용리단길 · 용산구",
+          "송리단길 · 송파구",
+          "강남역·강남대로 · 강남구",
+          "합정 · 마포구",
+          "망원동·망리단길 · 마포구",
+          "삼청동·북촌 · 종로구",
+          "광장시장·종로4가 · 종로구",
+          "동대문·DDP · 중구",
+          "잠실·롯데월드타워 · 송파구",
+          "건대입구·화양동 · 광진구",
+          "▤ 여의도 · 영등포구",
+          "문래동 창작촌 · 영등포구",
+          "▤ 고속터미널·반포 · 서초구",
+          "신촌·이대 · 서대문구",
+          "연희동 · 서대문구",
+          "청량리·경동시장 · 동대문구",
+          "샤로수길·서울대입구 · 관악구",
+          "녹두거리 · 관악구",
+          "신림역·별빛거리 · 관악구",
+          "노량진 · 동작구",
+          "성신여대·돈암 · 성북구",
+          "안암·고려대 · 성북구",
+          "청담동 명품거리 · 강남구",
+          "도산공원 · 강남구",
+          "논현동 · 강남구",
+          "역삼·테헤란로 · 강남구",
+          "선릉 · 강남구",
+          "용산역 · 용산구",
+          "남대문시장 · 중구",
+          "시청역 · 중구",
+          "잠실새내 · 송파구",
+          "▤ 가락시장 · 송파구",
+          "장안동 · 동대문구",
+          "공덕역 · 마포구",
+          "군자역 · 광진구",
+          "충무로 · 중구",
+          "남부터미널 · 서초구",
+          "경희대 · 동대문구",
+          "왕십리 · 성동구",
+          "사당역 · 서초구",
+          "숙대입구 · 용산구",
+          "혜화·대학로 · 종로구",
+          "당산 · 영등포구",
+          "불광 · 서울",
+          "천호 · 서울",
+          "독산 · 서울",
+          "화곡 · 서울",
+          "까치산 · 서울",
+          "미아사거리 · 서울",
+          "목동 · 서울",
+          "오류동 · 서울",
+          "상봉 · 서울",
+          "상계 · 서울",
+          "수유 · 서울",
+          "연신내 · 서울"
+        ],
+        "option_count": 66,
+        "select_disabled": false,
+        "verdict_text": "아직 돌릴 program 이 없다 — 가게 프로필을 넣으면 온·오프라인 채널안을 근거와 함께 낸다 (현재 공개 데모 경로, 근거 0건 입력).",
+        "grounds_count": 3,
+        "loading_left": false,
+        "result_open": true,
+        "result_name": "예시 카페 로우(가로수길점)",
+        "result_source": "규칙 기반 폴백",
+        "plan_count": 4,
+        "online_count": 2,
+        "offline_count": 2,
+        "plans_sample": [
+          {
+            "channel": "인스타그램",
+            "content": "예시 카페 로우(가로수길점) — 시그니처 메뉴·공간 분위기을 담은 릴스/피드 주 2회 게시",
+            "rationale": "근거 리뷰 키워드(좋아요.·편.·원두를·매주·바꿔서) 기반 톤앤매너"
+          },
+          {
+            "channel": "네이버 블로그",
+            "content": "'예시 카페 로우(가로수길점)' 방문 후기형 포스팅 + 지역 키워드 최적화",
+            "rationale": "근거 네이버 지도 유입 동선(검색→플레이스) 강화"
+          }
+        ],
+        "plans_empty": 0,
+        "tone_chips": [
+          "좋아요.",
+          "편.",
+          "원두를",
+          "매주",
+          "바꿔서"
+        ]
+      },
+      "map_sdk_notes": [],
+      "screenshot": "reports/screens/render_program.png",
+      "ok": true
+    },
+    {
+      "surface": "hubs",
+      "label": "HubExplorer",
+      "checks": [
+        {
+          "stage": "R1",
+          "name": "콘솔 에러 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R1",
+          "name": "pageerror 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R1",
+          "name": "리소스 적재 실패 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R1",
+          "name": "API 5xx 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R2",
+          "name": "거점 목록 렌더",
+          "ok": true,
+          "detail": 66
+        },
+        {
+          "stage": "R2",
+          "name": "요약 패널 열림",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "stage": "R3",
+          "name": "목록 66곳",
+          "ok": true,
+          "detail": 66
+        },
+        {
+          "stage": "R3",
+          "name": "제목에 거점 수",
+          "ok": true,
+          "detail": "거점 66곳"
+        },
+        {
+          "stage": "R3",
+          "name": "공실률 실측이 든 행 다수",
+          "ok": true,
+          "detail": "65/66행"
+        },
+        {
+          "stage": "R3",
+          "name": "요약이 고른 거점",
+          "ok": true,
+          "detail": "신사동 가로수길"
+        },
+        {
+          "stage": "R3",
+          "name": "대표 공실률에 값",
+          "ok": true,
+          "detail": "15.8%"
+        },
+        {
+          "stage": "R3",
+          "name": "출처 배지 실측(Gold)",
+          "ok": true,
+          "detail": "실측(Gold)"
+        },
+        {
+          "stage": "R3",
+          "name": "집계 행에 숫자",
+          "ok": true,
+          "detail": "공실 호실 / 점포340호 / 1,806곳집계 건물 / 정밀도612동 · 75.0%분모 커버리지83.2%앵커 대조 R-ONE18.2% -2.4%p다음 분기 예측 LSTM18.1% ↑감성 지수실측 없음실측 범위72셀 "
+        },
+        {
+          "stage": "R3",
+          "name": "실측 범위 배지",
+          "ok": true,
+          "detail": "실측 범위"
+        }
+      ],
+      "observed": {
+        "item_count": 66,
+        "title": "거점 66곳",
+        "measured_items": 65,
+        "absent_items": 0,
+        "summary_open": true,
+        "summary_name": "신사동 가로수길",
+        "figure_value": "15.8%",
+        "source_badge": "실측(Gold)",
+        "rows_text": "공실 호실 / 점포340호 / 1,806곳집계 건물 / 정밀도612동 · 75.0%분모 커버리지83.2%앵커 대조 R-ONE18.2% -2.4%p다음 분기 예측 LSTM18.1% ↑감성 지수실측 없음실측 범위72셀 · 1조각",
+        "legend": "실측 범위"
+      },
+      "map_sdk_notes": [],
+      "screenshot": "reports/screens/render_hubs.png",
+      "ok": true
+    },
+    {
+      "surface": "viewer",
+      "label": "BuildingViewer",
+      "checks": [
+        {
+          "stage": "R1",
+          "name": "콘솔 에러 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R1",
+          "name": "pageerror 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R1",
+          "name": "리소스 적재 실패 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R1",
+          "name": "API 5xx 0",
+          "ok": true,
+          "detail": []
+        },
+        {
+          "stage": "R2",
+          "name": "하네스 오류 없음",
+          "ok": true,
+          "detail": null
+        },
+        {
+          "stage": "R2",
+          "name": "measured 스택 렌더",
+          "ok": true,
+          "detail": 9
+        },
+        {
+          "stage": "R3",
+          "name": "measured 층 라벨 1F..",
+          "ok": true,
+          "detail": [
+            "9F",
+            "8F",
+            "7F",
+            "6F"
+          ]
+        },
+        {
+          "stage": "R2",
+          "name": "approx 스택 렌더",
+          "ok": true,
+          "detail": 2
+        },
+        {
+          "stage": "R3",
+          "name": "approx 층 라벨 1F..",
+          "ok": true,
+          "detail": [
+            "2F",
+            "1F"
+          ]
+        },
+        {
+          "stage": "R3",
+          "name": "실배치 스택에 영업 층",
+          "ok": true,
+          "detail": {
+            "occupied": 3,
+            "noncom": 4,
+            "vacant": 1,
+            "uncertain": 1
+          }
+        },
+        {
+          "stage": "R3",
+          "name": "실배치 스택에 공실 층",
+          "ok": true,
+          "detail": {
+            "occupied": 3,
+            "noncom": 4,
+            "vacant": 1,
+            "uncertain": 1
+          }
+        },
+        {
+          "stage": "R3",
+          "name": "실배치 범례가 대장 근거",
+          "ok": true,
+          "detail": "영업 = 점포·인허가로 확인된 층 (1·2·9) · 층 미상 = 층을 모르는 점포 1곳이 앉을 수 있는 층 · 공실 · 비상업 = 공실률 분모 밖 · 상업 5개 층 중 4개 영업 · 지상 9층근거: 건축물대장 층별개"
+        },
+        {
+          "stage": "R3",
+          "name": "근사 스택은 근사라고 밝힌다",
+          "ok": true,
+          "detail": "영업(점유율 환산) · 공실(추정) · 1/2호 · 지상 2층이 건물은 층 근거가 없어 아래부터 채운 근사다 — 실제 공실 층과 다를 수 있다"
+        }
+      ],
+      "observed": {
+        "measured": {
+          "building": "형지제2빌딩",
+          "rows": 9,
+          "kinds": {
+            "occupied": 3,
+            "noncom": 4,
+            "vacant": 1,
+            "uncertain": 1
+          },
+          "labels": [
+            "9F",
+            "8F",
+            "7F",
+            "6F",
+            "5F",
+            "4F",
+            "3F",
+            "2F",
+            "1F"
+          ],
+          "legend": "영업 = 점포·인허가로 확인된 층 (1·2·9) · 층 미상 = 층을 모르는 점포 1곳이 앉을 수 있는 층 · 공실 · 비상업 = 공실률 분모 밖 · 상업 5개 층 중 4개 영업 · 지상 9층근거: 건축물대장 층별개요 + 상가정보 층 표기 — 층 배치는 실측이다",
+          "street_state": "VITE_NAVER_MAPS_KEY_ID 미설정 (.env 확인)"
+        },
+        "approx": {
+          "building": "신사동 516-1",
+          "rows": 2,
+          "kinds": {
+            "vacant": 1,
+            "occupied": 1
+          },
+          "labels": [
+            "2F",
+            "1F"
+          ],
+          "legend": "영업(점유율 환산) · 공실(추정) · 1/2호 · 지상 2층이 건물은 층 근거가 없어 아래부터 채운 근사다 — 실제 공실 층과 다를 수 있다",
+          "street_state": "VITE_NAVER_MAPS_KEY_ID 미설정 (.env 확인)"
+        },
+        "harness_error": null
+      },
+      "map_sdk_notes": [],
+      "screenshot": "reports/screens/render_viewer.png",
+      "ok": true
+    }
+  ]
+}
