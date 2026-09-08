@@ -5,6 +5,10 @@
 - 성격: **진단만.** `apps/` 아래 소스는 한 줄도 고치지 않았다. 이 문서 하나만 추가한다.
 - 방법: 코드 정독 + 저장소 안의 Gold 산출물 계수. **화면을 띄우지 않았다** —
   이 문서에는 측정하지 않은 "빨라졌다/고쳤다" 류의 주장이 없다.
+- **추가 확인 2026-09-08** (브랜치 `claude/playwright-locator-count-timeout-62qboz`):
+  §7-6 을 처리했다 — playwright 소스를 읽어 §2-1 의 전제를 확정했다(§2-1-1).
+  **전제는 맞았고 234,687ms 의 해석은 그대로 선다.** 이번에도 화면은 띄우지 않았다.
+  고친 것은 이 문서뿐이다.
 
 > **2026-09-08 추가 — §9.** §6 의 누적 가설 중 "짝이 없다 → 전환마다 등록이 쌓인다"를
 > 스텁 지도 위에서 계측해 **확정**하고, 짝을 붙였다. §1~§8 은 진단 당시 그대로 둔다.
@@ -123,15 +127,66 @@ map 탭 `hub-switch` 의 초기 렌더(ms, 관측 순서):
 |---|---|---|
 | 1 | `expect_response("/heatmap/buildings?district=…")` + `select_option` | 15,000ms ([:109](../scripts/screen_loop.py#L109)) |
 | 2 | 노드별 `wait_for(state="visible")` × 3 | 각 8,000ms ([:439](../scripts/screen_loop.py#L439)) |
-| 3 | 노드별 `loc.count()` × 3 | **상한 없음** ([:443](../scripts/screen_loop.py#L443)) |
+| 3 | 노드별 `loc.count()` × 3 | **상한 없음** ([:443](../scripts/screen_loop.py#L443)) — 소스로 확인, §2-1-1 |
 | 4 | 노드별 `inner_text()` × 3 | 각 8,000ms(기본값, [:832](../scripts/screen_loop.py#L832)) |
 
 상한이 있는 것만 다 터져도 15,000 + 3×(8,000+8,000) = **63,000ms** 다.
 관측이 43,000~48,000ms 에서 평평해지는 것은 이 천장에 붙은 모양이고,
 **234,687ms 는 상한 있는 항목만으로는 나올 수 없다.** 3번(`count()`)처럼 상한이 없는
 호출이 렌더러 메인스레드에 막혀 통째로 늘어졌다고 보는 것이 이 숫자에 맞는 유일한
-읽기다. (Playwright `Locator.count()` 에 timeout 인자가 없다는 것은 내 기억에 따른
-**추측**이다. 이 환경에는 playwright 가 설치돼 있지 않아 소스로 확인하지 못했다 → §6-6)
+읽기다.
+
+### 2-1-1. `Locator.count()` 에 timeout 이 없다 — 소스로 확인했다 (§7-6 처리)
+
+처음 이 문서는 "`count()` 에 timeout 인자가 없다"를 **기억에 따른 추측**으로 적고
+확인을 §7-6 으로 넘겼다("이 환경에는 playwright 가 없다"). **그 환경 기술이 틀렸다** —
+원격 세션에는 Node `playwright` 1.56.1 이 `/opt/node22/lib/node_modules/playwright` 에
+설치돼 있다. 그 소스와 PyPI 의 Python 패키지를 읽어 확인했다. **전제는 맞았다.**
+
+**Python 쪽 — 인자가 아예 없다.** `screen_loop.py` 가 쓰는 것이 이쪽이다
+(아래 표는 PyPI 최신 `playwright` **1.62.0** 의 휠을 풀어 읽은 것이다).
+
+| 자리 | 내용 |
+|---|---|
+| `playwright/_impl/_locator.py` | `async def count(self) -> int:` — **파라미터가 `self` 뿐이다** |
+| `playwright/_impl/_frame.py` | `_query_count` 가 `send("queryCount", None, {"selector": selector})` — 두 번째 인자가 `timeout_calculator` 인데 **`None`** 이다 |
+| `playwright/_impl/_connection.py` `_augment_params` | `timeout: float = 0` 으로 시작해 `if timeout_calculator:` 일 때만 값을 넣는다 → `None` 이므로 **0 이 그대로 서버로 간다** |
+
+**드라이버(서버) 쪽 — 0 이면 타이머를 안 만든다.**
+
+| 자리 | 내용 |
+|---|---|
+| 클라이언트 번들 | `_queryCount(selector) { … this._channel.queryCount({ selector }, kNoTimeout) }` — 상수 이름이 **`kNoTimeout`** 이고 그 값이 `{ signal: undefined, timeout: 0 }` 이다 |
+| `dispatcher` | `controller.run(…, validMetadata.timeout)` (1.56 은 `validParams?.timeout`) |
+| `ProgressController.run` | `const deadline = timeout ? monotonicTime() + timeout : 0;` → `if (deadline)` 안에서만 `setTimeout` 을 건다. **0 이면 타이머가 없다** |
+
+Node 1.56.1 의 공개 타입도 같다 — `types.d.ts` 는 `count(): Promise<number>;` 로 **인자를
+받지 않고**, `locator.js` 의 `async count(_options)` 위에는 `// options are only here for
+testing` 이 붙어 있다. 형제 메서드들이 `timeout: this._frame._timeout(options)` 를 끼워
+넣는 자리에서 `_queryCount` 만 **그것을 끼우지 않는다.**
+
+버전 문제도 아니다. `playwright-python` **v1.40.0 · v1.48.0 · v1.54.0 · v1.58.0 · v1.62.0**
+에서 `count()` 의 서명이 전부 같고(`self` 만 받는다), `_query_count` 도 전부 timeout 을
+안 보낸다(1.40 은 인자 자체가 `send("queryCount", {"selector": …})` 로 timeout 자리가 없고,
+1.54 부터가 위 표의 `None` 형태다). PC 가 어느 버전을 썼든 결론은 안 바뀐다.
+
+여기서 따라오는 것 셋:
+
+1. **`page.set_default_timeout(8000)`([screen_loop.py:832](../scripts/screen_loop.py#L832))이
+   `count()` 에는 닿지 않는다.** 기본 타임아웃은 `TimeoutSettings` 를 거치는 호출에만
+   붙는데 `count()` 는 그 경로를 통째로 건너뛴다. 같은 `wait_nodes` 안에서
+   `wait_for`(명시 8,000ms)와 `inner_text`(기본 8,000ms)는 상한을 받고 `count()` 만 못 받는다.
+2. **막히는 이유도 소스에 있다.** 드라이버의 `queryCount` 는
+   `callOnSelector(selector, …, ({ elements }) => elements.length, {})` 로 **페이지 안에서
+   셀렉터를 평가해 센다.** 렌더러 메인스레드가 바쁘면 이 평가가 큐에 걸린 채로 있고,
+   끊어 줄 타이머가 없으니 호출이 통째로 늘어진다. §2-2 가 말한 그 모양이다.
+3. **63,000ms 는 이제 추측이 아니라 상한이다.** 창 안에서 상한 없는 호출은 `count()` 3개
+   뿐이므로(map 명세의 노드가 정확히 3개다 —
+   [screen_loop.py:192-199](../scripts/screen_loop.py#L192)),
+   **234,687 − 63,000 = 171,687ms 이상이 `count()` 안에서 렌더러를 기다린 시간**이다.
+   이 최소 171.7초는 §5-후보6("측정계가 부풀렸다")으로 설명되지 않는다 — 타이머가 없는
+   호출은 부풀릴 상한 자체가 없다. 부풀린 것이 아니라 **정말로 그만큼 막혀 있었다**는
+   뜻이고, 그래서 후보 6 은 원인이 아니라 확대경이라는 §5 의 판정이 유지된다.
 
 ### 2-2. 그래서 이 숫자는 "렌더 시간"이 아니라 "메인스레드가 막혀 있던 시간"에 가깝다
 
@@ -387,11 +442,15 @@ React 가 통째로 뗀다. map 탭이 거점을 바꾸면 만든 것이 **MapHo
 
 - 근거: §2-1 의 상한 표. 43~48초 평탄부는 상한 천장에 붙은 모양이고,
   234,687ms 는 상한 없는 `count()`([screen_loop.py:443](../scripts/screen_loop.py#L443))가
-  막힌 모양이다.
+  막힌 모양이다. **`count()` 에 상한이 없다는 것은 소스로 확인했다(§2-1-1).**
 - 단조 증가를 설명하는가: **설명하지 못한다 — 이것은 원인이 아니라 확대경이다.**
   검사기가 막히려면 메인스레드가 먼저 막혀야 한다. 다만 **숫자를 액면가로 읽으면
   안 된다**는 뜻은 된다: 13,234ms 와 48,860ms 의 비(3.7배)는 실제 렌더 비용의 비가
   아니라 "타임아웃 몇 개를 태웠나"에 가깝다.
+  단 **234,687ms 만은 그 읽기가 안 통한다.** 상한 있는 항목을 다 태워도 63,000ms 이고
+  나머지는 타이머가 없는 `count()` 가 실제로 기다린 시간이다(§2-1-1) — 그 조합에서는
+  최소 171.7초 동안 메인스레드가 정말로 막혀 있었다. **확대경으로 깎아낼 수 없는
+  유일한 관측**이다.
 
 ---
 
@@ -435,8 +494,8 @@ React 가 통째로 뗀다. map 탭이 거점을 바꾸면 만든 것이 **MapHo
 
 **49초 → 234초 — 설명하지 못한다. 미해결로 남긴다.**
 4.8배 점프는 그 앞의 완만한 곡선과 결이 다르다. 상한 없는 `count()` 가 막힌 모양이라는
-읽기(§2-1)는 *어떻게* 그 숫자가 나올 수 있었는지만 말하고, *왜 그 조합에서* 그랬는지는
-말하지 않는다. 가능한 갈래 — **전부 추측이고, 코드로는 어느 쪽도 못 고른다**:
+읽기(§2-1)는 **소스로 확정됐지만**(§2-1-1) *어떻게* 그 숫자가 나올 수 있었는지만 말하고,
+*왜 그 조합에서* 그랬는지는 말하지 않는다. 가능한 갈래 — **전부 추측이고, 코드로는 어느 쪽도 못 고른다**:
 (a) 그 시점에 렌더러가 메모리 한계에 닿아 GC 가 폭주했다,
 (b) 그 조합이 실행의 마지막이라 중단(Ctrl-C·절전) 직전의 정지가 시간에 섞였다,
 (c) 그 거점 고유의 사건(응답 지연·데이터 이상)이 겹쳤다.
@@ -505,10 +564,22 @@ Performance 패널로 전환 1회를 녹화해 **오버레이 생성 / React 커
 동시에 §4-C 의 "재그리기 3~4회"를 `console.count()` 로 실측한다 —
 **나는 이것을 코드에서 읽었을 뿐 세어 보지 않았다.**
 
-### 7-6. Playwright 타임아웃 표면 확인
+### 7-6. Playwright 타임아웃 표면 확인 — ✅ **처리됨 (2026-09-08)**
 
-`Locator.count()` 에 timeout 이 없다는 §2-1 의 전제를 설치된 playwright 소스로 확인한다
-(이 환경에는 playwright 가 없다). 틀리면 234,687ms 의 읽기를 다시 세워야 한다.
+`Locator.count()` 에 timeout 이 없다는 §2-1 의 전제를 playwright 소스로 확인했다.
+**전제는 맞았고, 234,687ms 의 읽기는 다시 세우지 않아도 된다** → 근거는 §2-1-1.
+
+이 항목이 적어 둔 "이 환경에는 playwright 가 없다"는 **틀린 기술이었다.** 원격 세션에는
+Node `playwright` 1.56.1 이 `/opt/node22/lib/node_modules/playwright` 에 설치돼 있다
+(브라우저는 `/opt/pw-browsers`). Python 패키지는 실제로 설치돼 있지 않지만 —
+`screen_loop.py` 가 쓰는 것은 이쪽이다 — PyPI 에서 받아 소스만 읽으면 되는 일이었다.
+얻은 것은 확인 하나가 아니라 셋이다(§2-1-1 의 "따라오는 것 셋"):
+`set_default_timeout` 이 `count()` 에 닿지 않는다는 것, 막히는 지점이
+`callOnSelector`(페이지 안 평가)라는 것, 63,000ms 가 확정 상한이라 234,687ms 중
+**최소 171,687ms 는 실제로 메인스레드가 막혀 있던 시간**이라는 것.
+
+남은 것은 *왜 그 조합에서* 그랬는가뿐이다 — §6-2 의 (a)/(b)/(c) 를 가르는 것은
+여전히 §7-2(리포트 읽기)와 §7-3(재현)이다.
 
 ---
 
