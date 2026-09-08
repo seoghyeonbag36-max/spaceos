@@ -36,6 +36,12 @@ src/design/      디자인 토큰 + 토큰 기반 컴포넌트
 ```powershell
 cd apps/frontend; npm run build    # tsc -b 포함 = 타입체크까지 여기서 난다
 cd apps/frontend; npm run lint
+cd apps/frontend; npm run test     # vitest — 지도 SDK·fetch 는 전역 목이라 네트워크를 안 탄다
 ```
+
+`npm run test` 가 보는 것은 **동작** 셋이다(타입·린트가 못 보는 자리):
+거점 전환 시 이전 거점의 오버레이·리스너 정리 · 탭이 부르는 API 경로 ·
+패널이 데이터 없을 때/있을 때 무엇을 그리는가. 목·픽스처는 `src/test/` 에 있고,
+테스트는 대상 옆에 `*.test.tsx` 로 둔다. 실제 지도·실제 백엔드 검증은 `/verify` 몫이다.
 
 `npm run dev` 는 Vite 프록시로 백엔드를 부른다 — 화면이 비면 백엔드가 떠 있는지부터 본다.
