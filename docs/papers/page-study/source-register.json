@@ -116,12 +116,170 @@
     {
       "doi": "10.1016/j.dss.2018.10.007",
       "url": "https://www.sciencedirect.com/science/article/pii/S0167923618301647",
-      "status": "abstract_and_section_snippets_only"
+      "status": "abstract_and_section_snippets_only",
+      "title": "Numerical data quality in IS research and the implications for replication",
+      "authors": [
+        "James R. Marsden",
+        "David E. Pingry"
+      ],
+      "accessed_on": "2026-09-07",
+      "edition": "공식 서지·초록만 확보; 전체 본문 판본 미확보",
+      "local_file": null,
+      "sha256": null,
+      "pdf_pages_read": [],
+      "full_text_verified": false,
+      "reason": "출판사 PDF HTTP 403; 전체 본문 미확보"
     },
     {
       "doi": "10.1016/j.dss.2019.113138",
       "url": "https://biblio.ugent.be/publication/8634924",
-      "status": "abstract_and_metadata_only; full_text_UGent_only"
+      "status": "abstract_and_metadata_only; full_text_UGent_only",
+      "title": "Measuring data quality in information systems research",
+      "authors": [
+        "Yoram Timmerman",
+        "Antoon Bronselaer"
+      ],
+      "accessed_on": "2026-09-07",
+      "edition": "공식 서지·초록만 확보; 전체 본문 판본 미확보",
+      "local_file": null,
+      "sha256": null,
+      "pdf_pages_read": [],
+      "full_text_verified": false,
+      "reason": "출판사 PDF HTTP 403; 전체 본문 미확보; UGent 웹 Downloads는 Published version / UGent only. PC Python 접근은 SSL 인증서 검증 실패."
     }
-  ]
+  ],
+  "pc_session": {
+    "accessed_on": "2026-09-07",
+    "initial_private_directory_present": false,
+    "core_download": {
+      "url": "https://arxiv.org/pdf/2007.03019v2",
+      "accessed_at_utc": "2026-09-07T11:22:46.399319+00:00",
+      "status": 200,
+      "content_type": "application/pdf",
+      "local_file": "private/alsudais-2007.03019v2.pdf",
+      "sha256": "5095cd20909a238afdc756414d2f6267b1b6bf74f98564890926e9fbaeea4ade",
+      "bytes": 723457
+    },
+    "reviewed_pdf_pages": [
+      3,
+      4,
+      5,
+      6,
+      8
+    ],
+    "reviewed_sections": [
+      "p.3 §2.2 / 표 2",
+      "p.4 §3.1 / 그림 2",
+      "p.5 §3.1–3.2 / 부록 언급",
+      "p.6 §4 / 표 4",
+      "p.8 참고문헌 끝"
+    ],
+    "page_image_paths": [
+      "private/pc-page-03.png",
+      "private/pc-page-04.png",
+      "private/pc-page-05.png",
+      "private/pc-page-06.png",
+      "private/pc-page-08.png"
+    ],
+    "prior_page_reviews_note": "page_reviews는 이전 세션의 정독 기록이다. 이전 visual_file 파일은 이번 체크아웃에 없으며 pc_session 경로와 구분한다.",
+    "access_attempts": [
+      {
+        "url": "https://www.sciencedirect.com/science/article/pii/S0167923620302086",
+        "accessed_at_utc": "2026-09-07T11:22:48.736871+00:00",
+        "error": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://www.sciencedirect.com/science/article/pii/S0167923618301647",
+        "accessed_at_utc": "2026-09-07T11:22:50.451102+00:00",
+        "error": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://biblio.ugent.be/publication/8634924",
+        "accessed_at_utc": "2026-09-07T11:22:51.171439+00:00",
+        "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1006)>"
+      },
+      {
+        "url": "https://www.sciencedirect.com/science/article/pii/S0167923620302086/pdfft",
+        "accessed_at_utc": "2026-09-07T11:25:58.588183+00:00",
+        "error": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://arxiv.org/src/2007.03019v2",
+        "accessed_at_utc": "2026-09-07T11:26:00.044830+00:00",
+        "status": 200,
+        "content_type": "application/pdf",
+        "bytes": 723457
+      },
+      {
+        "url": "https://www.sciencedirect.com/science/article/pii/S0167923618301647/pdfft",
+        "accessed_at_utc": "2026-09-07T11:26:03.054929+00:00",
+        "error": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://www.sciencedirect.com/science/article/pii/S0167923619301678/pdfft",
+        "accessed_at_utc": "2026-09-07T11:26:03.655552+00:00",
+        "error": "HTTP Error 403: Forbidden"
+      }
+    ],
+    "publisher_comparison": [
+      {
+        "item": "p.4 ID 343 / 344",
+        "verdict": "판본 또는 부록 미확보로 판정 불가"
+      },
+      {
+        "item": "p.6 34·22 / 33·23",
+        "verdict": "판본 또는 부록 미확보로 판정 불가"
+      },
+      {
+        "item": "p.6 6/500 = 1.1%",
+        "verdict": "판본 또는 부록 미확보로 판정 불가"
+      },
+      {
+        "item": "p.3·6 3/2263 = 1.3%",
+        "verdict": "판본 또는 부록 미확보로 판정 불가"
+      }
+    ],
+    "unacquired": [
+      {
+        "edition": "최종 출판본",
+        "status": "미확보",
+        "local_file": null,
+        "sha256": null,
+        "pages_read": [],
+        "reason": "출판사 HTTP 403. 기관 출판 기록·공개본에서 별도 파일 접근 링크를 확인하지 못함. 부재를 확정하지 않음."
+      },
+      {
+        "edition": "별도 accepted manuscript",
+        "status": "미확보",
+        "local_file": null,
+        "sha256": null,
+        "pages_read": [],
+        "reason": "출판사 HTTP 403. 기관 출판 기록·공개본에서 별도 파일 접근 링크를 확인하지 못함. 부재를 확정하지 않음."
+      },
+      {
+        "edition": "별도 appendix / supplementary material",
+        "status": "미확보",
+        "local_file": null,
+        "sha256": null,
+        "pages_read": [],
+        "reason": "출판사 HTTP 403. 기관 출판 기록·공개본에서 별도 파일 접근 링크를 확인하지 못함. 부재를 확정하지 않음."
+      },
+      {
+        "edition": "저자 공개 원데이터",
+        "status": "미확보",
+        "local_file": null,
+        "sha256": null,
+        "pages_read": [],
+        "reason": "출판사 HTTP 403. 기관 출판 기록·공개본에서 별도 파일 접근 링크를 확인하지 못함. 부재를 확정하지 않음."
+      },
+      {
+        "edition": "저자 공개 코드",
+        "status": "미확보",
+        "local_file": null,
+        "sha256": null,
+        "pages_read": [],
+        "reason": "출판사 HTTP 403. 기관 출판 기록·공개본에서 별도 파일 접근 링크를 확인하지 못함. 부재를 확정하지 않음."
+      }
+    ]
+  }
 }
