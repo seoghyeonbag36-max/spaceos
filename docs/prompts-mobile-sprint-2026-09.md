@@ -1,5 +1,11 @@
 # 9월 스프린트 모바일 프롬프트 14개
 
+> ⚠ **2026-09-08 — 이 14개 중 12개가 소진됐다.** 어느 것이 끝났고 무엇이 남았는지는
+> [prompts-mobile-2026-09-08.md](prompts-mobile-2026-09-08.md) §0 의 대조표를 먼저 볼 것
+> (문서가 아니라 산출물 파일로 셌다). 여기서 아직 유효한 것은 **A4-a(반복형) · A5(도메인) ·
+> B6(글자 정리 — 대상이 커져 새 판이 B10 이다)** 뿐이다. 나머지를 그대로 붙여넣으면
+> **이미 있는 것을 다시 만든다.**
+
 > 평일 근무 중·출퇴근 길에 폰으로 진행하는 작업의 **붙여넣기용 프롬프트**.
 > 계획 본문: [plan-design-upgrade-2026-09.md](plan-design-upgrade-2026-09.md) · [plan-mvp-3hubs-2026-09.md](plan-mvp-3hubs-2026-09.md)
 > 일반 모바일 작업 규칙(두 경로·불가능한 것): [../SpaceOS_Mobile_Dispatch_Prompts.md](../SpaceOS_Mobile_Dispatch_Prompts.md)
