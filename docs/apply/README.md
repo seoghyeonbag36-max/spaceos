@@ -39,7 +39,7 @@ python scripts/check_application.py --doc docs/apply/01-spatial-info/draft.md --
 
 | | 대회 | 마감 | 원고 |
 |---|---|---|---|
-| 01 | 제8회 공간정보 활용·아이디어 경진대회 | 2026-09-18 | [draft.md](01-spatial-info/draft.md) — 골격 |
+| 01 | 제8회 공간정보 활용·아이디어 경진대회 | 2026-09-18 | [draft.md](01-spatial-info/draft.md) — §3·§8 작성됨, 나머지 7절 골격 |
 | 02 | 2026 GovTech 창업 경진대회 | 2026-09-21 10:00 | [draft.md](02-govtech/draft.md) — 골격 |
 | 03 | 제3회 미래융합인재 발굴 SW 챌린지 | 2026-10-07 | 미착수 — 일반부 3~5인 팀·연령 요건이라 자격 확인 먼저 |
 | 04 | 제9회 핀테크 아이디어 공모전 | 2026-10-08 16:00 | 미착수 — 여신 언어로의 리프레이밍이 선행 |
@@ -50,6 +50,16 @@ python scripts/check_application.py --doc docs/apply/01-spatial-info/draft.md --
 
 06·08 은 학술 원고라 [docs/papers](../papers/) 의 규칙과 근거 인덱스를 따른다. 이 디렉터리는
 신청서 전용이다.
+
+## 공통 코어
+
+| | 산출물 | 상태 |
+|---|---|---|
+| C7 | [data-sources.md](data-sources.md) — 데이터 출처·라이선스 표 | 작성됨. 라이선스·갱신주기 칸은 포털 확인 후 채운다 |
+
+C7 을 만들며 **전제가 하나 뒤집혔다**: SpaceOS 는 브이월드(국가공간정보)를 이미 쓰고 있다
+(`data/collectors/vworld_bldg.py` → `build_page_master.py`). 공간정보 경진대회 원고 §3·§8 이
+"쓰지 않는다"는 전제로 잡혀 있던 것을 고쳤다.
 
 ## 서식을 아직 대조하지 못했다
 

@@ -1,17 +1,23 @@
 {
-  "started": "2026-09-09T02:21:28",
+  "started": "2026-09-09T05:12:50",
   "claims": "docs/apply/claims.json",
   "require_complete": false,
   "docs": [
     {
       "doc": "docs/apply/01-spatial-info/draft.md",
-      "fill_remaining": 9,
+      "fill_remaining": 7,
       "violations": [],
       "ok": true
     },
     {
       "doc": "docs/apply/02-govtech/draft.md",
       "fill_remaining": 6,
+      "violations": [],
+      "ok": true
+    },
+    {
+      "doc": "docs/apply/data-sources.md",
+      "fill_remaining": 0,
       "violations": [],
       "ok": true
     }
