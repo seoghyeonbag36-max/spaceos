@@ -1,11 +1,11 @@
 {
-  "started": "2026-09-09T05:12:50",
+  "started": "2026-09-09T06:15:04",
   "claims": "docs/apply/claims.json",
   "require_complete": false,
   "docs": [
     {
       "doc": "docs/apply/01-spatial-info/draft.md",
-      "fill_remaining": 7,
+      "fill_remaining": 5,
       "violations": [],
       "ok": true
     },

@@ -110,6 +110,25 @@ def test_condition_in_same_section_passes(tmp_path):
     assert not [v for v in res["violations"] if v["kind"] == "조건누락"]
 
 
+def test_condition_written_as_inline_code_counts(tmp_path):
+    """조건 문구를 백틱으로 감싸도 독자에게는 보이는 글자다 (2026-09-09 회귀 방지).
+
+    실제 원고에서 걸렸다 — `unresolved` 를 코드 표기로 적었더니 조건 검사가 못 봤다.
+    """
+    text = ("## 절\n마스터 폴리곤 52,642개는 `동결` 한 입력 묶음에 대한 값이다. "
+            "이 문장은 빈 절 판정을 피할 만큼 길다.\n")
+    res = ca.check_doc(_doc(tmp_path, text), CLAIMS, False)
+    assert res["ok"], res["violations"]
+
+
+def test_condition_inside_a_comment_does_not_count(tmp_path):
+    """주석은 독자에게 안 보인다 — 조건을 거기 적는 것으로 때울 수 없다."""
+    text = ("## 절\n마스터 폴리곤 52,642개를 검사했다. 이 문장은 빈 절 판정을 피할 "
+            "만큼 길게 쓴다.\n<!-- 동결 -->\n")
+    res = ca.check_doc(_doc(tmp_path, text), CLAIMS, False)
+    assert [v for v in res["violations"] if v["kind"] == "조건누락"], res["violations"]
+
+
 def test_condition_in_a_different_section_does_not_count(tmp_path):
     """다른 절에 한정 문구가 있어도 이 절의 문장은 여전히 한정 없이 읽힌다."""
     text = ("## 1\n건축물대장을 결합해 만들었다는 설명이 여기 있다.\n\n"
