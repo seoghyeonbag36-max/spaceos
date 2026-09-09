@@ -15,8 +15,9 @@
   4. 빈 절 — `<!-- FILL -->` 만 지우고 내용을 안 채운 자리
   5. FILL 잔여 — 제출 직전에는 0 이어야 한다 (`--require-complete`)
 
-HTML 주석과 코드펜스는 검사에서 제외한다. FILL 마커 자체가 금지어와 수치를 지시문으로
-담고 있어서, 주석까지 세면 지시문이 위반으로 잡힌다.
+HTML 주석과 코드펜스는 근거 검사(1~3)에서 제외한다. FILL 마커 자체가 금지어와 수치를
+지시문으로 담고 있어서, 주석까지 세면 지시문이 위반으로 잡힌다. 다만 '빈 절'(4) 은
+코드·표를 **내용으로 센다** — 근거에서 빼는 것과 절이 비었는지 세는 것은 다른 판정이다.
 
 산출: reports/application_check.json
 종료코드: 위반 0 이면 0, 아니면 1
@@ -50,17 +51,22 @@ HEADING_RE = re.compile(r"^#{1,6}[ \t]+.*$", re.MULTILINE)
 FILL_RE = re.compile(r"<!--\s*FILL")
 
 
-def _mask(text: str) -> str:
-    """HTML 주석과 코드펜스를 같은 길이의 공백으로 덮는다.
+def _mask(text: str, *, code: bool = True) -> str:
+    """HTML 주석(과 선택적으로 코드)을 같은 길이의 공백으로 덮는다.
 
     길이를 보존해야 위반 위치의 줄 번호가 원문과 맞는다.
+
+    `code=False` 는 '빈 절' 판정 전용이다. 코드블록·표는 **내용**이라서, 근거 스캔에서
+    빼는 것과 절이 비었는지 세는 것은 서로 다른 판정이다. 한 마스크로 둘 다 하면
+    코드블록만 든 절이 빈 절로 잡힌다(2026-09-09 테스트가 잡아낸 자리).
     """
     def blank(m: re.Match) -> str:
         return re.sub(r"[^\n]", " ", m.group(0))
 
     text = re.sub(r"<!--.*?-->", blank, text, flags=re.DOTALL)
-    text = re.sub(r"```.*?```", blank, text, flags=re.DOTALL)
-    text = re.sub(r"`[^`\n]*`", blank, text)
+    if code:
+        text = re.sub(r"```.*?```", blank, text, flags=re.DOTALL)
+        text = re.sub(r"`[^`\n]*`", blank, text)
     return text
 
 
@@ -102,6 +108,8 @@ def _load_claims() -> dict:
 def check_doc(path: Path, claims: dict, require_complete: bool) -> dict:
     raw = path.read_text(encoding="utf-8")
     masked = _mask(raw)
+    # 빈 절 판정용 — 코드·표는 내용이므로 남긴다.
+    masked_body = _mask(raw, code=False)
     violations: list[dict] = []
 
     allowed: set[str] = set()
@@ -174,7 +182,7 @@ def check_doc(path: Path, claims: dict, require_complete: bool) -> dict:
             continue
         if FILL_RE.search(raw[s:e]):
             continue  # 아직 안 채운 자리 — 5번에서 센다
-        if len(masked[s:e].strip()) >= 30:
+        if len(masked_body[s:e].strip()) >= 30:
             continue
         violations.append({
             "kind": "빈절",
