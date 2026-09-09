@@ -1,0 +1,193 @@
+{
+  "_설명": "신청서·논문 공모에 쓸 수 있는 수치의 전부. 이 파일에 없는 수치는 docs/apply/ 원고에 쓰지 않는다. scripts/check_application.py 가 이 파일로 판정한다.",
+  "_원본": "docs/papers/evidence-index.md · scripts/pppp_status.py · docs/feature-*.md. 원본이 바뀌면 여기를 먼저 고치고 원고를 고친다.",
+  "_주의": "모집단이 다른 값을 섞지 말 것. 54거점 실험값과 66거점 서빙값은 비교 가능하지 않다.",
+  "updated": "2026-09-09",
+
+  "allow": [
+    {
+      "id": "HUB66",
+      "value": "66거점",
+      "aliases": ["66개 거점", "66/66", "서울 66"],
+      "condition": "건축물대장",
+      "why": "Tier1 판정·대표 집계 커버리지·R-ONE 앵커 대조가 모두 66/66. '건축물대장 기반'이라는 한정 없이 쓰면 실측 정확도 주장으로 읽힌다",
+      "source": "scripts/pppp_status.py"
+    },
+    {
+      "id": "POLY",
+      "value": "52,642",
+      "aliases": ["52642"],
+      "condition": "동결",
+      "why": "마스터 폴리곤 수. 동결한 입력 묶음(audits/page-inventory-20260906)에 대한 값이다",
+      "source": "docs/papers/evidence-index.md PAGE-D01"
+    },
+    {
+      "id": "FLOORCHK",
+      "value": "30,912",
+      "aliases": ["30912"],
+      "condition": "동결",
+      "why": "층 정보 검사 대상 폴리곤 수. 해당 분모에서의 계산 일관성 확인이지 현실 정답이 아니다",
+      "source": "docs/papers/evidence-index.md PAGE-D02"
+    },
+    {
+      "id": "FLOORBAND",
+      "value": "16.2%p",
+      "aliases": ["16.2%", "16.235"],
+      "condition": "범위",
+      "why": "층 배정 범위 폭 중앙값. 정보 부족에 따른 범위이지 통계적 신뢰구간이나 현실 공실 오차가 아니다",
+      "source": "docs/papers/evidence-index.md PAGE-D06"
+    },
+    {
+      "id": "GNN_TOP1",
+      "value": "64.9%",
+      "aliases": [],
+      "condition": "66거점",
+      "why": "GNN 업종추천 Top-1. 조건 A(66거점 서빙본, 2026-09-05)",
+      "source": "docs/papers/evidence-index.md P1"
+    },
+    {
+      "id": "GNN_TOP3",
+      "value": "91.7%",
+      "aliases": [],
+      "condition": "66거점",
+      "why": "GNN 업종추천 Top-3. 조건 A(66거점 서빙본, 2026-09-05)",
+      "source": "docs/papers/evidence-index.md P1"
+    },
+    {
+      "id": "GNN_LIFT",
+      "value": "5.3%",
+      "aliases": ["+5.3%"],
+      "condition": "기준선",
+      "why": "거점 사전분포 기준선(Top-1 61.7% / Top-3 89.4%) 대비 lift. 기준선을 밝히지 않으면 절대 성능으로 오독된다",
+      "source": "docs/papers/evidence-index.md P1"
+    },
+    {
+      "id": "GNN_NODES",
+      "value": "47,442",
+      "aliases": ["47442"],
+      "condition": "",
+      "why": "그래프 노드 수",
+      "source": "docs/feature-platform.md 0"
+    },
+    {
+      "id": "GNN_EDGES",
+      "value": "188,673",
+      "aliases": ["188673"],
+      "condition": "",
+      "why": "그래프 엣지 수",
+      "source": "docs/feature-platform.md 0"
+    },
+    {
+      "id": "GNN_OFFPRIOR",
+      "value": "33.8%",
+      "aliases": [],
+      "condition": "66거점",
+      "why": "off-prior Top-3 (n=1,011). 54거점 실험군의 37.6% 와 절대 섞지 않는다 — 성능 저하가 아니라 모집단이 바뀐 것",
+      "source": "docs/papers/evidence-index.md P1"
+    },
+    {
+      "id": "LSTM_DIR",
+      "value": "70.8%",
+      "aliases": ["46/65"],
+      "condition": "66거점",
+      "why": "공실 예측 방향 정확도. 66거점 홀드아웃 · 2026-09-04 서빙본. 목표 70%를 0.8%p 차로 넘고 있다는 점을 함께 적는다",
+      "source": "docs/feature-platform.md 0"
+    },
+    {
+      "id": "LSTM_MAE",
+      "value": "1.061",
+      "aliases": [],
+      "condition": "66거점",
+      "why": "vac_proxy 원단위 MAE",
+      "source": "docs/feature-platform.md 0"
+    },
+    {
+      "id": "LSTM_RMSE",
+      "value": "1.387",
+      "aliases": [],
+      "condition": "66거점",
+      "why": "vac_proxy 원단위 RMSE",
+      "source": "docs/feature-platform.md 0"
+    },
+    {
+      "id": "UNITS",
+      "value": "664유닛",
+      "aliases": ["664"],
+      "condition": "66거점",
+      "why": "서빙 66거점의 실제 공실 유닛 인벤토리 (2026-09-05 실측). 배선 당시 54거점 528유닛이었으므로 옛 값과 섞지 않는다",
+      "source": "AGENTS.md 0 · services/vacant_inventory"
+    },
+    {
+      "id": "SAMPLE211",
+      "value": "211",
+      "aliases": [],
+      "condition": "unresolved",
+      "why": "독립 검토 표본. 전부 unresolved 다 — 사람 정답·오류율이 확보되지 않았다는 뜻이므로 반드시 그 상태와 함께 쓴다",
+      "source": "docs/papers/evidence-index.md PAGE-D07"
+    }
+  ],
+
+  "forbid": [
+    {
+      "id": "F_REAL_VACANCY",
+      "pattern": "실측\\s*공실률",
+      "why": "현실 공실 정확도는 미평가다 — 원천 관측 시점 정렬 평가 불가(PAGE-D03), 독립 검토 표본 211개 전부 unresolved(PAGE-D07)",
+      "instead": "건축물대장 기반 산출 공실률"
+    },
+    {
+      "id": "F_HUB73",
+      "pattern": "73\\s*(개\\s*)?거점",
+      "why": "data/gold/*/coverage.json 을 세면 나오는 수다. 서빙 목록 밖(경기 보류)의 산출물이 섞인다",
+      "instead": "66거점 (data/config/page_hubs.py 의 ACTIVE_HUBS)"
+    },
+    {
+      "id": "F_LSTM_OLD",
+      "pattern": "84\\.6\\s*%|74\\.1\\s*%|72\\.2\\s*%",
+      "why": "13·27·54거점 시절 값이다. 표본이 클수록 신뢰구간이 좁으므로 66거점 값만 인용한다",
+      "instead": "70.8% (66거점)"
+    },
+    {
+      "id": "F_OFFPRIOR_MIX",
+      "pattern": "37\\.6[0-9]?\\s*%",
+      "why": "54거점 실험군(조건 B) 값이다. 신청서에는 66거점 서빙본만 쓴다 — 두 값을 한 문서에 두면 모집단이 섞인다",
+      "instead": "33.8% (66거점 · 조건 A)"
+    },
+    {
+      "id": "F_DEAD_STACK",
+      "pattern": "Three\\.js|three\\.js|Mapbox|mapbox|Tailwind|tailwind|react-three",
+      "why": "셋 다 제거됐다. 베이스맵은 네이버뿐이고 스타일은 CSS 변수 한 체계다. 옛 문서를 복사하면 그대로 딸려 온다",
+      "instead": "네이버 지도(lib/naverMap.ts) · CSS 변수 토큰(src/styles/tokens.css)"
+    },
+    {
+      "id": "F_3D_TWIN",
+      "pattern": "3D\\s*(디지털\\s*)?트윈|3D\\s*건물\\s*모델",
+      "why": "2026-09-05 폐기됐다. 절차적 박스가 실측 형상이 아니었다. 대면심사에서 시연을 요구받으면 그 자리에서 깨진다",
+      "instead": "2D 층 스택 + 네이버 거리뷰"
+    },
+    {
+      "id": "F_VERCEL",
+      "pattern": "Vercel|vercel",
+      "why": "2026-08-28 프로덕션에서 내려왔다(무료 플랜 상업적 사용 금지). 현재 프로덕션은 Cloud Run + Firebase Hosting 이다",
+      "instead": "spaceos-twin.web.app (Cloud Run + Firebase Hosting)"
+    },
+    {
+      "id": "F_PILOT_CLAIM",
+      "pattern": "(파일럿|고객사|도입사|레퍼런스)\\s*\\d+\\s*(건|개|곳|사)\\s*(확보|달성|운영|진행|보유)",
+      "why": "계측 배선은 4/4로 서 있으나 실적은 미확인이다. 배선 100%는 파일럿 0건과 양립한다",
+      "instead": "목표로만 쓴다 — '6개월차 5~10건 목표'"
+    },
+    {
+      "id": "F_ACCURACY_LOOSE",
+      "pattern": "공실\\s*예측\\s*정확도\\s*(?!방향)",
+      "why": "측정한 것은 방향 정확도(오르는가 내리는가)이지 공실률 값의 정확도가 아니다",
+      "instead": "공실 예측 방향 정확도"
+    }
+  ],
+
+  "ignore": [
+    "20\\d\\d",
+    "0\\d{1,2}-\\d{3,4}-\\d{4}",
+    "\\d{1,3}(,\\d{3})*\\s*만\\s*원",
+    "\\d{1,3}(,\\d{3})*만원"
+  ]
+}
