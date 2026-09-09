@@ -1,0 +1,23 @@
+{
+  "started": "2026-09-09T02:09:30",
+  "claims": "docs/apply/claims.json",
+  "require_complete": true,
+  "docs": [
+    {
+      "doc": "docs/apply/02-govtech/draft.md",
+      "fill_remaining": 6,
+      "violations": [
+        {
+          "kind": "미완",
+          "id": "",
+          "line": 24,
+          "found": "FILL 마커 6개 남음",
+          "why": "제출 직전 검사(--require-complete)에서는 0 이어야 한다",
+          "instead": ""
+        }
+      ],
+      "ok": false
+    }
+  ],
+  "ok": false
+}

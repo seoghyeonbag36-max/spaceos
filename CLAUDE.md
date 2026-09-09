@@ -146,6 +146,10 @@ python scripts/pppp_status.py
 
 # 건축HUB 수집 전 프리플라이트 (쿼터·전원·시도이력)
 python scripts/quota_preflight.py
+
+# 공모전 신청서 원고의 근거 검사 — docs/apply/claims.json 밖의 수치를 잡는다
+python scripts/check_application.py                      # docs/apply/ 전체
+python scripts/check_application.py --doc <원고> --require-complete   # 제출 직전
 ```
 
 ⚠ **로그를 파일로 리다이렉트할 때 `PYTHONIOENCODING=utf-8`** — Windows 기본 cp949 에는

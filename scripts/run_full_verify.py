@@ -30,6 +30,8 @@ STEPS = [
                     "print('SELECT_BY', t.SELECT_BY); "
                     "print('FLOOR', t.OFFPRIOR_TOP3_FLOOR)"], ROOT, False),
     ("pppp-status", [sys.executable, "scripts/pppp_status.py"], ROOT, False),
+    # 신청서 원고의 근거 검사 — docs/apply/ 가 비어 있으면 통과한다.
+    ("application-check", [sys.executable, "scripts/check_application.py"], ROOT, False),
     # 프론트는 npm 이라 Windows 에서 셸이 필요하다(npm.cmd).
     ("frontend-build", "npm run build", ROOT / "apps" / "frontend", True),
 ]
