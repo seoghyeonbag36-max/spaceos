@@ -161,7 +161,9 @@ def check_doc(path: Path, claims: dict, require_complete: bool) -> dict:
             body = masked[s:e]
             if not any(n in body for n in needles):
                 continue
-            if cond in body:
+            # 조건 문구는 코드 표기(`unresolved`)로 적어도 인정한다 — 독자에게는 보이는
+            # 글자다. 주석은 여전히 안 센다(그건 안 보인다). 2026-09-09 실제로 걸린 자리.
+            if cond in masked_body[s:e]:
                 continue
             hit = next(n for n in needles if n in body)
             violations.append({
