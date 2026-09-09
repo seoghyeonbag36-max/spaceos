@@ -51,6 +51,16 @@ python scripts/check_application.py --doc docs/apply/01-spatial-info/draft.md --
 06·08 은 학술 원고라 [docs/papers](../papers/) 의 규칙과 근거 인덱스를 따른다. 이 디렉터리는
 신청서 전용이다.
 
+## 공통 코어
+
+| | 산출물 | 상태 |
+|---|---|---|
+| C7 | [data-sources.md](data-sources.md) — 데이터 출처·라이선스 표 | 작성됨. 라이선스·갱신주기 칸은 포털 확인 후 채운다 |
+
+C7 을 만들며 **전제가 하나 뒤집혔다**: SpaceOS 는 브이월드(국가공간정보)를 이미 쓰고 있다
+(`data/collectors/vworld_bldg.py` → `build_page_master.py`). 공간정보 경진대회 원고 §3·§8 이
+"쓰지 않는다"는 전제로 잡혀 있던 것을 고쳤다.
+
 ## 서식을 아직 대조하지 못했다
 
 두 원고 모두 머리에 `<!-- 확인필요(서식): … -->` 가 붙어 있다. 주최처 서식(hwp)을 받아
