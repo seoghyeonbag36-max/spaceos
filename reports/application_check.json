@@ -1,5 +1,5 @@
 {
-  "started": "2026-09-09T06:15:04",
+  "started": "2026-09-09T06:33:10",
   "claims": "docs/apply/claims.json",
   "require_complete": false,
   "docs": [
@@ -11,7 +11,7 @@
     },
     {
       "doc": "docs/apply/02-govtech/draft.md",
-      "fill_remaining": 6,
+      "fill_remaining": 3,
       "violations": [],
       "ok": true
     },

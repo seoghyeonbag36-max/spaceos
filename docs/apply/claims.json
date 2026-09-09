@@ -132,6 +132,30 @@
       "condition": "",
       "why": "3D 시각화를 걷어내고 2D 층 스택 + 거리뷰로 바꿨을 때의 프론트 번들 크기. 832KB(gzip 224KB) → 4KB(gzip 2KB). 앞뒤 값을 함께 쓴다 — 한쪽만 쓰면 의미가 없다",
       "source": "docs/feature-posting.md 0-V"
+    },
+    {
+      "id": "TARGET70",
+      "value": "70%",
+      "aliases": [],
+      "condition": "",
+      "why": "KPI 목표선(AI 정확도 70%+, Phase1). 달성값이 아니라 목표다 — 성과로 인용하지 않는다",
+      "source": "CLAUDE.md KPI Priorities · docs/feature-platform.md 0"
+    },
+    {
+      "id": "LSTM_MARGIN",
+      "value": "0.8%p",
+      "aliases": ["0.8%"],
+      "condition": "",
+      "why": "목표선 70% 대비 초과폭(70.8% - 70%). 거점이 더 늘면 내려갈 수 있는 자리라는 점을 함께 쓴다",
+      "source": "docs/feature-platform.md 0"
+    },
+    {
+      "id": "GNN_BASE",
+      "value": "89.4%",
+      "aliases": ["61.7%"],
+      "condition": "기준선",
+      "why": "거점 사전분포 기준선 (Top-3 89.4% / Top-1 61.7%). Top-3 91.7% 를 이 값 없이 쓰면 절대 성능으로 오독된다 — 둘은 반드시 함께 간다",
+      "source": "docs/papers/evidence-index.md P1"
     }
   ],
 
