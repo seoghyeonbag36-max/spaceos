@@ -7,6 +7,7 @@ import PageDashboard from "@/pages/PageDashboard";
 import AdminCoverage from "@/pages/AdminCoverage";
 import ProgramStudio from "@/pages/ProgramStudio";
 import MapHost from "@/components/MapHost";
+import { createPageWorkspace, type BuildingSelection } from "@/lib/workspaceState";
 import "./App.css";
 
 // 지도 위 오버레이 두 벌 — 지도 SDK 는 MapHost 가 받지만, 이 화면들도 거리뷰·층 스택 등
@@ -61,6 +62,12 @@ const NAV: { key: View; label: string; icon: JSX.Element; track?: TrackKey }[] =
 
 export default function App() {
   const [view, setView] = useState<View>("seoul");
+  const [pageWorkspace, setPageWorkspace] = useState(createPageWorkspace);
+  const [postingSelection, setPostingSelection] = useState<(BuildingSelection & { requestId: number })>();
+  const reviewBuilding = (selection: BuildingSelection) => {
+    setPostingSelection((previous) => ({ ...selection, requestId: (previous?.requestId ?? 0) + 1 }));
+    setView("posting");
+  };
   const [isAdmin, setIsAdmin] = useState(() => window.location.hash === "#admin");
   const [isBoard, setIsBoard] = useState(() => window.location.hash === "#board");
 
@@ -106,7 +113,7 @@ export default function App() {
       <main className="app-main">
         {view === "seoul" && <SeoulDashboard />}
         {view === "platform" && <PlatformConsole />}
-        {view === "posting" && <PostingConsole />}
+        {view === "posting" && <PostingConsole selection={postingSelection} />}
         {view === "program" && <ProgramStudio />}
       </main>
 
@@ -116,7 +123,7 @@ export default function App() {
       <MapHost active={isMap}>
         <Suspense fallback={<div className="map-loading">지도 화면 불러오는 중…</div>}>
           {view === "hubs" && <HubExplorer />}
-          {view === "map" && <MapShell />}
+          {view === "map" && <MapShell workspace={pageWorkspace} onWorkspaceChange={setPageWorkspace} onReview={reviewBuilding} />}
         </Suspense>
       </MapHost>
     </div>

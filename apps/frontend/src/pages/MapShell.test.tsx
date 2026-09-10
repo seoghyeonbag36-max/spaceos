@@ -11,7 +11,7 @@
  *   3. 사이드패널이 실측일 때 / 백엔드가 없을 때 각각 무엇을 그리는가
  */
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import MapShell from "@/pages/MapShell";
 import { installFetchStub, type FetchStub, type Route } from "@/test/fetchStub";
 import { installNaverStub, removeNaverStub, type NaverStub } from "@/test/naverStub";
@@ -44,7 +44,7 @@ let naver: NaverStub;
 let api: FetchStub;
 
 /** `withBuildings: false` 면 /heatmap/buildings 가 404 → 화면이 로컬 샘플로 폴백한다. */
-function mount(opts: { withBuildings?: boolean } = {}) {
+function mount(opts: { withBuildings?: boolean; onReview?: (selection: { districtId: string; buildingId: string; buildingName: string }) => void } = {}) {
   const routes: Route[] = [
     { match: /\/api\/v1\/commercial-districts$/, body: HUBS },
     { match: /\/api\/v1\/heatmap\/rent\?district=/, body: rentHeatmap("garosugil") },
@@ -65,7 +65,7 @@ function mount(opts: { withBuildings?: boolean } = {}) {
     );
   }
   api = installFetchStub(routes);
-  return renderOnMap(<MapShell />);
+  return renderOnMap(<MapShell onReview={opts.onReview} />);
 }
 
 beforeEach(() => { naver = installNaverStub(); });
@@ -73,7 +73,69 @@ beforeEach(() => { naver = installNaverStub(); });
 //   걷는다. 반대로 하면 언마운트 도중 화면 코드가 `window.naver` 를 못 찾고 죽는다.
 afterEach(() => { cleanup(); removeNaverStub(); });
 
-const hubSelect = () => screen.getByRole("combobox");
+const hubSelect = () => screen.getByRole("combobox", { name: "상권 선택" });
+
+describe("MapShell — 후보 탐색과 비교", () => {
+  beforeEach(() => {
+    // jsdom에는 dialog의 top-layer 구현이 없다. 열림 상태만 재현한다.
+    HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+    HTMLDialogElement.prototype.close = function () { this.open = false; };
+  });
+
+  it("검색과 상태 조건이 목록과 지도에 함께 적용되고 초기화된다", async () => {
+    mount();
+    await waitFor(() => expect(naver.live()).toHaveLength(3));
+    fireEvent.change(screen.getByRole("combobox", { name: "공실 상태 필터" }), { target: { value: "empty" } });
+    expect(screen.queryByText("가로수 B")).toBeNull();
+    await waitFor(() => expect(naver.live()).toHaveLength(1));
+    fireEvent.change(screen.getByRole("textbox", { name: "건물 검색" }), { target: { value: "찾을 수 없는 건물" } });
+    expect(screen.getByText("조건에 맞는 건물이 없습니다")).toBeTruthy();
+    await waitFor(() => expect(naver.live()).toHaveLength(0));
+    fireEvent.click(screen.getByRole("button", { name: "조건 초기화" }));
+    await waitFor(() => expect(naver.live()).toHaveLength(3));
+  });
+
+  it("후보 저장·비교가 동일한 건물과 출처를 유지하며 메모를 편집한다", async () => {
+    mount();
+    fireEvent.click(await screen.findByRole("button", { name: "가로수 A 후보 저장" }));
+    fireEvent.click(screen.getByRole("button", { name: "가로수 C 후보 저장" }));
+    fireEvent.click(screen.getByRole("button", { name: "후보 비교" }));
+    const dialog = within(screen.getByRole("dialog", { name: "가로수길에서 고른 건물" }));
+    expect(dialog.getByRole("columnheader", { name: "가로수 A" })).toBeTruthy();
+    expect(dialog.queryByRole("columnheader", { name: "가로수 B" })).toBeNull();
+    expect(dialog.getByText(/실측 자료 기반 공실 추정/)).toBeTruthy();
+    fireEvent.change(dialog.getByRole("textbox", { name: "가로수 A 선택 이유" }), { target: { value: "입구 동선 답사" } });
+    fireEvent.click(dialog.getByRole("button", { name: "후보 비교 닫기" }));
+    fireEvent.click(screen.getByRole("button", { name: "후보 비교" }));
+    expect((screen.getByRole("textbox", { name: "가로수 A 선택 이유" }) as HTMLTextAreaElement).value).toBe("입구 동선 답사");
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "가로수 A 후보 해제" }));
+    expect(within(screen.getByRole("dialog")).queryByRole("columnheader", { name: "가로수 A" })).toBeNull();
+  });
+
+  it("거점별 후보를 섞지 않고 원래 거점으로 돌아오면 저장 상태를 복원한다", async () => {
+    mount();
+    fireEvent.click(await screen.findByRole("button", { name: "가로수 A 후보 저장" }));
+    fireEvent.change(hubSelect(), { target: { value: "yeonnam" } });
+    await screen.findByText("연남 A");
+    expect(screen.getByText("저장한 후보 0/3")).toBeTruthy();
+    fireEvent.change(hubSelect(), { target: { value: "garosugil" } });
+    expect(await screen.findByRole("button", { name: "가로수 A 후보 해제" })).toBeTruthy();
+  });
+
+  it("입점 검토에는 건물 식별자만 넘기고 샘플 자료는 넘기지 않는다", async () => {
+    const review = vi.fn();
+    const view = mount({ onReview: review });
+    fireEvent.click(await screen.findByRole("button", { name: /^가로수 A 카페/ }));
+    fireEvent.click(screen.getByRole("button", { name: "이 건물로 입점 검토 →" }));
+    expect(review).toHaveBeenCalledWith({ districtId: "garosugil", buildingId: "g1", buildingName: "가로수 A" });
+    view.unmount();
+    mount({ withBuildings: false, onReview: review });
+    fireEvent.click(await screen.findByRole("button", { name: /^가로수길 A빌딩 의류/ }));
+    expect((screen.getByRole("button", { name: "이 건물로 입점 검토 →" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "가로수길 A빌딩 후보 저장" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(review).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe("MapShell — API 경로", () => {
   it("마운트하면 목록·건물·임대만 부른다 — 보고 있지 않은 레이어는 부르지 않는다", async () => {

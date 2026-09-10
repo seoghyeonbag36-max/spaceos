@@ -70,10 +70,11 @@ export interface DistrictPickerProps {
   /** 옵션 라벨 뒤에 붙일 보조 정보. 기본은 공실률. */
   suffix?: (d: DistrictSummary) => string;
   disabled?: boolean;
+  ariaLabel?: string;
 }
 
 export default function DistrictPicker({
-  districts, value, onChange, className, suffix, disabled,
+  districts, value, onChange, className, suffix, disabled, ariaLabel,
 }: DistrictPickerProps) {
   const byCity = new Map<string, DistrictSummary[]>();
   for (const d of districts) {
@@ -94,6 +95,7 @@ export default function DistrictPicker({
 
   return (
     <select
+      aria-label={ariaLabel}
       className={className}
       value={value}
       disabled={disabled}

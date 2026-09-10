@@ -1,5 +1,5 @@
 /* SpaceOS Program 스튜디오(가게 단위) — 스코프 .progstudio (PageDashboard 톤 계승) */
-.progstudio{--card:var(--surface);--ink:#1f2937;--sub:var(--muted);--line:#e5e7eb;--blue:#2E6FB7;
+.progstudio{--card:var(--surface);--sub:var(--muted);--blue:var(--track-program);
  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);background:#eef1f4;padding:20px;line-height:1.4}
 .progstudio *{box-sizing:border-box}
 .progstudio .wrap{max-width:1240px;margin:0 auto}
@@ -118,15 +118,39 @@
 .progstudio .chips{display:flex;flex-wrap:wrap;gap:5px}
 .progstudio .chip{font-size:11px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:3px 9px}
 
-/* 제안 카드 — 온라인/오프라인을 왼쪽 띠 색으로 구분한다 */
-.progstudio .plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:9px}
-.progstudio .plan{border:1px solid var(--line);border-left:4px solid #d4dde6;border-radius:11px;padding:11px 13px;background:#fafbfc}
-.progstudio .plan.is-online{border-left-color:#2E6FB7}
-.progstudio .plan.is-offline{border-left-color:#EFA50F}
-.progstudio .pchannel{font-size:12.5px;font-weight:700;margin-bottom:5px}
-.progstudio .pcontent{font-size:12.5px;line-height:1.6}
 .progstudio .prationale{font-size:11px;color:var(--sub);line-height:1.55;margin-top:7px;padding-top:7px;border-top:1px solid var(--line)}
 .progstudio .prationale b{font-weight:700;color:#5a6b85;margin-right:var(--sp-1)}
+
+/* 초안 작업대 — 선택·편집·미리보기는 화면 상태이며 서버 원본은 보존한다. */
+.progstudio .draft-workspace{margin:var(--sp-4) 0 var(--sp-5);min-width:0}
+.progstudio .draft-intro h2{margin:0 0 var(--sp-2);font-size:var(--fs-heading);line-height:var(--lh-heading)}
+.progstudio .draft-intro p{margin:var(--sp-1) 0;color:var(--muted);font-size:var(--fs-caption);line-height:var(--lh-caption)}
+.progstudio .draft-layout{display:grid;grid-template-columns:minmax(140px,.4fr) minmax(0,1fr);gap:var(--sp-4);margin-top:var(--sp-4)}
+.progstudio .draft-channels,.progstudio .draft-detail{min-width:0}
+.progstudio .draft-channel-group+ .draft-channel-group{margin-top:var(--sp-5)}
+.progstudio .draft-channel-group h3{display:flex;justify-content:space-between;gap:var(--sp-2);margin:0 0 var(--sp-2);font-size:var(--fs-caption);font-weight:var(--fw-semibold)}
+.progstudio .draft-channel-group h3 span,.progstudio .draft-none{color:var(--muted);font-size:var(--fs-caption)}
+.progstudio .draft-channel{display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-2);width:100%;padding:var(--sp-3);margin-bottom:var(--sp-2);text-align:left;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);font-size:var(--fs-body);line-height:var(--lh-body);overflow-wrap:anywhere}
+.progstudio .draft-channel:hover,.progstudio .draft-channel[aria-pressed="true"]{border-color:var(--track-program);background:var(--track-program-soft)}
+.progstudio .draft-channel[aria-pressed="true"]{box-shadow:inset var(--sp-1) 0 var(--track-program);font-weight:var(--fw-semibold)}
+.progstudio .draft-state{font-size:var(--fs-caption);font-weight:var(--fw-regular);color:var(--muted)}
+.progstudio .draft-state.is-edited{color:var(--track-program);font-weight:var(--fw-semibold)}
+.progstudio .draft-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+.progstudio .draft-toolbar h3{margin:0;font-size:var(--fs-heading);line-height:var(--lh-heading);overflow-wrap:anywhere}
+.progstudio .draft-view{display:flex;gap:var(--sp-1);padding:var(--sp-1);background:var(--bg);border-radius:var(--radius-md)}
+.progstudio .draft-view button{padding:var(--sp-2) var(--sp-3);border:1px solid transparent;border-radius:var(--radius-md);font-size:var(--fs-caption);font-weight:var(--fw-semibold);color:var(--muted);background:transparent}
+.progstudio .draft-view button[aria-pressed="true"]{background:var(--surface);color:var(--track-program);border-color:var(--line)}
+.progstudio .draft-workspace button:focus-visible,.progstudio .draft-editor textarea:focus-visible{outline:2px solid var(--track-program);outline-offset:var(--sp-1)}
+.progstudio .draft-validation{padding:var(--sp-3);margin:var(--sp-3) 0;color:var(--track-program);background:var(--track-program-soft);border-radius:var(--radius-md);font-size:var(--fs-caption);line-height:var(--lh-caption)}
+.progstudio .draft-editor>span{display:block;font-size:var(--fs-caption);font-weight:var(--fw-semibold);margin-bottom:var(--sp-2)}
+.progstudio .draft-editor textarea{font-size:var(--fs-body);line-height:var(--lh-body);padding:var(--sp-3);border-radius:var(--radius-md);background:var(--surface)}
+.progstudio .draft-preview{border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden}
+.progstudio .draft-preview-label{padding:var(--sp-3);font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted);background:var(--bg);border-bottom:1px solid var(--line)}
+.progstudio .draft-preview-content{padding:var(--sp-4);white-space:pre-wrap;overflow-wrap:anywhere;font-size:var(--fs-body);line-height:var(--lh-body);min-height:12em}
+.progstudio .draft-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:var(--sp-2);margin:var(--sp-3) 0}
+.progstudio .draft-feedback,.progstudio .draft-scope{font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--track-program);margin:var(--sp-2) 0}
+.progstudio .draft-detail .prationale{font-size:var(--fs-caption);line-height:var(--lh-caption);padding-top:var(--sp-3);margin-top:var(--sp-3);overflow-wrap:anywhere}
+.progstudio .draft-detail .prationale b{color:var(--muted)}
 
 .progstudio .ha{font-size:11.5px;color:#8a6d3b;background:#fdf8ec;border:1px solid #f3e6c4;border-radius:9px;padding:9px 11px;line-height:1.6}
 
@@ -136,4 +160,11 @@
 @media(max-width:980px){
  .progstudio .cols{grid-template-columns:1fr}
  .progstudio .cols>form.panel{position:static}
+}
+@media(max-width:640px){
+ .progstudio .draft-layout{grid-template-columns:1fr}
+ .progstudio .draft-channels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-3)}
+ .progstudio .draft-channel-group+ .draft-channel-group{margin-top:0}
+ .progstudio .ptitle{align-items:flex-start;flex-wrap:wrap}
+ .progstudio .ptools{flex-wrap:wrap}
 }

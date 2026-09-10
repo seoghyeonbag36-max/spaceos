@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
 import DistrictPicker, { CaveatNote, MeasuredValue } from "@/components/DistrictPicker";
+import PlatformComparison from "@/components/PlatformComparison";
 import Verdict, { Fold, type Ground } from "@/components/Verdict";
 import {
   getPlatformProfile, getSentiment, listDistricts, predictVacancy, recommendIndustry,
@@ -217,7 +218,9 @@ export default function PlatformConsole() {
       {!profErr && !prof && <div className="loading">상권 정체성 불러오는 중…</div>}
 
       {prof?.identity && <IdentitySection ident={prof.identity} hub={hub} />}
-      {prof && <OpeningsSection openings={prof.openings} />}
+      {prof?.district_id === districtId && (
+        <OpeningsSection key={districtId} openings={prof.openings} districtName={hub?.name ?? districtId} />
+      )}
 
       {/* 근거 — 위 두 답을 만든 모델의 성능과 한계. 지표가 아니라 **답**이 먼저 오도록 접어 둔다 */}
       <Fold title="모델 근거" badge="LSTM · GNN"
@@ -579,9 +582,22 @@ function Spark({ points, direction }: { points: number[]; direction: string }) {
 
 /* ───────────────── ② 어느 자리에 어떤 업소가 ───────────────── */
 
-function OpeningsSection({ openings }: { openings: PlatformProfile["openings"] }) {
+function OpeningsSection({ openings, districtName }: {
+  openings: PlatformProfile["openings"]; districtName: string;
+}) {
   const [shown, setShown] = useState(SITES_PAGE);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
+  const comparisonId = useId();
+  const selectionHintId = useId();
   const sites = openings.sites;
+  const selectedSites = selectedIds.flatMap((id) => sites.filter((site) => site.unit_id === id));
+  const canCompare = selectedSites.length >= 2;
+  function toggleSite(id: string) {
+    setSelectedIds((ids) => ids.includes(id)
+      ? ids.filter((selected) => selected !== id)
+      : ids.length < 3 ? [...ids, id] : ids);
+  }
   // 한 지번에 자리가 여럿이면 이름이 똑같이 찍힌다(신사동 552-19 가 3곳). 좌표가 다른
   // 별개의 자리인데 화면에서는 중복 버그처럼 보이므로, 겹칠 때만 유닛 번호를 붙인다.
   const dupNames = useMemo(() => {
@@ -597,12 +613,67 @@ function OpeningsSection({ openings }: { openings: PlatformProfile["openings"] }
 
       {sites.length === 0 && <div className="loading">이 상권에는 실측 공실 자리가 없다.</div>}
 
-      <div className="sites">
-        {sites.slice(0, shown).map((s) => (
-          <SiteCard key={s.unit_id} site={s}
-            seq={(dupNames.get(s.name) ?? 0) > 1 ? s.unit_id.split("-").pop() ?? null : null} />
-        ))}
-      </div>
+      {sites.length > 0 && (
+        <>
+          <section className="site-selection" aria-label="현재 비교 후보">
+            <div className="site-selection-head">
+              <div>
+                <h3>{districtName}의 자리 비교</h3>
+                <p>같은 상권의 공실 {openings.unit_count}곳 · 추천 매칭 반경 {openings.match_radius_m}m</p>
+              </div>
+              <span className="site-selection-count" role="status" aria-live="polite">
+                비교 후보 {selectedSites.length}/3곳
+              </span>
+            </div>
+            <p id={selectionHintId}>
+              {selectedSites.length === 3
+                ? "최대 3곳을 선택했습니다. 다른 자리를 고르려면 선택한 후보를 해제하세요."
+                : "아래에서 2~3곳을 선택해 면적·층·추천 근거를 나란히 확인하세요."}
+            </p>
+            {selectedSites.length > 0 && (
+              <ul className="site-selection-list">
+                {selectedSites.map((site) => (
+                  <li key={site.unit_id}>
+                    <span>{site.name}<small>{site.unit_id}</small></span>
+                    <button type="button" onClick={() => toggleSite(site.unit_id)}
+                      aria-label={`${site.name} (${site.unit_id}) 비교에서 제외`}>해제</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="site-selection-actions">
+              <Button type="button" disabled={!canCompare} aria-controls={comparisonId}
+                aria-expanded={canCompare && comparisonOpen}
+                onClick={() => setComparisonOpen((open) => !open)}>
+                {canCompare && comparisonOpen ? "비교 접기" : `선택한 ${selectedSites.length}곳 비교`}
+              </Button>
+              {selectedSites.length > 0 && (
+                <Button type="button" variant="ghost" onClick={() => {
+                  setSelectedIds([]); setComparisonOpen(false);
+                }}>선택 초기화</Button>
+              )}
+            </div>
+          </section>
+          <div id={comparisonId}>
+            {canCompare && comparisonOpen && (
+              <PlatformComparison sites={selectedSites} districtName={districtName}
+                source={openings.source} distinctNote={openings.distinct_note} />
+            )}
+          </div>
+          <fieldset className="site-candidates" aria-describedby={selectionHintId}>
+            <legend>비교할 자리 선택</legend>
+            <div className="sites">
+              {sites.slice(0, shown).map((s) => (
+                <SiteCard key={s.unit_id} site={s}
+                  seq={(dupNames.get(s.name) ?? 0) > 1 ? s.unit_id.split("-").pop() ?? null : null}
+                  selected={selectedIds.includes(s.unit_id)}
+                  disabled={selectedIds.length >= 3 && !selectedIds.includes(s.unit_id)}
+                  onToggle={() => toggleSite(s.unit_id)} />
+              ))}
+            </div>
+          </fieldset>
+        </>
+      )}
 
       {sites.length > shown && (
         <Button variant="ghost" className="more" onClick={() => setShown((n) => n + SITES_PAGE)}>
@@ -621,22 +692,31 @@ function OpeningsSection({ openings }: { openings: PlatformProfile["openings"] }
   );
 }
 
-function SiteCard({ site, seq }: { site: OpeningSite; seq: string | null }) {
+function SiteCard({ site, seq, selected, disabled, onToggle }: {
+  site: OpeningSite; seq: string | null;
+  selected: boolean; disabled: boolean; onToggle: () => void;
+}) {
   const max = site.recommendations[0]?.score ?? 1;
   return (
-    <Card className="site">
+    <Card className={`site${selected ? " is-selected" : ""}`}>
+      <label className="site-select">
+        <input type="checkbox" checked={selected} disabled={disabled} onChange={onToggle}
+          aria-label={`${site.name} (${site.unit_id}) 비교 후보 선택`} />
+        <span>{selected ? "비교 후보에 추가됨" : "비교 후보로 선택"}</span>
+      </label>
       <div className="sitehd">
         <span className="sname" title={site.name}>
           {site.name}{seq && <em> · 자리 {seq}</em>}
         </span>
         {site.matched_distance_m != null && (
-          <span className="sdist">{Math.round(site.matched_distance_m)}m</span>
+          <span className="sdist" title="공실 자리에서 추천 그래프 노드까지 거리">{site.matched_distance_m}m</span>
         )}
       </div>
       <div className="smeta">
-        {site.area_py != null && `${site.area_py}평`}
-        {site.floor && ` · ${site.floor}`}
-        {site.capacity != null && ` · ${site.capacity}호 중 공실 ${site.vacancy_rate?.toFixed(0)}%`}
+        {site.area_py != null ? `${site.area_py}평` : "면적 미제공"}
+        {` · ${site.floor || "층 미제공"}`}
+        {site.capacity != null && ` · ${site.capacity}호`}
+        {site.vacancy_rate != null ? ` · 공실 ${site.vacancy_rate}%` : " · 공실률 미제공"}
       </div>
 
       {site.recommendations.length > 0 ? (
@@ -659,7 +739,7 @@ function SiteCard({ site, seq }: { site: OpeningSite; seq: string | null }) {
       {site.distinct && (
         <div className="sdistinct">
           상권 평균 대비 <b>{site.distinct.industry}</b>
-          <span>+{site.distinct.delta_pp}p</span>
+          <span>{site.distinct.delta_pp > 0 ? "+" : ""}{site.distinct.delta_pp}p</span>
         </div>
       )}
 

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { BuildingSelection } from "@/lib/workspaceState";
 import DistrictPicker, { CaveatNote } from "@/components/DistrictPicker";
 import {
   BASIS_LABEL, getPostings, listDistricts, recommendIndustry, simulateRevenue,
@@ -42,9 +43,19 @@ const TIER_LABEL: Record<string, { name: string; sub: string }> = {
 
 const won = (v: number) => `${Math.round(v).toLocaleString()}만원`;
 
-export default function PostingConsole() {
+interface PostingConsoleProps { selection?: BuildingSelection & { requestId: number } }
+interface Calculation {
+  result: SimulateResult;
+  input: { district_id: string; unit_id: string; industry_type?: string; strategy?: string; prem?: number };
+}
+
+export default function PostingConsole({ selection }: PostingConsoleProps = {}) {
+  return <PostingSession key={selection ? `${selection.districtId}:${selection.buildingId}:${selection.requestId}` : "direct"} selection={selection} />;
+}
+
+function PostingSession({ selection }: PostingConsoleProps) {
   const [districts, setDistricts] = useState<DistrictSummary[]>([]);
-  const [districtId, setDistrictId] = useState(DEFAULT_DISTRICT);
+  const [districtId, setDistrictId] = useState(selection?.districtId ?? DEFAULT_DISTRICT);
   const [units, setUnits] = useState<Posting[]>([]);
   const [unitId, setUnitId] = useState<string>("");
   const [industry, setIndustry] = useState("");
@@ -52,7 +63,12 @@ export default function PostingConsole() {
   const [strategy, setStrategy] = useState("");
   const [recs, setRecs] = useState<IndustryRec[] | null>(null);
 
-  const [result, setResult] = useState<SimulateResult | null>(null);
+  const [calculation, setCalculation] = useState<Calculation | null>(null);
+  const [previous, setPrevious] = useState<Calculation | null>(null);
+  const lastCalculation = useRef<Calculation | null>(null);
+  const requestSerial = useRef(0);
+  const [handoffNote, setHandoffNote] = useState("");
+  const result = calculation?.result ?? null;
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -64,21 +80,51 @@ export default function PostingConsole() {
       .then((all) => {
         if (!live) return;
         setDistricts(all);
-        if (all.length && !all.some((d) => d.id === DEFAULT_DISTRICT)) setDistrictId(all[0].id);
+        if (!selection && all.length && !all.some((d) => d.id === DEFAULT_DISTRICT)) setDistrictId(all[0].id);
       })
       .catch((e) => live && setErr(String(e)));
     return () => { live = false; };
-  }, []);
+  }, [selection]);
+
+  useEffect(() => () => { requestSerial.current += 1; }, []);
+
+  function clearCalculation() {
+    requestSerial.current += 1;
+    setCalculation(null); setPrevious(null); setBusy(false);
+    lastCalculation.current = null;
+  }
+
+  function chooseDistrict(id: string) {
+    clearCalculation(); setUnits([]); setUnitId(""); setRecs(null); setHandoffNote("");
+    setIndustry(""); setPrem(""); setStrategy(""); setDistrictId(id);
+  }
+
+  function chooseUnit(id: string) {
+    clearCalculation(); setRecs(null); setErr(null);
+    setIndustry(""); setPrem(""); setStrategy(""); setUnitId(id);
+    setHandoffNote("");
+  }
 
   // 자리 목록 — 실측 공실 인벤토리(services/vacant_inventory)에서 온다
   useEffect(() => {
     let live = true;
-    setUnits([]); setUnitId(""); setResult(null); setRecs(null); setErr(null);
+    setUnits([]); setUnitId(""); setRecs(null); setErr(null);
     getPostings(districtId)
-      .then((p) => { if (live) { setUnits(p); setUnitId(p[0]?.id ?? ""); } })
+      .then((p) => {
+        if (!live) return;
+        setUnits(p);
+        if (selection && districtId === selection.districtId) {
+          // build_vacant_units.py의 id=f"vu-{p.get('id')}" 계약을 응답 목록에서 검증한다.
+          // 이름·좌표로 추측하거나 층 표본을 ROI 유닛으로 바꾸지 않는다.
+          const match = p.find((u) => u.id === `vu-${selection.buildingId}`);
+          setUnitId(match?.id ?? "");
+          setHandoffNote(match ? `${selection.buildingName}의 입점 계산 유닛을 확인했습니다.`
+            : `${selection.buildingName}과 일치하는 입점 계산 유닛이 없습니다. 계산할 자리를 직접 선택해 주세요.`);
+        } else setUnitId(p[0]?.id ?? "");
+      })
       .catch((e) => { if (live) setErr(String(e)); });
     return () => { live = false; };
-  }, [districtId]);
+  }, [districtId, selection]);
 
   // 자리를 고르면 그 좌표로 GNN 업종 추천을 물어 온다 — 업종 입력의 출발점이다.
   // (Platform 이 자리마다 답하는 것과 같은 질의다. 여기서는 그 답을 비용 계산에 넘긴다.)
@@ -101,28 +147,45 @@ export default function PostingConsole() {
   }, [unitId]);
 
   async function run(opts: { quiet?: boolean } = {}) {
-    if (!unitId) return;
+    if (!unit || !unitId) return;
+    const serial = ++requestSerial.current;
     setBusy(true);
     if (!opts.quiet) setErr(null);
     try {
       const parsed = prem.trim() === "" ? undefined : Math.max(0, Number(prem));
-      const r = await simulateRevenue({
+      const input: Calculation["input"] = {
         district_id: districtId,
         unit_id: unitId,
         industry_type: industry.trim() || undefined,
         strategy: strategy || undefined,
         prem: Number.isFinite(parsed as number) ? (parsed as number) : undefined,
-      });
-      setResult(r);
+      };
+      const r = await simulateRevenue(input);
+      if (serial !== requestSerial.current) return;
+      // 서버가 유닛을 찾지 못하면 첫 유닛으로 폴백할 수 있어 응답도 대조한다.
+      if (r.district_id !== input.district_id || r.unit_id !== input.unit_id) throw new Error("선택한 자리와 계산 응답이 일치하지 않습니다.");
+      const before = lastCalculation.current;
+      const sameScope = before && before.input.district_id === input.district_id && before.input.unit_id === input.unit_id
+        && before.input.industry_type === input.industry_type && before.input.strategy === input.strategy
+        && before.input.prem !== input.prem && before.result.source === r.source && before.result.inputs_quarter === r.inputs_quarter
+        && Object.entries(r.scenarios).every(([key, tier]) => before.result.scenarios[key]?.basis === tier.basis);
+      setPrevious(sameScope ? before : null);
+      const next = { result: r, input };
+      lastCalculation.current = next;
+      setCalculation(next);
     } catch (e) {
+      if (serial !== requestSerial.current) return;
       setErr(String(e));
-      setResult(null);
+      setCalculation(null); setPrevious(null); lastCalculation.current = null;
     } finally {
-      setBusy(false);
+      if (serial === requestSerial.current) setBusy(false);
     }
   }
 
   const tiers = result ? Object.entries(result.scenarios) : [];
+  const changedInput = calculation && (calculation.input.industry_type !== (industry.trim() || undefined)
+    || calculation.input.strategy !== (strategy || undefined)
+    || calculation.input.prem !== (prem.trim() === "" ? undefined : Number(prem)));
 
   return (
     <div className="postconsole"><div className="wrap">
@@ -148,12 +211,13 @@ export default function PostingConsole() {
       <div className="cols">
         {/* ── 입력 ── */}
         <form className="panel" onSubmit={(e) => { e.preventDefault(); run(); }}>
-          <div className="ptitle">입력</div>
+          <div className="ptitle">1. 자리와 업종 선택</div>
+          {handoffNote && <div className="posting-handoff" role="status">{handoffNote}</div>}
 
           <label className="field">
             <span className="flabel">상권</span>
             <DistrictPicker districts={districts} value={districtId}
-              onChange={setDistrictId} suffix={(d) => d.gu} />
+              onChange={chooseDistrict} suffix={(d) => d.gu} />
             <CaveatNote district={districts.find((d) => d.id === districtId)} />
           </label>
 
@@ -161,7 +225,8 @@ export default function PostingConsole() {
             <span className="flabel">
               자리 <em>실측 {units.length}곳</em>
             </span>
-            <select value={unitId} onChange={(e) => setUnitId(e.target.value)} disabled={!units.length}>
+            <select value={unitId} onChange={(e) => chooseUnit(e.target.value)} disabled={!units.length}>
+              {!unitId && <option value="">계산할 자리를 선택하세요</option>}
               {units.map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.n} · {u.area}평 · {u.floor}
@@ -194,6 +259,7 @@ export default function PostingConsole() {
             )}
           </label>
 
+          <div className="ptitle posting-input-step">2. 비용 조건 입력</div>
           <label className="field">
             <span className="flabel">권리금 <em>입력 계약</em></span>
             <input value={prem} inputMode="numeric"
@@ -206,6 +272,7 @@ export default function PostingConsole() {
             </span>
           </label>
 
+          <details className="posting-advanced"><summary>세부 조건 · 전략 선택</summary>
           <label className="field">
             <span className="flabel">전략</span>
             <select value={strategy} onChange={(e) => setStrategy(e.target.value)}>
@@ -216,6 +283,8 @@ export default function PostingConsole() {
             </select>
           </label>
 
+          </details>
+
           <Button className="run" type="submit" disabled={busy || !unitId}>
             {busy ? "계산 중…" : "시뮬레이션"}
           </Button>
@@ -223,9 +292,14 @@ export default function PostingConsole() {
 
         {/* ── 결과 ── */}
         <div className="results">
+          <div className="posting-result-heading"><h2>세 가격대의 비용과 회수기간</h2><p>처음 필요한 돈 · 매달 나가는 돈 · 투자 회수까지</p></div>
           {!result && !busy && <div className="empty">자리를 고르면 계산한다.</div>}
           {result && (
             <>
+              {calculation && <div className="posting-input-summary">
+                계산에 사용한 입력: {calculation.input.industry_type || "자리 기본 업종"} · 권리금 {calculation.input.prem === undefined ? "미입력 · 0 전제" : won(calculation.input.prem)} · {TIER_LABEL[calculation.input.strategy ?? ""]?.name ?? "세 전략 비교"}
+                {changedInput && <strong role="status">입력이 변경되었습니다. 다시 계산하면 결과에 반영됩니다.</strong>}
+              </div>}
               <div className="rhead">
                 <div className="rtitle">
                   {unit?.n ?? result.unit_id}
@@ -267,9 +341,10 @@ export default function PostingConsole() {
 
               <div className="tiers">
                 {tiers.map(([key, s]) => (
-                  <TierCard key={key} tierKey={key} s={s} />
+                  <TierCard key={key} tierKey={key} s={s} before={previous?.result.scenarios[key]} />
                 ))}
               </div>
+              {previous && calculation && <p className="posting-comparison-note">직전 계산 대비 · 동일 자리·업종·전략·기준분기 · 권리금 {previous.input.prem === undefined ? "미입력(0 전제)" : won(previous.input.prem)} → {calculation.input.prem === undefined ? "미입력(0 전제)" : won(calculation.input.prem)}. 차이는 두 서버 계산 결과를 비교한 값입니다.</p>}
 
               <div className="rsrc">
                 비용 기준: {BASIS_LABEL[tiers[0]?.[1]?.basis] ?? tiers[0]?.[1]?.basis ?? "미상"}
@@ -288,7 +363,7 @@ export default function PostingConsole() {
   );
 }
 
-function TierCard({ tierKey, s }: { tierKey: string; s: TierScenario }) {
+function TierCard({ tierKey, s, before }: { tierKey: string; s: TierScenario; before?: TierScenario }) {
   const meta = TIER_LABEL[tierKey] ?? { name: s.name ?? tierKey, sub: s.sub ?? "" };
   return (
     <Card className={"tier" + (s.recommended ? " rec" : "") + (s.viable ? "" : " dead")}>
@@ -310,8 +385,19 @@ function TierCard({ tierKey, s }: { tierKey: string; s: TierScenario }) {
         {/* "모른다"와 "안 된다"는 다른 정보다 — 순익이 0 이하면 회수기간이 정의되지 않는다 */}
         <span>{s.viable ? `${s.roi_months}개월` : "회수 불가"}</span>
       </div>
+      {before && <div className="tier-difference" aria-label={`${meta.name} 직전 계산과 비교`}>
+        <b>직전 계산 대비</b>
+        <span>초기 투자 {difference(s.invest_mn - before.invest_mn, "만원")}</span>
+        <span>월 순익 {difference(s.month_net - before.month_net, "만원")}</span>
+        <span>회수기간 {s.viable && before.viable && s.roi_months != null && before.roi_months != null
+          ? difference(s.roi_months - before.roi_months, "개월") : `${before.viable ? `${before.roi_months}개월` : "회수 불가"} → ${s.viable ? `${s.roi_months}개월` : "회수 불가"}`}</span>
+      </div>}
     </Card>
   );
+}
+
+function difference(value: number, unit: string): string {
+  return `${value > 0 ? "+" : ""}${Number(value.toFixed(2)).toLocaleString()}${unit}`;
 }
 
 /** 입력 출처 라벨 — 프록시를 실측으로 오독하지 않게 한다. 모르는 값은 그대로 노출한다. */
