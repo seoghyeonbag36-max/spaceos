@@ -13,7 +13,9 @@
 //   하나만 만들어 들고 있고(설계서 §10-1), 여기서는 그 위에 오버레이만 그린다.
 //   그전에는 탭을 옮길 때마다 지도가 죽고 다시 태어나 사용자가 맞춘 카메라가 날아갔다.
 //   이 컴포넌트의 루트는 이제 MapHost 안을 채우는 절대배치 레이어다(MapShell.css 참조).
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import CandidateCompare from "@/components/CandidateCompare";
+import { createPageWorkspace, type PageWorkspace, type BuildingSelection, type VacancyFilter } from "@/lib/workspaceState";
 import DistrictPicker, { CaveatNote } from "@/components/DistrictPicker";
 import { useMapHost } from "@/components/MapHost";
 import { getBuildingVacancy, getDensityHeatmap, getFootfallHeatmap, getRentHeatmap, listDistricts, recommendIndustry,
@@ -28,7 +30,8 @@ const BuildingViewer = lazy(() => import("@/components/BuildingViewer"));
 
 // 가로수길 코어 (강남구 신사동) — poc-building-vacancy.md §0.5. 거점 목록이 오기 전 초기 중심.
 const GAROSU = { lat: 37.5205, lng: 127.023 };
-const DEFAULT_DISTRICT = "garosugil";
+const EMPTY_BUILDINGS: Building[] = [];
+const EMPTY_IDS: string[] = [];
 
 type Layer = "footfall" | "vacancy" | "rent" | "density";
 type VacStatus = "full" | "partial" | "high" | "empty";
@@ -131,7 +134,23 @@ function rentColor(v: number, min: number, max: number) {
   return RENT_COLORS[idx];
 }
 
-export default function MapShell() {
+interface MapShellProps {
+  workspace?: PageWorkspace;
+  onWorkspaceChange?: Dispatch<SetStateAction<PageWorkspace>>;
+  onReview?: (selection: BuildingSelection) => void;
+}
+
+export default function MapShell({ workspace: externalWorkspace, onWorkspaceChange, onReview }: MapShellProps = {}) {
+  const [localWorkspace, setLocalWorkspace] = useState(createPageWorkspace);
+  const workspace = externalWorkspace ?? localWorkspace;
+  const setWorkspace = onWorkspaceChange ?? setLocalWorkspace;
+  const { districtId, query: q } = workspace;
+  const setQ = (query: string) => setWorkspace((w) => ({ ...w, query }));
+  const setDistrictId = (id: string) => {
+    setWorkspace((w) => ({ ...w, districtId: id, query: "", status: "all", selectedId: null }));
+    setCompareOpen(false);
+    setTwinOpen(false);
+  };
   // 지도는 MapHost 소유다 — 여기서는 빌려 쓰기만 한다.
   const { map, ready } = useMapHost();
   const overlaysRef = useRef<any[]>([]);
@@ -142,14 +161,18 @@ export default function MapShell() {
   // 짝의 본보기는 아래 zoom_changed 리스너다.
   const listenersRef = useRef<any[]>([]);
   const [layer, setLayer] = useState<Layer>("vacancy");
-  const [buildings, setBuildings] = useState<Building[]>(LOCAL_BUILDINGS);
+  const [inventory, setInventory] = useState<{ districtId: string; buildings: Building[]; source: "api" | "local" } | null>(null);
+  // 불러오는 중 이전 거점의 건물·출처를 새 거점 이름으로 보여주지 않는다.
+  const currentInventory = inventory?.districtId === districtId ? inventory : null;
+  const buildings = currentInventory?.buildings ?? EMPTY_BUILDINGS;
+  const src = currentInventory?.source ?? "local";
   const [rentHm, setRentHm] = useState<RentHeatmap | null>(null);
   const [footHm, setFootHm] = useState<FootfallHeatmap | null>(null);
   const [densHm, setDensHm] = useState<DensityHeatmap | null>(null);
-  const [src, setSrc] = useState<"api" | "local">("local");
-  const [selected, setSelected] = useState<Building | null>(null);
+  const selected = buildings.find((b) => b.id === workspace.selectedId) ?? null;
   const [rec, setRec] = useState<IndustryRecommend | null>(null);
-  const [q, setQ] = useState("");
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [savedOnly, setSavedOnly] = useState(false);
   const [hour, setHour] = useState(18);
   const [twinOpen, setTwinOpen] = useState(false);
   // 줌 자체가 아니라 **모드**를 담는다. 줌 값을 state 에 두면 휠을 굴릴 때마다
@@ -158,7 +181,11 @@ export default function MapShell() {
   // 건물 폴리곤이 있는 거점만 고른다 — vacancy_source === "gold" 가 곧 "Gold 마스터 보유"다.
   // 합성 거점을 열면 /heatmap/buildings 가 404 라 빈 지도가 된다.
   const [hubs, setHubs] = useState<DistrictSummary[]>([]);
-  const [districtId, setDistrictId] = useState(DEFAULT_DISTRICT);
+  const savedIds = workspace.savedIds[districtId] ?? EMPTY_IDS;
+  const saved = src === "api" ? buildings.filter((b) => savedIds.includes(b.id)) : [];
+  const filtered = useMemo(() => buildings.filter((b) => (!q.trim() || b.name.toLocaleLowerCase().includes(q.trim().toLocaleLowerCase()))
+    && (workspace.status === "all" || b.status === workspace.status)
+    && (!savedOnly || savedIds.includes(b.id))), [buildings, q, workspace.status, savedOnly, savedIds]);
 
   const hub = useMemo(() => hubs.find((h) => h.id === districtId), [hubs, districtId]);
   const center = hub ? { lat: hub.center[0], lng: hub.center[1] } : GAROSU;
@@ -172,19 +199,19 @@ export default function MapShell() {
         const gold = all.filter((d) => d.vacancy_source === "gold");
         setHubs(gold);
         // 기본 거점이 아직 Gold 가 아니면 첫 실측 거점으로 떨어진다
-        if (gold.length && !gold.some((d) => d.id === DEFAULT_DISTRICT)) setDistrictId(gold[0].id);
+        if (gold.length) setWorkspace((w) => gold.some((d) => d.id === w.districtId)
+          ? w : { ...w, districtId: gold[0].id, query: "", status: "all", selectedId: null });
       })
       .catch(() => { /* 목록 실패 시 기본 거점 단독으로 계속 */ });
     return () => { alive = false; };
-  }, []);
+  }, [setWorkspace]);
 
   // 건물 공실 데이터: 백엔드 /heatmap/buildings → 실패 시 로컬 샘플
   useEffect(() => {
     let alive = true;
-    setSelected(null);
     getBuildingVacancy(districtId)
-      .then((fc) => { if (alive) { setBuildings(fromGeoJSON(fc)); setSrc("api"); } })
-      .catch(() => { if (alive) { setBuildings(LOCAL_BUILDINGS); setSrc("local"); } });
+      .then((fc) => { if (alive) setInventory({ districtId, buildings: fromGeoJSON(fc), source: "api" }); })
+      .catch(() => { if (alive) setInventory({ districtId, buildings: LOCAL_BUILDINGS, source: "local" }); });
     return () => { alive = false; };
   }, [districtId]);
 
@@ -272,9 +299,9 @@ export default function MapShell() {
   useEffect(() => clearOverlays, []);
 
   const focus = (b: Building) => {
-    setSelected(b);
+    setWorkspace((w) => ({ ...w, selectedId: b.id }));
     const naver = (window as any).naver;
-    map?.panTo(new naver.maps.LatLng(b.center.lat, b.center.lng));
+    if (map && naver) map.panTo(new naver.maps.LatLng(b.center.lat, b.center.lng));
   };
 
   // 레이어 전환/데이터 변경 → 오버레이 다시 그림 (form follows data)
@@ -289,7 +316,7 @@ export default function MapShell() {
       // 칠하면 그 답이 색에 묻힌다. 점 클릭은 폴리곤과 같은 상세를 연다.
       const size = 13;
       const anchor = vacancyDotAnchor(size);
-      buildings.forEach((b) => {
+      filtered.forEach((b) => {
         if (b.status !== "empty") return;
         const dot = new naver.maps.Marker({
           map, position: new naver.maps.LatLng(b.center.lat, b.center.lng), zIndex: 60,
@@ -304,7 +331,7 @@ export default function MapShell() {
     } else if (layer === "vacancy") {
       // 가까이서 볼 때: 건물 footprint 폴리곤을 상태색으로 채움 + 클릭 상세.
       // 여기서는 4상태를 다 그린다 — 건물 형상이 보이는 축척이라 색이 서로를 덮지 않는다.
-      buildings.forEach((b) => {
+      filtered.forEach((b) => {
         const poly = new naver.maps.Polygon({
           map,
           paths: b.ring.map(([lng, lat]) => new naver.maps.LatLng(lat, lng)),
@@ -372,9 +399,18 @@ export default function MapShell() {
         overlaysRef.current.push(poly);
       });
     }
-  }, [layer, pinMode, ready, map, buildings, rentHm, footHm, densHm, center.lat, center.lng]);
+  }, [layer, pinMode, ready, map, filtered, rentHm, footHm, densHm, center.lat, center.lng]);
 
-  const filtered = useMemo(() => buildings.filter((b) => !q || b.name.includes(q)), [buildings, q]);
+  const toggleSaved = (id: string) => setWorkspace((w) => {
+    const ids = w.savedIds[districtId] ?? [];
+    const next = ids.includes(id) ? ids.filter((x) => x !== id) : ids.length < 3 ? [...ids, id] : ids;
+    return { ...w, savedIds: { ...w.savedIds, [districtId]: next } };
+  });
+  const review = (b: Building) => {
+    if (src !== "api") return;
+    setCompareOpen(false);
+    onReview?.({ districtId, buildingId: b.id, buildingName: b.name });
+  };
 
   return (
     <div className="mapshell">
@@ -385,27 +421,28 @@ export default function MapShell() {
         {hubs.length > 0 && (
           <>
             <DistrictPicker className="hub-select" districts={hubs}
+              ariaLabel="상권 선택"
               value={districtId} onChange={setDistrictId} />
             <CaveatNote district={hubs.find((h) => h.id === districtId)} />
           </>
         )}
-        <input className="search" placeholder={`건물 검색 (${hub?.name ?? "가로수길"})`} value={q} onChange={(e) => setQ(e.target.value)} />
-        <div className="seg" role="tablist">
+        <input className="search" aria-label="건물 검색" placeholder={`건물 검색 (${hub?.name ?? "가로수길"})`} value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="seg" role="group" aria-label="지도 데이터 레이어">
           {LAYERS.map((l) => (
-            <button key={l.key} className={layer === l.key ? "active" : ""} onClick={() => setLayer(l.key)}>{l.label}</button>
+            <button key={l.key} aria-pressed={layer === l.key} className={layer === l.key ? "active" : ""} onClick={() => setLayer(l.key)}>{l.label}</button>
           ))}
         </div>
       </div>
 
       {/* 좌측 리스트 패널 (모바일: 하단 시트) */}
-      <div className="overlay side-panel">
+      <div className={"overlay side-panel" + (selected ? " has-selection" : "")}>
         <div className="sp-head">
           {/* PPPP: Product ▶ Page — 이 platform 안에 어떤 page 가 놓일 자리인지를 본다.
               가격대 판단은 Posting(Price ▶ Posting) 의 몫이라 여기서 답하지 않는다. */}
           <div className="sp-track">PRODUCT ▶ PAGE</div>
           <div className="sp-title">{hub?.name ?? "가로수길"} · 건물 공실</div>
           <div className="sp-sub">
-            {hub ? `${hub.gu} · ` : ""}{filtered.length.toLocaleString()}동 · {src === "api" ? "실측" : "샘플"}(추정)
+            {hub ? `${hub.gu} · ` : ""}{currentInventory ? <>{filtered.length.toLocaleString()}동 · {src === "api" ? "실측" : "샘플"}(추정)</> : "건물 불러오는 중…"}
             {/* 거점 대표값이 없으면 그 사실을 적는다 — 조용히 빠지면 있는 값을 못 본
                 것처럼 읽힌다. 아래 건물 목록은 그대로다(내린 것은 대표값뿐이다). */}
             {hub && (hub.vacancy_rate !== null && Number.isFinite(hub.vacancy_rate)
@@ -418,25 +455,47 @@ export default function MapShell() {
             </div>
           )}
         </div>
-        <div className="sp-list">
+        <div className="building-filters">
+          <label>공실 상태<select aria-label="공실 상태 필터" value={workspace.status}
+            onChange={(e) => setWorkspace((w) => ({ ...w, status: e.target.value as VacancyFilter }))}>
+            <option value="all">전체 상태</option>
+            {(Object.keys(STATUS) as VacStatus[]).map((key) => <option key={key} value={key}>{STATUS[key].label}</option>)}
+          </select></label>
+          <button type="button" aria-pressed={savedOnly} onClick={() => setSavedOnly((value) => !value)}>저장한 후보 {saved.length}</button>
+          {(q || workspace.status !== "all" || savedOnly) && <button type="button" onClick={() => {
+            setWorkspace((w) => ({ ...w, query: "", status: "all" })); setSavedOnly(false);
+          }}>조건 초기화</button>}
+        </div>
+        <div className="sp-list" aria-label="건물 목록" aria-busy={!currentInventory}>
+          {currentInventory && filtered.length === 0 && <div className="building-empty">
+            <strong>{buildings.length === 0 ? "제공된 건물이 없습니다" : "조건에 맞는 건물이 없습니다"}</strong>
+            <p>{buildings.length === 0 ? "다른 상권을 선택해 주세요." : "검색어·공실 상태를 바꾸거나 저장한 후보 조건을 해제해 주세요."}</p>
+          </div>}
           {filtered.map((b) => (
+            <div key={b.id} className="building-card">
             <button
-              key={b.id}
               className={"b-item" + (selected?.id === b.id ? " active" : "")}
+              aria-pressed={selected?.id === b.id}
               onClick={() => { if (layer !== "vacancy") setLayer("vacancy"); focus(b); }}
             >
               <span className="b-dot" style={{ background: STATUS[b.status].color }} />
               <span>
                 <div className="b-name">{b.name}</div>
                 <div className="b-meta">{b.industry} · {STATUS[b.status].label}</div>
+                <div className="b-meta">수용 {b.capacity}호 · 영업 {b.active}호{b.floors ? ` · 지상 ${b.floors}층` : " · 층수 미상"}</div>
               </span>
               <span className="b-vac" style={{ color: STATUS[b.status].color }}>{vacRate(b)}%</span>
             </button>
+            <button className="save-candidate" type="button" aria-label={`${b.name} 후보 ${savedIds.includes(b.id) ? "해제" : "저장"}`}
+              aria-pressed={savedIds.includes(b.id)} disabled={src !== "api" || (!savedIds.includes(b.id) && savedIds.length >= 3)}
+              onClick={() => toggleSaved(b.id)}>{savedIds.includes(b.id) ? "✓ 저장됨" : "+ 후보 저장"}</button>
+            </div>
           ))}
         </div>
 
         {selected && (
           <div className="b-detail">
+            <button className="building-back" type="button" onClick={() => setWorkspace((w) => ({ ...w, selectedId: null }))}>← 건물 목록</button>
             <div className="b-name">{selected.name}</div>
             <div className="row"><span>공실률(추정)</span><span style={{ color: STATUS[selected.status].color }}>{vacRate(selected)}%</span></div>
             <div className="row"><span>상태</span><span>{STATUS[selected.status].label}</span></div>
@@ -468,9 +527,25 @@ export default function MapShell() {
             )}
 
             <button className="b-twin" onClick={() => setTwinOpen(true)}>층별 공실 · 거리뷰 보기</button>
+            <button className="save-candidate detail-save" type="button" aria-pressed={savedIds.includes(selected.id)}
+              disabled={src !== "api" || (!savedIds.includes(selected.id) && savedIds.length >= 3)}
+              onClick={() => toggleSaved(selected.id)}>{savedIds.includes(selected.id) ? "✓ 후보 저장됨" : "+ 이 건물 후보 저장"}</button>
+            {onReview && <button className="building-review" disabled={src !== "api"} onClick={() => review(selected)}>이 건물로 입점 검토 →</button>}
+            {src !== "api" && <p className="building-hint">샘플 자료는 후보 저장과 입점 계산에 사용할 수 없습니다.</p>}
           </div>
         )}
+        <div className="candidate-tray">
+          <div><strong>저장한 후보 {saved.length}/3</strong><span>현재 상권 · 이번 작업 동안 유지</span></div>
+          <button type="button" disabled={saved.length === 0} onClick={() => setCompareOpen(true)}>후보 비교</button>
+        </div>
       </div>
+
+      {compareOpen && <CandidateCompare districtName={hub?.name ?? districtId}
+        candidates={saved.map((b) => ({ ...b, statusLabel: STATUS[b.status].label, vacancyRate: b.capacity > 0 ? vacRate(b) : null }))}
+        notes={Object.fromEntries(saved.map((b) => [b.id, workspace.notes[`${districtId}:${b.id}`] ?? ""]))}
+        onNote={(id, value) => setWorkspace((w) => ({ ...w, notes: { ...w.notes, [`${districtId}:${id}`]: value } }))}
+        onRemove={toggleSaved} onClose={() => setCompareOpen(false)}
+        onReview={onReview ? (id) => { const b = saved.find((item) => item.id === id); if (b) review(b); } : undefined} />}
 
       {/* 유동인구 레이어 전용 시간 슬라이더 = 흐름 축 */}
       {layer === "footfall" && (

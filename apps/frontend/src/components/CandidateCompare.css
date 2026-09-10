@@ -1,0 +1,23 @@
+.candidate-dialog { width: min(1000px, calc(100vw - var(--sp-6))); max-height: 85dvh; box-sizing: border-box; padding: var(--sp-5); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sheet); font: inherit; }
+.candidate-dialog::backdrop { background: color-mix(in srgb, var(--ink) 45%, transparent); }
+.candidate-dialog header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--sp-4); }
+.candidate-dialog h2 { margin: var(--sp-1) 0 0; font-size: var(--fs-title); line-height: var(--lh-title); }
+.candidate-eyebrow { color: var(--track-page); font-size: var(--fs-caption); font-weight: var(--fw-bold); }
+.candidate-dialog button { padding: var(--sp-2) var(--sp-3); min-height: 44px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+.candidate-dialog button:hover { background: var(--track-page-soft); }
+.candidate-dialog button:focus-visible, .candidate-dialog textarea:focus-visible { outline: 2px solid var(--track-page); outline-offset: 2px; }
+.candidate-source, .candidate-footnote { color: var(--muted); font-size: var(--fs-caption); line-height: var(--lh-caption); }
+.candidate-table-wrap { overflow-x: auto; margin-block: var(--sp-4); }
+.candidate-dialog table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: var(--fs-body); }
+.candidate-dialog th, .candidate-dialog td { border-bottom: 1px solid var(--line); padding: var(--sp-3); text-align: left; vertical-align: top; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.candidate-dialog thead th { background: var(--track-page-soft); color: var(--track-page); }
+.candidate-dialog th:first-child { width: 130px; }
+.candidate-dialog td { min-width: 190px; }
+.candidate-dialog small { font-size: var(--fs-caption); color: var(--muted); font-weight: var(--fw-regular); }
+.candidate-dialog textarea { box-sizing: border-box; width: 100%; min-height: 100px; resize: vertical; border: 1px solid var(--line); border-radius: var(--radius-md); padding: var(--sp-2); font: inherit; background: var(--bg); color: var(--ink); }
+.candidate-dialog td button { display: block; width: 100%; margin-bottom: var(--sp-2); font-size: var(--fs-caption); }
+.candidate-dialog .candidate-primary { background: var(--track-posting); color: var(--surface); border-color: var(--track-posting); }
+.candidate-dialog .candidate-primary:hover { background: var(--track-posting-pressed); }
+.candidate-empty { padding: var(--sp-6); text-align: center; }
+.candidate-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 768px) { .candidate-dialog { padding: var(--sp-4); width: calc(100vw - var(--sp-4)); max-height: 90dvh; } .candidate-dialog table { min-width: 650px; } .candidate-dialog h2 { font-size: var(--fs-heading); } }

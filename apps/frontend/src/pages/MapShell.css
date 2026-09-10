@@ -162,7 +162,7 @@
   .mapshell .time-bar { bottom: calc(44vh + 12px); }
 }
 
-/* ── 3D 디지털 트윈 모달 ── */
+/* ── 층 스택·거리뷰 상세 ── */
 .mapshell .twin-modal {
   position: absolute; inset: 0; z-index: 20;
   display: flex; align-items: center; justify-content: center;
@@ -191,4 +191,52 @@
 .mapshell .twin-foot {
   padding: 10px var(--sp-4); border-top: 1px solid var(--line);
   font-size: 12px; color: var(--muted);
+}
+
+/* 벤치마킹 적용: 조건 → 후보 → 비교 → 입점 검토. 기존 지도와 데이터 눈금은 유지한다. */
+.mapshell .side-panel { width: 360px; }
+.mapshell .side-panel .sp-head, .mapshell .building-filters, .mapshell .candidate-tray { flex-shrink: 0; }
+.mapshell .side-panel .sp-track { color: var(--track-page); font-size: var(--fs-caption); }
+.mapshell .side-panel .sp-title { font-size: var(--fs-heading); }
+.mapshell .side-panel .sp-list { min-height: 100px; }
+.mapshell .building-filters { padding: var(--sp-3); display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); border-bottom: 1px solid var(--line); background: var(--bg); font-size: var(--fs-caption); }
+.mapshell .building-filters label { display: flex; align-items: center; gap: var(--sp-2); }
+.mapshell .building-filters select, .mapshell .building-filters button { border: 1px solid var(--line); padding: var(--sp-2); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); font: inherit; min-height: 36px; }
+.mapshell .building-filters button[aria-pressed="true"] { border-color: var(--track-page); color: var(--track-page); background: var(--track-page-soft); }
+.mapshell .building-card { border-bottom: 1px solid var(--line); padding-bottom: var(--sp-2); }
+.mapshell .building-card .b-item { border-bottom: 0; }
+.mapshell .b-item.active { background: var(--track-page-soft); box-shadow: inset 3px 0 var(--track-page); }
+.mapshell .b-item .b-name { font-size: var(--fs-body); }
+.mapshell .b-item .b-meta { font-size: var(--fs-caption); line-height: var(--lh-caption); margin-top: var(--sp-1); }
+.mapshell .b-vac { font-variant-numeric: tabular-nums; }
+.mapshell .save-candidate { margin-left: var(--sp-4); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); color: var(--track-page); padding: var(--sp-1) var(--sp-3); font: inherit; font-size: var(--fs-caption); min-height: 36px; cursor: pointer; }
+.mapshell .save-candidate[aria-pressed="true"] { background: var(--track-page-soft); border-color: var(--track-page); }
+.mapshell button:disabled { opacity: .5; cursor: not-allowed; }
+.mapshell button:focus-visible, .mapshell select:focus-visible, .mapshell input:focus-visible { outline: 2px solid var(--track-page); outline-offset: 2px; }
+.mapshell .building-empty { padding: var(--sp-5); font-size: var(--fs-body); line-height: var(--lh-body); }
+.mapshell .building-empty p, .mapshell .building-hint { color: var(--muted); font-size: var(--fs-caption); }
+.mapshell .b-detail { overflow-y: auto; max-height: 38dvh; flex: 0 1 auto; min-height: 0; background: var(--bg); }
+.mapshell .building-back { border: 0; background: transparent; color: var(--track-page); padding: 0 0 var(--sp-2); font: inherit; font-size: var(--fs-caption); cursor: pointer; }
+.mapshell .detail-save { margin: var(--sp-2) 0 0; width: 100%; }
+.mapshell .building-review { width: 100%; padding: var(--sp-3); min-height: 44px; border: 0; border-radius: var(--radius-md); margin-top: var(--sp-2); background: var(--track-posting); color: var(--surface); font: inherit; font-weight: var(--fw-semibold); cursor: pointer; }
+.mapshell .building-review:hover { background: var(--track-posting-pressed); }
+.mapshell .candidate-tray { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); padding: var(--sp-3); border-top: 1px solid var(--line); background: var(--surface); font-size: var(--fs-caption); }
+.mapshell .candidate-tray strong, .mapshell .candidate-tray span { display: block; }
+.mapshell .candidate-tray span { margin-top: var(--sp-1); color: var(--muted); }
+.mapshell .candidate-tray button { padding: var(--sp-2) var(--sp-3); min-height: 44px; border-radius: var(--radius-md); border: 0; background: var(--track-page); color: var(--surface); font: inherit; font-weight: var(--fw-semibold); cursor: pointer; }
+@media (max-width: 1050px) and (min-width: 769px) { .mapshell .overlay-top .search { flex-basis: 180px; } .mapshell .seg button { padding-inline: var(--sp-2); } .mapshell .side-panel { top: 112px; } }
+@media (max-width: 768px) {
+  .mapshell .side-panel { width: auto; height: 52dvh; }
+  .mapshell .side-panel .sp-head { padding: var(--sp-3); }
+  .mapshell .side-panel .sp-title { font-size: var(--fs-body); }
+  .mapshell .has-selection .building-filters, .mapshell .has-selection .sp-list { display: none; }
+  .mapshell .has-selection .b-detail { max-height: none; flex: 1; }
+  .mapshell .overlay-top { gap: var(--sp-2); }
+  .mapshell .overlay-top .hub-select { max-width: 45%; flex: 1; }
+  .mapshell .overlay-top .search { min-width: 0; width: 0; flex: 1; }
+  .mapshell .seg { flex: 1 0 100%; }
+  .mapshell .seg button { padding: 0 var(--sp-2); flex: 1; font-size: var(--fs-caption); }
+  .mapshell .legend { bottom: calc(52dvh + var(--sp-3)); left: var(--sp-3); right: var(--sp-3); flex-wrap: wrap; gap: var(--sp-2); font-size: var(--fs-caption); }
+  .mapshell .time-bar { bottom: calc(52dvh + 76px); }
+  .mapshell .time-bar input { width: 120px; }
 }

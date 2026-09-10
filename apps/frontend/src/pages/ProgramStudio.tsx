@@ -30,7 +30,7 @@ import "./ProgramStudio.css";
  *   · HA 검증 상세(폐기 사유·경고 목록·LLM 자체점검)는 `Humanistic Authority 검증` 으로
  *     접힌다. 다만 **폐기·경고가 있다는 사실 자체는 결론 줄에 남는다** — 접힌 자리가
  *     "문제 없음"으로 읽히면 안 된다.
- *   · 채널 카드(생성물 본문)는 접지 않는다. 그게 이 화면의 답이다.
+ *   · 채널 목록에서 초안을 고르면 본문을 편집하고 미리 본다. 생성 원본의 근거·HA는 보존한다.
  *   · 상용 온보딩 동의문은 접지 않는다. 읽지 않고 체크하게 만들면 동의가 아니다.
  *
  * ## 입력 원칙 — 화면에도 그대로 드러낸다(docs/feature-program.md §0)
@@ -107,6 +107,7 @@ export default function ProgramStudio() {
   const [districts, setDistricts] = useState<DistrictSummary[] | null>(null);
   const [districtErr, setDistrictErr] = useState(false);
   const [result, setResult] = useState<StoreMarketing | null>(null);
+  const [resultVersion, setResultVersion] = useState(0);
   const [busy, setBusy] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -117,6 +118,10 @@ export default function ProgramStudio() {
   const [externalConsent, setExternalConsent] = useState(false);
   const [retentionAcknowledged, setRetentionAcknowledged] = useState(false);
   const [onboardingReceipt, setOnboardingReceipt] = useState<string | null>(null);
+  // 비우기·모드 전환 뒤 늦게 도착한 이전 요청이 원문과 초안을 되살리지 않게 한다.
+  const generationVersion = useRef(0);
+  const lookupVersion = useRef(0);
+  useEffect(() => () => { generationVersion.current += 1; lookupVersion.current += 1; }, []);
 
   // 반자동 채우기 — 후보 검색(카카오) → 선택 → 블로그 스니펫 주입(네이버)
   const [places, setPlaces] = useState<StorePlace[] | null>(null);
@@ -135,7 +140,6 @@ export default function ProgramStudio() {
   const timer = useRef<number | null>(null);
   useEffect(() => {
     if (!busy) { if (timer.current) window.clearInterval(timer.current); return; }
-    setElapsed(0);
     timer.current = window.setInterval(() => setElapsed((s) => s + 1), 1000);
     return () => { if (timer.current) window.clearInterval(timer.current); };
   }, [busy]);
@@ -159,9 +163,27 @@ export default function ProgramStudio() {
 
   const hub = (districts ?? []).find((d) => d.id === form.districtId);
 
-  const set = <K extends keyof FormState>(k: K) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      setForm((f) => ({ ...f, [k]: e.target.value }));
+  function changeField<K extends keyof FormState>(k: K, value: FormState[K]) {
+    // 생성 원본의 입력이 바뀌면 이전 응답·초안·근거를 새 프로필에 붙이지 않는다.
+    discardResult();
+    discardLookup(["name", "category", "address", "districtId"].includes(k));
+    setForm((f) => ({ ...f, [k]: value }));
+  }
+
+  function discardResult() {
+    generationVersion.current += 1;
+    setResult(null);
+    setBusy(false);
+    setError(null);
+    setOnboardingReceipt(null);
+  }
+
+  function discardLookup(clearReviews = false) {
+    lookupVersion.current += 1;
+    setLookupBusy(false); setPlaces(null); setLookupNote(null);
+    // 다른 가게·상권으로 바뀐 뒤 이전 가게의 공개 스니펫을 재사용하지 않는다.
+    if (clearReviews) setPublicReviews([]);
+  }
 
   function toggleCommercialMode() {
     // 공개 검색 스니펫·합성 예시가 점주 제공 데이터로 둔갑하지 않도록 모드를 바꿀 때
@@ -172,9 +194,8 @@ export default function ProgramStudio() {
     setPublicReviews([]);
     setPlaces(null);
     setLookupNote(null);
-    setResult(null);
-    setError(null);
-    setOnboardingReceipt(null);
+    discardResult();
+    discardLookup(true);
     setRightsConfirmed(false);
     setProcessingConsent(false);
     setExternalConsent(false);
@@ -185,26 +206,31 @@ export default function ProgramStudio() {
   async function searchPlaces() {
     const q = form.name.trim();
     if (!q || lookupBusy) return;
+    const version = ++lookupVersion.current;
     setLookupBusy(true);
     setPlaces(null);
     setLookupNote(null);
     try {
       const r = await lookupStorePlaces(q, form.districtId || undefined);
+      if (version !== lookupVersion.current) return;
       setPlaces(r.places);
       setLookupNote(r.source === "unavailable"
         ? `가게 검색을 쓸 수 없다 — ${r.note ?? "카카오 로컬 키 확인 필요"}`
         : r.note);
     } catch (err) {
+      if (version !== lookupVersion.current) return;
       setPlaces([]);
       setLookupNote(`가게 검색 실패: ${String(err)}`);
     } finally {
-      setLookupBusy(false);
+      if (version === lookupVersion.current) setLookupBusy(false);
     }
   }
 
-  /** 후보 선택 → 기본정보를 채우고, 그 주소로 좁힌 블로그 스니펫을 리뷰란에 넣는다.
-   *  기존 리뷰 입력이 있으면 **덮어쓰지 않고 뒤에 잇는다** — 점주가 준 원문이 날아가면 안 된다. */
+  /** 후보 선택 → 기본정보를 채우고, 그 주소로 좁힌 블로그 스니펫을 별도 상태에 넣는다.
+   *  직접 입력한 원문은 보존하고 공개 검색분만 선택한 가게의 것으로 바꾼다. */
   async function applyPlace(p: StorePlace) {
+    discardResult(); discardLookup(true);
+    const version = ++lookupVersion.current;
     setForm((f) => ({
       ...f,
       name: p.name,
@@ -216,19 +242,29 @@ export default function ProgramStudio() {
     setLookupNote(null);
     try {
       const r = await lookupStoreReviews(p.name, p.address ?? p.road_address);
-      if (r.reviews.length) setPublicReviews((old) => [...old, ...r.reviews]);
+      if (version !== lookupVersion.current) return;
+      if (r.reviews.length) {
+        // 조회를 기다리는 동안 생성한 결과도 새로 합류한 입력을 읽은 결과는 아니다.
+        discardResult();
+        setPublicReviews(r.reviews);
+      }
       setLookupNote(`'${r.query}' 검색 → ${r.reviews.length}건 주입. ${r.note ?? ""}`.trim());
     } catch (err) {
+      if (version !== lookupVersion.current) return;
       setLookupNote(`리뷰 스니펫 조회 실패: ${String(err)}`);
     } finally {
-      setLookupBusy(false);
+      if (version === lookupVersion.current) setLookupBusy(false);
     }
   }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
+    const version = ++generationVersion.current;
+    setResultVersion((current) => current + 1);
+    setElapsed(0);
     setBusy(true);
+    setResult(null);
     setError(null);
     setOnboardingReceipt(null);
     try {
@@ -256,15 +292,18 @@ export default function ProgramStudio() {
           allow_external_model_processing: true,
           raw_input_retention: "request-only",
         }, apiKey.trim());
-        setResult(onboarded.marketing);
-        setOnboardingReceipt(onboarded.onboarding_id);
+        if (version === generationVersion.current) {
+          setResult(onboarded.marketing);
+          setOnboardingReceipt(onboarded.onboarding_id);
+        }
       } else {
-        setResult(await generateStoreMarketing(profile));
+        const generated = await generateStoreMarketing(profile);
+        if (version === generationVersion.current) setResult(generated);
       }
     } catch (err) {
-      setError(String(err));
+      if (version === generationVersion.current) setError(String(err));
     } finally {
-      setBusy(false);
+      if (version === generationVersion.current) setBusy(false);
     }
   }
 
@@ -292,15 +331,16 @@ export default function ProgramStudio() {
             {commercialMode ? "상용 입력 온보딩" : "가게 프로필"}
             <div className="ptools">
               {!commercialMode && (
-                <Button variant="ghost" type="button" className="ghost" onClick={() => setForm(SAMPLE)}>예시 채우기</Button>
+                <Button variant="ghost" type="button" className="ghost" onClick={() => {
+                  setForm(SAMPLE); discardResult(); discardLookup(true);
+                }}>예시 채우기</Button>
               )}
               <Button variant="ghost" type="button" className={`ghost ${commercialMode ? "active" : ""}`}
                 onClick={toggleCommercialMode}>
                 {commercialMode ? "공개 데모로" : "상용 온보딩"}
               </Button>
               <Button variant="ghost" type="button" className="ghost" onClick={() => {
-                setForm(EMPTY); setPublicReviews([]); setResult(null); setError(null);
-                setOnboardingReceipt(null);
+                setForm(EMPTY); setPublicReviews([]); discardResult(); discardLookup(true);
                 setApiKey(""); setRightsConfirmed(false); setProcessingConsent(false);
                 setExternalConsent(false); setRetentionAcknowledged(false);
               }}>비우기</Button>
@@ -338,9 +378,9 @@ export default function ProgramStudio() {
                 ? "점주 또는 권한을 받은 조직이 확인한 상호를 직접 입력한다."
                 : "상호를 넣고 검색하면 카카오 로컬에서 후보를 찾아 기본정보·블로그 스니펫을 채운다."}>
               {commercialMode ? (
-                <input value={form.name} onChange={set("name")} placeholder="점주 확인 상호" />
+                <input value={form.name} onChange={(e) => changeField("name", e.target.value)} placeholder="점주 확인 상호" />
               ) : <div className="inputbtn">
-                <input value={form.name} onChange={set("name")} placeholder="예: 맡기다"
+                <input value={form.name} onChange={(e) => changeField("name", e.target.value)} placeholder="예: 맡기다"
                   onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); searchPlaces(); } }} />
                 <Button variant="ghost" type="button" className="ghost" onClick={searchPlaces}
                   disabled={!form.name.trim() || lookupBusy}>
@@ -349,7 +389,7 @@ export default function ProgramStudio() {
               </div>}
             </Field>
             <Field label="카테고리" required>
-              <input value={form.category} onChange={set("category")} list="cat-hints" placeholder="예: 카페" />
+              <input value={form.category} onChange={(e) => changeField("category", e.target.value)} list="cat-hints" placeholder="예: 카페" />
               <datalist id="cat-hints">
                 {CATEGORY_HINTS.map((c) => <option key={c} value={c} />)}
               </datalist>
@@ -383,7 +423,7 @@ export default function ProgramStudio() {
               ? "거점 목록을 불러오지 못했다 — 백엔드 확인 필요. 지금은 컨텍스트 결합 없이만 생성된다."
               : "선택 시 해당 거점의 Gold 컨텍스트가 프롬프트에 결합된다. Gold 미적재 거점이면 컨텍스트 없이 생성된다."}
             count={districts?.length ? `${districts.length}곳` : undefined}>
-            <select value={form.districtId} onChange={set("districtId")} disabled={districts === null}>
+            <select value={form.districtId} onChange={(e) => changeField("districtId", e.target.value)} disabled={districts === null}>
               <option value="">{districts === null ? "거점 불러오는 중…" : "— 결합 안 함 —"}</option>
               {(districts ?? []).map((d) => (
                 // 이 select 는 "— 결합 안 함 —" 빈 옵션을 갖고 있어 DistrictPicker 로
@@ -408,7 +448,7 @@ export default function ProgramStudio() {
               ? "한 줄에 하나. 제공·처리 권한을 확인한 원문만 입력한다."
               : "한 줄에 하나. 자동 검색분은 위에 별도 표시되고, 이 칸에는 직접 입력한 원문만 둔다."}
             count={merchantReviews.length ? `${merchantReviews.length}건` : undefined}>
-            <textarea rows={8} value={form.reviewsText} onChange={set("reviewsText")}
+            <textarea rows={8} value={form.reviewsText} onChange={(e) => changeField("reviewsText", e.target.value)}
               placeholder={"원두를 매주 바꿔서 소개해주는 게 좋아요.\n2층 창가 자리가 조용해서 작업하기 좋았습니다.\n…"} />
           </Field>
 
@@ -418,13 +458,13 @@ export default function ProgramStudio() {
             summary={`주소 ${form.address ? "입력됨" : "없음"} · 사진 ${images.length}장`
               + ` · 메뉴 ${menu.length}개 · 키워드 ${keywords.length}개`}>
             <Field label="주소">
-              <input value={form.address} onChange={set("address")} placeholder="예: 서울 강남구 신사동 …" />
+              <input value={form.address} onChange={(e) => changeField("address", e.target.value)} placeholder="예: 서울 강남구 신사동 …" />
             </Field>
 
             <Field label="사진 URL"
               hint={`한 줄에 하나. 앞의 ${VISION_MAX}장만 vision 분석에 쓰인다. 공개 접근 가능한 URL 이어야 한다.`}
               count={images.length ? `${images.length}장` : undefined}>
-              <textarea rows={3} value={form.imagesText} onChange={set("imagesText")}
+              <textarea rows={3} value={form.imagesText} onChange={(e) => changeField("imagesText", e.target.value)}
                 placeholder={"https://…/store-1.jpg\nhttps://…/menu.jpg"} />
             </Field>
 
@@ -440,14 +480,14 @@ export default function ProgramStudio() {
             <Field label="메뉴"
               hint="한 줄에 하나 — 품목과 가격을 적힌 그대로. 지도 메뉴탭도 공식 API 가 없어 붙여넣기다. 없는 품목·가격은 생성기가 지어내지 않는다."
               count={menu.length ? `${menu.length}개` : undefined}>
-              <textarea rows={4} value={form.menuText} onChange={set("menuText")}
+              <textarea rows={4} value={form.menuText} onChange={(e) => changeField("menuText", e.target.value)}
                 placeholder={"오늘의 드립 6,000원\n말차 라떼 6,500원"} />
             </Field>
 
             <Field label="키워드(선택)"
               hint="쉼표로 구분. 넣으면 리뷰 빈도 추출 대신 이 값이 톤앤매너 키워드로 쓰인다."
               count={keywords.length ? `${keywords.length}개` : undefined}>
-              <input value={form.keywordsText} onChange={set("keywordsText")} placeholder="예: 산미, 조용함, 말차" />
+              <input value={form.keywordsText} onChange={(e) => changeField("keywordsText", e.target.value)} placeholder="예: 산미, 조용함, 말차" />
             </Field>
           </Fold>
 
@@ -506,7 +546,7 @@ export default function ProgramStudio() {
 
           {busy && <div className="empty">생성 중… {elapsed}초</div>}
 
-          {result && !busy && <Result r={result} />}
+          {result && !busy && <Result key={resultVersion} r={result} />}
           {onboardingReceipt && !busy && (
             <div className="receipt">
               상용 입력 동의 영수증 <code>{onboardingReceipt}</code> · 원문 DB 저장 없음
@@ -556,7 +596,7 @@ function headline({ result, busy, elapsed, error, commercialMode, hub, counts }:
       + ` (현재 ${route} 경로, 근거 ${reviewsIn + counts.images + counts.menu}건 입력).`;
   } else {
     const lead = `${result.store_name}(${result.category}) — 온라인 ${result.online.length}건 · `
-      + `오프라인 ${result.offline.length}건 program 을 돌린다`
+      + `오프라인 ${result.offline.length}건 홍보 초안을 준비했다`
       + `${result.online[0] ? `, 첫 수는 「${result.online[0].channel}」` : ""}.`;
     // 스텁이라는 사실은 상세를 접어도 결론에 남긴다 — 접힌 자리가 "문제 없음"으로 읽히면 안 된다
     verdict = stub
@@ -605,14 +645,14 @@ function headline({ result, busy, elapsed, error, commercialMode, hub, counts }:
     {
       label: "믿을 만한가",
       value: result
-        ? <>{stub ? "규칙 기반 폴백" : "LLM 생성"} · {haVerdict}
+        ? <>생성 원본: {stub ? "규칙 기반 폴백" : "LLM 생성"} · {haVerdict}
           {` · 톤 키워드 ${result.tone_keywords.length}개`}
           {result.tone_keywords.length ? ` (${result.tone_keywords.join(", ")})` : ""}</>
         : `경로 ${route} — ` + (commercialMode
           ? "API 키와 네 가지 확인을 모두 채워야 생성된다"
           : "공개 검색 스니펫과 예시 입력이 합류할 수 있다"),
       source: "서버 후처리 ha_guard — 금액·트렌드 방향·최상급·비방·채널 균형을 따로 검증한다"
-        + " (LLM 자체점검 문장과 섞지 않는다)",
+        + " (LLM 자체점검 문장과 섞지 않는다). 생성 후 편집한 초안은 이 검증에 포함되지 않는다.",
     },
   ];
 
@@ -653,17 +693,12 @@ function Result({ r }: { r: StoreMarketing }) {
         </span>
       </div>
 
-      {/* 채널 카드는 접지 않는다 — 그게 이 화면의 답이다 */}
-      <div className="rlabel">온라인 <em>{r.online.length}건</em></div>
-      <div className="plans">{r.online.map((p, i) => <Plan key={i} p={p} />)}</div>
-
-      <div className="rlabel">오프라인 <em>{r.offline.length}건</em></div>
-      <div className="plans">{r.offline.map((p, i) => <Plan key={i} p={p} />)}</div>
+      <DraftWorkspace online={r.online} offline={r.offline} />
 
       {/* 검증의 **결과**는 위 결론 줄이 이미 말했다. 여기 접힌 것은 그 사유와 원문이다. */}
-      <Fold title="Humanistic Authority 검증"
+      <Fold title="생성 원본의 Humanistic Authority 검증"
         badge={blocked.length ? `폐기 ${blocked.length}` : warnings.length ? `경고 ${warnings.length}` : "통과"}
-        summary={<>서버 후처리 ha_guard · 톤 키워드 {r.tone_keywords.length}개 · LLM 자체점검 문장</>}>
+        summary={<>편집 초안은 검증 대상 아님 · 톤 키워드 {r.tone_keywords.length}개 · LLM 자체점검 문장</>}>
 
         {/* 스텁이 나온 이유가 둘이다. 크레딧·키 문제와 "생성은 됐는데 검증에 걸렸다"를
             같은 문구로 보여주면 엉뚱한 데를 고치게 된다. */}
@@ -725,13 +760,114 @@ function Result({ r }: { r: StoreMarketing }) {
   );
 }
 
-function Plan({ p }: { p: ChannelPlan }) {
+/** 본문 편집은 현재 화면의 메모리에서만 한다. 서버 원본·근거·출처는 덮어쓰지 않는다. */
+function DraftWorkspace({ online, offline }: { online: ChannelPlan[]; offline: ChannelPlan[] }) {
+  const plans = [...online, ...offline];
+  const [contents, setContents] = useState(() => plans.map((p) => p.content));
+  const [selected, setSelected] = useState(0);
+  const [preview, setPreview] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copying" | "copied" | "failed">("idle");
+  const copyVersion = useRef(0);
+  const plan = plans[selected];
+  const content = contents[selected] ?? "";
+  const edited = plan ? content !== plan.content : false;
+  const editedCount = plans.filter((p, i) => contents[i] !== p.content).length;
+
+  function clearCopyStatus() {
+    copyVersion.current += 1;
+    setCopyStatus("idle");
+  }
+
+  function updateContent(next: string) {
+    setContents((current) => current.map((value, i) => i === selected ? next : value));
+    clearCopyStatus();
+  }
+
+  async function copyContent() {
+    const version = ++copyVersion.current;
+    setCopyStatus("copying");
+    try {
+      await navigator.clipboard.writeText(content);
+      if (version === copyVersion.current) setCopyStatus("copied");
+    } catch {
+      if (version === copyVersion.current) setCopyStatus("failed");
+    }
+  }
+
+  if (!plan) return <div className="empty">생성된 채널안이 없습니다. 입력 근거를 확인해 다시 생성하세요.</div>;
+
   return (
-    <div className={`plan is-${p.kind}`}>
-      <div className="pchannel">{p.channel}</div>
-      <div className="pcontent">{p.content}</div>
-      <div className="prationale"><b>근거</b> {p.rationale}</div>
-    </div>
+    <section className="draft-workspace" aria-label="채널별 홍보 초안">
+      <div className="draft-intro">
+        <h2>채널별 초안 다듬기</h2>
+        <p>채널 선택 → 본문 편집 → 미리보기 · 수정한 채널 {editedCount}개</p>
+        <p>초안은 이 화면에서만 유지됩니다. 다시 생성하거나 가게 프로필·입력 모드를 바꾸면 사라집니다.</p>
+      </div>
+      <div className="draft-layout">
+        <div className="draft-channels" role="group" aria-label="초안 채널 선택">
+          {([
+            { label: "온라인", items: online, offset: 0 },
+            { label: "오프라인", items: offline, offset: online.length },
+          ]).map((group) => (
+            <div key={group.label} className="draft-channel-group">
+              <h3>{group.label} <span>{group.items.length}건</span></h3>
+              {group.items.length === 0 && <p className="draft-none">생성된 채널 없음</p>}
+              {group.items.map((p, i) => {
+                const index = group.offset + i;
+                const changed = contents[index] !== p.content;
+                return (
+                  <button key={index} type="button" className="draft-channel"
+                    aria-pressed={selected === index} onClick={() => {
+                      setSelected(index); clearCopyStatus();
+                    }}>
+                    <span>{p.channel}</span>
+                    <span className={`draft-state${changed ? " is-edited" : ""}`}>{changed ? "편집됨" : "초안"}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div className="draft-detail">
+          <div className="draft-toolbar">
+            <h3>{plan.channel}</h3>
+            <div className="draft-view" role="group" aria-label="초안 보기 방식">
+              <button type="button" aria-pressed={!preview} onClick={() => setPreview(false)}>편집</button>
+              <button type="button" aria-pressed={preview} onClick={() => setPreview(true)}>미리보기</button>
+            </div>
+          </div>
+          <p className="draft-validation" id="draft-validation" role="status">
+            {edited
+              ? "편집됨 · 생성 후 사용자가 수정한 초안입니다. 수정한 본문은 서버 HA 검증을 거치지 않았습니다."
+              : "초안 · 생성 원본입니다. 출처와 HA 검증 결과는 아래에서 확인하세요."}
+          </p>
+          {preview ? (
+            <div className="draft-preview" role="region" aria-label={`${plan.channel} 본문 미리보기`}>
+              <div className="draft-preview-label">본문 미리보기 · 실제 채널 화면과 다를 수 있습니다</div>
+              <div className="draft-preview-content">{content || "본문이 비어 있습니다. 편집에서 내용을 입력하세요."}</div>
+            </div>
+          ) : (
+            <label className="draft-editor">
+              <span>초안 본문</span>
+              <textarea rows={10} value={content} onChange={(e) => updateContent(e.target.value)}
+                aria-describedby="draft-validation" />
+            </label>
+          )}
+          <div className="draft-actions">
+            <Button type="button" variant="ghost" disabled={!edited}
+              onClick={() => updateContent(plan.content)}>원본 되돌리기</Button>
+            <Button type="button" disabled={!content.trim() || copyStatus === "copying"}
+              onClick={copyContent}>{copyStatus === "copying" ? "복사 중…" : "본문 복사"}</Button>
+          </div>
+          {copyStatus === "copied" && <p className="draft-feedback" role="status">현재 초안 본문을 복사했습니다.</p>}
+          {copyStatus === "failed" && (
+            <p className="draft-feedback" role="alert">복사하지 못했습니다. 편집 화면에서 본문을 선택해 직접 복사하세요.</p>
+          )}
+          <div className="prationale"><b>생성 원본의 근거</b> {plan.rationale}</div>
+          {edited && <p className="draft-scope">위 근거와 아래 HA 결과는 생성 원본에 관한 내용입니다. 수정한 본문을 뒷받침하는지 직접 확인하세요.</p>}
+        </div>
+      </div>
+    </section>
   );
 }
 

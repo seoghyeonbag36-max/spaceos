@@ -92,3 +92,25 @@
 
 .postconsole .rsrc{font-size:10.5px;color:#9aa3af;line-height:1.7;margin-top:var(--sp-3)}
 .postconsole .rsrc b{color:var(--sub)}
+
+/* 비용을 이해하는 순서: 자리 → 조건 → 세 전략 → 입력 변경의 영향. */
+.postconsole .posting-handoff, .postconsole .posting-input-summary { padding: var(--sp-3); margin-bottom: var(--sp-4); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--track-posting-soft); font-size: var(--fs-caption); line-height: var(--lh-body); }
+.postconsole .posting-input-summary strong { display: block; margin-top: var(--sp-2); color: var(--track-posting); }
+.postconsole .posting-input-step { border-top: 1px solid var(--line); padding-top: var(--sp-4); margin-top: var(--sp-4); }
+.postconsole .posting-advanced { border-top: 1px solid var(--line); padding-top: var(--sp-3); margin-bottom: var(--sp-3); }
+.postconsole .posting-advanced summary { cursor: pointer; color: var(--track-posting); font-size: var(--fs-caption); padding-bottom: var(--sp-2); }
+.postconsole .posting-result-heading h2 { font-size: var(--fs-heading); line-height: var(--lh-heading); margin: 0 0 var(--sp-1); }
+.postconsole .posting-result-heading p { font-size: var(--fs-caption); color: var(--muted); margin: 0 0 var(--sp-4); }
+.postconsole .tiers { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
+.postconsole .tier { min-width: 0; padding: var(--sp-4); }
+.postconsole .tier.rec { border-top-color: var(--track-posting); }
+.postconsole .tname { font-size: var(--fs-heading); }
+.postconsole .tsub, .postconsole .trow { font-size: var(--fs-caption); line-height: var(--lh-body); }
+.postconsole .trow { flex-wrap: wrap; margin-top: var(--sp-2); }
+.postconsole .trow.big span:last-child { font-size: var(--fs-heading); }
+.postconsole .tier-difference { display: grid; gap: var(--sp-1); margin-top: var(--sp-4); border-top: 1px dashed var(--line); padding-top: var(--sp-3); font-size: var(--fs-caption); color: var(--track-posting); font-variant-numeric: tabular-nums; }
+.postconsole .posting-comparison-note { font-size: var(--fs-caption); line-height: var(--lh-body); color: var(--muted); padding: var(--sp-3); background: var(--surface); border-radius: var(--radius-md); }
+.postconsole button.run, .postconsole button.run:hover:not(:disabled) { background: var(--track-posting); min-height: 44px; font-size: var(--fs-body); }
+.postconsole :is(input, select, button, summary):focus-visible { outline: 2px solid var(--track-posting); outline-offset: 2px; }
+@media (max-width: 1100px) { .postconsole .cols { grid-template-columns: 1fr; } .postconsole .panel { position: static; } }
+@media (max-width: 600px) { .postconsole { padding: var(--sp-3); } .postconsole .tiers { grid-template-columns: 1fr; } }

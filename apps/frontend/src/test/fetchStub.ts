@@ -25,7 +25,7 @@ export interface Route {
   /** 기본 200. 404 를 주면 화면의 폴백 분기를 태울 수 있다 */
   status?: number;
   /** 응답 본문. 함수면 매칭 결과를 받아 만든다(거점 id 별 응답 등) */
-  body?: unknown | ((m: RegExpExecArray) => unknown);
+  body?: unknown | ((m: RegExpExecArray, call: ApiCall) => unknown);
 }
 
 export interface FetchStub {
@@ -54,7 +54,7 @@ export function installFetchStub(routes: Route[]): FetchStub {
       if (!m) continue;
       const status = r.status ?? 200;
       const payload = typeof r.body === "function"
-        ? (r.body as (mm: RegExpExecArray) => unknown)(m)
+        ? (r.body as (mm: RegExpExecArray, call: ApiCall) => unknown)(m, { method, url, body })
         : r.body;
       return Promise.resolve({
         ok: status < 400,
