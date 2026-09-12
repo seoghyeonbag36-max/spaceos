@@ -63,7 +63,7 @@ def _get(path: str, timeout: int = 30) -> tuple[int, object]:
     `path` 가 http 로 시작하면 절대 URL 로 본다(루트의 `/health` 용).
     """
     url = path if path.startswith("http") else f"{BASE}{path}"
-    req = urllib.request.Request(url, headers={"User-Agent": "spaceos-deploy-verify"})
+    req = urllib.request.Request(url, headers={"User-Agent": "placeos-deploy-verify"})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             raw = r.read().decode("utf-8", errors="replace")

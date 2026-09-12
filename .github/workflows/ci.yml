@@ -1,4 +1,4 @@
-# SpaceOS CI — 백엔드 pytest · 데이터 파이프라인 pytest · 프론트 타입체크+빌드
+# PlaceOS CI — 백엔드 pytest · 데이터 파이프라인 pytest · 프론트 타입체크+빌드
 #
 # docs/decision-infra-layer-2026-08-25.md §4-1 의 1순위다. 그 문서가 측정해 둔 대로
 # 튜닝 없이 그대로 걸 수 있다(백엔드 스위트 약 1분 30초 · 프론트 tsc 수 초).
@@ -10,7 +10,7 @@
 #
 # ⚠ 외부 API 를 치지 않는다
 #   `apps/backend/tests/conftest.py` 가 `LLM_API_KEY` 를 전역으로 비운다. 실호출
-#   검증(`test_llm_live.py`)은 `SPACEOS_LIVE_LLM=1` opt-in 이라 CI 에서는 skip 된다.
+#   검증(`test_llm_live.py`)은 `PLACEOS_LIVE_LLM=1` opt-in 이라 CI 에서는 skip 된다.
 #   즉 이 워크플로는 시크릿이 필요 없고, 포크 PR 에서도 그대로 돈다.
 #
 # ⚠ Gold 산출물은 저장소에 실려 있어야 한다

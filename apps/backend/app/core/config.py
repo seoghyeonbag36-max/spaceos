@@ -40,7 +40,8 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # PostgreSQL + PostGIS
+    # PostgreSQL + PostGIS — 계정/DB 이름 spaceos 는 이미 만들어진 로컬·컨테이너 DB 다.
+    # 브랜드(PlaceOS)와 별개로 두지 않으면 기존 개발 DB 에 붙지 못한다(2026-09-12).
     database_url: str = "postgresql://spaceos:spaceos@localhost:5432/spaceos"
     # Redis (캐싱 / Celery 브로커)
     redis_url: str = "redis://localhost:6379/0"

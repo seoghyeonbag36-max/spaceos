@@ -16,7 +16,7 @@ const MapShell = lazy(() => import("@/pages/MapShell"));
 const HubExplorer = lazy(() => import("@/pages/HubExplorer"));
 
 /**
- * SpaceOS 프론트엔드 진입점.
+ * PlaceOS 프론트엔드 진입점.
  * 전환: 서울(25구 로드맵) · 거점(서빙 66거점 보드+심층) + PPPP 네 서비스.
  * TODO: react-router 도입 시 /seoul, /hubs, /platform, /page, /posting, /program 으로 분리.
  *
@@ -99,7 +99,7 @@ export default function App() {
   return (
     <div className={"appshell" + (isMap ? " is-map" : "")}>
       <nav className="rail" aria-label="주요 화면">
-        <div className="rail-logo" title="SpaceOS">S</div>
+        <div className="rail-logo" title="PlaceOS">S</div>
         {NAV.map((n) => (
           <button
             key={n.key}

@@ -1,4 +1,4 @@
-/* SpaceOS Posting 콘솔 — 스코프 .postconsole (ProgramStudio 2단 레이아웃 계승).
+/* PlaceOS Posting 콘솔 — 스코프 .postconsole (ProgramStudio 2단 레이아웃 계승).
    왼쪽은 입력(sticky), 오른쪽은 결과. 결과 옆에는 늘 **그 값의 출처**가 붙는다 —
    R-ONE 실측 임대료와 시드 프록시가 같은 숫자처럼 보이면 안 된다. */
 .postconsole{--card:var(--surface);--ink:#1f2937;--sub:var(--muted);--line:#e5e7eb;--blue:#2E6FB7;

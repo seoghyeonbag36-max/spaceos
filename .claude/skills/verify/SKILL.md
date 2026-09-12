@@ -1,9 +1,9 @@
 ---
 name: verify
-description: SpaceOS 변경분을 실제 표면에서 확인하는 절차 — 정적 3종(pytest·build·torch) + 로컬 앱을 띄워 API·Vite 프록시·지도 픽셀까지. 작업을 마쳤을 때.
+description: PlaceOS 변경분을 실제 표면에서 확인하는 절차 — 정적 3종(pytest·build·torch) + 로컬 앱을 띄워 API·Vite 프록시·지도 픽셀까지. 작업을 마쳤을 때.
 ---
 
-# SpaceOS 검증 레시피
+# PlaceOS 검증 레시피
 
 ## 0. 정적 검증 3종 — 변경 직후 항상
 

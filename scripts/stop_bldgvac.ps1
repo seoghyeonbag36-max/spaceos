@@ -9,7 +9,7 @@
 # 갱신하고, 재실행 시 그 파일을 읽어 완료된 bdMgtSn 을 건너뛴다. 손실은 마지막 체크포인트
 # 이후 진행분(최대 149동)뿐이다.
 
-$log = 'c:\Users\USER\Documents\Claude\Projects\SpaceOS\spaceos\data\logs\bldgvac-resume.log'
+$log = 'c:\Users\USER\Documents\Claude\Projects\PlaceOS\spaceos\data\logs\bldgvac-resume.log'
 $ts  = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 
 $procs = @(Get-CimInstance Win32_Process -Filter "Name='python.exe'" |

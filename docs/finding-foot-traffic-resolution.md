@@ -17,7 +17,7 @@
 > 현재 상태: [prep-sgis-application.md](prep-sgis-application.md) · [feature-posting.md](feature-posting.md) §0-P
 
 > 질문: "생활인구를 거점 안까지 내릴 수 있는가." 앞서 `foot`(구역 유동인구)을
-> **공간 해상도 부재**로 막아뒀고([spaceos-vibe-build-sequence.md](spaceos-vibe-build-sequence.md) 6-1),
+> **공간 해상도 부재**로 막아뒀고([placeos-vibe-build-sequence.md](placeos-vibe-build-sequence.md) 6-1),
 > 해제 조건을 "생활인구 50m 격자 또는 골목상권 10m 도로 단위"로 적어뒀다.
 > 그 두 가지가 실제로 존재하는지, 어떤 형태인지 API 를 직접 두드려 확정한다.
 

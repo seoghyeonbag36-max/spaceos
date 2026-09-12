@@ -7,7 +7,7 @@
           Phase는 점수파생이 아니라 config.PHASE_PLAN(확정 SSOT)에서 부여한다.
 
 산식 원칙(메모리 seoul-25-districts-priority 모델과 동일):
-  - 공실(VAC)은 SpaceOS가 푸는 문제라 b2b에선 '많을수록 高점수'.
+  - 공실(VAC)은 PlaceOS가 푸는 문제라 b2b에선 '많을수록 高점수'.
   - 동점은 TILT 가중 연속점수로 정렬.
   - rank(점수순)와 phase(진입 계획)는 별개 축이다. phase는 PHASE_PLAN만 따른다.
 

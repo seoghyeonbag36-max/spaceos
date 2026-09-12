@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""SpaceOS API 키 일괄 점검 스크립트.
+"""PlaceOS API 키 일괄 점검 스크립트.
 
 사용법 (repo 어디서 실행해도 됨):
     python scripts/check_api_keys.py

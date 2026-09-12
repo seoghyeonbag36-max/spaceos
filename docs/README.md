@@ -1,6 +1,6 @@
-# SpaceOS 개발 문서
+# PlaceOS 개발 문서
 
-Claude Code(CLI) 기반 SpaceOS 개발 가이드. PPPP 프레임워크 4기능별로 "무엇을 설치하고 어떤 코드를 작성하는지" 정리한다.
+Claude Code(CLI) 기반 PlaceOS 개발 가이드. PPPP 프레임워크 4기능별로 "무엇을 설치하고 어떤 코드를 작성하는지" 정리한다.
 
 ## 문서 목록
 
@@ -12,7 +12,7 @@ Claude Code(CLI) 기반 SpaceOS 개발 가이드. PPPP 프레임워크 4기능�
 | [feature-page.md](feature-page.md) | **Page** — 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 |
 | [feature-posting.md](feature-posting.md) | **Posting** — 입점 솔루션 (전략별 비용-효용·ROI 분석) |
 | [feature-program.md](feature-program.md) | **Program** — LLM 마케팅 자동화 + 상용 입력 온보딩 |
-| [spaceos-vibe-build-sequence.md](spaceos-vibe-build-sequence.md) | **빌드 순서 + 현재 위치** — Phase 0~6 의존 순서, 막힌 것의 종류 구분 |
+| [placeos-vibe-build-sequence.md](placeos-vibe-build-sequence.md) | **빌드 순서 + 현재 위치** — Phase 0~6 의존 순서, 막힌 것의 종류 구분 |
 | [deploy-cloud-run.md](deploy-cloud-run.md) | **배포(현행)** — main 푸시 → GitHub Actions → Cloud Run. 빌드 시점 가드·수동 배포·무료 한도 |
 | [deploy-vercel.md](deploy-vercel.md) | ~~배포~~ **이력 전용** — Vercel 은 2026-08-28 프로덕션에서 내려왔다(무료 플랜 상업적 사용 금지). `vercel --prod` 를 쓰지 말 것 |
 | [api-keys-and-specs.md](api-keys-and-specs.md) · [api-key-checklist.md](api-key-checklist.md) | 인증키 5종과 응답 필드 스펙 |

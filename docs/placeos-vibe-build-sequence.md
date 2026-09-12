@@ -1,6 +1,6 @@
-# SpaceOS 바이브 코딩 빌드 순서 (Page 중심 → 전체 PPPP)
+# PlaceOS 바이브 코딩 빌드 순서 (Page 중심 → 전체 PPPP)
 
-> 목적: "SpaceOS를 만들기 위해 바이브 코딩으로 수행할 단계"를 의존성 순서로 정리. 지금까지 한 작업(거점 확정·데이터 조사·건물공실 PoC 설계·D1 스키마)이 어디에 위치하는지, 앞서 미뤄둔 (A)·(B)가 언제 들어오는지 명시한다.
+> 목적: "PlaceOS를 만들기 위해 바이브 코딩으로 수행할 단계"를 의존성 순서로 정리. 지금까지 한 작업(거점 확정·데이터 조사·건물공실 PoC 설계·D1 스키마)이 어디에 위치하는지, 앞서 미뤄둔 (A)·(B)가 언제 들어오는지 명시한다.
 >
 > **최종 갱신 2026-09-05.** 이 문서는 두 번 낡았다 — 08-02 에서 멈춰 Phase 3-2 를 미완으로
 > Tier1 을 13거점으로 적었고, 08-09 에서 멈춰 Tier1 을 22거점으로 적었다. 거점 수는 쿼터를
@@ -455,7 +455,7 @@ Platform 트랙은 88.2 → **93.8%**. **다만 게이트는 안 열렸다** —
   기본값은 `claude-sonnet-5` 다. 현 기본값으로 라이브 검증을 다시 돌린 기록이 없다.
   시연 전 크레딧 잔액 확인 필수 — 소진 시 rule-stub 으로 조용히 폴백한다.
   ```powershell
-  $env:SPACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v
+  $env:PLACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v
   ```
 
 ### 가로수길 4개 섹션 실측화 (2026-08-01) — 2/4 완료, 1 부분, 1 막힘
@@ -631,7 +631,7 @@ Platform 피처를 되살리지 않는다. 08-29 완료한 점주 제공 상용 
 기본 스위트에서는 skip, opt-in 이 필요하다(외부 호출·크레딧 사용):
 
 ```powershell
-$env:SPACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v
+$env:PLACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v
 ```
 
 응답이 비결정적이라 문구가 아니라 **계약**만 단언한다 — 스키마 충족, 건수 범위,
@@ -722,7 +722,7 @@ jangan·kyunghee `수원`). 불용어(`후기`·`추천`·`좋은`)와 인명(ch
 
 #### 3. 진행 문서 정리
 
-- **대상 파일:** `docs/spaceos-vibe-build-sequence.md`, `docs/feature-posting.md`,
+- **대상 파일:** `docs/placeos-vibe-build-sequence.md`, `docs/feature-posting.md`,
   `docs/feature-program.md`, `docs/README.md`, `scripts/pppp_status.py`,
   `data/tests/test_progress_docs.py`.
 - **입력 소스와 출처:** `scripts/pppp_status.py` 산출 상태, 위 Posting 공식 소스 기각 기록,

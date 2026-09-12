@@ -1,10 +1,10 @@
-# Memory — SpaceOS Project
+# Memory — PlaceOS Project
 
 ## Me
-**sh.pac** (seoghyeonbag36@gmail.com) — SpaceOS 창업자 겸 디지털 트윈 AI/IT 개발자. 지역 상권의 리뷰 데이터와 공실 히스토리를 결합해 물리적 상권을 디지털 트윈 SaaS로 플랫폼화하는 프로젝트를 진행 중.
+**sh.pac** (seoghyeonbag36@gmail.com) — PlaceOS 창업자 겸 디지털 트윈 AI/IT 개발자. 지역 상권의 리뷰 데이터와 공실 히스토리를 결합해 물리적 상권을 디지털 트윈 SaaS로 플랫폼화하는 프로젝트를 진행 중.
 
 ## Project Identity
-**SpaceOS** — 물리적 상권의 디지털 트윈 플랫폼. "Place ▶ Platform" 가설 검증(물리적 공간을 디지털·SNS 관점의 플랫폼으로 읽는다). 18~24개월 내 네이버/카카오/직방 대상 M&A Exit 목표.
+**PlaceOS** — 물리적 상권의 디지털 트윈 플랫폼. "Place ▶ Platform" 가설 검증(물리적 공간을 디지털·SNS 관점의 플랫폼으로 읽는다). 18~24개월 내 네이버/카카오/직방 대상 M&A Exit 목표.
 
 ## PPPP Framework (핵심 4기능)
 
@@ -79,8 +79,8 @@ Price 는 Posting 으로, Promotion 은 Program 으로만 간다.
 - **거점 선정 기준**: 데이터 가용성(공공데이터·SNS) + B2B 잠재 고객 접근성
 
 ## Recent Deliverables
-- `SpaceOS_PPPP_6Month_Vibe_Roadmap.docx` (2026-05-20) — 본 로드맵
-- `SpaceOS_6Month_Technical_Roadmap.docx` — 기술 로드맵 (이전)
+- `PlaceOS_PPPP_6Month_Vibe_Roadmap.docx` (2026-05-20) — 본 로드맵
+- `PlaceOS_6Month_Technical_Roadmap.docx` — 기술 로드맵 (이전)
 
 ---
 

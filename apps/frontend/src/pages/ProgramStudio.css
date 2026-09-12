@@ -1,4 +1,4 @@
-/* SpaceOS Program 스튜디오(가게 단위) — 스코프 .progstudio (PageDashboard 톤 계승) */
+/* PlaceOS Program 스튜디오(가게 단위) — 스코프 .progstudio (PageDashboard 톤 계승) */
 .progstudio{--card:var(--surface);--sub:var(--muted);--blue:var(--track-program);
  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);background:#eef1f4;padding:20px;line-height:1.4}
 .progstudio *{box-sizing:border-box}

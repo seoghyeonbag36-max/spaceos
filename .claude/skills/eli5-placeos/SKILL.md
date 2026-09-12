@@ -1,11 +1,11 @@
 ---
-name: eli5-spaceos
-description: SpaceOS를 아무것도 모르는 사람(디자이너·투자자·지자체)에게 그림으로 설명하는 발표용 슬라이드 HTML을 만든다. 미팅·데모·온보딩 자료가 필요할 때.
+name: eli5-placeos
+description: PlaceOS를 아무것도 모르는 사람(디자이너·투자자·지자체)에게 그림으로 설명하는 발표용 슬라이드 HTML을 만든다. 미팅·데모·온보딩 자료가 필요할 때.
 ---
 
-# eli5-spaceos — SpaceOS를 그림으로 설명하는 슬라이드
+# eli5-placeos — PlaceOS를 그림으로 설명하는 슬라이드
 
-`/eli5` 는 주제 하나를 설명한다. 이건 **SpaceOS 전체를 슬라이드 한 벌로** 낸다 —
+`/eli5` 는 주제 하나를 설명한다. 이건 **PlaceOS 전체를 슬라이드 한 벌로** 낸다 —
 PPT 에 넣거나 그대로 띄워서 발표하는 것이 목적이다.
 
 **범위 인수**: `$ARGUMENTS`
@@ -86,7 +86,7 @@ Posting·Program 에 `PROMOTION` 을 나란히 적었다 — 그 라벨을 다�
 - 폰트: `"Pretendard","Malgun Gothic","Segoe UI",sans-serif` (설치 안 돼 있어도 깨지지 않게).
 - 색은 `design/tokens/tokens.json` 값만 — brand `#0EA5B7`, ink `#1C2533`,
   공실 5단 `#22B07D→#E03E36`. **네이버 green `#03C75A` 은 네이버 연동을 말하는 자리에만.**
-- 톤은 기존 `docs/blueprint/SpaceOS_Blueprint.html` 과 같은 계열
+- 톤은 기존 `docs/blueprint/PlaceOS_Blueprint.html` 과 같은 계열
   (딥네이비 `#0A1826` + teal). 같은 미팅에서 두 자료가 다른 브랜드로 보이면 안 된다.
 - 키보드 넘김(←/→)과 `?scroll` 로 전체 훑기를 넣어 두면 발표와 검토 둘 다 된다.
 
@@ -95,8 +95,8 @@ Posting·Program 에 `PROMOTION` 을 나란히 적었다 — 그 라벨을 다�
 ## 5) 출력 위치
 
 ```
-docs/eli5/SpaceOS_ELI5_<범위>_<YYYY-MM-DD>.html   # 원본 (이걸 띄워서 발표해도 된다)
-docs/eli5/SpaceOS_ELI5_<범위>_<YYYY-MM-DD>-NN.png # 슬라이드별 PNG (PPT 에 붙이는 것)
+docs/eli5/PlaceOS_ELI5_<범위>_<YYYY-MM-DD>.html   # 원본 (이걸 띄워서 발표해도 된다)
+docs/eli5/PlaceOS_ELI5_<범위>_<YYYY-MM-DD>-NN.png # 슬라이드별 PNG (PPT 에 붙이는 것)
 ```
 
 PPT 삽입은 **PNG 붙여넣기**가 가장 안전하다. 인쇄→PDF 는 폰트·여백이 브라우저마다 다르다.

@@ -1,6 +1,6 @@
-SpaceOS UX/UI: third-party notices
+PlaceOS UX/UI: third-party notices
 
-Airbnb visx is used for the Platform comparison chart. Product layouts are implemented in SpaceOS; third-party product screen bundles are not included.
+Airbnb visx is used for the Platform comparison chart. Product layouts are implemented in PlaceOS; third-party product screen bundles are not included.
 
 
 @visx/shape 4.0.0

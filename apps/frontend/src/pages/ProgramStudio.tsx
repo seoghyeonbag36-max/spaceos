@@ -318,7 +318,7 @@ export default function ProgramStudio() {
   return (
     <div className="progstudio"><div className="wrap">
       <Verdict
-        eyebrow="SpaceOS · Program" conversion="PROMOTION ▶ PROGRAM"
+        eyebrow="PlaceOS · Program" conversion="PROMOTION ▶ PROGRAM"
         question="posting 한 page 를 어떤 홍보 program 으로 돌릴 것인가"
         verdict={head.verdict} grounds={head.grounds} sources={head.sources}
         note={HOW_TO_READ}
@@ -495,9 +495,9 @@ export default function ProgramStudio() {
           {commercialMode && (
             <div className="consentbox">
               <Field label="조직 API 키" required
-                hint="발급된 sk_spaceos_… 키. 요청 헤더에만 사용하며 브라우저 저장소에 보관하지 않는다.">
+                hint="발급된 sk_placeos_… 키. 요청 헤더에만 사용하며 브라우저 저장소에 보관하지 않는다.">
                 <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)}
-                  autoComplete="off" placeholder="sk_spaceos_…" />
+                  autoComplete="off" placeholder="sk_placeos_…" />
               </Field>
               <label className="consent">
                 <input type="checkbox" checked={rightsConfirmed}

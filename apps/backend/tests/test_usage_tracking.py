@@ -123,7 +123,7 @@ def test_api_key_authenticated_request_is_recorded():
 
 def test_invalid_api_key_is_rejected_not_downgraded():
     """조용히 익명으로 강등하면, 키가 죽은 파일럿이 200 을 받으면서 집계에서 사라진다."""
-    resp = client.get(_ANALYSIS_PATH, headers={"X-API-Key": "sk_spaceos_bogus"})
+    resp = client.get(_ANALYSIS_PATH, headers={"X-API-Key": "sk_placeos_bogus"})
     assert resp.status_code == 401
 
 

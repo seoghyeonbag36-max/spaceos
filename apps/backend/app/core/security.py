@@ -18,7 +18,7 @@ from app.models.auth import Membership, Org, User
 _bearer = HTTPBearer(auto_error=False)
 
 # B2B 연동이 헤더에 실어 보내는 키의 접두사 — 로그·유출 스캐너가 알아보게 한다.
-API_KEY_PREFIX = "sk_spaceos_"
+API_KEY_PREFIX = "sk_placeos_"
 
 
 def _bytes72(raw: str) -> bytes:

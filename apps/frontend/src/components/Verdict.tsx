@@ -38,7 +38,7 @@ export interface Ground {
 export default function Verdict({
   eyebrow, conversion, question, verdict, grounds, sources, note,
 }: {
-  /** 좌상단 표식 — "SPACEOS · PLATFORM" */
+  /** 좌상단 표식 — "PLACEOS · PLATFORM" */
   eyebrow: string;
   /** 전통 4P → 디지털 4P 전환 — "PLACE ▶ PLATFORM" */
   conversion: string;

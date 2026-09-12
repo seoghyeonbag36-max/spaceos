@@ -1,4 +1,4 @@
-# SpaceOS — Cloud Run 단일 컨테이너 (프론트 정적 + FastAPI API)
+# PlaceOS — Cloud Run 단일 컨테이너 (프론트 정적 + FastAPI API)
 #
 # ## 왜 한 컨테이너인가
 # `apps/frontend/src/lib/api.ts` 가 `/api/v1` 을 **상대경로로 하드코딩**한다. 프론트와

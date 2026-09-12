@@ -1,4 +1,4 @@
-# SpaceOS ML
+# PlaceOS ML
 
 AI 모델 학습/추론. PyTorch + PyTorch Geometric + MLflow.
 

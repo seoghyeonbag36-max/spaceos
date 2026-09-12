@@ -157,7 +157,7 @@ export default function PlatformConsole() {
   return (
     <div className="platconsole"><div className="wrap">
       <Verdict
-        eyebrow="SpaceOS · Platform" conversion="PLACE ▶ PLATFORM"
+        eyebrow="PlaceOS · Platform" conversion="PLACE ▶ PLATFORM"
         question="이 입지·상권은 어떤 플랫폼인가"
         verdict={head.verdict} grounds={head.grounds} sources={head.sources}
         note={

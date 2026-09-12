@@ -10,6 +10,7 @@
     "  단일 출처(컨테이너)를 지킨다. egress 가 실제로 문제가 되면 그때 나눈다.",
     "",
     "public 디렉터리는 비어 있다(파일을 올리지 않는다). 모든 요청이 리라이트로 나간다.",
+    "⚠ 2026-09-12 브랜드를 SpaceOS → PlaceOS 로 바꿨지만 아래 이름들은 **이미 만들어진 리소스**라 그대로 둔다 — 프로젝트 ID·사이트 ID·서비스명 모두 옛 이름이다.",
     "site: spaceos-twin → https://spaceos-twin.web.app (기본 사이트 spaceos-digital-twin.web.app 보다 짧다). `spaceos` 는 다른 프로젝트가 선점."
   ],
   "hosting": {

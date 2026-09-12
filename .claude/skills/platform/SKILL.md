@@ -5,7 +5,7 @@ description: PPPP 트랙 — Platform(상권 AI 추천 엔진 · GNN·감성·�
 
 # 트랙 컨텍스트: Platform (Place ▶ Platform)
 
-너는 지금 SpaceOS의 **Platform 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
+너는 지금 PlaceOS의 **Platform 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
 
 ## 먼저 읽기 (컨텍스트 로딩)
 - docs/10-platform-redefinition.md

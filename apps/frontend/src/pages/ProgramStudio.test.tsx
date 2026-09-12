@@ -211,7 +211,7 @@ describe("ProgramStudio — 채널별 초안", () => {
     fireEvent.change(screen.getByPlaceholderText("점주 확인 상호"), { target: { value: "점주 카페" } });
     fireEvent.change(screen.getByPlaceholderText("예: 카페"), { target: { value: "카페" } });
     fireEvent.change(screen.getByRole("textbox", { name: /점주 제공 리뷰/ }), { target: { value: "점주가 제공한 원문" } });
-    fireEvent.change(screen.getByPlaceholderText("sk_spaceos_…"), { target: { value: "sk_spaceos_test" } });
+    fireEvent.change(screen.getByPlaceholderText("sk_placeos_…"), { target: { value: "sk_placeos_test" } });
     const submit = screen.getByRole("button", { name: "동의하고 상용 생성" }) as HTMLButtonElement;
     const consents = screen.getAllByRole("checkbox");
     expect(consents).toHaveLength(4);

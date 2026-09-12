@@ -9,7 +9,7 @@ Vercel 에서 옮겨 온 경위는 [deploy-vercel.md](deploy-vercel.md) 머리�
 |---|---|
 | **프로덕션 URL** | **https://spaceos-twin.web.app** (Firebase Hosting) |
 | Cloud Run 원본 URL | https://spaceos-798830962560.us-central1.run.app |
-| GCP 프로젝트 | `spaceos-digital-twin` (표시명 SpaceOS) · 번호 `798830962560` |
+| GCP 프로젝트 | `spaceos-digital-twin` (표시명 PlaceOS) · 번호 `798830962560` |
 | 리전 | `us-central1` — **무료 한도가 적용되는 리전이라 그렇다** |
 | 이미지 | `us-central1-docker.pkg.dev/spaceos-digital-twin/spaceos/web` |
 | 결제 계정 | `011EDC-4A0AA8-3262D5` |
@@ -82,11 +82,11 @@ $g = "$env:LOCALAPPDATA\Google\Cloud SDK\google-cloud-sdk\bin\gcloud.cmd"
 WSL2 설치 후 Docker Desktop 엔진이 뜬다. 배포 전에 같은 이미지를 손에서 확인할 수 있다:
 
 ```bash
-docker build --build-arg VITE_NAVER_MAPS_KEY_ID=<키> -t spaceos-local:test .
-docker run -d --name spaceos-smoke -p 18080:8080 \
-  -e JWT_SECRET=local-smoke-secret-not-real -e DATABASE_URL="<Neon URL>" spaceos-local:test
+docker build --build-arg VITE_NAVER_MAPS_KEY_ID=<키> -t placeos-local:test .
+docker run -d --name placeos-smoke -p 18080:8080 \
+  -e JWT_SECRET=local-smoke-secret-not-real -e DATABASE_URL="<Neon URL>" placeos-local:test
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost:18080/health
-docker rm -f spaceos-smoke
+docker rm -f placeos-smoke
 ```
 
 실측(2026-08-28): 이미지 **775MB** · gold 106MB(거점 56 디렉터리 · master 54개) ·
@@ -100,14 +100,18 @@ docker rm -f spaceos-smoke
 ## 모니터링
 
 Cloud Monitoring 업타임 체크 **4개**가 5분마다 돈다. 실패하면
-`seoghyeonbag36@gmail.com` 으로 메일이 온다(알림 정책: "SpaceOS 프로덕션 다운 알림").
+`seoghyeonbag36@gmail.com` 으로 메일이 온다(알림 정책: "PlaceOS 프로덕션 다운 알림").
+
+⚠ 아래 이름·알림 정책명은 **2026-09-12 개명(SpaceOS → PlaceOS) 뒤 표기**다. GCP 콘솔에
+이미 만들어진 업타임 체크는 아직 `SpaceOS …` 로 남아 있다 — 표시명뿐이라 동작에는
+영향이 없지만, 콘솔에서 찾을 때는 옛 이름으로 검색한다(바꾸려면 콘솔에서 이름만 수정).
 
 | 체크 | 대상 | 보는 것 |
 |---|---|---|
-| SpaceOS health | Cloud Run 원본 | `/health` 가 200 이고 `"status":"ok"` 인가 |
-| SpaceOS districts gold | Cloud Run 원본 | 분석 API 가 `"vacancy_source":"gold"` 를 담는가 |
-| SpaceOS hosting health | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
-| SpaceOS hosting gold | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
+| PlaceOS health | Cloud Run 원본 | `/health` 가 200 이고 `"status":"ok"` 인가 |
+| PlaceOS districts gold | Cloud Run 원본 | 분석 API 가 `"vacancy_source":"gold"` 를 담는가 |
+| PlaceOS hosting health | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
+| PlaceOS hosting gold | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
 
 **둘로 나눠 두는 이유**: Cloud Run 이 멀쩡해도 Hosting 리라이트가 깨지면 사용자는 못 쓴다.
 원본만 보면 그 고장이 안 보인다. 반대로 Hosting 만 보면 어느 층이 깨졌는지 모른다.
@@ -172,7 +176,7 @@ URL 의 `&`(`...sslmode=require&channel_binding=require`)를 cmd 래퍼가 명�
 |---|---|
 | `POST /auth/signup` | 201 · 조직·사용자·멤버십 생성 |
 | `GET /auth/me` | 200 · role=admin |
-| `POST /auth/api-keys` | 201 · `sk_spaceos_…` 발급 |
+| `POST /auth/api-keys` | 201 · `sk_placeos_…` 발급 |
 | 익명 분석 호출 | 200 (공개 데모 유지) |
 | API 키 분석 호출 | 200 · 사용량 기록됨 |
 | **잘못된 키** | **401** — DB 가 없던 때는 500 이었다. 이제 설계대로 거절한다 |

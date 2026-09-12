@@ -25,7 +25,7 @@
 Program 72.2% · Posting 54.7%.
 
 Platform 의 잔여는 게이트 하나 — `KPI 업종추천 Top-1 ≥70%` (63.8%, 91.2%). 그런데
-[spaceos-vibe-build-sequence.md](spaceos-vibe-build-sequence.md) 막힘 표 **14번**이 이걸
+[placeos-vibe-build-sequence.md](placeos-vibe-build-sequence.md) 막힘 표 **14번**이 이걸
 *"자료가 없는 게 아니라 닿을 수 없음이 실측으로 확인된 목표"* 로 적어놨다.
 
 → **100% 규칙 하에서는 Page 로 넘어갈 수 없다. 영구 정지다.** 그런데 Page 는 이미 90%
@@ -544,5 +544,5 @@ off-prior 표본 877 에서 표준오차 ≈1.63%p 이므로 **−1.14%p 는 1σ
 
 - [feature-platform.md](feature-platform.md) §0 — Top-1 천장 실측 기각 원본
 - [feature-posting.md](feature-posting.md) §0 — 비용 모델 병목(6-1 의 3번 근거)
-- [spaceos-vibe-build-sequence.md](spaceos-vibe-build-sequence.md) — 막힘 표 6·12·14번
+- [placeos-vibe-build-sequence.md](placeos-vibe-build-sequence.md) — 막힘 표 6·12·14번
 - 커밋 `6aeb5f7`(Top-1 기각) · `32c9673`(균형 손실) · `624a943`(막힘 재분류)
