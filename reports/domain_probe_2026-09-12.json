@@ -1,0 +1,49 @@
+{
+  "probed_at": "2026-09-12",
+  "method": "registry RDAP (rdap.*) + KISA whois.kr:43",
+  "controls": {
+    "com": {
+      "domain": "google.com",
+      "result": "registered"
+    },
+    "net": {
+      "domain": "example.net",
+      "result": "registered"
+    },
+    "org": {
+      "domain": "example.org",
+      "result": "registered"
+    },
+    "io": {
+      "domain": "github.io",
+      "result": "registered"
+    },
+    "ai": {
+      "domain": "character.ai",
+      "result": "registered"
+    },
+    "kr": {
+      "domain": "naver.co.kr",
+      "result": "registered"
+    }
+  },
+  "unreliable_tlds": [],
+  "results": {
+    "placeos.com": "registered",
+    "placeos.net": "free",
+    "placeos.org": "free",
+    "placeos.io": "free",
+    "placeos.ai": "free",
+    "placeos.kr": "free",
+    "placeos.co.kr": "free",
+    "placeos.or.kr": "free",
+    "placetwin.kr": "free",
+    "placetwin.co.kr": "free",
+    "spacetwin.co.kr": "free",
+    "streetos.kr": "free",
+    "twinmap.kr": "registered",
+    "gongsil.kr": "registered",
+    "spaceos.kr": "free"
+  },
+  "caveat": "등록 여부만 판정한다. 상표 선등록은 KIPRIS·USPTO·IP Australia 별도 조회."
+}
