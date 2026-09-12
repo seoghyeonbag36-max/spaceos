@@ -28,11 +28,16 @@ function mount(matched: boolean) {
   return api;
 }
 
+// ⚠ Page 화면은 lazy 청크 + 지도 로더 + API 를 거쳐야 목록이 선다. 전체 병렬 실행
+//   부하에서는 findBy 기본 1초를 넘겨 스켈레톤이 떠 있는 채 실패했다(2026-09-13, 2회 중 1회).
+//   첫 대기에만 여유를 준다 — 이후 단계는 이미 로드된 화면이라 기본값으로 충분하다.
+const FIRST_LOAD = { timeout: 5000 };
+
 describe("App — Page에서 입점 검토", () => {
   it("검증된 건물 유닛을 인계하고 Page 후보·검색·단일 지도를 보존한다", async () => {
     const api = mount(true);
     fireEvent.click(screen.getByRole("button", { name: "Page" }));
-    fireEvent.click(await screen.findByRole("button", { name: "검토 건물 후보 저장" }));
+    fireEvent.click(await screen.findByRole("button", { name: "검토 건물 후보 저장" }, FIRST_LOAD));
     fireEvent.change(screen.getByRole("textbox", { name: "건물 검색" }), { target: { value: "검토" } });
     fireEvent.click(screen.getByRole("button", { name: /^검토 건물 카페/ }));
     const map = naver.map();
@@ -48,7 +53,7 @@ describe("App — Page에서 입점 검토", () => {
   it("일치하는 유닛이 없으면 첫 자리를 자동 선택하거나 계산하지 않는다", async () => {
     const api = mount(false);
     fireEvent.click(screen.getByRole("button", { name: "Page" }));
-    fireEvent.click(await screen.findByRole("button", { name: /^검토 건물 카페/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /^검토 건물 카페/ }, FIRST_LOAD));
     fireEvent.click(screen.getByRole("button", { name: "이 건물로 입점 검토 →" }));
     expect(await screen.findByText(/일치하는 입점 계산 유닛이 없습니다/)).toBeTruthy();
     expect(api.count(/simulate-revenue$/)).toBe(0);

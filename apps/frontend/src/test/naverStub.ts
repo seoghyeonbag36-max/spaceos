@@ -141,8 +141,13 @@ export function installNaverStub(): NaverStub {
     zoom: number;
     bounds: unknown = null;
     constructor(public el: unknown, public options: Record<string, unknown> = {}) {
-      // 폴리곤/점 표현이 갈리는 줌 경계는 15 다(MapShell 의 PIN_MAX_ZOOM).
-      // 기본 16 = 가까이 본 상태 → 건물 폴리곤이 그려진다.
+      // 앱 기본 줌과 같은 값(MapHost.DEFAULT_ZOOM). 다만 **이 기본값은 거의 안 쓰인다** —
+      // MapHost 가 지도를 만들 때 zoom 을 명시해 넘기므로 options.zoom 쪽으로 들어온다.
+      // 여기 값이 쓰이는 건 zoom 없이 지도를 만드는 경우뿐이다.
+      //
+      // ⚠ 줌 16 은 이제 **점 모드**다(MapShell 의 PIN_MAX_ZOOM, 2026-09-13 에 15→16).
+      //   건물마다 도형이 하나씩 필요한 테스트는 스스로 확대해야 한다 →
+      //   MapShell.test.tsx 의 `polygonMode()`.
       this.zoom = typeof options.zoom === "number" ? (options.zoom as number) : 16;
       maps.push(this);
     }

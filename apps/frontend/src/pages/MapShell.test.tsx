@@ -12,7 +12,8 @@
  */
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
-import MapShell from "@/pages/MapShell";
+import MapShell, { PIN_MAX_ZOOM } from "@/pages/MapShell";
+import { DEFAULT_ZOOM } from "@/components/MapHost";
 import { installFetchStub, type FetchStub, type Route } from "@/test/fetchStub";
 import { installNaverStub, removeNaverStub, type NaverStub } from "@/test/naverStub";
 import { renderOnMap } from "@/test/renderMap";
@@ -75,6 +76,20 @@ afterEach(() => { cleanup(); removeNaverStub(); });
 
 const hubSelect = () => screen.getByRole("combobox", { name: "상권 선택" });
 
+/**
+ * **폴리곤 모드로 들어간다** — 건물마다 도형이 하나씩 필요한 테스트용.
+ *
+ * 2026-09-13 부터 앱 기본 줌(DEFAULT_ZOOM=16)은 **점 모드**다(PIN_MAX_ZOOM=16 이하).
+ * 그전에는 경계가 15 라 기본 화면이 폴리곤이었고 테스트도 그냥 마운트만 하면 됐다.
+ * 이제는 확대해야 한다 — 안 그러면 공실의심(empty)만 그려져 수가 안 맞는다.
+ */
+async function polygonMode() {
+  await waitFor(() => expect(naver.map()).not.toBeNull());
+  const map = naver.map()!;
+  map.setZoom(PIN_MAX_ZOOM + 1);
+  naver.emit(map, "zoom_changed");
+}
+
 describe("MapShell — 후보 탐색과 비교", () => {
   beforeEach(() => {
     // jsdom에는 dialog의 top-layer 구현이 없다. 열림 상태만 재현한다.
@@ -84,6 +99,7 @@ describe("MapShell — 후보 탐색과 비교", () => {
 
   it("검색과 상태 조건이 목록과 지도에 함께 적용되고 초기화된다", async () => {
     mount();
+    await polygonMode();
     await waitFor(() => expect(naver.live()).toHaveLength(3));
     fireEvent.change(screen.getByRole("combobox", { name: "공실 상태 필터" }), { target: { value: "empty" } });
     expect(screen.queryByText("가로수 B")).toBeNull();
@@ -174,6 +190,7 @@ describe("MapShell — API 경로", () => {
 describe("MapShell — 거점 전환 시 정리", () => {
   it("거점을 바꾸면 이전 거점 건물 폴리곤이 전부 걷히고 새 거점만 남는다", async () => {
     mount();
+    await polygonMode();
     await waitFor(() => expect(naver.live().length).toBe(3));   // 가로수길 3동
     const before = naver.live();
 
@@ -188,11 +205,11 @@ describe("MapShell — 거점 전환 시 정리", () => {
 
   it("줌을 당기면 공실의심만 점으로 바뀐다 — 줌 리스너가 실제로 걸려 있다", async () => {
     mount();
+    await polygonMode();
     await waitFor(() => expect(naver.live().length).toBe(3));
 
-    const map = naver.map();
-    expect(map).not.toBeNull();
-    map!.setZoom(14);                       // PIN_MAX_ZOOM(15) 이하 = 먼 축척
+    const map = naver.map()!;
+    map.setZoom(PIN_MAX_ZOOM);              // 경계 **이하** = 먼 축척
     naver.emit(map, "zoom_changed");
 
     // 840~1,443동을 전부 칠하면 "어디가 비었나"가 색에 묻힌다 → empty 한 동만 점으로.
@@ -200,8 +217,37 @@ describe("MapShell — 거점 전환 시 정리", () => {
     expect(naver.live()[0].kind).toBe("Marker");
   });
 
+  /* 2026-09-13: 이 테스트가 이번 변경의 **본체**다.
+     점 모드는 2026-09-06 부터 구현돼 있었지만 경계가 15 이고 앱 기본 줌이 16 이라
+     **기본 화면에서는 한 번도 보인 적이 없다** — 사용자가 일부러 축소해야만 닿았고,
+     열자마자 보이는 것은 840동이 4색으로 꽉 찬 지도였다(디자이너 피드백이 지적한 화면).
+     경계를 16 으로 올려 기본 화면이 "어디가 비었나"에 먼저 답하게 했다.
+     여기가 무너지면 그 회귀가 조용히 돌아온 것이다. */
+  it("앱 기본 줌에서는 공실의심만 점으로 찍는다 — 열자마자 빈 자리가 보인다", async () => {
+    mount();
+
+    // 확대하지 않는다. MapHost 가 세운 그대로 = 사용자가 앱을 열었을 때의 화면.
+    await waitFor(() => expect(naver.live().length).toBeGreaterThan(0));
+    expect(naver.map()!.getZoom()).toBe(DEFAULT_ZOOM);
+
+    // 3동 중 empty 는 g1 하나뿐이다(가로수 A). 만실·고공실은 이 축척에서 그리지 않는다.
+    await waitFor(() => expect(naver.live().length).toBe(1));
+    expect(naver.live()[0].kind).toBe("Marker");
+
+    // 지도에 안 그렸다고 목록에서 빼지는 않는다 — 둘은 다른 질문에 답한다.
+    expect(screen.getByText("가로수 B")).toBeTruthy();
+    expect(screen.getByText("가로수 C")).toBeTruthy();
+  });
+
+  /* 이 부등식이 이번 버그의 재발 방지선이다. 두 값은 다른 파일에 있어 따로 움직이기
+     쉽고(MapHost 의 지도 옵션 vs MapShell 의 표현 경계), 어긋나도 화면은 멀쩡해 보인다. */
+  it("점 모드 경계는 앱 기본 줌을 포함한다 (PIN_MAX_ZOOM ≥ DEFAULT_ZOOM)", () => {
+    expect(PIN_MAX_ZOOM).toBeGreaterThanOrEqual(DEFAULT_ZOOM);
+  });
+
   it("언마운트하면 오버레이도 지도 리스너도 남지 않는다", async () => {
     const view = mount();
+    await polygonMode();
     await waitFor(() => expect(naver.live().length).toBe(3));
     expect(naver.liveListeners().length).toBeGreaterThan(0);
 
@@ -248,10 +294,15 @@ describe("MapShell — 사이드패널", () => {
  * 그래서 "무엇이 보이나"만 보지 않고 **오버레이를 몇 개 다시 만들었나**를 같이 센다.
  */
 describe("MapShell — 지도 ↔ 목록 동기화", () => {
-  const polygons = () => naver.overlays.filter((o) => o.kind === "Polygon");
+  /** ⚠ `naver.overlays` 는 **걷힌 것도 들고 있다**(걷혔는지를 봐야 하므로).
+   *  화면이 점 모드 → 폴리곤 모드로 한 번 갈아타는 동안 죽은 폴리곤이 앞에 쌓이는데,
+   *  그걸 집으면 리스너가 이미 떨어져 있어 mouseover 를 쏴도 아무 일이 없다.
+   *  **지금 지도에 붙어 있는 것만** 본다. */
+  const polygons = () => naver.live().filter((o) => o.kind === "Polygon");
 
   it("목록을 가리키면 그 건물 도형만 강조하고, 도형을 다시 만들지 않는다", async () => {
     mount();
+    await polygonMode();
     await waitFor(() => expect(naver.live()).toHaveLength(3));
     const made = naver.overlays.length;
     // 건물은 filtered 순서대로 그려진다 — g1·g2·g3.
@@ -279,6 +330,7 @@ describe("MapShell — 지도 ↔ 목록 동기화", () => {
 
   it("지도 쪽에서 가리켜도 목록의 같은 줄이 뜬다 — 왕복이 닫힌다", async () => {
     mount();
+    await polygonMode();
     await waitFor(() => expect(naver.live()).toHaveLength(3));
     const [pg1] = polygons();
 
@@ -293,6 +345,7 @@ describe("MapShell — 지도 ↔ 목록 동기화", () => {
 
   it("지도를 움직이면 목록이 화면 범위로 좁혀지고, 「거점 전체」로 되돌릴 수 있다", async () => {
     mount();
+    await polygonMode();
     await waitFor(() => expect(naver.live()).toHaveLength(3));
     expect(await screen.findByText("가로수 C")).toBeTruthy();
     const made = naver.overlays.length;
@@ -316,6 +369,7 @@ describe("MapShell — 지도 ↔ 목록 동기화", () => {
 
   it("범위 밖이라 비었을 때와 조건이 안 맞아 비었을 때를 다르게 말한다", async () => {
     mount();
+    await polygonMode();
     await waitFor(() => expect(naver.live()).toHaveLength(3));
 
     const map = naver.map()!;

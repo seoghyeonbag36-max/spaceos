@@ -17,7 +17,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState, type Dispatch, ty
 import CandidateCompare from "@/components/CandidateCompare";
 import { createPageWorkspace, type PageWorkspace, type BuildingSelection, type VacancyFilter } from "@/lib/workspaceState";
 import DistrictPicker, { CaveatNote } from "@/components/DistrictPicker";
-import { useMapHost } from "@/components/MapHost";
+import { useMapHost, DEFAULT_ZOOM } from "@/components/MapHost";
 import { getBuildingVacancy, getDensityHeatmap, getFootfallHeatmap, getRentHeatmap, listDistricts, recommendIndustry,
   type DensityHeatmap, type DistrictSummary, type FootfallHeatmap, type GeoJSONFC, type IndustryRecommend, type RentHeatmap } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
@@ -52,7 +52,16 @@ const LAYERS: { key: Layer; label: string }[] = [
 //
 // ⚠ 점 표현은 새로 만든 것이 아니라 `PageDashboard.tsx` 에 있던 구현을 옮긴 것이다.
 //   그 화면이 `#board` 해시로 밀려나면서 red dot 도 같이 안 보이게 돼 있었다.
-const PIN_MAX_ZOOM = 15;   // 이 줌 **이하**면 점, 초과면 폴리곤
+// 2026-09-13: **15 → 16.** 이 기능은 있는데 아무도 못 보고 있었다.
+// 앱이 여는 기본 줌은 `MapHost.DEFAULT_ZOOM` = 16 이라, 경계가 15 이면 16 > 15 →
+// 기본 화면이 **언제나 폴리곤 모드**였다. 즉 점 표현은 사용자가 일부러 축소해야만
+// 닿았고, 기본 화면은 여전히 840동이 4색으로 꽉 찬 지도였다 — 위 피드백이 지적한 바로
+// 그 화면이다. 경계를 기본 줌까지 끌어올려 **앱을 열면 빈 자리가 먼저 보이게** 한다.
+//
+// ⚠ 지켜야 하는 관계: PIN_MAX_ZOOM ≥ MapHost.DEFAULT_ZOOM.
+//   둘은 다른 파일에 있어 따로 움직이기 쉽다 — 그 단절이 이 버그의 원인이었다.
+//   MapShell.test.tsx 가 부등식을 직접 센다.
+export const PIN_MAX_ZOOM = 16;   // 이 줌 **이하**면 점, 초과면 폴리곤
 
 // 공실 상태 → 색 (design 토큰 vacancy 색계열 재사용, 단일 출처)
 const STATUS: Record<VacStatus, { color: string; label: string }> = {
@@ -182,7 +191,12 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
   const [twinOpen, setTwinOpen] = useState(false);
   // 줌 자체가 아니라 **모드**를 담는다. 줌 값을 state 에 두면 휠을 굴릴 때마다
   // 리렌더가 나고 오버레이 840개를 매 틱 다시 그린다. 불리언이라 전환은 두 번뿐이다.
-  const [pinMode, setPinMode] = useState(false);
+  //
+  // 초기값을 **기본 줌에서 끌어온다**(2026-09-13). 그전에는 무조건 false 로 시작했는데,
+  // 기본 줌이 점 모드가 된 뒤로는 그게 거점을 열 때마다 폴리곤 840~1,443개를 만들었다가
+  // 곧바로 버리고 점으로 다시 그리는 낭비였다(아래 sync 가 한 틱 뒤에 바로잡는다).
+  // 지도가 아직 없을 때의 추정이고, 지도가 서면 실제 줌으로 덮인다.
+  const [pinMode, setPinMode] = useState(DEFAULT_ZOOM <= PIN_MAX_ZOOM);
 
   // ── R1 지도 ↔ 목록 호버 동기화 (2026-09-13) ────────────────────────────────
   // 목록 1,443줄 중 "지금 보는 그거"가 지도 어디인지를 눈이 못 찾는다. Zillow·Redfin 이

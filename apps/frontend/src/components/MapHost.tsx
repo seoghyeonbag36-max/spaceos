@@ -30,6 +30,20 @@ import "./MapHost.css";
 /** 가로수길 코어 — 거점 목록이 오기 전 초기 중심(poc-building-vacancy.md §0.5). */
 const GAROSU = { lat: 37.5205, lng: 127.023 };
 
+/**
+ * 앱을 열면 지도가 서는 줌. **거점 하나가 화면에 들어오는 축척**이다.
+ *
+ * ⚠ 이 값은 혼자 쓰이지 않는다. `MapShell` 의 `PIN_MAX_ZOOM` 이 "이 줌 이하면 공실
+ *   점, 초과면 건물 폴리곤"을 가르는데, 둘이 따로 적혀 있어 **기본 화면이 어느 쪽에
+ *   떨어지는지 아무도 안 보고 있었다.** 2026-09-12 까지 기본 16 > 경계 15 라
+ *   기본 화면은 늘 폴리곤이었고, 840동이 4색으로 전부 칠해져 "어디가 비었나"가
+ *   색에 묻혔다(2026-09-06 디자이너 피드백 「공실을 red-dot 혹은 핀으로」가 지적한 화면).
+ *
+ *   지켜야 하는 관계: **PIN_MAX_ZOOM ≥ DEFAULT_ZOOM** — 기본 화면은 점 모드여야 한다.
+ *   `MapShell.test.tsx` 가 이 부등식을 직접 센다. 여기를 고치면 거기가 먼저 운다.
+ */
+export const DEFAULT_ZOOM = 16;
+
 export interface MapHostValue {
   /** 준비되기 전에는 null. 소비하는 쪽은 `ready` 로 가른다. */
   map: any | null;
@@ -75,7 +89,7 @@ export default function MapHost({ active, children }: { active: boolean; childre
         const naver = (window as any).naver;
         mapRef.current = new naver.maps.Map(elRef.current, {
           center: new naver.maps.LatLng(GAROSU.lat, GAROSU.lng),
-          zoom: 16, scaleControl: false, mapDataControl: false,
+          zoom: DEFAULT_ZOOM, scaleControl: false, mapDataControl: false,
         });
         setMap(mapRef.current);
         setReady(true);
