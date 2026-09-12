@@ -1,12 +1,30 @@
-/* 공유 지도 셸 — 좌측 내비 레일(--rail-w) 오른쪽 전부를 지도가 쓴다.
+/* 공유 지도 셸 — **뷰포트 전체**를 지도가 쓴다(2026-09-12 「지도 전체화면」).
    이 규칙은 종전 MapShell.css 의 `.mapshell` 에 있던 것을 그대로 옮긴 것이다
-   (2026-09-05 지도 셸 승격 — 설계서 §10-1). */
+   (2026-09-05 지도 셸 승격 — 설계서 §10-1).
+   층은 둘이다: 지도 캔버스(inset:0) 위에 오버레이 레이어(inset:0 0 0 --rail-w). */
 .maphost {
   position: fixed;
-  inset: 0 0 0 var(--rail-w, 0px);
+  /* 2026-09-12: 지도 캔버스는 **뷰포트 전체**다. 레일 아래까지 지도가 깔린다.
+     그전까지 여기서 `inset: 0 0 0 var(--rail-w)` 로 레일 폭(64px)만큼 잘라 냈다 —
+     레일이 지도 옆의 별도 열이라 지도가 화면을 다 쓰지 못했다.
+     지금 레일은 지도 옆이 아니라 지도 **위에** 뜬다(App.css `.is-map .rail`).
+     UI 가 레일 밑으로 숨는 문제는 아래 `.map-overlays` 가 대신 비켜서 막는다. */
+  inset: 0;
   overflow: hidden;
   font-family: var(--font-sans, system-ui, sans-serif);
   color: var(--ink);
+}
+
+/* ── 오버레이 레이어 ──
+   지도는 뷰포트 전체를 쓰지만 **UI 는 레일을 피한다**. 검색·목록·범례가
+   레일(64px) 밑으로 들어가면 눌리지 않는다. 지도 캔버스와 오버레이의 좌측
+   기준선이 여기서 갈린다 — 캔버스는 0, 오버레이는 --rail-w.
+   pointer-events:none 이라 빈 자리는 지도 드래그가 그대로 통과한다
+   (자식이 각자 auto 로 되살린다 — .mapshell · .map-overlays > .overlay). */
+.maphost .map-overlays {
+  position: absolute;
+  inset: 0 0 0 var(--rail-w, 0px);
+  pointer-events: none;
 }
 
 /* 지도 뷰가 아닐 때 — 언마운트하지 않고 숨긴다.
@@ -33,7 +51,8 @@
 /* 지도 키 미설정/도메인 미등록 시 안내 (레이아웃은 그대로 시연) */
 .maphost .map-note {
   position: absolute;
-  inset: 0;
+  /* 안내도 레일을 피한다 — 레일 위로 글자가 겹치면 둘 다 안 읽힌다. */
+  inset: 0 0 0 var(--rail-w, 0px);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);

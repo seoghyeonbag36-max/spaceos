@@ -61,7 +61,11 @@ const NAV: { key: View; label: string; icon: JSX.Element; track?: TrackKey }[] =
 ];
 
 export default function App() {
-  const [view, setView] = useState<View>("seoul");
+  // 첫 화면은 **지도**다(2026-09-12). 그전 기본값은 "seoul"(대시보드)이라, 지도 중심
+  // 제품인데 앱을 열면 지도가 한 픽셀도 안 보였다. 대신 비용이 하나 붙는다 —
+  // MapHost 가 미루던 지도 SDK 로드를 이제 모든 방문이 첫 화면에서 낸다.
+  // 되돌리려면 이 한 줄만 "seoul" 로 바꾼다.
+  const [view, setView] = useState<View>("map");
   const [pageWorkspace, setPageWorkspace] = useState(createPageWorkspace);
   const [postingSelection, setPostingSelection] = useState<(BuildingSelection & { requestId: number })>();
   const reviewBuilding = (selection: BuildingSelection) => {

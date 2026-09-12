@@ -240,3 +240,40 @@
   .mapshell .time-bar { bottom: calc(52dvh + 76px); }
   .mapshell .time-bar input { width: 120px; }
 }
+
+
+/* ── 목록 접기 (2026-09-12 「지도 전체화면」) ──
+   패널은 360px 불투명 카드라 1440px 화면에서 지도의 약 4분의 1을 덮는다.
+   지우지 않고 접을 수 있게만 한다 — 후보 저장·비교 동선이 이 안에 있다.
+   `hidden` 속성만으로는 안 닫힌다: `.mapshell .side-panel` 의 display:flex 가
+   UA 의 [hidden]{display:none} 보다 특정도가 높다. 그래서 여기서 다시 닫는다. */
+.mapshell .side-panel[hidden] { display: none; }
+
+.mapshell .side-panel .sp-head { position: relative; padding-right: 40px; }
+.mapshell .sp-collapse {
+  position: absolute; top: 10px; right: 8px;
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--muted);
+  font: inherit; font-size: 15px; line-height: 1; cursor: pointer;
+}
+.mapshell .sp-collapse:hover { background: var(--bg); color: var(--track-page); border-color: var(--track-page); }
+
+/* 펴기 버튼 — 접힌 목록이 어디로 갔는지 지도 위에 남긴다.
+   자리는 접히기 전 패널의 좌상단 모서리와 같다(top:64px left:12px). */
+.mapshell .panel-reopen {
+  top: 64px; left: 12px;
+  display: flex; align-items: center; gap: var(--sp-2);
+  min-height: 40px; padding: 0 14px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); color: var(--ink);
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+  font: inherit; font-size: 13px; font-weight: var(--fw-semibold, 600); cursor: pointer;
+}
+.mapshell .panel-reopen:hover { color: var(--track-page); border-color: var(--track-page); }
+
+@media (max-width: 1050px) and (min-width: 769px) { .mapshell .panel-reopen { top: 112px; } }
+@media (max-width: 768px) {
+  /* 모바일에서 패널은 하단 시트다 — 펴기 버튼도 같은 쪽 아래에 둔다. */
+  .mapshell .panel-reopen { top: auto; bottom: var(--sp-3); left: var(--sp-3); }
+}
