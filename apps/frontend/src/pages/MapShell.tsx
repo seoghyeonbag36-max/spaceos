@@ -161,6 +161,11 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
   // 짝의 본보기는 아래 zoom_changed 리스너다.
   const listenersRef = useRef<any[]>([]);
   const [layer, setLayer] = useState<Layer>("vacancy");
+  // 좌측 목록 패널을 접었는가(2026-09-12 「지도 전체화면」).
+  // 패널은 360px 불투명 카드라 1440px 화면에서 지도의 4분의 1을 덮는다. 지우지는
+  // 않는다 — 후보 저장·비교가 여기 있다. 대신 **접을 수 있게** 해서, 지도만 보고
+  // 싶을 때 화면 전체를 지도에 내준다. 기본은 종전대로 펼친 상태다.
+  const [panelOpen, setPanelOpen] = useState(true);
   const [inventory, setInventory] = useState<{ districtId: string; buildings: Building[]; source: "api" | "local" } | null>(null);
   // 불러오는 중 이전 거점의 건물·출처를 새 거점 이름으로 보여주지 않는다.
   const currentInventory = inventory?.districtId === districtId ? inventory : null;
@@ -434,9 +439,21 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
         </div>
       </div>
 
+      {/* 접었을 때만 뜨는 펴기 버튼 — 접힌 패널이 어디로 갔는지 화면에 남긴다. */}
+      {!panelOpen && (
+        <button className="overlay panel-reopen" onClick={() => setPanelOpen(true)}
+          aria-expanded={false} aria-controls="page-side-panel">
+          ☰ 건물 목록
+        </button>
+      )}
+
       {/* 좌측 리스트 패널 (모바일: 하단 시트) */}
-      <div className={"overlay side-panel" + (selected ? " has-selection" : "")}>
+      <div id="page-side-panel" hidden={!panelOpen}
+        className={"overlay side-panel" + (selected ? " has-selection" : "")}>
         <div className="sp-head">
+          <button className="sp-collapse" onClick={() => setPanelOpen(false)}
+            aria-expanded aria-controls="page-side-panel" aria-label="건물 목록 접기"
+            title="목록을 접고 지도를 넓게 본다">‹</button>
           {/* PPPP: Product ▶ Page — 이 platform 안에 어떤 page 가 놓일 자리인지를 본다.
               가격대 판단은 Posting(Price ▶ Posting) 의 몫이라 여기서 답하지 않는다. */}
           <div className="sp-track">PRODUCT ▶ PAGE</div>

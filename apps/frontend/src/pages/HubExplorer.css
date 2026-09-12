@@ -3,16 +3,19 @@
    지도는 MapHost 가 배경으로 깔고, 여기 있는 것은 전부 그 위에 뜬 오버레이다 —
    어느 것도 지도 폭을 줄이지 않는다(불변 조건 C1). */
 
-/* 오버레이 공통 — MapHost 의 직계 자식만 잡는다(.mapshell 안쪽과 섞이지 않게) */
-.maphost > .overlay { position: absolute; z-index: 5; }
+/* 오버레이 공통 — 오버레이 레이어의 직계 자식만 잡는다(.mapshell 안쪽과 섞이지 않게).
+   2026-09-12: 기준이 `.maphost >` 에서 `.map-overlays >` 로 내려왔다. 지도 캔버스가
+   뷰포트 전체를 쓰게 되면서 위치 기준을 잡는 층이 하나 늘었다 — MapHost.css 참조.
+   레이어 자체는 pointer-events:none 이라 여기서 되살려야 눌린다. */
+.map-overlays > .overlay { position: absolute; z-index: 5; pointer-events: auto; }
 
 /* ── A 상단: 거점 검색 ── */
-.maphost > .hx-top {
+.map-overlays > .hx-top {
   top: 12px; left: 12px; right: 12px;
   display: flex; gap: var(--sp-2);
   pointer-events: none;             /* 빈 영역은 지도 드래그가 통과한다 */
 }
-.maphost > .hx-top > * { pointer-events: auto; }
+.map-overlays > .hx-top > * { pointer-events: auto; }
 .hx-search {
   flex: 0 1 260px; min-width: 160px; height: 40px; padding: 0 14px;
   border: 1px solid var(--line); border-radius: 10px;
@@ -22,7 +25,7 @@
 .hx-search:focus { border-color: var(--brand); }
 
 /* ── B 좌측: 거점 목록 ── */
-.maphost > .hx-list {
+.map-overlays > .hx-list {
   top: 64px; left: 12px; bottom: 12px; width: 320px;
   display: flex; flex-direction: column;
   background: var(--surface); border: 1px solid var(--line);
@@ -65,7 +68,7 @@
 
 /* ── C 우측: 거점 요약 ──
    bottom 68 = 범례 44 + 여백 24. 범례를 덮으면 근거 배지가 가려진다. */
-.maphost > .hx-summary {
+.map-overlays > .hx-summary {
   top: 64px; right: 12px; bottom: 68px; width: 340px;
   display: flex; flex-direction: column; gap: 10px;
   padding: 14px var(--sp-4) var(--sp-4);
@@ -137,7 +140,7 @@
   margin: 2px 0 0; font-size: 11px; line-height: 1.6; color: var(--muted);
 }
 
-.maphost > .hx-reopen {
+.map-overlays > .hx-reopen {
   top: 64px; right: 12px;
   height: 36px; padding: 0 14px; border: 1px solid var(--line);
   border-radius: 10px; background: var(--surface); cursor: pointer;
@@ -147,7 +150,7 @@
 
 /* ── D 범례: 경계 근거 ──
    "실측 범위"라고 말한다. 상권 경계라고 말하지 않는다. */
-.maphost > .hx-legend {
+.map-overlays > .hx-legend {
   right: 12px; bottom: 12px;
   display: flex; align-items: center; gap: var(--sp-2);
   background: rgba(255,255,255,.94); padding: var(--sp-2) var(--sp-3);
@@ -173,32 +176,32 @@
    그래서 거점을 고르면 목록이 접히고(is-collapsed), "거점 목록" 버튼으로 되돌아온다.
    둘을 같이 보겠다고 사용자가 목록을 다시 열면(with-list) 그때만 위아래로 쌓인다. */
 @media (max-width: 768px) {
-  .maphost > .hx-list {
+  .map-overlays > .hx-list {
     top: auto; left: 0; right: 0; bottom: 0; width: auto;
     height: 38vh; border-radius: 16px 16px 0 0;
     box-shadow: var(--shadow-sheet, 0 -4px 24px rgba(11,27,51,.12));
   }
-  .maphost > .hx-list.is-collapsed { display: none; }
+  .map-overlays > .hx-list.is-collapsed { display: none; }
 
-  .maphost > .hx-summary {
+  .map-overlays > .hx-summary {
     top: auto; left: 0; right: 0; bottom: 0; width: auto;
     max-height: 52vh; border-radius: 16px 16px 0 0;
     box-shadow: var(--shadow-sheet, 0 -4px 24px rgba(11,27,51,.12));
   }
   /* 사용자가 목록을 도로 열었을 때만 요약이 그 위로 올라간다 */
-  .maphost > .hx-summary.with-list { bottom: 38vh; max-height: 44vh; }
+  .map-overlays > .hx-summary.with-list { bottom: 38vh; max-height: 44vh; }
 
   /* 범례는 시트 위가 아니라 **검색 바 아래**로 옮긴다 — 시트 높이가 상태마다 달라져
      bottom 기준으로 두면 요약 본문 위에 겹쳐 앉는다(760px 실측에서 그랬다). */
-  .maphost > .hx-legend { top: 60px; right: 12px; bottom: auto; }
-  .maphost > .hx-reopen { top: 60px; right: 12px; bottom: auto; }
+  .map-overlays > .hx-legend { top: 60px; right: 12px; bottom: auto; }
+  .map-overlays > .hx-reopen { top: 60px; right: 12px; bottom: auto; }
   .hx-search { flex: 1 1 auto; }
 }
 
 /* 좁은 화면에서 접힌 목록을 되부르는 버튼 — 데스크톱에서는 렌더되지 않는다.
    요약 시트가 bottom:0 까지 내려오므로 아래에 두면 본문을 가린다(760px 실측).
    검색 바(top:12, h40) 아래 왼쪽에 둔다 — 범례는 같은 높이 오른쪽이라 부딪히지 않는다. */
-.maphost > .hx-list-toggle {
+.map-overlays > .hx-list-toggle {
   left: 12px; top: 60px;
   height: 36px; padding: 0 14px; border: 1px solid var(--line);
   border-radius: 999px; background: var(--surface); cursor: pointer;

@@ -48,6 +48,19 @@
 .appshell .rail-btn[data-track]:hover { background: var(--rail-soft); color: var(--rail-accent); }
 .appshell .rail-btn[data-track].active:hover { background: var(--rail-accent); color: var(--surface); }
 
+/* ── 지도 뷰의 레일 (2026-09-12 「지도 전체화면」) ──
+   지도 캔버스가 뷰포트 전체를 쓰게 되면서, 레일 **아래에도 지도가 있다**.
+   불투명하게 두면 지도가 거기서 끊긴 것처럼 보인다 — 살짝 비치게 해서
+   지도가 화면 끝까지 이어지는 걸 눈으로 확인할 수 있게 한다.
+   대시보드 뷰에서는 뒤에 지도가 없으므로 위의 불투명 배경 그대로 간다. */
+.appshell.is-map .rail {
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-right: 0;
+  box-shadow: 1px 0 10px rgba(11, 27, 51, .12);
+}
+
 /* ── 본문 ──
    레일이 fixed 라 자리를 비켜주는 건 본문 몫이다. */
 .appshell .app-main { margin-left: var(--rail-w); }

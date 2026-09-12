@@ -101,8 +101,12 @@ export default function MapHost({ active, children }: { active: boolean; childre
           </div>
         )}
 
-        {/* 오버레이 — 지도 뷰일 때만 그린다. 지도 자체는 그대로 살아 있다. */}
-        {active && children}
+        {/* 오버레이 — 지도 뷰일 때만 그린다. 지도 자체는 그대로 살아 있다.
+            ⚠ 이 래퍼를 벗기지 말 것(2026-09-12). 지도 캔버스는 뷰포트 전체를 쓰는데
+            UI 까지 좌측 0 에서 시작하면 검색·목록이 레일(64px) 밑에 깔려 안 눌린다.
+            래퍼가 그 폭만큼 비켜서 캔버스와 UI 의 좌측 기준선을 갈라 놓는다
+            (MapHost.css `.map-overlays`). */}
+        {active && <div className="map-overlays">{children}</div>}
       </div>
     </MapHostCtx.Provider>
   );
