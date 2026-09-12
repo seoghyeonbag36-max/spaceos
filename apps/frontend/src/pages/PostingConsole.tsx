@@ -9,6 +9,7 @@ import type {
 } from "@/lib/api";
 import { Button } from "@/design/components/Button";
 import { Card } from "@/design/components/Card";
+import Verdict, { type Ground } from "@/components/Verdict";
 import "./PostingConsole.css";
 
 /**
@@ -73,6 +74,12 @@ function PostingSession({ selection }: PostingConsoleProps) {
   const [err, setErr] = useState<string | null>(null);
 
   const unit = useMemo(() => units.find((u) => u.id === unitId), [units, unitId]);
+
+  // 화면 머리(결론 1줄 + 근거 3줄). 계산 결과가 바뀔 때만 다시 짠다.
+  const head = useMemo(() => postingHeadline({
+    districtName: districts.find((d) => d.id === districtId)?.name ?? districtId,
+    unit, unitCount: units.length, result, premInput: prem,
+  }), [districts, districtId, unit, units.length, result, prem]);
 
   useEffect(() => {
     let live = true;
@@ -189,17 +196,26 @@ function PostingSession({ selection }: PostingConsoleProps) {
 
   return (
     <div className="postconsole"><div className="wrap">
-      <div className="hd">
-        <div className="ey">PLACEOS · POSTING <span className="conv4p">PRICE ▶ POSTING</span></div>
-        <h1>어느 가격대의 page 를 이 자리에 올릴까</h1>
-        <div className="sub">
-          "얼마에 팔까"가 아니라 <b>어느 가격대를 이 자리에 posting 할까</b>를 답한다.
-          실측 공실 자리를 골라 <b>업종·권리금</b>을 넣으면 세 전략(고급화·가성비·기능중심)의
-          월 순익과 회수기간을 낸다. 임대료는 R-ONE 실측, 면적은 건축물대장이며,
-          <b> 권리금은 공개 통계가 없어 기업이 넣는 입력</b>이다 — 비워 두면 0 을 전제로 계산하고
-          결과가 그 사실을 밝힌다.
-        </div>
-      </div>
+      {/* 2026-09-13: 손으로 짠 `.hd` 헤더를 공용 `Verdict` 로 바꿨다.
+          같은 모양(eyebrow · 4P 전환 · 질문 h1 · 설명)을 갖고 있었지만 **결론 문장과
+          근거 줄, 출처 줄이 없었다** — Platform·Program 은 이미 Verdict 를 쓰는데
+          Posting 만 질문을 던지고 답을 안 했다. 네 트랙이 같은 자리에서 같은 모양으로
+          답해야 한다는 것이 Verdict 를 만든 이유다(components/Verdict.tsx).
+          근거: design/references/INDEX.md §2-1(Placer.ai — 결론 → 차트 → 원자료). */}
+      <Verdict
+        eyebrow="PlaceOS · Posting" conversion="PRICE ▶ POSTING"
+        question="어느 가격대의 page 를 이 자리에 올릴까"
+        verdict={head.verdict} grounds={head.grounds} sources={head.sources}
+        note={
+          <>
+            "얼마에 팔까"가 아니라 <b>어느 가격대를 이 자리에 posting 할까</b>를 답한다.
+            실측 공실 자리를 골라 <b>업종·권리금</b>을 넣으면 세 전략(고급화·가성비·기능중심)의
+            월 순익과 회수기간을 낸다. 임대료는 R-ONE 실측, 면적은 건축물대장이며,
+            <b> 권리금은 공개 통계가 없어 기업이 넣는 입력</b>이다 — 비워 두면 0 을 전제로 계산하고
+            결과가 그 사실을 밝힌다.
+          </>
+        }
+      />
 
       {err && (
         <div className="err">
@@ -401,6 +417,107 @@ function difference(value: number, unit: string): string {
 }
 
 /** 입력 출처 라벨 — 프록시를 실측으로 오독하지 않게 한다. 모르는 값은 그대로 노출한다. */
+/* ───────────────── 결론 1줄 + 근거 3줄 (2026-09-13) ─────────────────
+ *
+ * 이 화면이 답한 것과 그 답을 세운 값. Platform·Program 의 `headline()` 과 같은 자리다.
+ *
+ * 상태가 셋이고 **셋을 섞지 않는다**:
+ *   ① 아직 자리를 안 골랐다      → 무엇을 고르면 무엇이 나오는지 말한다
+ *   ② 골라서 계산했고 회수된다   → 어느 전략이 몇 개월인지 말한다
+ *   ③ 계산했는데 셋 다 회수 불가 → **"추천이 없다"가 아니라 "회수가 안 된다"** 고 말한다
+ *
+ * ⚠ 권리금이 `absent`(입력 없음)면 결론에 그 사실을 싣는다. 0 을 전제로 낸 회수기간을
+ *   실측처럼 읽으면 그 숫자가 곧 거짓말이 된다 — 이 화면 주석 §화면 원칙과 같은 규칙이다.
+ */
+function postingHeadline({ districtName, unit, unitCount, result, premInput }: {
+  districtName: string;
+  unit?: Posting;
+  unitCount: number;
+  result: SimulateResult | null;
+  premInput: string;
+}): { verdict: React.ReactNode; grounds: Ground[]; sources: React.ReactNode[] } {
+  const sources: React.ReactNode[] = [
+    "임대료 R-ONE 실측", "면적 건축물대장", "영업비용률 KOSIS", "권리금 기업 입력",
+  ];
+
+  // ① 아직 계산 전.
+  if (!result) {
+    return {
+      verdict: unitCount
+        ? <>{districtName}에 실측 공실 <b>{unitCount.toLocaleString()}곳</b>이 있다. 자리와 업종을 고르면 세 가격대의 회수기간을 낸다.</>
+        : <>{districtName}의 공실 자리를 불러오는 중이다.</>,
+      grounds: [
+        { label: "고를 수 있는 자리", value: unitCount ? `${unitCount.toLocaleString()}곳` : "불러오는 중", source: "건축물대장 실측 인벤토리" },
+        { label: "비교하는 가격대", value: "고급화 · 가성비 · 기능중심 3전략" },
+        { label: "권리금", value: premInput ? `${Number(premInput).toLocaleString()}만원 입력됨` : "미입력 — 0 을 전제로 계산한다", source: "공개 통계 없음 · 기업 입력 계약" },
+      ],
+      sources,
+    };
+  }
+
+  // ⚠ 전략 이름은 `TIER_LABEL[key]` 로 읽는다. `scenario.name` 은 백엔드가 원시 키
+  //   ("value")를 주기도 해서 그대로 쓰면 화면 나머지(TierCard)와 다른 이름이 뜬다.
+  const entries = Object.entries(result.scenarios);
+  const label = (key: string, s: TierScenario) => TIER_LABEL[key]?.name ?? s.name;
+  const viable = entries.filter(([, t]) => t.viable);
+  // 추천 전략이 회수 불가일 수는 없지만, 백엔드가 recommended 를 안 준 경우를 대비해
+  // **회수되는 것 중 가장 빠른 것**으로 떨어진다. 없는 값을 지어내지 않는다.
+  const best = entries.find(([, t]) => t.recommended && t.viable)
+    ?? [...viable].sort((a, b) => a[1].roi_months - b[1].roi_months)[0];
+  const where = unit?.n ?? result.unit_id;
+  const premAbsent = result.inputs_source?.prem === "absent";
+  const basis = BASIS_LABEL[entries[0]?.[1]?.basis] ?? entries[0]?.[1]?.basis ?? "미상";
+
+  // ③ 셋 다 회수 불가 — 이것도 답이다. 비워 두면 "계산이 안 됐다"로 읽힌다.
+  if (!best) {
+    return {
+      verdict: <><b>{where}</b>는 세 전략 모두 회수되지 않는다.{result.unviable_note ? ` ${result.unviable_note}` : ""}</>,
+      grounds: [
+        { label: "회수되는 전략", value: `없음 (${entries.length}전략 중 0)`, source: `비용 기준 ${basis}` },
+        { label: "월 임대료", value: unit ? won(unit.rent) : "미상", source: "R-ONE 실측" },
+        { label: "권리금", value: premAbsent ? "미입력 — 0 전제" : "기업 입력 반영", source: premAbsent ? "이 값을 넣으면 회수기간이 더 늘어난다" : undefined },
+      ],
+      sources,
+    };
+  }
+
+  // ② 회수된다.
+  const [bestKey, bestTier] = best;
+  const bestName = label(bestKey, bestTier);
+  return {
+    verdict: (
+      <>
+        <b>{where}</b>는 <b>{bestName}</b> 전략으로 <b>{bestTier.roi_months}개월</b>에 회수된다
+        {premAbsent && <> — 단 <b>권리금 0 을 전제</b>로 한 값이다</>}.
+      </>
+    ),
+    grounds: [
+      {
+        label: "가장 빠른 회수",
+        value: `${bestName} · ${bestTier.roi_months}개월 (월 순익 ${won(bestTier.month_net)})`,
+        source: `비용 기준 ${basis}`,
+      },
+      {
+        label: "회수되는 전략",
+        value: `${entries.length}전략 중 ${viable.length}개`,
+        source: viable.length < entries.length ? `${entries.length - viable.length}개는 월 순익이 0 이하다` : undefined,
+      },
+      {
+        label: "권리금",
+        value: premAbsent ? "미입력 — 0 을 전제로 계산" : "기업 입력 반영",
+        source: premAbsent ? "공개 통계가 없어 그 자리에 들어갈 기업만 안다" : "입력 계약",
+      },
+      // 네 줄째부터는 Verdict 가 접는다 — 규칙이 세 줄이지 값이 셋인 것은 아니다.
+      {
+        label: "계산 경로",
+        value: result.source === "copilot" ? "외부 AI 창업 코파일럿" : "내부 3-Tier 폴백",
+        source: result.source_note ?? undefined,
+      },
+    ],
+    sources,
+  };
+}
+
 function srcLabel(v: string | undefined): string {
   return ({
     rone: "R-ONE 실측", flpop: "유동 실측", "flpop+seed": "유동+서열",

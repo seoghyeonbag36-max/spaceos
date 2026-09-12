@@ -7,12 +7,11 @@
 .postconsole *{box-sizing:border-box}
 .postconsole .wrap{max-width:1240px;margin:0 auto}
 
-.postconsole .hd{margin-bottom:14px}
-.postconsole .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af}
-.postconsole .conv4p{margin-left:var(--sp-2);padding:1px 7px;border-radius:99px;border:1px solid rgba(43,200,217,.45);color:#2BC8D9;font-size:10px;letter-spacing:.8px}
-.postconsole h1{font-size:27px;font-weight:700;margin:6px 0 var(--sp-1);letter-spacing:-.5px}
-.postconsole .sub{font-size:13px;color:var(--sub);line-height:1.65;max-width:860px}
-.postconsole .sub b{color:var(--ink)}
+/* 2026-09-13: 화면 머리를 공용 `Verdict` 로 바꾸면서 `.hd .ey .conv4p h1 .sub` 규칙이
+   전부 죽었다(마크업에서 사라졌으므로 선택자가 아무것도 잡지 않는다). 남겨 두면
+   다음 사람이 "여기서 헤더 색을 고치면 되겠지" 하고 죽은 규칙을 고치게 된다 —
+   이 저장소가 tailwind.config.ts·Storybook 에서 이미 겪은 일이다. 그래서 지운다.
+   지금 헤더 스타일의 단일 출처는 `src/components/Verdict.css` 의 `.verdict` 다. */
 
 .postconsole .err{background:#fef2f2;border:1px solid #fecaca;border-radius:13px;padding:var(--sp-4) 18px;font-size:13px;color:#7f1d1d;margin:14px 0;line-height:1.7}
 .postconsole .errdetail{font-size:11px;color:#b91c1c;margin-top:6px;word-break:break-all}

@@ -21,11 +21,19 @@ export type VacancyLevel = 0 | 1 | 2 | 3 | 4;
  * 지도 위 공실 점(red dot)의 HTML. 네이버 SDK `icon.content` 에 그대로 넣는다.
  * 흰 테두리 + 이중 그림자는 위성/일반 지도 어느 배경에서도 점이 묻히지 않게 한다.
  */
-export function vacancyDotHTML(color: string, size = 13): string {
+export function vacancyDotHTML(color: string, size = 13, hot = false): string {
+  // hot = 목록에서 이 건물에 마우스를 올린 상태(지도↔목록 호버 동기화, 2026-09-13).
+  // **크기를 키우지 않는다** — 점이 커지면 이웃 점을 덮어 주변 밀도가 달라 보인다.
+  // 대신 테두리를 두껍게 하고 불투명하게 올린다. 위치도 모양도 그대로다.
+  // → design/references/INDEX.md §2-3(Zillow·Redfin 호버 동기화)
+  const ring = hot ? 3 : 1.5;
+  const shadow = hot
+    ? "0 0 0 2px rgba(28,37,51,.55),0 2px 6px rgba(0,0,0,.45)"
+    : "0 0 0 1px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.35)";
   return (
     `<div style="width:${size}px;height:${size}px;border-radius:50%;`
-    + `background:${color};border:1.5px solid #fff;`
-    + `box-shadow:0 0 0 1px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.35);opacity:.92"></div>`
+    + `background:${color};border:${ring}px solid #fff;`
+    + `box-shadow:${shadow};opacity:${hot ? 1 : 0.92}"></div>`
   );
 }
 

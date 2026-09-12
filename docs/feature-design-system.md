@@ -26,7 +26,7 @@ apps/frontend/src/design/components/ Button·Card·BottomSheet·MapMarkerPin·Va
 | 네이버페이 공식 버튼 | 네이버페이 가맹점/개발자센터 | design/assets/naverpay/(원본) |
 | 네이버 지도 스타일·마커 | NCP Maps 콘솔/문서 | design/assets/navermap/ |
 | Pretendard 폰트 | npm pretendard | apps/frontend/public/fonts/ |
-| 참조 UI 패턴 | 네이버지도·당근·배민 캡처 | design/references/ |
+| 참조 UI 패턴 | 국내외 레퍼런스 12종 — **"무엇을 가져올지"가 항목마다 붙어 있다** | [design/references/INDEX.md](../design/references/INDEX.md) |
 
 ## 4. 산출물 저장·기록·공유
 - **토큰 동기화는 세 곳이다.** 한 곳을 고치면 나머지 두 곳을 같은 커밋에서 맞춘다.
@@ -36,6 +36,14 @@ apps/frontend/src/design/components/ Button·Card·BottomSheet·MapMarkerPin·Va
   - `src/styles/tokens.css` — 실제 화면에 먹는 CSS 변수. 컴포넌트는 이 `var(--…)` 를 쓴다
   - ⚠ Tailwind 는 쓰지 않는다. `tailwind.config.ts` 는 설치도 되지 않은 라이브러리의 죽은 설정이라
     2026-09-06 에 삭제했다(`@tailwind` 지시문 0개). 다시 끌어오지 말 것
+- **결론 1줄 + 근거 3줄은 `src/components/Verdict.tsx` 하나다.** 새 이름으로 다시 만들지 말 것 —
+  2026-09-13 에 같은 일을 하는 `KeyFinding` 을 만들었다가 중복이라 지웠다. 지금 쓰는 화면은
+  Platform · Program · Posting 셋이고, Page(MapShell)는 사이드패널이 320px 오버레이라
+  전폭 헤더가 안 들어가 아직 안 쓴다.
+- **죽은 Tailwind 클래스는 2026-09-13 에 다 걷혔다.** `BottomSheet` · `VacancyLegend` 가
+  `bg-surface` `flex items-center` 같은 유틸리티만 들고 있어 스타일이 하나도 안 걸린 채
+  방치돼 있었다(2026-09-06 에 Card · Button 만 고치고 남은 것). `design.css` 로 옮겨
+  되살렸고, `BottomSheet` 의 형태 언어는 `MapShell` 모바일 패널에 적용했다.
 - 컴포넌트 기록의 단일 출처는 `src/design/components/` 의 코드다.
   ⚠ Storybook 은 **설치된 적이 없다**(`.storybook/main.ts` 첫 줄이 `// TODO: 설치` 였고
   `build-storybook` 스크립트도 없었다) → 2026-09-06 삭제. 다시 쓰려면 설치가 먼저다.

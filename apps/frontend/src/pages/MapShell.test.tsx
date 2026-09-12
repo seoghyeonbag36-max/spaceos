@@ -237,3 +237,97 @@ describe("MapShell — 사이드패널", () => {
     expect(screen.queryByText("가로수 A")).toBeNull();
   });
 });
+
+/**
+ * 레퍼런스 이식분(design/references/INDEX.md §2-3 Zillow·Redfin · §1-1 호갱노노)의 회귀 그물.
+ *
+ * 이 둘은 **조용히 비싸지는** 기능이라 눈으로 보면 멀쩡한데 성능이 죽는다:
+ *   - 호버 강조를 오버레이 렌더 useEffect 의 deps 로 넣으면 마우스가 한 칸 움직일 때마다
+ *     폴리곤 1,443개를 부수고 다시 만든다. 화면은 똑같이 보인다.
+ *   - 뷰포트 필터를 오버레이까지 걸면 지도를 조금만 밀어도 전부 다시 그린다.
+ * 그래서 "무엇이 보이나"만 보지 않고 **오버레이를 몇 개 다시 만들었나**를 같이 센다.
+ */
+describe("MapShell — 지도 ↔ 목록 동기화", () => {
+  const polygons = () => naver.overlays.filter((o) => o.kind === "Polygon");
+
+  it("목록을 가리키면 그 건물 도형만 강조하고, 도형을 다시 만들지 않는다", async () => {
+    mount();
+    await waitFor(() => expect(naver.live()).toHaveLength(3));
+    const made = naver.overlays.length;
+    // 건물은 filtered 순서대로 그려진다 — g1·g2·g3.
+    const [pg1, pg2] = polygons();
+    // 호버 전 채움색을 받아 둔다. 아래에서 **이 값이 그대로인지**를 본다.
+    const baseFill = pg1.options.fillColor;
+
+    fireEvent.mouseEnter(await screen.findByRole("button", { name: /^가로수 A 카페/ }));
+
+    // 강조는 **제자리에서** 일어난다. 새 오버레이가 생겼다면 렌더 경로를 탄 것이다.
+    expect(naver.overlays.length).toBe(made);
+    expect(pg1.setOptionsCalls.length).toBe(1);
+    expect(pg1.options.strokeWeight).toBe(4);
+    expect(pg1.options.zIndex).toBe(200);
+    // 채움색은 공실 상태를 뜻한다 — 호버가 건드리면 화면이 거짓말을 한다.
+    expect(pg1.options.fillColor).toBe(baseFill);
+    // 가리키지 않은 건물은 손대지 않는다.
+    expect(pg2.setOptionsCalls.length).toBe(0);
+
+    fireEvent.mouseLeave(screen.getByRole("button", { name: /^가로수 A 카페/ }));
+    expect(pg1.options.strokeWeight).toBe(2);
+    expect(pg1.options.zIndex).toBe(50);
+    expect(naver.overlays.length).toBe(made);
+  });
+
+  it("지도 쪽에서 가리켜도 목록의 같은 줄이 뜬다 — 왕복이 닫힌다", async () => {
+    mount();
+    await waitFor(() => expect(naver.live()).toHaveLength(3));
+    const [pg1] = polygons();
+
+    naver.emit(pg1, "mouseover");
+
+    const row = (await screen.findByText("가로수 A")).closest(".building-card");
+    expect(row?.className).toContain("is-hot");
+
+    naver.emit(pg1, "mouseout");
+    expect((await screen.findByText("가로수 A")).closest(".building-card")?.className).not.toContain("is-hot");
+  });
+
+  it("지도를 움직이면 목록이 화면 범위로 좁혀지고, 「거점 전체」로 되돌릴 수 있다", async () => {
+    mount();
+    await waitFor(() => expect(naver.live()).toHaveLength(3));
+    expect(await screen.findByText("가로수 C")).toBeTruthy();
+    const made = naver.overlays.length;
+
+    // g1 만 담는 범위. fixtures 의 건물은 (37.52, 127.02)에서 0.0002 씩 어긋나 있다.
+    const map = naver.map()!;
+    map.bounds = new naver.LatLngBounds(new naver.LatLng(37.5199, 127.0199), new naver.LatLng(37.5201, 127.0201));
+    naver.emit(map, "idle");
+
+    await waitFor(() => expect(screen.queryByText("가로수 C")).toBeNull());
+    expect(screen.getByText("가로수 A")).toBeTruthy();
+    // 분모를 같이 말한다 — 조건에 맞는 3동 중 화면 안 1동.
+    expect(screen.getByText(/조건에 맞는/)).toBeTruthy();
+    // ⚠ 좁히는 건 **목록뿐이다.** 지도 도형까지 걸러 다시 그리면 이 수가 늘어난다.
+    expect(naver.overlays.length).toBe(made);
+
+    fireEvent.click(screen.getByRole("button", { name: "지도 범위만" }));
+    expect(await screen.findByText("가로수 C")).toBeTruthy();
+    expect(naver.overlays.length).toBe(made);
+  });
+
+  it("범위 밖이라 비었을 때와 조건이 안 맞아 비었을 때를 다르게 말한다", async () => {
+    mount();
+    await waitFor(() => expect(naver.live()).toHaveLength(3));
+
+    const map = naver.map()!;
+    // 건물이 하나도 없는 바다 한가운데.
+    map.bounds = new naver.LatLngBounds(new naver.LatLng(35.0, 125.0), new naver.LatLng(35.1, 125.1));
+    naver.emit(map, "idle");
+
+    // 필터를 지우라고 하면 안 된다 — 멀쩡한 조건을 지우게 된다.
+    expect(await screen.findByText("이 화면 범위에는 없습니다")).toBeTruthy();
+    expect(screen.queryByText("조건에 맞는 건물이 없습니다")).toBeNull();
+
+    fireEvent.change(screen.getByRole("textbox", { name: "건물 검색" }), { target: { value: "찾을 수 없는 건물" } });
+    expect(await screen.findByText("조건에 맞는 건물이 없습니다")).toBeTruthy();
+  });
+});

@@ -104,7 +104,29 @@ describe("PostingConsole — 결과 패널", () => {
     // 권리금을 안 넣었으면 0 은 관측이 아니라 **전제**다 — 화면이 그 사실을 밝힌다.
     expect(screen.getByText("전제(0)")).toBeTruthy();
     expect(screen.getByText("R-ONE 실측")).toBeTruthy();
-    expect(screen.getByText("내부 3-Tier 폴백")).toBeTruthy();
+    // ⚠ .badge 로 좁힌다 — 2026-09-13 부터 화면 머리(Verdict)의 "계산 경로" 근거도
+    //   같은 문구를 쓴다. 여기서 보려는 것은 **결과 패널의 배지**다.
+    expect(screen.getByText("내부 3-Tier 폴백", { selector: ".badge" })).toBeTruthy();
+  });
+
+  /* 2026-09-13: 화면 머리를 공용 `Verdict` 로 바꿨다 — 그전에는 질문(h1)만 있고
+     **답이 없었다**. Platform·Program 은 이미 결론 한 문장을 내는데 Posting 만
+     안 냈다. 결론이 조용히 사라지면(예: 근거 배열만 남기고 verdict 를 비우면)
+     화면은 여전히 멀쩡해 보이므로 여기서 못 박는다. */
+  it("계산이 끝나면 화면 머리가 결론 한 문장으로 답한다", async () => {
+    const head = await screen.findByRole("banner");
+    // ⚠ 근거 줄에도 "가성비"·"14개월"이 있으므로 **결론 문단 하나만** 본다.
+    //   Verdict 의 결론은 `.vone` 이다(components/Verdict.tsx).
+    await waitFor(() => expect(head.querySelector(".vone")?.textContent ?? "").toContain("14개월"));
+    const one = head.querySelector(".vone")!.textContent!;
+    // 질문만 던지고 마는 화면이 아니다 — 어느 전략으로 몇 개월인지 말한다.
+    expect(one).toContain("가성비");
+    expect(one).toContain("garosugil 1번 자리");
+    // ⚠ 권리금 미입력은 **결론에 실린다.** 0 전제로 낸 회수기간을 실측처럼 읽으면
+    //   그 숫자가 곧 거짓말이 된다.
+    expect(one).toContain("권리금 0 을 전제");
+    // 출처 줄은 상세를 다 접어도 남는다.
+    expect(within(head).getByText("임대료 R-ONE 실측")).toBeTruthy();
   });
 
   it("실측 자리가 0곳인 거점은 계산하지 않고 안내만 남긴다", async () => {
