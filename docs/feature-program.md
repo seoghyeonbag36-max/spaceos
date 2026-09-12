@@ -162,7 +162,7 @@ cityhall 33.5%, garosugil 31.8% ← 창원 가로수길, nonhyeon 23.1% ← 인�
 
 `tests/test_ha_guard.py` 27건(규칙별 양성 + 오탐 음성 대조 + 배선). ⚠ **실제 LLM
 생성물에 물려본 검증은 아직 못 했다** — 2026-08-06 현재 Anthropic 크레딧이 비어 있어
-(400 `credit balance is too low`) LLM 경로 자체가 안 돈다. 충전 후 `SPACEOS_LIVE_LLM=1`
+(400 `credit balance is too low`) LLM 경로 자체가 안 돈다. 충전 후 `PLACEOS_LIVE_LLM=1`
 로 재확인이 필요하다.
 
 ## 0-4. 상권 행사를 생성 컨텍스트에 결합 (2026-08-06)
@@ -535,7 +535,7 @@ int 에는 넣을 수 없다. `test_budget_share_cannot_hold_absolute_amount` �
 - 처리 동의, 입력 제공·처리 권한 확인, 외부 LLM 처리 동의, `request-only` 보존 확인을
   각각 명시적으로 받아야 한다. bool 기본값으로 동의를 만들지 않으며 하나라도 빠지면 422다.
 - 리뷰·사진·메뉴·키워드·창업계획 중 하나는 실제로 있어야 한다. 빈 프로필도 422다.
-- 권리 확인은 **조직의 진술**이다. SpaceOS가 저작권·개인정보 권리의 사실성을 별도로
+- 권리 확인은 **조직의 진술**이다. PlaceOS가 저작권·개인정보 권리의 사실성을 별도로
   검증했다는 뜻으로 표시하지 않는다.
 
 ### 저장·처리 경계
@@ -547,7 +547,7 @@ int 에는 넣을 수 없다. `test_budget_share_cannot_hold_absolute_amount` �
 상호·주소·리뷰·사진 URL·메뉴·키워드 원문은 앱 DB에 저장하지 않고 응답에도 `profile`·
 `consent`를 되돌리지 않는다.
 
-`request-only`는 **SpaceOS 애플리케이션 DB의 원문 보존 범위**다. 외부 LLM 공급자의 보존
+`request-only`는 **PlaceOS 애플리케이션 DB의 원문 보존 범위**다. 외부 LLM 공급자의 보존
 정책까지 없다고 보장하는 표현이 아니므로, UI도 외부 모델 처리 동의를 별도로 받는다.
 ProgramStudio는 공개 스니펫을 `publicReviews`로 분리하고 상용 모드에서 자동 검색을 끈다.
 API key는 현재 메모리의 요청 헤더에만 쓰며 브라우저 저장소에는 보관하지 않는다.

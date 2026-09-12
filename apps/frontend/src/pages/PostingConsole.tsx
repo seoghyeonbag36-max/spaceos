@@ -190,7 +190,7 @@ function PostingSession({ selection }: PostingConsoleProps) {
   return (
     <div className="postconsole"><div className="wrap">
       <div className="hd">
-        <div className="ey">SPACEOS · POSTING <span className="conv4p">PRICE ▶ POSTING</span></div>
+        <div className="ey">PLACEOS · POSTING <span className="conv4p">PRICE ▶ POSTING</span></div>
         <h1>어느 가격대의 page 를 이 자리에 올릴까</h1>
         <div className="sub">
           "얼마에 팔까"가 아니라 <b>어느 가격대를 이 자리에 posting 할까</b>를 답한다.

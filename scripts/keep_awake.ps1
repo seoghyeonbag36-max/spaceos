@@ -28,7 +28,7 @@ $signature = @'
 [DllImport("kernel32.dll", SetLastError = true)]
 public static extern uint SetThreadExecutionState(uint esFlags);
 '@
-$power = Add-Type -MemberDefinition $signature -Name 'SpaceOsPower' -Namespace 'SpaceOs' -PassThru
+$power = Add-Type -MemberDefinition $signature -Name 'PlaceOsPower' -Namespace 'PlaceOs' -PassThru
 
 # ⚠ PS 5.1 은 0x80000000 을 Int32 로 파싱해 [uint32] 캐스트가 터진다(-2147483648).
 #   10진 리터럴로 적는다. 처음에 16진으로 적었다가 호출이 실패했는데도 성공 메시지가

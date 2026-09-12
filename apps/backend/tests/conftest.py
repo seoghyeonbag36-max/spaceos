@@ -10,7 +10,7 @@
 개별 테스트가 각자 `monkeypatch.setattr(settings, "llm_api_key", "")` 하는 방식은
 빠뜨리기 쉽다(실제로 test_districts.py 가 빠뜨려 있었다). 그래서 여기서 전역으로 끈다.
 
-실호출 검증은 `test_llm_live.py` 가 `SPACEOS_LIVE_LLM=1` opt-in 으로만 수행한다 —
+실호출 검증은 `test_llm_live.py` 가 `PLACEOS_LIVE_LLM=1` opt-in 으로만 수행한다 —
 그 경우 이 픽스처는 키를 건드리지 않는다.
 """
 from __future__ import annotations
@@ -19,7 +19,8 @@ import os
 
 import pytest
 
-_LIVE = os.getenv("SPACEOS_LIVE_LLM") == "1"
+# SPACEOS_* 는 2026-09-12 PlaceOS 개명 전 이름 — 쓰던 셸을 깨지 않으려 폴백으로 남긴다
+_LIVE = (os.getenv("PLACEOS_LIVE_LLM") or os.getenv("SPACEOS_LIVE_LLM")) == "1"
 
 
 @pytest.fixture(autouse=True)

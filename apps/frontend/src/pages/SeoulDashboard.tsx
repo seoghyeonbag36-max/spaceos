@@ -53,7 +53,7 @@ export default function SeoulDashboard() {
       <div className="wrap">
         <div className="hd">
           <div>
-            <div className="ey">SpaceOS · Seoul Rollout</div>
+            <div className="ey">PlaceOS · Seoul Rollout</div>
             <h1>서울 25개 자치구 진입 로드맵</h1>
             <div className="sub">4기준×2대상 점수 모델 · Phase = 진입 계획(PHASE_PLAN) · 색상 기준 전환</div>
           </div>

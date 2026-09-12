@@ -1,4 +1,4 @@
-"""SpaceOS 데이터 레이크 ETL DAG (Airflow 골격).
+"""PlaceOS 데이터 레이크 ETL DAG (Airflow 골격).
 
 Bronze(원본) → Silver(정제) → Gold(분석/학습용) 3계층 파이프라인.
 거점 상권: 신사동 가로수길 → 성수동.
@@ -32,11 +32,11 @@ def build_gold(**_):
 
 if DAG is not None:
     with DAG(
-        dag_id="spaceos_bronze_to_gold",
+        dag_id="placeos_bronze_to_gold",
         start_date=datetime(2026, 1, 1),
         schedule="@weekly",
         catchup=False,
-        tags=["spaceos", "etl"],
+        tags=["placeos", "etl"],
     ) as dag:
         t1 = PythonOperator(task_id="ingest_bronze", python_callable=ingest_bronze)
         t2 = PythonOperator(task_id="transform_silver", python_callable=transform_silver)

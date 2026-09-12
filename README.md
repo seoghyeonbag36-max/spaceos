@@ -1,4 +1,4 @@
-# SpaceOS — 상권 디지털 트윈 플랫폼
+# PlaceOS — 상권 디지털 트윈 플랫폼
 
 물리적 상권의 리뷰 데이터와 공실 히스토리를 결합해 **"Place ▶ Platform"** 으로 전환하는 디지털 트윈 SaaS. 모노레포로 구성되어 있으며 Claude Code 기반 개발을 전제로 셋업되어 있다.
 
@@ -32,14 +32,14 @@ git clone https://github.com/seoghyeonbag36-max/spaceos.git && cd spaceos
 cp data/.env.example data/.env
 cp apps/backend/.env.example apps/backend/.env
 cp apps/frontend/.env.example apps/frontend/.env
-# → 공유 비밀번호 관리자(Bitwarden 컬렉션 "SpaceOS API Keys")에서 값 복사해 각 .env 채우기
+# → 공유 비밀번호 관리자(Bitwarden 컬렉션 "PlaceOS API Keys")에서 값 복사해 각 .env 채우기
 ```
 
 이후 아래 [빠른 시작](#빠른-시작)으로 실행한다. 각 키가 어디에 쓰이는지는 [docs/api-keys-and-specs.md](docs/api-keys-and-specs.md) 참조.
 
 ### 키 공유 규칙 (🔒 비밀값은 GitHub에 올리지 않는다)
 
-- **실제 키 값**은 GitHub이 아니라 **공유 비밀번호 관리자**(Bitwarden 무료 조직 컬렉션 `SpaceOS API Keys`)로만 공유한다. `.env`는 `.gitignore` 처리되어 커밋되지 않는다.
+- **실제 키 값**은 GitHub이 아니라 **공유 비밀번호 관리자**(Bitwarden 무료 조직 컬렉션 `PlaceOS API Keys`)로만 공유한다. `.env`는 `.gitignore` 처리되어 커밋되지 않는다.
 - **키가 바뀌면** → Bitwarden 항목만 갱신하고 팀원에게 알린다. `.env.example`은 슬롯(구조)만 담고 값은 비워 둔다.
 - **새 키가 생기면** → `.env.example`에 **빈 슬롯을 추가해 커밋**하고(값 없음), 실제 값은 Bitwarden에 넣는다.
 - 유일한 유료 키 `LLM_API_KEY`(Anthropic)는 **사용량 알림**을 설정한다.

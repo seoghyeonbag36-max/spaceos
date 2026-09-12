@@ -75,6 +75,8 @@ except (AttributeError, ValueError):
     pass
 
 LOG = ROOT / "data" / "logs" / "hub-chain-resume.log"
+# ⚠ 이미 등록된 Windows 예약작업 이름이다 — 개명(PlaceOS)해도 바꾸지 않는다.
+#   바꾸려면 schtasks 로 옛 작업을 지우고 새 이름으로 다시 등록해야 한다(2026-09-12).
 TASK_NAME = "SpaceOS-HubChain-Resume"
 
 # Windows 프로세스 생성 플래그 — 부모가 죽어도 살아남고, 창을 띄우지 않는다

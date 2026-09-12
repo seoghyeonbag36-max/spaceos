@@ -1,4 +1,4 @@
-# SpaceOS 데이터 레이어 규칙 (Bronze / Silver / Gold)
+# PlaceOS 데이터 레이어 규칙 (Bronze / Silver / Gold)
 
 모든 데이터는 3계층 폴더로만 이동한다. 원본을 절대 덮어쓰지 않는다.
 

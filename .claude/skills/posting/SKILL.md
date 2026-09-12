@@ -5,7 +5,7 @@ description: PPPP 트랙 — Posting(외부 AI 창업 코파일럿 어댑터 + 3
 
 # 트랙 컨텍스트: Posting (Price ▶ Posting)
 
-너는 지금 SpaceOS의 **Posting 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
+너는 지금 PlaceOS의 **Posting 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
 
 ## 먼저 읽기
 - docs/feature-posting.md

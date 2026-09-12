@@ -1,12 +1,12 @@
-# SpaceOS Codex Project
+# PlaceOS Codex Project
 
 This directory is the correct Codex project root:
 
 ```powershell
-C:\Users\USER\Documents\Claude\Projects\SpaceOS\spaceos
+C:\Users\USER\Documents\Claude\Projects\PlaceOS\spaceos
 ```
 
-Do not use the parent directory as the working root. The parent `SpaceOS/`
+Do not use the parent directory as the working root. The parent `PlaceOS/`
 folder is only a container/archive area.
 
 ## How To Open
@@ -14,14 +14,14 @@ folder is only a container/archive area.
 From PowerShell:
 
 ```powershell
-cd "C:\Users\USER\Documents\Claude\Projects\SpaceOS\spaceos"
+cd "C:\Users\USER\Documents\Claude\Projects\PlaceOS\spaceos"
 codex
 ```
 
 For repetitive implementation work:
 
 ```powershell
-cd "C:\Users\USER\Documents\Claude\Projects\SpaceOS\spaceos"
+cd "C:\Users\USER\Documents\Claude\Projects\PlaceOS\spaceos"
 codex --auto-edit
 ```
 

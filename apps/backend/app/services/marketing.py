@@ -46,7 +46,7 @@ _SLUG_RE = re.compile(r"^[a-z0-9-]{1,40}$")
 
 _GOLD_DIR = Path(__file__).resolve().parents[4] / "data" / "gold"
 
-_SYSTEM_PROMPT = """너는 SpaceOS의 Program(가게 단위 마케팅 자동화) 생성기다.
+_SYSTEM_PROMPT = """너는 PlaceOS의 Program(가게 단위 마케팅 자동화) 생성기다.
 입력된 가게 프로필(이름·카테고리·주소·리뷰 텍스트·사진·메뉴)과 상권 컨텍스트를 근거로,
 소상공인이 바로 실행할 수 있는 온라인/오프라인 마케팅 솔루션을 제안한다.
 
@@ -592,7 +592,7 @@ def _rule_stub(profile: dict, tone: list[str],
     }
 
 
-_DISTRICT_SYSTEM_PROMPT = """너는 SpaceOS의 Program(상권 단위 마케팅) 온라인 콘텐츠 생성기다.
+_DISTRICT_SYSTEM_PROMPT = """너는 PlaceOS의 Program(상권 단위 마케팅) 온라인 콘텐츠 생성기다.
 입력된 상권 컨텍스트(블로그 언급 키워드 빈도·업종 분포·검색 트렌드)만을 근거로,
 그 상권의 온라인 콘텐츠 소재를 한 줄 카피 형태로 제안한다.
 

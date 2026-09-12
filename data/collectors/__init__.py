@@ -1,1 +1,1 @@
-"""SpaceOS data 패키지."""
+"""PlaceOS data 패키지."""

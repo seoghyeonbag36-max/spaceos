@@ -34,10 +34,10 @@
 
 ## P0 — 시작 전 PC에서 한 번만 실행할 준비 프롬프트
 
-이 블록은 현재 로컬 SpaceOS 작업공간의 Codex에 보낸다. 원격에 없는 로컬 결과를 게시하는 작업이므로 Cloud에서 대신 실행할 수 있다고 가정하지 않는다.
+이 블록은 현재 로컬 PlaceOS 작업공간의 Codex에 보낸다. 원격에 없는 로컬 결과를 게시하는 작업이므로 Cloud에서 대신 실행할 수 있다고 가정하지 않는다.
 
 ```text
-SpaceOS의 내일 Codex Cloud 작업을 준비하라. 실제로 커밋·푸시하고 draft PR 생성까지 수행하는 것을 승인한다. 아직 main에는 머지하지 마라.
+PlaceOS의 내일 Codex Cloud 작업을 준비하라. 실제로 커밋·푸시하고 draft PR 생성까지 수행하는 것을 승인한다. 아직 main에는 머지하지 마라.
 
 저장소는 seoghyeonbag36-max/spaceos, 원격 작업 브랜치는 chore/cloud-page-2026-09-08, PR base는 main이다. AGENTS.md와 docs/papers/AGENTS.md를 읽어라.
 

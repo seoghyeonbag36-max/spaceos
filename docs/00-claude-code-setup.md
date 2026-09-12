@@ -1,6 +1,6 @@
 # 00. Claude Code 설치 및 공통 설정
 
-SpaceOS를 Claude Code(CLI)로 개발하기 위한 공통 준비 가이드. 기능별 개발은 `feature-*.md` 문서를 참고한다.
+PlaceOS를 Claude Code(CLI)로 개발하기 위한 공통 준비 가이드. 기능별 개발은 `feature-*.md` 문서를 참고한다.
 
 ---
 
@@ -27,7 +27,7 @@ claude --version
 
 ```bash
 # 프로젝트 폴더에서 최초 1회 실행 → 브라우저 로그인
-cd C:\Users\USER\Documents\Claude\Projects\SpaceOS
+cd C:\Users\USER\Documents\Claude\Projects\PlaceOS
 claude
 ```
 
@@ -48,15 +48,15 @@ claude
 처음 한 번 git 초기화가 필요하다(샌드박스 권한 문제로 자동화하지 못함).
 
 ```powershell
-cd C:\Users\USER\Documents\Claude\Projects\SpaceOS
-git init; git add -A; git commit -m "init: SpaceOS 모노레포 골격"
+cd C:\Users\USER\Documents\Claude\Projects\PlaceOS
+git init; git add -A; git commit -m "init: PlaceOS 모노레포 골격"
 ```
 
 ---
 
 ## 4. 기본 워크플로우 (바이브 코딩)
 
-SpaceOS는 "자연어 PRD → AI 코드 생성 → 검증" 사이클로 개발한다.
+PlaceOS는 "자연어 PRD → AI 코드 생성 → 검증" 사이클로 개발한다.
 
 1. **컨텍스트 부여** — Claude Code는 `CLAUDE.md`를 자동 로드한다. 추가 파일은 `@경로`로 참조: `@apps/backend/app/api/v1/ai.py 를 참고해서...`
 2. **슬래시 커맨드로 작업 지시** — 예: `/backend-dev 공실 히트맵 GeoJSON 엔드포인트`

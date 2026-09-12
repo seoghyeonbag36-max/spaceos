@@ -1,7 +1,7 @@
-"""SpaceOS 거점 점수 실측 실행 (간편 런처).
+"""PlaceOS 거점 점수 실측 실행 (간편 런처).
 
 cmd에서 `-m` 없이 실행:
-    cd C:\\Users\\USER\\Documents\\Claude\\Projects\\SpaceOS
+    cd C:\\Users\\USER\\Documents\\Claude\\Projects\\PlaceOS
     python score.py
 """
 import os

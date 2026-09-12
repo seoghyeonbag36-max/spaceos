@@ -1,8 +1,8 @@
-# SpaceOS — 리드(총괄) 바이브 코딩 플레이북
+# PlaceOS — 리드(총괄) 바이브 코딩 플레이북
 
-> **대상** — SpaceOS를 총괄하며 **Platform · Page · Posting · Program · Design을 모두 오가는** 사람(리드).
+> **대상** — PlaceOS를 총괄하며 **Platform · Page · Posting · Program · Design을 모두 오가는** 사람(리드).
 > **목적** — 한 트랙만 보는 팀원과 달리, 전 트랙을 빠르게 전환하며 바이브 코딩하기 위한 **터미널 경로 · 폴더 · 프롬프트 · 코드** 단일 기준.
-> **관계** — 팀원 공용 문서 `SpaceOS_PPPP_Design_Vibe_Coding_Guide.md`는 그대로 두고, 본 문서는 그 위에 얹는 **리드 전용 오케스트레이션** 레이어.
+> **관계** — 팀원 공용 문서 `PlaceOS_PPPP_Design_Vibe_Coding_Guide.md`는 그대로 두고, 본 문서는 그 위에 얹는 **리드 전용 오케스트레이션** 레이어.
 > **원칙** — 데이터 기반 · 추측 최소화 · 더미엔 `TODO` · 한국어(기술용어 영문 병기).
 
 > ⚙️ **본 플레이북과 함께 실제 동작하는 설정 파일이 레포에 생성되어 있다**(4장 참조):
@@ -14,7 +14,7 @@
 
 ```powershell
 # 1) 레포 루트에서 시작 (항상 여기)
-cd C:\Users\USER\Documents\Claude\Projects\SpaceOS ; claude
+cd C:\Users\USER\Documents\Claude\Projects\PlaceOS ; claude
 ```
 ```text
 # 2) 오케스트레이션: 전 트랙 상태 + 오늘 할 일
@@ -43,7 +43,7 @@ cd C:\Users\USER\Documents\Claude\Projects\SpaceOS ; claude
 리드는 항상 **레포 루트**에서 `claude`를 실행한다. 그래야 `CLAUDE.md`와 전체 트리가 컨텍스트에 들어와 **어느 트랙이든 바로 편집·검증**할 수 있다. (팀원은 자기 앱 폴더에서 시작해 좁게 본다.)
 
 ```
-루트 경로:  C:\Users\USER\Documents\Claude\Projects\SpaceOS
+루트 경로:  C:\Users\USER\Documents\Claude\Projects\PlaceOS
 ```
 
 ### 1.2 그 폴더에서 터미널 여는 3가지 방법
@@ -76,7 +76,7 @@ PowerShell(또는 Windows Terminal)을 권장한다. cmd로 작업할 때 자주
 ### 1.5 최초 1회 셋업 (복붙)
 ```powershell
 # 레포 루트에서
-cd C:\Users\USER\Documents\Claude\Projects\SpaceOS
+cd C:\Users\USER\Documents\Claude\Projects\PlaceOS
 
 # 런타임 확인
 node -v ; python --version ; git --version
@@ -98,7 +98,7 @@ claude mcp list
 
 ### 2.1 실제 모노레포 트리 (현 상태 기준)
 ```
-SpaceOS/
+PlaceOS/
 ├── apps/
 │   ├── backend/   app/api/v1/(ai·buildings·districts·heatmap·marketing·payments) · services · schemas · models
 │   └── frontend/  src/(components · pages · design/{tokens,components} · lib/{api.ts,naverMap.ts})
@@ -185,7 +185,7 @@ data-engineer 서브에이전트로 가로수길 네이버플레이스 리뷰를
 ### 3.5 PRD 6칸 템플릿 (모호하면 이걸로)
 슬래시 명령에 목표만 줘도 되지만, 정밀도가 필요하면 6칸을 채워 붙인다.
 ```text
-# 역할(Role)       너는 SpaceOS {트랙} 담당. CLAUDE.md 준수.
+# 역할(Role)       너는 PlaceOS {트랙} 담당. CLAUDE.md 준수.
 # 목표(Goal)       {한 문장}
 # 입력(Input)      경로 {silver/ 또는 gold/}, 스키마 {컬럼:타입}
 # 제약(Constraint) 확정 스택만 / 한국어 주석(영문 병기) / 더미엔 TODO / 타입힌트
@@ -220,7 +220,7 @@ Copy-Item .claude\settings.lead.json .claude\settings.local.json
 서버 2개를 새 PowerShell 탭으로 띄우는 스니펫. 필요 시 아래를 `scripts\dev-up.ps1`로 저장해 실행.
 ```powershell
 # scripts/dev-up.ps1 — 백엔드(:8000) + 프론트(:5173) 동시 기동
-$root = "C:\Users\USER\Documents\Claude\Projects\SpaceOS"
+$root = "C:\Users\USER\Documents\Claude\Projects\PlaceOS"
 Start-Process powershell -ArgumentList "-NoExit","-Command","cd $root\apps\backend; uvicorn app.main:app --reload"
 Start-Process powershell -ArgumentList "-NoExit","-Command","cd $root\apps\frontend; npm run dev"
 Write-Host "backend :8000 / frontend :5173 기동. claude 는 루트 탭에서 별도 실행."
@@ -240,7 +240,7 @@ Write-Host "backend :8000 / frontend :5173 기동. claude 는 루트 탭에서 �
 ```
 
 ### 5.2 빠른 시작 체크리스트
-- [ ] 레포 루트에서 터미널 열기 (`C:\Users\USER\Documents\Claude\Projects\SpaceOS`)
+- [ ] 레포 루트에서 터미널 열기 (`C:\Users\USER\Documents\Claude\Projects\PlaceOS`)
 - [ ] `npm i -g @anthropic-ai/claude-code` → `claude` 인증
 - [ ] `Copy-Item .claude\settings.lead.json .claude\settings.local.json`
 - [ ] `claude mcp list`로 postgres/filesystem/github 확인
@@ -257,7 +257,7 @@ Write-Host "backend :8000 / frontend :5173 기동. claude 는 루트 탭에서 �
 | 슬래시 명령 안 보임 | 실행 위치 | 레포 루트에서 `claude` 실행해야 `.claude/commands` 로드 |
 
 ### 부록 B. 기존 문서와의 관계
-- **팀원 공용**: `SpaceOS_PPPP_Design_Vibe_Coding_Guide.md` (용어·공통셋업·데이터구조·트랙별 코드)
+- **팀원 공용**: `PlaceOS_PPPP_Design_Vibe_Coding_Guide.md` (용어·공통셋업·데이터구조·트랙별 코드)
 - **프롬프트 모음**: `docs/VIBE-PROMPTS.md`, `docs/DESIGN-VIBE-PROMPTS.md`
 - **트랙 상세**: `docs/feature-*.md`
 - **본 문서**: 그 위에 얹는 **리드 오케스트레이션** (터미널·전환·권한·위임)

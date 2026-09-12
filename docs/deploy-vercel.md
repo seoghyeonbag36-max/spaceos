@@ -7,7 +7,7 @@
 > Cloud Run 에서는 해당 없다. 다만 **왜 옮겼는지**의 근거라서 지우지 않는다.
 >
 > 옮긴 이유는 성능이 아니라 **약관**이다: Vercel 무료(Hobby)는 상업적 사용을 금지하는데
-> SpaceOS 는 B2B 파일럿·DaaS 구독·M&A Exit 을 지향한다. 자세한 비교는
+> PlaceOS 는 B2B 파일럿·DaaS 구독·M&A Exit 을 지향한다. 자세한 비교는
 > `decision-infra-layer-2026-08-25.md`.
 
 프론트(Vite 정적 빌드) + 백엔드(FastAPI, Python 서버리스 함수)를 **Vercel 프로젝트 하나**로 배포한다.

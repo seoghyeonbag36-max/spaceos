@@ -1,6 +1,6 @@
 # 디자인 바이브 코딩 프롬프트 모음 (Claude Code 복붙용)
 
-> SpaceOS 폴더에서 `claude` 실행 후 붙여넣는다. 원칙: 토큰 먼저 → 컴포넌트 → 화면.
+> PlaceOS 폴더에서 `claude` 실행 후 붙여넣는다. 원칙: 토큰 먼저 → 컴포넌트 → 화면.
 > 모든 디자인은 docs/feature-design-system.md 의 네이버 연동 규칙을 따른다.
 
 ## 0. 디자인 시스템 부트스트랩
@@ -11,7 +11,7 @@ docs/feature-design-system.md 와 design/README.md, design/brand/naver-brand.md 
 토큰은 세 곳을 동기화한다 — design/tokens/tokens.json ⇄ apps/frontend/src/design/tokens/*.ts
 ⇄ apps/frontend/src/styles/tokens.css. 컴포넌트는 tokens.css 의 var(--…) 를 쓴다.
 Pretendard 폰트를 public/fonts 에 넣고 tokens.css 의 @font-face 를 연결.
-네이버 그린은 연동 맥락에만, brand teal 은 SpaceOS 고유 기능에만 쓰는 규칙을 주석으로 남겨줘.
+네이버 그린은 연동 맥락에만, brand teal 은 PlaceOS 고유 기능에만 쓰는 규칙을 주석으로 남겨줘.
 ```
 
 ## 1. Platform 화면 — 상권 첫 스킨십(디지털 프로필)

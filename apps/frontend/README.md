@@ -1,4 +1,4 @@
-# SpaceOS Frontend (React + TypeScript + Vite)
+# PlaceOS Frontend (React + TypeScript + Vite)
 
 공실 지도 UI. **네이버 지도**(지도 + 거리뷰 파노라마) + D3/Plotly.
 

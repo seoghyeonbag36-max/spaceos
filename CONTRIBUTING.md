@@ -1,4 +1,4 @@
-# SpaceOS 팀 개발 표준 (CONTRIBUTING)
+# PlaceOS 팀 개발 표준 (CONTRIBUTING)
 
 > 목표: 팀 전원이 **동일한 저장소 + 동일한 환경**에서 일한다.
 > 폴더를 복사하지 않는다 — `git clone` 한다. `.env`(시크릿)와 실데이터는 절대 공유하지 않는다.

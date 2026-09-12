@@ -37,7 +37,7 @@ cd apps/backend; python -m pytest -k <이름>    # 통과 조건으로 지목받
 - **LLM 목킹 통과는 실호출의 증거가 아니다.** `tests/test_posting_marketing.py` 는 `_call_llm` 을
   통째로 목킹해서, 모델 ID 를 고의로 깨뜨려도 전부 `except` 에 잡혀 통과한다.
   실호출 계약은 opt-in 스위트가 친다 (외부 호출·크레딧 소모):
-  `$env:SPACEOS_LIVE_LLM=1; python -m pytest tests/test_llm_live.py -v`
+  `$env:PLACEOS_LIVE_LLM=1; python -m pytest tests/test_llm_live.py -v`
 - **pytest 가 트레이스백 없이 죽으면** 코드 문제가 아니라 메모리다(OpenBLAS 할당 실패)
 
 ## 마이그레이션

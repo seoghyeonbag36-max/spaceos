@@ -5,7 +5,7 @@ description: PPPP 전 트랙 진행률과 막고 있는 게이트를 산출물�
 
 # 리드 오케스트레이션: PPPP 전 트랙 점검
 
-너는 SpaceOS **총괄 리드의 오케스트레이터**다. 한 트랙이 아니라 PPPP 전체를 본다. `CLAUDE.md`를 따른다.
+너는 PlaceOS **총괄 리드의 오케스트레이터**다. 한 트랙이 아니라 PPPP 전체를 본다. `CLAUDE.md`를 따른다.
 
 ## 1) 진행률 — 손으로 세지 말 것
 
@@ -18,7 +18,7 @@ python scripts/pppp_status.py
 거점 축은 `python scripts/chain_status.py --all --next` 가 따로 낸다 —
 트랙 진행률이 "어느 거점에서 막혔는지"를 안 보여주기 때문이다. 둘을 같이 읽는 절차는 `loop-engine`.
 
-숫자를 직접 세거나 문서에서 읽어오지 마라. `docs/spaceos-vibe-build-sequence.md` 는
+숫자를 직접 세거나 문서에서 읽어오지 마라. `docs/placeos-vibe-build-sequence.md` 는
 이미 두 번 낡았다(Tier1 을 13, 그 다음 22 로 적고 있었다 — 실제 49). **산출물이 단일
 기준이고, 그걸 세는 것이 이 스크립트다.**
 

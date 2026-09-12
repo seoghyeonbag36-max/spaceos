@@ -1,4 +1,4 @@
-# SpaceOS — 디지털 PPPP & 디자인 바이브 코딩 가이드
+# PlaceOS — 디지털 PPPP & 디자인 바이브 코딩 가이드
 
 > **목적** — Platform · Page · Posting · Program(PPPP)과 디자인 과정을 *바이브 코딩(Vibe Coding)* 으로 구현하기 위한 단일 기준 문서.
 > **핵심 가설** — "물리적 Place의 가치가 Digital Platform으로 전이된다."
@@ -20,7 +20,7 @@
 
 ## 1.0 큰 그림 — PPPP + 디자인 파이프라인
 
-SpaceOS는 전통 마케팅 4P(**Place · Product · Price · Promotion**)를 **디지털 4P(PPPP)** 로 전환하고, 그 결과물을 하나의 앱으로 묶는 **디자인 과정**을 더해 5개 트랙으로 구성된다.
+PlaceOS는 전통 마케팅 4P(**Place · Product · Price · Promotion**)를 **디지털 4P(PPPP)** 로 전환하고, 그 결과물을 하나의 앱으로 묶는 **디자인 과정**을 더해 5개 트랙으로 구성된다.
 
 > ⚠ **2026-09-05 재정의 — 4P 가 네 트랙에 1:1 로 붙는다.** 종전에는 Page 가 `Product/Price` 를
 > 겸하고 Posting·Program 이 `Promotion` 하나를 나눠 가졌다. 지금은 **Price ▶ Posting**,
@@ -34,7 +34,7 @@ SpaceOS는 전통 마케팅 4P(**Place · Product · Price · Promotion**)를 **
                  어떤 플랫폼?   어떤 page?    어느 가격대?     어떤 홍보?
 ```
 
-| 트랙 | 전환(기존 4P → 디지털) | 묻는 질문 | SpaceOS 구현 기능 | 핵심 기술 |
+| 트랙 | 전환(기존 4P → 디지털) | 묻는 질문 | PlaceOS 구현 기능 | 핵심 기술 |
 |------|------------------------|-----------|-------------------|-----------|
 | **Platform** | **Place ▶ Platform** | 이 입지·상권은 **어떤 플랫폼인가?** | 상권 AI 추천 엔진 (각 상권을 하나의 플랫폼으로) | GNN, PostGIS |
 | **Page** | **Product ▶ Page** | 이 platform 안에 **어떤 page 가 만들어져야 하는가?** | 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 | 네이버 지도 SDK (Three.js·Mapbox 는 제거됨) |
@@ -47,7 +47,7 @@ SpaceOS는 전통 마케팅 4P(**Place · Product · Price · Promotion**)를 **
 - **의미(Place ▶ Platform)** — **이 입지·상권은 어떤 플랫폼인가?** 물리적 *장소(Place)* 를
   SNS·디지털 관점에서 하나의 공간/플랫폼으로 읽고, 데이터와 거버넌스가 작동하는
   **디지털 트윈 운영 체계**로 전환한다.
-- **SpaceOS 구현** — 리뷰·유동인구·개폐업 데이터를 그래프로 모델링해, 특정 입지에 **최적 업종을 추천**하는 AI 엔진.
+- **PlaceOS 구현** — 리뷰·유동인구·개폐업 데이터를 그래프로 모델링해, 특정 입지에 **최적 업종을 추천**하는 AI 엔진.
 - **핵심 기술** — **GNN(Graph Neural Network)**: 업종 간 *시너지(synergy)* 와 *잠식(cannibalization)* 효과를 학습. PostgreSQL/**PostGIS** 공간 쿼리.
 - **산출물** — `/api/v1/ai/recommend` 업종 추천 API, 상권 점수(Commercial District Score).
 
@@ -57,7 +57,7 @@ SpaceOS는 전통 마케팅 4P(**Place · Product · Price · Promotion**)를 **
   아니라 **page** 를 묻는다. 개별 상가·업종의 *상품성(Product)* 을 신뢰도 높은
   **디지털 인터페이스**로 표현해 "어떤 업장이 어디에, 어디가 비었나"를 한눈에 보인다.
   ⚠ **가격대는 여기서 답하지 않는다** — Price 는 1.3 Posting 의 몫이다.
-- **SpaceOS 구현** — **공실 히트맵(Vacancy Heatmap)** + **3D 디지털 트윈 맵**. 건물의 과거 10년 업종 변천사(공실 히스토리)를 시각화.
+- **PlaceOS 구현** — **공실 히트맵(Vacancy Heatmap)** + **3D 디지털 트윈 맵**. 건물의 과거 10년 업종 변천사(공실 히스토리)를 시각화.
 - **핵심 기술** — **Three.js / @react-three/fiber**(3D 렌더링), **Mapbox GL JS**(2D 지도 위 3D 배치), 100m×100m 공실 그리드.
 - **산출물** — `/api/v1/heatmap`, `/api/v1/buildings/{id}/history`, 3D 트윈 뷰어.
 
@@ -68,7 +68,7 @@ SpaceOS는 전통 마케팅 4P(**Place · Product · Price · Promotion**)를 **
   전환한다. 입점 의사결정에 필요한 정보를 구조화해 "게시"한다.
   ⚠ 종전 라벨은 `Promotion → Posting` 이었다 — 3축 비용-효용·ROI 는 원래 가격대 판단이라
   2026-09-05 에 전환원을 Price 로 맞췄다(구현 변경 없음).
-- **SpaceOS 구현** — **입점 솔루션**: 후보 업종을 **고급화 / 가성비 / 기능중심** 3축으로 **비용-효용(cost-benefit)** 분석해 제시.
+- **PlaceOS 구현** — **입점 솔루션**: 후보 업종을 **고급화 / 가성비 / 기능중심** 3축으로 **비용-효용(cost-benefit)** 분석해 제시.
 - **핵심 기술** — **LSTM**(예상 매출·공실 위험도 시계열 예측), **Scikit-learn**(피처 엔지니어링), ROI(투자 회수 기간) 산출.
 - **산출물** — 입점 시뮬레이션 리포트(PDF), `/api/v1/ai/simulate` 매출 시뮬레이터.
 
@@ -78,7 +78,7 @@ SpaceOS는 전통 마케팅 4P(**Place · Product · Price · Promotion**)를 **
   어떤 홍보 program 으로 돌릴 것인가?** *홍보(Promotion)* 를 상인-건물주-소비자 간
   **지속 가능한 관계·참여 구조**로 전환한다. 일회성 광고가 아닌 "프로그램".
   2026-09-05 재정의로 **Promotion 은 이 트랙이 단독으로 받는다.**
-- **SpaceOS 구현** — **마케팅 자동화**: 분석 결과 연계 **LLM 콘텐츠 자동 생성** + **지역 행사/팝업 기획** 추천.
+- **PlaceOS 구현** — **마케팅 자동화**: 분석 결과 연계 **LLM 콘텐츠 자동 생성** + **지역 행사/팝업 기획** 추천.
 - **핵심 기술** — **LangChain** + LLM, 상권 감성 키워드(Sentiment) 기반 톤앤매너 매칭.
 - **산출물** — 자동 생성 SNS 포스팅·축제 기획안, `/api/v1/marketing/generate`.
 
@@ -95,7 +95,7 @@ PPPP 4개 트랙의 산출물(추천·히트맵·시뮬레이션·콘텐츠)을 
 
 | 용어 | 의미 |
 |------|------|
-| **디지털 트윈(Digital Twin)** | 물리적 상권을 데이터로 1:1 복제한 가상 모델. SpaceOS의 핵심 결과물. |
+| **디지털 트윈(Digital Twin)** | 물리적 상권을 데이터로 1:1 복제한 가상 모델. PlaceOS의 핵심 결과물. |
 | **공실 히스토리(Vacancy History)** | 특정 건물의 과거 업종 변천사 + AI 요약 폐업 사유. |
 | **GNN** | Graph Neural Network — 업종 간 시너지/잠식 분석 모델. |
 | **LSTM** | Long Short-Term Memory — 시계열 매출·공실 예측 모델. |
@@ -182,7 +182,7 @@ spaceos/
 > 📌 **CLAUDE.md** — Claude Code가 **매 세션 자동으로 읽는 '프로젝트 규칙 메모'**. 스택·컨벤션·금지사항을 적어두면 AI가 그대로 코드를 생성한다. 바이브 코딩 품질을 좌우하는 핵심 파일.
 
 ```markdown
-# SpaceOS — 코드베이스 가이드
+# PlaceOS — 코드베이스 가이드
 
 ## 핵심 가설
 "물리적 Place의 가치가 Digital Platform으로 전이된다."
@@ -277,7 +277,7 @@ claude mcp list            # 연결 확인
 └── fe-designer.md        # React·Three.js·디자인 시스템 (apps/frontend/)
 ```
 
-> SpaceOS 전용 스킬을 함께 사용한다: **spaceos-data-pipeline**(크롤링·ETL), **spaceos-tech-expert**(아키텍처·코드), **spaceos-strategy-expert**(전략·IR).
+> PlaceOS 전용 스킬을 함께 사용한다: **placeos-data-pipeline**(크롤링·ETL), **placeos-tech-expert**(아키텍처·코드), **placeos-strategy-expert**(전략·IR).
 
 ## 2.7 환경변수 / 시크릿 — `.env.example`
 
@@ -292,7 +292,7 @@ NAVER_CLIENT_ID=
 NCP_MAP_KEY_ID=
 OPENAI_API_KEY=
 # 데이터 저장
-S3_BRONZE_BUCKET=spaceos-bronze
+S3_BRONZE_BUCKET=placeos-bronze
 ```
 
 > `.env`는 `.gitignore`에 포함, `.env.example`만 커밋. 키 입력은 사용자가 직접(보안).
@@ -463,7 +463,7 @@ data/assets/3d-models/**
 
 ```text
 # 역할(Role)
-너는 SpaceOS {트랙} 담당 개발자다. CLAUDE.md 규칙을 따른다.
+너는 PlaceOS {트랙} 담당 개발자다. CLAUDE.md 규칙을 따른다.
 
 # 목표(Goal)
 {한 문장으로 무엇을 만드는가}
@@ -496,7 +496,7 @@ data/assets/3d-models/**
 
 ```text
 # 역할
-너는 SpaceOS Platform 트랙의 ML 엔지니어다. CLAUDE.md를 따른다.
+너는 PlaceOS Platform 트랙의 ML 엔지니어다. CLAUDE.md를 따른다.
 # 목표
 상권 그래프(업종=노드, 시너지=엣지)를 입력받아 특정 입지(grid)에 최적 업종 Top-5를 추천하는 GNN과 추론 API를 만든다.
 # 입력 데이터
@@ -596,7 +596,7 @@ async def recommend(req: RecommendRequest) -> list[IndustryScore]:
 
 ```text
 # 역할
-너는 SpaceOS Page 트랙의 프론트엔드 개발자다. CLAUDE.md를 따른다.
+너는 PlaceOS Page 트랙의 프론트엔드 개발자다. CLAUDE.md를 따른다.
 # 목표
 거점 상권의 공실을 2D 지도 히트맵으로, 선택 건물은 3D 디지털 트윈으로 보여주는 React 컴포넌트를 만든다.
 # 입력 데이터
@@ -728,7 +728,7 @@ export async function fetchHeatmap(district: string) {
 
 ```text
 # 역할
-너는 SpaceOS Posting 트랙의 백엔드/ML 엔지니어다. CLAUDE.md를 따른다.
+너는 PlaceOS Posting 트랙의 백엔드/ML 엔지니어다. CLAUDE.md를 따른다.
 # 목표
 후보 업종을 고급화/가성비/기능중심 3축으로 비용-효용 점수화하고, LSTM 예상 매출과 ROI(회수 개월)를 산출하는 서비스를 만든다.
 # 입력 데이터
@@ -801,7 +801,7 @@ if __name__ == "__main__":
 
 ```text
 # 역할
-너는 SpaceOS Program 트랙의 LLM 엔지니어다. CLAUDE.md를 따른다.
+너는 PlaceOS Program 트랙의 LLM 엔지니어다. CLAUDE.md를 따른다.
 # 목표
 상권 감성 키워드·분석 결과로 SNS 포스팅 초안과 지역 행사 아이디어를 자동 생성한다.
 톤은 Humanistic Authority(균형·공생·공감)를 반드시 지킨다.
@@ -866,7 +866,7 @@ if __name__ == "__main__":
 
 ```text
 # 역할
-너는 SpaceOS Design 트랙의 디자인 시스템 엔지니어다. CLAUDE.md를 따른다.
+너는 PlaceOS Design 트랙의 디자인 시스템 엔지니어다. CLAUDE.md를 따른다.
 # 목표
 PPPP 산출물을 하나의 앱으로 묶는 디자인 시스템(토큰+컴포넌트)과 상권 대시보드 레이아웃을 만든다.
 # 입력
@@ -1016,7 +1016,7 @@ export default function Dashboard({ district = "garosugil" }: { district?: strin
 
 ```text
 # 역할
-너는 SpaceOS 코드 리뷰어다.
+너는 PlaceOS 코드 리뷰어다.
 # 작업
 방금 생성한 {파일}을 검증한다:
 1. CLAUDE.md 규칙 준수 — 경로/타입힌트/한국어 주석/`# TODO` 표기
