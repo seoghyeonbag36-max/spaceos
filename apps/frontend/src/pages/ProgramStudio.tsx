@@ -14,7 +14,6 @@ import { mapLabelHTML } from "@/design/components/MapMarkerPin";
 import { colors } from "@/design/tokens/colors";
 import { useMapHost } from "@/components/MapHost";
 import { useFitMap, useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
-import { TRACK_PANEL_W } from "@/components/TrackMapFrame";
 import type { ProgramHandoff } from "@/lib/workspaceState";
 import "./ProgramStudio.css";
 
@@ -742,7 +741,7 @@ function useProgramMap({ districtId, districts, places, pickedPlace, arrival, ev
   const fitKey = candidatePts.length ? `places:${candidatePts.map((p) => `${p.lat},${p.lng}`).join("|")}`
     : single ? `one:${single.lat},${single.lng}` : districtId ? `hub:${districtId}` : null;
   const fitPts = candidatePts.length ? candidatePts : single ? [single] : [];
-  useFitMap(fitKey, fitPts, hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null, TRACK_PANEL_W);
+  useFitMap(fitKey, fitPts, hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null);
 
   if (!ready || !map || !current) return null;
   return {

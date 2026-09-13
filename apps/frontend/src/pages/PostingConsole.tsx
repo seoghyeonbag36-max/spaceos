@@ -13,7 +13,6 @@ import { mapLabelHTML, shortManwon } from "@/design/components/MapMarkerPin";
 import { colors } from "@/design/tokens/colors";
 import Verdict, { type Ground } from "@/components/Verdict";
 import { useFitMap, useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
-import { TRACK_PANEL_W } from "@/components/TrackMapFrame";
 import "./PostingConsole.css";
 
 /**
@@ -225,7 +224,7 @@ function PostingSession({ selection, districtId: sharedDistrict, onDistrictChang
   })), [units, unitId]);
   useMapMarkers(markers, chooseUnit);
   const hubCenter = districts.find((d) => d.id === districtId)?.center;
-  useFitMap(districtId, units, hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null, TRACK_PANEL_W);
+  useFitMap(districtId, units, hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null);
 
   // Posting → Program 인계 값. 업종은 **계산에 쓴 업종**을 먼저, 없으면 자리의 직전 업종.
   // 전략명은 계산했고 회수되는 전략이 있을 때만 — 없는 추천을 지어내지 않는다.

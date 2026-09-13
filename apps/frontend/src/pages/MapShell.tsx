@@ -86,6 +86,18 @@ interface Building {
 
 const vacRate = (b: Building) => Math.round((1 - b.active / b.capacity) * 100);
 
+/** 목록 순서 — 상태(공실의심 → 고공실 → 부분공실 → 만실) → 공실률 높은 순 → 빈 호 수 많은 순 → 이름. */
+const STATUS_RANK: Record<VacStatus, number> = { empty: 0, high: 1, partial: 2, full: 3 };
+type Rankable = Pick<Building, "status" | "capacity" | "active" | "name">;
+// 수용 0호(분모 없음)는 공실률을 0 으로 본다 — NaN 이 비교에 섞이면 정렬 전체가 흔들린다.
+const emptyShare = (b: Rankable) => (b.capacity > 0 ? (b.capacity - b.active) / b.capacity : 0);
+export function byVacancyFirst(a: Rankable, b: Rankable): number {
+  return STATUS_RANK[a.status] - STATUS_RANK[b.status]
+    || emptyShare(b) - emptyShare(a)
+    || (b.capacity - b.active) - (a.capacity - a.active)
+    || a.name.localeCompare(b.name, "ko");
+}
+
 // ── 로컬 폴백 샘플(백엔드 미기동 시). 백엔드 building_vacancy.py 와 동일 건물. ──
 const RAW: Array<{ id: string; name: string; lat: number; lng: number; status: VacStatus; capacity: number; active: number; industry: string }> = [
   { id: "b1", name: "가로수길 A빌딩", lat: 37.5219, lng: 127.0222, status: "empty", capacity: 12, active: 1, industry: "의류" },
@@ -261,11 +273,16 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
   // 목록에 실제로 그리는 것. **지도 오버레이는 filtered 를 그대로 쓴다** — 뷰포트로
   // 오버레이까지 거르면 지도를 조금 움직일 때마다 폴리곤을 전부 다시 만들게 되고,
   // 어차피 화면 밖 도형은 보이지 않으므로 얻는 것도 없다. 좁히는 건 목록뿐이다.
+  //
+  // 목록은 **빈 건물부터** 선다(2026-09-13). 종전에는 API 순서 그대로라 가로수길 첫 줄이
+  // 「신사동 516-14 · 만실 0%」였다 — 지도는 기본 줌에서 공실의심만 빨간 점으로 찍는데
+  // 목록 맨 위는 만실이라, 둘이 서로 다른 답을 말했다. 화면설계서 2판 Page 와이어프레임의
+  // 순서(공실의심 100% → 고공실 67% → 만실 0%)를 따른다. 정렬은 목록에만 — 오버레이 순서는 그대로.
   const listed = useMemo(() => {
-    if (!viewportOnly || !bounds?.hasLatLng) return filtered;
     const naver = (window as any).naver;
-    if (!naver) return filtered;
-    return filtered.filter((b) => bounds.hasLatLng(new naver.maps.LatLng(b.center.lat, b.center.lng)));
+    const inView = !viewportOnly || !bounds?.hasLatLng || !naver ? filtered
+      : filtered.filter((b) => bounds.hasLatLng(new naver.maps.LatLng(b.center.lat, b.center.lng)));
+    return [...inView].sort(byVacancyFirst);
   }, [filtered, bounds, viewportOnly]);
   // 뷰포트가 실제로 목록을 줄이고 있는가 — "N동 중 M동" 안내를 켤지 정한다.
   const clipped = listed.length !== filtered.length;
@@ -802,7 +819,8 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
               <span className="b-dot" style={{ background: STATUS[b.status].color }} />
               <span>
                 <div className="b-name">{b.name}</div>
-                <div className="b-meta">{b.industry} · {STATUS[b.status].label}</div>
+                {/* 공실의심 건물은 영업 점포가 없어 대표 업종이 빈 값으로 온다 — 「 · 공실의심」처럼 점만 남기지 않는다. */}
+                <div className="b-meta">{b.industry || "업종 미상"} · {STATUS[b.status].label}</div>
                 <div className="b-meta">수용 {b.capacity}호 · 영업 {b.active}호{b.floors ? ` · 지상 ${b.floors}층` : " · 층수 미상"}</div>
                 {layer === "rent" && rentByBuilding.has(b.id) && (() => {
                   const rows = rentByBuilding.get(b.id)!;
@@ -831,7 +849,7 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
             <div className="row"><span>공실률(추정)</span><span className="num" style={{ color: STATUS[selected.status].color }}>{vacRate(selected)}%</span></div>
             <div className="row"><span>상태</span><span>{STATUS[selected.status].label}</span></div>
             <div className="row"><span>상가 수용 / 영업</span><span>{selected.capacity}호 / {selected.active}호</span></div>
-            <div className="row"><span>대표 업종</span><span>{selected.industry}</span></div>
+            <div className="row"><span>대표 업종</span><span>{selected.industry || "미상"}</span></div>
 
             {/* 이 건물의 빈 층이 **각각 월 얼마인가** — 임대시세 레이어의 답이 건물 단위로 내려온 자리.
                 층이 없으면(빈 층 없음 · R-ONE 미제공) 그 사실을 적는다 — 0 원처럼 비워 두지 않는다. */}
