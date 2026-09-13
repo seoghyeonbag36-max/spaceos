@@ -7,7 +7,7 @@ Vercel 에서 옮겨 온 경위는 [deploy-vercel.md](deploy-vercel.md) 머리�
 
 | 항목 | 값 |
 |---|---|
-| **프로덕션 URL** | **https://placeos.web.app** (Firebase Hosting, 2026-09-13~) · 옛 주소 https://spaceos-twin.web.app 도 같은 서비스 |
+| **프로덕션 URL** | **https://placeos.web.app** (Firebase Hosting, 2026-09-13~) · 옛 주소 https://spaceos-twin.web.app 은 페이지만 301 로 정식 주소에 보내고 API 는 계속 서빙 |
 | Cloud Run 원본 URL | https://spaceos-798830962560.us-central1.run.app |
 | GCP 프로젝트 | `spaceos-digital-twin` (표시명 PlaceOS) · 번호 `798830962560` |
 | 리전 | `us-central1` — **무료 한도가 적용되는 리전이라 그렇다** |
@@ -102,20 +102,28 @@ docker rm -f placeos-smoke
 Cloud Monitoring 업타임 체크 **4개**가 5분마다 돈다. 실패하면
 `seoghyeonbag36@gmail.com` 으로 메일이 온다(알림 정책: "PlaceOS 프로덕션 다운 알림").
 
-⚠ 아래 이름·알림 정책명은 **2026-09-12 개명(SpaceOS → PlaceOS) 뒤 표기**다. GCP 콘솔에
-이미 만들어진 업타임 체크는 아직 `SpaceOS …` 로 남아 있다 — 표시명뿐이라 동작에는
-영향이 없지만, 콘솔에서 찾을 때는 옛 이름으로 검색한다(바꾸려면 콘솔에서 이름만 수정).
-
-| 체크 | 대상 | 보는 것 |
+| 체크 (ID) | 대상 | 보는 것 |
 |---|---|---|
-| PlaceOS health | Cloud Run 원본 | `/health` 가 200 이고 `"status":"ok"` 인가 |
-| PlaceOS districts gold | Cloud Run 원본 | 분석 API 가 `"vacancy_source":"gold"` 를 담는가 |
-| PlaceOS hosting health | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
-| PlaceOS hosting gold | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
+| PlaceOS health (`spaceos-health-Fu5ygSRiKro`) | Cloud Run 원본 | `/health` 가 200 이고 `"status":"ok"` 를 담는가 |
+| PlaceOS districts gold (`spaceos-districts-gold-QvQ7eGG9ly8`) | Cloud Run 원본 | 분석 API 가 `"vacancy_source":"gold"` 를 담는가 |
+| PlaceOS hosting health (`placeos-hosting-health-3a9w07wQOTw`) | `placeos.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
+| PlaceOS hosting gold (`placeos-hosting-gold-43YzLqMfgKo`) | `placeos.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
 
-⚠ 2026-09-13 정식 주소가 `placeos.web.app` 으로 옮겨졌지만 **업타임 체크 대상은 아직 옛 주소다**
-(콘솔에 만들어진 리소스라 이 저장소에서 못 바꾼다). 두 사이트가 같은 리라이트라 옛 주소가
-살아 있으면 새 주소도 산다 — 다만 사이트별 설정이 갈라지는 날(리다이렉트 등)엔 새 주소로 체크를 옮길 것.
+알림 정책은 check_id 가 아니라 **`uptime_url` 체크 전부**를 본다 — 체크를 새로 만들면 따로 묶지 않아도
+감시에 들어간다. 호스트는 수정이 안 돼 주소를 옮길 때는 **새로 만들고 옛 것을 지운다**(2026-09-13 에
+`spaceos-twin.web.app` 체크 2개를 이렇게 옮겼다).
+
+⚠ **2026-09-13 발견 — 네 체크가 내내 실패하고 있었다(6시간 통과율 0%).** 본문 비교 문자열이
+`status:ok` · `vacancy_source:gold` 로 **따옴표가 빠진 채** 저장돼 있어 JSON 응답(`"status":"ok"`)과
+절대 일치하지 않았다. 만들 때 셸이 따옴표를 먹은 것으로 보인다. 즉 감시는 "늘 빨간불"이라 진짜 장애를
+구분하지 못하는 상태였다. 비교 문자열을 따옴표 포함으로 고쳤다.
+
+**체크를 만들거나 고칠 때의 셸 함정 둘:**
+- Windows PowerShell 5.1 은 네이티브 명령에 넘기는 인자의 **큰따옴표를 벗긴다** — `--matcher-content='"status":"ok"'` 가
+  `status:ok` 로 들어간다. Git Bash 에서 작은따옴표로 감싸 넘기면 보존된다.
+- Git Bash 는 `/` 로 시작하는 인자를 **Windows 경로로 바꾼다** — `--path=/health` 가 `/C:/Program Files/Git/health` 가 된다.
+  경로는 PowerShell 에서, 비교 문자열은 Git Bash 에서 넣는다(`MSYS_NO_PATHCONV=1` 은 gcloud 실행기 자체를 깨뜨린다).
+- 만든 뒤 반드시 `gcloud monitoring uptime list-configs --format="table(name.basename(),httpCheck.path,contentMatchers[0].content)"` 로 저장된 값을 눈으로 확인한다.
 
 **둘로 나눠 두는 이유**: Cloud Run 이 멀쩡해도 Hosting 리라이트가 깨지면 사용자는 못 쓴다.
 원본만 보면 그 고장이 안 보인다. 반대로 Hosting 만 보면 어느 층이 깨졌는지 모른다.
@@ -150,16 +158,20 @@ Cloud Run Always Free: 월 200만 요청 · 180,000 vCPU초 · 360,000 GiB초 ·
 - 배포: `npx firebase-tools deploy --only hosting:placeos --project spaceos-digital-twin` (둘 다면 `--only hosting`)
 - 확인(09-13): `https://placeos.web.app/health` → `{"status":"ok"}` · `/api/v1/commercial-districts` 정상
 
-⚠ **새 주소에서 네이버 지도가 아직 안 뜬다.** 지도 키(NCP Maps Application)의 Web 서비스 URL 에
-`https://placeos.web.app` 이 없어 인증 API 가 `errorCode 200 Authentication Failed` 를 준다
-(같은 시각 `spaceos-twin.web.app` 은 통과). **NCP 콘솔 > Maps > Application > 서비스 환경 등록**에
-`https://placeos.web.app` · `https://placeos.firebaseapp.com` 을 추가해야 한다 — 콘솔 로그인이 필요한 일이라
-저장소에서 못 한다. 등록 확인은 브라우저 없이:
-`curl "https://oapi.map.naver.com/v3/auth?ncpKeyId=<KEY>&url=https%3A%2F%2Fplaceos.web.app&time=<ms>&callback=cb"` → `result` 면 통과.
+**네이버 지도 origin** — NCP 콘솔 > Maps > Application 의 Web 서비스 URL 에 `https://placeos.web.app` 이
+**등록됐다(2026-09-13, 사용자 콘솔 작업).** 등록 여부는 브라우저 없이 잰다:
+`curl "https://oapi.map.naver.com/v3/auth?ncpKeyId=<KEY>&url=https%3A%2F%2Fplaceos.web.app&time=<ms>&callback=cb"` → `result` 면 통과,
+`errorCode 200` 이면 미등록. 09-13 결과: `placeos.web.app` · `spaceos-twin.web.app` 통과, `*.firebaseapp.com` 미등록.
 
-**옛 주소를 새 주소로 돌리는 리다이렉트는 그 등록이 끝난 뒤에** 건다(`spaceos-twin` 사이트 항목에
-`"redirects": [{"source": "**", "destination": "https://placeos.web.app", "type": 301}]`). 먼저 걸면
-지도가 안 뜨는 주소로 모두를 보낸다.
+`*.firebaseapp.com` 은 **등록하지 않고 앱이 정식 주소로 옮긴다**(`apps/frontend/src/lib/canonicalHost.ts`).
+Firebase 는 사이트마다 `web.app`·`firebaseapp.com` 두 주소를 주는데 리다이렉트 규칙이 호스트를 못 가른다 —
+정식 주소 하나만 등록해 두고 나머지는 첫 화면에서 `location.replace` 로 보낸다(경로·쿼리·해시 보존).
+
+**옛 주소 301 (2026-09-13)** — `spaceos-twin` 사이트는 **페이지 경로(`/` · `/index.html`)만** `https://placeos.web.app/` 로
+301 한다. `/api/**` · `/health` 는 계속 Cloud Run 을 리라이트한다. 전부(`**`) 301 로 돌리면 옛 주소로 부르던 API 의
+POST 가 301 을 받고 GET 으로 바뀌어 조용히 깨진다(Firebase 리다이렉트는 307/308 을 못 쓴다).
+배포: `npx firebase-tools deploy --only hosting:spaceos-twin --project spaceos-digital-twin`.
+확인: `curl -sI https://spaceos-twin.web.app/` → `301` + `location: https://placeos.web.app/` · `curl -s https://spaceos-twin.web.app/health` → `{"status":"ok"}`.
 
 ### 2026-08-29 — 처음 세운 주소
 

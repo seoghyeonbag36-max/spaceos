@@ -7,7 +7,7 @@ description: 프로덕션 배포 — main 푸시로 도는 Cloud Run 자동 배�
 
 | 항목 | 값 |
 |---|---|
-| 프로덕션 | **https://placeos.web.app** (Firebase Hosting → Cloud Run) · 옛 주소 `spaceos-twin.web.app` 도 같은 서비스 |
+| 프로덕션 | **https://placeos.web.app** (Firebase Hosting → Cloud Run) · 옛 주소 `spaceos-twin.web.app` 은 페이지만 301, `/api` 는 계속 서빙 |
 | Cloud Run | `spaceos` / `us-central1` (무료 한도 리전) · 프로젝트 `spaceos-digital-twin` |
 | 파이프라인 | `.github/workflows/deploy.yml` — 테스트 → 빌드 → 배포 → **검증** |
 
