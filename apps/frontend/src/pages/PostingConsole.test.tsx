@@ -140,6 +140,8 @@ describe("PostingConsole — 결과 패널", () => {
     expect(tierPanel()).toBeNull();
     expect(unitSelect().disabled).toBe(true);
     expect(screen.getByText(/실측 0곳/)).toBeTruthy();
+    // 화면설계서 2판 상태표: 0곳을 "불러오는 중"으로 남기지 않는다.
+    expect(screen.getByText(/계산할 실측 공실 자리가 없다/)).toBeTruthy();
     // 자리가 없으면 시뮬레이션을 부르지 않는다 — 부르면 없는 자리로 값을 만들어 낸다.
     expect(api.count(/\/ai\/simulate-revenue$/)).toBe(0);
   });

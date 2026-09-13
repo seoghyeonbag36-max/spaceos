@@ -19,6 +19,7 @@ import { installNaverStub, removeNaverStub, type NaverStub } from "@/test/naverS
 import { renderOnMap } from "@/test/renderMap";
 import { buildings, district, rentHeatmap, rentListing } from "@/test/fixtures";
 import type { RentHeatmap } from "@/lib/api";
+import { createPageWorkspace } from "@/lib/workspaceState";
 
 vi.mock("@/lib/naverMap", () => ({
   loadNaverMaps: () => Promise.resolve(),
@@ -260,6 +261,63 @@ describe("MapShell — 임대시세는 금액으로 말한다", () => {
     expect(await screen.findByText(/이 거점에는 R-ONE 임대료가 없다/)).toBeTruthy();
     expect(screen.queryByLabelText("층별 평당 월 임대료")).toBeNull();
     expect(chips()).toHaveLength(0);
+  });
+});
+
+/**
+ * 화면설계서 2판 §Page 통과 조건 — PG-02(범례 기준) · PG-05(입력칸 Esc) · PG-07(선택 → 카메라·강조) ·
+ * 인계받은 건물이 목록에 없을 때.
+ */
+describe("MapShell — 화면설계서 2판", () => {
+  it("PG-02 범례 칩이 공실 상태의 점유율 기준을 말한다", async () => {
+    mount();
+    await polygonMode();
+    await waitFor(() => expect(naver.live()).toHaveLength(3));
+    const full = screen.getByTitle("만실 — 점유율 90% 이상");
+    expect(full.textContent).toContain("점유율 90% 이상");   // 스크린리더용 글자
+    expect(screen.getByTitle(/^공실의심 — 영업으로 확인된 호실 0/)).toBeTruthy();
+  });
+
+  it("PG-05 검색칸에서 Esc 를 눌러도 상세가 닫히지 않고, 검색칸 밖에서는 한 겹 닫힌다", async () => {
+    mount();
+    fireEvent.click(await screen.findByRole("button", { name: /^가로수 A 카페/ }));
+    expect(screen.getByRole("button", { name: "← 건물 목록" })).toBeTruthy();
+    const search = screen.getByRole("textbox", { name: "건물 검색" });
+    search.focus();
+    fireEvent.keyDown(search, { key: "Escape" });
+    expect(screen.getByRole("button", { name: "← 건물 목록" })).toBeTruthy();
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("button", { name: "← 건물 목록" })).toBeNull());
+  });
+
+  it("PG-07 고른 건물은 호버를 떼도 강조가 남고, 도형을 다시 만들어도 강조가 다시 입혀진다", async () => {
+    mount();
+    await polygonMode();
+    await waitFor(() => expect(naver.live()).toHaveLength(3));
+    const row = await screen.findByRole("button", { name: /^가로수 A 카페/ });
+    fireEvent.mouseEnter(row);
+    fireEvent.click(row);
+    fireEvent.mouseLeave(row);
+    const g1 = () => naver.live().filter((o) => o.kind === "Polygon")[0];
+    await waitFor(() => expect(g1().options.strokeWeight).toBe(4));
+    expect(naver.map()!.moves.some((m) => m.kind === "panTo")).toBe(true);
+
+    // 조건을 바꿔 도형을 새로 만들어도(1동만 남김) 고른 건물 강조가 유지된다.
+    fireEvent.change(screen.getByRole("combobox", { name: "공실 상태 필터" }), { target: { value: "empty" } });
+    await waitFor(() => expect(naver.live().filter((o) => o.kind === "Polygon")).toHaveLength(1));
+    expect(g1().options.strokeWeight).toBe(4);
+  });
+
+  it("인계받은 건물이 이 상권 목록에 없으면 찾지 못했다고 말하고, 닫기로 선택을 푼다", async () => {
+    installFetchStub([
+      { match: /\/api\/v1\/commercial-districts$/, body: HUBS },
+      { match: /\/api\/v1\/heatmap\/buildings\?district=garosugil/, body: GAROSU_BUILDINGS },
+    ]);
+    const change = vi.fn();
+    renderOnMap(<MapShell workspace={{ ...createPageWorkspace(), selectedId: "no-such-building" }} onWorkspaceChange={change} />);
+    expect(await screen.findByText("선택한 건물을 이 상권 건물 목록에서 찾지 못했습니다.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "닫기" }));
+    expect(change).toHaveBeenCalled();
   });
 });
 

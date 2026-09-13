@@ -18,6 +18,7 @@
  * 3. **실측 없음**(`measured_only` + `sentiment === null`) — 0 이 아니라 **재지 않은 것**이다.
  *    옵션 라벨에서 공실률만 보여주고 감성은 아예 적지 않는다.
  */
+import { useEffect, useRef, useState } from "react";
 import type { DistrictSummary } from "@/lib/api";
 
 /** 예외의 종류 — 셋이다.
@@ -85,6 +86,19 @@ export default function DistrictPicker({
   }
   const cities = [...byCity.keys()].sort(cityOrder);
 
+  // 스크린리더 알림(2026-09-13, 화면설계서 2판 C-05). 상권은 네 트랙이 공유하므로 바뀌면 화면
+  // 전체의 맥락이 바뀐다 — 눈으로는 지도가 날아가서 알지만 스크린리더 사용자는 모른다.
+  // **처음 그릴 때는 말하지 않는다**(바뀐 것이 없다). role 은 두지 않는다 — 화면마다 이미
+  // role="status" 가 하나씩 있어(비교 후보 수 등) 둘이 되면 그 자리를 찾는 도구가 헷갈린다.
+  const [announce, setAnnounce] = useState("");
+  const prevValue = useRef(value);
+  useEffect(() => {
+    if (prevValue.current === value) return;
+    prevValue.current = value;
+    const d = districts.find((x) => x.id === value);
+    if (d) setAnnounce(`상권 ${d.name} 선택됨`);
+  }, [value, districts]);
+
   const tail = suffix ?? ((d: DistrictSummary) => {
     // 공실률은 실측이 있을 때만. 없는 값을 0 으로 그리지 않는다.
     // "실측 없음"(안 쟀다)과 "대표값 미제공"(쟀지만 대표하지 못한다)은 다른 말이다.
@@ -94,6 +108,7 @@ export default function DistrictPicker({
   });
 
   return (
+    <>
     <select
       aria-label={ariaLabel}
       className={className}
@@ -119,6 +134,8 @@ export default function DistrictPicker({
           : <optgroup key={city} label={label}>{options}</optgroup>;
       })}
     </select>
+    <span className="sr-only" aria-live="polite">{announce}</span>
+    </>
   );
 }
 

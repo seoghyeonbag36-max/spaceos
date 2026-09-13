@@ -63,7 +63,9 @@ function deferred<T = StoreMarketing>() {
 }
 
 describe("ProgramStudio — 채널별 초안", () => {
-  it("온라인·오프라인 채널을 선택하고 본문만 편집해 미리 보며 원본으로 되돌린다", async () => {
+  // ⚠ 파일 첫 테스트라 모듈 변환 비용을 혼자 진다. 단독 2.3초인데 전체 병렬(9파일)에서 5초 기본
+  //   한도를 넘겼다(2026-09-13, 2회 연속). 동작 판정이 아니라 대기 한도만 늘린다.
+  it("온라인·오프라인 채널을 선택하고 본문만 편집해 미리 보며 원본으로 되돌린다", { timeout: 20000 }, async () => {
     const result = structuredClone(MARKETING);
     const api = mount({ result });
     const storage = vi.spyOn(Storage.prototype, "setItem");

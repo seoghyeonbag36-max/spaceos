@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { BuildingSelection } from "@/lib/workspaceState";
+import type { BuildingSelection, ProgramHandoff } from "@/lib/workspaceState";
 import DistrictPicker, { CaveatNote } from "@/components/DistrictPicker";
 import {
   BASIS_LABEL, getPostings, listDistricts, recommendIndustry, simulateRevenue,
@@ -54,24 +54,29 @@ interface PostingConsoleProps {
    *  안 주면 종전대로 화면이 스스로 상권을 든다(단독 렌더·테스트). */
   districtId?: string;
   onDistrictChange?: (id: string) => void;
+  /** Posting → Program 인계(화면설계서 2판). 주면 결과 아래 「이 자리로 홍보 program 만들기 →」가 뜬다. */
+  onMakeProgram?: (handoff: ProgramHandoff) => void;
 }
 interface Calculation {
   result: SimulateResult;
   input: { district_id: string; unit_id: string; industry_type?: string; strategy?: string; prem?: number };
 }
 
-export default function PostingConsole({ selection, districtId, onDistrictChange }: PostingConsoleProps = {}) {
+export default function PostingConsole({ selection, districtId, onDistrictChange, onMakeProgram }: PostingConsoleProps = {}) {
   return <PostingSession key={selection ? `${selection.districtId}:${selection.buildingId}:${selection.requestId}` : "direct"}
-    selection={selection} districtId={districtId} onDistrictChange={onDistrictChange} />;
+    selection={selection} districtId={districtId} onDistrictChange={onDistrictChange} onMakeProgram={onMakeProgram} />;
 }
 
-function PostingSession({ selection, districtId: sharedDistrict, onDistrictChange }: PostingConsoleProps) {
+function PostingSession({ selection, districtId: sharedDistrict, onDistrictChange, onMakeProgram }: PostingConsoleProps) {
   const [districts, setDistricts] = useState<DistrictSummary[]>([]);
   const [ownDistrict, setOwnDistrict] = useState(selection?.districtId ?? sharedDistrict ?? DEFAULT_DISTRICT);
   const controlled = sharedDistrict !== undefined && onDistrictChange !== undefined;
   const districtId = controlled ? sharedDistrict : ownDistrict;
   const setDistrictId = (id: string) => (controlled ? onDistrictChange(id) : setOwnDistrict(id));
   const [units, setUnits] = useState<Posting[]>([]);
+  // 자리 목록이 **도착한** 상권. 0곳과 불러오는 중을 가르는 데 쓴다(화면설계서 2판 상태표) —
+  // 종전에는 0곳인 상권에서 결론이 영원히 "불러오는 중이다"로 남았다.
+  const [unitsFor, setUnitsFor] = useState<string | null>(null);
   const [unitId, setUnitId] = useState<string>("");
   const [industry, setIndustry] = useState("");
   const [prem, setPrem] = useState("");
@@ -92,8 +97,8 @@ function PostingSession({ selection, districtId: sharedDistrict, onDistrictChang
   // 화면 머리(결론 1줄 + 근거 3줄). 계산 결과가 바뀔 때만 다시 짠다.
   const head = useMemo(() => postingHeadline({
     districtName: districts.find((d) => d.id === districtId)?.name ?? districtId,
-    unit, unitCount: units.length, result, premInput: prem,
-  }), [districts, districtId, unit, units.length, result, prem]);
+    unit, unitCount: units.length, unitsLoaded: unitsFor === districtId, result, premInput: prem,
+  }), [districts, districtId, unit, units.length, unitsFor, result, prem]);
 
   useEffect(() => {
     let live = true;
@@ -137,6 +142,7 @@ function PostingSession({ selection, districtId: sharedDistrict, onDistrictChang
       .then((p) => {
         if (!live) return;
         setUnits(p);
+        setUnitsFor(districtId);
         if (selection && districtId === selection.districtId) {
           // build_vacant_units.py의 id=f"vu-{p.get('id')}" 계약을 응답 목록에서 검증한다.
           // 이름·좌표로 추측하거나 층 표본을 ROI 유닛으로 바꾸지 않는다.
@@ -220,6 +226,23 @@ function PostingSession({ selection, districtId: sharedDistrict, onDistrictChang
   useMapMarkers(markers, chooseUnit);
   const hubCenter = districts.find((d) => d.id === districtId)?.center;
   useFitMap(districtId, units, hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null, TRACK_PANEL_W);
+
+  // Posting → Program 인계 값. 업종은 **계산에 쓴 업종**을 먼저, 없으면 자리의 직전 업종.
+  // 전략명은 계산했고 회수되는 전략이 있을 때만 — 없는 추천을 지어내지 않는다.
+  function makeProgram() {
+    if (!unit || !onMakeProgram) return;
+    const used = calculation?.input.unit_id === unit.id ? calculation : null;
+    const entries = used ? Object.entries(used.result.scenarios) : [];
+    const viable = entries.filter(([, t]) => t.viable);
+    const best = entries.find(([, t]) => t.recommended && t.viable)
+      ?? [...viable].sort((a, b) => a[1].roi_months - b[1].roi_months)[0];
+    onMakeProgram({
+      districtId, unitId: unit.id, unitName: unit.n, lat: unit.lat, lng: unit.lng,
+      area: unit.area, floor: unit.floor, rent: unit.rent,
+      industry: used?.input.industry_type || unit.was?.trim() || null,
+      strategy: best ? (TIER_LABEL[best[0]]?.name ?? best[1].name) : null,
+    });
+  }
 
   const tiers = result ? Object.entries(result.scenarios) : [];
   const changedInput = calculation && (calculation.input.industry_type !== (industry.trim() || undefined)
@@ -340,6 +363,10 @@ function PostingSession({ selection, districtId: sharedDistrict, onDistrictChang
 
         {/* ── 결과 ── */}
         <div className="results">
+          {onMakeProgram && (
+            <Button type="button" variant="ghost" className="posting-to-program" disabled={!unit}
+              onClick={makeProgram}>이 자리로 홍보 program 만들기 →</Button>
+          )}
           <div className="posting-result-heading"><h2>세 가격대의 비용과 회수기간</h2><p>처음 필요한 돈 · 매달 나가는 돈 · 투자 회수까지</p></div>
           {!result && !busy && <div className="empty">자리를 고르면 계산한다.</div>}
           {result && (
@@ -461,10 +488,11 @@ function difference(value: number, unit: string): string {
  * ⚠ 권리금이 `absent`(입력 없음)면 결론에 그 사실을 싣는다. 0 을 전제로 낸 회수기간을
  *   실측처럼 읽으면 그 숫자가 곧 거짓말이 된다 — 이 화면 주석 §화면 원칙과 같은 규칙이다.
  */
-function postingHeadline({ districtName, unit, unitCount, result, premInput }: {
+function postingHeadline({ districtName, unit, unitCount, unitsLoaded, result, premInput }: {
   districtName: string;
   unit?: Posting;
   unitCount: number;
+  unitsLoaded: boolean;
   result: SimulateResult | null;
   premInput: string;
 }): { verdict: React.ReactNode; grounds: Ground[]; sources: React.ReactNode[] } {
@@ -477,9 +505,11 @@ function postingHeadline({ districtName, unit, unitCount, result, premInput }: {
     return {
       verdict: unitCount
         ? <>{districtName}에 실측 공실 <b>{unitCount.toLocaleString()}곳</b>이 있다. 자리와 업종을 고르면 세 가격대의 회수기간을 낸다.</>
-        : <>{districtName}의 공실 자리를 불러오는 중이다.</>,
+        : unitsLoaded
+          ? <>{districtName}에는 계산할 실측 공실 자리가 없다.</>
+          : <>{districtName}의 공실 자리를 불러오는 중이다.</>,
       grounds: [
-        { label: "고를 수 있는 자리", value: unitCount ? `${unitCount.toLocaleString()}곳` : "불러오는 중", source: "건축물대장 실측 인벤토리" },
+        { label: "고를 수 있는 자리", value: unitCount ? `${unitCount.toLocaleString()}곳` : unitsLoaded ? "0곳" : "불러오는 중", source: "건축물대장 실측 인벤토리" },
         { label: "비교하는 가격대", value: "고급화 · 가성비 · 기능중심 3전략" },
         { label: "권리금", value: premInput ? `${Number(premInput).toLocaleString()}만원 입력됨` : "미입력 — 0 을 전제로 계산한다", source: "공개 통계 없음 · 기업 입력 계약" },
       ],

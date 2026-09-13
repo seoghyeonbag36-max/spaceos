@@ -110,7 +110,7 @@
 .progstudio .rname{font-size:17px;font-weight:700;letter-spacing:-.3px}
 .progstudio .rcat{font-size:11.5px;color:var(--sub);margin-top:3px}
 .progstudio .srcbadge{font-size:10px;font-weight:700;border-radius:6px;padding:3px 7px;flex:0 0 auto;letter-spacing:-.2px;white-space:nowrap}
-.progstudio .srcbadge.is-gold{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.progstudio .srcbadge.is-gold{color:var(--source-real);background:var(--source-real-soft);border:1px solid var(--source-real-line)}
 .progstudio .srcbadge.is-syn{color:#8a6d3b;background:#fdf8ec;border:1px dashed #e6d2a3}
 
 .progstudio .rlabel{font-size:12px;font-weight:700;color:var(--sub);margin:14px 0 7px}
@@ -169,6 +169,24 @@
  .progstudio .ptools{flex-wrap:wrap}
 }
 
-/* 지도 안내 한 줄(2026-09-13) — 지도에 찍힌 칩이 무엇인지 패널에서 말한다. */
-.progstudio .mapnote{font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted);background:var(--track-program-soft);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--sp-2) var(--sp-3);margin:0 0 var(--sp-3)}
-.progstudio .mapnote b{color:var(--track-program)}
+
+/* 입점 예정 자리 안내 · 오프라인 홍보 장소 (2026-09-13, 화면설계서 2판 §Program) */
+.progstudio .arrival{display:grid;gap:var(--sp-1);font-size:var(--fs-caption);line-height:var(--lh-caption);background:var(--track-posting-soft);border:1px solid var(--line);border-left:3px solid var(--track-posting);border-radius:var(--radius-md);padding:var(--sp-2) var(--sp-3);margin:0 0 var(--sp-3)}
+.progstudio .arrival b{color:var(--track-posting)}
+.progstudio .arrival span{color:var(--muted)}
+.progstudio .offline-places{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--sp-3);margin:0 0 var(--sp-3)}
+.progstudio .op-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-2);flex-wrap:wrap;font-size:var(--fs-body)}
+.progstudio .op-head b{color:var(--track-program)}
+.progstudio .op-head span{font-size:var(--fs-caption);color:var(--muted)}
+.progstudio .op-src{margin:var(--sp-1) 0 var(--sp-2);font-size:var(--fs-caption);color:var(--muted)}
+.progstudio .op-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--sp-1);max-height:220px;overflow-y:auto}
+.progstudio .op-list button{width:100%;display:grid;gap:2px;text-align:left;padding:var(--sp-2);border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
+.progstudio .op-list button[aria-pressed="true"]{border-color:var(--track-program);background:var(--track-program-soft);box-shadow:inset 3px 0 var(--track-program)}
+.progstudio .op-name{font-size:var(--fs-caption);font-weight:700}
+.progstudio .op-name i{font-style:normal;color:var(--muted);font-weight:600}
+.progstudio .op-meta{font-size:11px;color:var(--muted)}
+.progstudio .op-detail{margin:var(--sp-3) 0 0;display:grid;gap:var(--sp-1);font-size:var(--fs-caption);border-top:1px dashed var(--line);padding-top:var(--sp-2)}
+.progstudio .op-detail div{display:grid;grid-template-columns:44px 1fr;gap:var(--sp-2)}
+.progstudio .op-detail dt{color:var(--muted)}
+.progstudio .op-detail dd{margin:0}
+.progstudio .op-detail a{color:var(--track-program);font-weight:700}

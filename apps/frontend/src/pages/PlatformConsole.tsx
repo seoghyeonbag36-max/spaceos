@@ -16,6 +16,7 @@ import { useMapHost } from "@/components/MapHost";
 import { useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
 import { TRACK_PANEL_W } from "@/components/TrackMapFrame";
 import { boundaryBadge, computeHubBoundary, EMPTY_BOUNDARY, type HubBoundary } from "@/lib/hubBoundary";
+import type { BuildingSelection } from "@/lib/workspaceState";
 import "./PlatformConsole.css";
 
 /**
@@ -85,10 +86,12 @@ function approxVacancyPct(fc: VacancyForecast | null, hub?: DistrictSummary): nu
 
 const dirMark = (d: string) => (d === "up" ? "▲" : d === "down" ? "▼" : "—");
 
-export default function PlatformConsole({ districtId: sharedDistrict, onDistrictChange }: {
+export default function PlatformConsole({ districtId: sharedDistrict, onDistrictChange, onOpenInPage }: {
   /** 네 트랙이 공유하는 상권(App). 주면 제어 모드, 안 주면 화면이 스스로 든다(단독 렌더·테스트). */
   districtId?: string;
   onDistrictChange?: (id: string) => void;
+  /** Platform → Page 인계(화면설계서 2판). 주면 자리 카드에 「Page에서 이 건물 보기 →」가 뜬다. */
+  onOpenInPage?: (selection: BuildingSelection) => void;
 } = {}) {
   const [districts, setDistricts] = useState<DistrictSummary[]>([]);
   const [ownDistrict, setOwnDistrict] = useState(sharedDistrict ?? DEFAULT_DISTRICT);
@@ -249,7 +252,8 @@ export default function PlatformConsole({ districtId: sharedDistrict, onDistrict
       {prof?.identity && <IdentitySection ident={prof.identity} hub={hub} />}
       {prof?.district_id === districtId && (
         <OpeningsSection key={districtId} openings={prof.openings} districtName={hub?.name ?? districtId}
-          selectedIds={selectedSiteIds} onToggle={toggleSite} onClear={() => setSelectedSiteIds([])} />
+          selectedIds={selectedSiteIds} onToggle={toggleSite} onClear={() => setSelectedSiteIds([])}
+          onOpenInPage={onOpenInPage ? (site) => onOpenInPage(siteToBuilding(districtId, site)) : undefined} />
       )}
 
       {/* 근거 — 위 두 답을 만든 모델의 성능과 한계. 지표가 아니라 **답**이 먼저 오도록 접어 둔다 */}
@@ -693,8 +697,9 @@ function Spark({ points, direction }: { points: number[]; direction: string }) {
 
 /* ───────────────── ② 어느 자리에 어떤 업소가 ───────────────── */
 
-function OpeningsSection({ openings, districtName, selectedIds, onToggle: toggleSite, onClear }: {
+function OpeningsSection({ openings, districtName, selectedIds, onToggle: toggleSite, onClear, onOpenInPage }: {
   openings: PlatformProfile["openings"]; districtName: string;
+  onOpenInPage?: (site: OpeningSite) => void;
   /** 비교 후보 — 지도 칩과 공유하므로 상위(PlatformConsole)가 든다 */
   selectedIds: string[]; onToggle: (id: string) => void; onClear: () => void;
 }) {
@@ -780,7 +785,8 @@ function OpeningsSection({ openings, districtName, selectedIds, onToggle: toggle
                   seq={(dupNames.get(s.name) ?? 0) > 1 ? s.unit_id.split("-").pop() ?? null : null}
                   selected={selectedIds.includes(s.unit_id)}
                   disabled={selectedIds.length >= 3 && !selectedIds.includes(s.unit_id)}
-                  onToggle={() => toggleSite(s.unit_id)} />
+                  onToggle={() => toggleSite(s.unit_id)}
+                  onOpenInPage={onOpenInPage && s.unit_id.startsWith(UNIT_PREFIX) ? () => onOpenInPage(s) : undefined} />
               ))}
             </div>
           </fieldset>
@@ -804,9 +810,18 @@ function OpeningsSection({ openings, districtName, selectedIds, onToggle: toggle
   );
 }
 
-function SiteCard({ site, seq, selected, disabled, onToggle }: {
+/** 자리 id 규약 — build_vacant_units.py 가 `vu-{건물 id}` 로 만든다. Posting 인계와 같은 계약이다. */
+const UNIT_PREFIX = "vu-";
+
+/** 자리 → Page 건물 선택. 건물 id 는 규약에서 뗀 값만 쓴다(이름·좌표로 추측하지 않는다). */
+function siteToBuilding(districtId: string, site: OpeningSite): BuildingSelection {
+  return { districtId, buildingId: site.unit_id.slice(UNIT_PREFIX.length), buildingName: site.name };
+}
+
+function SiteCard({ site, seq, selected, disabled, onToggle, onOpenInPage }: {
   site: OpeningSite; seq: string | null;
   selected: boolean; disabled: boolean; onToggle: () => void;
+  onOpenInPage?: () => void;
 }) {
   const max = site.recommendations[0]?.score ?? 1;
   return (
@@ -856,6 +871,10 @@ function SiteCard({ site, seq, selected, disabled, onToggle }: {
       )}
 
       {site.was && <div className="swas">직전 업종 <b>{site.was}</b></div>}
+      {onOpenInPage && (
+        <button type="button" className="site-open-page" onClick={onOpenInPage}
+          aria-label={`${site.name} Page에서 이 건물 보기`}>Page에서 이 건물 보기 →</button>
+      )}
     </Card>
   );
 }

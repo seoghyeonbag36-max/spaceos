@@ -19,8 +19,9 @@
  * 좁은 패널 안에서는 그대로 두면 칸이 짓눌린다. 패널 안에서만 1단으로 접는 규칙은
  * TrackMapFrame.css 가 갖는다 — 콘솔 CSS 는 단독 화면(테스트·#board)용으로 그대로 둔다.
  */
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { TrackKey } from "@/design/tokens/colors";
+import { isEditableTarget } from "@/lib/keyboard";
 import "./TrackMapFrame.css";
 
 /** 패널 폭(px). 콘솔이 카메라를 맞출 때 이만큼 비켜야 점이 패널 밑에 안 깔린다. */
@@ -34,14 +35,23 @@ export default function TrackMapFrame({ track, label, children }: {
 }) {
   const [open, setOpen] = useState(true);
   const panelId = `track-panel-${track}`;
+  const collapseRef = useRef<HTMLButtonElement>(null);
+  const reopenRef = useRef<HTMLButtonElement>(null);
+  // 접기·펴기 뒤 포커스를 **짝 버튼으로** 옮긴다(화면설계서 2판 C-03). 누른 버튼이 사라지면
+  // 포커스가 body 로 떨어져 키보드 사용자는 어디서 다시 시작할지 모른다. 첫 렌더는 건너뛴다 —
+  // 탭을 열자마자 포커스를 뺏으면 레일에서 Tab 하던 흐름이 끊긴다.
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) { firstRender.current = false; return; }
+    (open ? collapseRef.current : reopenRef.current)?.focus();
+  }, [open]);
 
   // Esc 로 패널을 접는다 — Page(MapShell R5)와 같은 동선. 입력 중에는 건드리지 않는다
   // (textarea 에서 Esc 를 눌렀는데 패널이 닫히면 쓰던 내용이 눈앞에서 사라진다).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || !open) return;
-      const t = e.target as HTMLElement | null;
-      if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+      if (isEditableTarget(e.target)) return;
       if (document.querySelector("dialog[open]")) return;
       setOpen(false);
     };
@@ -52,13 +62,13 @@ export default function TrackMapFrame({ track, label, children }: {
   return (
     <div className="trackmap" data-track={track}>
       {!open && (
-        <button type="button" className="trackmap-reopen" onClick={() => setOpen(true)}
+        <button ref={reopenRef} type="button" className="trackmap-reopen" onClick={() => setOpen(true)}
           aria-expanded={false} aria-controls={panelId}>
           ☰ {label}
         </button>
       )}
       <aside id={panelId} className="trackmap-panel" hidden={!open} aria-label={label}>
-        <button type="button" className="trackmap-collapse" onClick={() => setOpen(false)}
+        <button ref={collapseRef} type="button" className="trackmap-collapse" onClick={() => setOpen(false)}
           aria-expanded aria-controls={panelId} aria-label={`${label} 접기`}
           title="패널을 접고 지도를 넓게 본다">‹</button>
         <div className="trackmap-scroll">{children}</div>

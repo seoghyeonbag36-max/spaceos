@@ -32,7 +32,7 @@
 .pagedash .dpill{font-size:10px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:2px 7px;flex:0 0 auto}
 /* 공실 수치 출처 배지 — 실측(Gold)은 초록 채움, 합성은 회색 점선 테두리로 "임시"임을 드러낸다 */
 .pagedash .srcbadge{font-size:9.5px;font-weight:700;border-radius:5px;padding:1px 5px;flex:0 0 auto;letter-spacing:-.2px}
-.pagedash .srcbadge.is-gold{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.pagedash .srcbadge.is-gold{color:var(--source-real);background:var(--source-real-soft);border:1px solid var(--source-real-line)}
 .pagedash .srcbadge.is-syn{color:#8a93a0;background:#f6f7f9;border:1px dashed #cfd5dd}
 /* R-ONE 앵커 대조 칩 — 판정이 아니라 참고 지표라 중립색으로 둔다(빨강/초록으로 물들이면
    격차 0 이 목표처럼 읽힌다. 모집단이 달라 0 은 애초에 목표가 아니다). */
@@ -163,7 +163,7 @@
   border-radius:6px;padding:2px var(--sp-2);flex-shrink:0}
 .pagedash .fv-name{font-size:13px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pagedash .fv-badge{font-size:10px;font-weight:700;border-radius:6px;padding:2px 7px;flex-shrink:0}
-.pagedash .fv-badge.ok{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.pagedash .fv-badge.ok{color:var(--source-real);background:var(--source-real-soft);border:1px solid var(--source-real-line)}
 .pagedash .fv-badge.maybe{color:#8a6d3b;background:#fdf8ec;border:1px solid #f3e6c4}
 .pagedash .fv-meta{font-size:12px;margin:6px 0 3px}
 .pagedash .fv-meta .dim{color:var(--sub);font-size:11px;margin-left:3px}

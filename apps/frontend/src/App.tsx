@@ -4,7 +4,7 @@ import PageDashboard from "@/pages/PageDashboard";
 import AdminCoverage from "@/pages/AdminCoverage";
 import MapHost from "@/components/MapHost";
 import TrackMapFrame from "@/components/TrackMapFrame";
-import { createPageWorkspace, type BuildingSelection } from "@/lib/workspaceState";
+import { createPageWorkspace, type BuildingSelection, type ProgramHandoff } from "@/lib/workspaceState";
 import "./App.css";
 
 // 네 트랙 화면은 전부 지도 위 오버레이다. 지도 SDK 는 MapHost 가 받지만, 화면마다
@@ -75,6 +75,25 @@ export default function App() {
     setPageWorkspace((w) => (w.districtId === id ? w
       : { ...w, districtId: id, query: "", status: "all", selectedId: null }));
   }, []);
+  // ── 트랙 간 인계(화면설계서 2판 인계 표) ─────────────────────────────────────
+  // Platform → Page: 그 건물을 Page 에서 연다. 상권·선택 건물은 Page 작업공간 하나에 쓰고,
+  // 검색어·상태 필터는 비운다 — 조건에 걸려 넘겨받은 건물이 목록에서 안 보이면 안 된다.
+  const openInPage = useCallback((selection: BuildingSelection) => {
+    setPageWorkspace((w) => ({
+      ...w, districtId: selection.districtId, selectedId: selection.buildingId, query: "", status: "all",
+    }));
+    setView("map");
+  }, []);
+  // Posting → Program: 인계마다 requestId 를 올려 Program 을 새로 마운트한다(초기값으로만 채운다).
+  const [programHandoff, setProgramHandoff] = useState<(ProgramHandoff & { requestId: number; dismissed?: boolean })>();
+  const makeProgram = useCallback((handoff: ProgramHandoff) => {
+    setProgramHandoff((prev) => ({ ...handoff, requestId: (prev?.requestId ?? 0) + 1 }));
+    setView("program");
+  }, []);
+  // 「비우기」 등으로 안내를 걷으면 표시만 끈다. key(requestId)는 그대로 둬 지금 화면을 다시 마운트하지 않는다.
+  const dismissArrival = useCallback(() => {
+    setProgramHandoff((h) => (h && !h.dismissed ? { ...h, dismissed: true } : h));
+  }, []);
   const [isAdmin, setIsAdmin] = useState(() => window.location.hash === "#admin");
   const [isBoard, setIsBoard] = useState(() => window.location.hash === "#board");
 
@@ -122,18 +141,20 @@ export default function App() {
         <Suspense fallback={<div className="map-loading">화면 불러오는 중…</div>}>
           {view === "platform" && (
             <TrackMapFrame track="platform" label="상권 정체성">
-              <PlatformConsole districtId={districtId} onDistrictChange={setDistrictId} />
+              <PlatformConsole districtId={districtId} onDistrictChange={setDistrictId} onOpenInPage={openInPage} />
             </TrackMapFrame>
           )}
           {view === "map" && <MapShell workspace={pageWorkspace} onWorkspaceChange={setPageWorkspace} onReview={reviewBuilding} />}
           {view === "posting" && (
             <TrackMapFrame track="posting" label="입점 계산">
-              <PostingConsole selection={postingSelection} districtId={districtId} onDistrictChange={setDistrictId} />
+              <PostingConsole selection={postingSelection} districtId={districtId} onDistrictChange={setDistrictId}
+                onMakeProgram={makeProgram} />
             </TrackMapFrame>
           )}
           {view === "program" && (
             <TrackMapFrame track="program" label="홍보 program">
-              <ProgramStudio mapDistrictId={districtId} />
+              <ProgramStudio key={programHandoff?.requestId ?? "direct"} mapDistrictId={districtId}
+                handoff={programHandoff?.dismissed ? undefined : programHandoff} onArrivalDismiss={dismissArrival} />
             </TrackMapFrame>
           )}
         </Suspense>

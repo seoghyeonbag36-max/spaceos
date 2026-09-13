@@ -344,46 +344,57 @@
 
 /* ═══ 임대시세 = 금액 (2026-09-13) ══════════════════════════════════════════════
    종전 초록 격자는 "진한 곳이 비싸다"만 말했다. 이제 층별 평당 표 · 건물별 빈 층 금액을
-   숫자로 싣는다. 색은 종전 R-ONE 배지 초록(#0f7a55 / #e3f5ee)을 그대로 쓴다 —
+   숫자로 싣는다. 색은 실측 출처 토큰(--source-real · -soft · -line)이다 —
    레이어 모양이 바뀌어도 "R-ONE 임대료"가 같은 색으로 읽힌다. */
 .mapshell .rent-summary {
   flex-shrink: 0; padding: var(--sp-3) var(--sp-4);
-  border-bottom: 1px solid var(--line); background: #f3fbf7;
+  border-bottom: 1px solid var(--line); background: var(--source-real-soft);
 }
 .mapshell .rent-summary-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); flex-wrap: wrap; }
 .mapshell .rent-summary-head strong { font-size: var(--fs-body); color: var(--ink); }
-.mapshell .rent-summary-head span { font-size: var(--fs-caption); color: #0f7a55; font-weight: 700; }
+.mapshell .rent-summary-head span { font-size: var(--fs-caption); color: var(--source-real); font-weight: 700; }
 .mapshell .rent-floors { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-1); margin-top: var(--sp-2); }
 .mapshell .rent-floor {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   padding: var(--sp-1) 0; border-radius: var(--radius-md);
-  background: var(--surface); border: 1px solid #b7e3d2;
+  background: var(--surface); border: 1px solid var(--source-real-line);
 }
 .mapshell .rent-floor span { font-size: 10.5px; color: var(--muted); }
-.mapshell .rent-floor b { font-size: 13px; color: #0f7a55; font-variant-numeric: tabular-nums; }
+.mapshell .rent-floor b { font-size: 13px; color: var(--source-real); font-variant-numeric: tabular-nums; }
 .mapshell .rent-summary-foot { margin: var(--sp-2) 0 0; font-size: var(--fs-caption); line-height: var(--lh-caption); color: var(--muted); }
 .mapshell .rent-summary-foot b { color: var(--ink); }
 
 /* 목록 줄 — 그 건물 빈 층의 금액 범위 */
-.mapshell .b-rent { font-size: var(--fs-caption); color: #0f7a55; margin-top: var(--sp-1); }
+.mapshell .b-rent { font-size: var(--fs-caption); color: var(--source-real); margin-top: var(--sp-1); }
 .mapshell .b-rent b { font-variant-numeric: tabular-nums; }
 
 /* 상세 — 층마다 월 얼마 */
 .mapshell .b-rentbox { margin-top: var(--sp-3); padding-top: 10px; border-top: 1px dashed var(--line); }
 .mapshell .b-rent-badge {
   font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px;
-  background: #e3f5ee; color: #0f7a55;
+  background: var(--source-real-soft); color: var(--source-real);
 }
 .mapshell .b-rent-table { width: 100%; margin-top: var(--sp-2); border-collapse: collapse; font-size: var(--fs-caption); }
 .mapshell .b-rent-table th { text-align: right; font-weight: 600; color: var(--muted); padding: 2px 4px; border-bottom: 1px solid var(--line); }
 .mapshell .b-rent-table th:first-child, .mapshell .b-rent-table td:first-child { text-align: left; }
 .mapshell .b-rent-table td { text-align: right; padding: 3px 4px; border-bottom: 1px solid #f1f4f9; font-variant-numeric: tabular-nums; }
-.mapshell .b-rent-table td b { color: #0f7a55; }
+.mapshell .b-rent-table td b { color: var(--source-real); }
 /* 추정 공실(probable)은 흐리게 + 라벨 — 확정과 같은 모양이면 추정이 실측처럼 읽힌다. */
 .mapshell .b-rent-table tr.is-probable td { color: var(--muted); }
 .mapshell .b-rent-table tr.is-probable i { font-style: normal; font-size: 10px; color: #8a5a00; }
-.mapshell .legend .note b { color: #0f7a55; }
+.mapshell .legend .note b { color: var(--source-real); }
 @media (max-width: 768px) {
   .mapshell .rent-summary { padding: var(--sp-2) var(--sp-3); }
   .mapshell .rent-summary-foot { display: none; }
 }
+
+/* 범례의 R-ONE 배지 — 인라인 hex 를 토큰 클래스로 옮겼다(2026-09-13, 화면설계서 2판 §토큰). */
+.mapshell .src-badge-real { color: var(--source-real); background: var(--source-real-soft); border: 1px solid var(--source-real-line); border-radius: 5px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
+
+/* 인계받은 건물을 못 찾았을 때의 안내(2026-09-13, 화면설계서 2판 인계 표). */
+.mapshell .handoff-miss {
+  flex-shrink: 0; margin: 0; display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4); border-bottom: 1px solid var(--line);
+  background: var(--track-page-soft); color: var(--ink); font-size: var(--fs-caption); line-height: var(--lh-caption);
+}
+.mapshell .handoff-miss button { border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); color: var(--track-page); font: inherit; padding: var(--sp-1) var(--sp-2); min-height: 32px; cursor: pointer; }

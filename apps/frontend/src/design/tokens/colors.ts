@@ -15,6 +15,8 @@ export const colors = {
     posting:  { base: "#A23C9F", pressed: "#863284", soft: "#FBF0FB" },
     program:  { base: "#7E2F53", pressed: "#622541", soft: "#FBF0F5" },
   },
+  // 실측 출처(R-ONE·대장) 색 — 임대시세 금액·출처 배지 (2026-09-13, 화면설계서 2판 §토큰)
+  source: { real: { base: "#0F7A55", soft: "#E3F5EE", line: "#B7E3D2" } },
   ink: "#1C2533",
   muted: "#6B7280",
   line: "#E3E9F2",
