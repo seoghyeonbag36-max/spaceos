@@ -1131,13 +1131,11 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>미해결</th><th>왜 막혀 있나</th><th>정할 사람</th></tr></thead>
           <tbody>
-            <tr><td><b>NCP Maps 에 새 주소 등록</b> — <span class="mono">https://placeos.web.app</span> · <span class="mono">https://placeos.firebaseapp.com</span></td><td>콘솔 로그인이 필요하다. 등록 전까지 새 주소에서 지도가 인증 실패(09-13 확인)</td><td>대표(NCP 콘솔 권한자)</td></tr>
-            <tr><td>옛 주소 → 새 주소 301 · 업타임 체크 대상 변경</td><td>위 등록이 먼저다</td><td>개발 · 대표(GCP 콘솔)</td></tr>
             <tr><td>로그인 · 회원가입 · API 키 화면</td><td>백엔드는 있고 화면이 없다. 멘토링 결과 반영 여부 미정</td><td>대표 · 디자인</td></tr>
             <tr><td>권리금 기본값 정책(비우면 0 전제 유지?)</td><td>회수기간이 짧게 보인다 — 결론 줄 경고로 버티는 중</td><td>대표 · Posting</td></tr>
             <tr><td>실제 호가 채널</td><td>크롤링 금지선 · 제휴 필요</td><td>대표</td></tr>
             <tr><td>모바일 시트 드래그</td><td>손잡이 모양만 있다</td><td>디자인</td></tr>
-            <tr><td>와이어프레임 → 실제 화면 캡처 교체</td><td>NCP 등록 뒤 새 주소에서 캡처</td><td>개발</td></tr>
+            <tr><td>와이어프레임 → 실제 화면 캡처 교체</td><td>새 주소에서 지도가 뜨므로 캡처할 수 있다</td><td>개발</td></tr>
             <tr><td>행사 데이터 재수집 주기</td><td>08-16 빌드 이후 종료 행사가 늘고 있다</td><td>데이터</td></tr>
           </tbody>
         </table>
@@ -1150,6 +1148,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
             <tr><td class="mono">2판 · 09-13</td><td><b>사실 오류 수정</b>: 인계 내용(표로 정본화) · “표식을 누르면 패널 항목 선택”(Program 행사까지 적용) · <kbd>Esc</kbd> 입력칸 규칙(네 화면 통일) · 와이어프레임 가로 스크롤</td></tr>
             <tr><td class="mono">2판 · 09-13</td><td><b>양식 필수 절 추가</b>: 화면 카드(목적·오해·주사용자·결론·제외) · 레이아웃 수치·z축·모바일 · 상태표 · 상호작용 목표 시간 · 데이터 바인딩 · 통과 조건 · 토큰 · 접근성 · 미해결 결정 주체</td></tr>
             <tr><td class="mono">2판 · 09-13</td><td><b>내용 추가</b>: 공실 4단계 정의 · 유동인구·인구밀도 · 모달 2종 · 자리 비교표 · 숨은 화면 · 공통 상태(지도 인증 실패 등) · 데이터 기준일 · 용어집</td></tr>
+            <tr><td class="mono">2판 · 09-13</td><td><b>주소·운영 정리</b>: NCP Maps 에 <span class="mono">placeos.web.app</span> 등록 확인 · 옛 주소는 페이지만 301(API 는 계속 서빙) · <span class="mono">*.firebaseapp.com</span> 과 옛 주소는 앱이 정식 주소로 옮김 · 업타임 체크를 새 주소로 옮기고 따옴표가 빠져 늘 실패하던 비교 문자열을 고침</td></tr>
             <tr><td class="mono">2판 · 09-13</td><td><b>새 동작</b>: Platform→Page 「Page에서 이 건물 보기 →」 · Posting→Program 「이 자리로 홍보 program 만들기 →」 · Program 오프라인 홍보 장소 목록·상세·종료 행사 제외 · 상권 선택 음성 알림 · 패널 접기/펴기 포커스 · 실측 출처 색 토큰 신설</td></tr>
             <tr><td class="mono">1판 · 09-13</td><td>서울·거점 탭 삭제 · PlaceOS 로고 · 네 트랙 지도 전체화면 · 임대시세 금액화 · <span class="mono">/marketing/events</span> · placeos.web.app</td></tr>
           </tbody>
