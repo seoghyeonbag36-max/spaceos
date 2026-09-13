@@ -3,13 +3,18 @@ import { caveatKind, CaveatNote } from "@/components/DistrictPicker";
 import Verdict, { Fold, type Ground } from "@/components/Verdict";
 import {
   listDistricts, generateCommercialStoreMarketing, generateStoreMarketing,
-  lookupStorePlaces, lookupStoreReviews,
+  getDistrictEvents, lookupStorePlaces, lookupStoreReviews,
 } from "@/lib/api";
 import type {
-  ChannelPlan, DistrictSummary, StoreMarketing, StorePlace,
+  ChannelPlan, DistrictSummary, MarketingEvent, StoreMarketing, StorePlace,
 } from "@/lib/api";
 import { Button } from "@/design/components/Button";
 import { Card } from "@/design/components/Card";
+import { mapLabelHTML } from "@/design/components/MapMarkerPin";
+import { colors } from "@/design/tokens/colors";
+import { useMapHost } from "@/components/MapHost";
+import { useFitMap, useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
+import { TRACK_PANEL_W } from "@/components/TrackMapFrame";
 import "./ProgramStudio.css";
 
 /**
@@ -102,8 +107,14 @@ const linesOf = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean
 const commaOf = (t: string) => t.split(",").map((s) => s.trim()).filter(Boolean);
 const isHttp = (u: string) => /^https?:\/\//.test(u);
 
-export default function ProgramStudio() {
+export default function ProgramStudio({ mapDistrictId }: {
+  /** 지도가 비출 상권(App 공유 상권). 폼의 「거점」을 고르지 않았을 때 카메라만 여기로 간다 —
+   *  **생성 요청에는 넣지 않는다.** 컨텍스트 결합은 사용자가 폼에서 고른 것만 쓴다. */
+  mapDistrictId?: string;
+} = {}) {
   const [form, setForm] = useState<FormState>(EMPTY);
+  // 후보 목록에서 고른 가게 — 지도에 "이 가게" 핀을 남기는 데만 쓴다. 입력이 바뀌면 걷는다.
+  const [pickedPlace, setPickedPlace] = useState<StorePlace | null>(null);
   const [districts, setDistricts] = useState<DistrictSummary[] | null>(null);
   const [districtErr, setDistrictErr] = useState(false);
   const [result, setResult] = useState<StoreMarketing | null>(null);
@@ -162,11 +173,17 @@ export default function ProgramStudio() {
     && (!commercialMode || commercialReady);
 
   const hub = (districts ?? []).find((d) => d.id === form.districtId);
+  const mapEvents = useProgramMap({
+    districtId: form.districtId || mapDistrictId || null,
+    districts: districts ?? [], places, pickedPlace,
+    onPickPlace: (p) => { if (!lookupBusy) applyPlace(p); },
+  });
 
   function changeField<K extends keyof FormState>(k: K, value: FormState[K]) {
     // 생성 원본의 입력이 바뀌면 이전 응답·초안·근거를 새 프로필에 붙이지 않는다.
     discardResult();
     discardLookup(["name", "category", "address", "districtId"].includes(k));
+    if (["name", "address"].includes(k)) setPickedPlace(null);
     setForm((f) => ({ ...f, [k]: value }));
   }
 
@@ -191,6 +208,7 @@ export default function ProgramStudio() {
     setCommercialMode(!commercialMode);
     setApiKey("");
     setForm(EMPTY);
+    setPickedPlace(null);
     setPublicReviews([]);
     setPlaces(null);
     setLookupNote(null);
@@ -231,6 +249,7 @@ export default function ProgramStudio() {
   async function applyPlace(p: StorePlace) {
     discardResult(); discardLookup(true);
     const version = ++lookupVersion.current;
+    setPickedPlace(p);
     setForm((f) => ({
       ...f,
       name: p.name,
@@ -324,6 +343,17 @@ export default function ProgramStudio() {
         note={HOW_TO_READ}
       />
 
+      {/* 지도에 무엇이 찍혔는지 한 줄로 — 칩만 있고 설명이 없으면 행사인지 가게인지 모른다. */}
+      {mapEvents && (
+        <div className="mapnote" role="status">
+          지도: 오프라인 홍보 장소 후보 <b>{mapEvents.events.length}곳</b>
+          {mapEvents.source === "seoul-open-data" ? " · 서울열린데이터광장 공공 문화행사"
+            : mapEvents.source === "seed" ? " · 행사 실데이터 미적재 — 점선 칩은 예시다"
+            : " · 행사 목록을 불러오지 못했다"}
+          {places && places.some((p) => p.lat != null) && " · 검은 칩 = 가게 후보(눌러서 고른다)"}
+        </div>
+      )}
+
       <div className="cols">
         {/* ── 입력 ── */}
         <form className="panel" onSubmit={submit}>
@@ -332,7 +362,7 @@ export default function ProgramStudio() {
             <div className="ptools">
               {!commercialMode && (
                 <Button variant="ghost" type="button" className="ghost" onClick={() => {
-                  setForm(SAMPLE); discardResult(); discardLookup(true);
+                  setForm(SAMPLE); setPickedPlace(null); discardResult(); discardLookup(true);
                 }}>예시 채우기</Button>
               )}
               <Button variant="ghost" type="button" className={`ghost ${commercialMode ? "active" : ""}`}
@@ -340,7 +370,7 @@ export default function ProgramStudio() {
                 {commercialMode ? "공개 데모로" : "상용 온보딩"}
               </Button>
               <Button variant="ghost" type="button" className="ghost" onClick={() => {
-                setForm(EMPTY); setPublicReviews([]); discardResult(); discardLookup(true);
+                setForm(EMPTY); setPickedPlace(null); setPublicReviews([]); discardResult(); discardLookup(true);
                 setApiKey(""); setRightsConfirmed(false); setProcessingConsent(false);
                 setExternalConsent(false); setRetentionAcknowledged(false);
               }}>비우기</Button>
@@ -556,6 +586,88 @@ export default function ProgramStudio() {
       </div>
     </div></div>
   );
+}
+
+/* ───────────── 지도 (2026-09-13) ───────────── */
+
+/**
+ * Program 이 지도에 그리는 것 — "어디서 홍보를 돌리나".
+ *
+ *   ① **가게 후보 칩** — 상호 검색 결과(카카오 로컬)를 지도에 건다. 같은 상호가 여러 곳이면
+ *      목록 글자만으로는 어느 것이 내 가게인지 헷갈린다. 위치로 고르게 한다. 칩을 누르면
+ *      목록에서 고른 것과 똑같이 기본정보·블로그 스니펫이 채워진다(`applyPlace`).
+ *   ② **고른 가게 핀** — 채운 뒤에도 "이 가게" 자리가 지도에 남는다.
+ *   ③ **오프라인 홍보 장소** — 상권의 공공 문화행사(서울열린데이터광장). 오프라인 program 을
+ *      어디에 붙일지의 후보다. **LLM 을 부르지 않는 경로**(`/marketing/events`)로만 받는다.
+ *      시드 폴백 행사는 점선으로 그린다 — 지어낸 일정이 실제 행사처럼 보이면 안 된다.
+ *
+ * 지도가 없으면(단독 렌더·테스트) 행사 요청도 보내지 않는다.
+ * 돌려주는 값은 패널이 행사 수를 말하는 데 쓴다. 지도가 없으면 null.
+ */
+function useProgramMap({ districtId, districts, places, pickedPlace, onPickPlace }: {
+  districtId: string | null; districts: DistrictSummary[];
+  places: StorePlace[] | null; pickedPlace: StorePlace | null;
+  onPickPlace: (p: StorePlace) => void;
+}): { events: MarketingEvent[]; source: string } | null {
+  const { map, ready } = useMapHost();
+  const [ev, setEv] = useState<{ id: string; events: MarketingEvent[]; source: string } | null>(null);
+
+  useEffect(() => {
+    if (!ready || !map || !districtId) return;
+    let live = true;
+    getDistrictEvents(districtId)
+      .then((r) => { if (live) setEv({ id: districtId, events: r.events, source: r.events_source ?? "seed" }); })
+      .catch(() => { if (live) setEv({ id: districtId, events: [], source: "unavailable" }); });
+    return () => { live = false; };
+  }, [ready, map, districtId]);
+  const current = ev && ev.id === districtId ? ev : null;
+
+  const placeKey = (p: StorePlace, i: number) => `place-${i}-${p.name}`;
+  const markers = useMemo<MapMarkerItem[]>(() => {
+    const out: MapMarkerItem[] = [];
+    const seed = current?.source !== "seoul-open-data";
+    for (const e of current?.events ?? []) {
+      out.push({
+        id: `event-${e.id}`, lat: e.lat, lng: e.lng, zIndex: 60,
+        html: mapLabelHTML({
+          text: e.n.length > 14 ? `${e.n.slice(0, 13)}…` : e.n,
+          sub: seed ? "예시" : e.when?.slice(0, 10),
+          color: colors.track.program.base, dashed: seed,
+        }),
+      });
+    }
+    (places ?? []).forEach((p, i) => {
+      if (p.lat == null || p.lng == null) return;
+      out.push({
+        id: placeKey(p, i), lat: p.lat, lng: p.lng, zIndex: 150,
+        html: mapLabelHTML({ text: p.name, sub: p.category?.split(">").pop()?.trim(), color: colors.ink }),
+      });
+    });
+    if (pickedPlace?.lat != null && pickedPlace.lng != null) {
+      out.push({
+        id: "picked", lat: pickedPlace.lat, lng: pickedPlace.lng, zIndex: 250,
+        html: mapLabelHTML({ text: pickedPlace.name, sub: "이 가게", color: colors.track.program.base, active: true }),
+      });
+    }
+    return out;
+  }, [current, places, pickedPlace]);
+
+  useMapMarkers(markers, (id) => {
+    const i = (places ?? []).findIndex((p, k) => placeKey(p, k) === id);
+    if (i >= 0) onPickPlace((places ?? [])[i]);
+  });
+
+  // 카메라: 후보가 뜨면 후보들에, 아니면 상권 중심에. 키가 바뀔 때만 움직인다.
+  const hubCenter = districts.find((d) => d.id === districtId)?.center;
+  const candidatePts = (places ?? []).filter((p) => p.lat != null && p.lng != null)
+    .map((p) => ({ lat: p.lat as number, lng: p.lng as number }));
+  const fitKey = candidatePts.length ? `places:${candidatePts.map((p) => `${p.lat},${p.lng}`).join("|")}`
+    : pickedPlace?.lat != null ? `picked:${pickedPlace.lat},${pickedPlace.lng}` : districtId ? `hub:${districtId}` : null;
+  const fitPts = candidatePts.length ? candidatePts
+    : pickedPlace?.lat != null && pickedPlace.lng != null ? [{ lat: pickedPlace.lat, lng: pickedPlace.lng }] : [];
+  useFitMap(fitKey, fitPts, hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null, TRACK_PANEL_W);
+
+  return ready && map && current ? { events: current.events, source: current.source } : null;
 }
 
 /* ───────────── 결론 1줄 + 근거 3줄 ───────────── */

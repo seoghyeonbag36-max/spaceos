@@ -177,12 +177,16 @@ python -u scripts/screen_loop.py --hubs yeonnam --canary    # 없는 셀렉터�
 ⚠ **탭 이름이 바뀌었다(2026-09-06 실측).** 이 절은 `"지도"` 탭을 진입점이라고 적고 있었는데
 그런 탭은 이제 없다 — 217d469 가 네비를 갈면서 **`"지도"` → `"Page"`** 가 됐고, 별도로
 **`"거점"`**(HubExplorer) 이 새로 생겼다. 낡은 이름으로 `get_by_role` 을 부르면 30초 타임아웃만
-난다. 현재 네비: `서울 · 거점 · Platform · Page · Posting · Program`.
+난다. ⚠ **2026-09-13 네비가 또 바뀌었다: `Platform · Page · Posting · Program` 넷뿐이다**
+(`서울`·`거점` 삭제). 네 탭 모두 지도(MapHost) 위에 뜨므로 **어느 탭이든 `.map-canvas` 가 보여야 한다.**
+명세: `docs/screen-spec-pppp-2026-09-13.html`.
 
 | 탭 | 컴포넌트 | 무엇 |
 |---|---|---|
-| `Page` | MapShell | 공실 4레이어 + 건물 클릭 패널 + 층 스택·거리뷰 (종전 "지도") |
-| `거점` | HubExplorer | 거점 목록 + 실측범위 경계 + 요약 |
+| `Platform` | TrackMapFrame > PlatformConsole | 좌측 패널(aside "상권 정체성") + 지도에 실측 범위 점선·자리별 업종 칩 |
+| `Page` | MapShell | 공실·유동·**임대시세(금액 칩·층별 평당 표)**·밀도 + 건물 패널 + 층 스택·거리뷰 |
+| `Posting` | TrackMapFrame > PostingConsole | 패널(aside "입점 계산") + 지도에 자리별 "월 ○○만" 칩 |
+| `Program` | TrackMapFrame > ProgramStudio | 패널(aside "홍보 program") + 지도에 공공 문화행사·가게 후보 칩 |
 
 지도는 더 이상 MapShell 이 만들지 않는다 — `MapHost` 가 앱 전체에서 하나만 만들어 들고,
 탭 전환 때 `visibility` 로 숨긴다. 그래서 **탭을 옮겨도 언마운트되지 않는다**(카메라 유지).

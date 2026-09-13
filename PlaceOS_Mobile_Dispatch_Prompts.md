@@ -130,4 +130,4 @@ docs/papers/paper-platform.md 의 §3.2(성능 천장 4회 확인)만 채운다.
 - **3D(@react-three/fiber)를 새로 깔지 않는다** — 2026-09-05 제거됨(`feature-posting.md` §0-V)
 - **mapbox-gl 을 다시 끌어오지 않는다** — 2026-08-25 제거됨. 베이스맵은 네이버뿐
 - **`vercel --prod` 를 쓰지 않는다** — 2026-08-28 Cloud Run 으로 이전(무료 플랜 상업적 사용 금지)
-- 배포는 `main` 푸시로 자동 (Firebase Hosting → Cloud Run, https://spaceos-twin.web.app)
+- 배포는 `main` 푸시로 자동 (Firebase Hosting → Cloud Run, https://placeos.web.app)

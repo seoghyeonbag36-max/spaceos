@@ -168,3 +168,7 @@
  .progstudio .ptitle{align-items:flex-start;flex-wrap:wrap}
  .progstudio .ptools{flex-wrap:wrap}
 }
+
+/* 지도 안내 한 줄(2026-09-13) — 지도에 찍힌 칩이 무엇인지 패널에서 말한다. */
+.progstudio .mapnote{font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted);background:var(--track-program-soft);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--sp-2) var(--sp-3);margin:0 0 var(--sp-3)}
+.progstudio .mapnote b{color:var(--track-program)}

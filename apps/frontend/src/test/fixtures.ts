@@ -52,13 +52,34 @@ export function vacancyHeatmap(id: string, cells?: HeatCell[]): VacancyHeatmap {
   };
 }
 
-export function rentHeatmap(id: string): RentHeatmap {
+/** 임대시세 — 층별 평당 표 + 층 단위 매물 금액. `listings` 를 안 주면 매물 없음.
+ *  건물 id 를 `buildings()` 의 id 와 맞추면 목록·상세에 금액이 붙는다. */
+export function rentHeatmap(id: string, listings: RentHeatmap["listings"] = []): RentHeatmap {
+  const monthly = listings.map((x) => x.monthly_rent);
   return {
-    district: id, rent_source: "rone", unit: "만원/평",
-    cells: [{
-      i: 0, j: 0, lat: 37.52, lng: 127.02, c_lat: 37.5204, c_lng: 127.0206,
-      dlat: 0.0009, dlng: 0.00113, v: 18, rent_per_pyeong: 18,
-    }],
+    district: id, rent_source: "rone", quarter: "20262", unit: "만원/평", monthly_unit: "만원/월",
+    base_rent_per_m2_krw_thousand: 74.64, base_rent_per_pyeong: 24.7,
+    floors: [
+      { floor: "1F", factor: 1, rent_per_pyeong: 24.7 },
+      { floor: "2F", factor: 0.45, rent_per_pyeong: 11.1 },
+    ],
+    listings, listing_count: listings.length,
+    monthly_min: monthly.length ? Math.min(...monthly) : null,
+    monthly_max: monthly.length ? Math.max(...monthly) : null,
+    basis: "R-ONE 소규모상가 임대료(1층 기준) × 층 계수 × 건축물대장 층별개요 면적",
+    excludes: ["보증금", "권리금", "관리비"],
+    note: "테스트 fixture",
+  };
+}
+
+/** 층 단위 매물 금액 한 줄 — 좌표는 `buildings()` 의 n 번째 건물 중심과 같다. */
+export function rentListing(buildingId: string, n: number, over: Partial<RentHeatmap["listings"][number]> = {}): RentHeatmap["listings"][number] {
+  return {
+    id: `vfu-${buildingId}-1`, building_id: buildingId, name: `${buildingId} 건물`,
+    lat: 37.52 + n * 0.0002, lng: 127.02 + n * 0.0002,
+    floor: 1, floor_label: "1F", certainty: "confirmed",
+    area_py: 30, area_m2: 99.2, factor: 1, rent_per_pyeong: 24.7, monthly_rent: 740,
+    ...over,
   };
 }
 

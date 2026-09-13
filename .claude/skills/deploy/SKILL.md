@@ -7,7 +7,7 @@ description: 프로덕션 배포 — main 푸시로 도는 Cloud Run 자동 배�
 
 | 항목 | 값 |
 |---|---|
-| 프로덕션 | **https://spaceos-twin.web.app** (Firebase Hosting → Cloud Run) |
+| 프로덕션 | **https://placeos.web.app** (Firebase Hosting → Cloud Run) · 옛 주소 `spaceos-twin.web.app` 도 같은 서비스 |
 | Cloud Run | `spaceos` / `us-central1` (무료 한도 리전) · 프로젝트 `spaceos-digital-twin` |
 | 파이프라인 | `.github/workflows/deploy.yml` — 테스트 → 빌드 → 배포 → **검증** |
 
@@ -40,10 +40,10 @@ CI 검증 단계가 `/health` 200 과 분석 API 의 `"vacancy_source":"gold"` �
 ## 배포 후 확인
 
 ```bash
-curl.exe -s https://spaceos-twin.web.app/health          # ⚠ /api/v1 아래가 아니다
-curl.exe -s "https://spaceos-twin.web.app/api/v1/heatmap/vacancy?district=<slug>" | head -c 200
+curl.exe -s https://placeos.web.app/health          # ⚠ /api/v1 아래가 아니다
+curl.exe -s "https://placeos.web.app/api/v1/heatmap/vacancy?district=<slug>" | head -c 200
 #   → vacancy_source: "gold" 인가("synthetic" 이면 그 거점은 합성 폴백이다)
-curl.exe -s "https://spaceos-twin.web.app/api/v1/commercial-districts" | head -c 300
+curl.exe -s "https://placeos.web.app/api/v1/commercial-districts" | head -c 300
 ```
 
 ## 긴급 수동 배포 (PowerShell)

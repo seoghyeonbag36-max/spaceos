@@ -17,7 +17,8 @@ import { DEFAULT_ZOOM } from "@/components/MapHost";
 import { installFetchStub, type FetchStub, type Route } from "@/test/fetchStub";
 import { installNaverStub, removeNaverStub, type NaverStub } from "@/test/naverStub";
 import { renderOnMap } from "@/test/renderMap";
-import { buildings, district, rentHeatmap } from "@/test/fixtures";
+import { buildings, district, rentHeatmap, rentListing } from "@/test/fixtures";
+import type { RentHeatmap } from "@/lib/api";
 
 vi.mock("@/lib/naverMap", () => ({
   loadNaverMaps: () => Promise.resolve(),
@@ -45,10 +46,10 @@ let naver: NaverStub;
 let api: FetchStub;
 
 /** `withBuildings: false` 면 /heatmap/buildings 가 404 → 화면이 로컬 샘플로 폴백한다. */
-function mount(opts: { withBuildings?: boolean; onReview?: (selection: { districtId: string; buildingId: string; buildingName: string }) => void } = {}) {
+function mount(opts: { withBuildings?: boolean; rent?: RentHeatmap; onReview?: (selection: { districtId: string; buildingId: string; buildingName: string }) => void } = {}) {
   const routes: Route[] = [
     { match: /\/api\/v1\/commercial-districts$/, body: HUBS },
-    { match: /\/api\/v1\/heatmap\/rent\?district=/, body: rentHeatmap("garosugil") },
+    { match: /\/api\/v1\/heatmap\/rent\?district=/, body: opts.rent ?? rentHeatmap("garosugil") },
     {
       match: /\/api\/v1\/heatmap\/footfall\?/,
       body: {
@@ -184,6 +185,81 @@ describe("MapShell — API 경로", () => {
 
     const options = Array.from(hubSelect().querySelectorAll("option")).map((o) => o.value);
     expect(options).toEqual(["garosugil", "yeonnam"]);
+  });
+});
+
+/**
+ * 임대시세 = **금액** (2026-09-13).
+ * 종전에는 100m 격자를 초록 5단계로 칠했다 — "진한 곳이 비싸다"만 있고 "얼마냐"가 없었다.
+ * 이 그물이 잡는 회귀: 금액 칩 대신 색 칸(Polygon)이 돌아오는 것, 층별 표·건물 상세에서
+ * 금액이 사라지는 것, 추정(probable) 공실이 확정과 같은 모양으로 그려지는 것.
+ */
+describe("MapShell — 임대시세는 금액으로 말한다", () => {
+  const RENT = rentHeatmap("garosugil", [
+    rentListing("g1", 0, { monthly_rent: 740 }),
+    rentListing("g3", 2, { id: "vfu-g3-2", floor: 2, floor_label: "2F", monthly_rent: 333, rent_per_pyeong: 11.1, certainty: "probable" }),
+  ]);
+  const chips = () => naver.live().filter((o) => o.kind === "Marker")
+    .map((o) => String((o.options.icon as { content?: string } | undefined)?.content ?? ""));
+
+  it("격자를 칠하지 않고 층별 평당 표와 금액 칩을 건다", async () => {
+    mount({ rent: RENT });
+    await screen.findByText("가로수 A");
+    fireEvent.click(screen.getByRole("button", { name: "임대시세" }));
+
+    // 패널의 첫 답 — 층마다 평당 월 얼마.
+    const table = await screen.findByLabelText("층별 평당 월 임대료");
+    expect(within(table).getByText("24.7만")).toBeTruthy();
+    expect(within(table).getByText("11.1만")).toBeTruthy();
+    expect(table.textContent).toContain("보증금·권리금·관리비 제외");
+
+    // 기본 줌(점 모드 축척)에서는 묶음 칩 하나 — 두 매물의 금액 범위와 개수를 글자로 말한다.
+    await waitFor(() => expect(chips()).toHaveLength(1));
+    expect(chips()[0]).toContain("월 333만~740만");
+    expect(chips()[0]).toContain("2곳");
+    // 색 칸(격자)은 한 장도 없다.
+    expect(naver.live().filter((o) => o.kind === "Polygon")).toHaveLength(0);
+  });
+
+  it("확대하면 건물마다 가장 싼 빈 층 금액을 걸고, 추정 공실은 점선이다", async () => {
+    mount({ rent: RENT });
+    await screen.findByText("가로수 A");
+    fireEvent.click(screen.getByRole("button", { name: "임대시세" }));
+    await polygonMode();
+
+    await waitFor(() => expect(chips()).toHaveLength(2));
+    const g1 = chips().find((c) => c.includes("월 740만"))!;
+    const g3 = chips().find((c) => c.includes("월 333만"))!;
+    expect(g1).toContain("solid");
+    expect(g3).toContain("dashed");
+    // 목록 줄에도 같은 금액이 붙는다 — 지도와 목록이 다른 숫자를 말하면 둘 다 못 믿는다.
+    const rentLines = screen.getAllByText(/빈 층 1개 · 월/).map((el) => el.textContent);
+    expect(rentLines).toEqual(expect.arrayContaining([expect.stringContaining("740만원"), expect.stringContaining("333만원")]));
+  });
+
+  it("건물을 고르면 층마다 월 임대료를 표로 보여주고, 레이어는 임대시세에 머문다", async () => {
+    mount({ rent: RENT });
+    await screen.findByText("가로수 C");
+    fireEvent.click(screen.getByRole("button", { name: "임대시세" }));
+    fireEvent.click(screen.getByRole("button", { name: /^가로수 C 카페/ }));
+
+    expect(await screen.findByText("빈 층 임대료(추정)")).toBeTruthy();
+    // 목록 줄에도 "333만원"이 있으므로 상세 표 안에서만 찾는다.
+    const row = within(screen.getByRole("table")).getByText("333만원").closest("tr")!;
+    expect(row.className).toContain("is-probable");
+    expect(within(row).getByText(/추정/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "임대시세" }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("R-ONE 이 없는 거점은 금액을 지어내지 않고 없다고 말한다", async () => {
+    installFetchStub([{ match: /\/api\/v1\/commercial-districts$/, body: HUBS },
+      { match: /\/api\/v1\/heatmap\/buildings\?district=garosugil/, body: GAROSU_BUILDINGS }]);
+    renderOnMap(<MapShell />);
+    await screen.findByText("가로수 A");
+    fireEvent.click(screen.getByRole("button", { name: "임대시세" }));
+    expect(await screen.findByText(/이 거점에는 R-ONE 임대료가 없다/)).toBeTruthy();
+    expect(screen.queryByLabelText("층별 평당 월 임대료")).toBeNull();
+    expect(chips()).toHaveLength(0);
   });
 });
 

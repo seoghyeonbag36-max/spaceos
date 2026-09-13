@@ -671,6 +671,23 @@ def _context_mtime(district_id: str) -> float:
     return base + events.source_mtime()
 
 
+def get_district_events(district_id: str) -> dict | None:
+    """상권 행사만 — **LLM 을 부르지 않는** 조회(2026-09-13).
+
+    Program 화면이 지도 위에 오프라인 홍보 장소(공공 문화행사)를 찍으려고 필요해졌다.
+    `get_district_marketing` 을 그대로 부르면 행사 몇 개를 얻자고 온라인 콘텐츠 LLM 생성까지
+    돈다(거점마다 1회, 인스턴스가 새로 뜨면 다시). 지도를 옮길 때마다 크레딧을 쓰는 화면이
+    되므로 행사 경로만 떼어 낸다. 출처 규칙은 아래 함수와 같다 — 적재됐는데 0건이면 빈 목록.
+    """
+    base = svc.get_marketing(district_id)
+    if base is None:
+        return None
+    real_events = events.for_district(district_id)
+    if real_events is None:
+        return {"district_id": district_id, "events": base["events"], "events_source": "seed"}
+    return {"district_id": district_id, "events": real_events, "events_source": "seoul-open-data"}
+
+
 def get_district_marketing(district_id: str) -> dict | None:
     """상권 단위 마케팅(행사 + 온라인 콘텐츠) — Program 2단계.
 

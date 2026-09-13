@@ -5,13 +5,16 @@
 ## 구조
 
 ```
-src/pages/       화면 (MapShell · PageDashboard · PlatformConsole · PostingConsole · ProgramStudio · HubExplorer · AdminCoverage)
-src/components/  공용 컴포넌트 (MapHost · BuildingViewer · DistrictPicker)
+src/pages/       화면 (MapShell · PlatformConsole · PostingConsole · ProgramStudio · PageDashboard(#board) · AdminCoverage(#admin))
+src/components/  공용 컴포넌트 (MapHost · TrackMapFrame · useMapMarkers · BuildingViewer · DistrictPicker)
 src/lib/         api.ts(백엔드 호출) · naverMap.ts(지도·거리뷰) · hubBoundary.ts
 src/design/      디자인 토큰 + 토큰 기반 컴포넌트
 ```
 
 ## 규칙
+
+- **네 트랙 화면은 전부 지도(MapHost) 위 오버레이다**(2026-09-13). Platform·Posting·Program 은 `TrackMapFrame` 패널 안에 뜨고,
+  지도 표식은 `useMapMarkers`/`useFitMap` 으로만 그린다 — 리스너·오버레이를 같은 수명으로 걷는 규칙이 거기 있다
 
 - 함수형 컴포넌트 + 훅. `@/` 경로 별칭을 쓴다
 - **API 호출은 `src/lib/api.ts` 로 일원화한다.** 컴포넌트에서 `fetch` 를 직접 부르지 않는다

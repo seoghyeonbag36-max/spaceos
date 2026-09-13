@@ -11,7 +11,7 @@
 
 Lovable 이 가장 먼저 읽어야 할 네 줄이다. 이걸 어기면 나머지가 다 맞아도 못 쓴다.
 
-1. **앱은 이미 있다.** https://spaceos-twin.web.app 에 네이버 지도 기반 대시보드가 돌아간다.
+1. **앱은 이미 있다.** https://placeos.web.app 에 네이버 지도 기반 대시보드가 돌아간다.
    이 랜딩은 그 앞에 서는 **별개의 정적 페이지**다. 앱을 다시 만들지 않는다.
 2. **지도·대시보드·차트를 구현하지 않는다.** 지도 SDK·차트 라이브러리를 설치하지 마라.
    앱 화면이 필요한 자리는 **스크린샷 슬롯**(§8 규칙의 회색 자리표시자)으로만 둔다.
@@ -329,7 +329,7 @@ Lovable 이 가장 먼저 읽어야 할 네 줄이다. 이걸 어기면 나머�
 ### S11. 푸터
 
 - **구성**: 좌측 로고 + 한 줄 소개(`물리적 상권의 디지털 트윈`) / 우측 링크 —
-  `앱` (https://spaceos-twin.web.app) · `문의` (mailto) · `개인정보처리방침` `[작성 필요]`
+  `앱` (https://placeos.web.app) · `문의` (mailto) · `개인정보처리방침` `[작성 필요]`
 - **각주 한 줄** (`--fs-caption` · `--muted`):
   > 이 페이지의 수치는 2026-09 기준 실측이다. 재측정 시점과 방법은 요청하면 제공한다.
 - **팀**: `[작성 필요]` — 창업자 소개 한 줄을 넣을지는 배포 전 결정
@@ -342,14 +342,14 @@ Lovable 이 가장 먼저 읽어야 할 네 줄이다. 이걸 어기면 나머�
 
 | # | 위치 | 문구 | 가는 곳 | 종류 |
 |---|---|---|---|---|
-| 1 | S0 상단 바 | `앱 열어보기` | https://spaceos-twin.web.app (새 탭) | secondary |
+| 1 | S0 상단 바 | `앱 열어보기` | https://placeos.web.app (새 탭) | secondary |
 | 2 | S1 히어로 | `앱 열어보기 — 연남동부터` | 〃 | **primary** |
 | 3 | S1 히어로 | `우리가 뭘 쟀는지 보기` | `#evidence` (페이지 내 스크롤) | secondary |
-| 4 | S3 하단 | `66거점 전부 보기 →` | https://spaceos-twin.web.app/#board (새 탭) | 텍스트 링크 |
-| 5 | S4 하단 | `네 화면 직접 보기 →` | https://spaceos-twin.web.app (새 탭) | 텍스트 링크 |
+| 4 | S3 하단 | `66거점 전부 보기 →` | https://placeos.web.app/#board (새 탭) | 텍스트 링크 |
+| 5 | S4 하단 | `네 화면 직접 보기 →` | https://placeos.web.app (새 탭) | 텍스트 링크 |
 | 6 | S6 하단 | `모델 근거 화면 보기 →` | 〃 | 텍스트 링크 |
 | 7 | S9 | `투자 자료 요청` | `#contact` | **primary** |
-| 8 | S10 | `앱 열어보기` | https://spaceos-twin.web.app (새 탭) | **primary** |
+| 8 | S10 | `앱 열어보기` | https://placeos.web.app (새 탭) | **primary** |
 | 9 | S10 | `자료 요청 메일 보내기` | `mailto:{{CONTACT_EMAIL}}?subject=PlaceOS%20자료%20요청` | secondary |
 | 10 | 모바일 고정 바 | `앱 열어보기` / `자료 요청` | 위 8·9 와 동일 | primary / secondary |
 

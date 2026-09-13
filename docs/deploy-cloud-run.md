@@ -7,7 +7,7 @@ Vercel 에서 옮겨 온 경위는 [deploy-vercel.md](deploy-vercel.md) 머리�
 
 | 항목 | 값 |
 |---|---|
-| **프로덕션 URL** | **https://spaceos-twin.web.app** (Firebase Hosting) |
+| **프로덕션 URL** | **https://placeos.web.app** (Firebase Hosting, 2026-09-13~) · 옛 주소 https://spaceos-twin.web.app 도 같은 서비스 |
 | Cloud Run 원본 URL | https://spaceos-798830962560.us-central1.run.app |
 | GCP 프로젝트 | `spaceos-digital-twin` (표시명 PlaceOS) · 번호 `798830962560` |
 | 리전 | `us-central1` — **무료 한도가 적용되는 리전이라 그렇다** |
@@ -113,6 +113,10 @@ Cloud Monitoring 업타임 체크 **4개**가 5분마다 돈다. 실패하면
 | PlaceOS hosting health | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
 | PlaceOS hosting gold | `spaceos-twin.web.app` | 같은 검사, 사용자가 실제로 쓰는 주소에서 |
 
+⚠ 2026-09-13 정식 주소가 `placeos.web.app` 으로 옮겨졌지만 **업타임 체크 대상은 아직 옛 주소다**
+(콘솔에 만들어진 리소스라 이 저장소에서 못 바꾼다). 두 사이트가 같은 리라이트라 옛 주소가
+살아 있으면 새 주소도 산다 — 다만 사이트별 설정이 갈라지는 날(리다이렉트 등)엔 새 주소로 체크를 옮길 것.
+
 **둘로 나눠 두는 이유**: Cloud Run 이 멀쩡해도 Hosting 리라이트가 깨지면 사용자는 못 쓴다.
 원본만 보면 그 고장이 안 보인다. 반대로 Hosting 만 보면 어느 층이 깨졌는지 모른다.
 
@@ -133,7 +137,31 @@ Cloud Run Always Free: 월 200만 요청 · 180,000 vCPU초 · 360,000 GiB초 ·
 ⚠ 무료 체험(90일/$300) 종료 시 결제계정이 **자동으로 닫힌다.** 그때 수동으로 유료 계정
 전환을 해야 Always Free 가 이어진다. 전환해도 한도 안에서는 $0 다.
 
-## 읽기 좋은 주소 — Firebase Hosting (2026-08-29)
+## 읽기 좋은 주소 — Firebase Hosting (2026-08-29 · 2026-09-13 개명)
+
+### 2026-09-13 — 정식 주소 `placeos.web.app`
+
+브랜드 개명(09-12, SpaceOS → PlaceOS)에 맞춰 사이트 `placeos` 를 **새로 만들었다**
+(`npx firebase-tools hosting:sites:create placeos --project spaceos-digital-twin`).
+`placeos` 는 비어 있었다(`spaceos` 는 다른 프로젝트가 선점해 08-29 에 `spaceos-twin` 을 썼던 것과 대조).
+사이트 ID 는 바꿀 수 없어 **옛 사이트를 고친 것이 아니라 하나를 더 세운 것**이다.
+
+- `firebase.json` 의 `hosting` 이 배열이 됐다 — `placeos`·`spaceos-twin` 둘 다 같은 Cloud Run 리라이트
+- 배포: `npx firebase-tools deploy --only hosting:placeos --project spaceos-digital-twin` (둘 다면 `--only hosting`)
+- 확인(09-13): `https://placeos.web.app/health` → `{"status":"ok"}` · `/api/v1/commercial-districts` 정상
+
+⚠ **새 주소에서 네이버 지도가 아직 안 뜬다.** 지도 키(NCP Maps Application)의 Web 서비스 URL 에
+`https://placeos.web.app` 이 없어 인증 API 가 `errorCode 200 Authentication Failed` 를 준다
+(같은 시각 `spaceos-twin.web.app` 은 통과). **NCP 콘솔 > Maps > Application > 서비스 환경 등록**에
+`https://placeos.web.app` · `https://placeos.firebaseapp.com` 을 추가해야 한다 — 콘솔 로그인이 필요한 일이라
+저장소에서 못 한다. 등록 확인은 브라우저 없이:
+`curl "https://oapi.map.naver.com/v3/auth?ncpKeyId=<KEY>&url=https%3A%2F%2Fplaceos.web.app&time=<ms>&callback=cb"` → `result` 면 통과.
+
+**옛 주소를 새 주소로 돌리는 리다이렉트는 그 등록이 끝난 뒤에** 건다(`spaceos-twin` 사이트 항목에
+`"redirects": [{"source": "**", "destination": "https://placeos.web.app", "type": 301}]`). 먼저 걸면
+지도가 안 뜨는 주소로 모두를 보낸다.
+
+### 2026-08-29 — 처음 세운 주소
 
 `spaceos-798830962560...` 의 숫자는 프로젝트 번호라 Cloud Run 에서 못 바꾼다. 앞에 Firebase
 Hosting 을 세워 **https://spaceos-twin.web.app** 을 얻었다. `firebase.json` 이 모든 요청(`**`)을
@@ -141,7 +169,7 @@ Cloud Run 서비스 `spaceos`(us-central1)로 리라이트한다.
 
 - Firebase 프로젝트 = GCP 프로젝트(`spaceos-digital-twin`). 새로 만들지 않았다
 - 사이트 ID 는 `spaceos-twin` — `spaceos` 는 다른 프로젝트가 선점했다
-- 배포: `npx firebase-tools deploy --only hosting --project spaceos-digital-twin`
+- 배포: `npx firebase-tools deploy --only hosting --project spaceos-digital-twin` (09-13 부터 두 사이트를 함께 낸다)
 - **정적 파일은 0개다.** 프론트도 컨테이너가 낸다(단일 출처 유지 — 아래 참조)
 
 ⚠ **Firebase 를 처음 쓰는 계정은 CLI 로 프로젝트를 붙일 수 없다.** `projects:addfirebase` 가

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.db import get_db
 from app.core.security import Principal, get_current_principal
-from app.schemas.district import Marketing
+from app.schemas.district import DistrictEvents, Marketing
 from app.schemas.marketing import (
     ProgramCommercialOnboardingRequest, ProgramCommercialOnboardingResponse,
     StoreMarketing, StorePlaceLookup, StoreProfile, StoreReviewLookup, VacantSiteList,
@@ -93,6 +93,22 @@ async def list_vacant_sites(
     sites = program_site.units(district_id)[:limit]
     return {"district_id": district_id, "sites": sites,
             **program_site.provenance(district_id)}
+
+
+@router.get("/events", response_model=DistrictEvents)
+async def list_district_events(
+    district_id: str = Query(..., min_length=1, max_length=40, description="거점 id"),
+) -> dict:
+    """상권 행사만 — 온라인 콘텐츠 LLM 생성을 **돌리지 않는다**.
+
+    Program 지도가 오프라인 홍보 장소를 찍는 데 쓴다. `/{district_id}` 는 행사와 함께
+    온라인 콘텐츠를 LLM 으로 만들어 오므로, 지도를 볼 때마다 부르면 크레딧을 쓴다.
+    ⚠ `/{district_id}` 보다 먼저 선언해야 한다(모듈 머리말).
+    """
+    out = mkt.get_district_events(district_id)
+    if out is None:
+        raise HTTPException(status_code=404, detail=f"unknown district: {district_id}")
+    return out
 
 
 @router.get("/{district_id}", response_model=Marketing)

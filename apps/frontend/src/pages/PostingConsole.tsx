@@ -9,7 +9,11 @@ import type {
 } from "@/lib/api";
 import { Button } from "@/design/components/Button";
 import { Card } from "@/design/components/Card";
+import { mapLabelHTML, shortManwon } from "@/design/components/MapMarkerPin";
+import { colors } from "@/design/tokens/colors";
 import Verdict, { type Ground } from "@/components/Verdict";
+import { useFitMap, useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
+import { TRACK_PANEL_W } from "@/components/TrackMapFrame";
 import "./PostingConsole.css";
 
 /**
@@ -44,19 +48,29 @@ const TIER_LABEL: Record<string, { name: string; sub: string }> = {
 
 const won = (v: number) => `${Math.round(v).toLocaleString()}만원`;
 
-interface PostingConsoleProps { selection?: BuildingSelection & { requestId: number } }
+interface PostingConsoleProps {
+  selection?: BuildingSelection & { requestId: number };
+  /** 네 트랙이 공유하는 상권(App). 주면 제어 모드 — 상권을 바꾸면 `onDistrictChange` 로 올린다.
+   *  안 주면 종전대로 화면이 스스로 상권을 든다(단독 렌더·테스트). */
+  districtId?: string;
+  onDistrictChange?: (id: string) => void;
+}
 interface Calculation {
   result: SimulateResult;
   input: { district_id: string; unit_id: string; industry_type?: string; strategy?: string; prem?: number };
 }
 
-export default function PostingConsole({ selection }: PostingConsoleProps = {}) {
-  return <PostingSession key={selection ? `${selection.districtId}:${selection.buildingId}:${selection.requestId}` : "direct"} selection={selection} />;
+export default function PostingConsole({ selection, districtId, onDistrictChange }: PostingConsoleProps = {}) {
+  return <PostingSession key={selection ? `${selection.districtId}:${selection.buildingId}:${selection.requestId}` : "direct"}
+    selection={selection} districtId={districtId} onDistrictChange={onDistrictChange} />;
 }
 
-function PostingSession({ selection }: PostingConsoleProps) {
+function PostingSession({ selection, districtId: sharedDistrict, onDistrictChange }: PostingConsoleProps) {
   const [districts, setDistricts] = useState<DistrictSummary[]>([]);
-  const [districtId, setDistrictId] = useState(selection?.districtId ?? DEFAULT_DISTRICT);
+  const [ownDistrict, setOwnDistrict] = useState(selection?.districtId ?? sharedDistrict ?? DEFAULT_DISTRICT);
+  const controlled = sharedDistrict !== undefined && onDistrictChange !== undefined;
+  const districtId = controlled ? sharedDistrict : ownDistrict;
+  const setDistrictId = (id: string) => (controlled ? onDistrictChange(id) : setOwnDistrict(id));
   const [units, setUnits] = useState<Posting[]>([]);
   const [unitId, setUnitId] = useState<string>("");
   const [industry, setIndustry] = useState("");
@@ -87,10 +101,13 @@ function PostingSession({ selection }: PostingConsoleProps) {
       .then((all) => {
         if (!live) return;
         setDistricts(all);
-        if (!selection && all.length && !all.some((d) => d.id === DEFAULT_DISTRICT)) setDistrictId(all[0].id);
+        // 지금 상권이 목록에 없으면 첫 거점으로 떨어진다. 제어 모드면 공유 상권을 기준으로 본다.
+        if (!selection && all.length && !all.some((d) => d.id === districtId)) setDistrictId(all[0].id);
       })
       .catch((e) => live && setErr(String(e)));
     return () => { live = false; };
+    // 목록은 마운트(또는 인계 선택이 바뀔 때) 한 번만 부른다 — 상권 전환마다 다시 부르지 않는다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selection]);
 
   useEffect(() => () => { requestSerial.current += 1; }, []);
@@ -188,6 +205,21 @@ function PostingSession({ selection }: PostingConsoleProps) {
       if (serial === requestSerial.current) setBusy(false);
     }
   }
+
+  // ── 지도 (2026-09-13 「네 트랙 모두 지도 전체화면」) ─────────────────────────
+  // 계산할 수 있는 자리를 지도에 **월임대료 칩**으로 건다. 드롭다운 한 줄로만 보이던 자리가
+  // "어디에 있고 얼마인지"로 먼저 읽힌다. 칩을 누르면 드롭다운에서 고른 것과 똑같이 동작한다.
+  // 금액은 목록의 `unit.rent`(R-ONE × 면적 × 층 계수) 그대로다 — 지도에서 따로 계산하지 않는다.
+  const markers = useMemo<MapMarkerItem[]>(() => units.map((u) => ({
+    id: u.id, lat: u.lat, lng: u.lng, zIndex: u.id === unitId ? 200 : 70,
+    html: mapLabelHTML({
+      text: `월 ${shortManwon(u.rent)}`, sub: `${u.area}평`,
+      color: colors.track.posting.base, active: u.id === unitId,
+    }),
+  })), [units, unitId]);
+  useMapMarkers(markers, chooseUnit);
+  const hubCenter = districts.find((d) => d.id === districtId)?.center;
+  useFitMap(districtId, units, hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null, TRACK_PANEL_W);
 
   const tiers = result ? Object.entries(result.scenarios) : [];
   const changedInput = calculation && (calculation.input.industry_type !== (industry.trim() || undefined)

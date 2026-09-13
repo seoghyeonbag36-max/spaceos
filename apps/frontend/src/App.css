@@ -15,12 +15,22 @@
   background: var(--surface); border-right: 1px solid var(--line, #e5e7eb);
   font-family: var(--font-sans, 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif);
 }
+/* 로고 — 2026-09-13 "S"(SpaceOS 머리글자) → PlaceOS 마크 + 워드마크.
+   레일 폭이 64px 라 워드마크는 한 줄로 작게 붙인다. 마크 색은 종전 UI 남색 그대로다. */
 .appshell .rail-logo {
-  width: 34px; height: 34px; flex: 0 0 34px; margin-bottom: 6px;
+  width: calc(var(--rail-w) - 6px); margin-bottom: 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  user-select: none;
+}
+.appshell .rail-logo-mark {
+  width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 10px; background: #3a5a98; color: var(--surface);
-  font-size: 15px; font-weight: 700; letter-spacing: -.5px;
-  user-select: none;
+  font-size: 16px; font-weight: 800; letter-spacing: -.5px;
+}
+.appshell .rail-logo-word {
+  font-size: 10px; font-weight: 800; letter-spacing: -.3px; line-height: 1;
+  color: #3a5a98; white-space: nowrap;
 }
 .appshell .rail-btn {
   width: calc(var(--rail-w) - 8px); padding: 7px 0 6px;
@@ -36,7 +46,8 @@
 /* ── 트랙 색 (2026-09-06) ──
    활성 버튼 여섯이 다 같은 남색이면 "눌린 자리"만 알고 "어느 트랙인지"는 모른다.
    PPPP 넷만 --rail-accent 를 자기 트랙 색으로 갈아끼운다(App.tsx 가 data-track 으로
-   이름만 준다). 서울·거점은 트랙이 아니라 값을 안 두므로 위 규칙의 남색 폴백이 남는다.
+   이름만 준다). 2026-09-13 서울·거점 탭이 빠져 레일 버튼은 전부 트랙이다 — 위 규칙의
+   남색 폴백은 이제 쓰이지 않지만, 트랙 아닌 버튼이 다시 생길 때를 위해 남긴다.
    색값은 여기서도 짓지 않는다 — styles/tokens.css 의 --track-* 가 단일 출처다.
    ⚠ 이번 변경은 레일까지다. 화면 본문에 트랙 색을 칠하는 건 D5-4·D5-6 몫. */
 .appshell .rail-btn[data-track="platform"] { --rail-accent: var(--track-platform); --rail-soft: var(--track-platform-soft); }
@@ -52,7 +63,7 @@
    지도 캔버스가 뷰포트 전체를 쓰게 되면서, 레일 **아래에도 지도가 있다**.
    불투명하게 두면 지도가 거기서 끊긴 것처럼 보인다 — 살짝 비치게 해서
    지도가 화면 끝까지 이어지는 걸 눈으로 확인할 수 있게 한다.
-   대시보드 뷰에서는 뒤에 지도가 없으므로 위의 불투명 배경 그대로 간다. */
+   2026-09-13 네 트랙 모두 지도 뷰라 셸에는 늘 is-map 이 붙는다(#board·#admin 은 셸 밖). */
 .appshell.is-map .rail {
   background: color-mix(in srgb, var(--surface) 84%, transparent);
   backdrop-filter: blur(10px);
@@ -62,19 +73,19 @@
 }
 
 /* ── 본문 ──
-   레일이 fixed 라 자리를 비켜주는 건 본문 몫이다. */
-.appshell .app-main { margin-left: var(--rail-w); }
-/* 지도 뷰의 MapShell 은 스스로 fixed 로 화면을 채운다 — 본문은 자리만 잡고 비운다. */
-.appshell.is-map, .appshell.is-map .app-main { height: 100dvh; overflow: hidden; }
+   지도(MapHost)가 fixed 로 뷰포트를 채우고 오버레이가 레일 폭만큼 비킨다 — 셸은 문서
+   스크롤만 잠근다. 패널 안 스크롤은 각 패널이 스스로 갖는다. */
+.appshell.is-map { height: 100dvh; overflow: hidden; }
 
 @media (max-width: 768px) {
   .appshell .rail { padding: 6px 0; }
-  .appshell .rail-logo { width: 30px; height: 30px; flex-basis: 30px; font-size: 13px; }
+  .appshell .rail-logo-mark { width: 30px; height: 30px; font-size: 14px; }
+  .appshell .rail-logo-word { font-size: 8.5px; }
   .appshell .rail-btn { font-size: 9.5px; }
   .appshell .rail-btn svg { width: 19px; height: 19px; }
 }
 
-/* 지도 오버레이 화면(HubExplorer/MapShell)을 받는 동안 — 지도 위에 뜬다. */
+/* 지도 오버레이 화면(네 트랙)을 받는 동안 — 지도 위에 뜬다. */
 .map-loading {
   position: absolute; top: 12px; left: 12px; z-index: 5;
   padding: var(--sp-2) var(--sp-3); border-radius: 10px;

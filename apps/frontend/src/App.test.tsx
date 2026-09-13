@@ -6,7 +6,6 @@ import { installFetchStub, type ApiCall } from "@/test/fetchStub";
 import { buildings, district, postings, rentHeatmap, simulateResult } from "@/test/fixtures";
 
 vi.mock("@/lib/naverMap", () => ({ loadNaverMaps: () => Promise.resolve(), describeNaverMapError: String }));
-vi.mock("@/pages/SeoulDashboard", () => ({ default: () => <div>서울 대시보드</div> }));
 
 let naver: NaverStub;
 beforeEach(() => { naver = installNaverStub(); });
@@ -32,6 +31,56 @@ function mount(matched: boolean) {
 //   부하에서는 findBy 기본 1초를 넘겨 스켈레톤이 떠 있는 채 실패했다(2026-09-13, 2회 중 1회).
 //   첫 대기에만 여유를 준다 — 이후 단계는 이미 로드된 화면이라 기본값으로 충분하다.
 const FIRST_LOAD = { timeout: 5000 };
+// 트랙 화면(Platform·Posting·Program)은 2026-09-13 부터 lazy 청크다 — 탭을 처음 누르면 청크 변환·로드가
+// 끼어든다. 부하가 걸린 PC 에서 5초를 넘겨 폴백("화면 불러오는 중…")이 떠 있는 채 실패했다(09-13 실측).
+const TAB_LOAD = { timeout: 20000 };
+
+describe("App — 레일과 지도 셸 (2026-09-13)", () => {
+  it("레일에는 PlaceOS 로고와 PPPP 네 트랙만 있다 — 서울·거점 탭은 없다", async () => {
+    mount(true);
+    const rail = screen.getByRole("navigation", { name: "주요 화면" });
+    expect(rail.textContent).toContain("PlaceOS");
+    expect(rail.textContent).not.toMatch(/SpaceOS/);
+    const labels = Array.from(rail.querySelectorAll("button")).map((b) => b.textContent);
+    expect(labels).toEqual(["Platform", "Page", "Posting", "Program"]);
+    expect(screen.queryByRole("button", { name: "서울" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "거점" })).toBeNull();
+    await screen.findByRole("button", { name: "검토 건물 후보 저장" }, TAB_LOAD);
+  });
+
+  it("Platform·Posting·Program 도 같은 지도 위 패널로 뜬다 — 탭을 옮겨도 지도는 하나다", async () => {
+    mount(true);
+    await screen.findByRole("button", { name: "검토 건물 후보 저장" }, TAB_LOAD);
+    const map = naver.map();
+    expect(map).not.toBeNull();
+    for (const [tab, panel] of [["Platform", "상권 정체성"], ["Posting", "입점 계산"], ["Program", "홍보 program"]] as const) {
+      fireEvent.click(screen.getByRole("button", { name: tab }));
+      const aside = await screen.findByRole("complementary", { name: panel }, TAB_LOAD);
+      // 패널은 지도 호스트 **안에** 뜬다 — 지도 없는 대시보드로 되돌아가면 여기가 운다.
+      expect(aside.closest(".maphost")).not.toBeNull();
+      expect(document.querySelector(".maphost")!.classList.contains("is-hidden")).toBe(false);
+      expect(naver.map()).toBe(map);
+    }
+  });
+
+  it("Posting 에서 상권을 바꾸면 Page 도 같은 상권을 본다", async () => {
+    installFetchStub([
+      { match: /commercial-districts$/, body: [district("garosugil", { name: "가로수길" }), district("yeonnam", { name: "연남동" })] },
+      { match: /heatmap\/buildings\?district=yeonnam/, body: buildings([{ id: "y1", name: "연남 건물", status: "empty" }]) },
+      { match: /heatmap\/buildings\?/, body: buildings([{ id: "g1", name: "검토 건물", status: "empty" }]) },
+      { match: /postings$/, body: [] },
+    ]);
+    render(<App />);
+    fireEvent.click(screen.getByRole("button", { name: "Posting" }));
+    await screen.findByRole("complementary", { name: "입점 계산" }, TAB_LOAD);
+    const hub = (await screen.findAllByRole("combobox"))[0] as HTMLSelectElement;
+    await waitFor(() => expect(hub.querySelectorAll("option").length).toBeGreaterThan(1));
+    fireEvent.change(hub, { target: { value: "yeonnam" } });
+    fireEvent.click(screen.getByRole("button", { name: "Page" }));
+    expect(await screen.findByText("연남 건물", {}, TAB_LOAD)).toBeTruthy();
+    expect((screen.getByRole("combobox", { name: "상권 선택" }) as HTMLSelectElement).value).toBe("yeonnam");
+  });
+});
 
 describe("App — Page에서 입점 검토", () => {
   it("검증된 건물 유닛을 인계하고 Page 후보·검색·단일 지도를 보존한다", async () => {

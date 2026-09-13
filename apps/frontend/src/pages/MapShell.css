@@ -341,3 +341,49 @@
   /* 건수 줄은 모바일에서 한 줄로 붙인다(세로 공간이 52dvh 뿐이다). */
   .mapshell .sp-count { padding: var(--sp-1) var(--sp-3); }
 }
+
+/* ═══ 임대시세 = 금액 (2026-09-13) ══════════════════════════════════════════════
+   종전 초록 격자는 "진한 곳이 비싸다"만 말했다. 이제 층별 평당 표 · 건물별 빈 층 금액을
+   숫자로 싣는다. 색은 종전 R-ONE 배지 초록(#0f7a55 / #e3f5ee)을 그대로 쓴다 —
+   레이어 모양이 바뀌어도 "R-ONE 임대료"가 같은 색으로 읽힌다. */
+.mapshell .rent-summary {
+  flex-shrink: 0; padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--line); background: #f3fbf7;
+}
+.mapshell .rent-summary-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2); flex-wrap: wrap; }
+.mapshell .rent-summary-head strong { font-size: var(--fs-body); color: var(--ink); }
+.mapshell .rent-summary-head span { font-size: var(--fs-caption); color: #0f7a55; font-weight: 700; }
+.mapshell .rent-floors { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-1); margin-top: var(--sp-2); }
+.mapshell .rent-floor {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: var(--sp-1) 0; border-radius: var(--radius-md);
+  background: var(--surface); border: 1px solid #b7e3d2;
+}
+.mapshell .rent-floor span { font-size: 10.5px; color: var(--muted); }
+.mapshell .rent-floor b { font-size: 13px; color: #0f7a55; font-variant-numeric: tabular-nums; }
+.mapshell .rent-summary-foot { margin: var(--sp-2) 0 0; font-size: var(--fs-caption); line-height: var(--lh-caption); color: var(--muted); }
+.mapshell .rent-summary-foot b { color: var(--ink); }
+
+/* 목록 줄 — 그 건물 빈 층의 금액 범위 */
+.mapshell .b-rent { font-size: var(--fs-caption); color: #0f7a55; margin-top: var(--sp-1); }
+.mapshell .b-rent b { font-variant-numeric: tabular-nums; }
+
+/* 상세 — 층마다 월 얼마 */
+.mapshell .b-rentbox { margin-top: var(--sp-3); padding-top: 10px; border-top: 1px dashed var(--line); }
+.mapshell .b-rent-badge {
+  font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px;
+  background: #e3f5ee; color: #0f7a55;
+}
+.mapshell .b-rent-table { width: 100%; margin-top: var(--sp-2); border-collapse: collapse; font-size: var(--fs-caption); }
+.mapshell .b-rent-table th { text-align: right; font-weight: 600; color: var(--muted); padding: 2px 4px; border-bottom: 1px solid var(--line); }
+.mapshell .b-rent-table th:first-child, .mapshell .b-rent-table td:first-child { text-align: left; }
+.mapshell .b-rent-table td { text-align: right; padding: 3px 4px; border-bottom: 1px solid #f1f4f9; font-variant-numeric: tabular-nums; }
+.mapshell .b-rent-table td b { color: #0f7a55; }
+/* 추정 공실(probable)은 흐리게 + 라벨 — 확정과 같은 모양이면 추정이 실측처럼 읽힌다. */
+.mapshell .b-rent-table tr.is-probable td { color: var(--muted); }
+.mapshell .b-rent-table tr.is-probable i { font-style: normal; font-size: 10px; color: #8a5a00; }
+.mapshell .legend .note b { color: #0f7a55; }
+@media (max-width: 768px) {
+  .mapshell .rent-summary { padding: var(--sp-2) var(--sp-3); }
+  .mapshell .rent-summary-foot { display: none; }
+}

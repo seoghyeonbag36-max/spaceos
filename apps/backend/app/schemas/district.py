@@ -218,6 +218,14 @@ class MarketingEvent(BaseModel):
     distance_m: int | None = None
 
 
+class DistrictEvents(BaseModel):
+    """GET /marketing/events — 상권 행사만(LLM 없이). Program 지도의 오프라인 홍보 장소."""
+    district_id: str
+    events: list[MarketingEvent]
+    # "seoul-open-data"(실데이터) | "seed"(Gold 미적재 폴백). 실데이터인데 0건이면 예정 행사가 없다.
+    events_source: str = "seed"
+
+
 class Marketing(BaseModel):
     district_id: str
     events: list[MarketingEvent]

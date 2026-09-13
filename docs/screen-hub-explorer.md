@@ -1,3 +1,6 @@
+> ⚠ **2026-09-13 「거점」 탭은 레일에서 삭제됐다.** 이 문서는 이력으로 남긴다. 실측 범위 선(부록 A · `lib/hubBoundary`)은
+> Platform 지도가 이어받았다 — 현행 화면 명세는 [screen-spec-pppp-2026-09-13.html](screen-spec-pppp-2026-09-13.html).
+
 # 화면설계서 — 거점 탐색(Hub Explorer)
 
 > 양식: [prompt-ux-screen-spec.md](prompt-ux-screen-spec.md) §3 · 경계 근거 **B안(실측 커버리지 외곽)**
