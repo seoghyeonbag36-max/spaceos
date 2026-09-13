@@ -13,8 +13,7 @@ import { Card } from "@/design/components/Card";
 import { mapLabelHTML } from "@/design/components/MapMarkerPin";
 import { colors } from "@/design/tokens/colors";
 import { useMapHost } from "@/components/MapHost";
-import { useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
-import { TRACK_PANEL_W } from "@/components/TrackMapFrame";
+import { fitInView, useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
 import { boundaryBadge, computeHubBoundary, EMPTY_BOUNDARY, type HubBoundary } from "@/lib/hubBoundary";
 import type { BuildingSelection } from "@/lib/workspaceState";
 import "./PlatformConsole.css";
@@ -321,13 +320,8 @@ function usePlatformMap({ districtId, sites, selectedIds, onToggle }: {
     });
     if (current.bbox) {
       const { south, west, north, east } = current.bbox;
-      const narrow = window.innerWidth <= 768;
-      map.fitBounds?.(
-        new naver.maps.LatLngBounds(new naver.maps.LatLng(south, west), new naver.maps.LatLng(north, east)),
-        narrow
-          ? { top: 64, right: 16, bottom: Math.round(window.innerHeight * 0.58) + 16, left: 16 }
-          : { top: 48, right: 48, bottom: 48, left: TRACK_PANEL_W + 48 },
-      );
+      fitInView(map, naver,
+        new naver.maps.LatLngBounds(new naver.maps.LatLng(south, west), new naver.maps.LatLng(north, east)));
     }
     return () => { polys.forEach((p) => p.setMap?.(null)); };
   }, [ready, map, current]);

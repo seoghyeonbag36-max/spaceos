@@ -12,7 +12,7 @@
  */
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
-import MapShell, { PIN_MAX_ZOOM } from "@/pages/MapShell";
+import MapShell, { byVacancyFirst, PIN_MAX_ZOOM } from "@/pages/MapShell";
 import { DEFAULT_ZOOM } from "@/components/MapHost";
 import { installFetchStub, type FetchStub, type Route } from "@/test/fetchStub";
 import { installNaverStub, removeNaverStub, type NaverStub } from "@/test/naverStub";
@@ -406,6 +406,25 @@ describe("MapShell — 사이드패널", () => {
     expect(screen.getByText("가로수 C")).toBeTruthy();
     // 거점 대표값도 같이 밝힌다.
     expect(screen.getByText(/거점 12\.3%/)).toBeTruthy();
+  });
+
+  it("목록은 빈 건물부터 선다 — 지도의 빨간 점과 목록 첫 줄이 같은 답을 말한다", async () => {
+    // API 순서는 g1(공실의심) · g2(만실) · g3(고공실)다. 종전에는 그대로 그려 만실이 둘째 줄에 섰다.
+    mount();
+    await screen.findByText("가로수 C");
+    const names = screen.getAllByText(/^가로수 [ABC]$/).map((el) => el.textContent);
+    expect(names).toEqual(["가로수 A", "가로수 C", "가로수 B"]);
+  });
+
+  it("같은 상태 안에서는 공실률 → 빈 호 수 → 이름 순이고, 수용 0호가 정렬을 흔들지 않는다", () => {
+    const rows = [
+      { name: "다", status: "high" as const, capacity: 10, active: 4 },   // 60%
+      { name: "가", status: "high" as const, capacity: 3, active: 1 },    // 67%
+      { name: "나", status: "full" as const, capacity: 0, active: 0 },    // 분모 없음
+      { name: "라", status: "high" as const, capacity: 20, active: 8 },   // 60% · 빈 12호
+      { name: "마", status: "empty" as const, capacity: 2, active: 0 },
+    ];
+    expect([...rows].sort(byVacancyFirst).map((r) => r.name)).toEqual(["마", "가", "라", "다", "나"]);
   });
 
   it("백엔드에 건물 산출물이 없으면 로컬 샘플로 폴백하고 '샘플(추정)'이라고 밝힌다", async () => {

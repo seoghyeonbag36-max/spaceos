@@ -24,9 +24,6 @@ import type { TrackKey } from "@/design/tokens/colors";
 import { isEditableTarget } from "@/lib/keyboard";
 import "./TrackMapFrame.css";
 
-/** 패널 폭(px). 콘솔이 카메라를 맞출 때 이만큼 비켜야 점이 패널 밑에 안 깔린다. */
-export const TRACK_PANEL_W = 560;
-
 export default function TrackMapFrame({ track, label, children }: {
   track: TrackKey;
   /** 접었을 때 펴기 버튼에 뜨는 이름 — "상권 정체성" 처럼 이 패널이 무엇인지 */
