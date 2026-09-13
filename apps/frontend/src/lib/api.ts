@@ -1,4 +1,4 @@
-/** SpaceOS 백엔드 API 클라이언트 (골격). */
+/** PlaceOS 백엔드 API 클라이언트 (골격). */
 
 const BASE = "/api/v1";
 
@@ -204,17 +204,44 @@ export interface VacancyHeatmap {
   predicted_direction: "up" | "down" | null;
 }
 
-export interface RentCell {
-  i: number; j: number; lat: number; lng: number;
-  c_lat: number; c_lng: number; dlat: number; dlng: number;
-  v: number; rent_per_pyeong: number;
+/** 층 단위 공실 매물 하나의 **추정 월임대료**.
+ *  월임대료(만원) = R-ONE(천원/㎡·월) × 그 층 대장 면적(㎡) × 층 계수 ÷ 10 — Posting `rent` 와 같은 식.
+ *  ⚠ 호가·실거래가가 아니다. 보증금·권리금·관리비가 빠져 있고, 한 층에 호실이 여럿이면 층 전체 금액이다. */
+export interface RentListing {
+  id: string;
+  building_id?: string | null;
+  name: string;
+  lat: number; lng: number;
+  floor: number; floor_label: string;
+  /** "confirmed" 비었음이 확정 · "probable" 층 미상 점포가 다른 층이면 빈다 */
+  certainty: "confirmed" | "probable";
+  area_py: number; area_m2: number;
+  factor: number;
+  /** 만원/평·월 */
+  rent_per_pyeong: number;
+  /** 만원/월 */
+  monthly_rent: number;
 }
 
+/** 임대시세 레이어 — 2026-09-13 격자(cells) 대신 **층별 평당 표 + 매물별 금액**을 준다. */
 export interface RentHeatmap {
   district: string;
-  rent_source: "rone";
+  /** "rone-shared" = 단독 표본이 없어 인접·포괄 상권 값을 빌렸다 */
+  rent_source: "rone" | "rone-shared";
+  quarter?: string | null;
   unit: "만원/평";
-  cells: RentCell[];
+  monthly_unit: "만원/월";
+  base_rent_per_m2_krw_thousand: number;
+  /** 1층 기준 만원/평·월 */
+  base_rent_per_pyeong: number;
+  floors: Array<{ floor: string; factor: number; rent_per_pyeong: number }>;
+  listings: RentListing[];
+  listing_count: number;
+  monthly_min: number | null;
+  monthly_max: number | null;
+  basis: string;
+  excludes: string[];
+  note: string;
 }
 
 /** 서울 13 Page 거점 요약(감성·공실·리뷰·Tier) — 거점 대시보드 */
@@ -225,7 +252,7 @@ export const getDistrict = (id: string) => getJSON<DistrictDetail>(`/commercial-
 export const getSentiment = (id: string) => getJSON<Zone[]>(`/commercial-districts/${id}/sentiment`);
 /** 거점 100m 공실 히트맵(Page) */
 export const getVacancyHeatmap = (id: string) => getJSON<VacancyHeatmap>(`/heatmap/vacancy?district=${id}`);
-/** 거점 100m 임대시세 레이어(Page) */
+/** 거점 임대시세(Page) — 층별 평당 표 + 층 단위 매물의 추정 월임대료 */
 export const getRentHeatmap = (id: string) => getJSON<RentHeatmap>(`/heatmap/rent?district=${id}`);
 /** 유동·밀도 레이어의 셀 (공실·임대와 같은 100m 격자) */
 export interface TrdarCell {
@@ -415,6 +442,10 @@ export const getFloorVacancies = (
 };
 /** 거점(상권) 마케팅 — 온라인 콘텐츠는 Gold 기반 생성(Program), 행사는 시드 */
 export const getMarketing = (id: string) => getJSON<Marketing>(`/marketing/${id}`);
+/** 상권 행사만 — LLM 을 부르지 않는다. Program 지도의 오프라인 홍보 장소(2026-09-13).
+ *  `getMarketing` 은 온라인 콘텐츠 생성까지 돌므로 지도에서 부르지 말 것. */
+export const getDistrictEvents = (id: string) =>
+  getJSON<Pick<Marketing, "district_id" | "events" | "events_source">>(`/marketing/events?district_id=${encodeURIComponent(id)}`);
 
 async function postJSON<T>(
   path: string,

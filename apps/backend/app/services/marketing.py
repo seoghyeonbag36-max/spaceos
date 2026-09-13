@@ -46,7 +46,7 @@ _SLUG_RE = re.compile(r"^[a-z0-9-]{1,40}$")
 
 _GOLD_DIR = Path(__file__).resolve().parents[4] / "data" / "gold"
 
-_SYSTEM_PROMPT = """너는 SpaceOS의 Program(가게 단위 마케팅 자동화) 생성기다.
+_SYSTEM_PROMPT = """너는 PlaceOS의 Program(가게 단위 마케팅 자동화) 생성기다.
 입력된 가게 프로필(이름·카테고리·주소·리뷰 텍스트·사진·메뉴)과 상권 컨텍스트를 근거로,
 소상공인이 바로 실행할 수 있는 온라인/오프라인 마케팅 솔루션을 제안한다.
 
@@ -592,7 +592,7 @@ def _rule_stub(profile: dict, tone: list[str],
     }
 
 
-_DISTRICT_SYSTEM_PROMPT = """너는 SpaceOS의 Program(상권 단위 마케팅) 온라인 콘텐츠 생성기다.
+_DISTRICT_SYSTEM_PROMPT = """너는 PlaceOS의 Program(상권 단위 마케팅) 온라인 콘텐츠 생성기다.
 입력된 상권 컨텍스트(블로그 언급 키워드 빈도·업종 분포·검색 트렌드)만을 근거로,
 그 상권의 온라인 콘텐츠 소재를 한 줄 카피 형태로 제안한다.
 
@@ -669,6 +669,23 @@ def _context_mtime(district_id: str) -> float:
     path = _context_path(slug)
     base = path.stat().st_mtime if path.exists() else 0.0
     return base + events.source_mtime()
+
+
+def get_district_events(district_id: str) -> dict | None:
+    """상권 행사만 — **LLM 을 부르지 않는** 조회(2026-09-13).
+
+    Program 화면이 지도 위에 오프라인 홍보 장소(공공 문화행사)를 찍으려고 필요해졌다.
+    `get_district_marketing` 을 그대로 부르면 행사 몇 개를 얻자고 온라인 콘텐츠 LLM 생성까지
+    돈다(거점마다 1회, 인스턴스가 새로 뜨면 다시). 지도를 옮길 때마다 크레딧을 쓰는 화면이
+    되므로 행사 경로만 떼어 낸다. 출처 규칙은 아래 함수와 같다 — 적재됐는데 0건이면 빈 목록.
+    """
+    base = svc.get_marketing(district_id)
+    if base is None:
+        return None
+    real_events = events.for_district(district_id)
+    if real_events is None:
+        return {"district_id": district_id, "events": base["events"], "events_source": "seed"}
+    return {"district_id": district_id, "events": real_events, "events_source": "seoul-open-data"}
 
 
 def get_district_marketing(district_id: str) -> dict | None:

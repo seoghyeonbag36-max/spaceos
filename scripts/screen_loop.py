@@ -225,7 +225,7 @@ TABS: tuple[TabSpec, ...] = (
 )
 TABS_BY_KEY = {t.key: t for t in TABS}
 
-CANARY_SEL = ".spaceos-canary-does-not-exist"
+CANARY_SEL = ".placeos-canary-does-not-exist"
 # 자기검사 픽스처용 가짜 거점 id — 실제 slug 를 코드에 박지 않기 위한 것이다
 # (`test_screen_loop.py` 가 "소스에 slug 문자열이 없다"를 검사한다).
 FAKE_HUB = "__self_check_hub__"

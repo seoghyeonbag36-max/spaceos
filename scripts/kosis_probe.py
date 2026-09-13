@@ -47,7 +47,7 @@ _ENV = _ROOT / "data" / ".env"
 LIST_URL = "https://kosis.kr/openapi/statisticsList.do"
 DATA_URL = "https://kosis.kr/openapi/Param/statisticsParameterData.do"
 META_URL = "https://kosis.kr/openapi/statisticsData.do"
-_UA = {"User-Agent": "Mozilla/5.0 (SpaceOS kosis-probe)"}
+_UA = {"User-Agent": "Mozilla/5.0 (PlaceOS kosis-probe)"}
 
 
 def _key() -> str:

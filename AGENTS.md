@@ -1,8 +1,8 @@
-# AGENTS.md — SpaceOS 작업 지침 (Codex 등 코딩 에이전트용)
+# AGENTS.md — PlaceOS 작업 지침 (Codex 등 코딩 에이전트용)
 
 **여기가 작업 루트다.** `.git` 이 이 디렉터리에 있다. 상위 폴더에서는 아무것도 만들지 않는다.
 
-SpaceOS는 물리적 상권의 디지털 트윈 SaaS다. 4대 기능을 **PPPP** 라 부르고, 전통 마케팅 4P 와
+PlaceOS는 물리적 상권의 디지털 트윈 SaaS다. 4대 기능을 **PPPP** 라 부르고, 전통 마케팅 4P 와
 **1:1** 로 대응한다 (2026-09-05 재정의 — 종전엔 Page 가 Product/Price 를 겸하고 Posting·Program 이
 Promotion 을 나눠 가졌다):
 
@@ -12,7 +12,7 @@ Promotion 을 나눠 가졌다):
 - **Promotion ▶ Program** — 어떤 홍보 program 을 돌릴까 (마케팅 자동화)
 
 > 이 문서는 Codex 등 외부 에이전트용 요약이다. 설계 배경·판단 이력은
-> [CLAUDE.md](CLAUDE.md) 와 [docs/spaceos-vibe-build-sequence.md](docs/spaceos-vibe-build-sequence.md) 에 있다.
+> [CLAUDE.md](CLAUDE.md) 와 [docs/placeos-vibe-build-sequence.md](docs/placeos-vibe-build-sequence.md) 에 있다.
 
 하위 디렉터리에도 AGENTS.md 가 있다 — 파일을 고치기 전에 그 파일을 덮는 것을 읽는다:
 [apps/backend](apps/backend/AGENTS.md) · [apps/frontend](apps/frontend/AGENTS.md) ·
@@ -86,7 +86,7 @@ apps/frontend    React + TypeScript + Vite — API 호출은 src/lib/api.ts 로 
 ml               PyTorch LSTM(공실 예측) / GNN(업종 추천) + MLflow
 data             수집기 collectors/ · 파이프라인 pipelines/ · Bronze→Silver→Gold 3계층
 infra            docker-compose / k8s / GitHub Actions
-docs             설계 문서 (진행 상태는 spaceos-vibe-build-sequence.md 가 정본)
+docs             설계 문서 (진행 상태는 placeos-vibe-build-sequence.md 가 정본)
 ```
 
 ## 2. 명령어
@@ -110,7 +110,7 @@ python -m data.pipelines.calibrate_vacancy <거점>     # R-ONE 앵커 대조
 전부 `except` 에 잡혀 **10 passed** 가 난다. 실호출 계약은 별도 스위트가 친다(외부 호출·크레딧 소모, opt-in):
 
 ```powershell
-$env:SPACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v
+$env:PLACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v
 ```
 
 ## 3. 코드 규칙

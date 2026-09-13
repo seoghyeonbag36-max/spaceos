@@ -15,7 +15,7 @@ NAVER_PAY_CLIENT_SECRET = os.getenv("NAVER_PAY_CLIENT_SECRET", "")
 
 
 class ReserveRequest(BaseModel):
-    product_name: str          # 예: "SpaceOS DaaS 월 구독" / "성수동 상권 리포트"
+    product_name: str          # 예: "PlaceOS DaaS 월 구독" / "성수동 상권 리포트"
     total_pay_amount: int      # 결제 금액(원)
     return_url: str            # 인증 후 콜백
 

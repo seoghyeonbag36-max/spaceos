@@ -1,4 +1,4 @@
-// SpaceOS 기본 버튼 — 토큰 기반. variant 로 네이버/브랜드 맥락 구분.
+// PlaceOS 기본 버튼 — 토큰 기반. variant 로 네이버/브랜드 맥락 구분.
 // naver variant 는 '네이버 연동 액션'(길찾기 등)에만 사용. 네이버페이 결제는 NaverPayButton 사용.
 //
 // 2026-09-06: Tailwind 유틸리티 클래스로만 짜여 있었는데 이 저장소에는 tailwindcss 가

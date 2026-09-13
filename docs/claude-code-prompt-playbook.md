@@ -1,8 +1,8 @@
-# SpaceOS × Claude Code 프롬프트 플레이북 — 단계별·진행상황별
+# PlaceOS × Claude Code 프롬프트 플레이북 — 단계별·진행상황별
 
 > 2026-06~07 가로수길 PoC를 실제로 완주하며 **효과가 검증된 프롬프트 패턴**만 정리한다.
 > (키 발급 → D1 프로브 → 콜렉터 → 폴리곤 결합 → /heatmap 실데이터 → 검증 준비까지의 실전 기록 기반)
-> 관련: [spaceos-vibe-build-sequence.md](spaceos-vibe-build-sequence.md) · [next-steps-after-keys.md](next-steps-after-keys.md)
+> 관련: [placeos-vibe-build-sequence.md](placeos-vibe-build-sequence.md) · [next-steps-after-keys.md](next-steps-after-keys.md)
 
 ---
 

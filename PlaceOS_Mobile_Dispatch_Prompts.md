@@ -1,4 +1,4 @@
-# SpaceOS 모바일 작업 프롬프트
+# PlaceOS 모바일 작업 프롬프트
 
 **2026-09-06 전면 재작성.** 이전 판은 "서울 25구"·"미구현 엔드포인트는 mock + TODO"
 기준이었는데 **둘 다 낡았다** — 지금은 66거점이고 그 엔드포인트들은 배선이 끝났다.
@@ -130,4 +130,4 @@ docs/papers/paper-platform.md 의 §3.2(성능 천장 4회 확인)만 채운다.
 - **3D(@react-three/fiber)를 새로 깔지 않는다** — 2026-09-05 제거됨(`feature-posting.md` §0-V)
 - **mapbox-gl 을 다시 끌어오지 않는다** — 2026-08-25 제거됨. 베이스맵은 네이버뿐
 - **`vercel --prod` 를 쓰지 않는다** — 2026-08-28 Cloud Run 으로 이전(무료 플랜 상업적 사용 금지)
-- 배포는 `main` 푸시로 자동 (Firebase Hosting → Cloud Run, https://spaceos-twin.web.app)
+- 배포는 `main` 푸시로 자동 (Firebase Hosting → Cloud Run, https://placeos.web.app)

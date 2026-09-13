@@ -17,7 +17,7 @@
 |---|---|---|
 | 핵심 원문·부록 확보 | 저자 공개본 확보. 최종본·별도 부록·보조문헌 전체 본문은 미확보 | [원문 등록](source-register.json) |
 | 페이지별 정독·방법 추출 | 공개본 8페이지 텍스트·시각 대조. 본문·표 불일치와 부록 공백 기록 | [읽기 장부·방법 근거표](reading-ledger.md) |
-| SpaceOS 변수 대응·설계 | 계산적 질문·검증 단위·지표·미평가 범위 확정 | [설계와 변수](design-and-variables.md) |
+| PlaceOS 변수 대응·설계 | 계산적 질문·검증 단위·지표·미평가 범위 확정 | [설계와 변수](design-and-variables.md) |
 | 보존 근거 검산·계산 재현 | 감사 파일 224개 해시 일치. 서빙 사본·셀 재합산·새 체크아웃 Gold→서빙 각각 66/66 통과 | [실행 결과](evidence-verification.json) |
 | 근거 등록·집필 | 조건 D 등록, 원고 §2.4 방법론 및 §3 결과 작성. 다른 절은 기존 뼈대 | [근거 인덱스](../evidence-index.md#page-condition-d), [Page 원고](../paper-page.md) |
 

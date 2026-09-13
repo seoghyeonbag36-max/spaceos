@@ -8,7 +8,7 @@
 
 > 평일 근무 중·출퇴근 길에 폰으로 진행하는 작업의 **붙여넣기용 프롬프트**.
 > 계획 본문: [plan-design-upgrade-2026-09.md](plan-design-upgrade-2026-09.md) · [plan-mvp-3hubs-2026-09.md](plan-mvp-3hubs-2026-09.md)
-> 일반 모바일 작업 규칙(두 경로·불가능한 것): [../SpaceOS_Mobile_Dispatch_Prompts.md](../SpaceOS_Mobile_Dispatch_Prompts.md)
+> 일반 모바일 작업 규칙(두 경로·불가능한 것): [../PlaceOS_Mobile_Dispatch_Prompts.md](../PlaceOS_Mobile_Dispatch_Prompts.md)
 > 프롬프트 안의 수치는 2026-09-06 실측이다. 오래 지나면 §0 의 명령으로 다시 잰다.
 
 ---
@@ -40,9 +40,9 @@ cd apps/frontend && grep -oE "#[0-9a-fA-F]{3,8}" src/pages/*.css src/components/
 ## A1 · D0 여정 지도 — 점심 15분
 
 ```
-너는 SpaceOS 창업자의 UX 리서치 파트너다. 아래 정보로 페르소나 3명의 여정 지도를 만든다.
+너는 PlaceOS 창업자의 UX 리서치 파트너다. 아래 정보로 페르소나 3명의 여정 지도를 만든다.
 
-[서비스] SpaceOS — 물리적 상권의 디지털 트윈. 빈 건물을 찾아 입점·홍보까지 잇는다.
+[서비스] PlaceOS — 물리적 상권의 디지털 트윈. 빈 건물을 찾아 입점·홍보까지 잇는다.
 [화면 4개] 순서대로
   Platform  이 입지·상권은 어떤 플랫폼인가 (업종 구성·유동·연령·시간대)
   Page      어디가 비었나 (건물·층 단위 공실 지도 + 네이버 거리뷰)
@@ -70,9 +70,9 @@ cd apps/frontend && grep -oE "#[0-9a-fA-F]{3,8}" src/pages/*.css src/components/
 ## A2 · D1 기획안 (.docx) — 퇴근길 30분
 
 ```
-너는 SpaceOS 창업자의 기획 담당이다. 아래 사실만 사용해 사업 기획안을 쓴다.
+너는 PlaceOS 창업자의 기획 담당이다. 아래 사실만 사용해 사업 기획안을 쓴다.
 
-[서비스] SpaceOS — 물리적 상권의 디지털 트윈 플랫폼.
+[서비스] PlaceOS — 물리적 상권의 디지털 트윈 플랫폼.
 가설: "Place ▶ Platform" — 물리적 공간을 SNS·디지털 관점의 플랫폼으로 읽는다.
 PPPP 프레임워크(전통 4P 와 1:1):
   Place ▶ Platform     이 입지·상권은 어떤 플랫폼인가
@@ -104,11 +104,11 @@ PPPP 프레임워크(전통 4P 와 1:1):
 ## A3 · D2a 랜딩 PRD — 퇴근길 30분
 
 ```
-SpaceOS 랜딩 페이지의 PRD 를 쓴다. 이 PRD 를 Lovable 에 그대로 넣을 것이다.
+PlaceOS 랜딩 페이지의 PRD 를 쓴다. 이 PRD 를 Lovable 에 그대로 넣을 것이다.
 
 [전제] 앱(지도 대시보드)은 이미 있다. 이 랜딩은 앱 앞에 서는 별개 페이지다.
        랜딩에 지도·대시보드를 만들지 않는다 — 스크린샷 자리만 비워 둔다.
-[답할 질문] "SpaceOS 가 뭐고, 왜 지금이고, 왜 우리인가"
+[답할 질문] "PlaceOS 가 뭐고, 왜 지금이고, 왜 우리인가"
 [읽는 사람] (투자자 | 프랜차이즈 본사 | 지자체) 중 하나를 골라 그 사람에게 쓴다
 
 [쓸 수 있는 실측 — 이 밖의 숫자를 만들지 마라]
@@ -138,9 +138,9 @@ SpaceOS 랜딩 페이지의 PRD 를 쓴다. 이 PRD 를 Lovable 에 그대로 �
 > 핀터레스트에서 저장한 캡처를 **폰에서 그대로 첨부**한다. 이게 폰이 데스크톱보다 나은 자리다.
 
 ```
-첨부한 UI 캡처를 SpaceOS 에 옮길 수 있는 "규칙"으로 분해한다.
+첨부한 UI 캡처를 PlaceOS 에 옮길 수 있는 "규칙"으로 분해한다.
 
-[SpaceOS 화면 제약 — 이걸 어기는 레이아웃은 가져올 수 없다]
+[PlaceOS 화면 제약 — 이걸 어기는 레이아웃은 가져올 수 없다]
  - 중앙은 네이버 지도 전체화면 고정. 나머지는 전부 그 위에 뜬 오버레이다
  - 패널이 지도를 밀어내면 위반이다
  - 좌측 64px 아이콘 레일(모바일 52px)
@@ -183,7 +183,7 @@ SpaceOS 랜딩 페이지의 PRD 를 쓴다. 이 PRD 를 Lovable 에 그대로 �
 ## A5 · D6 도메인 후보 — 점심 15분
 
 ```
-SpaceOS 랜딩용 도메인 후보를 고른다.
+PlaceOS 랜딩용 도메인 후보를 고른다.
 
 [서비스] 물리적 상권의 디지털 트윈 SaaS. B2B(프랜차이즈 본사·자산운용사·지자체) 대상.
 [제약]
@@ -249,7 +249,7 @@ tailwind.config.ts 만 토큰 1:1 매핑을 들고 남아 있고 첫 줄이
  삭제: apps/frontend/tailwind.config.ts
  문서 수정(전부 tailwind 를 언급한다):
    docs/feature-design-system.md · design/README.md
-   docs/DESIGN-VIBE-PROMPTS.md · SpaceOS_PPPP_Design_Vibe_Coding_Guide.md
+   docs/DESIGN-VIBE-PROMPTS.md · PlaceOS_PPPP_Design_Vibe_Coding_Guide.md
  → "토큰 → Tailwind 매핑" 서술을 지우고 동기화 규칙을 세 곳으로 고친다:
    design/tokens/tokens.json ⇄ apps/frontend/src/design/tokens/*.ts ⇄ src/styles/tokens.css
 

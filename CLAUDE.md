@@ -1,10 +1,10 @@
-# Memory — SpaceOS Project
+# Memory — PlaceOS Project
 
 ## Me
-**sh.pac** (seoghyeonbag36@gmail.com) — SpaceOS 창업자 겸 디지털 트윈 AI/IT 개발자. 지역 상권의 리뷰 데이터와 공실 히스토리를 결합해 물리적 상권을 디지털 트윈 SaaS로 플랫폼화하는 프로젝트를 진행 중.
+**sh.pac** (seoghyeonbag36@gmail.com) — PlaceOS 창업자 겸 디지털 트윈 AI/IT 개발자. 지역 상권의 리뷰 데이터와 공실 히스토리를 결합해 물리적 상권을 디지털 트윈 SaaS로 플랫폼화하는 프로젝트를 진행 중.
 
 ## Project Identity
-**SpaceOS** — 물리적 상권의 디지털 트윈 플랫폼. "Place ▶ Platform" 가설 검증(물리적 공간을 디지털·SNS 관점의 플랫폼으로 읽는다). 18~24개월 내 네이버/카카오/직방 대상 M&A Exit 목표.
+**PlaceOS** — 물리적 상권의 디지털 트윈 플랫폼. "Place ▶ Platform" 가설 검증(물리적 공간을 디지털·SNS 관점의 플랫폼으로 읽는다). 18~24개월 내 네이버/카카오/직방 대상 M&A Exit 목표.
 
 ## PPPP Framework (핵심 4기능)
 
@@ -79,8 +79,8 @@ Price 는 Posting 으로, Promotion 은 Program 으로만 간다.
 - **거점 선정 기준**: 데이터 가용성(공공데이터·SNS) + B2B 잠재 고객 접근성
 
 ## Recent Deliverables
-- `SpaceOS_PPPP_6Month_Vibe_Roadmap.docx` (2026-05-20) — 본 로드맵
-- `SpaceOS_6Month_Technical_Roadmap.docx` — 기술 로드맵 (이전)
+- `PlaceOS_PPPP_6Month_Vibe_Roadmap.docx` (2026-05-20) — 본 로드맵
+- `PlaceOS_6Month_Technical_Roadmap.docx` — 기술 로드맵 (이전)
 
 ---
 
@@ -130,7 +130,8 @@ docker compose -f infra/docker/docker-compose.yml up
 
 # 배포 — main 에 푸시하면 GitHub Actions 가 Cloud Run 으로 낸다(테스트→빌드→배포→검증).
 # 수동 배포·좌표·무료 한도의 경계는 docs/deploy-cloud-run.md 참조.
-#   프로덕션: https://spaceos-twin.web.app  (Firebase Hosting → Cloud Run)
+#   프로덕션: https://placeos.web.app  (Firebase Hosting → Cloud Run, 2026-09-13 정식 주소)
+#   옛 주소 https://spaceos-twin.web.app 도 같은 서비스로 살아 있다(firebase.json 사이트 2개)
 # ⚠ Vercel 은 2026-08-28 프로덕션에서 내려왔다(무료 플랜이 상업적 사용 금지).
 #   `vercel --prod` 를 쓰지 말 것 — docs/deploy-vercel.md 는 이력으로만 남겼다.
 git push origin main

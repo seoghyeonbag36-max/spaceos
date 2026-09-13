@@ -118,7 +118,7 @@ def test_api_key_issue_returns_plaintext_once():
     resp = client.post("/api/v1/auth/api-keys", json={"name": "ERP 연동"}, headers=h)
     assert resp.status_code == 201
     body = resp.json()
-    assert body["key"].startswith("sk_spaceos_")
+    assert body["key"].startswith("sk_placeos_")
     assert body["name"] == "ERP 연동"
     assert body["revoked_at"] is None
 
@@ -193,7 +193,7 @@ def test_api_key_resolves_to_org_and_stops_after_revoke():
         org, rec = found
         assert org.name == "Resolve사"
         assert rec.id == created["id"]
-        assert auth_service.resolve_api_key(db, "sk_spaceos_deadbeef") is None
+        assert auth_service.resolve_api_key(db, "sk_placeos_deadbeef") is None
     finally:
         db.close()
 

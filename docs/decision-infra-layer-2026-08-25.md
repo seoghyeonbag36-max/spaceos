@@ -89,7 +89,7 @@ DB 를 **분석 데이터용이 아니라 사용자 데이터용**으로만 도�
    돌린다: 백엔드 pytest(약 1분 30초) · 데이터 파이프라인 pytest(38건 4초) ·
    프론트 `npm run build`(= `tsc -b && vite build`). 시크릿이 필요 없다 —
    `conftest.py` 가 `LLM_API_KEY` 를 전역으로 비우고 실호출 검증은
-   `SPACEOS_LIVE_LLM=1` opt-in 이라 CI 에서 skip 된다. 포크 PR 에서도 그대로 돈다.
+   `PLACEOS_LIVE_LLM=1` opt-in 이라 CI 에서 skip 된다. 포크 PR 에서도 그대로 돈다.
 
    ⚠ **워크플로는 `infra/github/` 이 아니라 `.github/workflows/` 에 있다.** Actions 는
    저장소 루트의 그 경로만 읽고 설정으로 바꿀 수 없다. 위 표가 `infra/github/` 을

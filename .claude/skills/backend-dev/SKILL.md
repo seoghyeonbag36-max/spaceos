@@ -3,7 +3,7 @@ name: backend-dev
 description: FastAPI 백엔드에 라우터·스키마·서비스를 추가하는 규칙과 경로. apps/backend 에 엔드포인트나 비즈니스 로직을 붙일 때.
 ---
 
-SpaceOS 백엔드에 새 기능을 추가한다. 대상: 호출 인수(추가할 기능). 비어 있으면 무엇을 붙일지 먼저 묻는다.
+PlaceOS 백엔드에 새 기능을 추가한다. 대상: 호출 인수(추가할 기능). 비어 있으면 무엇을 붙일지 먼저 묻는다.
 
 규칙:
 1. 라우터는 `apps/backend/app/api/v1/`에 도메인별로 추가하고 `router.py`에 등록.

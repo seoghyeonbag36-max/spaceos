@@ -17,7 +17,7 @@
 ## 붙여 넣을 프롬프트
 
 ```
-SpaceOS 13거점의 건물 공실률이 부동산원(R-ONE) 앵커보다 계통적으로 높다.
+PlaceOS 13거점의 건물 공실률이 부동산원(R-ONE) 앵커보다 계통적으로 높다.
 앵커와 우리 지표가 애초에 같은 것을 재고 있는지 확인해줘.
 
 ## 현황
@@ -116,7 +116,7 @@ B. 분자 소스의 대형건물 커버리지 결손
 - `docs/prompt-vacancy-anchor-drift.md` — 07-27 앵커 이탈(처리 완료, 가설은 틀렸음)
 - `docs/prompt-playwright-e2e.md` — 시각 검증(07-27부터 미착수)
 - `docs/poc-building-vacancy.md` §성공 기준 — 41.6% 앵커의 정정 노트
-- `.claude/skills/verify` (spaceos:verify) — 로컬 앱 확인 절차
+- `.claude/skills/verify` (placeos:verify) — 로컬 앱 확인 절차
 
 ## 잔여 항목 (이 작업과 무관하게 남아 있음)
 

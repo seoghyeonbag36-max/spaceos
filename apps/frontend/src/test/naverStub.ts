@@ -20,13 +20,17 @@ type Handler = (...args: unknown[]) => void;
 export interface StubOverlay {
   /** Polygon · Marker · Circle · Rectangle · HeatMap … */
   readonly kind: string;
+  /** 생성 옵션 + 이후 `setOptions` 로 덮인 값이 합쳐진 현재 상태. */
   readonly options: Record<string, unknown>;
   /** 지금 붙어 있는 지도. `setMap(null)` 이면 null 이다. */
   map: unknown;
   /** setMap 호출 이력 — 걷혔는지뿐 아니라 몇 번 걷혔는지도 본다. */
   readonly setMapCalls: unknown[];
+  /** setOptions 호출 이력 — 호버 강조처럼 **다시 그리지 않고 고치는** 경로를 본다. */
+  readonly setOptionsCalls: Record<string, unknown>[];
   setMap(m: unknown): void;
   getMap(): unknown;
+  setOptions(o: Record<string, unknown>): void;
 }
 
 export interface StubListener {
@@ -42,11 +46,18 @@ export interface StubMap {
   /** setCenter / panTo / fitBounds 로 카메라를 옮긴 이력 */
   moves: Array<{ kind: "setCenter" | "panTo" | "fitBounds"; arg: unknown }>;
   zoom: number;
+  /**
+   * 현재 화면 범위. **기본값은 null** 이다 — 실제 SDK 는 지도가 붙기 전 null 을 준다.
+   * 화면 코드는 그때 뷰포트 필터를 걸지 않아야 한다(범위를 모르는데 거르면 목록이 빈다).
+   * 테스트에서 뷰포트 동기화를 보려면 여기에 LatLngBounds 를 넣고 `idle` 을 발화한다.
+   */
+  bounds: unknown;
   setCenter(v: unknown): void;
   panTo(v: unknown): void;
   fitBounds(v: unknown, padding?: unknown): void;
   setZoom(z: number): void;
   getZoom(): number;
+  getBounds(): unknown;
   getCenter(): unknown;
   setOptions(): void;
   refresh(): void;
@@ -54,6 +65,9 @@ export interface StubMap {
 }
 
 export interface NaverStub {
+  /** 화면 코드가 좌표를 만들 때 쓰는 것과 같은 생성자 — 테스트가 뷰포트를 짤 때 쓴다. */
+  LatLng: new (lat: number, lng: number) => { lat(): number; lng(): number };
+  LatLngBounds: new (sw: unknown, ne: unknown) => { hasLatLng(ll: unknown): boolean };
   /** 만들어진 순서대로 전부. 걷힌 것도 남는다(걷혔는지를 봐야 하므로). */
   overlays: StubOverlay[];
   listeners: StubListener[];
@@ -80,8 +94,19 @@ export function installNaverStub(): NaverStub {
     lng() { return this._lng; }
   }
 
+  /**
+   * 뷰포트 판정만 **진짜로** 한다. 좌표 투영은 여전히 안 하지만, 목록이 화면 범위로
+   * 좁혀지는지(R2 뷰포트 동기화)는 포함 여부를 실제로 계산해야 볼 수 있다.
+   * 경도 180도 경계(dateline)는 다루지 않는다 — 우리 거점은 전부 한국이다.
+   */
   class LatLngBounds {
-    constructor(public sw: unknown, public ne: unknown) {}
+    constructor(public sw: any, public ne: any) {}
+    hasLatLng(ll: any) {
+      const lat = typeof ll?.lat === "function" ? ll.lat() : ll?.lat;
+      const lng = typeof ll?.lng === "function" ? ll.lng() : ll?.lng;
+      return lat >= this.sw.lat() && lat <= this.ne.lat()
+        && lng >= this.sw.lng() && lng <= this.ne.lng();
+    }
   }
 
   class Point {
@@ -90,6 +115,7 @@ export function installNaverStub(): NaverStub {
 
   class Overlay implements StubOverlay {
     readonly setMapCalls: unknown[] = [];
+    readonly setOptionsCalls: Record<string, unknown>[] = [];
     map: unknown;
     constructor(readonly kind: string, readonly options: Record<string, unknown> = {}) {
       this.map = options.map ?? null;
@@ -97,6 +123,11 @@ export function installNaverStub(): NaverStub {
     }
     setMap(m: unknown) { this.setMapCalls.push(m); this.map = m ?? null; }
     getMap() { return this.map; }
+    /** 실제 SDK 와 같이 **제자리에서** 옵션을 덮는다 — 오버레이를 새로 만들지 않는다. */
+    setOptions(o: Record<string, unknown>) {
+      this.setOptionsCalls.push(o);
+      Object.assign(this.options, o);
+    }
   }
 
   /** 오버레이 종류마다 생성자를 하나씩 — 화면 코드는 `new naver.maps.Polygon({...})` 그대로 쓴다. */
@@ -108,9 +139,15 @@ export function installNaverStub(): NaverStub {
   class NaverMap implements StubMap {
     moves: StubMap["moves"] = [];
     zoom: number;
+    bounds: unknown = null;
     constructor(public el: unknown, public options: Record<string, unknown> = {}) {
-      // 폴리곤/점 표현이 갈리는 줌 경계는 15 다(MapShell 의 PIN_MAX_ZOOM).
-      // 기본 16 = 가까이 본 상태 → 건물 폴리곤이 그려진다.
+      // 앱 기본 줌과 같은 값(MapHost.DEFAULT_ZOOM). 다만 **이 기본값은 거의 안 쓰인다** —
+      // MapHost 가 지도를 만들 때 zoom 을 명시해 넘기므로 options.zoom 쪽으로 들어온다.
+      // 여기 값이 쓰이는 건 zoom 없이 지도를 만드는 경우뿐이다.
+      //
+      // ⚠ 줌 16 은 이제 **점 모드**다(MapShell 의 PIN_MAX_ZOOM, 2026-09-13 에 15→16).
+      //   건물마다 도형이 하나씩 필요한 테스트는 스스로 확대해야 한다 →
+      //   MapShell.test.tsx 의 `polygonMode()`.
       this.zoom = typeof options.zoom === "number" ? (options.zoom as number) : 16;
       maps.push(this);
     }
@@ -119,6 +156,7 @@ export function installNaverStub(): NaverStub {
     fitBounds(v: unknown) { this.moves.push({ kind: "fitBounds", arg: v }); }
     setZoom(z: number) { this.zoom = z; }
     getZoom() { return this.zoom; }
+    getBounds() { return this.bounds; }
     getCenter() { return new LatLng(37.5205, 127.023); }
     setOptions() {}
     refresh() {}
@@ -154,6 +192,8 @@ export function installNaverStub(): NaverStub {
   (window as unknown as { naver: unknown }).naver = naver;
 
   return {
+    LatLng: LatLng as unknown as NaverStub["LatLng"],
+    LatLngBounds: LatLngBounds as unknown as NaverStub["LatLngBounds"],
     overlays, listeners, maps,
     live: () => overlays.filter((o) => o.map != null),
     liveListeners: () => listeners.filter((l) => !l.removed),

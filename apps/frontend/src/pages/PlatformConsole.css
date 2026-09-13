@@ -1,4 +1,4 @@
-/* SpaceOS Platform 콘솔 — 스코프 .platconsole (PageDashboard 톤 계승).
+/* PlaceOS Platform 콘솔 — 스코프 .platconsole (PageDashboard 톤 계승).
    레이아웃이 곧 근거의 서열이다: 모델 둘은 위쪽 2단 카드, 시드인 감성은 아래 점선 영역.
    색으로도 갈린다 — 모델 카드는 흰 배경·실선, 시드 영역은 회색 배경·점선이다. */
 .platconsole{--card:var(--surface);--ink:#1f2937;--sub:var(--muted);--line:#e5e7eb;--blue:#2E6FB7;
@@ -25,7 +25,7 @@
  color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:var(--sp-1) var(--sp-2)}
 /* 공실 수치 출처 — PageDashboard .srcbadge 와 같은 규칙(실측 초록 채움 / 합성 점선) */
 .platconsole .chip .src{font-style:normal;font-size:9.5px;font-weight:700;border-radius:4px;padding:1px var(--sp-1)}
-.platconsole .chip .src.is-gold{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.platconsole .chip .src.is-gold{color:var(--source-real);background:var(--source-real-soft);border:1px solid var(--source-real-line)}
 .platconsole .chip .src.is-syn{color:#8a93a0;background:#f6f7f9;border:1px dashed #cfd5dd}
 
 /* 섹션 제목은 Fold 의 요약줄(.vfold summary)이 대신한다 — 접힌 채로도 안에 든 것을 말한다 */
@@ -172,10 +172,10 @@
 
 .platconsole .badge{font-size:9.5px;font-weight:700;letter-spacing:.3px;border-radius:5px;padding:2px 6px}
 .platconsole .badge.is-model{color:var(--surface);background:#3a5a98}
-.platconsole .badge.is-ground{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.platconsole .badge.is-ground{color:var(--source-real);background:var(--source-real-soft);border:1px solid var(--source-real-line)}
 .platconsole .badge.is-warn{color:#8a5a00;background:#fdf5e3;border:1px solid #f0dcae}
 .platconsole .badge.is-seed{color:#8a93a0;background:#f6f7f9;border:1px dashed #cfd5dd}
-.platconsole .badge.is-measured{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.platconsole .badge.is-measured{color:var(--source-real);background:var(--source-real-soft);border:1px solid var(--source-real-line)}
 
 /* 분기 세그먼트 */
 .platconsole .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;width:fit-content;margin-bottom:var(--sp-3)}
@@ -261,3 +261,7 @@
 .platconsole .zsent{font-size:10.5px;color:#9aa3af;margin-top:5px;padding-top:5px;border-top:1px dashed #eceff2}
 .platconsole .zkw{display:flex;gap:var(--sp-1);flex-wrap:wrap;margin-top:7px}
 .platconsole .kw{font-size:10px;font-weight:700;color:#8a93a0;background:#f6f7f9;border:1px solid #eceff2;border-radius:5px;padding:1px 5px}
+
+/* Platform → Page 인계 버튼(2026-09-13, 화면설계서 2판) — 트랙 색 테두리 버튼 */
+.platconsole .site-open-page{margin-top:var(--sp-3);width:100%;min-height:40px;border:1px solid var(--track-page);border-radius:var(--radius-md);background:var(--surface);color:var(--track-page);font:inherit;font-size:var(--fs-caption);font-weight:700;cursor:pointer}
+.platconsole .site-open-page:hover{background:var(--track-page-soft)}

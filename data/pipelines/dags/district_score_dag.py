@@ -32,11 +32,11 @@ def _collect_and_score(**_):
 
 if DAG is not None:
     with DAG(
-        dag_id="spaceos_seoul_district_score",
-        description="서울 25구 SpaceOS 진입 우선순위 점수 산출 (4기준×2대상)",
+        dag_id="placeos_seoul_district_score",
+        description="서울 25구 PlaceOS 진입 우선순위 점수 산출 (4기준×2대상)",
         start_date=datetime(2026, 1, 1),
         schedule="@weekly",
         catchup=False,
-        tags=["spaceos", "scoring", "commercial-district"],
+        tags=["placeos", "scoring", "commercial-district"],
     ) as dag:
         score = PythonOperator(task_id="collect_and_score", python_callable=_collect_and_score)

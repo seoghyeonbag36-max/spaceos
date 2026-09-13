@@ -13,7 +13,7 @@
 ## 붙여 넣을 프롬프트
 
 ```
-SpaceOS 건물 공실률 지표를 R-ONE 앵커와 같은 것을 재도록 정의를 고쳐줘.
+PlaceOS 건물 공실률 지표를 R-ONE 앵커와 같은 것을 재도록 정의를 고쳐줘.
 원인 규명은 docs/finding-anchor-population.md 에 끝나 있다. API 콜은 0으로 가능하다.
 
 ## 확정된 사실 (다시 규명하지 말 것)

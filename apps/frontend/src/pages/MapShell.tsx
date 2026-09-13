@@ -17,11 +17,13 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState, type Dispatch, ty
 import CandidateCompare from "@/components/CandidateCompare";
 import { createPageWorkspace, type PageWorkspace, type BuildingSelection, type VacancyFilter } from "@/lib/workspaceState";
 import DistrictPicker, { CaveatNote } from "@/components/DistrictPicker";
-import { useMapHost } from "@/components/MapHost";
+import { useMapHost, DEFAULT_ZOOM } from "@/components/MapHost";
+import { isEditableTarget } from "@/lib/keyboard";
 import { getBuildingVacancy, getDensityHeatmap, getFootfallHeatmap, getRentHeatmap, listDistricts, recommendIndustry,
-  type DensityHeatmap, type DistrictSummary, type FootfallHeatmap, type GeoJSONFC, type IndustryRecommend, type RentHeatmap } from "@/lib/api";
+  type DensityHeatmap, type DistrictSummary, type FootfallHeatmap, type GeoJSONFC, type IndustryRecommend,
+  type RentHeatmap, type RentListing } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
-import { vacancyDotAnchor, vacancyDotHTML } from "@/design/components/MapMarkerPin";
+import { mapLabelHTML, shortManwon, vacancyDotAnchor, vacancyDotHTML } from "@/design/components/MapMarkerPin";
 import "@/styles/tokens.css";
 import "./MapShell.css";
 
@@ -52,14 +54,25 @@ const LAYERS: { key: Layer; label: string }[] = [
 //
 // ⚠ 점 표현은 새로 만든 것이 아니라 `PageDashboard.tsx` 에 있던 구현을 옮긴 것이다.
 //   그 화면이 `#board` 해시로 밀려나면서 red dot 도 같이 안 보이게 돼 있었다.
-const PIN_MAX_ZOOM = 15;   // 이 줌 **이하**면 점, 초과면 폴리곤
+// 2026-09-13: **15 → 16.** 이 기능은 있는데 아무도 못 보고 있었다.
+// 앱이 여는 기본 줌은 `MapHost.DEFAULT_ZOOM` = 16 이라, 경계가 15 이면 16 > 15 →
+// 기본 화면이 **언제나 폴리곤 모드**였다. 즉 점 표현은 사용자가 일부러 축소해야만
+// 닿았고, 기본 화면은 여전히 840동이 4색으로 꽉 찬 지도였다 — 위 피드백이 지적한 바로
+// 그 화면이다. 경계를 기본 줌까지 끌어올려 **앱을 열면 빈 자리가 먼저 보이게** 한다.
+//
+// ⚠ 지켜야 하는 관계: PIN_MAX_ZOOM ≥ MapHost.DEFAULT_ZOOM.
+//   둘은 다른 파일에 있어 따로 움직이기 쉽다 — 그 단절이 이 버그의 원인이었다.
+//   MapShell.test.tsx 가 부등식을 직접 센다.
+export const PIN_MAX_ZOOM = 16;   // 이 줌 **이하**면 점, 초과면 폴리곤
 
 // 공실 상태 → 색 (design 토큰 vacancy 색계열 재사용, 단일 출처)
-const STATUS: Record<VacStatus, { color: string; label: string }> = {
-  full: { color: colors.vacancy[0], label: "만실" },
-  partial: { color: colors.vacancy[2], label: "부분공실" },
-  high: { color: colors.vacancy[3], label: "고공실" },
-  empty: { color: colors.vacancy[4], label: "공실의심" },
+// `rule` 은 범례가 말하는 기준이다(화면설계서 2판 §Page 「공실 상태 4단계 정의」).
+// 정본은 파이프라인 build_page_master._classify — 점유율 = 영업 확인 호 ÷ 상가 수용 호.
+const STATUS: Record<VacStatus, { color: string; label: string; rule: string }> = {
+  full: { color: colors.vacancy[0], label: "만실", rule: "점유율 90% 이상" },
+  partial: { color: colors.vacancy[2], label: "부분공실", rule: "점유율 50% 이상 90% 미만" },
+  high: { color: colors.vacancy[3], label: "고공실", rule: "점유율 0% 초과 50% 미만" },
+  empty: { color: colors.vacancy[4], label: "공실의심", rule: "영업으로 확인된 호실 0 — 확정 공실이 아니다" },
 };
 
 interface Building {
@@ -127,12 +140,28 @@ function rampColor(v: number, min: number, max: number, ramp: string[]) {
   return ramp[idx];
 }
 
-const RENT_COLORS = ["#E6F8EE", "#BEEAD3", "#7DD9AD", "#35BF7C", "#0F8E5E"];
-function rentColor(v: number, min: number, max: number) {
-  const span = Math.max(1, max - min);
-  const idx = Math.max(0, Math.min(RENT_COLORS.length - 1, Math.floor(((v - min) / span) * RENT_COLORS.length)));
-  return RENT_COLORS[idx];
-}
+// ── 임대시세 = **금액** (2026-09-13) ─────────────────────────────────────────────
+// 종전에는 100m 격자를 초록 5단계로 칠했다. 사용자는 "진한 곳이 비싸다"만 알 수 있었고
+// "그래서 얼마냐"는 답이 화면 어디에도 없었다. 게다가 R-ONE 임대료는 **상권 단위 값 하나**라
+// 셀마다 달라 보이던 차이는 공간 구조가 아니었다(services/rent_layer 독스트링).
+// 이제 값이 실제로 갈리는 축(층·면적)으로 내려가 **빈 층마다 월 얼마인지**를 글자로 건다.
+//
+// 멀리서(점 모드와 같은 줌 경계)는 칩이 서로를 덮으므로 반경 ~160m 묶음(묶음 사이 ~320m)으로
+// "월 N만~M만 · K곳", 가까이서는 건물마다 "월 N만"(그 건물 빈 층 중 가장 싼 층)을 건다.
+// 2026-09-13 실화면 확인에서 두 번 고쳤다:
+//   ① 처음 잡은 ~160m **격자 칸**은 z16 에서 칩 간격(약 84px)이 칩 폭(약 140px)보다 좁아 칩끼리 겹쳤다.
+//   ② 칸을 넓혀도 격자는 **칸 경계**에서 50m 떨어진 두 매물을 다른 묶음으로 갈라, 붙은 칩 한 쌍이 남았다.
+//   그래서 격자를 버리고 거리로 묶는다 — 기존 묶음의 첫 매물에서 반경 안이면 그 묶음에 넣는다.
+const RENT_CLUSTER_RADIUS_M = 160;
+const metersBetween = (aLat: number, aLng: number, bLat: number, bLng: number) =>
+  Math.hypot((aLat - bLat) * 111_000, (aLng - bLng) * 88_300);   // 서울 위도 기준 근사
+const RENT_CHIP_COLOR = colors.source.real.base;   // 실측 출처 토큰 — R-ONE 배지와 같은 색으로 읽힌다
+
+/** 층 라벨 정렬 키 — B1 < 1F < 2F … */
+const floorOrder = (label: string) => (label.startsWith("B") ? -Number(label.slice(1)) || -1 : parseInt(label, 10) || 0);
+
+/** 분기 코드(20262) → "26년 2분기" */
+const quarterText = (q?: string | null) => (q && q.length >= 5 ? `${q.slice(2, 4)}년 ${q.slice(4)}분기` : "기준 분기 미상");
 
 interface MapShellProps {
   workspace?: PageWorkspace;
@@ -172,6 +201,20 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
   const buildings = currentInventory?.buildings ?? EMPTY_BUILDINGS;
   const src = currentInventory?.source ?? "local";
   const [rentHm, setRentHm] = useState<RentHeatmap | null>(null);
+  // 임대료 요청이 실패(404 = R-ONE 없음)한 거점. "불러오는 중"과 "없다"를 섞지 않는다.
+  const [rentMissingFor, setRentMissingFor] = useState<string | null>(null);
+  // 다른 거점의 금액을 새 거점 이름 아래 잠깐이라도 보여주지 않는다.
+  const currentRent = rentHm?.district === districtId ? rentHm : null;
+  // 건물 id → 그 건물의 빈 층 금액(층 순). 목록·상세·지도 칩이 같은 표를 읽는다.
+  const rentByBuilding = useMemo(() => {
+    const m = new Map<string, RentListing[]>();
+    for (const x of currentRent?.listings ?? []) {
+      if (!x.building_id) continue;
+      m.set(x.building_id, [...(m.get(x.building_id) ?? []), x]);
+    }
+    for (const rows of m.values()) rows.sort((a, b) => floorOrder(a.floor_label) - floorOrder(b.floor_label));
+    return m;
+  }, [currentRent]);
   const [footHm, setFootHm] = useState<FootfallHeatmap | null>(null);
   const [densHm, setDensHm] = useState<DensityHeatmap | null>(null);
   const selected = buildings.find((b) => b.id === workspace.selectedId) ?? null;
@@ -182,7 +225,30 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
   const [twinOpen, setTwinOpen] = useState(false);
   // 줌 자체가 아니라 **모드**를 담는다. 줌 값을 state 에 두면 휠을 굴릴 때마다
   // 리렌더가 나고 오버레이 840개를 매 틱 다시 그린다. 불리언이라 전환은 두 번뿐이다.
-  const [pinMode, setPinMode] = useState(false);
+  //
+  // 초기값을 **기본 줌에서 끌어온다**(2026-09-13). 그전에는 무조건 false 로 시작했는데,
+  // 기본 줌이 점 모드가 된 뒤로는 그게 거점을 열 때마다 폴리곤 840~1,443개를 만들었다가
+  // 곧바로 버리고 점으로 다시 그리는 낭비였다(아래 sync 가 한 틱 뒤에 바로잡는다).
+  // 지도가 아직 없을 때의 추정이고, 지도가 서면 실제 줌으로 덮인다.
+  const [pinMode, setPinMode] = useState(DEFAULT_ZOOM <= PIN_MAX_ZOOM);
+
+  // ── R1 지도 ↔ 목록 호버 동기화 (2026-09-13) ────────────────────────────────
+  // 목록 1,443줄 중 "지금 보는 그거"가 지도 어디인지를 눈이 못 찾는다. Zillow·Redfin 이
+  // 호버 동기화로 그 탐색을 통째로 없앤다 → design/references/INDEX.md §2-3.
+  // ⚠ hoveredId 를 오버레이 렌더 useEffect 의 deps 에 넣으면 **마우스가 움직일 때마다
+  //   폴리곤 1,443개를 부수고 다시 만든다.** 그래서 오버레이는 건드리지 않고, id→도형
+  //   지도를 따로 들고 있다가 **바뀐 둘만** setOptions 로 제자리에서 고친다.
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  // id → { 도형, 평상시 옵션, 강조 옵션 }. 렌더 useEffect 가 채우고 호버 useEffect 가 읽는다.
+  const shapesRef = useRef<Map<string, { ov: any; base: Record<string, unknown>; hot: Record<string, unknown> }>>(new Map());
+
+  // ── R2 뷰포트 동기화 (2026-09-13) ──────────────────────────────────────────
+  // 화면 밖 매물은 사용자에게 존재하지 않는다. 목록과 지도가 서로 다른 걸 보고 있으면
+  // 둘 다 못 믿게 된다 → design/references/INDEX.md §1-1(호갱노노) · §2-3(Zillow).
+  // bounds 가 null 이면 **거르지 않는다** — SDK 는 지도가 붙기 전 null 을 주는데,
+  // 범위를 모르는 채 거르면 목록이 통째로 빈다.
+  const [bounds, setBounds] = useState<any>(null);
+  const [viewportOnly, setViewportOnly] = useState(true);
   // 건물 폴리곤이 있는 거점만 고른다 — vacancy_source === "gold" 가 곧 "Gold 마스터 보유"다.
   // 합성 거점을 열면 /heatmap/buildings 가 404 라 빈 지도가 된다.
   const [hubs, setHubs] = useState<DistrictSummary[]>([]);
@@ -191,6 +257,18 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
   const filtered = useMemo(() => buildings.filter((b) => (!q.trim() || b.name.toLocaleLowerCase().includes(q.trim().toLocaleLowerCase()))
     && (workspace.status === "all" || b.status === workspace.status)
     && (!savedOnly || savedIds.includes(b.id))), [buildings, q, workspace.status, savedOnly, savedIds]);
+
+  // 목록에 실제로 그리는 것. **지도 오버레이는 filtered 를 그대로 쓴다** — 뷰포트로
+  // 오버레이까지 거르면 지도를 조금 움직일 때마다 폴리곤을 전부 다시 만들게 되고,
+  // 어차피 화면 밖 도형은 보이지 않으므로 얻는 것도 없다. 좁히는 건 목록뿐이다.
+  const listed = useMemo(() => {
+    if (!viewportOnly || !bounds?.hasLatLng) return filtered;
+    const naver = (window as any).naver;
+    if (!naver) return filtered;
+    return filtered.filter((b) => bounds.hasLatLng(new naver.maps.LatLng(b.center.lat, b.center.lng)));
+  }, [filtered, bounds, viewportOnly]);
+  // 뷰포트가 실제로 목록을 줄이고 있는가 — "N동 중 M동" 안내를 켤지 정한다.
+  const clipped = listed.length !== filtered.length;
 
   const hub = useMemo(() => hubs.find((h) => h.id === districtId), [hubs, districtId]);
   const center = hub ? { lat: hub.center[0], lng: hub.center[1] } : GAROSU;
@@ -225,7 +303,7 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
     setRentHm(null);
     getRentHeatmap(districtId)
       .then((hm) => { if (alive) setRentHm(hm); })
-      .catch(() => { if (alive) setRentHm(null); });
+      .catch(() => { if (alive) { setRentHm(null); setRentMissingFor(districtId); } });
     return () => { alive = false; };
   }, [districtId]);
 
@@ -272,12 +350,27 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
     return () => { alive = false; };
   }, [selected, districtId, src]);
 
-  // 거점이 바뀌면 지도도 그 거점으로 옮긴다
+  // 거점이 바뀌면 지도도 그 거점으로 옮긴다.
+  // 단 **이미 고른 건물이 있으면 그 건물로** — 다른 트랙에서 건물을 넘겨받았을 때(Platform
+  // 「Page에서 이 건물 보기」) 거점 목록이 건물보다 늦게 오면 거점 중심이 건물 이동을 덮어쓴다.
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
   useEffect(() => {
     if (!ready || !hub || !map) return;
     const naver = (window as any).naver;
-    map.setCenter(new naver.maps.LatLng(center.lat, center.lng));
+    const target = selectedRef.current?.center ?? center;
+    map.setCenter(new naver.maps.LatLng(target.lat, target.lng));
   }, [ready, map, hub, center.lat, center.lng]);
+
+  // 고른 건물이 바뀌면 카메라를 그 건물로(화면설계서 2판 PG-07). 목록 클릭은 focus() 가 이미
+  // 옮기지만, 인계로 들어온 선택은 클릭이 없다. 해제(null)될 때는 움직이지 않는다.
+  const selectedKey = selected?.id ?? null;
+  useEffect(() => {
+    if (!ready || !map || !selectedRef.current) return;
+    const naver = (window as any).naver;
+    const c = selectedRef.current.center;
+    map.panTo?.(new naver.maps.LatLng(c.lat, c.lng));
+  }, [ready, map, selectedKey]);
 
   // 줌 → 표현 모드. 지도는 MapHost 소유라 여기서 만들지 않으므로 리스너만 붙였다 뗀다.
   // 초기값을 한 번 읽어 두지 않으면 사용자가 줌을 건드리기 전까지 모드가 틀린 채로 그려진다.
@@ -285,9 +378,14 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
     if (!ready || !map) return;
     const naver = (window as any).naver;
     const sync = () => setPinMode(map.getZoom() <= PIN_MAX_ZOOM);
+    // 카메라가 멈출 때마다 현재 화면 범위를 받는다(R2). `idle` 은 이동·줌이 **끝난 뒤**
+    // 한 번 오므로, 드래그 중 매 프레임 목록을 다시 거르지 않는다.
+    const syncBounds = () => setBounds(map.getBounds?.() ?? null);
     sync();
+    syncBounds();
     const h = naver.maps.Event.addListener(map, "zoom_changed", sync);
-    return () => naver.maps.Event.removeListener(h);
+    const hb = naver.maps.Event.addListener(map, "idle", syncBounds);
+    return () => { naver.maps.Event.removeListener(h); naver.maps.Event.removeListener(hb); };
   }, [ready, map]);
 
   const clearOverlays = () => {
@@ -297,6 +395,9 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
     listenersRef.current = [];
     overlaysRef.current.forEach((o) => o.setMap?.(null));
     overlaysRef.current = [];
+    // 호버 색인도 같이 비운다 — 걷힌 도형을 가리키고 있으면 다음 호버가
+    // 지도에 없는 오버레이에 setOptions 를 건다(조용히 아무 일도 안 일어난다).
+    shapesRef.current.clear();
   };
 
   // 이 탭을 떠날 때 Page 레이어를 걷는다 — 지도는 계속 살아 있으므로, 안 걷으면
@@ -323,28 +424,50 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
       const anchor = vacancyDotAnchor(size);
       filtered.forEach((b) => {
         if (b.status !== "empty") return;
+        const icon = (hot: boolean) => ({
+          content: vacancyDotHTML(STATUS[b.status].color, size, hot),
+          anchor: new naver.maps.Point(anchor, anchor),
+        });
         const dot = new naver.maps.Marker({
           map, position: new naver.maps.LatLng(b.center.lat, b.center.lng), zIndex: 60,
-          icon: {
-            content: vacancyDotHTML(STATUS[b.status].color, size),
-            anchor: new naver.maps.Point(anchor, anchor),
-          },
+          icon: icon(false),
         });
         listenersRef.current.push(naver.maps.Event.addListener(dot, "click", () => focus(b)));
+        // 지도 → 목록 방향(R1). 점 위에 마우스를 올리면 목록의 같은 줄이 뜬다.
+        listenersRef.current.push(naver.maps.Event.addListener(dot, "mouseover", () => setHoveredId(b.id)));
+        listenersRef.current.push(naver.maps.Event.addListener(dot, "mouseout", () => setHoveredId((h) => (h === b.id ? null : h))));
+        shapesRef.current.set(b.id, {
+          ov: dot,
+          base: { icon: icon(false), zIndex: 60 },
+          hot: { icon: icon(true), zIndex: 200 },
+        });
         overlaysRef.current.push(dot);
       });
     } else if (layer === "vacancy") {
       // 가까이서 볼 때: 건물 footprint 폴리곤을 상태색으로 채움 + 클릭 상세.
       // 여기서는 4상태를 다 그린다 — 건물 형상이 보이는 축척이라 색이 서로를 덮지 않는다.
       filtered.forEach((b) => {
-        const poly = new naver.maps.Polygon({
-          map,
-          paths: b.ring.map(([lng, lat]) => new naver.maps.LatLng(lat, lng)),
+        // 평상시 / 강조 옵션을 **여기서 한 번** 짜 둔다. 호버 useEffect 는 이 둘을
+        // 바꿔 끼우기만 한다 — 그래야 마우스가 움직여도 도형을 다시 만들지 않는다.
+        const base = {
           fillColor: STATUS[b.status].color, fillOpacity: 0.6,
           strokeColor: STATUS[b.status].color, strokeWeight: 2, strokeOpacity: 0.95,
-          clickable: true,
+          zIndex: 50,
+        };
+        // 강조는 **색을 바꾸지 않는다** — 색은 공실 상태를 뜻하므로 건드리면 거짓말이 된다.
+        // 대신 잉크색 외곽선을 두껍게 올려 위로 띄운다.
+        const hot = {
+          ...base, fillOpacity: 0.78,
+          strokeColor: colors.ink, strokeWeight: 4, strokeOpacity: 1, zIndex: 200,
+        };
+        const poly = new naver.maps.Polygon({
+          map, paths: b.ring.map(([lng, lat]) => new naver.maps.LatLng(lat, lng)),
+          ...base, clickable: true,
         });
         listenersRef.current.push(naver.maps.Event.addListener(poly, "click", () => focus(b)));
+        listenersRef.current.push(naver.maps.Event.addListener(poly, "mouseover", () => setHoveredId(b.id)));
+        listenersRef.current.push(naver.maps.Event.addListener(poly, "mouseout", () => setHoveredId((h) => (h === b.id ? null : h))));
+        shapesRef.current.set(b.id, { ov: poly, base, hot });
         overlaysRef.current.push(poly);
       });
     } else if (layer === "footfall" && footHm) {
@@ -384,27 +507,129 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
         });
         overlaysRef.current.push(poly);
       });
-    } else if (layer === "rent" && rentHm) {
-      const values = rentHm.cells.map((c) => c.v);
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      rentHm.cells.forEach((cell) => {
-        const color = rentColor(cell.v, min, max);
-        const paths = [
-          new naver.maps.LatLng(cell.lat, cell.lng),
-          new naver.maps.LatLng(cell.lat, cell.lng + cell.dlng),
-          new naver.maps.LatLng(cell.lat + cell.dlat, cell.lng + cell.dlng),
-          new naver.maps.LatLng(cell.lat + cell.dlat, cell.lng),
-        ];
-        const poly = new naver.maps.Polygon({
-          map, paths, fillColor: color, fillOpacity: 0.52,
-          strokeColor: color, strokeWeight: 1, strokeOpacity: 0.85,
-          clickable: false,
-        });
-        overlaysRef.current.push(poly);
-      });
     }
-  }, [layer, pinMode, ready, map, filtered, rentHm, footHm, densHm, center.lat, center.lng]);
+    // 임대시세(rent)는 아래 전용 이펙트가 그린다 — 선택한 건물 칩을 강조하려면 selectedId 에
+    // 반응해야 하는데, 그걸 이 이펙트 deps 에 넣으면 공실 폴리곤 1,443개를 선택마다 다시 만든다.
+
+    // 새로 만든 도형에 **지금의 강조**(호버·선택)를 다시 입힌다. 강조 이펙트는 id 가 바뀔 때만
+    // 돌므로, 조건을 바꿔 도형이 다시 만들어지면 선택한 건물의 강조가 조용히 사라진다.
+    prevHotRef.current = new Set();
+    applyHot(hotIds());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layer, pinMode, ready, map, filtered, footHm, densHm, center.lat, center.lng]);
+
+  // ── 임대시세 칩 ──────────────────────────────────────────────────────────────
+  const rentOverlaysRef = useRef<{ ov: any[]; ls: any[] }>({ ov: [], ls: [] });
+  useEffect(() => {
+    const naver = (window as any).naver;
+    const clear = () => {
+      rentOverlaysRef.current.ls.forEach((h) => naver?.maps?.Event?.removeListener(h));
+      rentOverlaysRef.current.ov.forEach((o) => o.setMap?.(null));
+      rentOverlaysRef.current = { ov: [], ls: [] };
+    };
+    clear();
+    if (!ready || !map || !naver?.maps || layer !== "rent" || !currentRent) return clear;
+    // 목록 조건(검색·상태·저장 후보)을 칩에도 같이 건다 — 목록과 지도가 다른 걸 보면 둘 다 못 믿는다.
+    const visible = new Set(filtered.map((b) => b.id));
+    const shown = currentRent.listings.filter((x) => !x.building_id || visible.has(x.building_id));
+    const add = (lat: number, lng: number, html: string, z: number, onClick: () => void) => {
+      const m = new naver.maps.Marker({
+        map, position: new naver.maps.LatLng(lat, lng), zIndex: z,
+        icon: { content: html, anchor: new naver.maps.Point(0, 0) },
+      });
+      rentOverlaysRef.current.ls.push(naver.maps.Event.addListener(m, "click", onClick));
+      rentOverlaysRef.current.ov.push(m);
+    };
+
+    if (pinMode) {
+      // 멀리서: 묶음. 한 묶음에 한 곳뿐이면 그 금액을 그대로 쓴다.
+      const seeds: Array<{ lat: number; lng: number; items: RentListing[] }> = [];
+      for (const x of shown) {
+        const home = seeds.find((g) => metersBetween(g.lat, g.lng, x.lat, x.lng) <= RENT_CLUSTER_RADIUS_M);
+        if (home) home.items.push(x); else seeds.push({ lat: x.lat, lng: x.lng, items: [x] });
+      }
+      for (const { items: g } of seeds) {
+        const vals = g.map((x) => x.monthly_rent);
+        const lo = Math.min(...vals), hi = Math.max(...vals);
+        const lat = g.reduce((s, x) => s + x.lat, 0) / g.length;
+        const lng = g.reduce((s, x) => s + x.lng, 0) / g.length;
+        const html = mapLabelHTML({
+          text: lo === hi ? `월 ${shortManwon(lo)}` : `월 ${shortManwon(lo)}~${shortManwon(hi)}`,
+          sub: g.length > 1 ? `${g.length}곳` : g[0].floor_label,
+          color: RENT_CHIP_COLOR, dashed: g.every((x) => x.certainty === "probable"),
+        });
+        add(lat, lng, html, 80, () => {
+          // 묶음을 누르면 건물 칩이 보이는 줌으로 들어간다. 줌 리스너가 모드를 바꾼다.
+          map.setZoom?.(PIN_MAX_ZOOM + 1);
+          map.panTo?.(new naver.maps.LatLng(lat, lng));
+        });
+      }
+    } else {
+      // 가까이서: 건물마다 하나. 그 건물 빈 층 중 **가장 싼 층**의 금액 — "여기 들어가려면 최소 얼마".
+      for (const [bid, rows] of rentByBuilding) {
+        if (!visible.has(bid)) continue;
+        const cheapest = rows.reduce((a, x) => (x.monthly_rent < a.monthly_rent ? x : a), rows[0]);
+        const selectedHere = workspace.selectedId === bid;
+        const html = mapLabelHTML({
+          text: `월 ${shortManwon(cheapest.monthly_rent)}${rows.length > 1 ? "~" : ""}`,
+          sub: rows.length > 1 ? `빈 층 ${rows.length}` : `${cheapest.floor_label} ${cheapest.area_py}평`,
+          color: RENT_CHIP_COLOR, active: selectedHere,
+          dashed: rows.every((x) => x.certainty === "probable"),
+        });
+        const b = buildings.find((item) => item.id === bid);
+        add(cheapest.lat, cheapest.lng, html, selectedHere ? 200 : 80, () => { if (b) focus(b); });
+      }
+    }
+    return clear;
+    // focus 는 렌더마다 새로 만들어지지만 map·setWorkspace 만 쓰므로 deps 에서 뺀다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, map, layer, pinMode, currentRent, rentByBuilding, filtered, buildings, workspace.selectedId]);
+
+  // ── R1 호버 강조를 **제자리에서** 적용 ──────────────────────────────────────
+  // 오버레이 렌더 useEffect 와 일부러 분리돼 있다. hoveredId 를 저쪽 deps 에 넣으면
+  // 마우스가 한 칸 움직일 때마다 도형 1,443개를 부수고 다시 만든다. 여기서는 **직전
+  // 것과 지금 것 둘만** setOptions 로 고친다 — 지도는 다시 그려지지 않는다.
+  // 2026-09-13: 호버뿐 아니라 **선택한 건물**도 같은 강조를 받는다(화면설계서 2판 §Page 상태표
+  // 「건물 선택됨 — 도형 강조」). 둘을 한 집합으로 다룬다 — 따로 고치면 호버를 뗄 때 선택 강조까지 벗긴다.
+  const prevHotRef = useRef<Set<string>>(new Set());
+  const hotIdsRef = useRef<Set<string>>(new Set());
+  hotIdsRef.current = new Set([hoveredId, workspace.selectedId].filter((x): x is string => !!x));
+  const hotIds = () => hotIdsRef.current;
+  function applyHot(want: Set<string>) {
+    const shapes = shapesRef.current;
+    for (const id of prevHotRef.current) {
+      if (!want.has(id)) shapes.get(id)?.ov.setOptions?.(shapes.get(id)!.base);
+    }
+    for (const id of want) {
+      if (!prevHotRef.current.has(id)) shapes.get(id)?.ov.setOptions?.(shapes.get(id)!.hot);
+    }
+    prevHotRef.current = new Set(want);
+  }
+  useEffect(() => {
+    applyHot(hotIds());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hoveredId, workspace.selectedId]);
+
+  // 거점·레이어가 바뀌면 호버를 놓는다. 안 놓으면 걷힌 도형의 id 가 남아, 새 거점에
+  // 우연히 같은 id 의 건물이 있으면 아무도 안 올렸는데 강조된 채로 뜬다.
+  useEffect(() => { setHoveredId(null); }, [districtId, layer, pinMode]);
+
+  // ── Esc 로 한 겹씩 되돌아간다 (R5) ──────────────────────────────────────────
+  // 이 화면은 층이 넷이다(층스택 모달 → 후보 비교 → 건물 상세 → 목록 패널). 그전에는
+  // 각 층마다 닫는 버튼을 눈으로 찾아 눌러야 했다. **가장 위의 한 겹만** 닫는다 —
+  // 한 번에 다 닫으면 사용자가 쌓아 둔 맥락이 통째로 날아간다.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      // 입력칸(검색 등)에서 누른 Esc 는 아무것도 닫지 않는다 — 네 화면 공통 규칙(lib/keyboard).
+      if (e.key !== "Escape" || isEditableTarget(e.target)) return;
+      if (twinOpen) { setTwinOpen(false); return; }
+      if (compareOpen) { setCompareOpen(false); return; }
+      if (workspace.selectedId) { setWorkspace((w) => ({ ...w, selectedId: null })); return; }
+      if (panelOpen) setPanelOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [twinOpen, compareOpen, workspace.selectedId, panelOpen, setWorkspace]);
 
   const toggleSaved = (id: string) => setWorkspace((w) => {
     const ids = w.savedIds[districtId] ?? [];
@@ -472,6 +697,30 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
             </div>
           )}
         </div>
+        {/* 임대시세 레이어의 첫 답 — "이 상권, 층마다 평당 월 얼마인가". 격자 색이 아니라 숫자다. */}
+        {layer === "rent" && currentRent && (
+          <div className="rent-summary" aria-label="층별 평당 월 임대료">
+            <div className="rent-summary-head">
+              <strong>층별 평당 월 임대료</strong>
+              <span>{currentRent.rent_source === "rone-shared" ? "R-ONE(인접 상권 표본)" : "R-ONE"} · {quarterText(currentRent.quarter)}</span>
+            </div>
+            <div className="rent-floors">
+              {currentRent.floors.map((f) => (
+                <div key={f.floor} className="rent-floor">
+                  <span>{f.floor === "4F+" ? "4층+" : f.floor === "B1" ? "지하1" : `${parseInt(f.floor, 10)}층`}</span>
+                  <b className="num">{f.rent_per_pyeong.toLocaleString("ko-KR")}만</b>
+                </div>
+              ))}
+            </div>
+            <p className="rent-summary-foot">
+              빈 층 매물 <b className="num">{currentRent.listing_count.toLocaleString("ko-KR")}</b>곳
+              {currentRent.monthly_min != null && currentRent.monthly_max != null && (
+                <> · 월 <b className="num">{currentRent.monthly_min.toLocaleString("ko-KR")}~{currentRent.monthly_max.toLocaleString("ko-KR")}만원</b></>
+              )}
+              {" · "}{currentRent.excludes.join("·")} 제외 · 호가가 아닌 추정
+            </p>
+          </div>
+        )}
         <div className="building-filters">
           <label>공실 상태<select aria-label="공실 상태 필터" value={workspace.status}
             onChange={(e) => setWorkspace((w) => ({ ...w, status: e.target.value as VacancyFilter }))}>
@@ -479,29 +728,94 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
             {(Object.keys(STATUS) as VacStatus[]).map((key) => <option key={key} value={key}>{STATUS[key].label}</option>)}
           </select></label>
           <button type="button" aria-pressed={savedOnly} onClick={() => setSavedOnly((value) => !value)}>저장한 후보 {saved.length}</button>
+          {/* 뷰포트 동기화 스위치(R2). 켜 두는 것이 기본이다 — 화면 밖 매물은 사용자에게
+              존재하지 않으므로, 지도를 옮겼는데 목록이 그대로면 둘 다 못 믿게 된다.
+              끌 수는 있어야 한다: 거점 전체 건수를 세야 할 때가 있다. */}
+          <button type="button" aria-pressed={viewportOnly} onClick={() => setViewportOnly((v) => !v)}
+            title="지도를 움직이면 목록이 화면에 보이는 범위로 좁혀집니다">
+            {viewportOnly ? "지도 범위만" : "거점 전체"}
+          </button>
           {(q || workspace.status !== "all" || savedOnly) && <button type="button" onClick={() => {
             setWorkspace((w) => ({ ...w, query: "", status: "all" })); setSavedOnly(false);
           }}>조건 초기화</button>}
         </div>
+        {/* 건수를 **먼저 수로** 말한다 — 네모가 "이 조건의 매물 N건"을 먼저 답하는 것과
+            같은 자리다(design/references/INDEX.md §1-4). 뷰포트가 목록을 실제로 줄이고
+            있을 때만 분모를 같이 보인다. */}
+        {currentInventory && (
+          <p className="sp-count" aria-live="polite">
+            <strong className="num">{listed.length.toLocaleString("ko-KR")}</strong>동
+            {clipped && <span className="sp-count-of"> · 조건에 맞는 <span className="num">{filtered.length.toLocaleString("ko-KR")}</span>동 중 지금 화면 안</span>}
+          </p>
+        )}
+        {/* 다른 트랙에서 넘겨받은 건물이 이 상권 목록에 없을 때(화면설계서 2판 인계 표 — Platform → Page).
+            조용히 아무것도 안 열면 버튼이 고장 난 것처럼 읽힌다. 목록은 그대로 두고 사실만 적는다. */}
+        {workspace.selectedId && currentInventory && src === "api" && !selected && (
+          <p className="handoff-miss" role="status">
+            선택한 건물을 이 상권 건물 목록에서 찾지 못했습니다.
+            <button type="button" onClick={() => setWorkspace((w) => ({ ...w, selectedId: null }))}>닫기</button>
+          </p>
+        )}
         <div className="sp-list" aria-label="건물 목록" aria-busy={!currentInventory}>
-          {currentInventory && filtered.length === 0 && <div className="building-empty">
-            <strong>{buildings.length === 0 ? "제공된 건물이 없습니다" : "조건에 맞는 건물이 없습니다"}</strong>
-            <p>{buildings.length === 0 ? "다른 상권을 선택해 주세요." : "검색어·공실 상태를 바꾸거나 저장한 후보 조건을 해제해 주세요."}</p>
+          {/* 로딩 중에는 **최종 레이아웃의 회색 골격**을 세운다(R5). 그전에는 빈 패널이라
+              "불러오는 중"과 "이 거점엔 건물이 없다"가 화면에서 구분되지 않았다
+              → design/references/INDEX.md §2-5(Linear·Stripe). */}
+          {!currentInventory && Array.from({ length: 5 }, (_, i) => (
+            <div key={i} className="building-card b-skeleton" aria-hidden>
+              <span className="skeleton sk-dot" />
+              <span className="sk-lines">
+                <span className="skeleton sk-line sk-line-name" />
+                <span className="skeleton sk-line" />
+              </span>
+              <span className="skeleton sk-vac" />
+            </div>
+          ))}
+          {currentInventory && listed.length === 0 && <div className="building-empty">
+            {/* 세 가지 빈 상태를 섞지 않는다: 자료가 없다 / 조건이 안 맞는다 /
+                **조건엔 맞는데 지금 화면 밖이다.** 셋째를 둘째로 적으면 사용자가
+                멀쩡한 필터를 지우게 된다. */}
+            <strong>
+              {buildings.length === 0 ? "제공된 건물이 없습니다"
+                : filtered.length > 0 ? "이 화면 범위에는 없습니다"
+                : "조건에 맞는 건물이 없습니다"}
+            </strong>
+            <p>
+              {buildings.length === 0 ? "다른 상권을 선택해 주세요."
+                : filtered.length > 0 ? `조건에 맞는 ${filtered.length.toLocaleString("ko-KR")}동이 화면 밖에 있습니다. 지도를 줄이거나 「거점 전체」로 바꿔 보세요.`
+                : "검색어·공실 상태를 바꾸거나 저장한 후보 조건을 해제해 주세요."}
+            </p>
           </div>}
-          {filtered.map((b) => (
-            <div key={b.id} className="building-card">
+          {listed.map((b) => (
+            <div key={b.id} className={"building-card" + (hoveredId === b.id ? " is-hot" : "")}>
             <button
               className={"b-item" + (selected?.id === b.id ? " active" : "")}
               aria-pressed={selected?.id === b.id}
-              onClick={() => { if (layer !== "vacancy") setLayer("vacancy"); focus(b); }}
+              /* 임대시세를 보다가 건물을 누르면 레이어를 유지한다 — 금액을 보려고 누른 것이다. */
+              onClick={() => { if (layer !== "vacancy" && layer !== "rent") setLayer("vacancy"); focus(b); }}
+              /* 목록 → 지도 방향(R1). 포커스도 같이 받는다 — 마우스가 없는 사용자에게도
+                 Tab 이동만으로 지도의 해당 도형이 뜬다. */
+              onMouseEnter={() => setHoveredId(b.id)}
+              onMouseLeave={() => setHoveredId((h) => (h === b.id ? null : h))}
+              onFocus={() => setHoveredId(b.id)}
+              onBlur={() => setHoveredId((h) => (h === b.id ? null : h))}
             >
               <span className="b-dot" style={{ background: STATUS[b.status].color }} />
               <span>
                 <div className="b-name">{b.name}</div>
                 <div className="b-meta">{b.industry} · {STATUS[b.status].label}</div>
                 <div className="b-meta">수용 {b.capacity}호 · 영업 {b.active}호{b.floors ? ` · 지상 ${b.floors}층` : " · 층수 미상"}</div>
+                {layer === "rent" && rentByBuilding.has(b.id) && (() => {
+                  const rows = rentByBuilding.get(b.id)!;
+                  const vals = rows.map((x) => x.monthly_rent);
+                  const lo = Math.min(...vals), hi = Math.max(...vals);
+                  return (
+                    <div className="b-rent">
+                      빈 층 {rows.length}개 · 월 <b className="num">{lo.toLocaleString("ko-KR")}{lo !== hi ? `~${hi.toLocaleString("ko-KR")}` : ""}만원</b>
+                    </div>
+                  );
+                })()}
               </span>
-              <span className="b-vac" style={{ color: STATUS[b.status].color }}>{vacRate(b)}%</span>
+              <span className="b-vac num" style={{ color: STATUS[b.status].color }}>{vacRate(b)}%</span>
             </button>
             <button className="save-candidate" type="button" aria-label={`${b.name} 후보 ${savedIds.includes(b.id) ? "해제" : "저장"}`}
               aria-pressed={savedIds.includes(b.id)} disabled={src !== "api" || (!savedIds.includes(b.id) && savedIds.length >= 3)}
@@ -514,10 +828,39 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
           <div className="b-detail">
             <button className="building-back" type="button" onClick={() => setWorkspace((w) => ({ ...w, selectedId: null }))}>← 건물 목록</button>
             <div className="b-name">{selected.name}</div>
-            <div className="row"><span>공실률(추정)</span><span style={{ color: STATUS[selected.status].color }}>{vacRate(selected)}%</span></div>
+            <div className="row"><span>공실률(추정)</span><span className="num" style={{ color: STATUS[selected.status].color }}>{vacRate(selected)}%</span></div>
             <div className="row"><span>상태</span><span>{STATUS[selected.status].label}</span></div>
             <div className="row"><span>상가 수용 / 영업</span><span>{selected.capacity}호 / {selected.active}호</span></div>
             <div className="row"><span>대표 업종</span><span>{selected.industry}</span></div>
+
+            {/* 이 건물의 빈 층이 **각각 월 얼마인가** — 임대시세 레이어의 답이 건물 단위로 내려온 자리.
+                층이 없으면(빈 층 없음 · R-ONE 미제공) 그 사실을 적는다 — 0 원처럼 비워 두지 않는다. */}
+            {currentRent && (
+              <div className="b-rentbox">
+                <div className="b-rec-h">빈 층 임대료(추정)<span className="b-rent-badge">R-ONE</span></div>
+                {(rentByBuilding.get(selected.id) ?? []).length === 0
+                  ? <div className="b-rec-note">이 건물에는 금액을 붙일 빈 층 매물이 없다.</div>
+                  : (
+                    <table className="b-rent-table">
+                      <thead><tr><th>층</th><th>면적</th><th>평당/월</th><th>월 임대료</th></tr></thead>
+                      <tbody>
+                        {rentByBuilding.get(selected.id)!.map((x) => (
+                          <tr key={x.id} className={x.certainty === "probable" ? "is-probable" : ""}>
+                            <td>{x.floor_label}{x.certainty === "probable" && <i title="층 미상 점포가 다른 층에 있으면 빈다"> 추정</i>}</td>
+                            <td className="num">{x.area_py.toLocaleString("ko-KR")}평</td>
+                            <td className="num">{x.rent_per_pyeong.toLocaleString("ko-KR")}만</td>
+                            <td className="num"><b>{x.monthly_rent.toLocaleString("ko-KR")}만원</b></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                <div className="b-rec-note">
+                  R-ONE 소규모상가 {quarterText(currentRent.quarter)} × 층 계수 × 대장 층 면적 · {currentRent.excludes.join("·")} 제외 ·
+                  한 층에 호실이 여럿이면 층 전체 금액
+                </div>
+              </div>
+            )}
 
             {/* GNN 업종 추천 — 스텁(Gold 미적재)·빈 추천은 그리지 않는다.
                 합성값을 실측처럼 보이게 하지 않는 vacancy_source 규칙과 같은 원칙이다. */}
@@ -577,9 +920,10 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
         {/* 범례는 **지금 화면에 그려진 것만** 말한다. 점 모드에서 만실·부분공실 칩을
             띄우면 "그 색도 어딘가 있다"는 거짓말이 된다(줌을 당겨야 나온다). */}
         {layer === "vacancy" && (pinMode ? ["empty"] : (Object.keys(STATUS) as VacStatus[])).map((k) => (
-          <span key={k} className="chip">
+          <span key={k} className="chip" title={`${STATUS[k as VacStatus].label} — ${STATUS[k as VacStatus].rule}`}>
             <span className={"sw" + (pinMode ? " dot" : "")} style={{ background: STATUS[k as VacStatus].color }} />
             {STATUS[k as VacStatus].label}
+            <span className="sr-only"> — {STATUS[k as VacStatus].rule}</span>
           </span>
         ))}
         {layer === "vacancy" && pinMode && (
@@ -610,7 +954,19 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
               : "유동인구 · 불러오는 중"}
           </span>
         )}
-        {layer === "rent" && <span className="note">평당 임대시세 · {rentHm?.unit ?? "만원/평"} <span style={{ color: "#0f7a55", background: "#e3f5ee", border: "1px solid #b7e3d2", borderRadius: 5, padding: "1px 5px", fontSize: 10, fontWeight: 700 }}>R-ONE</span></span>}
+        {layer === "rent" && (
+          <span className="note">
+            {currentRent
+              ? <>
+                  칩 = 빈 층 월 임대료(추정) · 1층 평당 <b className="num">{currentRent.base_rent_per_pyeong.toLocaleString("ko-KR")}만원</b>
+                  {" · "}{pinMode ? "묶음 — 누르면 건물별" : "건물별 가장 싼 빈 층"} · 점선 = 추정 공실{" "}
+                  <span className="src-badge-real">
+                    {currentRent.rent_source === "rone-shared" ? "R-ONE 인접상권" : "R-ONE"} {quarterText(currentRent.quarter)}
+                  </span>
+                </>
+              : rentMissingFor === districtId ? "임대시세 · 이 거점에는 R-ONE 임대료가 없다(이웃 거점 값으로 채우지 않는다)" : "임대시세 · 불러오는 중"}
+          </span>
+        )}
         {layer === "density" && (
           <span className="note">
             {densHm

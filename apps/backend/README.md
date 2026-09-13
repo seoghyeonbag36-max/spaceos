@@ -1,4 +1,4 @@
-# SpaceOS Backend (FastAPI)
+# PlaceOS Backend (FastAPI)
 
 상권 디지털 트윈 API 서버. PostgreSQL/PostGIS + Redis + Celery.
 

@@ -131,7 +131,7 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
     <div className="pagedash"><div className="wrap">
       <div className="hd">
         <div>
-          <div className="ey">SpaceOS · Platform</div>
+          <div className="ey">PlaceOS · Platform</div>
           <h1>주요 Platform — 서울 {summaries.length}거점</h1>
           <div className="sub">
             공실은 Gold 실측 {kpi.gold}거점 · 합성 {kpi.n - kpi.gold}거점(카드의 실측/합성 배지로 구분).
@@ -205,7 +205,7 @@ function Board({ summaries, onOpen }: { summaries: DistrictSummary[]; onOpen: (i
         ))}
       </div>
 
-      <div className="foot">시드 데이터(app/data/seoul_pages.py) — 수집 파이프라인(Gold) 적재 시 실측으로 자동 교체 · SpaceOS PPPP</div>
+      <div className="foot">시드 데이터(app/data/seoul_pages.py) — 수집 파이프라인(Gold) 적재 시 실측으로 자동 교체 · PlaceOS PPPP</div>
     </div></div>
   );
 }
@@ -381,7 +381,7 @@ function VacancyMap({ detail }: { detail: DistrictDetail }) {
 
     if (layer === "buildings" && bld) {
       // 공실 지도: 공실의심(empty) 건물만 개별 red dot 으로 — "어디가 비었나".
-      // 만실·부분공실·고공실은 숨긴다(SpaceOS 공실 개별값 목표: 진짜 빈 건물만). 점 클릭 → 상세+거리뷰.
+      // 만실·부분공실·고공실은 숨긴다(PlaceOS 공실 개별값 목표: 진짜 빈 건물만). 점 클릭 → 상세+거리뷰.
       bld.features.forEach((f) => {
         const p = f.properties;
         if (p.status !== "empty") return;

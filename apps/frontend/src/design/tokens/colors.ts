@@ -1,5 +1,5 @@
-// SpaceOS 디자인 토큰 — 색상 (단일 출처)
-// 네이버 호환: green은 네이버 연동 맥락에만, brand(teal)는 SpaceOS 고유 기능.
+// PlaceOS 디자인 토큰 — 색상 (단일 출처)
+// 네이버 호환: green은 네이버 연동 맥락에만, brand(teal)는 PlaceOS 고유 기능.
 export const colors = {
   naver: { green: "#03C75A", greenPressed: "#02B350", greenSoft: "#E6F8EE" },
   brand: { primary: "#0EA5B7", primaryPressed: "#0B8294", soft: "#E6F7F9" },
@@ -15,6 +15,8 @@ export const colors = {
     posting:  { base: "#A23C9F", pressed: "#863284", soft: "#FBF0FB" },
     program:  { base: "#7E2F53", pressed: "#622541", soft: "#FBF0F5" },
   },
+  // 실측 출처(R-ONE·대장) 색 — 임대시세 금액·출처 배지 (2026-09-13, 화면설계서 2판 §토큰)
+  source: { real: { base: "#0F7A55", soft: "#E3F5EE", line: "#B7E3D2" } },
   ink: "#1C2533",
   muted: "#6B7280",
   line: "#E3E9F2",

@@ -5,7 +5,7 @@ description: PPPP 트랙 — Page(공실 히트맵 + 층별 매물 목록 + 네�
 
 # 트랙 컨텍스트: Page (Product ▶ Page)
 
-너는 지금 SpaceOS의 **Page 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
+너는 지금 PlaceOS의 **Page 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
 
 ## 먼저 읽기
 - docs/feature-page.md

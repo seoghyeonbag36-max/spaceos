@@ -1,4 +1,4 @@
-# Cloud Build — SpaceOS 컨테이너 빌드 (Cloud Run 배포용)
+# Cloud Build — PlaceOS 컨테이너 빌드 (Cloud Run 배포용)
 #
 # `gcloud run deploy --source` 를 쓰지 않는 이유: 네이버 지도 키가 **빌드 타임** 변수라
 # `--build-arg` 로 넣어야 하는데 `--source` 배포는 그걸 못 넘긴다. 그래서 빌드와 배포를
@@ -12,6 +12,7 @@
 #   진짜 비밀값(JWT_SECRET·DATABASE_URL 등)은 여기 두지 말고 Cloud Run 런타임
 #   환경변수로 넣을 것 — 그쪽은 번들에 안 들어간다.
 
+# ⚠ _IMAGE 의 spaceos-* 는 실제 Artifact Registry 경로다 — 개명(PlaceOS)과 무관하게 유지한다.
 substitutions:
   _NAVER_KEY: ''
   _IMAGE: 'us-central1-docker.pkg.dev/spaceos-digital-twin/spaceos/web:latest'

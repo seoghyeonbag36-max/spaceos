@@ -1,0 +1,1162 @@
+<title>PlaceOS PPPP 화면설계서</title>
+<meta name="description" content="Platform → Page → Posting → Program 네 화면의 목적·레이아웃 수치·상태·상호작용·데이터 바인딩·통과 조건을 사용 순서대로 정리한 화면설계서 (2026-09-13 개정 2판)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* ── 토큰: PlaceOS 앱의 styles/tokens.css 에서 옮겼다(단일 출처는 앱이다) ── */
+:root {
+  --bg: #F4F7FB; --surface: #FFFFFF; --ink: #1C2533; --muted: #5E6878; --line: #E3E9F2; --line-strong: #CBD5E3;
+  --platform: #6460C4; --platform-soft: #F0F0FB;
+  --page: #753DA6; --page-soft: #F6F0FB;
+  --posting: #A23C9F; --posting-soft: #FBF0FB;
+  --program: #7E2F53; --program-soft: #FBF0F5;
+  --real: #0F7A55; --real-soft: #E3F5EE;
+  --warn: #8A5A00; --warn-soft: #FDF5E3;
+  --empty: #E03E36; --full: #22B07D; --partial: #EFA50F; --high: #F2682C;
+  --map: #E8EDF3; --map-road: #FFFFFF; --map-block: #DDE4EC; --map-park: #D6E9D8;
+  --shadow: 0 1px 3px rgba(11,27,51,.08), 0 6px 18px rgba(11,27,51,.06);
+  --sans: "IBM Plex Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151E; --surface: #171E2A; --ink: #E4E9F1; --muted: #9AA5B5; --line: #263041; --line-strong: #364256;
+    --platform: #9D9AEC; --platform-soft: #232447;
+    --page: #B68BDD; --page-soft: #2A2139;
+    --posting: #DE8ADB; --posting-soft: #33203A;
+    --program: #DC8DB1; --program-soft: #36202B;
+    --real: #5FCB9D; --real-soft: #15302A;
+    --warn: #E9C06A; --warn-soft: #35291A;
+    --map: #1B2330; --map-road: #283244; --map-block: #212A38; --map-park: #1E3027;
+    --shadow: 0 1px 3px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151E; --surface: #171E2A; --ink: #E4E9F1; --muted: #9AA5B5; --line: #263041; --line-strong: #364256;
+  --platform: #9D9AEC; --platform-soft: #232447;
+  --page: #B68BDD; --page-soft: #2A2139;
+  --posting: #DE8ADB; --posting-soft: #33203A;
+  --program: #DC8DB1; --program-soft: #36202B;
+  --real: #5FCB9D; --real-soft: #15302A;
+  --warn: #E9C06A; --warn-soft: #35291A;
+  --map: #1B2330; --map-road: #283244; --map-block: #212A38; --map-park: #1E3027;
+  --shadow: 0 1px 3px rgba(0,0,0,.4), 0 6px 18px rgba(0,0,0,.3);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-size: 15px; line-height: 1.7;
+  -webkit-font-smoothing: antialiased; word-break: keep-all; overflow-wrap: anywhere;
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--page); outline-offset: 2px; }
+code, .mono { font-family: var(--mono); font-size: .86em; }
+code { background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: 0 5px; white-space: nowrap; }
+kbd { font-family: var(--mono); font-size: .82em; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; background: var(--surface); }
+h1, h2, h3, h4 { text-wrap: balance; line-height: 1.3; margin: 0; }
+
+/* ── 뼈대: 왼쪽 목차 = 앱의 레일 ── */
+.shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 40px; max-width: 1240px; margin: 0 auto; padding-inline: 24px; }
+.index { position: sticky; top: 0; align-self: start; padding-block: 36px; max-height: 100vh; overflow-y: auto; }
+.index .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+.index .mark { width: 34px; height: 34px; border-radius: 10px; background: #3A5A98; color: #fff; display: grid; place-items: center; font-weight: 700; }
+.index .brand b { font-size: 15px; letter-spacing: -.2px; }
+.index .brand span { display: block; font-size: 11px; color: var(--muted); line-height: 1.3; }
+.index nav { display: grid; gap: 2px; }
+.index a { display: grid; grid-template-columns: 22px 1fr; align-items: baseline; gap: 6px; text-decoration: none; padding: 6px 10px; border-radius: 9px; font-size: 13.5px; color: var(--muted); }
+.index a:hover { background: var(--surface); color: var(--ink); }
+.index a .n { font-family: var(--mono); font-size: 11px; }
+.index a[data-t] { color: var(--ink); font-weight: 600; }
+.index a[data-t] .n { color: var(--tc); }
+.index a[data-t]:hover { background: var(--tsoft); }
+.index .sep { height: 1px; background: var(--line); margin: 8px 4px; }
+[data-t="platform"] { --tc: var(--platform); --tsoft: var(--platform-soft); }
+[data-t="page"] { --tc: var(--page); --tsoft: var(--page-soft); }
+[data-t="posting"] { --tc: var(--posting); --tsoft: var(--posting-soft); }
+[data-t="program"] { --tc: var(--program); --tsoft: var(--program-soft); }
+
+main { padding-block: 36px 96px; min-width: 0; }
+.doc-head { padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.doc-head h1 { font-size: clamp(28px, 4vw, 38px); font-weight: 700; letter-spacing: -.02em; margin-top: 6px; }
+.doc-head p { max-width: 70ch; color: var(--muted); margin: 12px 0 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 18px 0 0; font-size: 13px; }
+.meta div { display: grid; }
+.meta dt { color: var(--muted); font-size: 11.5px; }
+.meta dd { margin: 0; font-weight: 600; }
+
+section { padding-top: 56px; scroll-margin-top: 12px; }
+.sec-head { display: grid; gap: 6px; margin-bottom: 20px; }
+.sec-head h2 { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+.sec-head .lede { color: var(--muted); max-width: 72ch; margin: 0; }
+h3 { font-size: 16px; font-weight: 600; margin: 32px 0 10px; display: flex; align-items: baseline; gap: 8px; }
+h3 .tpl { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--muted); }
+p { margin: 0 0 12px; max-width: 72ch; }
+
+/* ── 흐름 ── */
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+.step { padding: 18px 18px 16px; border-left: 1px solid var(--line); position: relative; display: grid; gap: 6px; align-content: start; }
+.step:first-child { border-left: 0; }
+.step::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--tc); }
+.step .conv { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; color: var(--tc); font-weight: 500; }
+.step h3 { margin: 0; font-size: 18px; }
+.step .q { font-size: 13.5px; }
+.step .hand { margin-top: 6px; font-size: 12px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 8px; }
+.step .hand b { color: var(--ink); font-weight: 600; }
+
+/* ── 표 ── */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.6; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+thead th { font-size: 11.5px; font-weight: 600; color: var(--muted); letter-spacing: .03em; background: color-mix(in srgb, var(--surface) 70%, var(--bg)); white-space: nowrap; }
+tbody th { font-weight: 600; white-space: nowrap; }
+td.no { width: 44px; }
+td.num, .tnum { font-variant-numeric: tabular-nums; }
+.num-badge { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--bg); font-family: var(--mono); font-size: 11.5px; font-weight: 500; }
+td .src { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.q { font-style: normal; }
+q { quotes: "“" "”"; color: var(--ink); }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; border-radius: 5px; padding: 0 6px; margin-right: 4px; line-height: 1.7; white-space: nowrap; }
+.tag.new { background: var(--tsoft, var(--page-soft)); color: var(--tc, var(--page)); }
+.tag.real { background: var(--real-soft); color: var(--real); }
+.tag.est { background: var(--warn-soft); color: var(--warn); }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; border: 1px solid rgba(0,0,0,.08); }
+
+/* ── 트랙 머리 · 화면 카드 ── */
+.track-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: end; padding-bottom: 16px; border-bottom: 2px solid var(--tc); }
+.track-head .big { grid-row: span 2; font-family: var(--mono); font-size: 44px; line-height: 1; color: var(--tc); font-weight: 500; }
+.track-head .conv { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--tc); }
+.track-head h2 { font-size: 26px; }
+.question { margin: 16px 0 0; font-size: 18px; font-weight: 600; max-width: 62ch; }
+.question::before { content: "묻는 질문"; font-size: 12px; font-weight: 500; color: var(--muted); display: block; }
+.screen-card { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 18px 0 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.screen-card div { padding: 12px 16px; border-top: 1px solid var(--line); }
+.screen-card div:nth-child(-n+2) { border-top: 0; }
+.screen-card div:nth-child(even) { border-left: 1px solid var(--line); }
+.screen-card dt { font-size: 11.5px; font-weight: 600; color: var(--tc); letter-spacing: .02em; }
+.screen-card dd { margin: 2px 0 0; font-size: 14px; }
+.screen-card .wide { grid-column: 1 / -1; border-left: 0 !important; }
+
+/* ── 와이어프레임 ──
+   실제 앱 비율(1440×900)을 컨테이너 쿼리 단위로 줄였다. 레일 64px = 4.4cqw, 패널 560px = 38.9cqw, Page 패널 360px = 25cqw. */
+.wf-scroll { overflow-x: auto; margin: 20px 0 8px; padding-bottom: 4px; }
+.wf { container-type: inline-size; position: relative; min-width: 640px; aspect-ratio: 16 / 10; border-radius: 12px; overflow: hidden; border: 1px solid var(--line-strong); box-shadow: var(--shadow);
+  background:
+    linear-gradient(90deg, transparent 31%, var(--map-road) 31% 32.2%, transparent 32.2% 58%, var(--map-road) 58% 59.4%, transparent 59.4% 83%, var(--map-road) 83% 84%, transparent 84%),
+    linear-gradient(0deg, transparent 22%, var(--map-road) 22% 24%, transparent 24% 55%, var(--map-road) 55% 56.5%, transparent 56.5% 80%, var(--map-road) 80% 81%, transparent 81%),
+    linear-gradient(118deg, transparent 47%, var(--map-road) 47% 48.4%, transparent 48.4%),
+    radial-gradient(ellipse 12% 16% at 72% 72%, var(--map-park) 98%, transparent 100%),
+    repeating-linear-gradient(0deg, var(--map-block) 0 1.2cqw, var(--map) 1.2cqw 1.7cqw),
+    var(--map);
+  font-size: 1.05cqw; line-height: 1.35; color: var(--ink); }
+.wf * { line-height: inherit; }
+.wf-rail { position: absolute; inset: 0 auto 0 0; width: 4.4cqw; background: color-mix(in srgb, var(--surface) 88%, transparent); box-shadow: 1px 0 6px rgba(11,27,51,.12); display: flex; flex-direction: column; align-items: center; gap: .9cqw; padding-top: .8cqw; }
+.wf-logo { display: grid; justify-items: center; gap: .2cqw; margin-bottom: .4cqw; }
+.wf-logo i { width: 2.4cqw; height: 2.4cqw; border-radius: .7cqw; background: #3A5A98; color: #fff; display: grid; place-items: center; font-style: normal; font-weight: 700; font-size: 1.1cqw; }
+.wf-logo b { font-size: .68cqw; color: #3A5A98; font-weight: 700; }
+.wf-rail span { width: 3.6cqw; padding: .45cqw 0; border-radius: .7cqw; text-align: center; font-size: .72cqw; font-weight: 600; color: var(--muted); }
+.wf-rail span::before { content: ""; display: block; width: 1.3cqw; height: 1.3cqw; margin: 0 auto .25cqw; border: .12cqw solid currentColor; border-radius: .35cqw; }
+.wf-rail span.on { background: var(--tc); color: #fff; }
+.wf-panel { position: absolute; top: .85cqw; bottom: .85cqw; left: 5.25cqw; width: 38.9cqw; background: var(--bg); border: 1px solid var(--line); border-top: .22cqw solid var(--tc); border-radius: 1cqw; box-shadow: var(--shadow); padding: 1.1cqw 1.2cqw; display: flex; flex-direction: column; gap: .7cqw; overflow: hidden; }
+.wf-panel.narrow { width: 25cqw; top: 4.4cqw; padding: 0; gap: 0; border-top-width: 1px; }
+.wf-x { position: absolute; top: .6cqw; right: .6cqw; width: 1.9cqw; height: 1.9cqw; border: 1px solid var(--line); border-radius: .5cqw; background: var(--surface); display: grid; place-items: center; color: var(--muted); }
+.wf .ey { font-family: var(--mono); font-size: .72cqw; letter-spacing: .05em; color: var(--tc); }
+.wf .hq { font-size: 1.45cqw; font-weight: 700; }
+.wf .verdict { font-size: 1.02cqw; }
+.wf .grounds { display: grid; gap: .3cqw; }
+.wf .grounds div { display: grid; grid-template-columns: 7cqw 1fr; gap: .6cqw; font-size: .88cqw; }
+.wf .grounds div b { color: var(--muted); font-weight: 500; }
+.wf .srcline { font-size: .74cqw; color: var(--muted); border-top: 1px dashed var(--line); padding-top: .45cqw; }
+.wf .card { background: var(--surface); border: 1px solid var(--line); border-radius: .7cqw; padding: .6cqw .8cqw; }
+.wf .fold { background: var(--surface); border: 1px solid var(--line); border-radius: .7cqw; padding: .5cqw .8cqw; font-size: .9cqw; display: flex; justify-content: space-between; gap: .5cqw; }
+.wf .fold::after { content: "▾"; color: var(--muted); }
+.wf .row { display: flex; gap: .5cqw; align-items: center; flex-wrap: wrap; }
+.wf .ctl { background: var(--surface); border: 1px solid var(--line); border-radius: .55cqw; padding: .35cqw .6cqw; font-size: .86cqw; }
+.wf .ctl.grow { flex: 1; color: var(--muted); }
+.wf .btn { background: var(--tc); color: #fff; border-radius: .55cqw; padding: .45cqw .8cqw; font-size: .9cqw; font-weight: 600; text-align: center; }
+.wf .btn.ghost { background: var(--surface); color: var(--tc); border: 1px solid var(--tc); }
+.wf .pill { font-size: .78cqw; border-radius: .4cqw; padding: .1cqw .45cqw; background: var(--surface); border: 1px solid var(--line); }
+.wf .lbl { font-size: .8cqw; color: var(--muted); }
+.wf .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5cqw; }
+.wf .tier { background: var(--surface); border: 1px solid var(--line); border-top: .25cqw solid var(--line-strong); border-radius: .6cqw; padding: .5cqw; font-size: .8cqw; display: grid; gap: .15cqw; }
+.wf .tier.rec { border-top-color: var(--tc); }
+.wf .tier b { font-size: .95cqw; }
+.wf .tier .kv { display: flex; justify-content: space-between; color: var(--muted); }
+.wf .tier .kv i { font-style: normal; color: var(--ink); font-family: var(--mono); }
+.wf .banner { background: var(--tsoft); border: 1px solid color-mix(in srgb, var(--tc) 40%, var(--line)); border-radius: .6cqw; padding: .5cqw .8cqw; font-size: .85cqw; }
+.wf-top { position: absolute; top: .85cqw; left: 5.25cqw; right: .85cqw; display: flex; gap: .55cqw; }
+.wf-top .ctl { box-shadow: var(--shadow); font-size: .95cqw; padding: .55cqw .8cqw; }
+.wf-seg { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: .55cqw; overflow: hidden; box-shadow: var(--shadow); }
+.wf-seg span { padding: .55cqw .8cqw; font-size: .95cqw; font-weight: 600; color: var(--muted); border-left: 1px solid var(--line); }
+.wf-seg span:first-child { border-left: 0; }
+.wf-seg span.on { background: #0EA5B7; color: #fff; }
+.wf-legend { position: absolute; right: .85cqw; bottom: .85cqw; background: color-mix(in srgb, var(--surface) 94%, transparent); border: 1px solid var(--line); border-radius: .6cqw; padding: .4cqw .7cqw; font-size: .8cqw; display: flex; gap: .7cqw; align-items: center; box-shadow: var(--shadow); max-width: 52cqw; }
+.wf-legend i { display: inline-block; width: .8cqw; height: .8cqw; border-radius: 50%; margin-right: .25cqw; vertical-align: -.05cqw; }
+.wf .sp-head { padding: .9cqw 1cqw .7cqw; border-bottom: 1px solid var(--line); background: var(--surface); }
+.wf .sp-head .t { font-size: 1.15cqw; font-weight: 700; }
+.wf .sp-sec { padding: .6cqw 1cqw; border-bottom: 1px solid var(--line); }
+.wf .item { display: grid; grid-template-columns: 1cqw 1fr auto; gap: .6cqw; align-items: center; padding: .6cqw 1cqw; border-bottom: 1px solid var(--line); background: var(--surface); font-size: .85cqw; }
+.wf .item i { width: .8cqw; height: .8cqw; border-radius: 50%; }
+.wf .item b { display: block; font-size: .95cqw; }
+.wf .item em { font-style: normal; color: var(--muted); }
+.wf .item .m { color: var(--real); font-weight: 600; }
+.wf .floors { display: grid; grid-template-columns: repeat(5, 1fr); gap: .3cqw; margin-top: .4cqw; }
+.wf .floors div { background: var(--surface); border: 1px solid color-mix(in srgb, var(--real) 35%, var(--line)); border-radius: .45cqw; text-align: center; padding: .25cqw 0; font-size: .7cqw; color: var(--muted); }
+.wf .floors b { display: block; font-size: .95cqw; color: var(--real); font-family: var(--mono); font-weight: 500; }
+.m-chip { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; }
+.m-chip span { background: var(--surface); border: .14cqw solid var(--cc, var(--tc)); border-radius: .55cqw; padding: .22cqw .5cqw; font-size: .9cqw; font-weight: 700; white-space: nowrap; box-shadow: 0 1px 4px rgba(11,27,51,.25); font-variant-numeric: tabular-nums; }
+.m-chip span small { font-size: .74cqw; font-weight: 500; color: var(--muted); margin-left: .25cqw; }
+.m-chip::after { content: ""; border-left: .45cqw solid transparent; border-right: .45cqw solid transparent; border-top: .55cqw solid var(--cc, var(--tc)); margin-top: -1px; }
+.m-chip.on span { background: var(--cc, var(--tc)); color: #fff; }
+.m-chip.on span small { color: rgba(255,255,255,.85); }
+.m-chip.dash span { border-style: dashed; }
+.m-chip.real { --cc: var(--real); }
+.m-chip.dark { --cc: var(--ink); }
+.m-dot { position: absolute; width: 1.05cqw; height: 1.05cqw; border-radius: 50%; background: var(--empty); border: .16cqw solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); transform: translate(-50%, -50%); }
+.m-bound { position: absolute; border: .2cqw dashed var(--platform); background: color-mix(in srgb, var(--platform) 8%, transparent); border-radius: 2cqw 4cqw 1.5cqw 3cqw; }
+.co { position: absolute; z-index: 5; width: 2cqw; height: 2cqw; border-radius: 50%; background: var(--ink); color: var(--bg); font-family: var(--mono); font-size: 1cqw; display: grid; place-items: center; box-shadow: 0 0 0 .25cqw var(--bg); transform: translate(-50%, -50%); }
+.wf-cap { font-size: 12.5px; color: var(--muted); margin: 0 0 14px; }
+figure { margin: 0; }
+figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+
+/* 모바일 와이어프레임 */
+.phones { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; margin: 16px 0 8px; }
+.phones figure { width: 220px; max-width: 100%; }
+.wf.phone { min-width: 0; width: 100%; aspect-ratio: 9 / 19; border-radius: 22px; font-size: 3.8cqw; }
+.wf.phone .wf-rail { width: 15cqw; gap: 3cqw; padding-top: 3cqw; }
+.wf.phone .wf-logo i { width: 9cqw; height: 9cqw; font-size: 4cqw; border-radius: 2.5cqw; }
+.wf.phone .wf-logo b { font-size: 2.6cqw; }
+.wf.phone .wf-rail span { width: 13cqw; font-size: 2.6cqw; padding: 1.5cqw 0; }
+.wf.phone .wf-rail span::before { width: 5cqw; height: 5cqw; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--bg); border-top: 1.2cqw solid var(--tc); border-radius: 6cqw 6cqw 0 0; box-shadow: 0 -4px 24px rgba(11,27,51,.14); padding: 3cqw 4cqw; display: grid; gap: 2.4cqw; align-content: start; }
+.sheet::before { content: ""; justify-self: center; width: 14cqw; height: 1.4cqw; border-radius: 9cqw; background: var(--line-strong); }
+.sheet .t { font-weight: 700; font-size: 4.4cqw; }
+.sheet .ln { height: 2.6cqw; border-radius: 1cqw; background: var(--line); }
+.sheet .ln.s { width: 60%; }
+.sheet .blk { border: 1px solid var(--line); background: var(--surface); border-radius: 2.5cqw; padding: 2.4cqw; display: grid; gap: 1.6cqw; }
+.phone .ptop { position: absolute; top: 3cqw; left: 18cqw; right: 3cqw; display: grid; gap: 1.6cqw; }
+.phone .ptop span { background: var(--surface); border: 1px solid var(--line); border-radius: 2cqw; padding: 1.6cqw 2cqw; font-size: 3cqw; box-shadow: var(--shadow); }
+.phone .legend-m { position: absolute; left: 18cqw; right: 3cqw; font-size: 2.8cqw; background: var(--surface); border: 1px solid var(--line); border-radius: 2cqw; padding: 1.2cqw 2cqw; }
+
+/* 상태·인계·체크 */
+.cols2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+.box h4 { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .02em; }
+.box ul, .box ol { margin: 0; padding-left: 18px; font-size: 13.5px; display: grid; gap: 4px; }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; counter-reset: pc; }
+.checks li { display: grid; grid-template-columns: 46px 1fr; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 14px; counter-increment: pc; }
+.checks li:first-child { border-top: 0; }
+.checks li::before { content: attr(data-id); font-family: var(--mono); font-size: 11.5px; color: var(--tc, var(--muted)); padding-top: 2px; }
+.handoff { margin-top: 16px; display: flex; gap: 12px; align-items: baseline; padding: 12px 16px; border-radius: 12px; background: var(--tsoft); font-size: 13.5px; }
+.handoff .arrow { font-family: var(--mono); color: var(--tc); font-weight: 500; white-space: nowrap; }
+.formula { font-family: var(--mono); font-size: 13px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--real); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: nowrap; }
+.realv { color: var(--real); font-family: var(--mono); }
+.issue { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); background: var(--warn-soft); }
+.issue h4 { color: var(--warn); }
+.note { font-size: 13px; color: var(--muted); margin-top: 10px; }
+footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding-inline: 16px; }
+  .index { position: static; padding-block: 24px 0; max-height: none; }
+  .index nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .step:nth-child(3) { border-left: 0; }
+  .step:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .cols2 { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .flow, .screen-card { grid-template-columns: minmax(0, 1fr); }
+  .step { border-left: 0; border-top: 1px solid var(--line); }
+  .step:first-child { border-top: 0; }
+  .screen-card div { border-left: 0 !important; border-top: 1px solid var(--line) !important; }
+  .screen-card div:first-child { border-top: 0 !important; }
+  .track-head .big { font-size: 34px; }
+}
+</style>
+
+<div class="shell">
+  <aside class="index" aria-label="목차">
+    <div class="brand"><span class="mark" aria-hidden="true">P</span><div><b>PlaceOS</b><span>화면설계서 · 2판 · 2026-09-13</span></div></div>
+    <nav>
+      <a href="#flow"><span class="n">—</span>흐름과 인계</a>
+      <a href="#frame"><span class="n">—</span>공통 프레임</a>
+      <div class="sep" role="presentation"></div>
+      <a href="#platform" data-t="platform"><span class="n">1</span>Platform</a>
+      <a href="#page" data-t="page"><span class="n">2</span>Page</a>
+      <a href="#posting" data-t="posting"><span class="n">3</span>Posting</a>
+      <a href="#program" data-t="program"><span class="n">4</span>Program</a>
+      <div class="sep" role="presentation"></div>
+      <a href="#rules"><span class="n">—</span>근거 표기 규칙</a>
+      <a href="#tokens"><span class="n">—</span>토큰</a>
+      <a href="#a11y"><span class="n">—</span>접근성</a>
+      <a href="#nfr"><span class="n">—</span>성능·데이터 기준일</a>
+      <a href="#glossary"><span class="n">—</span>용어집</a>
+      <a href="#open"><span class="n">—</span>미해결·변경 이력</a>
+    </nav>
+  </aside>
+
+  <main>
+    <header class="doc-head">
+      <div class="eyebrow">Screen specification · PPPP · 2판</div>
+      <h1>PlaceOS PPPP 화면설계서</h1>
+      <p>물리적 상권을 네 질문으로 읽는 제품의 화면 넷을 사용 순서대로 적었다 — <b>어떤 플랫폼인가 → 어떤 page 를 놓을까 → 어느 가격대로 posting 할까 → 어떻게 program 을 돌릴까.</b> 목차는 저장소 양식 <span class="mono">docs/prompt-ux-screen-spec.md</span> §3 의 산출 형식(목적 · 레이아웃 · 상태 · 상호작용 · 데이터 바인딩 · 근거 표기 · 토큰 · 접근성 · 통과 조건 · 미해결)을 따른다. 이 문서가 화면의 정본이다 — 코드가 이 문서와 다르면 코드를 고친다.</p>
+      <dl class="meta">
+        <div><dt>판</dt><dd>2판 · 2026-09-13 (1판 대비 사실 오류 4건 수정 · 양식 필수 절 추가)</dd></div>
+        <div><dt>서비스 주소</dt><dd class="mono">placeos.web.app</dd></div>
+        <div><dt>기준 화면</dt><dd>데스크톱 1440×900 · 모바일 ≤768px</dd></div>
+        <div><dt>대상 독자</dt><dd>기획·디자인·개발·파일럿 고객 담당</dd></div>
+      </dl>
+    </header>
+
+    <!-- ═════════ 흐름 · 인계 ═════════ -->
+    <section id="flow">
+      <div class="sec-head">
+        <h2>흐름과 인계</h2>
+        <p class="lede">전통 4P 가 네 트랙에 하나씩 대응한다. 네 화면은 <b>같은 지도와 같은 상권</b>을 공유하고, 앞 화면에서 고른 것을 <b>버튼 하나로</b> 다음 화면에 넘긴다. 무엇이 넘어가는지는 아래 인계 표가 정본이다 — 표에 없는 값은 넘어가지 않는다.</p>
+      </div>
+      <div class="flow">
+        <div class="step" data-t="platform"><span class="conv">PLACE ▶ PLATFORM</span><h3>1 · Platform</h3><span class="q">이 입지·상권은 어떤 플랫폼인가?</span><span class="hand">다음으로 <b>자리 한 곳</b> → 「Page에서 이 건물 보기 →」</span></div>
+        <div class="step" data-t="page"><span class="conv">PRODUCT ▶ PAGE</span><h3>2 · Page</h3><span class="q">이 platform 안에 어떤 page 가 만들어져야 하나?</span><span class="hand">다음으로 <b>건물 한 동</b> → 「이 건물로 입점 검토 →」</span></div>
+        <div class="step" data-t="posting"><span class="conv">PRICE ▶ POSTING</span><h3>3 · Posting</h3><span class="q">어느 가격대의 page 를 이 자리에 올릴까?</span><span class="hand">다음으로 <b>입점 예정 자리</b> → 「이 자리로 홍보 program 만들기 →」</span></div>
+        <div class="step" data-t="program"><span class="conv">PROMOTION ▶ PROGRAM</span><h3>4 · Program</h3><span class="q">posting 한 page 를 어떤 홍보 program 으로 돌릴까?</span><span class="hand">내는 것 <b>채널별 초안</b> — 복사해서 쓴다</span></div>
+      </div>
+
+      <h3>인계 표</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>출발 → 도착</th><th>트리거</th><th>넘기는 값</th><th>받는 쪽이 하는 일</th><th>없을 때</th></tr></thead>
+          <tbody>
+            <tr><th>모든 트랙 ↔ 모든 트랙</th><td>상권 선택기 변경</td><td>상권 id 하나</td><td>다른 트랙을 열면 같은 상권. Page 의 검색어·상태 필터·선택 건물은 비운다(저장 후보는 상권별로 남는다)</td><td>상권이 목록에 없으면 첫 거점으로 떨어진다</td></tr>
+            <tr><th>Platform → Page</th><td>자리 카드 「Page에서 이 건물 보기 →」</td><td>상권 id · 건물 id(<span class="mono">unit_id</span> 에서 <span class="mono">vu-</span> 를 뗀 값) · 건물명</td><td>Page 로 전환, 레이어는 공실, 그 건물 상세를 열고 카메라를 그 건물로 옮긴다</td><td><q>선택한 건물을 이 상권 건물 목록에서 찾지 못했습니다.</q> — 목록은 그대로 둔다</td></tr>
+            <tr><th>Page → Posting</th><td>건물 상세 「이 건물로 입점 검토 →」</td><td>상권 id · 건물 id · 건물명</td><td><span class="mono">vu-{건물 id}</span> 유닛을 찾아 자동 선택하고 한 번 계산</td><td><q>{건물명}과 일치하는 입점 계산 유닛이 없습니다. 계산할 자리를 직접 선택해 주세요.</q> — 첫 자리를 멋대로 고르지 않는다</td></tr>
+            <tr><th>Posting → Program</th><td>결과 아래 「이 자리로 홍보 program 만들기 →」</td><td>상권 id · 자리명 · 좌표 · 면적 · 층 · 월 임대료 · 업종(계산에 쓴 업종, 없으면 직전 업종) · 추천 전략명(계산했을 때만)</td><td>Program 폼의 <b>거점 · 카테고리 · 주소</b>를 채우고 「입점 예정 자리」 안내와 지도 핀을 띄운다. 가게명·리뷰는 비워 둔다(입점할 기업이 넣는다)</td><td>업종이 없으면 카테고리를 비운다. 자리가 없으면 버튼이 비활성</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">인계는 화면에 보이는 입력칸을 채우는 방식으로만 한다. 채운 값은 사용자가 그대로 보고 고칠 수 있어야 한다 — 보이지 않는 값을 생성 요청에 몰래 싣지 않는다.</p>
+    </section>
+
+    <!-- ═════════ 공통 프레임 ═════════ -->
+    <section id="frame">
+      <div class="sec-head">
+        <h2>공통 프레임</h2>
+        <p class="lede">네 화면이 같은 틀 위에 선다. 여기 적은 규칙은 트랙마다 반복하지 않는다.</p>
+      </div>
+
+      <h3>불변 조건 <span class="tpl">양식 §1</span></h3>
+      <div class="cols2" style="margin-top:0">
+        <div class="box"><h4>C1 · 지도는 배경이고 하나다</h4><ul>
+          <li>네이버 지도 캔버스가 뷰포트 전체(<span class="mono">position:fixed; inset:0</span>)를 쓰고, 나머지는 전부 그 위 오버레이다. 패널이 지도를 밀어내면 위반.</li>
+          <li>지도 인스턴스는 앱 수명 동안 하나. 탭을 바꿔도 언마운트·재생성하지 않고 오버레이만 갈아끼운다.</li>
+          <li>캔버스는 <span class="mono">width/height:100%</span> 를 같이 준다(SDK 가 position 을 덮어써 높이가 0 이 되는 함정).</li>
+        </ul></div>
+        <div class="box"><h4>C2 · 상권 선택은 화면 전환이 아니다</h4><ul>
+          <li>상권을 고르면 같은 지도 안에서 카메라 이동 · 트랙별 표식 · 패널 내용이 함께 바뀐다. 다른 페이지로 넘어가지 않는다.</li>
+          <li>상권은 네 트랙이 공유한다(인계 표 첫 줄).</li>
+          <li>거점 수·건물 수 같은 가변 숫자는 문구에 박지 않고 API 응답에서 센다.</li>
+        </ul></div>
+      </div>
+
+      <h3>레이아웃 맵 — 데스크톱 <span class="tpl">양식 2번 · ≥1024px</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>슬롯</th><th>좌표·크기</th><th>z</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><th>지도 캔버스</th><td class="mono">fixed · inset 0 · 100%×100%</td><td class="mono">0</td><td>레일 아래까지 깔린다</td></tr>
+            <tr><th>좌측 레일</th><td class="mono">fixed · left 0 · top 0 · bottom 0 · w 64</td><td class="mono">1200</td><td>반투명(표면 84%) + blur 10px. 로고 34×34 + 워드마크, 버튼 56×48 넷</td></tr>
+            <tr><th>오버레이 층</th><td class="mono">absolute · inset 0 0 0 64</td><td class="mono">—</td><td><span class="mono">pointer-events:none</span> — 빈 자리는 지도 드래그가 통과, 자식만 이벤트를 받는다</td></tr>
+            <tr><th>트랙 패널(Platform·Posting·Program)</th><td class="mono">top 12 · left 12 · bottom 12 · w min(560, 100%−24)</td><td class="mono">5</td><td>윗변 3px 트랙 색 · 오른쪽 위 접기 버튼 28×28(top 8 · right 8) · 내부 스크롤</td></tr>
+            <tr><th>트랙 패널 펴기 버튼</th><td class="mono">top 12 · left 12 · h 40</td><td class="mono">5</td><td>접었을 때만. 문구 <q>☰ {패널 이름}</q></td></tr>
+            <tr><th>Page 상단 바</th><td class="mono">top 12 · left 12 · right 12 · h 40</td><td class="mono">5</td><td>상권 선택(≤240) · 검색(260) · 레이어 세그먼트</td></tr>
+            <tr><th>Page 목록 패널</th><td class="mono">top 64 · left 12 · bottom 12 · w 360</td><td class="mono">5</td><td>1024~1050px 에서는 top 112(상단 바가 두 줄)</td></tr>
+            <tr><th>Page 범례</th><td class="mono">right 12 · bottom 12</td><td class="mono">5</td><td>지금 그려진 것만 말한다</td></tr>
+            <tr><th>Page 시간 슬라이더</th><td class="mono">bottom 12 · 가운데 · 슬라이더 w 200</td><td class="mono">5</td><td>유동인구 레이어에서만</td></tr>
+            <tr><th>모달(층별 공실·거리뷰)</th><td class="mono">absolute · inset 0 · 상자 min(560, 92vw)×min(460, 80vh)</td><td class="mono">20</td><td>바탕 반투명 잉크 50%</td></tr>
+            <tr><th>대화상자(후보 비교)</th><td class="mono">&lt;dialog&gt; top layer</td><td class="mono">top layer</td><td>닫으면 여는 버튼으로 포커스 복귀</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>레이아웃 맵 — 모바일 <span class="tpl">양식 2번 · ≤768px</span></h3>
+      <div class="phones">
+        <figure data-t="platform">
+          <div class="wf phone" role="img" aria-label="모바일 트랙 화면: 좌측 52px 레일, 하단 58% 높이 시트">
+            <div class="wf-rail"><div class="wf-logo"><i>P</i><b>PlaceOS</b></div><span class="on">Platform</span><span>Page</span><span>Posting</span><span>Program</span></div>
+            <div class="m-bound" style="left:30%;top:10%;width:60%;height:28%"></div>
+            <div class="m-chip on" style="left:55%;top:24%"><span>카페</span></div>
+            <div class="sheet" style="height:58%"><div class="t">이 입지·상권은 어떤 플랫폼인가</div><div class="ln"></div><div class="ln s"></div><div class="blk"><div class="ln"></div><div class="ln s"></div></div><div class="blk"><div class="ln s"></div></div></div>
+          </div>
+          <figcaption>트랙 패널 → 하단 시트 58dvh</figcaption>
+        </figure>
+        <figure data-t="page">
+          <div class="wf phone" role="img" aria-label="모바일 Page 화면: 상단 컨트롤 두 줄, 하단 52% 시트, 시트 위 범례">
+            <div class="wf-rail"><div class="wf-logo"><i>P</i><b>PlaceOS</b></div><span>Platform</span><span class="on">Page</span><span>Posting</span><span>Program</span></div>
+            <div class="ptop"><span>신사동 가로수길 ▾ · 건물 검색</span><span>유동 · 공실 · 임대 · 밀도</span></div>
+            <span class="m-dot" style="left:50%;top:30%"></span><span class="m-dot" style="left:70%;top:38%"></span>
+            <div class="legend-m" style="bottom:55%">● 공실의심 · 확대하면 건물별</div>
+            <div class="sheet" style="height:52%"><div class="t">신사동 가로수길 · 건물 공실</div><div class="ln s"></div><div class="blk"><div class="ln"></div><div class="ln s"></div></div><div class="blk"><div class="ln"></div><div class="ln s"></div></div></div>
+          </div>
+          <figcaption>Page 목록 → 하단 시트 52dvh</figcaption>
+        </figure>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>슬롯</th><th>모바일 규칙</th></tr></thead>
+          <tbody>
+            <tr><th>레일</th><td class="mono">w 52 · 로고 30×30 · 라벨 9.5px</td></tr>
+            <tr><th>트랙 패널</th><td>하단 시트 <span class="mono">left 0 · right 0 · bottom 0 · h 58dvh</span>, 위 모서리 16px, 그림자 <span class="mono">--shadow-sheet</span>. 펴기 버튼은 <span class="mono">bottom 12 · left 12</span></td></tr>
+            <tr><th>Page 목록</th><td>하단 시트 <span class="mono">h 52dvh</span> + 손잡이. 건물을 고르면 조건·목록을 숨기고 상세만 시트를 채운다</td></tr>
+            <tr><th>Page 범례·슬라이더</th><td>시트 위로 올린다 — 범례 <span class="mono">bottom 52dvh+12</span>, 슬라이더 <span class="mono">bottom 52dvh+76</span></td></tr>
+            <tr><th>카메라 맞춤</th><td>시트 높이만큼 아래 여백(<span class="mono">bottom = 화면높이×0.52~0.58 + 16~24</span>)을 준다</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">⚠ 시트 높이를 끌어서 바꾸는 제스처는 아직 없다. 손잡이는 모양 단서일 뿐이다(미해결 표 참조).</p>
+
+      <h3>지도 표식 규칙</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>표식</th><th>쓰는 곳</th><th>모양</th><th>누르면</th></tr></thead>
+          <tbody>
+            <tr><th>라벨 칩</th><td>금액·업종·이름처럼 글자로 말해야 하는 값 — Platform 자리 · Page 임대시세 · Posting 자리 · Program 행사·가게</td><td>흰 바탕 + 1.5px 테두리(트랙 색 · 실측 출처 색 · 잉크) + 꼬리. <b>선택되면 색으로 채움</b>, <b>점선 = 추정</b></td><td><b>패널에서 같은 항목을 고른 것과 똑같이 동작한다.</b> 칩마다 패널에 키보드로 닿는 같은 동작이 반드시 있다</td></tr>
+            <tr><th>공실 점</th><td>Page 공실 z≤16</td><td>지름 13px 빨간 점 + 흰 테두리</td><td>그 건물 선택</td></tr>
+            <tr><th>건물 폴리곤</th><td>Page 공실 z≥17</td><td>공실 4색 채움 60% · 호버는 잉크 테두리 4px(색은 안 바꾼다)</td><td>그 건물 선택</td></tr>
+            <tr><th>실측 범위 선</th><td>Platform</td><td>트랙 색 점선 2.5px · 채움 7% · 1칸짜리 조각은 채우지 않음</td><td>반응 없음(밑의 칩이 클릭을 받는다)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>공통 상태</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>상태</th><th>지도</th><th>오버레이</th><th>문구</th></tr></thead>
+          <tbody>
+            <tr><th>트랙 화면 처음 여는 중</th><td>그대로</td><td>왼쪽 위 작은 상자</td><td><q>화면 불러오는 중…</q></td></tr>
+            <tr><th>지도 인증 실패</th><td>회색 바탕 위 안내(레일 오른쪽 전체)</td><td>패널은 그대로 떠 있고 쓸 수 있다</td><td><q>네이버 지도를 불러오지 못했습니다</q> + SDK 오류 + <q>NCP 콘솔 &gt; Maps &gt; Application 의 Web 서비스 URL 에 {현재 origin} 을 등록해야 합니다.</q></td></tr>
+            <tr><th>거점 목록 API 실패</th><td>기본 중심(가로수길)</td><td>트랙마다 자기 문구</td><td>Platform <q>거점 목록을 불러오지 못했습니다.</q> · Program <q>거점 목록을 불러오지 못했다 — 백엔드 확인 필요…</q> · Page·Posting 은 기본 거점으로 계속</td></tr>
+            <tr><th>예외 거점</th><td>그대로</td><td>상권 선택기 옵션 앞 표식 + 선택하면 문구 전문</td><td>▣ 단일시설 · ▤ 계획상가 밀집 · ▨ 대표값 미제공 — 전문은 <span class="mono">caveat</span> 원문</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>숨은 화면</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>주소</th><th>화면</th><th>규칙</th></tr></thead>
+          <tbody>
+            <tr><th class="mono">#board</th><td>종전 거점 보드(PageDashboard)</td><td>레일에 버튼 없음. 층별 매물·입점·마케팅 섹션의 이사가 끝나면 삭제 예정</td></tr>
+            <tr><th class="mono">#admin</th><td>관리자 커버리지(AdminCoverage)</td><td>레일에 버튼 없음. 데이터는 <span class="mono">X-Admin-Token</span> 이 있어야 온다 — 지도에서 제외된 건물 수는 공개 대상이 아니다</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>키보드 — 네 화면 공통</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>키</th><th>반응</th></tr></thead>
+          <tbody>
+            <tr><th><kbd>Tab</kbd></th><td>레일 → (Page) 상단 바 → 패널 순. 지도 캔버스는 탭 순서에서 뺀다(<span class="mono">tabindex=-1</span>)</td></tr>
+            <tr><th><kbd>Esc</kbd></th><td><b>입력칸(input·textarea·select)에 포커스가 있으면 아무것도 닫지 않는다.</b> 그 밖에서는 가장 위의 한 겹만 닫는다 — Page: 층별 공실·거리뷰 → 후보 비교 → 건물 상세 → 목록 패널 / 트랙: 열린 대화상자가 없을 때 패널</td></tr>
+            <tr><th>접기·펴기</th><td>‹ 로 접으면 포커스가 펴기 버튼으로, 펴기 버튼으로 열면 포커스가 ‹ 로 간다</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>공통 통과 조건 <span class="tpl">양식 9번</span></h3>
+      <ol class="checks">
+        <li data-id="C-01">레일에 PlaceOS 로고와 Platform · Page · Posting · Program 네 버튼만 있다.</li>
+        <li data-id="C-02">네 탭을 오가도 지도가 깜빡이거나 다시 만들어지지 않는다(표식만 바뀐다).</li>
+        <li data-id="C-03">트랙 패널의 ‹ 를 누르면 지도가 화면 전체가 되고 포커스가 「☰ …」 버튼에 있다. 다시 누르면 패널이 열리고 포커스가 ‹ 에 있다.</li>
+        <li data-id="C-04">검색칸·입력칸에서 <kbd>Esc</kbd> 를 눌러도 패널이 닫히지 않는다.</li>
+        <li data-id="C-05">상권을 바꾸면 스크린리더가 <q>상권 {이름} 선택됨</q> 을 읽고, 다른 탭을 열어도 같은 상권이다.</li>
+        <li data-id="C-06">지도 인증 실패 시 회색 빈 화면이 아니라 원인·등록할 origin 문구가 뜨고 패널은 계속 쓸 수 있다.</li>
+        <li data-id="C-07">768px 이하에서 패널은 하단 시트가 되고 지도 폭이 줄지 않는다.</li>
+      </ol>
+    </section>
+
+    <!-- ═════════ 1 Platform ═════════ -->
+    <section id="platform" data-t="platform">
+      <div class="track-head"><span class="big">1</span><span class="conv">PLACE ▶ PLATFORM · 진입점: 레일 첫 번째</span><h2>Platform — 상권 정체성</h2></div>
+      <p class="question">이 입지·상권은 어떤 플랫폼인가? 그 안 어느 빈 자리에 어떤 업소가 들어오면 좋은가?</p>
+      <dl class="screen-card">
+        <div><dt>화면 목적</dt><dd>상권을 하나의 플랫폼으로 읽어 유형·수요·밖에서의 이름을 한 문장으로 답하고, 빈 자리별 업종 후보를 지도에 건다.</dd></div>
+        <div><dt>막는 오해</dt><dd>지도의 점선을 <b>상권 경계</b>로 읽는 것 — 그 선은 공실률 분모에 들어간 실측 범위다.</dd></div>
+        <div><dt>주사용자</dt><dd>프랜차이즈 본사 출점팀 · 자산운용사 — 이 상권이 우리 브랜드·자산에 맞는 플랫폼인지 가른다</dd></div>
+        <div><dt>이 화면의 결론</dt><dd>「유형」 한 줄 + 근거 3줄, 그리고 비교할 자리 2~3곳</dd></div>
+        <div class="wide"><dt>다루지 않는 것</dt><dd>건물별 층 공실·임대료(Page) · 비용 계산(Posting) · 감성 점수(전 거점 미측정)</dd></div>
+      </dl>
+
+      <div class="wf-scroll">
+        <div class="wf" role="img" aria-label="Platform 화면 와이어프레임: 좌측 패널에 결론과 근거, 지도에 실측 범위 점선과 자리별 업종 칩">
+          <div class="wf-rail"><div class="wf-logo"><i>P</i><b>PlaceOS</b></div><span class="on">Platform</span><span>Page</span><span>Posting</span><span>Program</span></div>
+          <div class="m-bound" style="left:50%;top:14%;width:34%;height:62%"></div>
+          <div class="m-chip on" style="left:62%;top:36%"><span>카페<small>31평</small></span></div>
+          <div class="m-chip" style="left:74%;top:48%"><span>패션<small>54평</small></span></div>
+          <div class="m-chip" style="left:57%;top:60%"><span>음식점<small>22평</small></span></div>
+          <div class="m-chip dash" style="left:79%;top:27%"><span>추천 없음<small>18평</small></span></div>
+          <div class="wf-panel">
+            <span class="wf-x">‹</span>
+            <div class="ey">PLACEOS · PLATFORM · PLACE ▶ PLATFORM</div>
+            <div class="hq">이 입지·상권은 어떤 플랫폼인가</div>
+            <div class="verdict">{상권명} — <b>「유형」</b> 플랫폼이다 (최대 업종군 비중 · 점포 수).</div>
+            <div class="grounds">
+              <div><b>무엇이 모여 있나</b><span>업종군 상위 3 · 비중 · 곳수</span></div>
+              <div><b>누가 · 언제 오나</b><span>유동 최다 시간대 · 빈틈 · 연령 · 여성 비중</span></div>
+              <div><b>밖에서 뭐라고 불리나</b><span>블로그 언급 상위 3 · 검색 트렌드</span></div>
+            </div>
+            <div class="srcline">출처 카카오 플레이스 · TRDAR · 네이버 데이터랩 · LSTM · GNN · R-ONE 앵커</div>
+            <div class="row"><span class="ctl">상권 {상권명} · {구} ▾</span><span class="pill">공실률 {n}% 실측</span><span class="pill">지도 선: 실측 범위</span></div>
+            <div class="fold">정체성 원자료 <span class="lbl">업종 · 시간대 · 키워드 · 트렌드</span></div>
+            <div class="card" style="display:grid;gap:.4cqw"><div class="row" style="justify-content:space-between"><b style="font-size:.95cqw">어느 자리에 어떤 업소가 들어오면 좋나</b><span class="lbl">비교 후보 1/3곳</span></div>
+              <div class="row"><span class="pill">☑ 자리 A · 카페 46%</span><span class="pill">☐ 자리 B</span><span class="pill">☐ 자리 C</span></div>
+              <div class="row"><span class="btn ghost">Page에서 이 건물 보기 →</span><span class="btn">선택한 1곳 비교</span></div></div>
+            <div class="fold">모델 근거 <span class="lbl">LSTM · GNN</span></div>
+            <div class="fold">구역 <span class="lbl">행정동 실측</span></div>
+          </div>
+          <span class="co" style="left:42%;top:21%">1</span><span class="co" style="left:42%;top:52%">2</span><span class="co" style="left:42%;top:64%">3</span><span class="co" style="left:42%;top:78%">4</span><span class="co" style="left:49%;top:12%">5</span><span class="co" style="left:66%;top:28%">6</span>
+        </div>
+      </div>
+      <p class="wf-cap">중괄호는 응답 값이 들어가는 자리, 업종·평수는 배치 설명용 예시다.</p>
+
+      <h3>구성요소</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>영역</th><th>내용</th><th>동작</th></tr></thead>
+          <tbody>
+            <tr><td class="no"><span class="num-badge">1</span></td><td>결론 머리</td><td>질문 헤드라인 → 결론 1줄 → 근거 3줄(4줄째 「어디로 가고 있나」는 접힘) → 출처 줄(접지 않음) → 「이 화면을 읽는 법」</td><td>—</td></tr>
+            <tr><td class="no"><span class="num-badge">2</span></td><td>상권 선택 · 칩</td><td>상권(구 표기, 예외 표식) · 유형 · 공실률(실측/합성) · 건물 수 · 지도 선 배지</td><td>바꾸면 공유 상권이 바뀌고 비교 후보가 빈다</td></tr>
+            <tr><td class="no"><span class="num-badge">3</span></td><td>자리 제안 접힘</td><td>현재 비교 후보(최대 3) · 자리 카드 9장씩(더 보기) · 카드마다 체크박스 · 면적/층/호/공실률 · GNN 추천 막대 · 상권 평균 대비 · 직전 업종 · <b>「Page에서 이 건물 보기 →」</b> · 2곳 이상이면 비교표</td><td>체크 = 칩 채움. 버튼 = Page 로 인계</td></tr>
+            <tr><td class="no"><span class="num-badge">4</span></td><td>나머지 접힘</td><td>정체성 원자료(업종 막대·시간대·키워드·트렌드) · 모델 근거(LSTM +1~4분기 · GNN Top-3 vs 사전확률) · 구역(행정동)</td><td>요약줄이 안에 든 개수를 말한다</td></tr>
+            <tr><td class="no"><span class="num-badge">5</span></td><td>지도 · 실측 범위</td><td>100m 격자 외곽선, 트랙 색 점선. 조각은 조각대로</td><td>진입·상권 변경 시 카메라를 범위 bbox 에 맞춘다(패널 폭 +48 비킴)</td></tr>
+            <tr><td class="no"><span class="num-badge">6</span></td><td>지도 · 자리 칩</td><td>상권 평균 대비 두드러진 업종 → 없으면 GNN 1위 → 없으면 <q>추천 없음</q>(점선). 보조 글자 면적(평)</td><td>누르면 비교 후보 토글 + 자리 제안 접힘을 편다(한 번 펴면 마지막 후보를 빼도 접지 않는다)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>자리 비교표 행</h3>
+      <p>면적 · 층 · 재고 · 공실률 · 추천 노드까지 거리 · GNN 추천 점수(0~1) · 상권 평균 대비 두드러진 업종 · 해당 업종의 자리 점수 · 해당 업종의 상권 평균 · 상권 평균 대비 차이(p) · 직전 업종. 값이 없으면 <q>미제공</q>, 0 은 0 으로 적는다.</p>
+
+      <h3>상태표 <span class="tpl">양식 3번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>상태</th><th>지도</th><th>패널</th><th>문구</th></tr></thead>
+          <tbody>
+            <tr><th>초기(공유 상권)</th><td>경계 계산 후 bbox 로 이동</td><td>결론·근거 로딩 문구</td><td><q>{상권명} — 상권 정체성을 불러오는 중이다.</q></td></tr>
+            <tr><th>로딩</th><td>이전 상권 표식은 즉시 걷음</td><td>본문 자리</td><td><q>상권 정체성 불러오는 중…</q></td></tr>
+            <tr><th>정상</th><td>점선 + 칩</td><td>결론·근거·접힘</td><td>—</td></tr>
+            <tr><th>실측 범위 없음</th><td>선 없음</td><td>칩 <q>지도 선: 실측 범위 없음</q></td><td>—</td></tr>
+            <tr><th>업종 근거 없음</th><td>칩만</td><td>결론</td><td><q>{상권명} — 업종 근거가 없어 유형을 판정하지 않는다.</q></td></tr>
+            <tr><th>대표값 미제공</th><td>그대로</td><td>공실률 칩</td><td><q>대표값 미제공</q>(0% 아님)</td></tr>
+            <tr><th>Platform 산출물 없음(404)</th><td>선만(있으면)</td><td>오류 상자</td><td><q>이 상권의 Platform 산출물이 없습니다.</q> / <q>이 도시에는 아직 Platform 소스(업종 구성·감성·트렌드)를 수집하지 않았다.</q></td></tr>
+            <tr><th>API 실패(5xx·네트워크)</th><td>그대로</td><td>오류 상자</td><td>제목 + 원문(진단용)</td></tr>
+            <tr><th>자리 0곳</th><td>칩 없음</td><td>접힘 안</td><td><q>이 상권에는 실측 공실 자리가 없다.</q></td></tr>
+            <tr><th>예측·추천 산출물 없음</th><td>—</td><td>모델 근거 카드</td><td><q>이 거점의 예측 산출물이 없다 — …</q> · <q>이 거점의 추천 산출물이 없다 — …</q></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>상호작용 <span class="tpl">양식 4번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>트리거</th><th>반응</th><th>목표 시간</th></tr></thead>
+          <tbody>
+            <tr><td>레일 Platform</td><td>패널 표시 → 경계 요청 → 카메라 맞춤</td><td class="tnum">첫 진입 1초 · 재진입 즉시</td></tr>
+            <tr><td>상권 변경</td><td>비교 후보 비움 · 표식 교체 · 결론 재계산</td><td class="tnum">3초 이내</td></tr>
+            <tr><td>자리 칩 · 체크박스</td><td>비교 후보 수 갱신(<span class="mono">role=status</span>) · 칩 채움</td><td class="tnum">즉시(&lt;100ms)</td></tr>
+            <tr><td>「Page에서 이 건물 보기 →」</td><td>Page 전환 · 건물 상세 · 카메라 이동</td><td class="tnum">건물 목록 도착 후 즉시</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>데이터 바인딩 <span class="tpl">양식 5번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>화면 요소</th><th>API · 필드</th><th>없을 때 문구</th><th>출처 배지</th></tr></thead>
+          <tbody>
+            <tr><td>유형 · 규칙</td><td class="mono">GET /commercial-districts/{id}/platform → identity.archetype · archetype_rule</td><td><q>업종 근거가 없어 유형을 판정하지 않는다.</q></td><td>출처 줄 identity.source</td></tr>
+            <tr><td>업종 구성</td><td class="mono">identity.categories.groups[] · total · ungrouped</td><td><q>업종 라벨 없음</q></td><td>archetype_rule</td></tr>
+            <tr><td>누가·언제</td><td class="mono">identity.demand.bands · peak_band · gap_band · ages · female_share</td><td><q>TRDAR 수요신호 없음</q></td><td>TRDAR 상권 단위</td></tr>
+            <tr><td>키워드 · 트렌드</td><td class="mono">identity.keywords.words · trends[]</td><td><q>블로그 언급 없음</q></td><td>네이버 블로그 빈도 · 데이터랩</td></tr>
+            <tr><td>자리 카드 · 칩</td><td class="mono">openings.sites[] (unit_id · lat · lng · area_py · floor · recommendations · distinct · was)</td><td><q>면적 미제공</q> · <q>층 미제공</q> · <q>공실률 미제공</q> · <q>반경 안에 그래프 노드가 없다 — 거점 평균으로 채우지 않는다.</q></td><td>openings.source</td></tr>
+            <tr><td>실측 범위 선</td><td class="mono">GET /heatmap/vacancy?district={id} → cells[]</td><td><q>실측 범위 없음</q></td><td>지도 선 배지</td></tr>
+            <tr><td>공실률 칩</td><td class="mono">DistrictSummary.vacancy_rate · vacancy_withheld · vacancy_source</td><td><q>대표값 미제공</q> / <q>실측 없음</q></td><td>실측 · 합성</td></tr>
+            <tr><td>예측</td><td class="mono">POST /ai/predict-vacancy → forecast_vac_proxy · delta · horizons</td><td>404 문구</td><td>LSTM · vac_proxy</td></tr>
+            <tr><td>추천</td><td class="mono">POST /ai/recommend-industry → recommendations · metrics</td><td>404 문구 · stub 이면 그리지 않음</td><td>GNN · 사전확률 대비</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>통과 조건 <span class="tpl">양식 9번</span></h3>
+      <ol class="checks">
+        <li data-id="PL-01">레일 Platform 을 누르면 지도가 남은 채 왼쪽 패널 「상권 정체성」이 뜨고, 지도에 점선 실측 범위가 그려진다.</li>
+        <li data-id="PL-02">패널 칩이 <q>지도 선: 실측 범위…</q> 로 그 선이 무엇인지 말한다.</li>
+        <li data-id="PL-03">자리 칩을 누르면 「어느 자리에…」가 펼쳐지고 비교 후보가 1 늘며 칩이 색으로 채워진다.</li>
+        <li data-id="PL-04">비교 후보가 3곳이면 넷째 체크박스가 비활성이다.</li>
+        <li data-id="PL-05">자리 카드의 「Page에서 이 건물 보기 →」를 누르면 Page 로 넘어가 그 건물 상세가 열린다.</li>
+        <li data-id="PL-06">상권을 바꾸면 비교 후보가 0/3 이 되고, Page 를 열어도 같은 상권이다.</li>
+        <li data-id="PL-07">Platform 산출물이 없는 상권에서 원문 에러 대신 <q>이 상권의 Platform 산출물이 없습니다.</q> 가 뜬다.</li>
+      </ol>
+      <div class="handoff"><span class="arrow">1 → 2</span><span>「Page에서 이 건물 보기 →」 — 인계 표 참조. 상권만 옮기고 싶으면 레일에서 Page 를 누른다.</span></div>
+    </section>
+
+    <!-- ═════════ 2 Page ═════════ -->
+    <section id="page" data-t="page">
+      <div class="track-head"><span class="big">2</span><span class="conv">PRODUCT ▶ PAGE · 진입점: 앱 첫 화면 · 레일 두 번째</span><h2>Page — 건물 공실과 임대시세</h2></div>
+      <p class="question">이 platform 안에 어떤 page 가 만들어져야 하는가 — 어느 건물 몇 층이 비었고, 그 자리는 월 얼마인가?</p>
+      <dl class="screen-card">
+        <div><dt>화면 목적</dt><dd>빈 건물을 지도에서 먼저 찾고, 층·임대료·거리뷰로 후보 3곳까지 좁힌다.</dd></div>
+        <div><dt>막는 오해</dt><dd>R-ONE 추정 임대료를 <b>호가</b>로, 공실의심을 <b>확정 공실</b>로 읽는 것.</dd></div>
+        <div><dt>주사용자</dt><dd>출점 담당 · 자산운용사 리싱 담당 — 답사할 건물 후보를 추린다</dd></div>
+        <div><dt>이 화면의 결론</dt><dd>저장한 후보 최대 3곳과 각 후보의 빈 층·월 임대료</dd></div>
+        <div class="wide"><dt>다루지 않는 것</dt><dd>업종 적합성 판정(Platform) · 회수기간(Posting) · 호가·보증금·권리금</dd></div>
+      </dl>
+
+      <figure>
+        <div class="wf-scroll">
+          <div class="wf" role="img" aria-label="Page 공실 레이어: 상단 검색과 레이어 토글, 좌측 건물 목록, 지도에 빨간 공실 점">
+            <div class="wf-rail"><div class="wf-logo"><i>P</i><b>PlaceOS</b></div><span>Platform</span><span class="on">Page</span><span>Posting</span><span>Program</span></div>
+            <div class="wf-top"><span class="ctl">{상권명} · 공실 {n}% ▾</span><span class="ctl grow">건물 검색 ({상권명})</span><div class="wf-seg"><span>유동인구</span><span class="on">공실</span><span>임대시세</span><span>인구밀도</span></div></div>
+            <span class="m-dot" style="left:48%;top:40%"></span><span class="m-dot" style="left:55%;top:52%"></span><span class="m-dot" style="left:63%;top:34%"></span><span class="m-dot" style="left:70%;top:60%"></span><span class="m-dot" style="left:80%;top:44%"></span><span class="m-dot" style="left:59%;top:70%"></span>
+            <div class="wf-panel narrow">
+              <div class="sp-head"><div class="ey">PRODUCT ▶ PAGE</div><div class="t">{상권명} · 건물 공실</div><div class="lbl">{구} · {n}동 · 실측(추정) · 거점 {n}%</div></div>
+              <div class="sp-sec row"><span class="ctl">전체 상태 ▾</span><span class="ctl">저장한 후보 0</span><span class="ctl">지도 범위만</span></div>
+              <div class="sp-sec lbl"><b style="color:var(--ink)">N</b>동 · 조건에 맞는 M동 중 지금 화면 안</div>
+              <div class="item"><i style="background:var(--empty)"></i><span><b>건물 A</b><em>업종 · 공실의심</em></span><span style="color:var(--empty)">100%</span></div>
+              <div class="item"><i style="background:var(--high)"></i><span><b>건물 B</b><em>업종 · 고공실</em></span><span style="color:var(--high)">67%</span></div>
+              <div class="item"><i style="background:var(--full)"></i><span><b>건물 C</b><em>업종 · 만실</em></span><span style="color:var(--full)">0%</span></div>
+            </div>
+            <div class="wf-legend"><span><i style="background:var(--empty)"></i>공실의심</span><span>공실의심만 표시 · 확대하면 건물별 상태</span></div>
+            <span class="co" style="left:30%;top:9%">1</span><span class="co" style="left:30%;top:18%">2</span><span class="co" style="left:30%;top:30%">3</span><span class="co" style="left:30%;top:46%">4</span><span class="co" style="left:52%;top:36%">6</span>
+          </div>
+        </div>
+        <figcaption>공실 레이어(기본) · z16 이하 공실의심만 점, z17 이상 건물 폴리곤 4색</figcaption>
+      </figure>
+      <figure style="margin-top:18px">
+        <div class="wf-scroll">
+          <div class="wf" role="img" aria-label="Page 임대시세 레이어: 좌측에 층별 평당 임대료 표, 지도에 월 임대료 칩">
+            <div class="wf-rail"><div class="wf-logo"><i>P</i><b>PlaceOS</b></div><span>Platform</span><span class="on">Page</span><span>Posting</span><span>Program</span></div>
+            <div class="wf-top"><span class="ctl">{상권명} · 공실 {n}% ▾</span><span class="ctl grow">건물 검색</span><div class="wf-seg"><span>유동인구</span><span>공실</span><span class="on">임대시세</span><span>인구밀도</span></div></div>
+            <div class="m-chip real" style="left:52%;top:38%"><span>월 740만<small>1F 30평</small></span></div>
+            <div class="m-chip real dash" style="left:66%;top:50%"><span>월 333만<small>2F 30평</small></span></div>
+            <div class="m-chip real on" style="left:75%;top:32%"><span>월 1,286만~<small>빈 층 3</small></span></div>
+            <div class="m-chip real" style="left:60%;top:70%"><span>월 412만<small>3F 34평</small></span></div>
+            <div class="wf-panel narrow">
+              <div class="sp-head"><div class="ey">PRODUCT ▶ PAGE</div><div class="t">{상권명} · 건물 공실</div></div>
+              <div class="sp-sec" style="background:var(--real-soft)"><div class="row" style="justify-content:space-between"><b style="font-size:.95cqw">층별 평당 월 임대료</b><span class="lbl" style="color:var(--real)">R-ONE · 26년 2분기</span></div>
+                <div class="floors"><div>지하1<b>18.5만</b></div><div>1층<b>24.7만</b></div><div>2층<b>11.1만</b></div><div>3층<b>9.9만</b></div><div>4층+<b>7.4만</b></div></div>
+                <div class="lbl" style="margin-top:.3cqw">빈 층 매물 {n}곳 · 월 {min}~{max}만원 · 보증금·권리금·관리비 제외 · 호가가 아닌 추정</div></div>
+              <div class="item"><i style="background:var(--empty)"></i><span><b>건물 A</b><em>수용 2호 · 영업 0호</em><span class="m">빈 층 1개 · 월 740만원</span></span><span style="color:var(--empty)">100%</span></div>
+              <div class="item"><i style="background:var(--high)"></i><span><b>건물 B</b><em>수용 6호 · 영업 2호</em><span class="m">빈 층 3개 · 월 1,286~2,140만원</span></span><span style="color:var(--high)">67%</span></div>
+            </div>
+            <div class="wf-legend"><span>칩 = 빈 층 월 임대료(추정) · 1층 평당 <b style="color:var(--real)">24.7만원</b> · 건물별 가장 싼 빈 층 · 점선 = 추정 공실</span></div>
+            <span class="co" style="left:30%;top:27%">7</span><span class="co" style="left:66%;top:22%">8</span>
+          </div>
+        </div>
+        <figcaption>임대시세 레이어 · 층별 평당 표는 가로수길 실제 값(26년 2분기), 매물 칩 금액은 예시</figcaption>
+      </figure>
+
+      <h3>구성요소</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>영역</th><th>내용</th><th>동작</th></tr></thead>
+          <tbody>
+            <tr><td class="no"><span class="num-badge">1</span></td><td>상단 바</td><td>상권 선택(실측 거점만, <span class="mono">aria-label="상권 선택"</span>) · 건물 검색 · 레이어 4종</td><td>유동·밀도는 그 레이어를 누를 때만 요청</td></tr>
+            <tr><td class="no"><span class="num-badge">2</span></td><td>패널 머리</td><td>PRODUCT ▶ PAGE · 상권명 · 구 · 동 수 · 실측/샘플 · 거점 공실률 · R-ONE 앵커 격차</td><td>‹ 로 목록 접기 → <q>☰ 건물 목록</q></td></tr>
+            <tr><td class="no"><span class="num-badge">3</span></td><td>조건 · 건수</td><td>공실 상태 · 저장한 후보 N · 지도 범위만/거점 전체 · 조건 초기화 · 건수(<span class="mono">aria-live</span>)</td><td>지도를 옮기면 목록이 화면 범위로 좁혀짐</td></tr>
+            <tr><td class="no"><span class="num-badge">4</span></td><td>건물 목록</td><td>상태 점 · 이름 · 업종·상태 · 수용/영업 · 지상 층수 · 공실률 · 「+ 후보 저장」(상권당 3곳) · 임대시세일 때 빈 층 금액 줄</td><td>호버·포커스 ↔ 지도 강조. 누르면 상세(임대시세 레이어는 유지)</td></tr>
+            <tr><td class="no"><span class="num-badge">5</span></td><td>건물 상세</td><td>공실률 · 상태 · 수용/영업 · 대표 업종 · GNN 업종 추천 · 빈 층 임대료 표 · 「층별 공실 · 거리뷰 보기」 · 후보 저장 · 「이 건물로 입점 검토 →」</td><td>입점 검토 → Posting 인계</td></tr>
+            <tr><td class="no"><span class="num-badge">6</span></td><td>지도 · 공실</td><td>z≤16 공실의심 점 · z≥17 폴리곤 4색. 선택된 건물이 바뀌면 카메라를 그 건물로</td><td>점·도형 클릭 = 목록 클릭</td></tr>
+            <tr><td class="no"><span class="num-badge">7</span></td><td>임대시세 · 패널</td><td>층별 평당 표(지하1·1층·2층·3층·4층+) · 매물 수 · 월 범위 · 제외 항목</td><td>—</td></tr>
+            <tr><td class="no"><span class="num-badge">8</span></td><td>임대시세 · 지도</td><td>z≤16 반경 ~160m 거리 묶음 칩 <q>월 {min}만~{max}만 · {n}곳</q> · z≥17 건물 칩 <q>월 {가장 싼 빈 층}만</q>(빈 층이 여럿이면 “~”)</td><td>묶음 → z17 로 확대 · 건물 칩 → 건물 상세</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>공실 상태 4단계 정의</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>상태</th><th>기준(점유율 = 영업 확인 호 ÷ 상가 수용 호)</th><th>색</th><th>지도 표현</th></tr></thead>
+          <tbody>
+            <tr><th><span class="sw" style="background:var(--full)"></span>만실</th><td class="tnum">점유율 90% 이상</td><td class="mono">#22B07D</td><td>z≥17 폴리곤</td></tr>
+            <tr><th><span class="sw" style="background:var(--partial)"></span>부분공실</th><td class="tnum">50% 이상 90% 미만</td><td class="mono">#EFA50F</td><td>z≥17 폴리곤</td></tr>
+            <tr><th><span class="sw" style="background:var(--high)"></span>고공실</th><td class="tnum">0% 초과 50% 미만</td><td class="mono">#F2682C</td><td>z≥17 폴리곤</td></tr>
+            <tr><th><span class="sw" style="background:var(--empty)"></span>공실의심</th><td class="tnum">0% — 영업으로 확인된 호실이 없다(확정 공실이 아니다)</td><td class="mono">#E03E36</td><td>z≤16 점 · z≥17 폴리곤</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">범례 칩에 마우스를 올리면 이 기준이 뜨고, 스크린리더는 칩 이름으로 기준까지 읽는다(예: <q>만실 — 점유율 90% 이상</q>). 기준의 정본은 파이프라인 <span class="mono">build_page_master._classify</span> 다.</p>
+
+      <h3>유동인구 · 인구밀도 레이어</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>레이어</th><th>지도</th><th>조작</th><th>범례 문구 · 배지</th></tr></thead>
+          <tbody>
+            <tr><th>유동인구</th><td>셀 중심 가중 히트맵(반경 30 · 불투명 0.7). 히트맵 모듈이 없으면 원 32m</td><td>시간 슬라이더 0~23시(기본 18시) · 평일 고정 — 값이 실제 질의(<span class="mono">hour</span>)에 들어간다</td><td><q>유동인구 · {시간대} · 집계구 {n}곳</q> + 배지 <q>집계구 단위</q>/<q>TRDAR 상권단위</q> + 시간 눈금 배지 <q>생활인구 24h(집계구)</q>/<q>생활인구 24h(행정동)</q>/<q>TRDAR 6구간</q>. 로딩 <q>유동인구 · 불러오는 중</q></td></tr>
+            <tr><th>인구밀도</th><td>격자 5단계 남색 계열 채움 50%</td><td>—</td><td><q>{label} · {unit} · 집계구 {n}곳</q> + 해상도 배지. 로딩 <q>밀도 · 불러오는 중</q></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>임대시세 — 금액의 식</h3>
+      <div class="formula">월 임대료(만원) = R-ONE 소규모상가 임대료(천원/㎡·월) × 층 계수 × 그 층 대장 면적(㎡) ÷ 10</div>
+      <div class="table-wrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>층</th><th>층 계수</th><th>가로수길 평당 월 임대료</th><th>계산</th></tr></thead>
+          <tbody>
+            <tr><td>1층</td><td class="mono">1.00</td><td class="realv">24.7만원</td><td class="mono">74.64 × 3.3058 × 1.00 ÷ 10</td></tr>
+            <tr><td>지하1</td><td class="mono">0.75</td><td class="realv">18.5만원</td><td class="mono">74.64 × 3.3058 × 0.75 ÷ 10</td></tr>
+            <tr><td>2층</td><td class="mono">0.45</td><td class="realv">11.1만원</td><td class="mono">74.64 × 3.3058 × 0.45 ÷ 10</td></tr>
+            <tr><td>3층</td><td class="mono">0.40</td><td class="realv">9.9만원</td><td class="mono">74.64 × 3.3058 × 0.40 ÷ 10</td></tr>
+            <tr><td>4층 이상</td><td class="mono">0.30</td><td class="realv">7.4만원</td><td class="mono">74.64 × 3.3058 × 0.30 ÷ 10</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">층 계수는 실측이 아니라 계수다. Posting 임대료와 같은 표를 쓴다. 호가·실거래가가 아니고 보증금·권리금·관리비가 빠져 있으며, 한 층에 호실이 여럿이면 층 전체 금액이다.</p>
+
+      <h3>모달 · 대화상자</h3>
+      <div class="cols2" style="margin-top:0">
+        <div class="box"><h4>층별 공실 · 거리뷰 (모달, z 20)</h4><ul>
+          <li>머리 <q>{건물명} · 층별 공실 · 거리뷰</q> + ✕ · 바탕 클릭 · <kbd>Esc</kbd> 로 닫힘</li>
+          <li>왼쪽 2D 층 스택(위가 꼭대기, 최대 20층): <span class="sw" style="background:#22B07D"></span>영업 <span class="sw" style="background:#F2B441"></span>층 미상 점포가 앉을 수 있는 층 <span class="sw" style="background:#C7D0DB"></span>비상업(분모 밖) 나머지 공실</li>
+          <li>층 근거가 없는 건물은 점유율 환산 근사 스택 — 범례가 <q>영업(점유율 환산) · 공실(추정)</q> 으로 밝힌다</li>
+          <li>오른쪽 네이버 거리뷰 + <b>촬영일</b>(없으면 <q>촬영 시점 미상</q>) — 거리뷰는 공실 판정 근거가 아니다</li>
+        </ul></div>
+        <div class="box"><h4>후보 비교 (대화상자)</h4><ul>
+          <li>제목 <q>{상권명}에서 고른 건물</q> · 머리표 PAGE · 후보 비교</li>
+          <li>열 = 저장한 후보(최대 3), 행 = 공실 상태 · 공실률(추정, 없으면 <q>산정 불가</q>) · 상가 수용/영업 · 대표 업종 · 지상 층수(<q>확인되지 않음</q>) · 선택한 이유(메모) · 다음 단계(입점 검토)</li>
+          <li>후보 해제 · 메모는 이번 작업 동안 유지 · 닫으면 여는 버튼으로 포커스 복귀</li>
+        </ul></div>
+      </div>
+
+      <h3>상태표 <span class="tpl">양식 3번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>상태</th><th>지도</th><th>패널</th><th>문구</th></tr></thead>
+          <tbody>
+            <tr><th>초기(앱 열기)</th><td>z16 · 공유 상권 중심 · 공실의심 점</td><td>목록</td><td>—</td></tr>
+            <tr><th>로딩</th><td>이전 상권 표식 걷음</td><td>회색 골격 5줄</td><td><q>건물 불러오는 중…</q></td></tr>
+            <tr><th>건물 선택됨</th><td>그 건물로 카메라 · 도형 강조</td><td>상세</td><td>—</td></tr>
+            <tr><th>인계받은 건물이 목록에 없음</th><td>상권 중심</td><td>안내 줄</td><td><q>선택한 건물을 이 상권 건물 목록에서 찾지 못했습니다.</q></td></tr>
+            <tr><th>자료 없음</th><td>표식 없음</td><td>빈 목록</td><td><q>제공된 건물이 없습니다</q> / <q>다른 상권을 선택해 주세요.</q></td></tr>
+            <tr><th>조건 불일치</th><td>표식 없음</td><td>빈 목록</td><td><q>조건에 맞는 건물이 없습니다</q> / <q>검색어·공실 상태를 바꾸거나 저장한 후보 조건을 해제해 주세요.</q></td></tr>
+            <tr><th>조건엔 맞는데 화면 밖</th><td>그대로</td><td>빈 목록</td><td><q>이 화면 범위에는 없습니다</q> / <q>조건에 맞는 {n}동이 화면 밖에 있습니다. 지도를 줄이거나 「거점 전체」로 바꿔 보세요.</q></td></tr>
+            <tr><th>백엔드 없음(샘플)</th><td>샘플 8동</td><td>머리 <q>샘플(추정)</q></td><td><q>샘플 자료는 후보 저장과 입점 계산에 사용할 수 없습니다.</q></td></tr>
+            <tr><th>대표값 미제공</th><td>그대로</td><td>머리</td><td><q>거점 대표값 미제공</q></td></tr>
+            <tr><th>R-ONE 없음</th><td>칩 없음</td><td>층 표 없음</td><td>범례 <q>임대시세 · 이 거점에는 R-ONE 임대료가 없다(이웃 거점 값으로 채우지 않는다)</q></td></tr>
+            <tr><th>빈 층 매물 없는 건물</th><td>칩 없음</td><td>상세</td><td><q>이 건물에는 금액을 붙일 빈 층 매물이 없다.</q></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>상호작용 <span class="tpl">양식 4번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>트리거</th><th>반응</th><th>목표 시간</th></tr></thead>
+          <tbody>
+            <tr><td>상권 변경</td><td>목록·표식 교체 · 카메라 이동</td><td class="tnum">지도·목록 3초 이내(KPI)</td></tr>
+            <tr><td>목록 호버·포커스</td><td>지도 도형 두 개만 제자리 강조(도형 재생성 없음)</td><td class="tnum">즉시</td></tr>
+            <tr><td>지도 이동 끝(<span class="mono">idle</span>)</td><td>목록·건수 좁힘</td><td class="tnum">즉시</td></tr>
+            <tr><td>줌 16↔17</td><td>점 ↔ 폴리곤, 묶음 ↔ 건물 칩</td><td class="tnum">즉시</td></tr>
+            <tr><td>「층별 공실 · 거리뷰 보기」</td><td>모달 · 거리뷰 로드</td><td class="tnum">3초 이내(KPI)</td></tr>
+            <tr><td>「이 건물로 입점 검토 →」</td><td>Posting 전환 · 유닛 매칭 · 계산</td><td class="tnum">1초 이내</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>데이터 바인딩 <span class="tpl">양식 5번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>화면 요소</th><th>API · 필드</th><th>없을 때 문구</th><th>출처 배지</th></tr></thead>
+          <tbody>
+            <tr><td>상권 선택기</td><td class="mono">GET /commercial-districts → vacancy_source=="gold" 만</td><td>기본 거점 단독</td><td>예외 표식</td></tr>
+            <tr><td>건물 목록 · 도형</td><td class="mono">GET /heatmap/buildings?district= → features[].properties (id · name · status · capacity · active · industry · floors · com_floors · occ_floors · unknown_n)</td><td><q>층수 미상</q></td><td><q>실측(추정)</q> / <q>샘플(추정)</q></td></tr>
+            <tr><td>GNN 추천</td><td class="mono">POST /ai/recommend-industry → recommendations · scope · matched_distance_m</td><td>stub·빈 추천은 그리지 않음</td><td>GNN · 거점 평균 대비</td></tr>
+            <tr><td>층별 평당 표</td><td class="mono">GET /heatmap/rent?district= → floors[] · base_rent_per_pyeong · quarter · rent_source</td><td>R-ONE 없음 문구</td><td><q>R-ONE</q> / <q>R-ONE(인접 상권 표본)</q></td></tr>
+            <tr><td>금액 칩 · 목록 줄 · 상세 표</td><td class="mono">listings[] (building_id · floor_label · area_py · rent_per_pyeong · monthly_rent · certainty)</td><td>빈 층 없음 문구</td><td>점선·<q>추정</q> = probable</td></tr>
+            <tr><td>유동인구</td><td class="mono">GET /heatmap/footfall?district=&amp;hour=&amp;daytype=weekday</td><td><q>유동인구 · 불러오는 중</q></td><td>해상도·시간 눈금 배지</td></tr>
+            <tr><td>인구밀도</td><td class="mono">GET /heatmap/density?district=</td><td><q>밀도 · 불러오는 중</q></td><td>해상도 배지</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>통과 조건 <span class="tpl">양식 9번</span></h3>
+      <ol class="checks">
+        <li data-id="PG-01">앱을 열면 z16 에서 공실의심만 빨간 점으로 보이고, 범례가 <q>공실의심만 표시 · 확대하면 건물별 상태</q> 라고 말한다.</li>
+        <li data-id="PG-02">z17 로 확대하면 건물 폴리곤 4색이 되고, 범례 칩에 마우스를 올리면 점유율 기준이 뜬다.</li>
+        <li data-id="PG-03">목록 줄에 마우스를 올리면 지도 도형 테두리가 두꺼워지고, 도형에 올리면 목록 줄이 강조된다.</li>
+        <li data-id="PG-04">임대시세를 누르면 격자 색이 없고 층별 평당 표와 <q>월 ○○만</q> 칩이 뜨며, 칩 금액과 건물 상세 표 금액이 같다.</li>
+        <li data-id="PG-05">건물 검색칸에서 <kbd>Esc</kbd> 를 눌러도 상세·패널이 닫히지 않는다. 검색칸 밖에서는 한 겹씩 닫힌다.</li>
+        <li data-id="PG-06">R-ONE 이 없는 거점에서 <q>이 거점에는 R-ONE 임대료가 없다</q> 가 뜨고 금액 칩이 없다.</li>
+        <li data-id="PG-07">Platform 에서 인계받으면 그 건물 상세가 열리고 카메라가 그 건물로 간다.</li>
+        <li data-id="PG-08">「이 건물로 입점 검토 →」 → Posting 에서 그 건물 유닛이 선택되거나, 없으면 안내만 뜨고 계산하지 않는다.</li>
+      </ol>
+      <div class="handoff"><span class="arrow">2 → 3</span><span>「이 건물로 입점 검토 →」 — 인계 표 참조. Posting 에서 Page 로 돌아와도 검색어·저장 후보·지도가 그대로다.</span></div>
+    </section>
+
+    <!-- ═════════ 3 Posting ═════════ -->
+    <section id="posting" data-t="posting">
+      <div class="track-head"><span class="big">3</span><span class="conv">PRICE ▶ POSTING · 진입점: 레일 세 번째 · Page 인계</span><h2>Posting — 입점 계산</h2></div>
+      <p class="question">“얼마에 팔까”가 아니라 — 어느 가격대의 page 를 이 자리에 posting 해야 회수가 되는가?</p>
+      <dl class="screen-card">
+        <div><dt>화면 목적</dt><dd>실측 공실 자리 하나에 세 가격 전략(고급화·가성비·기능중심)의 월 순익과 회수기간을 낸다.</dd></div>
+        <div><dt>막는 오해</dt><dd>권리금 0 전제로 낸 회수기간을 실측처럼 읽는 것 · “추천 없음”과 “회수 불가”를 섞는 것.</dd></div>
+        <div><dt>주사용자</dt><dd>입점을 검토하는 기업(프랜차이즈 가맹 개발·자영업 창업자)</dd></div>
+        <div><dt>이 화면의 결론</dt><dd>「{자리}는 {전략}으로 {n}개월에 회수된다」 또는 「세 전략 모두 회수되지 않는다」</dd></div>
+        <div class="wide"><dt>다루지 않는 것</dt><dd>층 단위 매물 ROI(표본으로 쓰면 프리미엄 트립와이어가 뒤집힌다) · 홍보안(Program)</dd></div>
+      </dl>
+
+      <div class="wf-scroll">
+        <div class="wf" role="img" aria-label="Posting 화면 와이어프레임: 좌측 패널에 입력과 세 전략 결과, 인계 버튼, 지도에 자리별 월 임대료 칩">
+          <div class="wf-rail"><div class="wf-logo"><i>P</i><b>PlaceOS</b></div><span>Platform</span><span>Page</span><span class="on">Posting</span><span>Program</span></div>
+          <div class="m-chip on" style="left:60%;top:40%"><span>월 450만<small>20평</small></span></div>
+          <div class="m-chip" style="left:72%;top:55%"><span>월 1,120만<small>48평</small></span></div>
+          <div class="m-chip" style="left:54%;top:66%"><span>월 380만<small>17평</small></span></div>
+          <div class="m-chip" style="left:81%;top:34%"><span>월 690만<small>29평</small></span></div>
+          <div class="wf-panel">
+            <span class="wf-x">‹</span>
+            <div class="ey">PLACEOS · POSTING · PRICE ▶ POSTING</div>
+            <div class="hq">어느 가격대의 page 를 이 자리에 올릴까</div>
+            <div class="verdict"><b>{자리명}</b>는 <b>{전략}</b> 전략으로 <b>{n}개월</b>에 회수된다 — 단 권리금 0 을 전제로 한 값이다.</div>
+            <div class="card" style="display:grid;gap:.4cqw">
+              <div class="lbl" style="color:var(--ink);font-weight:600">1. 자리와 업종 선택</div>
+              <div class="row"><span class="ctl grow">상권 {상권명} ▾</span><span class="ctl grow">자리 · {n}평 · {층} ▾</span></div>
+              <div class="row"><span class="ctl grow">업종 예: 카페</span><span class="pill">카페 41%</span><span class="pill">음식점 22%</span></div>
+              <div class="lbl" style="color:var(--ink);font-weight:600">2. 비용 조건 입력</div>
+              <div class="row"><span class="ctl grow">권리금 · 만원 — 비우면 0 전제</span><span class="btn">시뮬레이션</span></div>
+            </div>
+            <div class="tiers">
+              <div class="tier"><b>고급화</b><span class="kv">초기 투자<i>—</i></span><span class="kv">월 순익<i>—</i></span><span class="kv">회수<i>—</i></span></div>
+              <div class="tier rec"><b>가성비 · 추천</b><span class="kv">초기 투자<i>—</i></span><span class="kv">월 순익<i>—</i></span><span class="kv">회수<i>—</i></span></div>
+              <div class="tier"><b>기능중심</b><span class="kv">초기 투자<i>—</i></span><span class="kv">월 순익<i>—</i></span><span class="kv">회수<i>—</i></span></div>
+            </div>
+            <div class="row"><span class="pill" style="color:var(--real)">면적 대장 실측</span><span class="pill" style="color:var(--real)">임대료 R-ONE 실측</span><span class="pill" style="border-style:dashed;color:var(--warn)">권리금 전제(0)</span></div>
+            <div class="btn ghost">이 자리로 홍보 program 만들기 →</div>
+          </div>
+          <span class="co" style="left:42%;top:21%">1</span><span class="co" style="left:42%;top:40%">2</span><span class="co" style="left:42%;top:55%">3</span><span class="co" style="left:42%;top:69%">4</span><span class="co" style="left:42%;top:82%">5</span><span class="co" style="left:42%;top:91%">6</span><span class="co" style="left:64%;top:31%">7</span>
+        </div>
+      </div>
+
+      <h3>구성요소</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>영역</th><th>내용</th><th>동작</th></tr></thead>
+          <tbody>
+            <tr><td class="no"><span class="num-badge">1</span></td><td>결론 머리</td><td>세 상태를 섞지 않는다: 계산 전 / 회수됨 / 셋 다 회수 불가</td><td>—</td></tr>
+            <tr><td class="no"><span class="num-badge">2</span></td><td>1. 자리와 업종</td><td>상권 · 자리(<q>실측 N곳</q>) · 자리 아래 월 임대료·직전 업종·유동 · 업종 입력 + GNN 추천 칩</td><td>자리를 고르면 입력 없이 한 번 자동 계산</td></tr>
+            <tr><td class="no"><span class="num-badge">3</span></td><td>2. 비용 조건</td><td>권리금(입력 계약) · 세부 조건에 전략 선택 · 「시뮬레이션」</td><td>입력이 바뀌면 <q>입력이 변경되었습니다. 다시 계산하면 결과에 반영됩니다.</q></td></tr>
+            <tr><td class="no"><span class="num-badge">4</span></td><td>세 가격대 결과</td><td>카드 셋: 초기 투자 · 월 비용 · 월 매출 · 월 순익 · 회수기간. 권리금만 바꿔 재계산하면 <q>직전 계산 대비</q></td><td>—</td></tr>
+            <tr><td class="no"><span class="num-badge">5</span></td><td>출처 배지</td><td>면적·임대료·권리금·유동·층 = 실측(초록) / 프록시(회색 점선) / 전제(노랑 점선) · 코파일럿/내부 폴백 · 기준 분기</td><td>—</td></tr>
+            <tr><td class="no"><span class="num-badge">6</span></td><td>인계 버튼</td><td>「이 자리로 홍보 program 만들기 →」 — 자리가 있을 때 켜진다</td><td>Program 인계(인계 표)</td></tr>
+            <tr><td class="no"><span class="num-badge">7</span></td><td>지도 · 자리 칩</td><td>계산할 수 있는 자리마다 <q>월 {rent}만 · {area}평</q>. 선택 자리는 채움. 카메라는 자리들에 맞춘다</td><td>칩 = 드롭다운 선택</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>상태표 <span class="tpl">양식 3번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>상태</th><th>지도</th><th>패널</th><th>문구</th></tr></thead>
+          <tbody>
+            <tr><th>로딩</th><td>상권 중심</td><td>결론</td><td><q>{상권명}의 공실 자리를 불러오는 중이다.</q></td></tr>
+            <tr><th>계산 전</th><td>자리 칩</td><td>결과 자리</td><td><q>자리를 고르면 계산한다.</q></td></tr>
+            <tr><th>인계 성공 · 실패</th><td>선택 칩</td><td>안내 줄</td><td><q>{건물명}의 입점 계산 유닛을 확인했습니다.</q> / 인계 표 문구</td></tr>
+            <tr><th>회수 불가</th><td>그대로</td><td>카드 <q>회수 불가</q> + 사유</td><td><q>{자리}는 세 전략 모두 회수되지 않는다.</q></td></tr>
+            <tr><th>자리 0곳</th><td>칩 없음</td><td>드롭다운·시뮬레이션·인계 버튼 비활성</td><td><q>{상권명}에는 계산할 실측 공실 자리가 없다.</q> (불러오는 중 문구와 섞지 않는다)</td></tr>
+            <tr><th>계산 실패</th><td>그대로</td><td>오류 상자</td><td><q>계산에 실패했습니다.</q> + 원문</td></tr>
+            <tr><th>코파일럿 실패</th><td>그대로</td><td>경고 상자</td><td><q>코파일럿이 설정돼 있는데 실패했다 — 아래는 폴백 계산이다.</q></td></tr>
+            <tr><th>응답 불일치</th><td>그대로</td><td>결과 버림</td><td><q>선택한 자리와 계산 응답이 일치하지 않습니다.</q></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>상호작용 · 데이터 바인딩 <span class="tpl">양식 4 · 5번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>화면 요소 · 트리거</th><th>API · 필드</th><th>없을 때</th><th>목표 시간 · 배지</th></tr></thead>
+          <tbody>
+            <tr><td>자리 목록 · 칩</td><td class="mono">GET /commercial-districts/{id}/postings → id · n · lat · lng · area · floor · rent · was · foot</td><td>빈 목록 → 비활성</td><td class="tnum">3초 · 건축물대장 실측 인벤토리</td></tr>
+            <tr><td>업종 추천 칩</td><td class="mono">POST /ai/recommend-industry {district_id, lat, lon}</td><td>404 → 칩 없음</td><td>GNN — 이 자리 좌표 기준</td></tr>
+            <tr><td>「시뮬레이션」 · 결과</td><td class="mono">POST /ai/simulate-revenue → scenarios · inputs_source · inputs_quarter · source · unviable_note</td><td>오류 상자</td><td class="tnum">1초 · 비용 기준 basis 배지</td></tr>
+            <tr><td>인계 버튼</td><td>선택 자리 + 마지막 계산(있으면)</td><td>비활성</td><td class="tnum">즉시 Program 전환</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>통과 조건 <span class="tpl">양식 9번</span></h3>
+      <ol class="checks">
+        <li data-id="PS-01">지도 자리 칩을 누르면 자리 드롭다운 값이 그 자리로 바뀌고 계산이 한 번 돈다.</li>
+        <li data-id="PS-02">결과 카드 셋에 초기 투자·월 비용·월 매출·월 순익·회수기간이 있고, 순익 ≤0 이면 <q>회수 불가</q> 다.</li>
+        <li data-id="PS-03">권리금을 비워 두면 결론 줄에 <q>권리금 0 을 전제</q> 가 들어간다.</li>
+        <li data-id="PS-04">입력 출처 배지가 실측·프록시·전제 세 모양으로 갈린다.</li>
+        <li data-id="PS-05">같은 자리에서 권리금만 바꿔 다시 계산하면 카드마다 <q>직전 계산 대비</q> 차이가 뜬다.</li>
+        <li data-id="PS-06">「이 자리로 홍보 program 만들기 →」를 누르면 Program 으로 넘어가 거점·카테고리·주소가 채워지고 「입점 예정 자리」 안내와 지도 핀이 뜬다.</li>
+        <li data-id="PS-07">자리가 0곳인 상권에서 시뮬레이션·인계 버튼이 비활성이다.</li>
+      </ol>
+      <div class="handoff"><span class="arrow">3 → 4</span><span>「이 자리로 홍보 program 만들기 →」 — 인계 표 참조.</span></div>
+    </section>
+
+    <!-- ═════════ 4 Program ═════════ -->
+    <section id="program" data-t="program">
+      <div class="track-head"><span class="big">4</span><span class="conv">PROMOTION ▶ PROGRAM · 진입점: 레일 네 번째 · Posting 인계</span><h2>Program — 홍보 program</h2></div>
+      <p class="question">posting 한 page 를 온라인·오프라인에서 어떤 홍보 program 으로 돌릴 것인가?</p>
+      <dl class="screen-card">
+        <div><dt>화면 목적</dt><dd>입점할(또는 입점한) 가게의 리뷰·메뉴·사진을 근거로 온·오프라인 채널별 홍보 초안을 만들고, 오프라인은 상권의 실제 행사 장소와 잇는다.</dd></div>
+        <div><dt>막는 오해</dt><dd>규칙 기반 스텁을 LLM 생성으로 · 편집한 초안을 검증된 초안으로 · 종료된 행사를 앞으로 열릴 행사로 읽는 것.</dd></div>
+        <div><dt>주사용자</dt><dd>이 상권 빈 건물에 입점할 기업의 마케팅 담당 · 점주</dd></div>
+        <div><dt>이 화면의 결론</dt><dd>채널별 초안(복사 가능) + 붙일 수 있는 오프라인 행사 후보</dd></div>
+        <div class="wide"><dt>다루지 않는 것</dt><dd>광고 집행·예산 · 네이버 플레이스 리뷰 크롤링(공식 API 없음 — 붙여넣기만)</dd></div>
+      </dl>
+
+      <div class="wf-scroll">
+        <div class="wf" role="img" aria-label="Program 화면 와이어프레임: 좌측 패널에 입점 예정 자리 안내, 행사 목록, 가게 프로필 입력, 지도에 입점 예정 자리 핀과 행사 칩">
+          <div class="wf-rail"><div class="wf-logo"><i>P</i><b>PlaceOS</b></div><span>Platform</span><span>Page</span><span>Posting</span><span class="on">Program</span></div>
+          <div class="m-chip on" style="left:58%;top:30%"><span>{행사명}<small>09-20~09-27</small></span></div>
+          <div class="m-chip" style="left:78%;top:62%"><span>{행사명}<small>10-02</small></span></div>
+          <div class="m-chip dark" style="left:84%;top:36%"><span>{가게 후보}<small>카페</small></span></div>
+          <div class="m-chip on" style="left:64%;top:72%;--cc:var(--posting)"><span>입점 예정 자리<small>20평 · 1F</small></span></div>
+          <div class="wf-panel">
+            <span class="wf-x">‹</span>
+            <div class="ey">PLACEOS · PROGRAM · PROMOTION ▶ PROGRAM</div>
+            <div class="hq">posting 한 page 를 어떤 홍보 program 으로 돌릴 것인가</div>
+            <div class="verdict">아직 돌릴 program 이 없다 — 가게 프로필을 넣으면 온·오프라인 채널안을 근거와 함께 낸다.</div>
+            <div class="banner"><b>입점 예정 자리</b> — {자리명} · {n}평 · {층} · 월 {rent}만원 · Posting {전략} 전략</div>
+            <div class="card" style="display:grid;gap:.35cqw"><div class="row" style="justify-content:space-between"><b style="font-size:.95cqw">오프라인 홍보 장소 · N곳</b><span class="lbl">종료된 행사 M곳은 뺐다</span></div>
+              <div class="row"><span class="pill" style="border-color:var(--tc);color:var(--tc)">● {행사명} · 09-20~09-27</span><span class="pill">{행사명} · 10-02</span></div>
+              <div class="lbl">일정 · 장소 · 주최 · 요금 · 대상 · 행사 페이지 열기 ↗</div></div>
+            <div class="card" style="display:grid;gap:.4cqw">
+              <div class="row" style="justify-content:space-between"><b style="font-size:.95cqw">가게 프로필</b><span class="row"><span class="pill">예시 채우기</span><span class="pill">상용 온보딩</span><span class="pill">비우기</span></span></div>
+              <div class="row"><span class="ctl grow">가게명 · 검색</span><span class="ctl">카테고리 {업종}</span></div>
+              <div class="ctl">거점 {상권명} ▾ · 주소 {자리명}</div>
+              <div class="ctl" style="height:2.6cqw;color:var(--muted)">리뷰 · 블로그 텍스트 (한 줄에 하나)</div>
+              <div class="btn">마케팅 솔루션 생성</div>
+            </div>
+          </div>
+          <span class="co" style="left:42%;top:33%">1</span><span class="co" style="left:42%;top:44%">2</span><span class="co" style="left:42%;top:66%">3</span><span class="co" style="left:58%;top:22%">4</span><span class="co" style="left:88%;top:28%">5</span><span class="co" style="left:64%;top:63%">6</span>
+        </div>
+      </div>
+      <p class="wf-cap">생성 결과(채널별 초안 · HA 검증)는 프로필 아래에 이어진다.</p>
+
+      <h3>구성요소</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>영역</th><th>내용</th><th>동작</th></tr></thead>
+          <tbody>
+            <tr><td class="no"><span class="num-badge">1</span></td><td>입점 예정 자리 안내</td><td>Posting 인계 때만. <q>입점 예정 자리 — {자리명} · {면적}평 · {층} · 월 {임대료}만원</q>(+ <q>· Posting {전략} 전략</q>) + <q>가게명·리뷰를 넣으면 이 자리 기준으로 홍보 program 을 만든다. 거점·카테고리·주소는 Posting 에서 채웠다(바꿀 수 있다).</q></td><td>「비우기」·「상용 온보딩」 전환 시 사라진다</td></tr>
+            <tr><td class="no"><span class="num-badge">2</span></td><td>오프라인 홍보 장소</td><td>상권(폼 거점, 없으면 공유 상권)의 공공 문화행사 목록. 종료일이 지난 행사는 뺀다. 고른 행사 상세: 일정 · 장소 · 주최 · 요금 · 대상 · <q>행사 페이지 열기 ↗</q></td><td>목록 클릭 = 칩 선택 + 지도가 그 행사로 이동</td></tr>
+            <tr><td class="no"><span class="num-badge">3</span></td><td>가게 프로필 · 결과</td><td>가게명(+검색) · 카테고리 · 거점 · 리뷰 · 접힘(주소·사진·메뉴·키워드) · 모드(공개 데모/상용 온보딩: API 키 + 동의 4개) · 결과(채널별 초안 편집·미리보기·복사 · HA 검증 접힘)</td><td>후보는 자동 선택하지 않는다</td></tr>
+            <tr><td class="no"><span class="num-badge">4</span></td><td>지도 · 행사 칩</td><td><q>{행사명(13자)} · {기간 MM-DD~MM-DD}</q>. 시드 폴백이면 점선 + <q>예시</q>. 선택된 행사는 채움</td><td>칩 = 목록에서 고른 것과 같다</td></tr>
+            <tr><td class="no"><span class="num-badge">5</span></td><td>지도 · 가게 후보</td><td>상호 검색 결과를 잉크색 칩으로. 고른 가게는 <q>이 가게</q> 채움 칩</td><td>칩 = 후보 목록에서 고른 것과 같다</td></tr>
+            <tr><td class="no"><span class="num-badge">6</span></td><td>지도 · 입점 예정 자리</td><td>Posting 색 채움 칩 <q>입점 예정 자리</q> + 면적·층</td><td>반응 없음</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>상태표 <span class="tpl">양식 3번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>상태</th><th>지도</th><th>패널</th><th>문구</th></tr></thead>
+          <tbody>
+            <tr><th>결과 전</th><td>행사 칩</td><td>결과 자리</td><td><q>왼쪽에 가게 프로필을 넣고 «마케팅 솔루션 생성»을 누르면 여기에 결과가 나온다. …</q></td></tr>
+            <tr><th>생성 중</th><td>그대로</td><td>결론 · 버튼</td><td><q>생성 중… {n}초</q></td></tr>
+            <tr><th>행사 실데이터 0곳</th><td>칩 없음</td><td>장소 목록</td><td><q>이 상권에 예정된 공공 문화행사가 없다 — 예시로 채우지 않는다.</q></td></tr>
+            <tr><th>행사 미적재(시드)</th><td>점선 칩</td><td>목록 머리</td><td><q>행사 실데이터 미적재 — 점선 칩은 예시다</q></td></tr>
+            <tr><th>행사 요청 실패</th><td>칩 없음</td><td>목록 머리</td><td><q>행사 목록을 불러오지 못했다</q></td></tr>
+            <tr><th>가게 검색 0건</th><td>후보 칩 없음</td><td>경고</td><td><q>검색 결과가 없다. 지도에 표기된 상호 그대로 넣거나, 아래에 직접 입력하라.</q></td></tr>
+            <tr><th>생성 실패</th><td>그대로</td><td>오류</td><td><q>생성에 실패했습니다.</q> + 백엔드 기동 명령 + 원문</td></tr>
+            <tr><th>LLM 못 탐 · HA 폐기</th><td>그대로</td><td>결론에 남김</td><td><q>단 LLM 을 타지 못해 아래는 규칙 기반 스텁이다.</q> / <q>단 LLM 생성물이 HA 검증에 걸려 폐기됐고({n}건), 아래는 규칙 기반 스텁이다.</q></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>상호작용 · 데이터 바인딩 <span class="tpl">양식 4 · 5번</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>화면 요소 · 트리거</th><th>API · 필드</th><th>없을 때</th><th>목표 시간 · 배지</th></tr></thead>
+          <tbody>
+            <tr><td>행사 칩 · 목록</td><td class="mono">GET /marketing/events?district_id= → events[] (id · n · lat · lng · when · place · org · fee · target · link) · events_source — LLM 을 부르지 않는다</td><td>상태표</td><td class="tnum">1초 · 서울열린데이터광장</td></tr>
+            <tr><td>가게 검색</td><td class="mono">GET /marketing/places?query=&amp;district_id=</td><td>0건 경고</td><td class="tnum">1초 · 카카오 로컬</td></tr>
+            <tr><td>후보 선택 → 스니펫</td><td class="mono">GET /marketing/reviews?name=&amp;address=</td><td>안내 줄</td><td>네이버 블로그 검색(방문자 리뷰 아님)</td></tr>
+            <tr><td>「마케팅 솔루션 생성」</td><td class="mono">POST /marketing/generate · POST /marketing/onboarding/generate</td><td>오류</td><td class="tnum">10~20초(사진 포함) · LLM/스텁 배지 · HA</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>통과 조건 <span class="tpl">양식 9번</span></h3>
+      <ol class="checks">
+        <li data-id="PR-01">상권의 공공 문화행사가 지도 칩과 「오프라인 홍보 장소」 목록에 같은 수로 뜨고, 종료일이 지난 행사는 둘 다에서 빠진다(뺀 수를 적는다).</li>
+        <li data-id="PR-02">행사 칩을 누르면 목록에서 그 행사가 선택되고 상세(일정·장소·주최·요금·대상)가 뜬다. 목록에서 누르면 지도 칩이 채워진다.</li>
+        <li data-id="PR-03">가게명을 검색하면 후보가 목록과 지도 칩으로 함께 뜨고, 어느 쪽을 눌러도 같은 가게가 채워진다.</li>
+        <li data-id="PR-04">「예시 채우기」 → 「마케팅 솔루션 생성」 → 결론 줄이 온라인·오프라인 건수를 말한다.</li>
+        <li data-id="PR-05">LLM 을 타지 못하면 결론 줄에 <q>규칙 기반 스텁</q> 이 남는다(상세를 접어도).</li>
+        <li data-id="PR-06">상용 온보딩은 API 키와 네 동의를 모두 채워야 생성 버튼이 켜진다.</li>
+        <li data-id="PR-07">Posting 에서 넘어오면 「입점 예정 자리」 안내·지도 핀이 뜨고, 「비우기」를 누르면 둘 다 사라진다.</li>
+      </ol>
+    </section>
+
+    <!-- ═════════ 근거 표기 규칙 ═════════ -->
+    <section id="rules">
+      <div class="sec-head"><h2>근거 표기 규칙 <span class="tpl" style="font-family:var(--mono);font-size:12px;color:var(--muted)">양식 6번</span></h2>
+        <p class="lede">추정을 실측처럼, 없는 값을 0 처럼 보이게 하지 않는 것이 이 제품의 제1원칙이다. 차이는 모양으로 말한다.</p></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>상황</th><th>화면이 하는 것</th><th>예</th></tr></thead>
+          <tbody>
+            <tr><td>추정 · 확정이 섞일 때</td><td>점선 테두리 · 흐린 글자 · <q>추정</q></td><td>probable 빈 층 · 추천 없는 자리 · 시드 행사</td></tr>
+            <tr><td>값이 없을 때</td><td>0·이웃 값으로 채우지 않고 없다고 적는다</td><td><q>이 거점에는 R-ONE 임대료가 없다</q> · <q>대표값 미제공</q> · <q>실측 없음</q></td></tr>
+            <tr><td>빌려 온 값</td><td>출처 라벨을 가른다</td><td><span class="mono">rone</span> / <span class="mono">rone-shared</span>(인접 상권 표본)</td></tr>
+            <tr><td>합성 · 샘플</td><td>배지</td><td><q>합성</q> · <q>샘플(추정)</q></td></tr>
+            <tr><td>예외 거점</td><td>표식 + 문구 전문</td><td>▣ 단일시설 · ▤ 계획상가 밀집 · ▨ 대표값 미제공</td></tr>
+            <tr><td>해상도</td><td>범례 배지</td><td>집계구 단위 · TRDAR 상권단위 · 100m 격자</td></tr>
+            <tr><td>계수·근사</td><td>단위를 숨기지 않고 식을 싣는다</td><td>층 계수 · vac_proxy → % 는 근사</td></tr>
+            <tr><td>접힌 상세</td><td>요약줄에 개수, 출처 줄은 접지 않는다</td><td>「정체성 원자료 — 업종 N곳 / N군 …」</td></tr>
+            <tr><td>금액</td><td>제외 항목과 “추정”을 같이 적는다</td><td><q>보증금·권리금·관리비 제외 · 호가가 아닌 추정</q></td></tr>
+            <tr><td>시점</td><td>기준일·촬영일·종료 여부를 같이 적는다</td><td>R-ONE 26년 2분기 · 거리뷰 촬영일 · 종료된 행사 제외</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═════════ 토큰 ═════════ -->
+    <section id="tokens">
+      <div class="sec-head"><h2>토큰 <span class="tpl" style="font-family:var(--mono);font-size:12px;color:var(--muted)">양식 7번</span></h2>
+        <p class="lede">화면은 토큰 이름으로만 색·간격을 쓴다. 단일 출처는 <span class="mono">apps/frontend/src/styles/tokens.css</span> 이고 <span class="mono">design/tokens/colors.ts</span> · <span class="mono">design/tokens/tokens.json</span> 이 같은 값을 든다.</p></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>역할</th><th>토큰</th><th>값</th><th>쓰는 곳</th></tr></thead>
+          <tbody>
+            <tr><td>트랙 — Platform</td><td class="mono">--track-platform · -soft</td><td class="mono"><span class="sw" style="background:#6460C4"></span>#6460C4 · #F0F0FB</td><td>레일 활성 · 패널 윗변 · 자리 칩 · 실측 범위 선</td></tr>
+            <tr><td>트랙 — Page</td><td class="mono">--track-page · -soft</td><td class="mono"><span class="sw" style="background:#753DA6"></span>#753DA6 · #F6F0FB</td><td>레일 · 필터 눌림 · 선택 줄</td></tr>
+            <tr><td>트랙 — Posting</td><td class="mono">--track-posting · -soft</td><td class="mono"><span class="sw" style="background:#A23C9F"></span>#A23C9F · #FBF0FB</td><td>레일 · 자리 칩 · 입점 검토 버튼 · 입점 예정 자리 핀</td></tr>
+            <tr><td>트랙 — Program</td><td class="mono">--track-program · -soft</td><td class="mono"><span class="sw" style="background:#7E2F53"></span>#7E2F53 · #FBF0F5</td><td>레일 · 행사 칩 · 안내 줄</td></tr>
+            <tr><td>실측 출처 <span class="tag new" style="--tc:var(--real);--tsoft:var(--real-soft)">신설</span></td><td class="mono">--source-real · -soft · -line</td><td class="mono"><span class="sw" style="background:#0F7A55"></span>#0F7A55 · #E3F5EE · #B7E3D2</td><td>R-ONE 배지 · 임대시세 표·칩·금액 · Posting 실측 배지</td></tr>
+            <tr><td>공실 4단계</td><td class="mono">colors.vacancy[0·2·3·4]</td><td class="mono">#22B07D · #EFA50F · #F2682C · #E03E36</td><td>점 · 폴리곤 · 목록 점 · 범례</td></tr>
+            <tr><td>레이어 세그먼트 활성</td><td class="mono">--brand</td><td class="mono">#0EA5B7</td><td>Page 상단 레이어 토글</td></tr>
+            <tr><td>로고</td><td>UI 남색</td><td class="mono">#3A5A98</td><td>레일 로고 마크·워드마크</td></tr>
+            <tr><td>중립</td><td class="mono">--ink · --muted · --line · --surface · --bg</td><td class="mono">#1C2533 · #6B7280 · #E3E9F2 · #FFFFFF · #F4F7FB</td><td>전체</td></tr>
+            <tr><td>간격 · 모서리 · 그림자</td><td class="mono">--sp-1…8 (4px 그리드) · --radius-md 12 · --radius-lg 16 · --shadow-card · --shadow-sheet</td><td>—</td><td>패널·시트·카드</td></tr>
+            <tr><td>글꼴</td><td class="mono">--font-sans (Pretendard) · --fw 400·600·700</td><td>—</td><td>이 세 굵기만 쓴다(800 금지)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">실측 출처 색은 공실 “만실” 초록과 색상각이 가깝다. 임대시세 레이어에서는 공실 도형을 그리지 않으므로 지도 위에서 둘이 겹치지 않는다. 네이버 그린(#03C75A)은 네이버 연동 맥락 전용이다.</p>
+    </section>
+
+    <!-- ═════════ 접근성 ═════════ -->
+    <section id="a11y">
+      <div class="sec-head"><h2>접근성 <span class="tpl" style="font-family:var(--mono);font-size:12px;color:var(--muted)">양식 8번</span></h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>규칙</th></tr></thead>
+          <tbody>
+            <tr><th>대비</th><td>본문·트랙 색 글자는 --bg · --surface · 자기 soft 위에서 AA 4.5:1 이상. 채운 칩의 흰 글자도 같은 기준</td></tr>
+            <tr><th>지도 위 글자</th><td>칩은 흰 바탕 + 1.5px 테두리 + 그림자 — 위성·일반 지도 어느 바탕에서도 읽힌다. 범례는 표면 94% 불투명</td></tr>
+            <tr><th>키보드 대체</th><td>지도 칩·점·도형은 키보드로 닿지 않는다. <b>모든 표식 동작은 패널의 버튼·체크박스·드롭다운으로 똑같이 할 수 있어야 한다</b>(Platform 체크박스 · Page 목록 · Posting 드롭다운 · Program 후보·행사 목록)</td></tr>
+            <tr><th>알림(aria-live)</th><td>상권 변경 <q>상권 {이름} 선택됨</q> · Page 건수 · Platform 비교 후보 수(<span class="mono">role=status</span>) · Posting 인계 결과 · Program 지도 안내</td></tr>
+            <tr><th>이름</th><td>패널 <span class="mono">aside</span> 에 패널 이름(<q>상권 정체성</q> · <q>입점 계산</q> · <q>홍보 program</q>) · 레일 <span class="mono">nav "주요 화면"</span> · 현재 탭 <span class="mono">aria-current="page"</span> · 지도 레이어 <span class="mono">group "지도 데이터 레이어"</span></td></tr>
+            <tr><th>포커스</th><td>보이는 포커스 링(트랙 색 2px) · 패널 접기/펴기와 대화상자 닫기 뒤 포커스 복귀 · <kbd>Esc</kbd> 규칙(공통 프레임)</td></tr>
+            <tr><th>움직임</th><td>카메라 이동 외 장식 애니메이션 없음. 스켈레톤 반짝임은 <span class="mono">prefers-reduced-motion</span> 에서 멈춘다</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═════════ 성능 · 데이터 기준일 ═════════ -->
+    <section id="nfr">
+      <div class="sec-head"><h2>성능 목표 · 데이터 기준일</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>목표</th><th>현재 · 주의</th></tr></thead>
+          <tbody>
+            <tr><td>지도·건물 상세 로딩</td><td class="tnum">3초 이내(KPI)</td><td>건물 1,443동 거점도 도형 재생성 없이 호버 강조</td></tr>
+            <tr><td>API p95</td><td class="tnum">200ms 이내</td><td>⚠ 무료 한도 리전(us-central1)이라 서울에서 왕복 150~200ms 가 붙어 <b>현 구성으로는 못 맞춘다</b> — 유료 파일럿 시 서울 리전</td></tr>
+            <tr><td>트랙 첫 진입</td><td class="tnum">1초 이내</td><td>화면별 청크를 눌렀을 때 받는다</td></tr>
+            <tr><td>지도 칩 수</td><td>화면당 수백 개 이하</td><td>임대시세 z≤16 은 반경 ~160m 거리 묶음으로 줄인다</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>데이터 기준일</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>데이터</th><th>쓰는 화면</th><th>기준 · 빌드</th><th>주의</th></tr></thead>
+          <tbody>
+            <tr><td>건물 공실 마스터(건축물대장 + 상가정보)</td><td>Page</td><td class="tnum">2026-09-04 빌드(가로수길)</td><td>공실의심은 영업 확인 0 — 확정 공실이 아니다</td></tr>
+            <tr><td>층 단위 공실 매물</td><td>Page 임대시세</td><td class="tnum">2026-09-05 빌드</td><td>확정/추정(certainty)</td></tr>
+            <tr><td>입점 계산 유닛</td><td>Posting · Platform 자리</td><td class="tnum">2026-08-25 빌드</td><td>건물 1동 = 유닛 1개</td></tr>
+            <tr><td>R-ONE 소규모상가 임대료</td><td>Page · Posting</td><td class="tnum">26년 2분기 · 2026-09-04 빌드</td><td>사실상 1층 기준 → 층 계수</td></tr>
+            <tr><td>집계구 생활인구</td><td>Page 유동 · Posting 유동 등급</td><td class="tnum">2026-09-05 빌드</td><td>⚠ 원천 계열 <b>2026-07-31 생산 종료</b> — 더 갱신되지 않는다</td></tr>
+            <tr><td>서울 공공 문화행사</td><td>Program</td><td class="tnum">2026-08-16 빌드</td><td>⚠ 종료된 행사가 섞여 있다 — 화면에서 종료일로 거른다</td></tr>
+            <tr><td>네이버 거리뷰</td><td>Page 모달</td><td>파노라마 촬영일</td><td>화면에 촬영일 표기</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">문서 속 가로수길 수치(840동 · 빈 층 매물 411곳 · R-ONE 74.64천원/㎡)는 위 빌드 기준이다. 화면 문구에는 이런 수를 박지 않고 응답에서 센다.</p>
+    </section>
+
+    <!-- ═════════ 용어집 ═════════ -->
+    <section id="glossary">
+      <div class="sec-head"><h2>용어집</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>용어</th><th>뜻</th></tr></thead>
+          <tbody>
+            <tr><th>Platform · Page · Posting · Program</th><td>PPPP. 전통 4P(Place · Product · Price · Promotion)의 디지털 전환 — 상권을 플랫폼으로, 빈 자리를 page 로, 가격대를 posting 으로, 홍보를 program 으로 읽는다</td></tr>
+            <tr><th>거점 · 상권</th><td>서빙하는 분석 단위 상권. 수는 API 응답으로 센다</td></tr>
+            <tr><th>실측 범위</th><td>공실률 분모에 들어간 100m 격자의 외곽선. 상권 경계가 아니다</td></tr>
+            <tr><th>공실의심 · 고공실 · 부분공실 · 만실</th><td>점유율 0 · 0~50% · 50~90% · 90% 이상(Page 정의 표)</td></tr>
+            <tr><th>확정 · 추정 공실</th><td><span class="mono">confirmed</span> 층 미상 점포를 다 앉히고도 남은 층 / <span class="mono">probable</span> 층 미상 점포가 다른 층에 있으면 비는 층</td></tr>
+            <tr><th>R-ONE</th><td>한국부동산원 상업용부동산 임대동향. 소규모상가 임대료(천원/㎡·월)를 쓴다</td></tr>
+            <tr><th>층 계수</th><td>1층 기준 R-ONE 임대료를 층에 맞추는 계수(1F 1.00 · B1 0.75 · 2F 0.45 · 3F 0.40 · 4F+ 0.30). 실측 아님</td></tr>
+            <tr><th>앵커 · 격차</th><td>R-ONE 중대형상가 공실률과 우리 실측의 차이(%p). 모집단이 달라 0 이 정상은 아니다 — 거점 간 비교용</td></tr>
+            <tr><th>vac_proxy</th><td>LSTM 공실 예측의 단위. % 는 현재 공실률에 delta 를 더한 근사</td></tr>
+            <tr><th>GNN 추천 · 두드러진 업종</th><td>점포 그래프로 자리별 업종 확률을 낸 것 · 그중 상권 평균을 뺀 차이가 가장 큰 업종</td></tr>
+            <tr><th>3-Tier</th><td>고급화(객단가↑ 회전↓) · 가성비(객단가↓ 회전↑) · 기능중심(면적·인력 최소)</td></tr>
+            <tr><th>권리금 입력 계약</th><td>공개 통계가 없어 입점할 기업이 넣는 값. 비우면 0 전제로 계산하고 그 사실을 적는다</td></tr>
+            <tr><th>HA 검증 · 스텁</th><td>Humanistic Authority(균형·공생·공감) 서버 후처리 검증 · LLM 을 못 타거나 폐기됐을 때의 규칙 기반 결과</td></tr>
+            <tr><th>대표값 미제공</th><td><span class="mono">vacancy_withheld</span> — 쟀지만 거점을 대표하지 못해 내린 값. “안 쟀다(실측 없음)”와 다르다</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═════════ 미해결 · 변경 이력 ═════════ -->
+    <section id="open">
+      <div class="sec-head"><h2>미해결 <span class="tpl" style="font-family:var(--mono);font-size:12px;color:var(--muted)">양식 10번</span> · 변경 이력</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>미해결</th><th>왜 막혀 있나</th><th>정할 사람</th></tr></thead>
+          <tbody>
+            <tr><td><b>NCP Maps 에 새 주소 등록</b> — <span class="mono">https://placeos.web.app</span> · <span class="mono">https://placeos.firebaseapp.com</span></td><td>콘솔 로그인이 필요하다. 등록 전까지 새 주소에서 지도가 인증 실패(09-13 확인)</td><td>대표(NCP 콘솔 권한자)</td></tr>
+            <tr><td>옛 주소 → 새 주소 301 · 업타임 체크 대상 변경</td><td>위 등록이 먼저다</td><td>개발 · 대표(GCP 콘솔)</td></tr>
+            <tr><td>로그인 · 회원가입 · API 키 화면</td><td>백엔드는 있고 화면이 없다. 멘토링 결과 반영 여부 미정</td><td>대표 · 디자인</td></tr>
+            <tr><td>권리금 기본값 정책(비우면 0 전제 유지?)</td><td>회수기간이 짧게 보인다 — 결론 줄 경고로 버티는 중</td><td>대표 · Posting</td></tr>
+            <tr><td>실제 호가 채널</td><td>크롤링 금지선 · 제휴 필요</td><td>대표</td></tr>
+            <tr><td>모바일 시트 드래그</td><td>손잡이 모양만 있다</td><td>디자인</td></tr>
+            <tr><td>와이어프레임 → 실제 화면 캡처 교체</td><td>NCP 등록 뒤 새 주소에서 캡처</td><td>개발</td></tr>
+            <tr><td>행사 데이터 재수집 주기</td><td>08-16 빌드 이후 종료 행사가 늘고 있다</td><td>데이터</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>변경 이력</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>판</th><th>변경</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">2판 · 09-13</td><td><b>사실 오류 수정</b>: 인계 내용(표로 정본화) · “표식을 누르면 패널 항목 선택”(Program 행사까지 적용) · <kbd>Esc</kbd> 입력칸 규칙(네 화면 통일) · 와이어프레임 가로 스크롤</td></tr>
+            <tr><td class="mono">2판 · 09-13</td><td><b>양식 필수 절 추가</b>: 화면 카드(목적·오해·주사용자·결론·제외) · 레이아웃 수치·z축·모바일 · 상태표 · 상호작용 목표 시간 · 데이터 바인딩 · 통과 조건 · 토큰 · 접근성 · 미해결 결정 주체</td></tr>
+            <tr><td class="mono">2판 · 09-13</td><td><b>내용 추가</b>: 공실 4단계 정의 · 유동인구·인구밀도 · 모달 2종 · 자리 비교표 · 숨은 화면 · 공통 상태(지도 인증 실패 등) · 데이터 기준일 · 용어집</td></tr>
+            <tr><td class="mono">2판 · 09-13</td><td><b>새 동작</b>: Platform→Page 「Page에서 이 건물 보기 →」 · Posting→Program 「이 자리로 홍보 program 만들기 →」 · Program 오프라인 홍보 장소 목록·상세·종료 행사 제외 · 상권 선택 음성 알림 · 패널 접기/펴기 포커스 · 실측 출처 색 토큰 신설</td></tr>
+            <tr><td class="mono">1판 · 09-13</td><td>서울·거점 탭 삭제 · PlaceOS 로고 · 네 트랙 지도 전체화면 · 임대시세 금액화 · <span class="mono">/marketing/events</span> · placeos.web.app</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>PlaceOS · PPPP 화면설계서 2판 · 2026-09-13 · 저장소 원본 <span class="mono">docs/screen-spec-pppp-2026-09-13.html</span> · 양식 <span class="mono">docs/prompt-ux-screen-spec.md</span> · 코드 <span class="mono">apps/frontend/src/App.tsx</span> · <span class="mono">components/TrackMapFrame.tsx</span> · <span class="mono">pages/*</span></footer>
+  </main>
+</div>

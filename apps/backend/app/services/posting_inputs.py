@@ -144,6 +144,20 @@ def _floor_factor(floor: str, table: dict[str, float] | None) -> float:
     return float(tbl.get("1F", 1.0))
 
 
+def floor_factor(floor: str) -> float:
+    """층 라벨 → 임대료 계수. 산출 JSON 의 `floor_factor` 를 우선 쓴다.
+
+    Page 임대시세 레이어(`rent_layer`)가 층 단위 매물에 금액을 붙일 때 쓴다 — Posting 의
+    `rent` 와 **같은 표**를 봐야 두 화면이 같은 자리에 같은 금액을 낸다.
+    """
+    return _floor_factor(floor, (_load() or {}).get("floor_factor"))
+
+
+def is_shared_rone(district_id: str) -> bool:
+    """단독 R-ONE 표본이 없어 인접·포괄 상권 값을 빌려 쓰는 거점인가."""
+    return district_id in _SHARED_RONE
+
+
 def _weighted(mix: dict, table: dict[str, float] | None) -> float | None:
     """면적 비중 dict → 층 계수 가중평균. 비었거나 합이 0 이면 None."""
     if not isinstance(mix, dict) or not mix:

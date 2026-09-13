@@ -16,7 +16,7 @@ def _read(relative: str) -> str:
 
 def test_canonical_progress_names_current_state_and_remaining_work() -> None:
     """정본은 완료된 작업을 다시 '다음 작업'으로 만들지 않아야 한다."""
-    doc = _read("docs/spaceos-vibe-build-sequence.md")
+    doc = _read("docs/placeos-vibe-build-sequence.md")
 
     assert "현재 위치 요약 (2026-09-05)" in doc
     # 2026-09-05: `area` 게이트를 관측 전용으로 강등하며 Posting 이 97.6 → 100% 가 됐다.

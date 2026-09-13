@@ -1,10 +1,10 @@
-# SpaceOS 디자인 데이터 레이어 (Design Source of Truth)
+# PlaceOS 디자인 데이터 레이어 (Design Source of Truth)
 
 UX/UI 디자인도 코드처럼 한 곳에서 관리한다. "네이버와 잘 어울리는" 디자인을 만들기 위한 원천 데이터를 모으고 정리하는 폴더.
 
 ```
 design/
-├── brand/            네이버·SpaceOS 브랜드 규칙 (컬러·로고 사용·금지사항)
+├── brand/            네이버·PlaceOS 브랜드 규칙 (컬러·로고 사용·금지사항)
 ├── assets/
 │   ├── naverpay/     ⚠ 네이버페이 공식 버튼 에셋 (임의 변경 금지 — 원본 그대로 보관)
 │   ├── navermap/     네이버 지도 마커·지도 스타일(style JSON)·컨트롤 캡처

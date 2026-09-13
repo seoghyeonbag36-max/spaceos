@@ -1,11 +1,11 @@
-# Glossary — SpaceOS
+# Glossary — PlaceOS
 
-SpaceOS 프로젝트 전체에서 사용되는 용어·약어·고유명사 사전.
+PlaceOS 프로젝트 전체에서 사용되는 용어·약어·고유명사 사전.
 
 ## 핵심 프레임워크
 | 용어 | 의미 | 맥락 |
 |------|------|------|
-| **SpaceOS** | 프로젝트명 — 물리적 상권의 디지털 트윈 SaaS | "Place ▶ Platform" 가설 |
+| **PlaceOS** | 프로젝트명 — 물리적 상권의 디지털 트윈 SaaS | "Place ▶ Platform" 가설 |
 | **PPPP** | Platform·Page·Posting·Program | 디지털 4P 전환 프레임워크. **2026-09-05 부터 전통 4P 와 1:1** — 종전엔 Page 가 Product/Price 를 겸하고 Posting·Program 이 Promotion 을 나눠 가졌다 |
 | **Platform** | **Place ▶ Platform** | 이 입지·상권은 어떤 플랫폼인가 — 물리적 공간을 SNS·디지털 관점의 공간/플랫폼으로 읽는다. 상권 AI 추천 엔진 |
 | **Page** | **Product ▶ Page** | 이 platform 안에 어떤 page 가 만들어져야 하는가(제품이 아니라 page 다). 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 |

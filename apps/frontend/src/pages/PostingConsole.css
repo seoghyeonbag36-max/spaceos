@@ -1,4 +1,4 @@
-/* SpaceOS Posting 콘솔 — 스코프 .postconsole (ProgramStudio 2단 레이아웃 계승).
+/* PlaceOS Posting 콘솔 — 스코프 .postconsole (ProgramStudio 2단 레이아웃 계승).
    왼쪽은 입력(sticky), 오른쪽은 결과. 결과 옆에는 늘 **그 값의 출처**가 붙는다 —
    R-ONE 실측 임대료와 시드 프록시가 같은 숫자처럼 보이면 안 된다. */
 .postconsole{--card:var(--surface);--ink:#1f2937;--sub:var(--muted);--line:#e5e7eb;--blue:#2E6FB7;
@@ -7,12 +7,11 @@
 .postconsole *{box-sizing:border-box}
 .postconsole .wrap{max-width:1240px;margin:0 auto}
 
-.postconsole .hd{margin-bottom:14px}
-.postconsole .ey{font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9aa3af}
-.postconsole .conv4p{margin-left:var(--sp-2);padding:1px 7px;border-radius:99px;border:1px solid rgba(43,200,217,.45);color:#2BC8D9;font-size:10px;letter-spacing:.8px}
-.postconsole h1{font-size:27px;font-weight:700;margin:6px 0 var(--sp-1);letter-spacing:-.5px}
-.postconsole .sub{font-size:13px;color:var(--sub);line-height:1.65;max-width:860px}
-.postconsole .sub b{color:var(--ink)}
+/* 2026-09-13: 화면 머리를 공용 `Verdict` 로 바꾸면서 `.hd .ey .conv4p h1 .sub` 규칙이
+   전부 죽었다(마크업에서 사라졌으므로 선택자가 아무것도 잡지 않는다). 남겨 두면
+   다음 사람이 "여기서 헤더 색을 고치면 되겠지" 하고 죽은 규칙을 고치게 된다 —
+   이 저장소가 tailwind.config.ts·Storybook 에서 이미 겪은 일이다. 그래서 지운다.
+   지금 헤더 스타일의 단일 출처는 `src/components/Verdict.css` 의 `.verdict` 다. */
 
 .postconsole .err{background:#fef2f2;border:1px solid #fecaca;border-radius:13px;padding:var(--sp-4) 18px;font-size:13px;color:#7f1d1d;margin:14px 0;line-height:1.7}
 .postconsole .errdetail{font-size:11px;color:#b91c1c;margin-top:6px;word-break:break-all}
@@ -56,7 +55,7 @@
 .postconsole .rind{font-size:11px;font-weight:700;color:#3a5a98;background:#f2f6fb;border:1px solid #e2eaf4;border-radius:6px;padding:2px 7px}
 .postconsole .rbadges{display:flex;gap:5px;flex-wrap:wrap}
 .postconsole .badge{font-size:10px;font-weight:700;border-radius:5px;padding:2px 7px}
-.postconsole .badge.is-copilot{color:var(--surface);background:#0f7a55}
+.postconsole .badge.is-copilot{color:var(--surface);background:var(--source-real)}
 .postconsole .badge.is-fallback{color:#5a6b85;background:#f1f4f8;border:1px solid #dfe5ee}
 .postconsole .badge.is-q{color:#8a5a00;background:#fdf5e3;border:1px solid #f0dcae}
 
@@ -70,7 +69,7 @@
 .postconsole .isrc{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;
  border-radius:6px;padding:3px var(--sp-2)}
 .postconsole .isrc i{font-style:normal;font-size:9.5px;font-weight:700}
-.postconsole .isrc.is-real{color:#0f7a55;background:#e3f5ee;border:1px solid #b7e3d2}
+.postconsole .isrc.is-real{color:var(--source-real);background:var(--source-real-soft);border:1px solid var(--source-real-line)}
 .postconsole .isrc.is-proxy{color:#8a93a0;background:#f6f7f9;border:1px dashed #cfd5dd}
 .postconsole .isrc.is-absent{color:#8a5a00;background:#fdf5e3;border:1px dashed #f0dcae}
 
@@ -114,3 +113,7 @@
 .postconsole :is(input, select, button, summary):focus-visible { outline: 2px solid var(--track-posting); outline-offset: 2px; }
 @media (max-width: 1100px) { .postconsole .cols { grid-template-columns: 1fr; } .postconsole .panel { position: static; } }
 @media (max-width: 600px) { .postconsole { padding: var(--sp-3); } .postconsole .tiers { grid-template-columns: 1fr; } }
+
+/* Posting → Program 인계(2026-09-13, 화면설계서 2판) — 결과 위, 자리가 있으면 켜진다 */
+.postconsole .posting-to-program{width:100%;min-height:44px;margin-bottom:var(--sp-3);border:1px solid var(--track-program);color:var(--track-program);background:var(--surface);font-weight:700}
+.postconsole button.posting-to-program:hover:not(:disabled){background:var(--track-program-soft)}

@@ -32,7 +32,7 @@ CI, 도메인 미등록 origin — 에서 이 세 화면은 **여전히 실데�
     # 터미널 1 — 백엔드
     cd apps/backend && .venv/bin/python -m uvicorn app.main:app --port 8022
     # 터미널 2 — 프론트 (프록시를 8022 로 돌린다)
-    cd apps/frontend && SPACEOS_API_TARGET=http://localhost:8022 npm run dev
+    cd apps/frontend && PLACEOS_API_TARGET=http://localhost:8022 npm run dev
     # 터미널 3
     PYTHONIOENCODING=utf-8 python -u scripts/render_validate.py
 
@@ -40,8 +40,8 @@ CI, 도메인 미등록 origin — 에서 이 세 화면은 **여전히 실데�
     python -u scripts/render_validate.py --headed      # 눈으로 볼 때
 
 환경변수:
-    SPACEOS_WEB_BASE   프론트 주소 (기본 http://localhost:5173)
-    SPACEOS_CHROMIUM   chromium 실행 파일 경로. 번들 브라우저가 없는 컨테이너에서 쓴다
+    PLACEOS_WEB_BASE   프론트 주소 (기본 http://localhost:5173)
+    PLACEOS_CHROMIUM   chromium 실행 파일 경로. 번들 브라우저가 없는 컨테이너에서 쓴다
                        (예: /opt/pw-browsers/chromium-1194/chrome-linux/chrome)
 
 ## 설계 제약 (screen_loop.py 의 것을 그대로 잇는다)
@@ -355,12 +355,12 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--headed", action="store_true")
     ap.add_argument("--canary", action="store_true", help="실검사 — 전 표면이 실패해야 정상")
-    ap.add_argument("--base", default=None, help="프론트 주소 (기본 SPACEOS_WEB_BASE 또는 :5173)")
+    ap.add_argument("--base", default=None, help="프론트 주소 (기본 PLACEOS_WEB_BASE 또는 :5173)")
     args = ap.parse_args(argv)
 
     import os
-    BASE_URL = args.base or os.environ.get("SPACEOS_WEB_BASE", BASE_URL)
-    chromium_path = os.environ.get("SPACEOS_CHROMIUM") or None
+    BASE_URL = args.base or os.environ.get("PLACEOS_WEB_BASE") or os.environ.get("SPACEOS_WEB_BASE", BASE_URL)
+    chromium_path = os.environ.get("PLACEOS_CHROMIUM") or os.environ.get("SPACEOS_CHROMIUM") or None
 
     # 거점 목록을 런타임에 읽는다 — slug 를 박지 않는다(설계 제약 2).
     try:

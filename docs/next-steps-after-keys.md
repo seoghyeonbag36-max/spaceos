@@ -1,6 +1,6 @@
 # API 키 발급 후 진행 단계 (검증 → 수집 → 가공 → 연결 → 확인)
 
-> [api-key-checklist.md](api-key-checklist.md)로 키를 다 채운 **다음**에 밟을 순서. 담당(사용자/개발)과 분기점을 명시한다. 상위 로드맵은 [spaceos-vibe-build-sequence.md](spaceos-vibe-build-sequence.md), 건물 공실 설계는 [poc-building-vacancy.md](poc-building-vacancy.md).
+> [api-key-checklist.md](api-key-checklist.md)로 키를 다 채운 **다음**에 밟을 순서. 담당(사용자/개발)과 분기점을 명시한다. 상위 로드맵은 [placeos-vibe-build-sequence.md](placeos-vibe-build-sequence.md), 건물 공실 설계는 [poc-building-vacancy.md](poc-building-vacancy.md).
 
 ## 한눈 요약
 ```

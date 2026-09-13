@@ -5,16 +5,16 @@ description: 서울 자치구 건물 단위 상권 세분화 HTML(Leaflet) 생�
 
 # District Map 생성·통합 커맨드
 
-너는 지금 SpaceOS의 **서울 자치구 디지털 트윈 맵** 작업을 수행한다.
+너는 지금 PlaceOS의 **서울 자치구 디지털 트윈 맵** 작업을 수행한다.
 
 ## 필수 선독(先讀) 파일
 
 작업 전 반드시 읽어라.
 
 ```
-html/Seoul/SpaceOS_Mapo_Building_Map.html          # 단일 구 파일 패턴 기준선
-html/Seoul/SpaceOS_Jongno_Building_Map.html        # 단일 구 파일 패턴 기준선 (종로구)
-html/Seoul/SpaceOS_Seoul_GangnamMapo_Building_Map.html  # 통합 파일 패턴 기준선
+html/Seoul/PlaceOS_Mapo_Building_Map.html          # 단일 구 파일 패턴 기준선
+html/Seoul/PlaceOS_Jongno_Building_Map.html        # 단일 구 파일 패턴 기준선 (종로구)
+html/Seoul/PlaceOS_Seoul_GangnamMapo_Building_Map.html  # 통합 파일 패턴 기준선
 data/config/seoul_districts.py                     # 구 코드·base 점수·키워드 SSOT
 ```
 
@@ -42,7 +42,7 @@ data/config/seoul_districts.py                     # 구 코드·base 점수·�
 
 ## STEP 1 — 개별 구 HTML 파일 생성
 
-파일명: `html/Seoul/SpaceOS_{구영문명}_Building_Map.html`
+파일명: `html/Seoul/PlaceOS_{구영문명}_Building_Map.html`
 (영문명 예: 용산구→Yongsan, 서초구→Seocho, 중구→Jung, 동대문구→Dongdaemun)
 
 ### 1-1. 구조 (기준 파일과 동일하게 유지)
@@ -123,7 +123,7 @@ map = L.map('map').setView([중심위도, 중심경도], 14);
 
 ## STEP 2 — 통합 파일에 병합
 
-파일: `html/Seoul/SpaceOS_Seoul_GangnamMapo_Building_Map.html`  
+파일: `html/Seoul/PlaceOS_Seoul_GangnamMapo_Building_Map.html`  
 (파일명은 현재 그대로 유지 — 내용만 추가)
 
 ### 2-1. CSS
@@ -208,7 +208,7 @@ if ({구소문자}.length) {
 
 작업 마친 뒤 아래를 직접 확인한다.
 
-- [ ] 개별 파일 `html/Seoul/SpaceOS_{구영문명}_Building_Map.html` 생성됨
+- [ ] 개별 파일 `html/Seoul/PlaceOS_{구영문명}_Building_Map.html` 생성됨
 - [ ] 건물 30동 완비 (id 중복 없음, zone 값이 버튼 값과 일치)
 - [ ] 통합 파일 CSS — 구 색상 변수·버튼·배지 추가됨
 - [ ] 통합 파일 HTML — 헤더 배지·구 버튼·존 버튼·범례·비교 패널 추가됨

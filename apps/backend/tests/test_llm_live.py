@@ -16,7 +16,7 @@ LLM **응답의 매핑**만 검증한다. 그래서 실호출이 어떤 이유�
 키를 채운 뒤 opt-in 환경변수를 주면 돈다:
 
     # PowerShell
-    $env:SPACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v
+    $env:PLACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v
 
 호출 4건, 건당 수 센트 수준이다.
 
@@ -42,11 +42,11 @@ V1 = "/api/v1"
 
 # 외부 API 를 치는 테스트라 명시적 opt-in 을 요구한다. 키만 있으면 도는 구조로 두면
 # 평소 스위트가 조용히 크레딧을 쓴다.
-_LIVE = os.getenv("SPACEOS_LIVE_LLM") == "1"
+_LIVE = (os.getenv("PLACEOS_LIVE_LLM") or os.getenv("SPACEOS_LIVE_LLM")) == "1"   # SPACEOS_* 는 개명 전 폴백
 
 pytestmark = [
     pytest.mark.llm,
-    pytest.mark.skipif(not _LIVE, reason="실호출 테스트 — SPACEOS_LIVE_LLM=1 로 opt-in"),
+    pytest.mark.skipif(not _LIVE, reason="실호출 테스트 — PLACEOS_LIVE_LLM=1 로 opt-in"),
     pytest.mark.skipif(not settings.llm_api_key, reason="LLM_API_KEY 미설정"),
 ]
 

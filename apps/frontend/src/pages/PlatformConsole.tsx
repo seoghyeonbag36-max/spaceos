@@ -3,13 +3,20 @@ import DistrictPicker, { CaveatNote, MeasuredValue } from "@/components/District
 import PlatformComparison from "@/components/PlatformComparison";
 import Verdict, { Fold, type Ground } from "@/components/Verdict";
 import {
-  getPlatformProfile, getSentiment, listDistricts, predictVacancy, recommendIndustry,
+  getPlatformProfile, getSentiment, getVacancyHeatmap, listDistricts, predictVacancy, recommendIndustry,
 } from "@/lib/api";
 import type {
   DistrictSummary, IndustryRecommend, OpeningSite, PlatformProfile, VacancyForecast, Zone,
 } from "@/lib/api";
 import { Button } from "@/design/components/Button";
 import { Card } from "@/design/components/Card";
+import { mapLabelHTML } from "@/design/components/MapMarkerPin";
+import { colors } from "@/design/tokens/colors";
+import { useMapHost } from "@/components/MapHost";
+import { useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
+import { TRACK_PANEL_W } from "@/components/TrackMapFrame";
+import { boundaryBadge, computeHubBoundary, EMPTY_BOUNDARY, type HubBoundary } from "@/lib/hubBoundary";
+import type { BuildingSelection } from "@/lib/workspaceState";
 import "./PlatformConsole.css";
 
 /**
@@ -79,9 +86,25 @@ function approxVacancyPct(fc: VacancyForecast | null, hub?: DistrictSummary): nu
 
 const dirMark = (d: string) => (d === "up" ? "▲" : d === "down" ? "▼" : "—");
 
-export default function PlatformConsole() {
+export default function PlatformConsole({ districtId: sharedDistrict, onDistrictChange, onOpenInPage }: {
+  /** 네 트랙이 공유하는 상권(App). 주면 제어 모드, 안 주면 화면이 스스로 든다(단독 렌더·테스트). */
+  districtId?: string;
+  onDistrictChange?: (id: string) => void;
+  /** Platform → Page 인계(화면설계서 2판). 주면 자리 카드에 「Page에서 이 건물 보기 →」가 뜬다. */
+  onOpenInPage?: (selection: BuildingSelection) => void;
+} = {}) {
   const [districts, setDistricts] = useState<DistrictSummary[]>([]);
-  const [districtId, setDistrictId] = useState(DEFAULT_DISTRICT);
+  const [ownDistrict, setOwnDistrict] = useState(sharedDistrict ?? DEFAULT_DISTRICT);
+  const controlled = sharedDistrict !== undefined && onDistrictChange !== undefined;
+  const districtId = controlled ? sharedDistrict : ownDistrict;
+  const setDistrictId = (id: string) => (controlled ? onDistrictChange(id) : setOwnDistrict(id));
+  // 자리 비교 후보 — 지도 칩과 목록 체크박스가 **같은 상태**를 본다(그래서 여기로 올렸다).
+  // 상권이 바뀌면 비운다: 다른 상권의 자리를 비교 후보로 남기지 않는다.
+  const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
+  useEffect(() => { setSelectedSiteIds([]); }, [districtId]);
+  const toggleSite = (id: string) => setSelectedSiteIds((ids) => ids.includes(id)
+    ? ids.filter((selected) => selected !== id)
+    : ids.length < 3 ? [...ids, id] : ids);
   const [quarters, setQuarters] = useState(1);
   const [listErr, setListErr] = useState<string | null>(null);
 
@@ -104,10 +127,12 @@ export default function PlatformConsole() {
       .then((all) => {
         if (!live) return;
         setDistricts(all);
-        if (all.length && !all.some((d) => d.id === DEFAULT_DISTRICT)) setDistrictId(all[0].id);
+        if (all.length && !all.some((d) => d.id === districtId)) setDistrictId(all[0].id);
       })
       .catch((e) => live && setListErr(String(e)));
     return () => { live = false; };
+    // 목록은 마운트 때 한 번만 — 상권 전환마다 다시 부르지 않는다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 정체성 + 자리 제안 — 이 화면의 본론
@@ -154,10 +179,13 @@ export default function PlatformConsole() {
     [hub, districtId, prof, profErr, fc, rec, zones],
   );
 
+  const sitesHere = prof?.district_id === districtId ? prof.openings.sites : null;
+  const boundary = usePlatformMap({ districtId, sites: sitesHere, selectedIds: selectedSiteIds, onToggle: toggleSite });
+
   return (
     <div className="platconsole"><div className="wrap">
       <Verdict
-        eyebrow="SpaceOS · Platform" conversion="PLACE ▶ PLATFORM"
+        eyebrow="PlaceOS · Platform" conversion="PLACE ▶ PLATFORM"
         question="이 입지·상권은 어떤 플랫폼인가"
         verdict={head.verdict} grounds={head.grounds} sources={head.sources}
         note={
@@ -198,6 +226,10 @@ export default function PlatformConsole() {
             {hub.building_count != null && (
               <span className="chip">건물 {hub.building_count.toLocaleString()}동</span>
             )}
+            {/* 지도에 그린 선이 무엇인지 — 상권 경계가 아니라 **잰 범위**다(hubBoundary). */}
+            {boundary && <span className="chip" title="지도에 그린 선은 공실률 분모에 들어간 100m 격자의 외곽선이다. 상권 경계가 아니다.">
+              지도 선: {boundaryBadge(boundary)}
+            </span>}
           </div>
         )}
       </div>
@@ -219,7 +251,9 @@ export default function PlatformConsole() {
 
       {prof?.identity && <IdentitySection ident={prof.identity} hub={hub} />}
       {prof?.district_id === districtId && (
-        <OpeningsSection key={districtId} openings={prof.openings} districtName={hub?.name ?? districtId} />
+        <OpeningsSection key={districtId} openings={prof.openings} districtName={hub?.name ?? districtId}
+          selectedIds={selectedSiteIds} onToggle={toggleSite} onClear={() => setSelectedSiteIds([])}
+          onOpenInPage={onOpenInPage ? (site) => onOpenInPage(siteToBuilding(districtId, site)) : undefined} />
       )}
 
       {/* 근거 — 위 두 답을 만든 모델의 성능과 한계. 지표가 아니라 **답**이 먼저 오도록 접어 둔다 */}
@@ -234,6 +268,87 @@ export default function PlatformConsole() {
       <SentimentSection zones={zones} hub={hub} />
     </div></div>
   );
+}
+
+/* ───────────────── 지도 (2026-09-13) ───────────────── */
+
+/**
+ * Platform 이 지도에 그리는 두 가지 — "이 상권은 어디까지인가" 와 "그 안 어느 자리에 무엇이".
+ *
+ *   ① **실측 범위 선** — 종전 「거점」 탭(HubExplorer)이 그리던 것을 이어받았다. 뜻은 상권
+ *      경계가 아니라 "공실률 분모에 들어간 100m 격자의 외곽선"이다(lib/hubBoundary). 칩이
+ *      그 사실을 말한다. 조각은 조각대로 그린다 — 감싸 덮으면 안 잰 곳을 잰 것처럼 보인다.
+ *   ② **자리 칩** — 실측 공실 자리마다 **상권 평균 대비 가장 두드러지는 업종**(distinct).
+ *      없으면 GNN Top-1, 그것도 없으면 "추천 없음". 칩을 누르면 비교 후보에 넣고 뺀다 —
+ *      목록 체크박스와 같은 상태다.
+ *
+ * 지도가 없으면(단독 렌더·테스트) 경계 요청도 보내지 않는다 — 그릴 곳이 없는 값을 받지 않는다.
+ * 경계를 돌려준다(패널 칩이 배지를 쓴다). 지도가 없으면 null.
+ */
+function usePlatformMap({ districtId, sites, selectedIds, onToggle }: {
+  districtId: string; sites: OpeningSite[] | null;
+  selectedIds: string[]; onToggle: (id: string) => void;
+}): HubBoundary | null {
+  const { map, ready } = useMapHost();
+  const [boundary, setBoundary] = useState<{ id: string; b: HubBoundary } | null>(null);
+
+  useEffect(() => {
+    if (!ready || !map) return;
+    let live = true;
+    getVacancyHeatmap(districtId)
+      .then((hm) => { if (live) setBoundary({ id: districtId, b: computeHubBoundary(hm.cells) }); })
+      .catch(() => { if (live) setBoundary({ id: districtId, b: EMPTY_BOUNDARY }); });
+    return () => { live = false; };
+  }, [ready, map, districtId]);
+
+  const current = boundary?.id === districtId ? boundary.b : null;
+
+  // 선 그리기 + 카메라. 카메라는 거점 center 가 아니라 경계 bbox 에 맞춘다 — center 는
+  // 수집 원점이라 실측 범위와 어긋날 수 있다(HubExplorer 에서 옮겨 온 규칙).
+  useEffect(() => {
+    const naver = (window as any).naver;
+    if (!ready || !map || !naver?.maps || !current) return;
+    const polys = current.pieces.map((piece) => {
+      const toPath = (ring: Array<[number, number]>) => ring.map(([lat, lng]) => new naver.maps.LatLng(lat, lng));
+      const solo = piece.cells <= 1;
+      return new naver.maps.Polygon({
+        map, paths: [toPath(piece.outer), ...piece.holes.map(toPath)],
+        strokeColor: colors.track.platform.base, strokeWeight: solo ? 1 : 2.5,
+        strokeOpacity: solo ? 0.7 : 0.95, strokeStyle: "shortdash",
+        fillColor: colors.track.platform.base, fillOpacity: solo ? 0 : 0.07,
+        clickable: false,
+      });
+    });
+    if (current.bbox) {
+      const { south, west, north, east } = current.bbox;
+      const narrow = window.innerWidth <= 768;
+      map.fitBounds?.(
+        new naver.maps.LatLngBounds(new naver.maps.LatLng(south, west), new naver.maps.LatLng(north, east)),
+        narrow
+          ? { top: 64, right: 16, bottom: Math.round(window.innerHeight * 0.58) + 16, left: 16 }
+          : { top: 48, right: 48, bottom: 48, left: TRACK_PANEL_W + 48 },
+      );
+    }
+    return () => { polys.forEach((p) => p.setMap?.(null)); };
+  }, [ready, map, current]);
+
+  const markers = useMemo<MapMarkerItem[]>(() => (sites ?? [])
+    .filter((s) => s.lat != null && s.lng != null)
+    .map((s) => {
+      const on = selectedIds.includes(s.unit_id);
+      const top = s.distinct?.industry ?? s.recommendations[0]?.industry ?? null;
+      return {
+        id: s.unit_id, lat: s.lat as number, lng: s.lng as number, zIndex: on ? 200 : 70,
+        html: mapLabelHTML({
+          text: top ?? "추천 없음",
+          sub: s.area_py != null ? `${s.area_py}평` : undefined,
+          color: colors.track.platform.base, active: on, dashed: top == null,
+        }),
+      };
+    }), [sites, selectedIds]);
+  useMapMarkers(markers, onToggle);
+
+  return ready && map ? current : null;
 }
 
 /* ───────────────── 결론 1줄 + 근거 3줄 ───────────────── */
@@ -582,22 +697,22 @@ function Spark({ points, direction }: { points: number[]; direction: string }) {
 
 /* ───────────────── ② 어느 자리에 어떤 업소가 ───────────────── */
 
-function OpeningsSection({ openings, districtName }: {
+function OpeningsSection({ openings, districtName, selectedIds, onToggle: toggleSite, onClear, onOpenInPage }: {
   openings: PlatformProfile["openings"]; districtName: string;
+  onOpenInPage?: (site: OpeningSite) => void;
+  /** 비교 후보 — 지도 칩과 공유하므로 상위(PlatformConsole)가 든다 */
+  selectedIds: string[]; onToggle: (id: string) => void; onClear: () => void;
 }) {
   const [shown, setShown] = useState(SITES_PAGE);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const comparisonId = useId();
   const selectionHintId = useId();
   const sites = openings.sites;
   const selectedSites = selectedIds.flatMap((id) => sites.filter((site) => site.unit_id === id));
   const canCompare = selectedSites.length >= 2;
-  function toggleSite(id: string) {
-    setSelectedIds((ids) => ids.includes(id)
-      ? ids.filter((selected) => selected !== id)
-      : ids.length < 3 ? [...ids, id] : ids);
-  }
+  // 한 번 고르면 펼친 채로 둔다 — 마지막 후보를 해제했다고 사용자 손 밑에서 접히면 안 된다.
+  const [pinnedOpen, setPinnedOpen] = useState(false);
+  useEffect(() => { if (selectedIds.length > 0) setPinnedOpen(true); }, [selectedIds.length]);
   // 한 지번에 자리가 여럿이면 이름이 똑같이 찍힌다(신사동 552-19 가 3곳). 좌표가 다른
   // 별개의 자리인데 화면에서는 중복 버그처럼 보이므로, 겹칠 때만 유닛 번호를 붙인다.
   const dupNames = useMemo(() => {
@@ -607,7 +722,9 @@ function OpeningsSection({ openings, districtName }: {
   }, [sites]);
 
   return (
-    <Fold title="어느 자리에 어떤 업소가 들어오면 좋나" badge="실측 공실"
+    // 지도 칩으로 후보를 고르면 이 접힌 자리를 편다 — 고른 결과가 접힌 채 안 보이면
+    // 칩을 눌러도 아무 일이 안 일어난 것처럼 읽힌다.
+    <Fold title="어느 자리에 어떤 업소가 들어오면 좋나" badge="실측 공실" open={pinnedOpen || undefined}
       summary={<>공실 <b>{openings.unit_count}곳</b> · 추천이 붙은 자리 <b>{openings.matched_count}곳</b>
         {" "}(반경 {openings.match_radius_m}m 안 그래프 노드) · 상권 평균과 가장 다른 자리부터</>}>
 
@@ -649,7 +766,7 @@ function OpeningsSection({ openings, districtName }: {
               </Button>
               {selectedSites.length > 0 && (
                 <Button type="button" variant="ghost" onClick={() => {
-                  setSelectedIds([]); setComparisonOpen(false);
+                  onClear(); setComparisonOpen(false);
                 }}>선택 초기화</Button>
               )}
             </div>
@@ -668,7 +785,8 @@ function OpeningsSection({ openings, districtName }: {
                   seq={(dupNames.get(s.name) ?? 0) > 1 ? s.unit_id.split("-").pop() ?? null : null}
                   selected={selectedIds.includes(s.unit_id)}
                   disabled={selectedIds.length >= 3 && !selectedIds.includes(s.unit_id)}
-                  onToggle={() => toggleSite(s.unit_id)} />
+                  onToggle={() => toggleSite(s.unit_id)}
+                  onOpenInPage={onOpenInPage && s.unit_id.startsWith(UNIT_PREFIX) ? () => onOpenInPage(s) : undefined} />
               ))}
             </div>
           </fieldset>
@@ -692,9 +810,18 @@ function OpeningsSection({ openings, districtName }: {
   );
 }
 
-function SiteCard({ site, seq, selected, disabled, onToggle }: {
+/** 자리 id 규약 — build_vacant_units.py 가 `vu-{건물 id}` 로 만든다. Posting 인계와 같은 계약이다. */
+const UNIT_PREFIX = "vu-";
+
+/** 자리 → Page 건물 선택. 건물 id 는 규약에서 뗀 값만 쓴다(이름·좌표로 추측하지 않는다). */
+function siteToBuilding(districtId: string, site: OpeningSite): BuildingSelection {
+  return { districtId, buildingId: site.unit_id.slice(UNIT_PREFIX.length), buildingName: site.name };
+}
+
+function SiteCard({ site, seq, selected, disabled, onToggle, onOpenInPage }: {
   site: OpeningSite; seq: string | null;
   selected: boolean; disabled: boolean; onToggle: () => void;
+  onOpenInPage?: () => void;
 }) {
   const max = site.recommendations[0]?.score ?? 1;
   return (
@@ -744,6 +871,10 @@ function SiteCard({ site, seq, selected, disabled, onToggle }: {
       )}
 
       {site.was && <div className="swas">직전 업종 <b>{site.was}</b></div>}
+      {onOpenInPage && (
+        <button type="button" className="site-open-page" onClick={onOpenInPage}
+          aria-label={`${site.name} Page에서 이 건물 보기`}>Page에서 이 건물 보기 →</button>
+      )}
     </Card>
   );
 }

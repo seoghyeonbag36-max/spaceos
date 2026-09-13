@@ -3,7 +3,7 @@ name: frontend-dev
 description: React+TS 컴포넌트·페이지 추가 규칙 — api.ts 일원화, @/ 별칭, 빌드 타입체크. apps/frontend 에 UI 를 붙일 때.
 ---
 
-SpaceOS 프론트엔드에 UI를 추가한다. 대상: 호출 인수(추가할 UI). 비어 있으면 무엇을 붙일지 먼저 묻는다.
+PlaceOS 프론트엔드에 UI를 추가한다. 대상: 호출 인수(추가할 UI). 비어 있으면 무엇을 붙일지 먼저 묻는다.
 
 규칙:
 1. 함수형 컴포넌트 + 훅. 컴포넌트는 `src/components/`, 페이지는 `src/pages/`.

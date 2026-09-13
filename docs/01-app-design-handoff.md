@@ -1,6 +1,6 @@
 # 01. 앱 디자인 핸드오프 — 외부 작업자용 Claude Code 셋업
 
-SpaceOS의 앱/UI 디자인과 프론트엔드 구현을 **다른 작업자**에게 맡기기 위한 인수인계 가이드. 작업자는 Claude를 처음 쓰며, 프로젝트 파일을 **본인 컴퓨터로 옮겨** 작업하는 상황을 전제로 한다.
+PlaceOS의 앱/UI 디자인과 프론트엔드 구현을 **다른 작업자**에게 맡기기 위한 인수인계 가이드. 작업자는 Claude를 처음 쓰며, 프로젝트 파일을 **본인 컴퓨터로 옮겨** 작업하는 상황을 전제로 한다.
 
 작업 범위는 두 가지를 모두 포함한다.
 - **디자인 시안/프로토타입** — 화면 흐름·레이아웃·컴포넌트 시안 (이미지/Figma 참조 → 코드 변환)
@@ -11,7 +11,7 @@ SpaceOS의 앱/UI 디자인과 프론트엔드 구현을 **다른 작업자**에
 ## 1. 파일 전달 (오너 → 작업자)
 
 ### 1-1. 무엇을 전달하나
-프로젝트 루트 `SpaceOS/` 폴더 전체를 전달한다. 단, 아래는 **제외**한다.
+프로젝트 루트 `PlaceOS/` 폴더 전체를 전달한다. 단, 아래는 **제외**한다.
 
 | 제외 대상 | 이유 |
 |----------|------|
@@ -26,14 +26,14 @@ SpaceOS의 앱/UI 디자인과 프론트엔드 구현을 **다른 작업자**에
 - **권장 — Git 원격 저장소**: 오너가 GitHub/GitLab 비공개 저장소에 푸시 → 작업자가 `git clone`. 이력·협업·되돌리기에 유리.
   ```powershell
   # 오너 측 (최초 1회)
-  cd C:\Users\USER\Documents\Claude\Projects\SpaceOS
-  git init; git add -A; git commit -m "init: SpaceOS"
+  cd C:\Users\USER\Documents\Claude\Projects\PlaceOS
+  git init; git add -A; git commit -m "init: PlaceOS"
   git remote add origin <비공개_저장소_URL>
   git push -u origin main
   ```
   ```bash
   # 작업자 측
-  git clone <비공개_저장소_URL> SpaceOS
+  git clone <비공개_저장소_URL> PlaceOS
   ```
 - **대안 — 압축 파일 전달**: 폴더를 zip으로 압축해 클라우드(드라이브)로 공유. 단 `node_modules`·`.venv`·`.env`는 빼고 압축.
 
@@ -70,7 +70,7 @@ git --version
 npm install -g @anthropic-ai/claude-code
 
 # 2) 프로젝트 폴더로 이동
-cd SpaceOS        # (clone 또는 압축 해제한 위치)
+cd PlaceOS        # (clone 또는 압축 해제한 위치)
 
 # 3) 실행 → 최초 1회 브라우저 로그인
 claude
@@ -150,7 +150,7 @@ npm run build          # 타입체크 + 빌드 통과해야 함
 ## 7. 작업자 온보딩 체크리스트
 
 - [ ] Node 18+, Git 설치 확인
-- [ ] SpaceOS 폴더 수령 (`.env`·`node_modules` 제외 정상)
+- [ ] PlaceOS 폴더 수령 (`.env`·`node_modules` 제외 정상)
 - [ ] `npm install -g @anthropic-ai/claude-code` 설치
 - [ ] 프로젝트 폴더에서 `claude` 실행 + 로그인
 - [ ] `cd apps/frontend && npm install && npm run dev` → localhost:5173 확인

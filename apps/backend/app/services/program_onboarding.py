@@ -10,6 +10,7 @@ from app.models.auth import AuditLog
 from app.schemas.marketing import ProgramCommercialOnboardingRequest
 from app.services import marketing
 
+# ⚠ 와이어 계약 문자열 — 브랜드 개명(PlaceOS)과 무관하게 유지한다. 바꾸려면 버전을 올린다(2026-09-12).
 CONTRACT_VERSION = "spaceos.program-onboarding/1"
 AUDIT_ACTION = "program.onboarding.accepted"
 

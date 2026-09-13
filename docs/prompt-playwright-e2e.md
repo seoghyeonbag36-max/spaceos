@@ -25,7 +25,7 @@
 ## 붙여 넣을 프롬프트
 
 ```
-SpaceOS 프론트에 Playwright e2e를 구축하고, 13거점 red dot 렌더를 시각 검증해줘.
+PlaceOS 프론트에 Playwright e2e를 구축하고, 13거점 red dot 렌더를 시각 검증해줘.
 
 ## 배경
 2026-07-27에 13거점 건물 대장(Tier1) 수집을 완료하고 build_page_master를 재빌드했다.
@@ -85,4 +85,4 @@ capacity가 층수 근사(floor_approx)에서 실제 대장(expos_units/floor_ou
 - 파이프라인: `data/pipelines/build_page_master.py`
 - 수집기: `data/collectors/building_vacancy.py`
 - 수집 래퍼: `scripts/run_bldgvac_until_done.ps1`
-- 기존 수동 확인 절차: `.claude/skills/verify` (spaceos:verify 스킬)
+- 기존 수동 확인 절차: `.claude/skills/verify` (placeos:verify 스킬)

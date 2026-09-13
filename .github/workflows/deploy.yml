@@ -1,4 +1,4 @@
-# SpaceOS 배포 — main 푸시 시 Cloud Run 으로 나간다
+# PlaceOS 배포 — main 푸시 시 Cloud Run 으로 나간다
 #
 # ## 왜 이 파일이 필요한가
 # 2026-08-28 Vercel → Cloud Run 전환 전까지는 `git push` 가 Vercel 로 **자동 배포**됐다.
@@ -27,6 +27,9 @@ concurrency:
   group: deploy-cloud-run
   cancel-in-progress: false   # 배포는 중간에 끊지 않는다
 
+# ⚠ 2026-09-12 브랜드를 SpaceOS → PlaceOS 로 바꿨지만 아래 이름들은 **이미 만들어진 리소스**라 그대로 둔다.
+#   글자만 PlaceOS 로 바꾸면 배포가 존재하지 않는 리소스를 찾는다. 옮기려면
+#   GCP 프로젝트·Artifact Registry·Cloud Run 서비스를 먼저 새로 만들어야 한다.
 env:
   PROJECT_ID: spaceos-digital-twin
   REGION: us-central1

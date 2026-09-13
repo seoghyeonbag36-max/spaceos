@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import PlatformConsole from "./PlatformConsole";
 import type { OpeningSite, PlatformProfile } from "@/lib/api";
@@ -180,6 +180,22 @@ describe("PlatformConsole — 동일 상권 후보 비교", () => {
     expect(within(region).getByRole("table")).toBeTruthy();
     expect(region.querySelector("svg")).toBeNull();
     expect(within(region).getByText(DISTINCT_NOTE)).toBeTruthy();
+  });
+
+  it("Page 인계 버튼은 vu- 규약 자리에만 뜨고, 건물 id 는 규약에서 뗀 값만 넘긴다", async () => {
+    installFetchStub([
+      { match: /\/commercial-districts$/, body: [district("garosugil", { name: "가로수길" })] },
+      { match: /\/commercial-districts\/garosugil\/platform$/, body: profile("garosugil", [
+        site(1, { unit_id: "vu-11680-1", name: "규약 자리" }), site(2),
+      ]) },
+      { match: /\/commercial-districts\/[^/]+\/sentiment$/, body: [] },
+    ]);
+    const open = vi.fn();
+    render(<PlatformConsole onOpenInPage={open} />);
+    await openCandidates();
+    expect(screen.queryByRole("button", { name: "테스트 자리 2 Page에서 이 건물 보기" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "규약 자리 Page에서 이 건물 보기" }));
+    expect(open).toHaveBeenCalledWith({ districtId: "garosugil", buildingId: "11680-1", buildingName: "규약 자리" });
   });
 
   it("실측 공실 자리가 없으면 선택 UI나 비교값을 만들지 않는다", async () => {

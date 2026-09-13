@@ -3,13 +3,19 @@ import { caveatKind, CaveatNote } from "@/components/DistrictPicker";
 import Verdict, { Fold, type Ground } from "@/components/Verdict";
 import {
   listDistricts, generateCommercialStoreMarketing, generateStoreMarketing,
-  lookupStorePlaces, lookupStoreReviews,
+  getDistrictEvents, lookupStorePlaces, lookupStoreReviews,
 } from "@/lib/api";
 import type {
-  ChannelPlan, DistrictSummary, StoreMarketing, StorePlace,
+  ChannelPlan, DistrictSummary, MarketingEvent, StoreMarketing, StorePlace,
 } from "@/lib/api";
 import { Button } from "@/design/components/Button";
 import { Card } from "@/design/components/Card";
+import { mapLabelHTML } from "@/design/components/MapMarkerPin";
+import { colors } from "@/design/tokens/colors";
+import { useMapHost } from "@/components/MapHost";
+import { useFitMap, useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
+import { TRACK_PANEL_W } from "@/components/TrackMapFrame";
+import type { ProgramHandoff } from "@/lib/workspaceState";
 import "./ProgramStudio.css";
 
 /**
@@ -102,8 +108,27 @@ const linesOf = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean
 const commaOf = (t: string) => t.split(",").map((s) => s.trim()).filter(Boolean);
 const isHttp = (u: string) => /^https?:\/\//.test(u);
 
-export default function ProgramStudio() {
-  const [form, setForm] = useState<FormState>(EMPTY);
+export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss }: {
+  /** 지도가 비출 상권(App 공유 상권). 폼의 「거점」을 고르지 않았을 때 카메라만 여기로 간다 —
+   *  **생성 요청에는 넣지 않는다.** 컨텍스트 결합은 사용자가 폼에서 고른 것만 쓴다. */
+  mapDistrictId?: string;
+  /** Posting → Program 인계(화면설계서 2판). **보이는 입력칸만** 채운다 — 거점·카테고리·주소.
+   *  App 이 인계마다 key 를 바꿔 새로 마운트하므로 초기값으로만 읽는다. */
+  handoff?: ProgramHandoff;
+  /** 안내를 걷었을 때 App 에 알린다 — 탭을 다녀와 다시 마운트돼도 걷은 안내가 되살아나지 않게. */
+  onArrivalDismiss?: () => void;
+} = {}) {
+  const [form, setForm] = useState<FormState>(() => handoff
+    ? { ...EMPTY, districtId: handoff.districtId, category: handoff.industry ?? "", address: handoff.unitName }
+    : EMPTY);
+  // 「입점 예정 자리」 안내·지도 핀. 폼을 통째로 갈아엎는 동작(비우기·예시·모드 전환)에서 걷는다 —
+  // 폼은 다른 가게가 됐는데 안내만 남으면 엉뚱한 자리를 가리킨다.
+  const [arrival, setArrivalState] = useState<ProgramHandoff | null>(handoff ?? null);
+  const setArrival = (next: null) => { setArrivalState(next); onArrivalDismiss?.(); };
+  // 고른 오프라인 홍보 장소(행사). 지도 칩과 패널 목록이 같은 상태를 본다.
+  const [eventId, setEventId] = useState<string | null>(null);
+  // 후보 목록에서 고른 가게 — 지도에 "이 가게" 핀을 남기는 데만 쓴다. 입력이 바뀌면 걷는다.
+  const [pickedPlace, setPickedPlace] = useState<StorePlace | null>(null);
   const [districts, setDistricts] = useState<DistrictSummary[] | null>(null);
   const [districtErr, setDistrictErr] = useState(false);
   const [result, setResult] = useState<StoreMarketing | null>(null);
@@ -162,11 +187,20 @@ export default function ProgramStudio() {
     && (!commercialMode || commercialReady);
 
   const hub = (districts ?? []).find((d) => d.id === form.districtId);
+  const eventsDistrict = form.districtId || mapDistrictId || null;
+  useEffect(() => { setEventId(null); }, [eventsDistrict]);
+  const mapEvents = useProgramMap({
+    districtId: eventsDistrict,
+    districts: districts ?? [], places, pickedPlace, arrival, eventId,
+    onPickPlace: (p) => { if (!lookupBusy) applyPlace(p); },
+    onPickEvent: setEventId,
+  });
 
   function changeField<K extends keyof FormState>(k: K, value: FormState[K]) {
     // 생성 원본의 입력이 바뀌면 이전 응답·초안·근거를 새 프로필에 붙이지 않는다.
     discardResult();
     discardLookup(["name", "category", "address", "districtId"].includes(k));
+    if (["name", "address"].includes(k)) setPickedPlace(null);
     setForm((f) => ({ ...f, [k]: value }));
   }
 
@@ -191,6 +225,8 @@ export default function ProgramStudio() {
     setCommercialMode(!commercialMode);
     setApiKey("");
     setForm(EMPTY);
+    setPickedPlace(null);
+    setArrival(null);
     setPublicReviews([]);
     setPlaces(null);
     setLookupNote(null);
@@ -231,6 +267,7 @@ export default function ProgramStudio() {
   async function applyPlace(p: StorePlace) {
     discardResult(); discardLookup(true);
     const version = ++lookupVersion.current;
+    setPickedPlace(p);
     setForm((f) => ({
       ...f,
       name: p.name,
@@ -318,11 +355,28 @@ export default function ProgramStudio() {
   return (
     <div className="progstudio"><div className="wrap">
       <Verdict
-        eyebrow="SpaceOS · Program" conversion="PROMOTION ▶ PROGRAM"
+        eyebrow="PlaceOS · Program" conversion="PROMOTION ▶ PROGRAM"
         question="posting 한 page 를 어떤 홍보 program 으로 돌릴 것인가"
         verdict={head.verdict} grounds={head.grounds} sources={head.sources}
         note={HOW_TO_READ}
       />
+
+      {/* Posting → Program 인계 안내(화면설계서 2판 §Program ①). 금액·전략은 안내에만 쓰고
+          생성 요청에는 싣지 않는다 — 요청 계약(StoreProfile)에 그 필드가 없다. */}
+      {arrival && (
+        <div className="arrival" role="status">
+          <b>입점 예정 자리</b> — {arrival.unitName} · {arrival.area}평 · {arrival.floor} · 월 {arrival.rent.toLocaleString("ko-KR")}만원
+          {arrival.strategy && <> · Posting {arrival.strategy} 전략</>}
+          <span>가게명·리뷰를 넣으면 이 자리 기준으로 홍보 program 을 만든다. 거점·카테고리·주소는 Posting 에서 채웠다(바꿀 수 있다).</span>
+        </div>
+      )}
+
+      {/* 오프라인 홍보 장소(화면설계서 2판 §Program ②) — 지도 칩과 **같은 목록**이다. 칩은
+          키보드로 닿지 않으므로 여기서 같은 선택을 할 수 있어야 한다. 지도가 없으면 그리지 않는다. */}
+      {mapEvents && (
+        <OfflinePlaces data={mapEvents} selectedId={eventId} hasPlaceChips={!!places?.some((p) => p.lat != null)}
+          onSelect={(e) => { setEventId(e.id); mapEvents.panTo(e.lat, e.lng); }} />
+      )}
 
       <div className="cols">
         {/* ── 입력 ── */}
@@ -332,7 +386,7 @@ export default function ProgramStudio() {
             <div className="ptools">
               {!commercialMode && (
                 <Button variant="ghost" type="button" className="ghost" onClick={() => {
-                  setForm(SAMPLE); discardResult(); discardLookup(true);
+                  setForm(SAMPLE); setPickedPlace(null); setArrival(null); discardResult(); discardLookup(true);
                 }}>예시 채우기</Button>
               )}
               <Button variant="ghost" type="button" className={`ghost ${commercialMode ? "active" : ""}`}
@@ -340,7 +394,7 @@ export default function ProgramStudio() {
                 {commercialMode ? "공개 데모로" : "상용 온보딩"}
               </Button>
               <Button variant="ghost" type="button" className="ghost" onClick={() => {
-                setForm(EMPTY); setPublicReviews([]); discardResult(); discardLookup(true);
+                setForm(EMPTY); setPickedPlace(null); setArrival(null); setPublicReviews([]); discardResult(); discardLookup(true);
                 setApiKey(""); setRightsConfirmed(false); setProcessingConsent(false);
                 setExternalConsent(false); setRetentionAcknowledged(false);
               }}>비우기</Button>
@@ -495,9 +549,9 @@ export default function ProgramStudio() {
           {commercialMode && (
             <div className="consentbox">
               <Field label="조직 API 키" required
-                hint="발급된 sk_spaceos_… 키. 요청 헤더에만 사용하며 브라우저 저장소에 보관하지 않는다.">
+                hint="발급된 sk_placeos_… 키. 요청 헤더에만 사용하며 브라우저 저장소에 보관하지 않는다.">
                 <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)}
-                  autoComplete="off" placeholder="sk_spaceos_…" />
+                  autoComplete="off" placeholder="sk_placeos_…" />
               </Field>
               <label className="consent">
                 <input type="checkbox" checked={rightsConfirmed}
@@ -555,6 +609,197 @@ export default function ProgramStudio() {
         </Card>
       </div>
     </div></div>
+  );
+}
+
+/* ───────────── 지도 (2026-09-13) ───────────── */
+
+/** 행사 기간 문자열("YYYY-MM-DD~YYYY-MM-DD")을 가른다. 모양이 다르면 null — 그 행사는 거르지 않는다
+ *  (날짜를 모르는 것을 종료로 단정하면 있는 행사를 지운다). */
+export function eventRange(when: string | null | undefined): { start: string; end: string } | null {
+  const m = /^(\d{4}-\d{2}-\d{2})\s*~\s*(\d{4}-\d{2}-\d{2})/.exec(when ?? "");
+  if (m) return { start: m[1], end: m[2] };
+  const one = /^(\d{4}-\d{2}-\d{2})/.exec(when ?? "");
+  return one ? { start: one[1], end: one[1] } : null;
+}
+
+/** 종료일이 오늘보다 앞선 행사를 뺀다(화면설계서 2판 PR-01). 행사 산출물이 08-16 빌드라 이미
+ *  끝난 행사가 섞여 있다 — 끝난 행사를 "홍보를 붙일 곳"으로 보여주면 거짓 안내가 된다.
+ *  `today` 는 로컬 날짜 "YYYY-MM-DD". 남은 것은 시작일 순. */
+export function splitEvents(events: MarketingEvent[], today: string): { upcoming: MarketingEvent[]; ended: number } {
+  const upcoming: MarketingEvent[] = [];
+  let ended = 0;
+  for (const e of events) {
+    const r = eventRange(e.when);
+    if (r && r.end < today) ended += 1; else upcoming.push(e);
+  }
+  upcoming.sort((a, b) => (eventRange(a.when)?.start ?? "9999").localeCompare(eventRange(b.when)?.start ?? "9999"));
+  return { upcoming, ended };
+}
+
+const localToday = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
+/** 칩·목록에 쓰는 짧은 기간 — "09-20~09-27" 또는 "10-02". */
+function shortRange(when: string): string {
+  const r = eventRange(when);
+  if (!r) return when;
+  return r.start === r.end ? r.start.slice(5) : `${r.start.slice(5)}~${r.end.slice(5)}`;
+}
+
+interface ProgramMapData {
+  events: MarketingEvent[];
+  ended: number;
+  source: string;
+  panTo: (lat: number, lng: number) => void;
+}
+
+/**
+ * Program 이 지도에 그리는 것 — "어디서 홍보를 돌리나".
+ *
+ *   ① **가게 후보 칩** — 상호 검색 결과(카카오 로컬). 같은 상호가 여러 곳이면 위치로 고른다.
+ *      칩을 누르면 목록에서 고른 것과 똑같이 채워진다(`applyPlace`).
+ *   ② **고른 가게 핀** — 채운 뒤에도 "이 가게" 자리가 남는다.
+ *   ③ **오프라인 홍보 장소** — 상권의 공공 문화행사. **LLM 을 부르지 않는 경로**
+ *      (`/marketing/events`)로만 받는다. 시드 폴백은 점선, 종료된 행사는 뺀다.
+ *      칩을 누르면 패널 목록에서 그 행사가 선택된다(표식 규칙 — 화면설계서 2판).
+ *   ④ **입점 예정 자리** — Posting 에서 넘어왔을 때의 자리(Posting 트랙 색).
+ *
+ * 지도가 없으면(단독 렌더·테스트) 행사 요청도 보내지 않고 null 을 돌려준다.
+ */
+function useProgramMap({ districtId, districts, places, pickedPlace, arrival, eventId, onPickPlace, onPickEvent }: {
+  districtId: string | null; districts: DistrictSummary[];
+  places: StorePlace[] | null; pickedPlace: StorePlace | null;
+  arrival: ProgramHandoff | null; eventId: string | null;
+  onPickPlace: (p: StorePlace) => void;
+  onPickEvent: (id: string) => void;
+}): ProgramMapData | null {
+  const { map, ready } = useMapHost();
+  const [ev, setEv] = useState<{ id: string; events: MarketingEvent[]; source: string } | null>(null);
+
+  useEffect(() => {
+    if (!ready || !map || !districtId) return;
+    let live = true;
+    getDistrictEvents(districtId)
+      .then((r) => { if (live) setEv({ id: districtId, events: r.events, source: r.events_source ?? "seed" }); })
+      .catch(() => { if (live) setEv({ id: districtId, events: [], source: "unavailable" }); });
+    return () => { live = false; };
+  }, [ready, map, districtId]);
+  const current = ev && ev.id === districtId ? ev : null;
+  const split = useMemo(() => splitEvents(current?.events ?? [], localToday()), [current]);
+
+  const placeKey = (p: StorePlace, i: number) => `place-${i}-${p.name}`;
+  const markers = useMemo<MapMarkerItem[]>(() => {
+    const out: MapMarkerItem[] = [];
+    const seed = current?.source !== "seoul-open-data";
+    for (const e of split.upcoming) {
+      const on = e.id === eventId;
+      out.push({
+        id: `event-${e.id}`, lat: e.lat, lng: e.lng, zIndex: on ? 220 : 60,
+        html: mapLabelHTML({
+          text: e.n.length > 14 ? `${e.n.slice(0, 13)}…` : e.n,
+          sub: seed ? "예시" : shortRange(e.when),
+          color: colors.track.program.base, dashed: seed, active: on,
+        }),
+      });
+    }
+    (places ?? []).forEach((p, i) => {
+      if (p.lat == null || p.lng == null) return;
+      out.push({
+        id: placeKey(p, i), lat: p.lat, lng: p.lng, zIndex: 150,
+        html: mapLabelHTML({ text: p.name, sub: p.category?.split(">").pop()?.trim(), color: colors.ink }),
+      });
+    });
+    if (pickedPlace?.lat != null && pickedPlace.lng != null) {
+      out.push({
+        id: "picked", lat: pickedPlace.lat, lng: pickedPlace.lng, zIndex: 250,
+        html: mapLabelHTML({ text: pickedPlace.name, sub: "이 가게", color: colors.track.program.base, active: true }),
+      });
+    }
+    if (arrival) {
+      out.push({
+        id: "arrival", lat: arrival.lat, lng: arrival.lng, zIndex: 240,
+        html: mapLabelHTML({ text: "입점 예정 자리", sub: `${arrival.area}평 · ${arrival.floor}`, color: colors.track.posting.base, active: true }),
+      });
+    }
+    return out;
+  }, [current, split, eventId, places, pickedPlace, arrival]);
+
+  useMapMarkers(markers, (id) => {
+    if (id.startsWith("event-")) { onPickEvent(id.slice("event-".length)); return; }
+    const i = (places ?? []).findIndex((p, k) => placeKey(p, k) === id);
+    if (i >= 0) onPickPlace((places ?? [])[i]);
+  });
+
+  // 카메라: 후보 → 고른 가게 → 입점 예정 자리 → 상권 중심 순. 키가 바뀔 때만 움직인다.
+  const hubCenter = districts.find((d) => d.id === districtId)?.center;
+  const candidatePts = (places ?? []).filter((p) => p.lat != null && p.lng != null)
+    .map((p) => ({ lat: p.lat as number, lng: p.lng as number }));
+  const single = pickedPlace?.lat != null && pickedPlace.lng != null ? { lat: pickedPlace.lat, lng: pickedPlace.lng }
+    : arrival ? { lat: arrival.lat, lng: arrival.lng } : null;
+  const fitKey = candidatePts.length ? `places:${candidatePts.map((p) => `${p.lat},${p.lng}`).join("|")}`
+    : single ? `one:${single.lat},${single.lng}` : districtId ? `hub:${districtId}` : null;
+  const fitPts = candidatePts.length ? candidatePts : single ? [single] : [];
+  useFitMap(fitKey, fitPts, hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null, TRACK_PANEL_W);
+
+  if (!ready || !map || !current) return null;
+  return {
+    events: split.upcoming, ended: split.ended, source: current.source,
+    panTo: (lat, lng) => {
+      const naver = (window as any).naver;
+      if (naver?.maps) map.panTo?.(new naver.maps.LatLng(lat, lng));
+    },
+  };
+}
+
+/** 오프라인 홍보 장소 목록 + 고른 행사 상세. 지도 칩과 같은 목록·같은 선택이다. */
+function OfflinePlaces({ data, selectedId, hasPlaceChips, onSelect }: {
+  data: ProgramMapData; selectedId: string | null; hasPlaceChips: boolean;
+  onSelect: (e: MarketingEvent) => void;
+}) {
+  const { events, ended, source } = data;
+  const selected = events.find((e) => e.id === selectedId) ?? null;
+  const seed = source !== "seoul-open-data";
+  return (
+    <section className="offline-places" aria-label="오프라인 홍보 장소">
+      <div className="op-head">
+        <b>오프라인 홍보 장소 · {events.length}곳</b>
+        {ended > 0 && <span>종료된 행사 {ended}곳은 뺐다</span>}
+      </div>
+      <p className="op-src" role="status">
+        {source === "unavailable" ? "행사 목록을 불러오지 못했다"
+          : source === "seed" ? "행사 실데이터 미적재 — 점선 칩은 예시다"
+          : events.length === 0 ? "이 상권에 예정된 공공 문화행사가 없다 — 예시로 채우지 않는다."
+          : "서울열린데이터광장 공공 문화행사 · 지도 칩과 같은 목록"}
+        {hasPlaceChips && " · 잉크색 칩 = 가게 후보(눌러서 고른다)"}
+      </p>
+      {events.length > 0 && (
+        <ul className="op-list">
+          {events.map((e) => (
+            <li key={e.id}>
+              <button type="button" aria-pressed={e.id === selectedId} onClick={() => onSelect(e)}>
+                <span className="op-name">{e.n}{seed && <i> · 예시</i>}</span>
+                <span className="op-meta">{shortRange(e.when)}{e.place ? ` · ${e.place}` : ""}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {selected && (
+        <dl className="op-detail" aria-label={`${selected.n} 상세`}>
+          <div><dt>일정</dt><dd>{selected.when || "미제공"}</dd></div>
+          <div><dt>장소</dt><dd>{selected.place || "미제공"}</dd></div>
+          <div><dt>주최</dt><dd>{selected.org || "미제공"}</dd></div>
+          <div><dt>요금</dt><dd>{selected.fee || "미제공"}</dd></div>
+          <div><dt>대상</dt><dd>{selected.target || "미제공"}</dd></div>
+          {selected.link && /^https?:\/\//.test(selected.link) && (
+            <a href={selected.link} target="_blank" rel="noopener noreferrer">행사 페이지 열기 ↗</a>
+          )}
+        </dl>
+      )}
+    </section>
   );
 }
 

@@ -70,7 +70,7 @@ describe("Posting — 입력과 결과의 대응", () => {
     outdated.source = "copilot";
     await act(async () => { resolveFirst(outdated); await pending; });
     expect(screen.queryByText("코파일럿", { selector: ".badge" })).toBeNull();
-    expect(screen.getByText("내부 3-Tier 폴백")).toBeTruthy();
+    expect(screen.getByText("내부 3-Tier 폴백", { selector: ".badge" })).toBeTruthy();
   });
 
   it("선택한 자리와 다른 서버 폴백 응답은 결과로 표시하지 않는다", async () => {

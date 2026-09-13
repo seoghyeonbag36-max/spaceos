@@ -45,7 +45,7 @@ async def get_sentiment(district_id: str) -> list[dict]:
       - data/crawlers/review_crawler.py 는 NotImplementedError (골격만)
       - 네이버 블로그 코퍼스(17,653건)는 **거점 단위 광고성 스니펫**이라
         324개 구역으로 내릴 수 없고, 감성분석을 돌리면 광고 톤을 재게 된다
-    자세한 판단 근거는 docs/spaceos-vibe-build-sequence.md 의 5번 항목 참조.
+    자세한 판단 근거는 docs/placeos-vibe-build-sequence.md 의 5번 항목 참조.
     """
     zones = svc.get_sentiment(district_id)
     if zones is None:

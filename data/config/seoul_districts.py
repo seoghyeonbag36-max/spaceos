@@ -1,6 +1,6 @@
 """서울 25개 구 거점 선정 점수 모델 설정 (config).
 
-SpaceOS 진입 우선순위 산식의 단일 진실 공급원(Single Source of Truth).
+PlaceOS 진입 우선순위 산식의 단일 진실 공급원(Single Source of Truth).
 - DISTRICTS: 25개 구의 자치구 코드 + 4기준 base 앵커(0~100) + 수집 키워드.
 - SCORE_BANDS: base(0~100) → 1~4점 변환 임계 밴드 (대상별·기준별).
 - TILT: 동점 시 연속 점수 정렬용 대상별 가중치.
@@ -70,7 +70,7 @@ DISTRICTS: dict[str, dict] = {
 
 # base(0~100) → 1~4점 변환 밴드. (upper_bound_inclusive, score) 오름차순.
 # 마지막 항목의 upper_bound=100 이 최고 점수. 대상별·기준별로 방향과 구간이 다르다.
-# 핵심 원칙: 공실(VAC)은 'SpaceOS가 푸는 문제' → 입주업체(b2b)에겐 높을수록 高점수,
+# 핵심 원칙: 공실(VAC)은 'PlaceOS가 푸는 문제' → 입주업체(b2b)에겐 높을수록 高점수,
 #           방문고객(b2c)에겐 약한 음(-) 신호라 만점 상한을 3으로 제한.
 SCORE_BANDS: dict[str, dict[str, list[tuple[int, int]]]] = {
     "SNS": {

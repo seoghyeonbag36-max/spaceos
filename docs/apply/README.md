@@ -57,7 +57,7 @@ python scripts/check_application.py --doc docs/apply/01-spatial-info/draft.md --
 |---|---|---|
 | C7 | [data-sources.md](data-sources.md) — 데이터 출처·라이선스 표 | 작성됨. 라이선스·갱신주기 칸은 포털 확인 후 채운다 |
 
-C7 을 만들며 **전제가 하나 뒤집혔다**: SpaceOS 는 브이월드(국가공간정보)를 이미 쓰고 있다
+C7 을 만들며 **전제가 하나 뒤집혔다**: PlaceOS 는 브이월드(국가공간정보)를 이미 쓰고 있다
 (`data/collectors/vworld_bldg.py` → `build_page_master.py`). 공간정보 경진대회 원고 §3·§8 이
 "쓰지 않는다"는 전제로 잡혀 있던 것을 고쳤다.
 

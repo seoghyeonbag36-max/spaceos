@@ -5,7 +5,7 @@ description: PPPP 네 트랙 산출물을 하나의 앱으로 묶는 디자인�
 
 # 트랙 컨텍스트: Design (PPPP 산출물 통합 레이어)
 
-너는 지금 SpaceOS의 **Design 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
+너는 지금 PlaceOS의 **Design 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
 
 ## 먼저 읽기
 - docs/feature-design-system.md
@@ -24,7 +24,7 @@ description: PPPP 네 트랙 산출물을 하나의 앱으로 묶는 디자인�
 
 ## 통합 규칙
 - 대시보드 1화면에서 4트랙을 본다: 감성(Platform)·히트맵(Page)·입점(Posting)·마케팅(Program).
-- 색상은 **토큰만** 사용(하드코딩 금지). 네이버 green은 네이버 연동 맥락만, brand teal은 SpaceOS 고유 기능.
+- 색상은 **토큰만** 사용(하드코딩 금지). 네이버 green은 네이버 연동 맥락만, brand teal은 PlaceOS 고유 기능.
 
 ## 이번 목표
 

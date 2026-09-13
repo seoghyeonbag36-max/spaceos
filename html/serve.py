@@ -17,7 +17,7 @@ if __name__ == "__main__":
     os.chdir(DIR)
     with http.server.HTTPServer(("", PORT), Handler) as httpd:
         url = f"http://localhost:{PORT}"
-        print(f"\n  SpaceOS 지도 서버 시작")
+        print(f"\n  PlaceOS 지도 서버 시작")
         print(f"  URL : {url}")
         print(f"  종료: Ctrl+C\n")
         webbrowser.open(url)
