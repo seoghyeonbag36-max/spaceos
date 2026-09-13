@@ -8,11 +8,22 @@ import { createPageWorkspace, type BuildingSelection, type ProgramHandoff } from
 import "./App.css";
 
 // 네 트랙 화면은 전부 지도 위 오버레이다. 지도 SDK 는 MapHost 가 받지만, 화면마다
-// 거리뷰·층 스택·차트 같은 무거운 자식이 있어 눌렀을 때만 받는다.
-const MapShell = lazy(() => import("@/pages/MapShell"));
-const PlatformConsole = lazy(() => import("@/pages/PlatformConsole"));
-const PostingConsole = lazy(() => import("@/pages/PostingConsole"));
-const ProgramStudio = lazy(() => import("@/pages/ProgramStudio"));
+// 거리뷰·층 스택·차트 같은 무거운 자식이 있어 청크를 나눈다.
+const loadMapShell = () => import("@/pages/MapShell");
+const loadPlatform = () => import("@/pages/PlatformConsole");
+const loadPosting = () => import("@/pages/PostingConsole");
+const loadProgram = () => import("@/pages/ProgramStudio");
+const MapShell = lazy(loadMapShell);
+const PlatformConsole = lazy(loadPlatform);
+const PostingConsole = lazy(loadPosting);
+const ProgramStudio = lazy(loadProgram);
+
+/** 첫 화면이 선 뒤 나머지 트랙 청크를 미리 받아 둔다(2026-09-13 로컬 실화면 확인).
+ *  아직 안 받은 트랙 탭을 누르면 React 가 Suspense 폴백을 띄우는 동안 **이전 탭 화면을 지우지 않고
+ *  숨긴 채** 둔다 — 지도 표식은 DOM 이 아니라 SDK 객체라 숨겨지지 않아, 느린 망에서는
+ *  "화면 불러오는 중…" 아래로 이전 트랙의 칩·선이 그대로 보였다. 미리 받아 두면 탭 전환이
+ *  멈추지 않아 그 틈이 생기지 않는다. 첫 화면 로딩을 방해하지 않게 잠시 뒤에 받는다. */
+const PRELOAD_DELAY_MS = 1500;
 
 /**
  * PlaceOS 프론트엔드 진입점.
@@ -93,6 +104,13 @@ export default function App() {
   // 「비우기」 등으로 안내를 걷으면 표시만 끈다. key(requestId)는 그대로 둬 지금 화면을 다시 마운트하지 않는다.
   const dismissArrival = useCallback(() => {
     setProgramHandoff((h) => (h && !h.dismissed ? { ...h, dismissed: true } : h));
+  }, []);
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      // 실패해도 조용히 넘어간다 — 그 탭을 누를 때 lazy 가 다시 받는다.
+      for (const load of [loadMapShell, loadPlatform, loadPosting, loadProgram]) load().catch(() => {});
+    }, PRELOAD_DELAY_MS);
+    return () => window.clearTimeout(t);
   }, []);
   const [isAdmin, setIsAdmin] = useState(() => window.location.hash === "#admin");
   const [isBoard, setIsBoard] = useState(() => window.location.hash === "#board");

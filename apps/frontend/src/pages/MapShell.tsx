@@ -146,9 +146,15 @@ function rampColor(v: number, min: number, max: number, ramp: string[]) {
 // 셀마다 달라 보이던 차이는 공간 구조가 아니었다(services/rent_layer 독스트링).
 // 이제 값이 실제로 갈리는 축(층·면적)으로 내려가 **빈 층마다 월 얼마인지**를 글자로 건다.
 //
-// 멀리서(점 모드와 같은 줌 경계)는 칩이 서로를 덮으므로 ~160m 묶음으로 "월 N만~M만 · K곳",
-// 가까이서는 건물마다 "월 N만"(그 건물 빈 층 중 가장 싼 층)을 건다.
-const RENT_CLUSTER_DLAT = 0.0015, RENT_CLUSTER_DLNG = 0.0019;
+// 멀리서(점 모드와 같은 줌 경계)는 칩이 서로를 덮으므로 반경 ~160m 묶음(묶음 사이 ~320m)으로
+// "월 N만~M만 · K곳", 가까이서는 건물마다 "월 N만"(그 건물 빈 층 중 가장 싼 층)을 건다.
+// 2026-09-13 실화면 확인에서 두 번 고쳤다:
+//   ① 처음 잡은 ~160m **격자 칸**은 z16 에서 칩 간격(약 84px)이 칩 폭(약 140px)보다 좁아 칩끼리 겹쳤다.
+//   ② 칸을 넓혀도 격자는 **칸 경계**에서 50m 떨어진 두 매물을 다른 묶음으로 갈라, 붙은 칩 한 쌍이 남았다.
+//   그래서 격자를 버리고 거리로 묶는다 — 기존 묶음의 첫 매물에서 반경 안이면 그 묶음에 넣는다.
+const RENT_CLUSTER_RADIUS_M = 160;
+const metersBetween = (aLat: number, aLng: number, bLat: number, bLng: number) =>
+  Math.hypot((aLat - bLat) * 111_000, (aLng - bLng) * 88_300);   // 서울 위도 기준 근사
 const RENT_CHIP_COLOR = colors.source.real.base;   // 실측 출처 토큰 — R-ONE 배지와 같은 색으로 읽힌다
 
 /** 층 라벨 정렬 키 — B1 < 1F < 2F … */
@@ -537,12 +543,12 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
 
     if (pinMode) {
       // 멀리서: 묶음. 한 묶음에 한 곳뿐이면 그 금액을 그대로 쓴다.
-      const groups = new Map<string, RentListing[]>();
+      const seeds: Array<{ lat: number; lng: number; items: RentListing[] }> = [];
       for (const x of shown) {
-        const k = `${Math.floor(x.lat / RENT_CLUSTER_DLAT)}:${Math.floor(x.lng / RENT_CLUSTER_DLNG)}`;
-        groups.set(k, [...(groups.get(k) ?? []), x]);
+        const home = seeds.find((g) => metersBetween(g.lat, g.lng, x.lat, x.lng) <= RENT_CLUSTER_RADIUS_M);
+        if (home) home.items.push(x); else seeds.push({ lat: x.lat, lng: x.lng, items: [x] });
       }
-      for (const g of groups.values()) {
+      for (const { items: g } of seeds) {
         const vals = g.map((x) => x.monthly_rent);
         const lo = Math.min(...vals), hi = Math.max(...vals);
         const lat = g.reduce((s, x) => s + x.lat, 0) / g.length;
