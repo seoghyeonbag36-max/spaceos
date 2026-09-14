@@ -55,18 +55,23 @@ interface PostingConsoleProps {
   onDistrictChange?: (id: string) => void;
   /** Posting → Program 인계(화면설계서 2판). 주면 결과 아래 「이 자리로 홍보 program 만들기 →」가 뜬다. */
   onMakeProgram?: (handoff: ProgramHandoff) => void;
+  /** 「내 사업」 업종의 입력어(화면설계서 3판). 업종칸의 기본값이다 — 상권·자리를 바꾸면 빈칸이 아니라 이 값으로 돌아간다. */
+  defaultIndustry?: string;
+  /** Platform 업종 바꾸기 표 「이 업종으로 입점 계산 →」. 있으면 `defaultIndustry` 보다 앞선다. */
+  industryRequest?: { input: string; requestId: number };
 }
 interface Calculation {
   result: SimulateResult;
   input: { district_id: string; unit_id: string; industry_type?: string; strategy?: string; prem?: number };
 }
 
-export default function PostingConsole({ selection, districtId, onDistrictChange, onMakeProgram }: PostingConsoleProps = {}) {
-  return <PostingSession key={selection ? `${selection.districtId}:${selection.buildingId}:${selection.requestId}` : "direct"}
-    selection={selection} districtId={districtId} onDistrictChange={onDistrictChange} onMakeProgram={onMakeProgram} />;
+export default function PostingConsole({ selection, districtId, onDistrictChange, onMakeProgram, defaultIndustry, industryRequest }: PostingConsoleProps = {}) {
+  return <PostingSession key={`${selection ? `${selection.districtId}:${selection.buildingId}:${selection.requestId}` : "direct"}|${industryRequest?.requestId ?? 0}`}
+    selection={selection} districtId={districtId} onDistrictChange={onDistrictChange} onMakeProgram={onMakeProgram}
+    defaultIndustry={defaultIndustry} industryRequest={industryRequest} />;
 }
 
-function PostingSession({ selection, districtId: sharedDistrict, onDistrictChange, onMakeProgram }: PostingConsoleProps) {
+function PostingSession({ selection, districtId: sharedDistrict, onDistrictChange, onMakeProgram, defaultIndustry, industryRequest }: PostingConsoleProps) {
   const [districts, setDistricts] = useState<DistrictSummary[]>([]);
   const [ownDistrict, setOwnDistrict] = useState(selection?.districtId ?? sharedDistrict ?? DEFAULT_DISTRICT);
   const controlled = sharedDistrict !== undefined && onDistrictChange !== undefined;
@@ -77,7 +82,10 @@ function PostingSession({ selection, districtId: sharedDistrict, onDistrictChang
   // 종전에는 0곳인 상권에서 결론이 영원히 "불러오는 중이다"로 남았다.
   const [unitsFor, setUnitsFor] = useState<string | null>(null);
   const [unitId, setUnitId] = useState<string>("");
-  const [industry, setIndustry] = useState("");
+  // 업종칸의 기본값(화면설계서 3판 Posting 구성요소 2) — Platform 인계 업종 → 「내 사업」 입력어 → 빈칸.
+  const baseIndustry = industryRequest?.input ?? defaultIndustry ?? "";
+  const baseSource = industryRequest ? "Platform 에서 고른 업종으로 채웠습니다" : defaultIndustry ? "내 사업 기준으로 채웠습니다" : "";
+  const [industry, setIndustry] = useState(baseIndustry);
   const [prem, setPrem] = useState("");
   const [strategy, setStrategy] = useState("");
   const [recs, setRecs] = useState<IndustryRec[] | null>(null);
@@ -124,12 +132,12 @@ function PostingSession({ selection, districtId: sharedDistrict, onDistrictChang
 
   function chooseDistrict(id: string) {
     clearCalculation(); setUnits([]); setUnitId(""); setRecs(null); setHandoffNote("");
-    setIndustry(""); setPrem(""); setStrategy(""); setDistrictId(id);
+    setIndustry(baseIndustry); setPrem(""); setStrategy(""); setDistrictId(id);
   }
 
   function chooseUnit(id: string) {
     clearCalculation(); setRecs(null); setErr(null);
-    setIndustry(""); setPrem(""); setStrategy(""); setUnitId(id);
+    setIndustry(baseIndustry); setPrem(""); setStrategy(""); setUnitId(id);
     setHandoffNote("");
   }
 
@@ -326,6 +334,9 @@ function PostingSession({ selection, districtId: sharedDistrict, onDistrictChang
                 ))}
                 <i className="chipnote">GNN 추천 — 이 자리 좌표 기준</i>
               </span>
+            )}
+            {baseIndustry && industry === baseIndustry && (
+              <span className="fhint">{baseSource} — 바꿀 수 있습니다</span>
             )}
           </label>
 

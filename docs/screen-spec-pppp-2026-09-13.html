@@ -1,5 +1,5 @@
 <title>PlaceOS PPPP 화면설계서</title>
-<meta name="description" content="Platform → Page → Posting → Program 네 화면의 목적·레이아웃 수치·상태·상호작용·데이터 바인딩·통과 조건을 사용 순서대로 정리한 화면설계서 (2026-09-13 개정 2판)">
+<meta name="description" content="Platform → Page → Posting → Program 네 화면의 목적·레이아웃 수치·상태·상호작용·데이터 바인딩·통과 조건을 사용 순서대로 정리한 화면설계서 (2026-09-13 개정 3판 — 주요 고객: 업종이 정해진 창업자 · 업종 바꾸기/상권 옮기기 사업자)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
@@ -118,7 +118,7 @@ tbody th { font-weight: 600; white-space: nowrap; }
 td.no { width: 44px; }
 td.num, .tnum { font-variant-numeric: tabular-nums; }
 .num-badge { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--bg); font-family: var(--mono); font-size: 11.5px; font-weight: 500; }
-td .src { display: block; font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+td .src, th .src { display: block; font-weight: 400; font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 2px; }
 .q { font-style: normal; }
 q { quotes: "“" "”"; color: var(--ink); }
 .tag { display: inline-block; font-size: 11px; font-weight: 600; border-radius: 5px; padding: 0 6px; margin-right: 4px; line-height: 1.7; white-space: nowrap; }
@@ -282,8 +282,9 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
 
 <div class="shell">
   <aside class="index" aria-label="목차">
-    <div class="brand"><span class="mark" aria-hidden="true">P</span><div><b>PlaceOS</b><span>화면설계서 · 2판 · 2026-09-13</span></div></div>
+    <div class="brand"><span class="mark" aria-hidden="true">P</span><div><b>PlaceOS</b><span>화면설계서 · 3판 · 2026-09-13</span></div></div>
     <nav>
+      <a href="#customers"><span class="n">—</span>주요 고객</a>
       <a href="#flow"><span class="n">—</span>흐름과 인계</a>
       <a href="#frame"><span class="n">—</span>공통 프레임</a>
       <div class="sep" role="presentation"></div>
@@ -291,6 +292,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
       <a href="#page" data-t="page"><span class="n">2</span>Page</a>
       <a href="#posting" data-t="posting"><span class="n">3</span>Posting</a>
       <a href="#program" data-t="program"><span class="n">4</span>Program</a>
+      <a href="#landlord"><span class="n">—</span>건물주 연결(추후)</a>
       <div class="sep" role="presentation"></div>
       <a href="#rules"><span class="n">—</span>근거 표기 규칙</a>
       <a href="#tokens"><span class="n">—</span>토큰</a>
@@ -303,16 +305,72 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
 
   <main>
     <header class="doc-head">
-      <div class="eyebrow">Screen specification · PPPP · 2판</div>
+      <div class="eyebrow">Screen specification · PPPP · 3판</div>
       <h1>PlaceOS PPPP 화면설계서</h1>
-      <p>물리적 상권을 네 질문으로 읽는 제품의 화면 넷을 사용 순서대로 적었다 — <b>어떤 플랫폼인가 → 어떤 page 를 놓을까 → 어느 가격대로 posting 할까 → 어떻게 program 을 돌릴까.</b> 목차는 저장소 양식 <span class="mono">docs/prompt-ux-screen-spec.md</span> §3 의 산출 형식(목적 · 레이아웃 · 상태 · 상호작용 · 데이터 바인딩 · 근거 표기 · 토큰 · 접근성 · 통과 조건 · 미해결)을 따른다. 이 문서가 화면의 정본이다 — 코드가 이 문서와 다르면 코드를 고친다.</p>
+      <p>물리적 상권을 네 질문으로 읽는 제품의 화면 넷을 사용 순서대로 적었다 — <b>어떤 플랫폼인가 → 어떤 page 를 놓을까 → 어느 가격대로 posting 할까 → 어떻게 program 을 돌릴까.</b> 3판부터 이 네 질문을 묻는 사람은 <b>자기 업종이나 자기 가게에서 출발하는 사업자</b>다(주요 고객 절). 목차는 저장소 양식 <span class="mono">docs/prompt-ux-screen-spec.md</span> §3 의 산출 형식(목적 · 레이아웃 · 상태 · 상호작용 · 데이터 바인딩 · 근거 표기 · 토큰 · 접근성 · 통과 조건 · 미해결)을 따른다. 이 문서가 화면의 정본이다 — 코드가 이 문서와 다르면 코드를 고친다.</p>
       <dl class="meta">
-        <div><dt>판</dt><dd>2판 · 2026-09-13 (1판 대비 사실 오류 4건 수정 · 양식 필수 절 추가)</dd></div>
+        <div><dt>판</dt><dd>3판 · 2026-09-13 (주요 고객 재정의 → 「내 사업」 설정 · 내 업종 기준 상권 비교 신설)</dd></div>
         <div><dt>서비스 주소</dt><dd class="mono">placeos.web.app</dd></div>
         <div><dt>기준 화면</dt><dd>데스크톱 1440×900 · 모바일 ≤768px</dd></div>
-        <div><dt>대상 독자</dt><dd>기획·디자인·개발·파일럿 고객 담당</dd></div>
+        <div><dt>대상 독자</dt><dd>기획·디자인·개발</dd></div>
       </dl>
     </header>
+
+    <!-- ═════════ 주요 고객 (3판 신설) ═════════ -->
+    <section id="customers">
+      <div class="sec-head">
+        <h2>주요 고객</h2>
+        <p class="lede">3판에서 주요 고객을 바꿨다. 2판까지는 <b>상권을 먼저 고르는 분석가</b>(프랜차이즈 출점팀 · 자산운용사 리싱 담당 · 지자체)였고, 이제는 <b>자기 업종이나 자기 가게에서 출발하는 사업자</b>다. 그래서 화면이 처음 붙잡는 값이 <b>상권에서 업종으로</b> 바뀐다.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>고객</th><th>앱을 열 때 머릿속 한 문장</th><th>출발 값</th><th>네 화면에서 얻는 것</th><th>3판</th></tr></thead>
+          <tbody>
+            <tr><th>① 업종이 정해진 창업자<span class="src">소상공인</span></th><td><q>카페를 차리려는데, 어느 상권 어느 빈 자리가 월 얼마고 몇 달이면 본전인가?</q></td><td>업종</td><td>Platform 내 업종 기준 상권 비교 → Page 그 상권 빈 건물 → Posting 내 업종으로 회수기간 → Program 오픈 홍보</td><td><span class="tag real">구현</span></td></tr>
+            <tr><th>②-a 업종을 바꾸려는 사업자<span class="src">피벗 · 같은 상권</span></th><td><q>지금 상권에서 장사가 안 된다. 여기서 무엇으로 바꾸면 되나?</q></td><td>지금 상권 · 지금 업종</td><td>Platform 이 상권에서 업종별 입지 적합도 순위(지금 업종 위치 표시) → Posting 바꿀 업종으로 계산 → Program 업종 전환 안내</td><td><span class="tag real">구현</span></td></tr>
+            <tr><th>②-b 상권을 옮기려는 사업자<span class="src">이전 · 같은 업종</span></th><td><q>같은 장사를 다른 상권에서 하면 나을까?</q></td><td>지금 업종 · 지금 상권</td><td>Platform 상권 비교에 지금 상권을 고정해 견줌 → Page·Posting 새 자리 → Program 이전 안내(지금 가게 리뷰가 근거)</td><td><span class="tag real">구현</span></td></tr>
+            <tr><th>③ 건물주</th><td><q>우리 건물 빈 층에 들어올 사업자를 찾고 싶다.</q></td><td>건물</td><td>사업자가 저장한 후보 건물로 입점 문의가 온다</td><td><span class="tag est">추후</span> 연결 지점만 정의 — <a href="#landlord">건물주 연결</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cols2">
+        <div class="box"><h4>그래서 디자인이 바뀐다</h4><ol>
+          <li><b>출발 값이 업종이다</b> → 네 화면이 공유하는 「내 사업」 설정(목적 · 업종 · 지금 상권)을 둔다. 상권 선택처럼 한 번 정하면 모든 트랙이 읽는다.</li>
+          <li><b>창업자에게는 동네가 먼저 정해져 있지 않다</b> → Platform 이 「이 상권은 어떤가」보다 먼저 「내 업종이면 어느 상권인가」를 답한다. 2026-09-07 페르소나 지도에서 창업자에게 Platform 이 세 번째로 밀렸던 문제를 뒤집는다.</li>
+          <li><b>기존 사업자는 이미 리뷰·메뉴가 있다</b> → 창업 전에는 빈칸뿐이던 Program 이 피벗·이전 사업자에게는 바로 쓰인다. 그 사실을 화면이 먼저 말한다.</li>
+          <li><b>말이 사업자의 말이어야 한다</b> → 결론 줄은 업종·금액·개월로 말하고, 모델 이름(GNN·LSTM)과 원자료 경로는 접힘 안 근거로만 둔다.</li>
+        </ol></div>
+        <div class="box"><h4>3판에서 주사용자에서 뺀 사람</h4><ul>
+          <li>프랜차이즈 본사 출점팀 · 자산운용사 리싱 담당 · 지자체 담당자</li>
+          <li>기능은 지우지 않는다 — 상권 비교·후보 비교·임대시세는 그대로 쓸 수 있다. 다만 <b>문구·기본값·순서를 이들에게 맞추지 않는다.</b></li>
+          <li>「내 사업」을 건너뛰면(「그냥 둘러보기」) 2판과 같은 화면이다.</li>
+        </ul></div>
+      </div>
+
+      <h3>업종 12종 — 「내 사업」이 고르는 목록</h3>
+      <p>업종 이름표가 두 벌이라 대응표가 필요하다. 모델 추천(GNN)은 <b>7종</b>(음식점 · 카페 · 병원 · 편의점 · 숙박 · 문화시설 · 약국)만 알고, 상권 업종 구성은 카카오 플레이스 라벨이다. 사업자가 고르는 12종은 둘을 잇는다. <b>모델 7종 밖 업종은 입지 적합도를 내지 않는다</b> — 가까운 업종 점수로 대신 채우지 않는다. 정본은 백엔드 <span class="mono">services/business_fit.py</span> 이고 화면은 <span class="mono">GET /ai/industries</span> 로 받는다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>화면 이름</th><th>입력칸에 채우는 말</th><th>모델 7종</th><th>같은 업종으로 세는 카카오 라벨(부분 일치)</th></tr></thead>
+          <tbody>
+            <tr><th>카페·디저트</th><td>카페</td><td>카페</td><td>카페 · 커피 · 디저트 · 베이커리 · 제과 · 빙수 · 아이스크림 · 브런치</td></tr>
+            <tr><th>음식점</th><td>음식점</td><td>음식점</td><td>한식 · 일식 · 중식 · 양식 · 분식 · 치킨 · 피자 · 고기 · 국수 · 해물 · 식당 · 음식 …</td></tr>
+            <tr><th>술집</th><td>주점</td><td>—</td><td>호프 · 주점 · 술집 · 포차 · 와인 · 이자카야 · 맥주</td></tr>
+            <tr><th>미용·네일</th><td>미용실</td><td>—</td><td>미용 · 헤어 · 네일 · 에스테틱 · 왁싱 · 뷰티</td></tr>
+            <tr><th>병·의원</th><td>병원</td><td>병원</td><td>의원 · 병원 · 외과 · 내과 · 치과 · 한의 · 피부과 · 성형 …</td></tr>
+            <tr><th>약국</th><td>약국</td><td>약국</td><td>약국</td></tr>
+            <tr><th>편의점·생활</th><td>편의점</td><td>편의점</td><td>편의점 · CU · GS25 · 세븐일레븐 · 마트 · 슈퍼 · 세탁</td></tr>
+            <tr><th>옷·잡화</th><td>의류</td><td>—</td><td>의류 · 패션 · 신발 · 가방 · 화장품 · 잡화 · 안경 · 주얼리 · 편집</td></tr>
+            <tr><th>학원·교육</th><td>학원</td><td>—</td><td>학원 · 교육 · 스터디 · 독서실</td></tr>
+            <tr><th>운동·여가</th><td>운동시설</td><td>—</td><td>헬스 · 필라테스 · 요가 · 골프 · 클라이밍 · 당구 · 볼링 · PC방 · 노래</td></tr>
+            <tr><th>숙박</th><td>숙박</td><td>숙박</td><td>호텔 · 모텔 · 여관 · 게스트하우스 · 펜션 · 레지던스</td></tr>
+            <tr><th>전시·공연</th><td>문화시설</td><td>문화시설</td><td>전시 · 미술 · 공연 · 극장 · 박물 · 갤러리 · 서점</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">같은 업종 비중은 카카오 플레이스 <b>업종 라벨 상위 표본</b>에서 센 값이라 상권의 전체 점포 수가 아니다. 화면은 <q>표본 N곳 중 k곳</q>으로 적는다. 비중이 높다는 것은 경쟁이 많다는 뜻도, 수요가 검증됐다는 뜻도 된다 — 화면이 좋다·나쁘다로 판정하지 않는다.</p>
+    </section>
 
     <!-- ═════════ 흐름 · 인계 ═════════ -->
     <section id="flow">
@@ -332,6 +390,8 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>출발 → 도착</th><th>트리거</th><th>넘기는 값</th><th>받는 쪽이 하는 일</th><th>없을 때</th></tr></thead>
           <tbody>
+            <tr><th>「내 사업」 → 모든 트랙 <span class="tag new" style="--tc:var(--page);--tsoft:var(--page-soft)">3판</span></th><td>「내 사업」 카드 「시작」 · 칩에서 바꾸기</td><td>목적(창업 · 업종 바꾸기 · 상권 옮기기) · 업종 key · 지금 상권 id(바꾸기·옮기기만)</td><td>Platform 으로 전환해 「내 업종으로 본 상권」을 연다. 바꾸기·옮기기면 공유 상권을 지금 상권으로 둔다. Posting 업종칸 · Program 카테고리칸의 <b>기본값</b>이 된다. Page 건물 상세 업종 추천에서 내 업종을 표시한다</td><td>「그냥 둘러보기」 → 아무것도 채우지 않는다(2판 화면)</td></tr>
+            <tr><th>Platform → Posting <span class="tag new" style="--tc:var(--page);--tsoft:var(--page-soft)">3판</span></th><td>업종 바꾸기 표 「이 업종으로 입점 계산 →」</td><td>상권 id · 업종 입력어</td><td>Posting 업종칸을 그 업종으로 채운다(자리는 사용자가 고른다)</td><td>—</td></tr>
             <tr><th>모든 트랙 ↔ 모든 트랙</th><td>상권 선택기 변경</td><td>상권 id 하나</td><td>다른 트랙을 열면 같은 상권. Page 의 검색어·상태 필터·선택 건물은 비운다(저장 후보는 상권별로 남는다)</td><td>상권이 목록에 없으면 첫 거점으로 떨어진다</td></tr>
             <tr><th>Platform → Page</th><td>자리 카드 「Page에서 이 건물 보기 →」</td><td>상권 id · 건물 id(<span class="mono">unit_id</span> 에서 <span class="mono">vu-</span> 를 뗀 값) · 건물명</td><td>Page 로 전환, 레이어는 공실, 그 건물 상세를 열고 카메라를 그 건물로 옮긴다</td><td><q>선택한 건물을 이 상권 건물 목록에서 찾지 못했습니다.</q> — 목록은 그대로 둔다</td></tr>
             <tr><th>Page → Posting</th><td>건물 상세 「이 건물로 입점 검토 →」</td><td>상권 id · 건물 id · 건물명</td><td><span class="mono">vu-{건물 id}</span> 유닛을 찾아 자동 선택하고 한 번 계산</td><td><q>{건물명}과 일치하는 입점 계산 유닛이 없습니다. 계산할 자리를 직접 선택해 주세요.</q> — 첫 자리를 멋대로 고르지 않는다</td></tr>
@@ -376,6 +436,8 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
             <tr><th>Page 상단 바</th><td class="mono">top 12 · left 12 · right 12 · h 40</td><td class="mono">5</td><td>상권 선택(≤240) · 검색(260) · 레이어 세그먼트</td></tr>
             <tr><th>Page 목록 패널</th><td class="mono">top 64 · left 12 · bottom 12 · w 360</td><td class="mono">5</td><td>1024~1050px 에서는 top 112(상단 바가 두 줄)</td></tr>
             <tr><th>Page 범례</th><td class="mono">right 12 · bottom 12</td><td class="mono">5</td><td>지금 그려진 것만 말한다</td></tr>
+            <tr><th>「내 사업」 칩 <span class="tag new" style="--tc:var(--page);--tsoft:var(--page-soft)">3판</span></th><td class="mono">top 12 · right 12 · h 40</td><td class="mono">6</td><td>네 트랙 같은 자리. Page 는 상단 바가 right 12 까지 차므로 칩 폭만큼 상단 바 오른쪽을 비운다</td></tr>
+            <tr><th>「내 사업」 카드 <span class="tag new" style="--tc:var(--page);--tsoft:var(--page-soft)">3판</span></th><td class="mono">absolute · top 72 · 가운데 · w min(520, 100%−24)</td><td class="mono">30</td><td>처음 방문 · 칩을 눌렀을 때. 모달이 아니다 — 지도·패널은 계속 쓸 수 있다</td></tr>
             <tr><th>Page 시간 슬라이더</th><td class="mono">bottom 12 · 가운데 · 슬라이더 w 200</td><td class="mono">5</td><td>유동인구 레이어에서만</td></tr>
             <tr><th>모달(층별 공실·거리뷰)</th><td class="mono">absolute · inset 0 · 상자 min(560, 92vw)×min(460, 80vh)</td><td class="mono">20</td><td>바탕 반투명 잉크 50%</td></tr>
             <tr><th>대화상자(후보 비교)</th><td class="mono">&lt;dialog&gt; top layer</td><td class="mono">top layer</td><td>닫으면 여는 버튼으로 포커스 복귀</td></tr>
@@ -413,7 +475,8 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
             <tr><th>트랙 패널</th><td>하단 시트 <span class="mono">left 0 · right 0 · bottom 0 · h 58dvh</span>, 위 모서리 16px, 그림자 <span class="mono">--shadow-sheet</span>. 펴기 버튼은 <span class="mono">bottom 12 · left 12</span></td></tr>
             <tr><th>Page 목록</th><td>하단 시트 <span class="mono">h 52dvh</span> + 손잡이. 건물을 고르면 조건·목록을 숨기고 상세만 시트를 채운다</td></tr>
             <tr><th>Page 범례·슬라이더</th><td>시트 위로 올린다 — 범례 <span class="mono">bottom 52dvh+12</span>, 슬라이더 <span class="mono">bottom 52dvh+76</span></td></tr>
-            <tr><th>카메라 맞춤</th><td>시트 높이만큼 아래 여백(<span class="mono">bottom = 화면높이×0.52~0.58 + 16~24</span>)을 준다</td></tr>
+            <tr><th>카메라 맞춤</th><td>시트 높이만큼 아래 여백을 준다 — 상수가 아니라 <b>그려진 시트 윗변을 잰다</b>(데스크톱은 패널 오른쪽 끝 + 칩 반폭 72). 네이버 <span class="mono">fitBounds</span> 는 비대칭 여백을 정수 줌으로 내리며 절반쯤 잃으므로, 맞춘 뒤 범위 중심을 가려지지 않은 영역 가운데로 다시 민다</td></tr>
+            <tr><th>「내 사업」 칩 · 카드</th><td>칩은 <span class="mono">top 8 · right 8</span>. Page 는 상단 컨트롤 첫 줄의 오른쪽 끝을 비운다. 카드는 <span class="mono">top 8 · left 60 · right 8</span>, 최대 높이 <span class="mono">70dvh</span> 에서 내부 스크롤</td></tr>
           </tbody>
         </table>
       </div>
@@ -456,6 +519,38 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         </table>
       </div>
 
+      <h3>「내 사업」 설정 <span class="tag new" style="--tc:var(--page);--tsoft:var(--page-soft)">3판</span></h3>
+      <p>상권 선택과 같은 급의 <b>공유 값</b>이다. 한 번 정하면 네 트랙이 모두 읽고, 트랙마다 다시 묻지 않는다. 한 화면에서 끝내는 세 단계다 — 단계를 넘기는 마법사가 아니라 위에서 아래로 채우는 카드 하나.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>순서</th><th>칸</th><th>선택지 · 문구</th><th>규칙</th></tr></thead>
+          <tbody>
+            <tr><td class="no"><span class="num-badge">1</span></td><th>무엇을 하려고 하세요?</th><td>「새로 창업」 <q>업종은 정했고, 어느 상권이 좋을지 찾는다</q> · 「지금 상권에서 업종 바꾸기」 <q>가게 자리는 그대로, 무엇으로 바꿀지</q> · 「같은 업종으로 상권 옮기기」 <q>하던 장사를 어느 상권에서 할지</q></td><td>라디오 3개(<span class="mono">radiogroup</span>). 기본 선택 없음</td></tr>
+            <tr><td class="no"><span class="num-badge">2</span></td><th>업종</th><td>창업·옮기기 <q>어떤 업종인가요?</q> · 바꾸기 <q>지금 업종은 무엇인가요?</q> — 12종 칩(주요 고객 절 표). 모델 7종 밖 업종 칩에는 작은 글씨 <q>상권 비교만</q></td><td>하나만 고른다</td></tr>
+            <tr><td class="no"><span class="num-badge">3</span></td><th>지금 가게 상권</th><td>바꾸기·옮기기만. 상권 선택기와 같은 목록(예외 표식 포함)</td><td>창업이면 숨긴다</td></tr>
+            <tr><td class="no">—</td><th>버튼</th><td>「시작」(필수 칸이 차야 켜진다) · 「그냥 둘러보기」</td><td>시작 → Platform 으로 전환 · 칩으로 접힘. 둘러보기 → 칩 <q>내 사업 설정</q> 으로 접힘</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>상태</th><th>칩 문구</th><th>카드</th></tr></thead>
+          <tbody>
+            <tr><th>처음 방문</th><td>—</td><td>펼침(Page 지도 위)</td></tr>
+            <tr><th>설정됨 · 창업</th><td><q>카페·디저트 창업 ▾</q></td><td>접힘</td></tr>
+            <tr><th>설정됨 · 바꾸기</th><td><q>{지금 상권} · 음식점에서 업종 바꾸기 ▾</q></td><td>접힘</td></tr>
+            <tr><th>설정됨 · 옮기기</th><td><q>카페·디저트 · {지금 상권}에서 옮기기 ▾</q></td><td>접힘</td></tr>
+            <tr><th>둘러보기</th><td><q>내 사업 설정 ▾</q></td><td>접힘</td></tr>
+            <tr><th>업종 목록 실패</th><td>그대로</td><td><q>업종 목록을 불러오지 못했습니다. 「그냥 둘러보기」로 계속할 수 있습니다.</q> — 시작 비활성</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="note" style="padding-left:18px">
+        <li><b>저장</b>: 이 브라우저에만 남긴다(<span class="mono">localStorage</span>). 서버로 보내지 않는다 — 계정이 생기면 옮긴다(미해결 표). 읽기가 실패하면 처음 방문으로 본다.</li>
+        <li><b>칩을 눌러 바꾸면</b> 이미 채운 Posting 업종칸 · Program 카테고리칸은 건드리지 않는다 — 사용자가 고친 값을 덮지 않는다. 새로 여는 트랙의 기본값만 바뀐다.</li>
+        <li><b>Esc</b>: 카드가 펼쳐져 있으면 가장 위의 한 겹으로 본다 — 입력칸 규칙은 같다.</li>
+      </ul>
+
       <h3>키보드 — 네 화면 공통</h3>
       <div class="table-wrap">
         <table>
@@ -477,6 +572,10 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <li data-id="C-05">상권을 바꾸면 스크린리더가 <q>상권 {이름} 선택됨</q> 을 읽고, 다른 탭을 열어도 같은 상권이다.</li>
         <li data-id="C-06">지도 인증 실패 시 회색 빈 화면이 아니라 원인·등록할 origin 문구가 뜨고 패널은 계속 쓸 수 있다.</li>
         <li data-id="C-07">768px 이하에서 패널은 하단 시트가 되고 지도 폭이 줄지 않는다.</li>
+        <li data-id="C-08">처음 열면 「내 사업」 카드가 뜨고, 목적·업종(·지금 상권)을 채워야 「시작」이 켜진다. 「그냥 둘러보기」는 언제나 눌린다.</li>
+        <li data-id="C-09">「시작」을 누르면 Platform 으로 넘어가고, 네 트랙 오른쪽 위 칩이 목적과 업종을 말한다. 바꾸기·옮기기면 공유 상권이 지금 상권이다.</li>
+        <li data-id="C-10">새로고침해도 「내 사업」이 남는다. 둘러보기를 골랐어도 카드가 다시 펼쳐지지 않는다.</li>
+        <li data-id="C-11">트랙 카메라가 표식을 패널 밑에 두지 않는다 — 가장 왼쪽 칩도 패널 오른쪽 끝에서 떨어져 보인다.</li>
       </ol>
     </section>
 
@@ -487,8 +586,8 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
       <dl class="screen-card">
         <div><dt>화면 목적</dt><dd>상권을 하나의 플랫폼으로 읽어 유형·수요·밖에서의 이름을 한 문장으로 답하고, 빈 자리별 업종 후보를 지도에 건다.</dd></div>
         <div><dt>막는 오해</dt><dd>지도의 점선을 <b>상권 경계</b>로 읽는 것 — 그 선은 공실률 분모에 들어간 실측 범위다.</dd></div>
-        <div><dt>주사용자</dt><dd>프랜차이즈 본사 출점팀 · 자산운용사 — 이 상권이 우리 브랜드·자산에 맞는 플랫폼인지 가른다</dd></div>
-        <div><dt>이 화면의 결론</dt><dd>「유형」 한 줄 + 근거 3줄, 그리고 비교할 자리 2~3곳</dd></div>
+        <div><dt>주사용자</dt><dd>창업자 — 내 업종을 어느 상권에서 할지 · 옮기려는 사업자 — 지금 상권보다 나은 상권이 있는지 · 바꾸려는 사업자 — 지금 상권에서 무엇으로 바꿀지</dd></div>
+        <div><dt>이 화면의 결론</dt><dd>창업·옮기기: 내 업종 기준 상권 순위와 견줄 상권 2~3곳 · 바꾸기: 지금 상권에서 바꿔볼 업종 순위 · 그다음 이 상권의 「유형」과 비교할 자리</dd></div>
         <div class="wide"><dt>다루지 않는 것</dt><dd>건물별 층 공실·임대료(Page) · 비용 계산(Posting) · 감성 점수(전 거점 미측정)</dd></div>
       </dl>
 
@@ -504,6 +603,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
             <span class="wf-x">‹</span>
             <div class="ey">PLACEOS · PLATFORM · PLACE ▶ PLATFORM</div>
             <div class="hq">이 입지·상권은 어떤 플랫폼인가</div>
+            <div class="banner"><b>카페·디저트로 본 상권</b> — 서울 {n}곳 중 <b>{k}위</b> · 입지 적합도 {x}% (서울 평균 {y}%) · 같은 업종 표본 {a}/{b}곳 <span class="lbl">▸ 다른 상권 5곳</span></div>
             <div class="verdict">{상권명} — <b>「유형」</b> 플랫폼이다 (최대 업종군 비중 · 점포 수).</div>
             <div class="grounds">
               <div><b>무엇이 모여 있나</b><span>업종군 상위 3 · 비중 · 곳수</span></div>
@@ -539,6 +639,27 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         </table>
       </div>
 
+      <h3>내 업종으로 본 상권 <span class="tag new" style="--tc:var(--platform);--tsoft:var(--platform-soft)">3판</span></h3>
+      <p>「내 사업」이 설정돼 있으면 패널 <b>맨 위</b>(결론 머리 위)에 선다. 설정이 없으면 이 자리에 한 줄 <q>업종을 알려주면 어느 상권이 맞는지부터 보여줍니다 — 내 사업 설정</q> 만 둔다. 목적에 따라 표가 다르다.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>목적</th><th>머리 줄</th><th>표</th><th>누르면</th></tr></thead>
+          <tbody>
+            <tr><th>창업</th><td><q>{업종} — 이 상권은 서울 {n}곳 중 {k}위</q> + 줄 셋: 입지 적합도 {x}%(서울 평균 {y}%) · 같은 업종 표본 {a}/{b}곳 · 1층 평당 월 {r}만원 · 공실률 {v}%</td><td><b>상권 순위 상위 5</b>(지금 보는 상권이 5위 밖이면 맨 아래 <q>보는 중</q> 한 줄 더). 줄: 순위 · 상권·구 · 적합도 · 같은 업종 비중 · 1층 평당 · 공실률</td><td>줄 「이 상권 보기」 → 공유 상권 변경(카메라·패널이 그 상권으로)</td></tr>
+            <tr><th>옮기기</th><td>창업과 같고, 지금 상권과의 차이를 붙인다 <q>지금 상권({이름}) 대비 적합도 +{d}%p</q></td><td>상위 5 + <b>지금 상권 고정 줄</b>(맨 위, <q>지금</q> 표식)</td><td>같음</td></tr>
+            <tr><th>바꾸기</th><td><q>{지금 상권}에서 바꿔볼 업종 — 지금 업종 {업종}은 {k}위</q></td><td><b>이 상권 업종 순위</b> — 모델 7종은 적합도 순, 7종 밖 업종은 아래에 순위 없이. 줄: 업종 · 적합도(순위) · 같은 업종 비중 · <q>지금</q> 표식</td><td>줄 「이 업종으로 입점 계산 →」 → Posting(업종칸 채움)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="formula" style="margin-top:12px">입지 적합도(상권, 업종) = 그 상권 점포 자리마다 모델(GNN)이 매긴 “이 자리에 그 업종이 있을 확률”의 평균</div>
+      <ul class="note" style="padding-left:18px">
+        <li><b>이 값이 아닌 것</b>: 매출·생존율이 아니다. 비슷한 입지에 그 업종이 <b>이미 모여 있는 정도</b>를 모델이 배운 값이다. 머리 줄 아래 한 줄로 이 사실을 늘 적는다.</li>
+        <li>산출물이 자리마다 상위 3개 업종만 실어 그 밖은 0 으로 본다 → 절대값은 실제보다 낮다. <b>상권끼리·업종끼리 순위를 가리는 데만</b> 쓴다.</li>
+        <li>모델 7종 밖 업종(술집 · 미용·네일 · 옷·잡화 · 학원·교육 · 운동·여가)을 고르면 창업·옮기기 <b>순위 표를 그리지 않는다</b>(가나다순 5곳은 아무것도 말하지 않는다). 머리 줄 아래 <q>{업종}은 모델 추천 대상(7종) 밖이라 적합도 순위를 내지 않습니다</q> 를 적고, 지금 보는 상권의 같은 업종 비중·임대료·공실률만 보여준다. 옮기기의 지금 상권과는 상권을 바꿔 가며 견준다.</li>
+      </ul>
+      <h3>자리 칩 · 자리 카드 — 내 업종이 있을 때 <span class="tag new" style="--tc:var(--platform);--tsoft:var(--platform-soft)">3판</span></h3>
+      <p>창업·옮기기이고 업종이 모델 7종 안이면, 자리 칩 글자가 <q>{입력어} {점수}%</q> 가 되고 자리 카드는 <b>내 업종 점수 순</b>으로 선다. 그 자리 상위 3개에 내 업종이 없으면 칩은 점선 <q>{입력어} 3위 밖</q>, 카드는 뒤로 간다. 바꾸기이거나 7종 밖이면 2판 규칙(상권 평균 대비 두드러진 업종)을 그대로 쓴다.</p>
+
       <h3>자리 비교표 행</h3>
       <p>면적 · 층 · 재고 · 공실률 · 추천 노드까지 거리 · GNN 추천 점수(0~1) · 상권 평균 대비 두드러진 업종 · 해당 업종의 자리 점수 · 해당 업종의 상권 평균 · 상권 평균 대비 차이(p) · 직전 업종. 값이 없으면 <q>미제공</q>, 0 은 0 으로 적는다.</p>
 
@@ -556,6 +677,8 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
             <tr><th>Platform 산출물 없음(404)</th><td>선만(있으면)</td><td>오류 상자</td><td><q>이 상권의 Platform 산출물이 없습니다.</q> / <q>이 도시에는 아직 Platform 소스(업종 구성·감성·트렌드)를 수집하지 않았다.</q></td></tr>
             <tr><th>API 실패(5xx·네트워크)</th><td>그대로</td><td>오류 상자</td><td>제목 + 원문(진단용)</td></tr>
             <tr><th>자리 0곳</th><td>칩 없음</td><td>접힘 안</td><td><q>이 상권에는 실측 공실 자리가 없다.</q></td></tr>
+            <tr><th>「내 사업」 없음 <span class="tag new" style="--tc:var(--platform);--tsoft:var(--platform-soft)">3판</span></th><td>그대로</td><td>맨 위 한 줄</td><td><q>업종을 알려주면 어느 상권이 맞는지부터 보여줍니다</q> + 「내 사업 설정」</td></tr>
+            <tr><th>상권·업종 순위 불러오는 중 <span class="tag new" style="--tc:var(--platform);--tsoft:var(--platform-soft)">3판</span></th><td>그대로</td><td>맨 위 카드</td><td><q>{업종} 기준으로 상권을 견주는 중…</q></td></tr>
             <tr><th>예측·추천 산출물 없음</th><td>—</td><td>모델 근거 카드</td><td><q>이 거점의 예측 산출물이 없다 — …</q> · <q>이 거점의 추천 산출물이 없다 — …</q></td></tr>
           </tbody>
         </table>
@@ -588,6 +711,9 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
             <tr><td>공실률 칩</td><td class="mono">DistrictSummary.vacancy_rate · vacancy_withheld · vacancy_source</td><td><q>대표값 미제공</q> / <q>실측 없음</q></td><td>실측 · 합성</td></tr>
             <tr><td>예측</td><td class="mono">POST /ai/predict-vacancy → forecast_vac_proxy · delta · horizons</td><td>404 문구</td><td>LSTM · vac_proxy</td></tr>
             <tr><td>추천</td><td class="mono">POST /ai/recommend-industry → recommendations · metrics</td><td>404 문구 · stub 이면 그리지 않음</td><td>GNN · 사전확률 대비</td></tr>
+            <tr><td>업종 12종 <span class="tag new" style="--tc:var(--platform);--tsoft:var(--platform-soft)">3판</span></td><td class="mono">GET /ai/industries → industries[] (key · label · input · model_label)</td><td>「내 사업」 카드 실패 문구</td><td>—</td></tr>
+            <tr><td>상권 순위(창업·옮기기) <span class="tag new" style="--tc:var(--platform);--tsoft:var(--platform-soft)">3판</span></td><td class="mono">GET /ai/industry-fit?industry={key} → model_covered · seoul_fit · districts[] (district_id · name · gu · fit · fit_rank · same_n · sample_n · same_share · rent_1f_per_pyeong · rent_shared) — 공실률은 <span class="mono">GET /commercial-districts</span> 응답에서 합친다</td><td><q>업종 기준 상권 비교를 불러오지 못했습니다.</q> · 값마다 <q>미제공</q></td><td>모델 GNN · 카카오 플레이스 표본 · R-ONE(인접 상권 표본이면 표시) · 건축물대장 실측</td></tr>
+            <tr><td>업종 순위(바꾸기) <span class="tag new" style="--tc:var(--platform);--tsoft:var(--platform-soft)">3판</span></td><td class="mono">GET /ai/district-industries/{district_id} → rows[] (key · label · input · model_label · fit · fit_rank · same_n · same_share) · sample_n</td><td>404 → <q>이 상권은 업종 순위 산출물이 없습니다.</q></td><td>같음</td></tr>
           </tbody>
         </table>
       </div>
@@ -601,6 +727,11 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <li data-id="PL-05">자리 카드의 「Page에서 이 건물 보기 →」를 누르면 Page 로 넘어가 그 건물 상세가 열린다.</li>
         <li data-id="PL-06">상권을 바꾸면 비교 후보가 0/3 이 되고, Page 를 열어도 같은 상권이다.</li>
         <li data-id="PL-07">Platform 산출물이 없는 상권에서 원문 에러 대신 <q>이 상권의 Platform 산출물이 없습니다.</q> 가 뜬다.</li>
+        <li data-id="PL-08">창업 · 카페·디저트로 설정하면 패널 맨 위에 <q>카페·디저트 — 이 상권은 서울 N곳 중 K위</q> 와 상위 5 상권 표가 뜨고, 줄의 「이 상권 보기」가 공유 상권을 바꾼다.</li>
+        <li data-id="PL-09">옮기기면 표 맨 위에 <q>지금</q> 표식의 지금 상권 줄이 고정되고, 머리 줄이 지금 상권 대비 차이(%p)를 말한다.</li>
+        <li data-id="PL-10">바꾸기면 이 상권 업종 순위 표에 지금 업종이 <q>지금</q> 표식으로 있고, 「이 업종으로 입점 계산 →」이 Posting 업종칸을 그 업종으로 채운다.</li>
+        <li data-id="PL-11">모델 7종 밖 업종(예: 술집)을 고르면 순위 숫자가 하나도 없고 <q>적합도 순위를 내지 않습니다</q> 가 뜬다.</li>
+        <li data-id="PL-12">창업 · 카페·디저트면 자리 칩이 <q>카페 NN%</q> 또는 점선 <q>카페 3위 밖</q> 이고, 자리 카드가 카페 점수 순이다.</li>
       </ol>
       <div class="handoff"><span class="arrow">1 → 2</span><span>「Page에서 이 건물 보기 →」 — 인계 표 참조. 상권만 옮기고 싶으면 레일에서 Page 를 누른다.</span></div>
     </section>
@@ -612,7 +743,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
       <dl class="screen-card">
         <div><dt>화면 목적</dt><dd>빈 건물을 지도에서 먼저 찾고, 층·임대료·거리뷰로 후보 3곳까지 좁힌다.</dd></div>
         <div><dt>막는 오해</dt><dd>R-ONE 추정 임대료를 <b>호가</b>로, 공실의심을 <b>확정 공실</b>로 읽는 것.</dd></div>
-        <div><dt>주사용자</dt><dd>출점 담당 · 자산운용사 리싱 담당 — 답사할 건물 후보를 추린다</dd></div>
+        <div><dt>주사용자</dt><dd>창업자 · 옮기려는 사업자 — 고른 상권에서 발품 팔러 갈 빈 건물 3곳을 추린다(후보 저장은 훗날 건물주 연결의 출발점)</dd></div>
         <div><dt>이 화면의 결론</dt><dd>저장한 후보 최대 3곳과 각 후보의 빈 층·월 임대료</dd></div>
         <div class="wide"><dt>다루지 않는 것</dt><dd>업종 적합성 판정(Platform) · 회수기간(Posting) · 호가·보증금·권리금</dd></div>
       </dl>
@@ -670,7 +801,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
             <tr><td class="no"><span class="num-badge">2</span></td><td>패널 머리</td><td>PRODUCT ▶ PAGE · 상권명 · 구 · 동 수 · 실측/샘플 · 거점 공실률 · R-ONE 앵커 격차</td><td>‹ 로 목록 접기 → <q>☰ 건물 목록</q></td></tr>
             <tr><td class="no"><span class="num-badge">3</span></td><td>조건 · 건수</td><td>공실 상태 · 저장한 후보 N · 지도 범위만/거점 전체 · 조건 초기화 · 건수(<span class="mono">aria-live</span>)</td><td>지도를 옮기면 목록이 화면 범위로 좁혀짐</td></tr>
             <tr><td class="no"><span class="num-badge">4</span></td><td>건물 목록</td><td>상태 점 · 이름 · 업종·상태 · 수용/영업 · 지상 층수 · 공실률 · 「+ 후보 저장」(상권당 3곳) · 임대시세일 때 빈 층 금액 줄</td><td>호버·포커스 ↔ 지도 강조. 누르면 상세(임대시세 레이어는 유지)</td></tr>
-            <tr><td class="no"><span class="num-badge">5</span></td><td>건물 상세</td><td>공실률 · 상태 · 수용/영업 · 대표 업종 · GNN 업종 추천 · 빈 층 임대료 표 · 「층별 공실 · 거리뷰 보기」 · 후보 저장 · 「이 건물로 입점 검토 →」</td><td>입점 검토 → Posting 인계</td></tr>
+            <tr><td class="no"><span class="num-badge">5</span></td><td>건물 상세</td><td>공실률 · 상태 · 수용/영업 · 대표 업종(빈 값이면 <q>미상</q>) · GNN 업종 추천(<b>3판</b>: 내 업종 줄에 <q>내 업종</q> 표식 · 상위 3에 없으면 아래 한 줄 <q>{입력어}는 이 자리 추천 3위 밖</q>) · 빈 층 임대료 표 · 「층별 공실 · 거리뷰 보기」 · 후보 저장 · 「이 건물로 입점 검토 →」</td><td>입점 검토 → Posting 인계</td></tr>
             <tr><td class="no"><span class="num-badge">6</span></td><td>지도 · 공실</td><td>z≤16 공실의심 점 · z≥17 폴리곤 4색. 선택된 건물이 바뀌면 카메라를 그 건물로</td><td>점·도형 클릭 = 목록 클릭</td></tr>
             <tr><td class="no"><span class="num-badge">7</span></td><td>임대시세 · 패널</td><td>층별 평당 표(지하1·1층·2층·3층·4층+) · 매물 수 · 월 범위 · 제외 항목</td><td>—</td></tr>
             <tr><td class="no"><span class="num-badge">8</span></td><td>임대시세 · 지도</td><td>z≤16 반경 ~160m 거리 묶음 칩 <q>월 {min}만~{max}만 · {n}곳</q> · z≥17 건물 칩 <q>월 {가장 싼 빈 층}만</q>(빈 층이 여럿이면 “~”)</td><td>묶음 → z17 로 확대 · 건물 칩 → 건물 상세</td></tr>
@@ -795,6 +926,8 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <li data-id="PG-06">R-ONE 이 없는 거점에서 <q>이 거점에는 R-ONE 임대료가 없다</q> 가 뜨고 금액 칩이 없다.</li>
         <li data-id="PG-07">Platform 에서 인계받으면 그 건물 상세가 열리고 카메라가 그 건물로 간다.</li>
         <li data-id="PG-08">「이 건물로 입점 검토 →」 → Posting 에서 그 건물 유닛이 선택되거나, 없으면 안내만 뜨고 계산하지 않는다.</li>
+        <li data-id="PG-09">목록은 공실의심 → 고공실 → 부분공실 → 만실, 같은 상태는 공실률 순으로 선다 — 기본 줌의 빨간 점과 목록 첫 줄이 같은 답을 말한다.</li>
+        <li data-id="PG-10">「내 사업」 업종이 모델 7종 안이면 건물 상세 업종 추천에 <q>내 업종</q> 표식 또는 <q>3위 밖</q> 한 줄이 뜬다.</li>
       </ol>
       <div class="handoff"><span class="arrow">2 → 3</span><span>「이 건물로 입점 검토 →」 — 인계 표 참조. Posting 에서 Page 로 돌아와도 검색어·저장 후보·지도가 그대로다.</span></div>
     </section>
@@ -806,7 +939,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
       <dl class="screen-card">
         <div><dt>화면 목적</dt><dd>실측 공실 자리 하나에 세 가격 전략(고급화·가성비·기능중심)의 월 순익과 회수기간을 낸다.</dd></div>
         <div><dt>막는 오해</dt><dd>권리금 0 전제로 낸 회수기간을 실측처럼 읽는 것 · “추천 없음”과 “회수 불가”를 섞는 것.</dd></div>
-        <div><dt>주사용자</dt><dd>입점을 검토하는 기업(프랜차이즈 가맹 개발·자영업 창업자)</dd></div>
+        <div><dt>주사용자</dt><dd>창업자 · 옮기려는 사업자 — 이 자리에 내 업종으로 들어가면 몇 달에 본전인가 / 바꾸려는 사업자 — 바꿀 업종으로 셈하면 어떤가</dd></div>
         <div><dt>이 화면의 결론</dt><dd>「{자리}는 {전략}으로 {n}개월에 회수된다」 또는 「세 전략 모두 회수되지 않는다」</dd></div>
         <div class="wide"><dt>다루지 않는 것</dt><dd>층 단위 매물 ROI(표본으로 쓰면 프리미엄 트립와이어가 뒤집힌다) · 홍보안(Program)</dd></div>
       </dl>
@@ -848,7 +981,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
           <thead><tr><th>#</th><th>영역</th><th>내용</th><th>동작</th></tr></thead>
           <tbody>
             <tr><td class="no"><span class="num-badge">1</span></td><td>결론 머리</td><td>세 상태를 섞지 않는다: 계산 전 / 회수됨 / 셋 다 회수 불가</td><td>—</td></tr>
-            <tr><td class="no"><span class="num-badge">2</span></td><td>1. 자리와 업종</td><td>상권 · 자리(<q>실측 N곳</q>) · 자리 아래 월 임대료·직전 업종·유동 · 업종 입력 + GNN 추천 칩</td><td>자리를 고르면 입력 없이 한 번 자동 계산</td></tr>
+            <tr><td class="no"><span class="num-badge">2</span></td><td>1. 자리와 업종</td><td>상권 · 자리(<q>실측 N곳</q>) · 자리 아래 월 임대료·직전 업종·유동 · 업종 입력 + GNN 추천 칩. <b>3판</b>: 업종칸 기본값 = Platform 「이 업종으로 입점 계산」 업종 → 없으면 「내 사업」 입력어 → 없으면 빈칸. 칸 아래 <q>내 사업 기준으로 채웠습니다 — 바꿀 수 있습니다</q></td><td>자리를 고르면 한 번 자동 계산(업종칸 값으로). 상권·자리를 바꾸면 업종칸이 빈칸이 아니라 <b>기본값</b>으로 돌아간다</td></tr>
             <tr><td class="no"><span class="num-badge">3</span></td><td>2. 비용 조건</td><td>권리금(입력 계약) · 세부 조건에 전략 선택 · 「시뮬레이션」</td><td>입력이 바뀌면 <q>입력이 변경되었습니다. 다시 계산하면 결과에 반영됩니다.</q></td></tr>
             <tr><td class="no"><span class="num-badge">4</span></td><td>세 가격대 결과</td><td>카드 셋: 초기 투자 · 월 비용 · 월 매출 · 월 순익 · 회수기간. 권리금만 바꿔 재계산하면 <q>직전 계산 대비</q></td><td>—</td></tr>
             <tr><td class="no"><span class="num-badge">5</span></td><td>출처 배지</td><td>면적·임대료·권리금·유동·층 = 실측(초록) / 프록시(회색 점선) / 전제(노랑 점선) · 코파일럿/내부 폴백 · 기준 분기</td><td>—</td></tr>
@@ -897,6 +1030,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <li data-id="PS-05">같은 자리에서 권리금만 바꿔 다시 계산하면 카드마다 <q>직전 계산 대비</q> 차이가 뜬다.</li>
         <li data-id="PS-06">「이 자리로 홍보 program 만들기 →」를 누르면 Program 으로 넘어가 거점·카테고리·주소가 채워지고 「입점 예정 자리」 안내와 지도 핀이 뜬다.</li>
         <li data-id="PS-07">자리가 0곳인 상권에서 시뮬레이션·인계 버튼이 비활성이다.</li>
+        <li data-id="PS-08">「내 사업」이 카페·디저트면 Posting 을 열었을 때 업종칸이 <q>카페</q> 이고, 자리를 바꿔도 <q>카페</q> 로 돌아간다. 사용자가 고친 뒤에는 자리를 바꾸기 전까지 그 값이 유지된다.</li>
       </ol>
       <div class="handoff"><span class="arrow">3 → 4</span><span>「이 자리로 홍보 program 만들기 →」 — 인계 표 참조.</span></div>
     </section>
@@ -908,7 +1042,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
       <dl class="screen-card">
         <div><dt>화면 목적</dt><dd>입점할(또는 입점한) 가게의 리뷰·메뉴·사진을 근거로 온·오프라인 채널별 홍보 초안을 만들고, 오프라인은 상권의 실제 행사 장소와 잇는다.</dd></div>
         <div><dt>막는 오해</dt><dd>규칙 기반 스텁을 LLM 생성으로 · 편집한 초안을 검증된 초안으로 · 종료된 행사를 앞으로 열릴 행사로 읽는 것.</dd></div>
-        <div><dt>주사용자</dt><dd>이 상권 빈 건물에 입점할 기업의 마케팅 담당 · 점주</dd></div>
+        <div><dt>주사용자</dt><dd>창업자 — 오픈 홍보 · 바꾸는 사업자 — 업종 전환 안내 · 옮기는 사업자 — 이전 안내. 뒤의 둘은 <b>이미 리뷰·메뉴가 있어</b> 근거 있는 초안이 바로 나온다</dd></div>
         <div><dt>이 화면의 결론</dt><dd>채널별 초안(복사 가능) + 붙일 수 있는 오프라인 행사 후보</dd></div>
         <div class="wide"><dt>다루지 않는 것</dt><dd>광고 집행·예산 · 네이버 플레이스 리뷰 크롤링(공식 API 없음 — 붙여넣기만)</dd></div>
       </dl>
@@ -949,7 +1083,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
           <tbody>
             <tr><td class="no"><span class="num-badge">1</span></td><td>입점 예정 자리 안내</td><td>Posting 인계 때만. <q>입점 예정 자리 — {자리명} · {면적}평 · {층} · 월 {임대료}만원</q>(+ <q>· Posting {전략} 전략</q>) + <q>가게명·리뷰를 넣으면 이 자리 기준으로 홍보 program 을 만든다. 거점·카테고리·주소는 Posting 에서 채웠다(바꿀 수 있다).</q></td><td>「비우기」·「상용 온보딩」 전환 시 사라진다</td></tr>
             <tr><td class="no"><span class="num-badge">2</span></td><td>오프라인 홍보 장소</td><td>상권(폼 거점, 없으면 공유 상권)의 공공 문화행사 목록. 종료일이 지난 행사는 뺀다. 고른 행사 상세: 일정 · 장소 · 주최 · 요금 · 대상 · <q>행사 페이지 열기 ↗</q></td><td>목록 클릭 = 칩 선택 + 지도가 그 행사로 이동</td></tr>
-            <tr><td class="no"><span class="num-badge">3</span></td><td>가게 프로필 · 결과</td><td>가게명(+검색) · 카테고리 · 거점 · 리뷰 · 접힘(주소·사진·메뉴·키워드) · 모드(공개 데모/상용 온보딩: API 키 + 동의 4개) · 결과(채널별 초안 편집·미리보기·복사 · HA 검증 접힘)</td><td>후보는 자동 선택하지 않는다</td></tr>
+            <tr><td class="no"><span class="num-badge">3</span></td><td>가게 프로필 · 결과</td><td>가게명(+검색) · 카테고리 · 거점 · 리뷰 · 접힘(주소·사진·메뉴·키워드) · 모드(공개 데모/상용 온보딩: API 키 + 동의 4개) · 결과(채널별 초안 편집·미리보기·복사 · HA 검증 접힘)</td><td>후보는 자동 선택하지 않는다. <b>3판</b>: 카테고리 기본값 = Posting 인계 업종 → 없으면 「내 사업」 입력어. 바꾸기·옮기기면 프로필 위에 한 줄 <q>지금 가게의 리뷰·메뉴를 붙여넣으면 {업종 전환|이전} 안내 초안의 근거가 됩니다</q>(가게명 검색으로 지금 가게를 찾을 수 있다)</td></tr>
             <tr><td class="no"><span class="num-badge">4</span></td><td>지도 · 행사 칩</td><td><q>{행사명(13자)} · {기간 MM-DD~MM-DD}</q>. 시드 폴백이면 점선 + <q>예시</q>. 선택된 행사는 채움</td><td>칩 = 목록에서 고른 것과 같다</td></tr>
             <tr><td class="no"><span class="num-badge">5</span></td><td>지도 · 가게 후보</td><td>상호 검색 결과를 잉크색 칩으로. 고른 가게는 <q>이 가게</q> 채움 칩</td><td>칩 = 후보 목록에서 고른 것과 같다</td></tr>
             <tr><td class="no"><span class="num-badge">6</span></td><td>지도 · 입점 예정 자리</td><td>Posting 색 채움 칩 <q>입점 예정 자리</q> + 면적·층</td><td>반응 없음</td></tr>
@@ -996,7 +1130,31 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <li data-id="PR-05">LLM 을 타지 못하면 결론 줄에 <q>규칙 기반 스텁</q> 이 남는다(상세를 접어도).</li>
         <li data-id="PR-06">상용 온보딩은 API 키와 네 동의를 모두 채워야 생성 버튼이 켜진다.</li>
         <li data-id="PR-07">Posting 에서 넘어오면 「입점 예정 자리」 안내·지도 핀이 뜨고, 「비우기」를 누르면 둘 다 사라진다.</li>
+        <li data-id="PR-08">「내 사업」이 옮기기 · 카페·디저트면 Program 을 바로 열었을 때 카테고리가 <q>카페</q> 이고 <q>이전 안내 초안의 근거가 됩니다</q> 한 줄이 뜬다. 창업이면 그 줄이 없다.</li>
       </ol>
+    </section>
+
+    <!-- ═════════ 건물주 연결 (추후) ═════════ -->
+    <section id="landlord">
+      <div class="sec-head">
+        <h2>건물주 연결 <span class="tag est">추후</span></h2>
+        <p class="lede">목표는 사업자가 추린 빈 건물과 그 건물주를 잇는 것이다. <b>이번 판에는 화면이 없다</b> — 누르면 아무 일도 일어나지 않는 「건물주에게 문의」 버튼을 미리 달지 않는다. 대신 붙을 자리와 선결 조건을 못 박아 둔다.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>붙을 자리</th><th>사업자 쪽에서 넘길 값</th><th>왜 거기인가</th></tr></thead>
+          <tbody>
+            <tr><th>Page 후보 비교 대화상자 「다음 단계」 줄</th><td>건물 id · 저장 사유(메모) · 「내 사업」 목적·업종</td><td>사업자가 발품 전에 스스로 3곳으로 좁힌 자리 — 건물주에게 가장 뜨거운 신호다</td></tr>
+            <tr><th>Posting 결과 아래</th><td>위 + 계산에 쓴 권리금 · 회수되는 전략</td><td>“이 가격대로 들어오겠다”까지 셈한 사업자다</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="box issue" style="margin-top:12px"><h4>화면을 만들기 전에 풀려야 하는 것</h4><ul>
+        <li><b>계정</b> — 문의는 누가 보냈는지가 있어야 한다. 백엔드 계정층은 섰고 로그인 화면이 없다(미해결 표).</li>
+        <li><b>건물주 쪽 등록</b> — 건축물대장 소유자는 공개 연락처가 아니다. 건물주가 스스로 등록한 건물에만 문의 버튼이 뜬다.</li>
+        <li><b>동의</b> — 사업자의 업종·예산을 건물주에게 넘기는 것은 제3자 제공이다. 넘기는 항목을 화면에 적고 동의를 받는다.</li>
+        <li><b>수익 모델</b> — 문의 무료/유료, 계약 성사 수수료 여부는 정책 결정이다.</li>
+      </ul></div>
     </section>
 
     <!-- ═════════ 근거 표기 규칙 ═════════ -->
@@ -1057,7 +1215,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
             <tr><th>대비</th><td>본문·트랙 색 글자는 --bg · --surface · 자기 soft 위에서 AA 4.5:1 이상. 채운 칩의 흰 글자도 같은 기준</td></tr>
             <tr><th>지도 위 글자</th><td>칩은 흰 바탕 + 1.5px 테두리 + 그림자 — 위성·일반 지도 어느 바탕에서도 읽힌다. 범례는 표면 94% 불투명</td></tr>
             <tr><th>키보드 대체</th><td>지도 칩·점·도형은 키보드로 닿지 않는다. <b>모든 표식 동작은 패널의 버튼·체크박스·드롭다운으로 똑같이 할 수 있어야 한다</b>(Platform 체크박스 · Page 목록 · Posting 드롭다운 · Program 후보·행사 목록)</td></tr>
-            <tr><th>알림(aria-live)</th><td>상권 변경 <q>상권 {이름} 선택됨</q> · Page 건수 · Platform 비교 후보 수(<span class="mono">role=status</span>) · Posting 인계 결과 · Program 지도 안내</td></tr>
+            <tr><th>알림(aria-live)</th><td>상권 변경 <q>상권 {이름} 선택됨</q> · 「내 사업」 시작 <q>{칩 문구}로 설정됨</q> · Page 건수 · Platform 비교 후보 수(<span class="mono">role=status</span>) · Posting 인계 결과 · Program 지도 안내</td></tr>
             <tr><th>이름</th><td>패널 <span class="mono">aside</span> 에 패널 이름(<q>상권 정체성</q> · <q>입점 계산</q> · <q>홍보 program</q>) · 레일 <span class="mono">nav "주요 화면"</span> · 현재 탭 <span class="mono">aria-current="page"</span> · 지도 레이어 <span class="mono">group "지도 데이터 레이어"</span></td></tr>
             <tr><th>포커스</th><td>보이는 포커스 링(트랙 색 2px) · 패널 접기/펴기와 대화상자 닫기 뒤 포커스 복귀 · <kbd>Esc</kbd> 규칙(공통 프레임)</td></tr>
             <tr><th>움직임</th><td>카메라 이동 외 장식 애니메이션 없음. 스켈레톤 반짝임은 <span class="mono">prefers-reduced-motion</span> 에서 멈춘다</td></tr>
@@ -1106,6 +1264,8 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
           <thead><tr><th>용어</th><th>뜻</th></tr></thead>
           <tbody>
             <tr><th>Platform · Page · Posting · Program</th><td>PPPP. 전통 4P(Place · Product · Price · Promotion)의 디지털 전환 — 상권을 플랫폼으로, 빈 자리를 page 로, 가격대를 posting 으로, 홍보를 program 으로 읽는다</td></tr>
+            <tr><th>내 사업</th><td>목적(창업 · 업종 바꾸기 · 상권 옮기기) + 업종 + 지금 상권. 네 트랙이 공유하는 값(공통 프레임)</td></tr>
+            <tr><th>입지 적합도</th><td>그 상권 점포 자리마다 모델(GNN)이 매긴 “그 업종이 있을 확률”의 평균. 비슷한 입지에 그 업종이 이미 모여 있는 정도이지 매출·생존이 아니다. 모델 7종 업종만 있다</td></tr>
             <tr><th>거점 · 상권</th><td>서빙하는 분석 단위 상권. 수는 API 응답으로 센다</td></tr>
             <tr><th>실측 범위</th><td>공실률 분모에 들어간 100m 격자의 외곽선. 상권 경계가 아니다</td></tr>
             <tr><th>공실의심 · 고공실 · 부분공실 · 만실</th><td>점유율 0 · 0~50% · 50~90% · 90% 이상(Page 정의 표)</td></tr>
@@ -1131,6 +1291,11 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>미해결</th><th>왜 막혀 있나</th><th>정할 사람</th></tr></thead>
           <tbody>
+            <tr><td><b>업종 12종 목록 확정</b> — 지금 목록은 모델 7종 + 카카오 군에서 소상공인 창업이 잦은 업종을 골랐다</td><td>빠진 업종(세탁소·꽃집·반려동물 등)을 넣으면 같은 업종 비중만 나오고 적합도는 없다</td><td>대표</td></tr>
+            <tr><td>모델 7종 밖 업종의 입지 적합도</td><td>GNN 재학습(라벨 확장)이 필요하다. 그 전까지 순위를 내지 않는다</td><td>ML</td></tr>
+            <tr><td>바꾸기·옮기기의 <b>지금 가게 위치</b></td><td>지금은 상권 단위다. 가게 좌표를 받으면 바꾸기 순위를 그 자리 기준(최근접 노드)으로 낼 수 있다 — 입력 부담과 맞바꾼다</td><td>대표 · 디자인</td></tr>
+            <tr><td>「내 사업」을 계정으로 옮기기</td><td>지금은 브라우저에만 남는다. 로그인 화면이 선 뒤 옮긴다</td><td>개발</td></tr>
+            <tr><td>건물주 연결 선결 조건 넷</td><td>건물주 연결 절 참조</td><td>대표</td></tr>
             <tr><td>로그인 · 회원가입 · API 키 화면</td><td>백엔드는 있고 화면이 없다. 멘토링 결과 반영 여부 미정</td><td>대표 · 디자인</td></tr>
             <tr><td>권리금 기본값 정책(비우면 0 전제 유지?)</td><td>회수기간이 짧게 보인다 — 결론 줄 경고로 버티는 중</td><td>대표 · Posting</td></tr>
             <tr><td>실제 호가 채널</td><td>크롤링 금지선 · 제휴 필요</td><td>대표</td></tr>
@@ -1145,6 +1310,9 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>판</th><th>변경</th></tr></thead>
           <tbody>
+            <tr><td class="mono">3판 · 09-13</td><td><b>주요 고객 재정의</b>: 분석가(출점팀·자산운용사·지자체) → 업종이 정해진 창업자 · 업종 바꾸기/상권 옮기기 사업자 · (추후) 건물주. 주요 고객 절 · 업종 12종 대응표 신설</td></tr>
+            <tr><td class="mono">3판 · 09-13</td><td><b>새 동작</b>: 공통 「내 사업」 설정(카드·칩·저장) · Platform 「내 업종으로 본 상권」(상권 순위 · 지금 상권 고정 · 업종 순위) · 자리 칩·카드 내 업종 점수 순 · Platform→Posting 업종 인계 · Posting 업종칸·Program 카테고리칸 기본값 · Page 상세 내 업종 표식 · Program 기존 사업자 안내 줄 · 건물주 연결 연결 지점</td></tr>
+            <tr><td class="mono">3판 · 09-13</td><td><b>실사이트 대조 반영</b>: Page 목록 공실 순 정렬(PG-09) · 트랙 카메라 여백을 그려진 패널로 재고 중심 보정(C-11) · index.html no-cache</td></tr>
             <tr><td class="mono">2판 · 09-13</td><td><b>사실 오류 수정</b>: 인계 내용(표로 정본화) · “표식을 누르면 패널 항목 선택”(Program 행사까지 적용) · <kbd>Esc</kbd> 입력칸 규칙(네 화면 통일) · 와이어프레임 가로 스크롤</td></tr>
             <tr><td class="mono">2판 · 09-13</td><td><b>양식 필수 절 추가</b>: 화면 카드(목적·오해·주사용자·결론·제외) · 레이아웃 수치·z축·모바일 · 상태표 · 상호작용 목표 시간 · 데이터 바인딩 · 통과 조건 · 토큰 · 접근성 · 미해결 결정 주체</td></tr>
             <tr><td class="mono">2판 · 09-13</td><td><b>내용 추가</b>: 공실 4단계 정의 · 유동인구·인구밀도 · 모달 2종 · 자리 비교표 · 숨은 화면 · 공통 상태(지도 인증 실패 등) · 데이터 기준일 · 용어집</td></tr>
@@ -1156,6 +1324,6 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
       </div>
     </section>
 
-    <footer>PlaceOS · PPPP 화면설계서 2판 · 2026-09-13 · 저장소 원본 <span class="mono">docs/screen-spec-pppp-2026-09-13.html</span> · 양식 <span class="mono">docs/prompt-ux-screen-spec.md</span> · 코드 <span class="mono">apps/frontend/src/App.tsx</span> · <span class="mono">components/TrackMapFrame.tsx</span> · <span class="mono">pages/*</span></footer>
+    <footer>PlaceOS · PPPP 화면설계서 3판 · 2026-09-13 · 저장소 원본 <span class="mono">docs/screen-spec-pppp-2026-09-13.html</span> · 양식 <span class="mono">docs/prompt-ux-screen-spec.md</span> · 코드 <span class="mono">apps/frontend/src/App.tsx</span> · <span class="mono">components/TrackMapFrame.tsx</span> · <span class="mono">pages/*</span></footer>
   </main>
 </div>

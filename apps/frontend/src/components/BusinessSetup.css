@@ -1,0 +1,83 @@
+/* 「내 사업」 카드 + 칩 — 화면설계서 3판 공통 프레임.
+   오버레이 층(.map-overlays, 레일 오른쪽) 기준으로 선다. 색은 토큰에서만 가져온다. */
+
+.biz {
+  position: absolute; inset: 0;
+  pointer-events: none;           /* 빈 자리는 지도 드래그가 통과한다 */
+  font-family: var(--font-sans, system-ui, sans-serif);
+  color: var(--ink);
+  z-index: 6;
+}
+.biz > * { pointer-events: auto; }
+
+.biz-chip {
+  position: absolute; top: 12px; right: 12px;
+  display: flex; align-items: center; gap: 6px;
+  max-width: 300px; height: 40px; padding: 0 14px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); color: var(--ink);
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(11,27,51,.08));
+  font: inherit; font-size: 13px; font-weight: var(--fw-bold, 700); cursor: pointer;
+}
+.biz-chip-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.biz-chip:not(.is-set) { color: var(--track-page); border-color: color-mix(in srgb, var(--track-page) 45%, var(--line)); }
+.biz-chip:hover { border-color: var(--track-page); }
+.biz-chip:focus-visible,
+.biz-card :is(button, input, select):focus-visible { outline: 2px solid var(--track-page); outline-offset: 2px; }
+
+.biz-card {
+  position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
+  width: min(520px, calc(100% - 24px)); max-height: calc(100% - 96px); overflow-y: auto;
+  display: grid; gap: var(--sp-3);
+  padding: 20px 20px 16px;
+  background: var(--bg); border: 1px solid var(--line); border-top: 3px solid var(--track-page);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 8px 32px rgba(11,27,51,.18);
+  z-index: 30;
+}
+.biz-card h2 { margin: 0; font-size: 20px; font-weight: var(--fw-bold, 700); letter-spacing: -.01em; }
+.biz-card h2:focus { outline: none; }
+.biz-sub { margin: -4px 0 0; font-size: 13px; color: var(--muted); }
+
+.biz-card fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.biz-card legend { padding: 0; margin-bottom: 6px; font-size: 13px; font-weight: var(--fw-semibold, 600); }
+
+.biz-goals { display: grid; gap: 6px; }
+.biz-goal, .biz-ind {
+  position: relative; display: grid; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+}
+.biz-goal { grid-template-columns: 1fr; padding: 10px 12px; gap: 2px; }
+.biz-goal b { font-size: 14px; }
+.biz-goal span { font-size: 12.5px; color: var(--muted); }
+.biz-goal input, .biz-ind input { position: absolute; opacity: 0; pointer-events: none; }
+.biz-goal.on, .biz-ind.on { border-color: var(--track-page); background: var(--track-page-soft); box-shadow: inset 0 0 0 1px var(--track-page); }
+.biz-goal:has(input:focus-visible), .biz-ind:has(input:focus-visible) { outline: 2px solid var(--track-page); outline-offset: 2px; }
+
+.biz-ind-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.biz-ind { padding: 8px 6px; text-align: center; align-content: center; min-height: 48px; }
+.biz-ind b { font-size: 13px; font-weight: var(--fw-semibold, 600); }
+.biz-ind small { font-size: 10.5px; color: var(--muted); }
+.biz-inds[disabled] { opacity: .7; }
+.biz-hint { margin: 0; font-size: 12.5px; color: var(--muted); }
+.biz-error { margin: 0; font-size: 12.5px; color: #B42318; }
+
+.biz-home { display: grid; gap: 4px; }
+.biz-home-label { font-size: 13px; font-weight: var(--fw-semibold, 600); }
+.biz-home-select {
+  height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); font: inherit; font-size: 13px; color: var(--ink);
+}
+
+.biz-actions { display: flex; gap: var(--sp-2); justify-content: flex-end; flex-wrap: wrap; }
+.biz-actions button { height: 40px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: var(--fw-semibold, 600); cursor: pointer; }
+.biz-start { border: 0; background: var(--track-page); color: #fff; }
+.biz-start:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
+.biz-browse { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+
+@media (max-width: 768px) {
+  .biz-chip { top: 8px; right: 8px; max-width: 45%; height: 36px; padding: 0 10px; font-size: 12px; }
+  .biz-card { top: 8px; left: 8px; right: 8px; transform: none; width: auto; max-height: 70dvh; }
+  .biz-ind-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { .biz-card { transition: none; } }

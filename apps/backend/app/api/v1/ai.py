@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from app.schemas.posting import SimulateRequest, SimulateResult
+from app.services import business_fit as fit_svc
 from app.services import industry_recommend as industry_svc
 from app.services import posting as posting_svc
 from app.services import vacancy_forecast as vacancy_svc
@@ -63,6 +64,33 @@ async def recommend_industry(req: IndustryRequest) -> dict[str, object]:
             status_code=404,
             detail=f"no recommendation for district/좌표: {req.district_id}")
     return {**out, "building_id": req.building_id}
+
+
+@router.get("/industries")
+async def list_industries() -> dict[str, object]:
+    """「내 사업」이 고르는 업종 12종(화면설계서 3판 주요 고객 절). 순서가 화면 칩 순서다."""
+    return {"industries": fit_svc.industries()}
+
+
+@router.get("/industry-fit")
+async def industry_fit_by_district(industry: str) -> dict[str, object]:
+    """내 업종으로 서빙 상권 전체를 견준다 — 창업자·상권 옮기기 사업자용.
+
+    모델 7종 밖 업종은 `model_covered=False` 이고 순위(fit_rank)가 전부 None 이다.
+    """
+    out = fit_svc.fit_by_district(industry)
+    if out is None:
+        raise HTTPException(status_code=404, detail=f"unknown industry: {industry}")
+    return out
+
+
+@router.get("/district-industries/{district_id}")
+async def district_industries(district_id: str) -> dict[str, object]:
+    """한 상권 안에서 업종 12종을 견준다 — 업종 바꾸기 사업자용."""
+    out = fit_svc.industries_in_district(district_id)
+    if out is None:
+        raise HTTPException(status_code=404, detail=f"no industry data for district: {district_id}")
+    return out
 
 
 @router.post("/simulate-revenue", response_model=SimulateResult)

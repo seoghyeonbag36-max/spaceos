@@ -21,8 +21,9 @@ import { useMapHost, DEFAULT_ZOOM } from "@/components/MapHost";
 import { isEditableTarget } from "@/lib/keyboard";
 import { getBuildingVacancy, getDensityHeatmap, getFootfallHeatmap, getRentHeatmap, listDistricts, recommendIndustry,
   type DensityHeatmap, type DistrictSummary, type FootfallHeatmap, type GeoJSONFC, type IndustryRecommend,
-  type RentHeatmap, type RentListing } from "@/lib/api";
+  type IndustryOption, type RentHeatmap, type RentListing } from "@/lib/api";
 import { colors } from "@/design/tokens/colors";
+import { topic } from "@/lib/businessProfile";
 import { mapLabelHTML, shortManwon, vacancyDotAnchor, vacancyDotHTML } from "@/design/components/MapMarkerPin";
 import "@/styles/tokens.css";
 import "./MapShell.css";
@@ -179,9 +180,11 @@ interface MapShellProps {
   workspace?: PageWorkspace;
   onWorkspaceChange?: Dispatch<SetStateAction<PageWorkspace>>;
   onReview?: (selection: BuildingSelection) => void;
+  /** 「내 사업」 업종(화면설계서 3판 PG-10). 모델 7종 안이면 건물 상세 업종 추천에서 표시한다. */
+  myIndustry?: IndustryOption | null;
 }
 
-export default function MapShell({ workspace: externalWorkspace, onWorkspaceChange, onReview }: MapShellProps = {}) {
+export default function MapShell({ workspace: externalWorkspace, onWorkspaceChange, onReview, myIndustry }: MapShellProps = {}) {
   const [localWorkspace, setLocalWorkspace] = useState(createPageWorkspace);
   const workspace = externalWorkspace ?? localWorkspace;
   const setWorkspace = onWorkspaceChange ?? setLocalWorkspace;
@@ -887,12 +890,18 @@ export default function MapShell({ workspace: externalWorkspace, onWorkspaceChan
                 <div className="b-rec-h">
                   이 자리 업종 추천<span className="b-rec-badge">GNN</span>
                 </div>
-                {rec.recommendations.map((r) => (
-                  <div className="row" key={r.industry}>
-                    <span>{r.industry}</span>
-                    <span>{Math.round(r.score * 100)}%</span>
-                  </div>
-                ))}
+                {rec.recommendations.map((r) => {
+                  const mine = !!myIndustry?.model_label && r.industry === myIndustry.model_label;
+                  return (
+                    <div className={"row" + (mine ? " is-mine" : "")} key={r.industry}>
+                      <span>{r.industry}{mine && <em className="b-rec-mine">내 업종</em>}</span>
+                      <span>{Math.round(r.score * 100)}%</span>
+                    </div>
+                  );
+                })}
+                {myIndustry?.model_label && !rec.recommendations.some((r) => r.industry === myIndustry.model_label) && (
+                  <div className="b-rec-note">{topic(myIndustry.input)} 이 자리 추천 3위 밖</div>
+                )}
                 <div className="b-rec-note">
                   {rec.scope === "node"
                     ? `가장 가까운 점포 자리 기준 · ${Math.round(rec.matched_distance_m ?? 0)}m`

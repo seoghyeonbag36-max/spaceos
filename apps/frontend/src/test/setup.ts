@@ -37,6 +37,8 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  // 「내 사업」(화면설계서 3판)은 localStorage 에 남는다 — 앞 테스트의 설정이 다음 테스트의 첫 화면을 바꾸지 않게.
+  try { window.localStorage.clear(); } catch { /* 저장소가 막힌 환경 */ }
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });

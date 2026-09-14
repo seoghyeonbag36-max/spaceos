@@ -627,6 +627,49 @@ export const recommendIndustry = (req: {
   district_id: string; lat?: number; lon?: number; building_id?: string;
 }) => postJSON<IndustryRecommend>("/ai/recommend-industry", req);
 
+/* ===== 내 업종으로 본 상권(화면설계서 3판) — GET /ai/industries · /ai/industry-fit · /ai/district-industries ===== */
+
+/** 「내 사업」이 고르는 업종 12종 중 하나. `key` 는 브라우저에 저장되는 안정 식별자다.
+ *  `input` 은 Posting 업종칸·Program 카테고리칸에 채우는 말, `model_label` 은 GNN 7종 라벨(없으면 적합도 없음). */
+export interface IndustryOption { key: string; label: string; input: string; model_label: string | null; }
+
+export const listIndustries = () => getJSON<{ industries: IndustryOption[] }>("/ai/industries");
+
+/** 업종 하나로 본 상권 한 줄. 공실률은 싣지 않는다 — 상권 목록(`listDistricts`)에서 합친다.
+ *  ⚠ `fit` 은 매출·생존이 아니라 "비슷한 입지에 그 업종이 모여 있는 정도"(GNN 상권 평균)이고,
+ *     Top-3 근사라 절대값은 낮다 — **순위로만** 읽는다. */
+export interface IndustryFitRow {
+  district_id: string; name: string | null; gu: string | null;
+  fit: number | null; fit_rank: number | null;
+  same_n: number | null; sample_n: number | null; same_share: number | null;
+  rent_1f_per_pyeong: number | null; rent_shared: boolean;
+}
+
+export interface IndustryFit {
+  industry: IndustryOption;
+  /** 모델 7종 안 업종인가. false 면 순위·적합도가 전부 null 이다(가나다순) */
+  model_covered: boolean;
+  seoul_fit: number | null;
+  ranked_n: number;
+  districts: IndustryFitRow[];
+  source: string; note: string;
+}
+
+export const getIndustryFit = (key: string) =>
+  getJSON<IndustryFit>(`/ai/industry-fit?industry=${encodeURIComponent(key)}`);
+
+/** 한 상권 안 업종 순위 한 줄(업종 바꾸기). */
+export interface DistrictIndustryRow extends IndustryOption {
+  fit: number | null; fit_rank: number | null; same_n: number | null; same_share: number | null;
+}
+
+export interface DistrictIndustries {
+  district_id: string; rows: DistrictIndustryRow[]; sample_n: number | null; source: string; note: string;
+}
+
+export const getDistrictIndustries = (districtId: string) =>
+  getJSON<DistrictIndustries>(`/ai/district-industries/${encodeURIComponent(districtId)}`);
+
 /* ===== 가게 단위 마케팅 솔루션(Program 1단계) — POST /marketing/generate ===== */
 
 /** 가게 프로필. 수집 채널(점주 제공·네이버 지역검색·카카오 로컬)에 무관한 정규화 입력 계약.

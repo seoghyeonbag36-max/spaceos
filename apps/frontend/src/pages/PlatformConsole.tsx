@@ -6,11 +6,13 @@ import {
   getPlatformProfile, getSentiment, getVacancyHeatmap, listDistricts, predictVacancy, recommendIndustry,
 } from "@/lib/api";
 import type {
-  DistrictSummary, IndustryRecommend, OpeningSite, PlatformProfile, VacancyForecast, Zone,
+  DistrictSummary, IndustryOption, IndustryRecommend, OpeningSite, PlatformProfile, VacancyForecast, Zone,
 } from "@/lib/api";
 import { Button } from "@/design/components/Button";
 import { Card } from "@/design/components/Card";
 import { mapLabelHTML } from "@/design/components/MapMarkerPin";
+import IndustryFitCard from "@/components/IndustryFitCard";
+import { findIndustry, type BusinessProfile } from "@/lib/businessProfile";
 import { colors } from "@/design/tokens/colors";
 import { useMapHost } from "@/components/MapHost";
 import { fitInView, useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
@@ -85,12 +87,20 @@ function approxVacancyPct(fc: VacancyForecast | null, hub?: DistrictSummary): nu
 
 const dirMark = (d: string) => (d === "up" ? "▲" : d === "down" ? "▼" : "—");
 
-export default function PlatformConsole({ districtId: sharedDistrict, onDistrictChange, onOpenInPage }: {
+export default function PlatformConsole({ districtId: sharedDistrict, onDistrictChange, onOpenInPage,
+  business = null, industries = null, onOpenBusiness, onTryIndustry }: {
   /** 네 트랙이 공유하는 상권(App). 주면 제어 모드, 안 주면 화면이 스스로 든다(단독 렌더·테스트). */
   districtId?: string;
   onDistrictChange?: (id: string) => void;
   /** Platform → Page 인계(화면설계서 2판). 주면 자리 카드에 「Page에서 이 건물 보기 →」가 뜬다. */
   onOpenInPage?: (selection: BuildingSelection) => void;
+  /** 「내 사업」(화면설계서 3판). 있으면 패널 맨 위에 「내 업종으로 본 상권」을 세운다. */
+  business?: BusinessProfile | null;
+  industries?: IndustryOption[] | null;
+  /** 「내 사업」이 없을 때 한 줄 안내의 「내 사업 설정」. 없으면(단독 렌더) 안내를 그리지 않는다. */
+  onOpenBusiness?: () => void;
+  /** 업종 바꾸기 표 「이 업종으로 입점 계산 →」 → Posting 업종칸(인계 표 Platform → Posting). */
+  onTryIndustry?: (input: string) => void;
 } = {}) {
   const [districts, setDistricts] = useState<DistrictSummary[]>([]);
   const [ownDistrict, setOwnDistrict] = useState(sharedDistrict ?? DEFAULT_DISTRICT);
@@ -178,11 +188,29 @@ export default function PlatformConsole({ districtId: sharedDistrict, onDistrict
     [hub, districtId, prof, profErr, fc, rec, zones],
   );
 
-  const sitesHere = prof?.district_id === districtId ? prof.openings.sites : null;
-  const boundary = usePlatformMap({ districtId, sites: sitesHere, selectedIds: selectedSiteIds, onToggle: toggleSite });
+  // 창업·옮기기이고 내 업종이 모델 7종 안이면 자리를 **내 업종 점수 순**으로 세우고 칩도 그 점수를 말한다
+  // (화면설계서 3판 「자리 칩 · 자리 카드 — 내 업종이 있을 때」). 바꾸기·7종 밖이면 2판 규칙 그대로.
+  const myIndustry = findIndustry(industries, business?.industryKey);
+  const mySite = business?.goal !== "pivot" && myIndustry?.model_label
+    ? { label: myIndustry.model_label, input: myIndustry.input } : null;
+  const openingsHere = useMemo(() => {
+    if (prof?.district_id !== districtId) return null;
+    if (!mySite) return prof.openings;
+    const score = (site: OpeningSite) => site.recommendations.find((r) => r.industry === mySite.label)?.score ?? -1;
+    // 안정 정렬 — 점수가 같으면(둘 다 3위 밖 등) 원래 순서(상권 평균 대비 두드러진 자리부터)를 지킨다.
+    const sites = prof.openings.sites.map((site, i) => ({ site, i }))
+      .sort((a, b) => score(b.site) - score(a.site) || a.i - b.i).map((x) => x.site);
+    return { ...prof.openings, sites };
+    // mySite 는 렌더마다 새 객체라 값으로 비교한다
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prof, districtId, mySite?.label]);
+  const sitesHere = openingsHere?.sites ?? null;
+  const boundary = usePlatformMap({ districtId, sites: sitesHere, selectedIds: selectedSiteIds, onToggle: toggleSite, mySite });
 
   return (
     <div className="platconsole"><div className="wrap">
+      <IndustryFitCard business={business} industries={industries} districtId={districtId} districts={districts}
+        onDistrictChange={setDistrictId} onOpenBusiness={onOpenBusiness} onTryIndustry={onTryIndustry} />
       <Verdict
         eyebrow="PlaceOS · Platform" conversion="PLACE ▶ PLATFORM"
         question="이 입지·상권은 어떤 플랫폼인가"
@@ -249,8 +277,8 @@ export default function PlatformConsole({ districtId: sharedDistrict, onDistrict
       {!profErr && !prof && <div className="loading">상권 정체성 불러오는 중…</div>}
 
       {prof?.identity && <IdentitySection ident={prof.identity} hub={hub} />}
-      {prof?.district_id === districtId && (
-        <OpeningsSection key={districtId} openings={prof.openings} districtName={hub?.name ?? districtId}
+      {openingsHere && (
+        <OpeningsSection key={districtId} openings={openingsHere} districtName={hub?.name ?? districtId} mySite={mySite}
           selectedIds={selectedSiteIds} onToggle={toggleSite} onClear={() => setSelectedSiteIds([])}
           onOpenInPage={onOpenInPage ? (site) => onOpenInPage(siteToBuilding(districtId, site)) : undefined} />
       )}
@@ -284,9 +312,10 @@ export default function PlatformConsole({ districtId: sharedDistrict, onDistrict
  * 지도가 없으면(단독 렌더·테스트) 경계 요청도 보내지 않는다 — 그릴 곳이 없는 값을 받지 않는다.
  * 경계를 돌려준다(패널 칩이 배지를 쓴다). 지도가 없으면 null.
  */
-function usePlatformMap({ districtId, sites, selectedIds, onToggle }: {
+function usePlatformMap({ districtId, sites, selectedIds, onToggle, mySite }: {
   districtId: string; sites: OpeningSite[] | null;
   selectedIds: string[]; onToggle: (id: string) => void;
+  mySite: { label: string; input: string } | null;
 }): HubBoundary | null {
   const { map, ready } = useMapHost();
   const [boundary, setBoundary] = useState<{ id: string; b: HubBoundary } | null>(null);
@@ -330,16 +359,27 @@ function usePlatformMap({ districtId, sites, selectedIds, onToggle }: {
     .filter((s) => s.lat != null && s.lng != null)
     .map((s) => {
       const on = selectedIds.includes(s.unit_id);
+      const sub = s.area_py != null ? `${s.area_py}평` : undefined;
+      if (mySite) {
+        // 3판 — 내 업종 점수. 그 자리 상위 3에 없으면 점선 "3위 밖"(0% 로 그리지 않는다).
+        const mine = s.recommendations.find((r) => r.industry === mySite.label);
+        return {
+          id: s.unit_id, lat: s.lat as number, lng: s.lng as number, zIndex: on ? 200 : mine ? 90 : 70,
+          html: mapLabelHTML({
+            text: mine ? `${mySite.input} ${Math.round(mine.score * 100)}%` : `${mySite.input} 3위 밖`,
+            sub, color: colors.track.platform.base, active: on, dashed: !mine,
+          }),
+        };
+      }
       const top = s.distinct?.industry ?? s.recommendations[0]?.industry ?? null;
       return {
         id: s.unit_id, lat: s.lat as number, lng: s.lng as number, zIndex: on ? 200 : 70,
         html: mapLabelHTML({
           text: top ?? "추천 없음",
-          sub: s.area_py != null ? `${s.area_py}평` : undefined,
-          color: colors.track.platform.base, active: on, dashed: top == null,
+          sub, color: colors.track.platform.base, active: on, dashed: top == null,
         }),
       };
-    }), [sites, selectedIds]);
+    }), [sites, selectedIds, mySite?.label, mySite?.input]);
   useMapMarkers(markers, onToggle);
 
   return ready && map ? current : null;
@@ -691,8 +731,10 @@ function Spark({ points, direction }: { points: number[]; direction: string }) {
 
 /* ───────────────── ② 어느 자리에 어떤 업소가 ───────────────── */
 
-function OpeningsSection({ openings, districtName, selectedIds, onToggle: toggleSite, onClear, onOpenInPage }: {
+function OpeningsSection({ openings, districtName, selectedIds, onToggle: toggleSite, onClear, onOpenInPage, mySite }: {
   openings: PlatformProfile["openings"]; districtName: string;
+  /** 3판 — 창업·옮기기 · 모델 7종 업종이면 자리가 이 업종 점수 순으로 온다 */
+  mySite?: { label: string; input: string } | null;
   onOpenInPage?: (site: OpeningSite) => void;
   /** 비교 후보 — 지도 칩과 공유하므로 상위(PlatformConsole)가 든다 */
   selectedIds: string[]; onToggle: (id: string) => void; onClear: () => void;
@@ -720,7 +762,7 @@ function OpeningsSection({ openings, districtName, selectedIds, onToggle: toggle
     // 칩을 눌러도 아무 일이 안 일어난 것처럼 읽힌다.
     <Fold title="어느 자리에 어떤 업소가 들어오면 좋나" badge="실측 공실" open={pinnedOpen || undefined}
       summary={<>공실 <b>{openings.unit_count}곳</b> · 추천이 붙은 자리 <b>{openings.matched_count}곳</b>
-        {" "}(반경 {openings.match_radius_m}m 안 그래프 노드) · 상권 평균과 가장 다른 자리부터</>}>
+        {" "}(반경 {openings.match_radius_m}m 안 그래프 노드) · {mySite ? <><b>{mySite.input}</b> 점수 높은 자리부터</> : "상권 평균과 가장 다른 자리부터"}</>}>
 
       {sites.length === 0 && <div className="loading">이 상권에는 실측 공실 자리가 없다.</div>}
 
