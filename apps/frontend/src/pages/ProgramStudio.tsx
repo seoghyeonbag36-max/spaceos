@@ -15,6 +15,7 @@ import { colors } from "@/design/tokens/colors";
 import { useMapHost } from "@/components/MapHost";
 import { useFitMap, useMapMarkers, type MapMarkerItem } from "@/components/useMapMarkers";
 import type { ProgramHandoff } from "@/lib/workspaceState";
+import type { BusinessGoal } from "@/lib/businessProfile";
 import "./ProgramStudio.css";
 
 /**
@@ -107,7 +108,7 @@ const linesOf = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean
 const commaOf = (t: string) => t.split(",").map((s) => s.trim()).filter(Boolean);
 const isHttp = (u: string) => /^https?:\/\//.test(u);
 
-export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss }: {
+export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss, defaultCategory, businessGoal }: {
   /** 지도가 비출 상권(App 공유 상권). 폼의 「거점」을 고르지 않았을 때 카메라만 여기로 간다 —
    *  **생성 요청에는 넣지 않는다.** 컨텍스트 결합은 사용자가 폼에서 고른 것만 쓴다. */
   mapDistrictId?: string;
@@ -116,10 +117,14 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
   handoff?: ProgramHandoff;
   /** 안내를 걷었을 때 App 에 알린다 — 탭을 다녀와 다시 마운트돼도 걷은 안내가 되살아나지 않게. */
   onArrivalDismiss?: () => void;
+  /** 「내 사업」 업종의 입력어(화면설계서 3판). 카테고리칸의 기본값 — Posting 인계 업종이 있으면 그쪽이 앞선다. */
+  defaultCategory?: string;
+  /** 「내 사업」 목적. 바꾸기·옮기기면 지금 가게 리뷰·메뉴가 근거가 된다는 안내를 띄운다. */
+  businessGoal?: BusinessGoal;
 } = {}) {
   const [form, setForm] = useState<FormState>(() => handoff
-    ? { ...EMPTY, districtId: handoff.districtId, category: handoff.industry ?? "", address: handoff.unitName }
-    : EMPTY);
+    ? { ...EMPTY, districtId: handoff.districtId, category: handoff.industry ?? defaultCategory ?? "", address: handoff.unitName }
+    : { ...EMPTY, category: defaultCategory ?? "" });
   // 「입점 예정 자리」 안내·지도 핀. 폼을 통째로 갈아엎는 동작(비우기·예시·모드 전환)에서 걷는다 —
   // 폼은 다른 가게가 됐는데 안내만 남으면 엉뚱한 자리를 가리킨다.
   const [arrival, setArrivalState] = useState<ProgramHandoff | null>(handoff ?? null);
@@ -399,6 +404,14 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
               }}>비우기</Button>
             </div>
           </div>
+
+          {/* 기존 사업자(업종 바꾸기·상권 옮기기)는 이미 리뷰·메뉴가 있다 — 창업 전 빈칸 문제가 없다는 것을 먼저 말한다(3판 PR-08). */}
+          {!commercialMode && (businessGoal === "pivot" || businessGoal === "move") && (
+            <p className="existing-biz" role="note">
+              지금 가게의 리뷰·메뉴를 붙여넣으면 <b>{businessGoal === "pivot" ? "업종 전환" : "이전"} 안내</b> 초안의 근거가 됩니다.
+              가게명으로 검색하면 지금 가게를 찾을 수 있습니다.
+            </p>
+          )}
 
           {/* 입력 경로의 한계 — 지우면 안 되는 문장들이라 접어 둔다 */}
           <Fold title="입력 규칙과 한계" summary="공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선">

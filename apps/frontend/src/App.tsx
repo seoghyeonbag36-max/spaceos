@@ -4,6 +4,9 @@ import PageDashboard from "@/pages/PageDashboard";
 import AdminCoverage from "@/pages/AdminCoverage";
 import MapHost from "@/components/MapHost";
 import TrackMapFrame from "@/components/TrackMapFrame";
+import BusinessSetup from "@/components/BusinessSetup";
+import { listDistricts, listIndustries, type DistrictSummary, type IndustryOption } from "@/lib/api";
+import { businessChipText, findIndustry, loadBusiness, saveBusiness, type BusinessProfile, type BusinessState } from "@/lib/businessProfile";
 import { createPageWorkspace, type BuildingSelection, type ProgramHandoff } from "@/lib/workspaceState";
 import "./App.css";
 
@@ -50,6 +53,11 @@ const PRELOAD_DELAY_MS = 1500;
  *   Program=가게 후보·홍보 행사 장소.
  *   상권 선택도 **네 트랙이 하나를 공유한다.** 같은 place 에 대한 네 질문이라, 탭을 옮길
  *   때마다 상권을 다시 고르게 하면 흐름이 끊긴다.
+ *
+ * 2026-09-13(화면설계서 3판): **「내 사업」을 네 트랙이 공유한다.** 주요 고객이 상권을 먼저 고르는
+ *   분석가에서 업종·지금 가게에서 출발하는 사업자(창업 · 업종 바꾸기 · 상권 옮기기)로 바뀌었다.
+ *   상권과 같은 급의 공유 값이라 여기 둔다 — 처음 방문이면 Page 지도 위에 카드를 펴고,
+ *   「시작」하면 Platform 으로 넘어가 「내 업종으로 본 상권」부터 답한다.
  *
  * #admin 해시는 관리자 커버리지 패널로 간다. 네비게이션에 버튼을 두지 않는다 —
  * 지도에서 제외된 건물 수는 공개 대상이 아니다(2026-07-26). 데이터 자체도
@@ -105,6 +113,52 @@ export default function App() {
   const dismissArrival = useCallback(() => {
     setProgramHandoff((h) => (h && !h.dismissed ? { ...h, dismissed: true } : h));
   }, []);
+
+  // ── 「내 사업」(화면설계서 3판 공통 프레임) ───────────────────────────────────
+  const [business, setBusiness] = useState<BusinessState>(loadBusiness);
+  const [bizOpen, setBizOpen] = useState(() => business.status === "unset");
+  const [industries, setIndustries] = useState<IndustryOption[] | null | "error">(null);
+  // 상권 목록은 카드(지금 가게 상권)와 칩 문구(지금 상권 이름)에만 쓴다 — 필요할 때 한 번만 받는다.
+  // 요약 응답은 상권마다 격자를 다시 계산해 무겁다(services/business_fit._served 독스트링).
+  const [bizDistricts, setBizDistricts] = useState<DistrictSummary[]>([]);
+  const profile = business.status === "set" ? business.profile : null;
+  const needDistricts = bizOpen || !!profile?.homeDistrictId;
+  useEffect(() => {
+    let alive = true;
+    listIndustries().then((r) => alive && setIndustries(r.industries)).catch(() => alive && setIndustries("error"));
+    return () => { alive = false; };
+  }, []);
+  useEffect(() => {
+    if (!needDistricts || bizDistricts.length) return;
+    let alive = true;
+    listDistricts()
+      .then((all) => alive && setBizDistricts(all.filter((d) => d.vacancy_source === "gold")))
+      .catch(() => { /* 카드의 상권 칸만 비활성 — 목적·업종은 계속 고를 수 있다 */ });
+    return () => { alive = false; };
+  }, [needDistricts, bizDistricts.length]);
+  const [bizAnnounce, setBizAnnounce] = useState("");
+  const startBusiness = useCallback((next: BusinessProfile) => {
+    const state: BusinessState = { status: "set", profile: next };
+    setBusiness(state);
+    saveBusiness(state);
+    setBizOpen(false);
+    if (next.homeDistrictId) setDistrictId(next.homeDistrictId);
+    setBizAnnounce(`${businessChipText(state, Array.isArray(industries) ? industries : null, bizDistricts)}로 설정됨`);
+    setView("platform");
+  }, [industries, bizDistricts, setDistrictId]);
+  const browse = useCallback(() => {
+    const state: BusinessState = { status: "browsing" };
+    setBusiness(state);
+    saveBusiness(state);
+    setBizOpen(false);
+  }, []);
+  const myIndustry = findIndustry(Array.isArray(industries) ? industries : null, profile?.industryKey);
+  // Platform 업종 바꾸기 표 → Posting 업종칸(인계 표 「Platform → Posting」).
+  const [postingIndustry, setPostingIndustry] = useState<{ input: string; requestId: number }>();
+  const tryIndustry = useCallback((input: string) => {
+    setPostingIndustry((prev) => ({ input, requestId: (prev?.requestId ?? 0) + 1 }));
+    setView("posting");
+  }, []);
   useEffect(() => {
     const t = window.setTimeout(() => {
       // 실패해도 조용히 넘어간다 — 그 탭을 누를 때 lazy 가 다시 받는다.
@@ -159,24 +213,31 @@ export default function App() {
         <Suspense fallback={<div className="map-loading">화면 불러오는 중…</div>}>
           {view === "platform" && (
             <TrackMapFrame track="platform" label="상권 정체성">
-              <PlatformConsole districtId={districtId} onDistrictChange={setDistrictId} onOpenInPage={openInPage} />
+              <PlatformConsole districtId={districtId} onDistrictChange={setDistrictId} onOpenInPage={openInPage}
+                business={profile} industries={Array.isArray(industries) ? industries : null}
+                onOpenBusiness={() => setBizOpen(true)} onTryIndustry={tryIndustry} />
             </TrackMapFrame>
           )}
-          {view === "map" && <MapShell workspace={pageWorkspace} onWorkspaceChange={setPageWorkspace} onReview={reviewBuilding} />}
+          {view === "map" && <MapShell workspace={pageWorkspace} onWorkspaceChange={setPageWorkspace} onReview={reviewBuilding}
+            myIndustry={myIndustry} />}
           {view === "posting" && (
             <TrackMapFrame track="posting" label="입점 계산">
               <PostingConsole selection={postingSelection} districtId={districtId} onDistrictChange={setDistrictId}
-                onMakeProgram={makeProgram} />
+                onMakeProgram={makeProgram} defaultIndustry={myIndustry?.input} industryRequest={postingIndustry} />
             </TrackMapFrame>
           )}
           {view === "program" && (
             <TrackMapFrame track="program" label="홍보 program">
               <ProgramStudio key={programHandoff?.requestId ?? "direct"} mapDistrictId={districtId}
-                handoff={programHandoff?.dismissed ? undefined : programHandoff} onArrivalDismiss={dismissArrival} />
+                handoff={programHandoff?.dismissed ? undefined : programHandoff} onArrivalDismiss={dismissArrival}
+                defaultCategory={myIndustry?.input} businessGoal={profile?.goal} />
             </TrackMapFrame>
           )}
         </Suspense>
+        <BusinessSetup state={business} industries={industries} districts={bizDistricts} districtId={districtId}
+          open={bizOpen} onOpenChange={setBizOpen} onStart={startBusiness} onBrowse={browse} />
       </MapHost>
+      <span className="sr-only" aria-live="polite">{bizAnnounce}</span>
     </div>
   );
 }

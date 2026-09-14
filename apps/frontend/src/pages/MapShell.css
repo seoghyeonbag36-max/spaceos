@@ -20,7 +20,9 @@
 
 /* 상단: 검색 + 레이어 토글 */
 .mapshell .overlay-top {
-  top: 12px; left: 12px; right: 12px;
+  /* 오른쪽 312px 는 「내 사업」 칩 자리다(화면설계서 3판 · BusinessSetup.css .biz-chip max-width 300 + 여백 12).
+     칩은 네 트랙 같은 자리에 서므로 Page 상단 바가 그 밑으로 들어가면 안 된다. */
+  top: 12px; left: 12px; right: 324px;
   display: flex; gap: var(--sp-2); flex-wrap: wrap; align-items: flex-start;
   pointer-events: none; /* 빈 영역은 지도 드래그 통과 */
 }
@@ -131,6 +133,9 @@
   background: var(--brand-soft, #e6f7f9); color: var(--brand-pressed);
 }
 /* 성능을 정직하게 — Top-3 만 보면 과대평가된다(베이스라인 0.89, lift +3.1%) */
+/* 3판 — 「내 사업」 업종 표식 */
+.mapshell .b-rec .row.is-mine { font-weight: 700; color: var(--track-page); }
+.mapshell .b-rec-mine { font-style: normal; font-size: 10.5px; font-weight: 700; margin-left: 6px; padding: 0 5px; border-radius: 4px; background: var(--track-page-soft); color: var(--track-page); }
 .mapshell .b-rec-note {
   margin-top: var(--sp-2); font-size: 11px; line-height: 1.5;
   color: var(--muted);
@@ -231,7 +236,8 @@
   .mapshell .side-panel .sp-title { font-size: var(--fs-body); }
   .mapshell .has-selection .building-filters, .mapshell .has-selection .sp-list { display: none; }
   .mapshell .has-selection .b-detail { max-height: none; flex: 1; }
-  .mapshell .overlay-top { gap: var(--sp-2); }
+  /* 모바일 칩은 max-width 45% · top 8 — 첫 줄 오른쪽을 그만큼 비운다 */
+  .mapshell .overlay-top { gap: var(--sp-2); right: calc(45% + 16px); }
   .mapshell .overlay-top .hub-select { max-width: 45%; flex: 1; }
   .mapshell .overlay-top .search { min-width: 0; width: 0; flex: 1; }
   .mapshell .seg { flex: 1 0 100%; }

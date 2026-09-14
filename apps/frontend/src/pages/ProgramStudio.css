@@ -174,6 +174,9 @@
 .progstudio .arrival{display:grid;gap:var(--sp-1);font-size:var(--fs-caption);line-height:var(--lh-caption);background:var(--track-posting-soft);border:1px solid var(--line);border-left:3px solid var(--track-posting);border-radius:var(--radius-md);padding:var(--sp-2) var(--sp-3);margin:0 0 var(--sp-3)}
 .progstudio .arrival b{color:var(--track-posting)}
 .progstudio .arrival span{color:var(--muted)}
+/* 3판 — 기존 사업자(업종 바꾸기·상권 옮기기) 안내 줄 */
+.progstudio .existing-biz{margin:0 0 var(--sp-3);font-size:var(--fs-caption);line-height:var(--lh-caption);background:var(--track-program-soft);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--sp-2) var(--sp-3)}
+.progstudio .existing-biz b{color:var(--track-program)}
 .progstudio .offline-places{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--sp-3);margin:0 0 var(--sp-3)}
 .progstudio .op-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-2);flex-wrap:wrap;font-size:var(--fs-body)}
 .progstudio .op-head b{color:var(--track-program)}
