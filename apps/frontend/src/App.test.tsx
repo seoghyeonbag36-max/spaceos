@@ -45,7 +45,8 @@ describe("App — 레일과 지도 셸 (2026-09-13)", MULTI_TAB, () => {
     expect(rail.textContent).toContain("PlaceOS");
     expect(rail.textContent).not.toMatch(/SpaceOS/);
     const labels = Array.from(rail.querySelectorAll("button")).map((b) => b.textContent);
-    expect(labels).toEqual(["Platform", "Page", "Posting", "Program"]);
+    // 레일 순서는 첫 화면(Page)부터 사용자가 밟는 순서다(2026-09-15).
+    expect(labels).toEqual(["Page", "Platform", "Posting", "Program"]);
     expect(screen.queryByRole("button", { name: "서울" })).toBeNull();
     expect(screen.queryByRole("button", { name: "거점" })).toBeNull();
     await screen.findByRole("button", { name: "검토 건물 후보 저장" }, TAB_LOAD);

@@ -69,11 +69,13 @@ type View = "platform" | "map" | "posting" | "program";
    가져오고(App.css), 여기서는 **이름만** 넘긴다(색 하드코딩 금지 — design skill 규칙).
    ⚠ view key 와 track 이름은 하나만 어긋난다 — Page 트랙의 화면 key 는 "map" 이다. */
 const NAV: { key: View; label: string; icon: JSX.Element; track: TrackKey }[] = [
-  // PPPP 네 트랙 — 순서가 곧 프레임워크 순서다(Platform → Page → Posting → Program).
-  // 전통 4P 와 1:1 대응한다(2026-09-05 재정의): Place▶Platform · Product▶Page ·
+  // PPPP 네 트랙. 전통 4P 와 1:1 대응한다(2026-09-05 재정의): Place▶Platform · Product▶Page ·
   // Price▶Posting · Promotion▶Program. 라벨을 되돌리지 말 것.
-  { key: "platform", label: "Platform", icon: <IconSpark />, track: "platform" },
+  // 2026-09-15: 레일 순서는 **Page → Platform → Posting → Program** 이다. 프레임워크 순서
+  //   (Platform → Page → …)와 일부러 다르다 — 사용자가 실제로 밟는 순서를 따른다. 첫 화면이
+  //   Page 지도이고, 거기서 「내 사업」을 「시작」하면 Platform 으로 넘어간다(화면설계서 3판).
   { key: "map", label: "Page", icon: <IconPin />, track: "page" },
+  { key: "platform", label: "Platform", icon: <IconSpark />, track: "platform" },
   { key: "posting", label: "Posting", icon: <IconKey />, track: "posting" },
   { key: "program", label: "Program", icon: <IconMegaphone />, track: "program" },
 ];
