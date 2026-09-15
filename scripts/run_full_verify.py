@@ -22,9 +22,17 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "full_verify.json"
 LOGDIR = ROOT / "reports" / "logs"
 
+# 백엔드 의존성(fastapi 등)은 `apps/backend/.venv` 에 들어간다 — CLAUDE.md 가 적은
+# 정식 실행도 `cd apps/backend && .venv/bin/python -m pytest -q` 다. sys.executable 로
+# 돌리면 그 venv 밖 인터프리터에서 25개 모듈이 ImportError 로 죽고, 무인 검증이
+# **코드 결함이 아닌 이유로** 빨갛게 끝난다(2026-09-15 실측). venv 가 있으면 그것을 쓴다.
+_BACKEND_VENV = ROOT / "apps" / "backend" / ".venv" / (
+    "Scripts/python.exe" if os.name == "nt" else "bin/python")
+BACKEND_PY = str(_BACKEND_VENV) if _BACKEND_VENV.exists() else sys.executable
+
 # (이름, 커맨드, 작업디렉터리, 셸필요)
 STEPS = [
-    ("backend-pytest", [sys.executable, "-m", "pytest", "-q"], ROOT / "apps" / "backend", False),
+    ("backend-pytest", [BACKEND_PY, "-m", "pytest", "-q"], ROOT / "apps" / "backend", False),
     ("gnn-import", [sys.executable, "-c",
                     "import ml.training.train_gnn as t; "
                     "print('SELECT_BY', t.SELECT_BY); "

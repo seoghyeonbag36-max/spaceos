@@ -1,5 +1,17 @@
 # 다음 작업용 프롬프트 — 노드 소스 교체 뒤 GNN 재학습 (라벨 어휘 결정 포함)
 
+> **실행 상태 (2026-09-15 갱신) — 0단계에서 막혔다. 프롬프트는 그대로 유효하다.**
+> · Bronze(`stores_raw.json`)가 없는 환경이라 0단계(소분류 실측)도 1단계(Gold 재생성)도
+>   돌지 않았다. `DATA_GO_KR_SERVICE_KEY` 도 없어 수집으로 풀 수 없었다.
+> · **수치는 하나도 재지 않았고 어휘도 결정하지 않았다.** 서빙 산출물은 그대로
+>   카카오 유래본이다(남은 노출 1건 미해소).
+> · 다만 **2단계의 (b)·(c)를 잴 코드는 섰다** — `--label-level group_mapped|lcls`
+>   (`ml/training/train_gnn.py`) + 저장 허용 목록 `SAVEABLE_LABEL_LEVELS` +
+>   `data/tests/test_gnn_label_levels.py` 9건.
+> · **Bronze 가 있는 머신에서 0단계부터 그대로 이어가면 된다.**
+>   경위·수치를 채울 표: `docs/finding-map-provider-google-2026-09-15.md` §7-2-3-1.
+
+
 2026-09-15 카카오 저장층 이전(`docs/finding-map-provider-google-2026-09-15.md` §7-2)의
 마지막 미결 항목이다. 점포 노드가 카카오 → 상가정보로 바뀌었고, 서빙 배치
 `gold/platform_industry_recommend.json` 은 아직 **옛 카카오 노드로 만들어진 것**이다.
