@@ -75,6 +75,54 @@ def test_returns_none_outside_seven_groups(row):
     assert to_category_group(row) is None
 
 
+# ── 1-B. 실측 중분류 어휘 (2026-09-15 감사) ─────────────────────────────────
+# 커밋된 Gold 산출물에서 뽑은 **실제** 상가정보 중분류다
+# (`gold/*/vacant_{units,floor_units}.json` 의 `grp`/`was` = `indsMclsNm` 최빈값,
+#  135파일·65종·등장 13,855회). 처음 규칙은 대분류·소분류만 봐서 이 어휘의
+# **65종 중 2종(3.1%)만** 사상했다 — 감사가 그걸 잡았다.
+@pytest.mark.parametrize("mcls, expected", [
+    # 음식점 — 중분류만 와도 잡아야 한다(대분류가 빠진 호출이 실제로 있었다)
+    ("한식", "음식점"), ("서양식", "음식점"), ("일식", "음식점"), ("중식", "음식점"),
+    ("주점", "음식점"), ("기타 간이", "음식점"), ("동남아시아", "음식점"),
+    ("구내식당·뷔페", "음식점"),
+    ("비알코올", "카페"),
+    ("의원", "병원"), ("병원", "병원"), ("기타 보건", "병원"),
+    ("일반 숙박", "숙박"), ("기타 숙박", "숙박"),
+    ("도서관·사적지", "문화시설"),
+])
+def test_real_mid_category_vocabulary_maps(mcls, expected):
+    assert to_category_group({"indsMclsNm": mcls}) == expected
+
+
+@pytest.mark.parametrize("row, why", [
+    # 🔴 감사가 실제로 잡은 오사상 — '음료' 로 카페를 판정하면 소매점이 카페가 된다
+    ({"indsMclsNm": "음료 소매"}, "음료 소매(26건)는 소매점이다"),
+    # 소매 대분류의 의약·화장품은 병원도 약국도 아니다(약국은 소분류로만 잡는다)
+    ({"indsLclsNm": "소매", "indsMclsNm": "의약·화장품 소매"}, "화장품 가게"),
+    # 카카오 CT1 문화시설의 모집단은 박물관·미술관·영화관·공연장이다
+    ({"indsMclsNm": "유원지·오락"}, "놀이공원·오락실(299건)"),
+    ({"indsMclsNm": "스포츠 서비스"}, "체육시설(279건)"),
+    # 중분류 '종합 소매' 를 편의점으로 사상하면 슈퍼·잡화까지 편의점이 된다
+    ({"indsMclsNm": "종합 소매"}, "종합 소매(483건)"),
+    # 7종 밖 — 미사상이 정상이다
+    ({"indsMclsNm": "섬유·의복·신발 소매"}, "의류 소매(1,265건)"),
+    ({"indsMclsNm": "기타 교육"}, "학원(815건)"),
+    ({"indsMclsNm": "이용·미용"}, "미용실(648건)"),
+])
+def test_real_vocabulary_that_must_not_map(row, why):
+    assert to_category_group(row) is None, why
+
+
+def test_retail_marker_blocks_cafe_and_hospital():
+    """'소매' 가 붙은 중분류는 카페·병원으로 가지 않는다 — 오사상 차단 규칙 자체를 고정."""
+    assert to_category_group({"indsMclsNm": "음료 소매"}) is None
+    assert to_category_group({"indsLclsNm": "보건의료", "indsMclsNm": "의약품 소매"}) is None
+    # 다만 소분류가 '약국' 이면 ① 이 먼저 잡는다(소매여도 약국이다)
+    assert to_category_group(
+        {"indsLclsNm": "소매", "indsMclsNm": "의약·화장품 소매",
+         "indsSclsNm": "약국"}) == "약국"
+
+
 def test_cafe_is_not_folded_into_food():
     """판정 순서 회귀 — 카페가 음식점으로 접히면 라벨이 degenerate 한다.
 
@@ -248,6 +296,40 @@ def test_hub_iterating_builders_pass_slugs_not_hub_objects(monkeypatch):
     assert set(hub_args) <= set(ACTIVE_HUBS), \
         f"ACTIVE_HUBS 에 없는 키: {set(hub_args) - set(ACTIVE_HUBS)}"
     assert len(set(hub_args)) == len(ACTIVE_HUBS), "일부 거점을 빠뜨렸다"
+
+
+def test_gold_audit_reproduces_the_measurement():
+    """`--gold` 감사가 저장소 Gold 에서 실제로 돌고, 오사상 유형이 되돌아오지 않는다.
+
+    Bronze 없는 환경(신규 클론·CI)에서도 사상 규칙을 검사할 수 있어야 한다.
+    2026-09-15 측정: 파일 135 · 중분류 65종 · 등장 13,855회 · 사상 15종(23.1%)/47.0%.
+    Gold 가 재생성되면 수치는 움직이므로 **하한과 불변식**으로만 고정한다.
+    """
+    from data.config.store_taxonomy import audit_gold
+
+    out = audit_gold()
+    assert out["files"] > 0, "Gold 산출물을 못 찾았다 — 감사가 아무것도 세지 않는다"
+    assert out["terms"] > 0 and out["occurrences"] > 0
+    assert out["mapped_terms"] >= 10, f"사상 어휘가 급감했다: {out['mapped_terms']}"
+    assert out["occurrence_pct"] >= 30, f"등장 기준 사상률이 급감했다: {out['occurrence_pct']}%"
+    # 핵심 그룹이 살아 있어야 한다 — 하나라도 0 이면 규칙이 무너진 것이다
+    assert {"음식점", "병원", "카페", "숙박"} <= set(out["by_group"])
+
+
+def test_gold_audit_maps_no_retail_term():
+    """'소매' 가 든 중분류는 하나도 사상되지 않는다 — 실측이 잡은 오사상 유형의 불변식.
+
+    `--gold` 감사는 중분류만 넘기므로, 여기서 소매가 사상되면 그건 '음료 소매 → 카페'
+    같은 오사상이 되돌아온 것이다(약국·편의점은 소분류가 있어야 잡히고, 그건 정상).
+    """
+    from data.config.store_taxonomy import audit_gold
+
+    out = audit_gold()
+    # 그룹별 등장 합이 사상 등장과 일치해야 한다(집계가 새지 않았다)
+    assert sum(out["by_group"].values()) == out["mapped_occurrences"]
+    # 소매 어휘가 사상되면 미사상 상위에서 사라진다 — 대표 3종이 남아 있는지로 확인한다
+    for term in ("섬유·의복·신발 소매", "종합 소매", "의약·화장품 소매"):
+        assert to_category_group({"indsMclsNm": term}) is None, term
 
 
 def test_roadview_sample_has_no_stored_place_names():
