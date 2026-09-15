@@ -33,6 +33,14 @@
 (소분류 어휘 실측) — 그 전에 돌리면 라벨이 틀린 채로 학습된다.
 ⚠ 그리고 **옛 카카오 그래프는 재현 불가능하다**(Bronze 를 없앴다) — 대조군을 만들 수
 없으므로 이 재학습은 회귀 측정이 아니라 **새 기준선 수립**이다.
+
+어휘 3안은 `--label-level` 로 고른다(2026-09-15 구현, LABEL_LEVELS 참조):
+  (a) `group`        7종 + '미분류' 8클래스 — 기본값. 거점사전 기준선 Top-1 61.2%/Top-3 89.7%
+                     (단 그 기준선은 카카오 7종 모집단 위에서 잰 값이다)
+  (b) `group_mapped` 7종만 — 사상 안 된 노드를 **모집단에서 뺀다**. 옛 모집단에 가장 가깝다
+  (c) `lcls`         상가정보 대분류 10종 — 거점사전 기준선 Top-1 34.0%/Top-3 69.9%
+**Top-3 는 반드시 그 어휘의 기준선과 나란히 읽는다** — 어휘를 바꾸면 기준선이 같이 움직여서,
+기준선 없는 Top-3 비교는 그 자체로 오독이다(2026-08-26 에 그렇게 기각이 뒤집혔다).
 산출:
   ml/artifacts/industry_gnn.pt                        체크포인트(+ 라벨·피처 메타)
   data/gold/platform_industry_recommend.json          서빙용 배치 추천(토치 없는 Vercel 경로)
@@ -125,6 +133,22 @@ MIN_CLASS_NODES = 10   # 이보다 작은 업종 대분류는 '기타'로 병합
 TOP_K = 3              # 추천 Top-K (KPI: Top-3 70%+)
 SEED = 42
 
+# 라벨 어휘 — `--label-level`. 2026-09-15 노드 소스 교체로 선택지가 생겼다
+# (docs/prompt-gnn-retrain-scls-2026-09-15.md 의 3안):
+#   group        (a) 7종 + '미분류'  — 사상 안 된 업종을 클래스로 받는다(코드 기본 동작)
+#   group_mapped (b) 7종만           — 사상 안 된 노드를 **모집단에서 뺀다**(옛 카카오 모집단에 가장 가깝다)
+#   lcls         (c) 상가정보 대분류  — category_group_src(indsLclsNm) 10종. **어휘가 바뀐다**
+#   category2        category 2단계   — 세분 업종 진단용(옛 카카오 노드 전용)
+LABEL_LEVELS = ("group", "group_mapped", "category2", "lcls")
+
+# 산출물 저장이 허용되는 어휘 — 서빙(체크포인트 classes · recommend json)이 7종 문자열을
+# 전제하기 때문이다. group 과 group_mapped 는 **같은 7종 문자열**을 쓰므로(전자는 여기에
+# '미분류'가 더 붙는다) 서빙 업종명이 조용히 바뀌지 않는다.
+# ⚠ lcls 를 여기 넣지 않은 것은 의도다 — 대분류 10종은 라벨 문자열 자체가 달라서
+#   /api/v1/ai/recommend-industry 응답의 업종명이 바뀐다. 그 어휘로 가기로 **결정**했다면
+#   프론트 표시를 확인한 뒤 이 목록에 의도적으로 더할 것(가드를 지우는 것이 아니다).
+SAVEABLE_LABEL_LEVELS = ("group", "group_mapped")
+
 _M_PER_DEG_LAT = 111000.0
 _M_PER_DEG_LON = 88300.0
 
@@ -176,8 +200,54 @@ def load_graph() -> tuple[pd.DataFrame, pd.DataFrame]:
         "그래프 gold 없음 — build_gold + build_store_graph_edges 먼저 실행")
 
 
+def _has_group(nodes: pd.DataFrame) -> bool:
+    """7종 사상 라벨(category_group)이 실제로 채워져 있는가."""
+    return ("category_group" in nodes
+            and nodes["category_group"].fillna("").str.len().gt(0).any())
+
+
+def _label_population(nodes: pd.DataFrame, edges: pd.DataFrame,
+                      level: str) -> tuple[pd.DataFrame, pd.DataFrame, int]:
+    """라벨 어휘가 요구하는 대로 **노드 모집단**을 좁히고 끊어진 엣지를 버린다.
+
+    `group_mapped`(프롬프트 (b)안) 전용이다. 상가정보는 가두 점포 전체를 주므로 7종에
+    사상되지 않는 업종(소매·교육·미용 등)이 `category_group` 공란으로 들어온다.
+    (a)안은 그것을 '미분류' 클래스로 받지만, (b)안은 **모집단에서 뺀다** — 카카오 수집이
+    7개 카테고리만 골라 받았으므로 모집단을 맞춰야 옛 수치와 같은 것을 재게 된다.
+
+    노드를 빼면 그 노드를 가리키는 엣지가 dangling 이 된다. `_edge_index` 의 id→행번호
+    사상이 NaN 을 만들고 그게 조용히 정수로 캐스팅되면 **엉뚱한 노드끼리 메시지가 오간다.**
+    그래서 여기서 양끝이 모두 남은 엣지만 남긴다.
+
+    ⚠ 밀집도 피처(`log_knn_deg`)도 함께 줄어든다 — 걸러낸 엣지 테이블을 `_features` 가
+      그대로 받기 때문이다. 이것은 의도다: (b)안의 목적이 '옛 모집단 재현'이고, 카카오
+      그래프에서도 소매·교육 점포는 애초에 없어서 차수에 세어지지 않았다. 반대로
+      '물리적으로 옆에 가게가 몇 개 있나'를 온전히 보고 싶다면 필터 전 엣지로 차수를
+      세야 하는데, 그건 (b)안과 다른 실험이다(모집단이 아니라 피처를 바꾸는 것이다).
+    """
+    if level != "group_mapped":
+        return nodes, edges, 0
+    if not _has_group(nodes):
+        raise ValueError(
+            "group_mapped 는 category_group(7종 사상) 컬럼이 채워진 노드 테이블을 요구한다 — "
+            "카카오 시절 노드에는 없다. build_gold --platform13 으로 상가정보 노드를 먼저 만들 것")
+    keep = nodes["category_group"].fillna("").str.len().gt(0)
+    dropped = int((~keep).sum())
+    kept = nodes[keep].reset_index(drop=True)
+    ids = set(kept["node_id"])
+    before = len(edges)
+    e = edges[edges["src"].isin(ids) & edges["dst"].isin(ids)].reset_index(drop=True)
+    print(f"[gnn] group_mapped: 미사상 {dropped:,}노드 제외 → {len(kept):,}노드 "
+          f"({dropped / max(len(nodes), 1) * 100:.1f}% 제거) · "
+          f"엣지 {before:,} → {len(e):,}")
+    if kept.empty:
+        raise ValueError("group_mapped: 7종에 사상된 노드가 하나도 없다 — "
+                         "data.config.store_taxonomy --audit 로 사상률을 먼저 볼 것")
+    return kept, e, dropped
+
+
 def _labels(nodes: pd.DataFrame, level: str = "group") -> tuple[np.ndarray, list[str]]:
-    """업종 라벨. `level` 로 태스크 입도를 고른다.
+    """업종 라벨. `level` 로 태스크 입도·어휘를 고른다.
 
     - `group`(기본) — category_group(7종). 서빙이 쓰는 라벨 체계다.
       음식점/카페/편의점/병원/약국/숙박/문화시설. 이게 없는 옛 노드(garosugil 단일
@@ -185,17 +255,30 @@ def _labels(nodes: pd.DataFrame, level: str = "group") -> tuple[np.ndarray, list
       (카페가 음식점 하위)라 음식점 78% 로 degenerate 하다.
       2026-09-15 이후 노드는 상가정보 계층을 이 7종으로 사상한 값이 들어오고,
       사상되지 않는 업종은 공란 → '미분류' 로 받는다(모듈 머리말의 경고 참조).
+    - `group_mapped` — 같은 7종이되 **미분류를 클래스로 만들지 않는다.** 그 노드는
+      `_label_population` 이 모집단에서 뺀 뒤라 여기 도달하지 않는다. 라벨 문자열이
+      `group` 과 같은 7종이므로 서빙 어휘가 바뀌지 않는다(저장 허용 목록에 있다).
+    - `lcls` — 상가정보 **대분류**(indsLclsNm, 10종). 노드 테이블의 `category_group_src`
+      를 그대로 쓴다(재수집 불필요). 거점사전 기준선이 7종과 다르다 —
+      Top-1 34.0% / Top-3 69.9% (docs/finding-sequence-and-accuracy-2026-08-17.md §6).
+      **라벨 문자열이 7종과 다르므로 서빙 업종명이 바뀐다** → 저장 허용 목록에 없다.
     - `category2` — category 2단계(≈30클래스) 세분 라벨. Top-1 천장이 피처가 아니라
       태스크 입도 때문이라는 가설을 재는 자리다(feature-platform.md §0). 라벨 체계가
       바뀌므로 **산출물을 저장하지 않는다** — `train()` 이 강제로 save 를 끈다.
     """
-    if level not in ("group", "category2"):
-        raise ValueError(f"label level 은 group|category2 — 받은 값 {level!r}")
-    use_group = (level == "group"
-                 and "category_group" in nodes
-                 and nodes["category_group"].fillna("").str.len().gt(0).any())
-    if use_group:
+    if level not in LABEL_LEVELS:
+        raise ValueError(f"label level 은 {'|'.join(LABEL_LEVELS)} — 받은 값 {level!r}")
+    if level == "lcls":
+        if "category_group_src" not in nodes:
+            raise ValueError(
+                "lcls 라벨은 category_group_src(상가정보 indsLclsNm) 컬럼을 요구한다 — "
+                "카카오 시절 노드 테이블에는 없다. build_gold --platform13 먼저")
+        raw = nodes["category_group_src"].fillna("").replace("", "미분류")
+    elif level in ("group", "group_mapped") and _has_group(nodes):
         raw = nodes["category_group"].fillna("").replace("", "미분류")
+    elif level == "group_mapped":
+        # _label_population 이 먼저 막지만, _labels 를 단독 호출하는 경로도 있다.
+        raise ValueError("group_mapped 는 category_group 이 채워진 노드 테이블을 요구한다")
     else:
         raw = nodes["category"].fillna("").map(
             lambda c: " > ".join(str(c).split(" > ")[:2]) or "미분류")
@@ -591,8 +674,16 @@ def _edge_index(nodes: pd.DataFrame, edges: pd.DataFrame,
     e = edges
     if keep is not None and "type" in e:
         e = e[e["type"].isin(keep)]
-    src = e["src"].map(idx).to_numpy()
-    dst = e["dst"].map(idx).to_numpy()
+    src = e["src"].map(idx)
+    dst = e["dst"].map(idx)
+    # 노드 테이블에 없는 끝점(dangling) — group_mapped 처럼 모집단을 좁히면 생긴다.
+    # 버리지 않으면 map 의 NaN 이 정수로 캐스팅되면서 **엉뚱한 노드끼리** 이어진다.
+    ok = src.notna() & dst.notna()
+    if not bool(ok.all()):
+        print(f"[gnn] ⚠ 노드 테이블에 없는 끝점을 가진 엣지 {int((~ok).sum()):,}개 제외")
+        src, dst = src[ok], dst[ok]
+    src = src.to_numpy(dtype=np.int64)
+    dst = dst.to_numpy(dtype=np.int64)
     # 무방향 → 양방향 전개
     ei = np.concatenate([np.stack([src, dst]), np.stack([dst, src])], axis=1)
     return torch.tensor(ei, dtype=torch.long)
@@ -863,14 +954,19 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
         # 진단용 런이므로 서빙 산출물과 섞지 않는다.
         print("[gnn] class_weight=True — 실험 런이므로 산출물 저장을 끈다")
         save = False
-    if save and label_level != "group":
-        # 서빙(json·체크포인트)은 7종 대분류 어휘를 전제한다. 세분 라벨 런이 그걸
+    if save and label_level not in SAVEABLE_LABEL_LEVELS:
+        # 서빙(json·체크포인트)은 7종 대분류 어휘를 전제한다. 어휘가 다른 런이 그걸
         # 덮어쓰면 /recommend-industry 응답의 업종명이 조용히 바뀐다.
-        print(f"[gnn] label_level={label_level} — 실험 런이므로 산출물 저장을 끈다")
+        # 가드를 없애지 말 것 — 새 어휘를 채택했다면 SAVEABLE_LABEL_LEVELS 에 더한다.
+        print(f"[gnn] label_level={label_level} — 서빙 어휘가 아니므로 산출물 저장을 끈다 "
+              f"(저장 가능: {'|'.join(SAVEABLE_LABEL_LEVELS)})")
         save = False
 
     nodes, edges = load_graph()
     nodes = nodes.reset_index(drop=True)
+    # 라벨 어휘가 모집단을 좁히는 경우(group_mapped)는 **피처·엣지보다 먼저** 걸러야
+    # 한다 — 행 순서가 곧 노드 인덱스라 뒤에서 걸면 엣지가 어긋난다.
+    nodes, edges, unmapped_dropped = _label_population(nodes, edges, label_level)
     y_np, classes = _labels(nodes, level=label_level)
     x_np, feat_names = _features(nodes, edges, use_demand=use_demand,
                                  use_building=use_building,
@@ -1017,6 +1113,9 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
     metrics.update({"nodes": len(nodes), "edges_used": int(ei.shape[1] // 2),
                     "classes": len(classes), "features": len(feat_names),
                     "label_level": label_level,
+                    # 어휘가 모집단을 얼마나 잘랐는지 산출물이 스스로 밝힌다 —
+                    # 안 밝히면 nodes 수만 보고 수집이 준 것으로 오독된다.
+                    "unmapped_nodes_dropped": unmapped_dropped,
                     "class_weight": int(class_weight),
                     "demand_features": int(any(n in feat_names for n in _DEMAND_COLS)),
                     "building_features": int(any(n in feat_names
@@ -1113,8 +1212,12 @@ if __name__ == "__main__":
                          "안 걸린다고 판정했다(분산비 0.458 vs 행정동 0.266, 노드 "
                          "귀속 100%%). 돌리기 전에 docs/feature-platform.md §0-Q 를 "
                          "읽을 것 — 프로브는 변동의 **양**만 쟀다")
-    ap.add_argument("--label-level", default="group", choices=("group", "category2"),
-                    help="라벨 입도. category2 는 세분 업종 실험(산출물 저장 안 함)")
+    ap.add_argument("--label-level", default="group", choices=LABEL_LEVELS,
+                    help="라벨 어휘·입도. group=7종+미분류(기본) · "
+                         "group_mapped=7종만(미사상 노드를 모집단에서 제외) · "
+                         "lcls=상가정보 대분류 10종 · category2=세분 업종 실험. "
+                         f"저장되는 것은 {'|'.join(SAVEABLE_LABEL_LEVELS)} 뿐이다 — "
+                         "나머지는 서빙 어휘가 달라 산출물 저장을 끈다")
     ap.add_argument("--patience", type=int, default=50)
     ap.add_argument("--select-by", default="top1", choices=SELECT_BY,
                     help="조기 종료·모델 선택 기준(검증셋). top1=종전 기본값 · "

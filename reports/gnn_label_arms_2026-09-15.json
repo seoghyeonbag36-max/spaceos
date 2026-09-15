@@ -1,0 +1,49 @@
+{
+  "date": "2026-09-15",
+  "what": "GNN 재학습(노드 소스 상가정보 전환) 시도 — 0단계에서 막혔다",
+  "blocked_at": {
+    "step0_scls_audit": "Bronze 없음 — `python -m data.config.store_taxonomy --audit` → '거점 66곳 · 행 0 · 가두 0 · Bronze 없음 66곳'",
+    "step1_gold": "`build_gold --platform13` → 'Bronze 없음 — building_vacancy 먼저' 3줄",
+    "step2_train": "gold/platform13 그래프 없음. 커밋된 그래프는 gold/garosugil 209노드(node_id 전부 kakao:*, category_group 열 없음)",
+    "why_not_collect": "DATA_GO_KR_SERVICE_KEY 미설정(.env.example 만 있다) — 상가정보 수집이 '미설정 — 건너뜀'으로 끝난다"
+  },
+  "measured": null,
+  "vocabulary_decision": null,
+  "serving_artifact": "data/gold/platform_industry_recommend.json 은 그대로 카카오 유래본 — 재학습이 돌지 않았으므로 백업·교체 모두 하지 않았다",
+  "implemented": {
+    "label_levels": [
+      "group",
+      "group_mapped",
+      "category2",
+      "lcls"
+    ],
+    "saveable_label_levels": [
+      "group",
+      "group_mapped"
+    ],
+    "b_arm": "group_mapped — 미사상 노드를 모집단에서 제외 + 양끝 생존 엣지만 유지(_label_population), _edge_index 에 dangling 끝점 2차 방어",
+    "c_arm": "lcls — category_group_src(indsLclsNm) 10종. 서빙 어휘가 달라 저장 허용 목록 밖",
+    "tests": "data/tests/test_gnn_label_levels.py 9건 (torch 없으면 skip)"
+  },
+  "gates": {
+    "data_pytest": "374 passed · 1 skipped (사이드카 미생성 테스트 skip)",
+    "backend_pytest": "339 passed · 6 skipped (.venv/bin/python)",
+    "pppp_status": "KPI 업종추천 Top-3 ≥70% 통과 — 단 옛 카카오 metrics(0.9167) 기준이다",
+    "run_full_verify": "5/5 pass"
+  },
+  "next": "Bronze 가 있는 머신에서 docs/prompt-store-taxonomy-scls-2026-09-15.md(0단계)부터 그대로 이어간다. 수치를 채울 표: docs/finding-map-provider-google-2026-09-15.md §7-2-3-1",
+  "bronze_free_alternatives_checked_2026-09-16": {
+    "committed_gold_vacant_units": "중분류만 — 편의점·약국은 구조적으로 0",
+    "program_content_context_csv": "어휘가 카카오 것이다(category,커피전문점,7) — 상가정보 소분류가 아니다",
+    "git_history": "stores_raw.json 은 한 번도 커밋된 적 없음(--diff-filter=A 전수 0건)",
+    "probe_log": "data/logs/probe_d1_2026-07-07.log — 실측 응답 1행뿐(indsSclsNm='광고물 설계/제작업')",
+    "public_code_table_fetch": "세션 네트워크 정책이 차단 — www.data.go.kr·apis.data.go.kr CONNECT 403",
+    "verdict": "이 환경에서 편의점·약국·커피전문점 소분류 문자열은 확정 불가"
+  },
+  "structural_fix_2026-09-16": {
+    "sidecar": "data/gold/store_taxonomy_vocab.json — 분류 삼단 + 등장 횟수(점포 레코드 없음). --audit 가 쓰고 커밋한다",
+    "bronze_free_audit": "store_taxonomy --vocab — 현재 규칙으로 재사상해 전수 사상률 + 미검증 3규칙 '확정/없다' 판정 + rule_drift 검출",
+    "effect": "0단계는 이제 Bronze 를 **한 번만** 요구한다. 그 커밋 뒤로는 신규 클론·CI·원격 세션에서도 감사된다",
+    "mcnemar": "scripts/mcnemar_gnn_arms.py 에 a/b/c 는 쌍대 비교 불가(분할·모집단이 다르다)임을 명시 — 집합 검사 에러는 맞는 답이다"
+  }
+}

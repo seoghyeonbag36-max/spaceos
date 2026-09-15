@@ -355,3 +355,134 @@ def test_jipgyegu_sidecar_holds_no_kakao_ids():
     doc = json.loads(path.read_text(encoding="utf-8"))
     assert not [k for k in (doc.get("nodes") or {}) if str(k).startswith("kakao:")]
     assert doc.get("oa_codes"), "집계구 코드 목록은 남아 있어야 한다(수집 keep-list)"
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  어휘 사이드카 (2026-09-16) — 소분류를 Bronze 없이 감사하기 위한 최소 기록
+# ══════════════════════════════════════════════════════════════════════════
+# 왜: Bronze 는 커밋 안 되고 Gold 공실 산출물은 중분류만 담아 **소분류 어휘가 저장소에
+# 하나도 안 남는다.** 2026-09-15 재학습이 그래서 0단계에서 멈췄다(finding §7-2-3-1).
+# 아래 테스트는 합성 행만 쓴다 — Bronze 도 네트워크도 타지 않는다.
+from data.config import store_taxonomy as _tx  # noqa: E402
+
+_VOCAB_SAMPLE = [
+    {"indsLclsNm": "음식", "indsMclsNm": "한식", "indsSclsNm": "백반/한정식",
+     "bizesNm": "김밥천국", "lat": 37.5, "lon": 127.0, "bizesId": "MA0101"},
+    {"indsLclsNm": "음식", "indsMclsNm": "한식", "indsSclsNm": "백반/한정식",
+     "bizesNm": "다른집", "lat": 37.6, "lon": 127.1, "bizesId": "MA0102"},
+    {"indsLclsNm": "소매", "indsMclsNm": "종합 소매", "indsSclsNm": "편의점",
+     "bizesNm": "가게", "lat": 37.7, "lon": 127.2, "bizesId": "MA0103"},
+    {"indsLclsNm": "부동산", "indsMclsNm": "부동산 중개", "indsSclsNm": "부동산 중개",
+     "bizesNm": "공인중개사", "lat": 37.8, "lon": 127.3, "bizesId": "MA0104"},
+]
+
+
+def test_vocab_table_aggregates_the_three_tier_code_only():
+    table = _tx.vocab_table(_VOCAB_SAMPLE)
+    by_scls = {t["scls"]: t for t in table}
+    assert by_scls["백반/한정식"]["n"] == 2       # 같은 삼단은 합쳐진다
+    assert by_scls["편의점"]["n"] == 1
+    assert by_scls["백반/한정식"]["group"] == "음식점"
+
+
+def test_vocab_table_carries_no_place_records():
+    """이 사이드카는 커밋된다 — 점포를 식별하는 값이 한 줄도 들어가면 안 된다.
+
+    (상가정보는 공공데이터라 적재 자체는 자유롭지만, 커밋되는 산출물의 성격을
+    '분류 어휘 집계'로 못박아 둔다 — 여기가 넓어지면 Bronze 를 커밋하는 것과 같아진다.)
+    """
+    forbidden = {"bizesNm", "bizesId", "lat", "lon", "rdnmAdr", "bldMngNo",
+                 "name", "node_id", "road_address"}
+    for row in _tx.vocab_table(_VOCAB_SAMPLE):
+        assert not (set(row) & forbidden), row
+        assert set(row) == {"lcls", "mcls", "scls", "n", "storefront", "group"}
+
+
+def test_vocab_table_marks_non_storefront_like_the_collector():
+    table = {t["scls"]: t for t in _tx.vocab_table(_VOCAB_SAMPLE)}
+    assert table["부동산 중개"]["storefront"] is False   # 사무실형 대분류
+    assert table["백반/한정식"]["storefront"] is True
+
+
+def test_vocab_verdicts_confirm_or_say_absent():
+    """프롬프트의 완료 기준 — 세 규칙 각각이 '확정' 또는 '이 표본에 없다' 로 닫힌다."""
+    v = _tx.vocab_verdicts(_tx.vocab_table(_VOCAB_SAMPLE))
+    assert v["편의점"]["confirmed"] is True
+    assert "편의점" in v["편의점"]["scls"]
+    # 이 합성 표본에는 약국·카페 소분류가 없다 — 추측으로 채우지 않고 '없다'로 닫는다
+    assert v["약국"]["confirmed"] is False
+    assert v["카페"]["confirmed"] is False
+    assert v["약국"]["why"]          # 왜 미검증인지가 판정에 같이 실린다
+
+
+def test_audit_vocab_reads_the_sidecar_without_bronze(tmp_path, capsys):
+    _tx.write_vocab(_tx.vocab_table(_VOCAB_SAMPLE),
+                    {"built": "2026-09-16", "hubs": 66, "rows": 4, "storefront": 3},
+                    root=tmp_path)
+    out = _tx.audit_vocab(root=tmp_path)
+    assert out["exists"] is True
+    # 가두 분류조합 2종 — 부동산 중개는 사무실형이라 빠진다(행 4 → 삼단 3종 → 가두 2종)
+    assert out["terms"] == 2
+    assert out["mapped_terms"] == 2               # 백반/한정식 · 편의점
+    assert out["occurrences"] == 3                # 백반 2 + 편의점 1
+    assert out["occurrence_pct"] == 100.0
+    assert out["by_group"] == {"음식점": 2, "편의점": 1}
+    assert out["rule_drift_terms"] == 0
+    assert "편의점" in capsys.readouterr().out
+
+
+def test_audit_vocab_flags_rule_drift(tmp_path):
+    """규칙을 고친 뒤 사이드카를 다시 안 만든 상태를 잡는다 — 조용히 지나가면 안 된다."""
+    table = _tx.vocab_table(_VOCAB_SAMPLE)
+    for t in table:
+        if t["scls"] == "편의점":
+            t["group"] = "음식점"                  # 옛 규칙이 냈다고 치자
+    _tx.write_vocab(table, {"built": "2026-09-16", "hubs": 1}, root=tmp_path)
+    out = _tx.audit_vocab(root=tmp_path)
+    assert out["rule_drift_terms"] == 1
+    assert out["by_group"]["편의점"] == 1          # 수치는 **현재 규칙** 기준이다
+
+
+def test_audit_vocab_says_so_when_the_sidecar_is_missing(tmp_path):
+    out = _tx.audit_vocab(root=tmp_path)
+    assert out["exists"] is False                 # 없는 것을 추측으로 메우지 않는다
+
+
+def test_committed_sidecar_if_present_holds_no_place_records():
+    """저장소에 사이드카가 커밋되면 그 내용도 같은 불변식을 지켜야 한다."""
+    import json
+
+    path = _tx.vocab_path()
+    if not path.exists():
+        pytest.skip("어휘 사이드카 미생성 — Bronze 가 있는 머신의 --audit 가 만든다")
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    assert doc.get("schema") == _tx.VOCAB_SCHEMA
+    for row in doc["terms"]:
+        assert set(row) == {"lcls", "mcls", "scls", "n", "storefront", "group"}
+
+
+def test_audit_writes_the_sidecar_when_bronze_exists(tmp_path, monkeypatch, capsys):
+    """생산 경로 — Bronze 가 있는 머신에서 `--audit` 가 사이드카를 쓴다.
+
+    이 저장소의 CI·원격 세션에는 Bronze 가 없어서 실행으로 확인할 수 없는 경로다.
+    그래서 `load_latest` 를 합성 행으로 갈아끼워 **쓰기까지** 확인한다 —
+    안 그러면 '돌려보지 않은 생산자'를 커밋하게 된다.
+    """
+    import json
+
+    from data.collectors import common as _common
+
+    monkeypatch.setattr(_common, "load_latest",
+                        lambda slug, name: _VOCAB_SAMPLE if name == "stores_raw.json" else None)
+    out = _tx.audit(["garosugil"], root=tmp_path)
+
+    assert out["rows"] == len(_VOCAB_SAMPLE)
+    assert out["vocab_terms"] == 3                      # 삼단 3종(사무실형 포함)
+    path = _tx.vocab_path(tmp_path)
+    assert path.exists()
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    assert doc["schema"] == _tx.VOCAB_SCHEMA
+    assert doc["hubs"] == 1 and doc["built"]
+    # 쓴 것을 그대로 다시 읽어 감사가 성립한다(왕복)
+    assert _tx.audit_vocab(root=tmp_path)["mapped_terms"] == 2
+    assert "커밋할 것" in capsys.readouterr().out      # 커밋하라고 말해 준다
