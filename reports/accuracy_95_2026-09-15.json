@@ -1,0 +1,99 @@
+{
+ "generated_at": "2026-09-15",
+ "question": "현재 KPI(정확도) 몇 % · 95% 도달 가능한가",
+ "method": "저장소 산출물 실측 · 네트워크 0콜",
+ "metrics": {
+  "1_lstm_direction": {
+   "value_pct": 70.8,
+   "hits": 46,
+   "n": 65,
+   "kpi": 70,
+   "se_pp": 5.64,
+   "ci95": [
+    59.7,
+    81.8
+   ],
+   "margin_in_se": 0.14,
+   "verdict": "KPI 와 통계적으로 구분 불가 (0.14σ). 95% 는 CI 상한 81.8% 밖 — 도달 불가"
+  },
+  "2_gnn_top3": {
+   "value_pct": 91.67,
+   "prior_pct": 89.35,
+   "lift_pct": 5.3,
+   "macro_f1": 0.2352,
+   "to_95_pp": 3.33,
+   "verdict": "대분류 7종에서만 사정권. 입도를 내리면 수학적으로 불가(중분류 75종 사전 Top-3 28.5%)",
+   "caveat": "서빙 아티팩트는 카카오 유래본 — 상가정보 재학습은 DATA_GO_KR_SERVICE_KEY 미설정으로 막힘"
+  },
+  "3_gnn_top1": {
+   "value_pct": 64.94,
+   "prior_pct": 61.68,
+   "verdict": "게이트 폐기. 95% 논외"
+  },
+  "4_ground_truth_vacancy": {
+   "value_pct": 75,
+   "n_approx": 25,
+   "hubs": 1,
+   "hub": "garosugil",
+   "se_pp": 8.54,
+   "ci95": [
+    58,
+    92
+   ],
+   "verdict": "95% 가 의미도 있고 달성도 가능한 유일한 자리 — 측정 문제이고 오차가 귀속 가능"
+  }
+ },
+ "calibration": {
+  "ours_mid_median_pct": 19.2,
+  "rone_anchor_median_pct": 8.8,
+  "ratio": 2.18,
+  "verdict": "정확도 이전에 타당성 — 공식 통계의 2.18배로 보고 중"
+ },
+ "mechanism": {
+  "stores_per_unit_by_floors": {
+   "1층": 1.12,
+   "2층": 0.61,
+   "3-4층": 0.63,
+   "5-7층": 0.56,
+   "8층+": 0.41
+  },
+  "spread_x": 2.7,
+  "mid_segment_share_pct": 66.1,
+  "mid_segment_buildings": 25619,
+  "interpretation": "귀속이 옳다면 평평해야 하는 열이 단조 감소 — '큰 건물의 분자 결손'의 실물. 결손 최대 구간이 곧 R-ONE 앵커 비교 대상",
+  "rejected_hypothesis": {
+   "claim": "층 근거(occ_floors) 부족한 거점일수록 격차가 크다",
+   "pearson_r": -0.122,
+   "low_half_gap_pp": 9.9,
+   "high_half_gap_pp": 8.1,
+   "verdict": "기각 — 격차는 거점의 성질이 아니라 건물 규모의 성질. 교정은 규모별로 설계할 것"
+  }
+ },
+ "required_sample_for_95": {
+  "pm10pp": 19,
+  "pm5pp": 73,
+  "pm3pp": 203,
+  "pm2pp": 457,
+  "pm1pp": 1825,
+  "current": "로드뷰 라벨 20~30건 · 1거점",
+  "note": "n=25 에서 p=75% 의 CI 는 58~92% — 75% 와 95% 가 구분되지 않는다"
+ },
+ "path_to_95": [
+  {
+   "step": 1,
+   "what": "층·호 식별 보강 (flrNo 공란 35.8% · hoNo 100% 동시 공란 · 내부 복원 불가)",
+   "gate": "점포/호실이 규모에 걸쳐 평평 (8층+ 0.41 → 1.0 대역)"
+  },
+  {
+   "step": 2,
+   "what": "앵커 정합 확인",
+   "gate": "격차 중앙 +8.95 → ±3%p · |격차|>10%p 거점 31 → 10 이하"
+  },
+  {
+   "step": 3,
+   "what": "지상 실측 표본 확대",
+   "gate": "20~30건 → 457건 · 거점 1 → 5~8 (격차 층화 추출)"
+  }
+ ],
+ "repro": "data/gold/*/page_building_master.geojson 의 floors·stores·capacity 3속성 + data/gold/*/calibration.json 의 rone_aligned.mid"
+}
