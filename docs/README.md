@@ -47,6 +47,7 @@ Claude Code(CLI) 기반 PlaceOS 개발 가이드. PPPP 프레임워크 4기능�
 | [finding-gyeonggi-licensing-source-2026-08-30.md](finding-gyeonggi-licensing-source-2026-08-30.md) | 경기 인허가는 경기데이터드림 `GENRESTRT` — 키·응답 검증 완료, 좌표계 함정 하나 |
 | [finding-hub-caveat-axes-2026-09-02.md](finding-hub-caveat-axes-2026-09-02.md) | 계획상가 거점을 가르는 **두 축이 어긋난다** — 판정 축이 프록시였음이 실측으로 드러났다 |
 | [finding-map-provider-google-2026-09-15.md](finding-map-provider-google-2026-09-15.md) | 지도 공급자 재검증(네이버·카카오 → 구글) — **전환하지 않는다**. 부산물로 드러난 **카카오 로컬 영구저장 약관 저촉**은 저장층을 상가정보로 옮겨 해소(§7-2) |
+| [finding-sbiz365-mcp-2026-09-15.md](finding-sbiz365-mcp-2026-09-15.md) | 소상공인365·창업 API·MCP 연동 판정 — **소상공인365 는 붙이지 않는다**(행정동 입도 · 이미 보유 · Iframe 이라 Bronze 불가). MCP 는 **서버 방향으로만**. 재평가 트리거는 전화 한 통 하나(§3-B) |
 
 ## 진행률은 문서에서 읽지 않는다
 
