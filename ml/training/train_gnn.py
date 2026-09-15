@@ -26,6 +26,13 @@
 ⚠ 현행 서빙 산출물 `data/gold/platform_industry_recommend.json` 은 아직 카카오
 노드(kakao:*)로 만들어진 것이다. 재학습·재생성 전까지 그 파일이 남은 마지막
 카카오 유래 산출물이다(finding §7-2 의 '남은 노출' 항목).
+
+⚠ **재학습 절차는 프롬프트로 정리돼 있다** — `docs/prompt-gnn-retrain-scls-2026-09-15.md`.
+어휘 3안(7종+미분류 / 7종만 / 상가정보 대분류 10종)과 그 기준선, 기각된 레버 목록,
+금지 사항이 거기 있다. **선행**: `docs/prompt-store-taxonomy-scls-2026-09-15.md`
+(소분류 어휘 실측) — 그 전에 돌리면 라벨이 틀린 채로 학습된다.
+⚠ 그리고 **옛 카카오 그래프는 재현 불가능하다**(Bronze 를 없앴다) — 대조군을 만들 수
+없으므로 이 재학습은 회귀 측정이 아니라 **새 기준선 수립**이다.
 산출:
   ml/artifacts/industry_gnn.pt                        체크포인트(+ 라벨·피처 메타)
   data/gold/platform_industry_recommend.json          서빙용 배치 추천(토치 없는 Vercel 경로)
