@@ -73,6 +73,21 @@ Bronze 가 없는 데(신규 클론·CI)서 위 감사를 **재현**하려면:
 
 ⚠ 그 작업 전까지 세 규칙(`scls` 의 "편의점"·"약국"·"카페/커피/다방/찻집")은
 **미검증 추측**이다. 값이 안 맞으면 그 셋을 먼저 의심할 것.
+
+## 왜 Bronze 없는 머신에서 이 실측이 매번 막히나 (2026-09-16 조치)
+
+소분류 어휘가 **저장소 어디에도 안 남기 때문**이다 — Bronze 는 커밋되지 않고, 커밋된
+Gold(`vacant_units.grp`)는 중분류만 담는다. 2026-09-15 재학습 시도가 정확히 여기서
+멈췄다(finding §7-2-3-1). 소스가 공공데이터로 바뀐 뒤로는 그 제약이 불필요하다:
+**점포 레코드가 아니라 분류 어휘 집계만** 남기면 된다.
+
+    python -m data.config.store_taxonomy --audit    # Bronze 있는 머신 — 사이드카를 쓴다
+    git add data/gold/store_taxonomy_vocab.json     # ← 이 커밋이 이 문제를 닫는다
+    python -m data.config.store_taxonomy --vocab    # Bronze 없는 머신 — 소분류까지 감사
+
+`--vocab` 은 사이드카의 분류 삼단을 **현재 규칙으로 다시 사상해** 사상률을 내고,
+위 세 규칙 각각을 '실측 문자열 확정' 또는 '이 표본에 없다' 로 닫는다.
+사이드카가 없으면 그 사실만 말하고 끝난다 — 추측으로 메우지 않는다.
 """
 from __future__ import annotations
 
@@ -213,13 +228,14 @@ def category_path(row: dict) -> str:
 # ══════════════════════════════════════════════════════════════════════════
 #  감사 — 실제 Bronze 어휘로 규칙을 조일 때 쓴다
 # ══════════════════════════════════════════════════════════════════════════
-def audit(slugs: list[str] | None = None) -> dict:
+def audit(slugs: list[str] | None = None, root=None) -> dict:
     """거점 Bronze `stores_raw.json` 을 훑어 사상 커버리지와 미사상 어휘를 센다."""
     from data.collectors.common import load_latest
     from data.config.page_hubs import ACTIVE_HUBS
 
     targets = slugs or list(ACTIVE_HUBS)   # dict[str, PageHub] — 키가 거점 slug 다
     total = storefront = mapped = 0
+    vocab_counts: Counter = Counter()      # 사이드카용 — 분류 삼단만 센다
     unmapped_lcls: Counter = Counter()
     unmapped_scls: Counter = Counter()
     by_group: Counter = Counter()
@@ -232,6 +248,7 @@ def audit(slugs: list[str] | None = None) -> dict:
             continue
         for r in rows:
             total += 1
+            vocab_counts[vocab_key(r)] += 1
             if not is_storefront(r):
                 continue
             storefront += 1
@@ -270,6 +287,24 @@ def audit(slugs: list[str] | None = None) -> dict:
         # 여기서 찾지 말 것 — 분류체계에 아예 없는 수요다(2026-08-17 전수 검색).
         print(f"[taxonomy] ※ 사상 불가(분류체계 부재): {' · '.join(UNMAPPABLE_DEMAND)}"
               f" — 라벨을 만들 수 없다. 재학습으로 풀리지 않는다")
+        # 어휘를 저장소에 남긴다 — 이 파일이 있어야 다음 사람이 Bronze 없이 감사한다.
+        # 점포 레코드가 아니라 분류 삼단 집계다(위 VOCAB_SCHEMA 주석).
+        from datetime import date
+        table = vocab_table_from_counts(vocab_counts)
+        path = write_vocab(table, {"built": date.today().isoformat(),
+                                   "hubs": len(targets) - len(missing),
+                                   "rows": total, "storefront": storefront}, root=root)
+        out["vocab_path"] = str(path)
+        out["vocab_terms"] = len(table)
+        print(f"[taxonomy] 어휘 사이드카 {len(table):,}종 → {path}")
+        print("[taxonomy] ⚠ 이 파일을 **커밋할 것** — 커밋해야 Bronze 없는 머신에서 "
+              "`--vocab` 으로 소분류까지 감사된다(2026-09-15 재학습이 막힌 자리다)")
+        for label, v in vocab_verdicts(
+                [t for t in table if t.get("storefront")]).items():
+            mark = "✅" if v["confirmed"] else "❌ 이 표본에 없다 —"
+            detail = (", ".join(f"{k}({n:,})" for k, n in v["scls"].items())
+                      if v["confirmed"] else v["why"])
+            print(f"    {mark} {label} {detail}")
     else:
         print("[taxonomy] 셀 것이 없다 — building_vacancy 로 stores_raw 수집이 먼저다")
     return out
@@ -348,14 +383,183 @@ def audit_gold(root=None) -> dict:
     return out
 
 
+# ══════════════════════════════════════════════════════════════════════════
+#  어휘 사이드카 — 소분류를 저장소에 남긴다 (2026-09-16 신설)
+# ══════════════════════════════════════════════════════════════════════════
+# 왜 생겼나: **소분류 어휘가 저장소 어디에도 안 남는다.** Bronze 는 커밋되지 않고,
+# 커밋된 Gold(`vacant_units.grp`)는 중분류만 담는다. 그래서 Bronze 가 없는 머신
+# (신규 클론·CI·원격 세션)에서는 `--audit` 가 셀 것이 없고, `편의점`·`약국`·
+# `커피전문점` 세 규칙이 **미검증 추측인 채로 남는다** — 2026-09-15 재학습 시도가
+# 정확히 여기서 멈췄다(finding §7-2-3-1).
+#
+# 고치는 방법은 Bronze 를 커밋하는 게 아니라, **어휘 집계만** 남기는 것이다.
+# 이 사이드카에는 분류 삼단(대/중/소)과 등장 횟수뿐이고 상호·좌표·bizesId 같은
+# 점포 레코드는 들어가지 않는다 — 공공데이터의 분류체계 어휘이고 용량은 수십 KB 다.
+# 한 번 만들어 커밋하면 그 뒤로는 **Bronze 없이 규칙을 감사할 수 있다**(--vocab).
+VOCAB_SCHEMA = "store-taxonomy-vocab/1"
+VOCAB_NAME = "store_taxonomy_vocab.json"
+
+# 미검증 추측 3종 — `--vocab`·`--audit` 가 이 규칙들이 실제 어휘에 걸리는지 판정한다.
+# (라벨, 그 라벨을 내야 하는 규칙의 설명)
+UNVERIFIED_SCLS_RULES = (
+    (GROUP_CVS, "중분류 '종합 소매' 하위 — 슈퍼·잡화와 갈라야 한다"),
+    (GROUP_PHARMACY, "중분류 '의약·화장품 소매' 하위 — 화장품 가게와 갈라야 한다"),
+    (GROUP_CAFE, "중분류 '비알코올' 하위 — 커피전문점/다방/찻집 표기 확인 필요"),
+)
+
+
+def vocab_table(rows) -> list[dict]:
+    """점포 행 → **분류 삼단 집계**. 점포 레코드는 한 줄도 담지 않는다.
+
+    순수 함수다(파일·네트워크를 안 탄다) — 그래서 Bronze 없이도 테스트된다.
+    `is_storefront` 필터는 여기서 걸지 않고 플래그로 남긴다: 사무실형 대분류가
+    무엇이었는지도 감사 재료이기 때문이다(분모가 달라지는 자리).
+    """
+    agg: Counter = Counter()
+    for r in rows:
+        agg[vocab_key(r)] += 1
+    return vocab_table_from_counts(agg)
+
+
+def vocab_key(row: dict) -> tuple[str, str, str]:
+    """집계 키 — 분류 삼단만. 점포를 식별하는 값은 키에 안 들어간다."""
+    return (str(row.get("indsLclsNm") or ""), str(row.get("indsMclsNm") or ""),
+            str(row.get("indsSclsNm") or ""))
+
+
+def vocab_table_from_counts(agg: Counter) -> list[dict]:
+    """이미 센 삼단 카운터 → 사이드카 행. `audit()` 는 222,260행을 메모리에 쌓지 않고
+    거점을 훑으면서 이 카운터만 키운다(이 환경은 메모리 여유가 빠듯하다)."""
+    out = []
+    for (lcls, mcls, scls), n in agg.most_common():
+        row = {"indsLclsNm": lcls, "indsMclsNm": mcls, "indsSclsNm": scls}
+        out.append({"lcls": lcls, "mcls": mcls, "scls": scls, "n": n,
+                    "storefront": bool(is_storefront(row)),
+                    # 이 커밋 시점 규칙이 낸 값 — `--vocab` 이 재계산해서 대조한다.
+                    # 규칙을 고쳤는데 사이드카가 그대로면 그 표류를 잡아 준다.
+                    "group": to_category_group(row) or ""})
+    return out
+
+
+def vocab_verdicts(table: list[dict]) -> dict[str, dict]:
+    """미검증 3규칙 판정 — 실제 어휘에서 그 라벨을 내는 **소분류 문자열**을 모은다.
+
+    프롬프트(docs/prompt-store-taxonomy-scls-2026-09-15.md)의 완료 기준이 요구하는
+    '실측 문자열 확정 **또는** 이 표본에 없다' 를 기계가 판정하게 만든 것이다.
+    """
+    out: dict[str, dict] = {}
+    for label, why in UNVERIFIED_SCLS_RULES:
+        hits = [(t["scls"], t["n"]) for t in table
+                if to_category_group({"indsLclsNm": t["lcls"], "indsMclsNm": t["mcls"],
+                                       "indsSclsNm": t["scls"]}) == label and t["scls"]]
+        hits.sort(key=lambda kv: -kv[1])
+        out[label] = {"why": why, "confirmed": bool(hits),
+                      "scls": dict(hits[:10]),
+                      "occurrences": sum(n for _, n in hits)}
+    return out
+
+
+def vocab_path(root=None):
+    from pathlib import Path
+
+    from data.collectors.common import GOLD
+    return (Path(root) if root else GOLD) / VOCAB_NAME
+
+
+def write_vocab(table: list[dict], meta: dict, root=None):
+    """사이드카를 쓴다. 호출자는 `audit()`(Bronze 가 있는 머신)뿐이다."""
+    import json
+
+    path = vocab_path(root)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    doc = {"schema": VOCAB_SCHEMA, **meta, "terms": table}
+    path.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
+    return path
+
+
+def audit_vocab(root=None) -> dict:
+    """**Bronze 없이** 커밋된 어휘 사이드카로 규칙을 감사한다 (2026-09-16 신설).
+
+    `--gold`(중분류만)와 달리 이쪽은 **소분류까지** 본다. 사이드카가 없으면 그 사실을
+    그대로 말하고 끝낸다 — 없는 것을 추측으로 메우지 않는다.
+    """
+    import json
+
+    path = vocab_path(root)
+    if not path.exists():
+        print(f"[taxonomy:vocab] 사이드카 없음 — {path}")
+        print("[taxonomy:vocab] Bronze 가 있는 머신에서 `--audit` 를 한 번 돌리면 "
+              "이 파일이 생기고, 그 뒤로는 Bronze 없이 감사된다")
+        return {"exists": False, "path": str(path)}
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    table = doc.get("terms") or []
+    store = [t for t in table if t.get("storefront")]
+
+    mapped_terms = drift = 0
+    mapped_hits = total_hits = 0
+    unmapped_scls: Counter = Counter()
+    by_group: Counter = Counter()
+    for t in store:
+        n = int(t.get("n") or 0)
+        total_hits += n
+        g = to_category_group({"indsLclsNm": t["lcls"], "indsMclsNm": t["mcls"],
+                               "indsSclsNm": t["scls"]}) or ""
+        if g != (t.get("group") or ""):
+            drift += 1
+        if g:
+            mapped_terms += 1
+            mapped_hits += n
+            by_group[g] += n
+        else:
+            unmapped_scls[t["scls"] or "(공란)"] += n
+
+    verdicts = vocab_verdicts(store)
+    out = {
+        "exists": True, "path": str(path), "built": doc.get("built"),
+        "hubs": doc.get("hubs"), "terms": len(store),
+        "occurrences": total_hits,
+        "mapped_terms": mapped_terms, "mapped_occurrences": mapped_hits,
+        "term_pct": round(mapped_terms / len(store) * 100, 1) if store else None,
+        "occurrence_pct": round(mapped_hits / total_hits * 100, 1) if total_hits else None,
+        "by_group": dict(by_group.most_common()),
+        "unmapped_top_scls": dict(unmapped_scls.most_common(25)),
+        "rule_drift_terms": drift,
+        "verdicts": verdicts,
+    }
+    print(f"[taxonomy:vocab] {path.name} · 수집 {doc.get('built')} · 거점 {doc.get('hubs')} · "
+          f"가두 분류조합 {len(store):,}종 · 등장 {total_hits:,}회")
+    print(f"[taxonomy:vocab] 어휘 기준 사상 {mapped_terms}/{len(store)}종 ({out['term_pct']}%) · "
+          f"등장 기준 {mapped_hits:,}/{total_hits:,}회 ({out['occurrence_pct']}%)")
+    print(f"[taxonomy:vocab] 그룹별 등장: {out['by_group']}")
+    if drift:
+        # 규칙을 고친 뒤 사이드카를 안 다시 만든 상태다. 값 자체는 재계산분이 맞다.
+        print(f"[taxonomy:vocab] ⚠ 사이드카에 적힌 group 과 현재 규칙이 다른 조합 {drift}종 "
+              f"— 규칙이 바뀐 것이다(위 수치는 현재 규칙으로 재계산한 값)")
+    print("[taxonomy:vocab] 미검증 3규칙 판정")
+    for label, v in verdicts.items():
+        if v["confirmed"]:
+            print(f"    ✅ {label} ← {', '.join(f'{k}({n:,})' for k, n in v['scls'].items())}")
+        else:
+            print(f"    ❌ {label} — 이 표본에 없다 ({v['why']})")
+    print("[taxonomy:vocab] 미사상 소분류 상위")
+    for k, n in unmapped_scls.most_common(25):
+        print(f"    {k}: {n:,}")
+    return out
+
+
 def main(argv: list[str]) -> int:
     if "--gold" in argv:
         audit_gold()
+        return 0
+    if "--vocab" in argv:
+        audit_vocab()
         return 0
     if "--audit" not in argv:
         print(__doc__)
         print("사용: python -m data.config.store_taxonomy --audit [거점...]   # Bronze 전수")
         print("      python -m data.config.store_taxonomy --gold             # 커밋된 Gold 중분류")
+        print("      python -m data.config.store_taxonomy --vocab            # 커밋된 어휘 "
+              "사이드카(소분류까지) — Bronze 불필요")
         return 0
     slugs = [a for a in argv if not a.startswith("-")]
     audit(slugs or None)

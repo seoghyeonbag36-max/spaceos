@@ -154,6 +154,13 @@ data/gold/*/*
 # 안 쓰이지만, 빠지면 음성결과를 재현할 수 없다. 안 올랐다는 사실 자체가 산출물이라
 # (지우면 다음 사람이 같은 것을 다시 시도한다 — docs/feature-platform.md §0-J) 남긴다.
 !data/gold/features/adong_hourly.parquet
+
+# 업종 분류 어휘 사이드카(대/중/소 + 등장 횟수). Bronze 는 커밋되지 않고 Gold 공실
+# 산출물은 중분류만 담아, **소분류 어휘가 저장소에 하나도 안 남는다** — 2026-09-15
+# 재학습이 정확히 그래서 0단계에서 멈췄다. 점포 레코드가 아니라 분류 삼단 집계이고
+# (상호·좌표·bizesId 없음) 수십 KB 다. 생성: store_taxonomy --audit(Bronze 있는 머신)
+# 감사: store_taxonomy --vocab (Bronze 불필요)
+!data/gold/store_taxonomy_vocab.json
 # 예외: Program 상권 컨텍스트(거점당 ~3KB, 54거점 합계 174KB) — services/marketing.py 가
 # LLM 프롬프트 입력으로 디스크에서 읽는다. 빠져 있으면 배포 환경에서 garosugil 만
 # 컨텍스트를 갖고 나머지 53거점은 조용히 시드 카피로 폴백한다(2026-08-01 발견).
