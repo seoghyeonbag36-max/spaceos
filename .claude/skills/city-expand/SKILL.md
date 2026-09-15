@@ -15,7 +15,7 @@ description: 새 도시(서울 밖)로 스택을 확장하는 절차 — 어느 
 |---|---|
 | 소상공인 상가정보 · 건축HUB · V-World | Page 분자·분모·폴리곤 |
 | R-ONE 임대동향 | Posting 임대료 · LSTM 피처 (**표본 수 확인 필수**) |
-| 카카오 로컬 · 네이버 블로그/데이터랩 | Platform 업종·키워드 · Program 콘텐츠 |
+| 상가정보(점포·업종) · 네이버 블로그/데이터랩 | Platform 업종·키워드 · Program 콘텐츠 |
 | KOSIS · 공정위 · SGIS | 매출앵커·공간단위 |
 
 | 서울 전용 — 교체해야 하는 넷 | 경기 대체재 |
@@ -56,7 +56,7 @@ description: 새 도시(서울 밖)로 스택을 확장하는 절차 — 어느 
 |---|---|---|
 | 0 | 경기 포털 키 · 후보 지점 비율 프로브 | 키 200 응답 · 비율표. 인허가는 `openapi.gg.go.kr/GENRESTRT?KEY=…&SIGUN_NM=고양시` 1콜로 확인 |
 | **1. Page 최소 성립 — ✅ 완료** | 거점 등록 → 수집 → 공실 → 지도 (`hub-onboard`) | **20거점 등록 · Tier1 Gold 7거점만 서빙 · 앵커 대조 완료** |
-| 2 | 카카오·블로그·트렌드 → `program_content_context` | `/commercial-districts/{id}/platform` 200 · archetype 판정 |
+| 2 | 상가정보·블로그·트렌드 → `program_content_context` | `/commercial-districts/{id}/platform` 200 · archetype 판정 |
 | 3 | 경기 생활이동·추정매출 → `demand` | 시간대·연령·성별 6구간이 **서울과 같은 스키마**로 |
 | 4 | R-ONE 매핑 + 공유 표기 → 3-Tier | 회수불가 비율 서울 대역(0.5~3%) 안 · `rone-shared` 배지 |
 | 5 | 시 행사 소스 | 실데이터 or **빈 상태 명시**(시드로 채우지 않는다) |

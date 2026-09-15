@@ -1,6 +1,6 @@
 """[Platform·GNN] 점포 그래프 엣지 — 공간 kNN + 동일 건물 + 체인.
 
-소스: gold/{slug}/platform_store_graph_nodes.parquet (kakao 현존 점포)
+소스: gold/{slug}/platform_store_graph_nodes.parquet (상가정보 현존 점포)
 산출: gold/{slug}/platform_store_graph_edges.parquet
   src, dst   node_id 쌍 (무방향 — 한 쌍당 1행, GNN 입력 시 양방향 전개)
   dist_m     두 점포 간 거리(m, 등장방형 근사)
@@ -9,8 +9,9 @@
 
 엣지 종류
   spatial_knn    k=5 최근접 + 최대 반경 150m. 거점 블록 스케일의 물리적 근접.
-  same_building  동일 도로명주소(road_address_name). 같은 건물 입점은 집객·고객 공유의
-                 관측 가능한 프록시다. 카카오 주소 보유율 99.6%.
+  same_building  동일 건물관리번호(bdMgtSn) → PNU → 도로명 순 폴백. 같은 건물 입점은
+                 집객·고객 공유의 관측 가능한 프록시다. 2026-09-15 에 노드 소스가
+                 상가정보로 바뀌며 건물 식별자가 직접 들어와 문자열 대조를 대체했다.
   same_chain     동일 상호 3곳 이상(GS25·스타벅스 등). 150m 캡 때문에 spatial_knn 만으로는
                  그래프가 거점별로 완전히 끊겨 27개 컴포넌트가 된다 — 체인 엣지가 거점 간
                  유일한 연결이다.
@@ -22,8 +23,9 @@
 
 TODO(GNN): 리뷰 유사도 엣지는 보류 — 네이버 블로그 검색 API 가 본문이 아닌 ~150자
    스니펫만 주어 점포명 동시 언급이 8,554건 중 15건(0.2%)뿐이다(2026-07-23 측정).
-   점포 단위 리뷰 원문(플레이스 리뷰)은 공식 API 가 없다. LOCALDATA 인허가 노드 통합
-   (entity resolution)도 미구현.
+   점포 단위 리뷰 원문(플레이스 리뷰)은 공식 API 가 없다. 인허가 노드 통합
+   (entity resolution: 상가정보 bizesId ↔ 인허가 MGTNO)도 미구현 — build_gold
+   `build_store_graph_nodes` 의 TODO 참조.
 
 실행: python -m data.pipelines.build_store_graph_edges [--platform13]
 """
@@ -130,11 +132,32 @@ def _group_edges(groups: dict[str, list[int]], df: pd.DataFrame, etype: str) -> 
 
 
 def _building_groups(df: pd.DataFrame) -> dict[str, list[int]]:
+    """동일 건물 그룹 — 건물관리번호(bdMgtSn) 우선, 없으면 PNU, 없으면 도로명.
+
+    2026-09-15 에 키가 셋으로 늘었다. 노드 소스가 카카오 로컬 → 상가정보로 바뀌면서
+    (약관: 응답 저장 금지 → finding-map-provider-google-2026-09-15.md §7-2)
+    **건물 식별자가 직접 들어왔다.** 종전에는 도로명 문자열 일치가 유일한 수단이었다.
+
+    왜 문자열보다 나은가: 도로명은 같은 건물에도 표기가 갈리고(부번·건물명 유무),
+    반대로 한 도로명에 동이 여럿인 단지도 한 덩어리로 접힌다. `bdMgtSn` 은
+    건축물대장 키라 Page 건물 마스터(`pnu`)와도 같은 축이다.
+
+    폴백을 남기는 이유: 상가정보에도 `bldMngNo` 공란 행이 있고(수집기 실측
+    "bdMgtSn 누락"), 옛 노드 테이블(kakao:*)로 이 빌더를 돌릴 수도 있다.
+    키 종류를 접두로 갈라 **서로 다른 키가 같은 그룹으로 섞이지 않게** 한다.
+    """
     groups: dict[str, list[int]] = defaultdict(list)
-    for i, addr in enumerate(df.get("road_address", pd.Series([""] * len(df)))):
-        a = str(addr or "").strip()
-        if a:
-            groups[a].append(i)
+    empty = pd.Series([""] * len(df))
+    bd = df.get("bd_mgt_sn", empty).fillna("").astype(str).to_numpy()
+    pnu = df.get("pnu", empty).fillna("").astype(str).to_numpy()
+    addr = df.get("road_address", empty).fillna("").astype(str).to_numpy()
+    for i in range(len(df)):
+        if bd[i].strip():
+            groups[f"bd:{bd[i].strip()}"].append(i)
+        elif pnu[i].strip():
+            groups[f"pnu:{pnu[i].strip()}"].append(i)
+        elif addr[i].strip():
+            groups[f"addr:{addr[i].strip()}"].append(i)
     return groups
 
 

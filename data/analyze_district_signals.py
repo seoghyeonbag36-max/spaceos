@@ -7,7 +7,9 @@ Bronze(platform13)의 수집분을 거점 단위로 집계해, 시드(zones/unit
 산출 항목
   - stor : 점포수(STOR_CO)·폐업률(CLSBIZ_RT)·개업률(OPBIZ_RT) 최신분기 + 추세
   - ix   : 상권변화지표(다이나믹/확장/축소/정체) — zones 의 증감(d) 방향 근거
-  - kakao: 업종 구성(category_group_name) — units 의 업종·Tier 근거
+  - store: 업종 구성(상가정보 업종 대분류·7종 사상) — units 의 업종·Tier 근거
+           2026-09-15 카카오 로컬에서 교체했다(약관: 응답 저장 금지 →
+           docs/finding-map-provider-google-2026-09-15.md §7-2)
   - naver: 블로그 언급 수 — zones 의 리뷰(r) 총량 배분 근거
 
 실행: python -m data.analyze_district_signals [거점id ...]   (미지정 시 전 거점)
@@ -20,6 +22,7 @@ from collections import Counter, defaultdict
 
 from data.collectors.common import load_latest
 from data.config.platform_districts import SLUG
+from data.config.store_taxonomy import is_storefront, to_category_group
 
 
 def _num(v: object) -> float:
@@ -34,10 +37,19 @@ def _load(name: str) -> list[dict]:
     return rows if isinstance(rows, list) else []
 
 
+def _load_stores(district_ids: list[str]) -> dict[str, list[dict]]:
+    """거점별 상가정보(가두 점포만). platform13 단일 Bronze 가 아니라 거점별 파일이다."""
+    out: dict[str, list[dict]] = {}
+    for did in district_ids:
+        rows = load_latest(did, "stores_raw.json")
+        if isinstance(rows, list):
+            out[did] = [r for r in rows if is_storefront(r)]
+    return out
+
+
 def analyze(district_ids: list[str] | None = None) -> dict[str, dict]:
     stor = _load("seoul_trdar_stor.json")
     ix = _load("seoul_trdar_ix.json")
-    kakao = _load("kakao_places.json")
     blog = _load("naver_blog.json")
 
     by_id: dict[str, dict] = defaultdict(dict)
@@ -83,12 +95,16 @@ def analyze(district_ids: list[str] | None = None) -> dict[str, dict]:
             "cls_sale_mt_avg": round(sum(_num(r["CLS_SALE_MT_AVRG"]) for r in cur) / len(cur), 1),
         }
 
-    # ── kakao: 업종 구성 ──────────────────────────────────────────────────────
+    # ── store: 업종 구성 (상가정보) ───────────────────────────────────────────
+    stores = _load_stores(ids)
     for did in ids:
-        rows = [r for r in kakao if r["district_id"] == did]
-        by_id[did]["kakao"] = {
+        rows = stores.get(did, [])
+        by_id[did]["store"] = {
             "places": len(rows),
-            "groups": Counter(r["category_group_name"] for r in rows).most_common(8),
+            # 7종 사상 라벨로 센다 — 종전 카카오 category_group_name 과 같은 어휘라
+            # 이 스크립트를 근거로 쓴 옛 판단과 계속 대조된다.
+            "groups": Counter(to_category_group(r) or "미분류" for r in rows).most_common(8),
+            "lcls": Counter(str(r.get("indsLclsNm") or "미상") for r in rows).most_common(8),
         }
 
     # ── naver: 블로그 언급 ────────────────────────────────────────────────────
@@ -113,7 +129,7 @@ def main() -> None:
         if x:
             print(f"  ix   {x['quarter']}: {x['labels']}  "
                   f"영업개월 {x['opr_sale_mt_avg']} / 폐업개월 {x['cls_sale_mt_avg']}")
-        print(f"  kakao: {d['kakao']['places']}곳 {d['kakao']['groups'][:5]}")
+        print(f"  store: {d['store']['places']}곳 {d['store']['groups'][:5]}")
         print(f"  blog : {d['blog']['posts']}건")
         print(f"  업종상위: {d.get('top_induty', [])[:6]}")
     print("\nJSON:")

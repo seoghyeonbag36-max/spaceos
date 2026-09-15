@@ -9,8 +9,15 @@
 선행: 수집기 실행으로 Bronze 를 채운다.
   python -m data.collectors.seoul_trdar
   python -m data.collectors.localdata
-  python -m data.collectors.kakao_local
+  python -m data.collectors.building_vacancy       # stores_raw.json (상가정보) ← 점포 노드 소스
   python -m data.collectors.naver_blog
+
+⚠ **점포 노드의 소스는 2026-09-15 에 카카오 로컬 → 상가정보로 바뀌었다.**
+카카오 로컬은 응답 결과의 저장을 허용하지 않는다(실시간 호출만) — 상호·좌표·place_url
+을 Bronze 와 Gold 노드로 영구화하던 경로가 약관에 저촉했다. 이제 `kakao_local` 은
+Bronze 를 쓰지 않고, 이 빌더도 `kakao_places.json` 을 읽지 않는다.
+근거·경위: docs/finding-map-provider-google-2026-09-15.md §7-2 · 사상 규칙은
+data/config/store_taxonomy.py.
 
 실행: python -m data.pipelines.build_gold
 """
@@ -30,6 +37,7 @@ except ImportError:  # pragma: no cover
 from data.collectors.common import GOLD, SILVER, load_latest
 from data.config.garosugil import SLUG
 from data.config.platform_districts import DISTRICT_TRDAR, SLUG as SLUG13
+from data.config.store_taxonomy import category_path, is_storefront, to_category_group
 
 _GOLD_DIR = GOLD / SLUG
 _SILVER_DIR = SILVER / SLUG
@@ -230,66 +238,120 @@ def build_platform13_timeseries() -> None:
     _save(out, GOLD / SLUG13, "platform_district_timeseries")
 
 
+def _store_node_rows(slug: str, district_id: str) -> list[dict]:
+    """거점 하나의 상가정보 Bronze → GNN 노드 행.
+
+    소스는 `bronze/{거점}/{날짜}/stores_raw.json`(소상공인 상가(상권)정보, 공공데이터).
+    2026-09-15 이전에는 카카오 로컬 응답을 여기에 넣었는데, 카카오는 응답 저장을
+    허용하지 않아 약관에 저촉했다 → docs/finding-map-provider-google-2026-09-15.md §7-2.
+
+    바뀐 것은 소스만이 아니다. 상가정보는 카카오가 주지 않던 세 키를 준다:
+      `bldMngNo`  건물관리번호 — 동일 건물 엣지의 **정확한** 키(도로명 문자열 대조가 아니다)
+      `lnoCd`     PNU 19자리 — Page 건물 마스터와 직접 조인된다
+      `flrNo`/`hoNo`  층·호 — 공실 유닛(build_vacant_units)과 직접 붙는다
+    """
+    rows: list[dict] = []
+    skipped_office = skipped_nokey = 0
+    for s in load_latest(slug, "stores_raw.json") or []:
+        if not is_storefront(s):
+            skipped_office += 1      # 사무실형 대분류 — 분모(상가 호수)와 도메인 불일치
+            continue
+        bizes_id = str(s.get("bizesId") or "").strip()
+        if not bizes_id:
+            skipped_nokey += 1
+            continue
+        rows.append({
+            "node_id": f"sdsc:{bizes_id}",
+            "name": s.get("bizesNm", ""),
+            # 카카오 category_name("음식점 > 카페 > 커피전문점")의 자리. Program 컨텍스트가
+            # 마지막 조각을 쓰므로 계층 구분자를 같은 " > " 로 맞춘다.
+            "category": category_path(s),
+            # GNN 분류 라벨 — 기존 7종 어휘(음식점/카페/편의점/병원/약국/숙박/문화시설)로
+            # 사상한다. 어휘를 유지하는 이유는 게이트·체크포인트가 여기 맞춰져 있어서다.
+            # 사상 규칙과 그 근거는 data/config/store_taxonomy.py.
+            "category_group": to_category_group(s) or "",
+            # 상가정보 원본 계층 — 그래프를 대분류 10 / 중분류 75 / 소분류 247 로 다시
+            # 짜는 경로를 **재수집 없이** 열어 둔다(기준선은 finding-sequence §6 에 측정됨).
+            "category_group_src": s.get("indsLclsNm", ""),
+            "inds_mcls": s.get("indsMclsNm", ""),
+            "inds_scls": s.get("indsSclsNm", ""),
+            "lon": s.get("lon"), "lat": s.get("lat"),
+            "road_address": s.get("rdnmAdr", ""),
+            "bd_mgt_sn": s.get("bldMngNo") or s.get("bdMgtSn") or "",
+            "pnu": s.get("lnoCd", ""),
+            "floor": s.get("flrNo", ""), "ho": s.get("hoNo", ""),
+            "district_id": district_id,
+            "source": "sdsc",
+        })
+    if skipped_office or skipped_nokey:
+        print(f"       [{slug}] 제외: 사무실형 {skipped_office} · bizesId 공란 {skipped_nokey}")
+    return rows
+
+
+def _report_group_coverage(df) -> None:
+    """7종 사상 커버리지를 로그로 남긴다 — 조용히 '미분류' 가 늘어나는 것을 막는다."""
+    filled = df["category_group"].fillna("").str.len().gt(0)
+    pct = round(filled.mean() * 100, 1) if len(df) else 0.0
+    print(f"       7종 사상 {int(filled.sum()):,}/{len(df):,} ({pct}%)")
+    if pct < 50:
+        print("       ⚠ 사상률이 낮다 — `python -m data.config.store_taxonomy --audit` 로 "
+              "실제 어휘를 확인하고 규칙을 조일 것")
+
+
 def build_platform13_store_graph_nodes() -> None:
-    """[Platform·GNN] 거점 점포 노드 — kakao_local --platform13 수집분.
+    """[Platform·GNN] 거점 점포 노드 — 거점별 상가정보(stores_raw) 수집분.
 
     gold/platform13/platform_store_graph_nodes.parquet (district_id 포함).
-    가로수길 단일 거점 노드(gold/garosugil)와 별개 신규 산출물.
+    가로수길 단일 거점 노드(gold/garosugil)와 별개 산출물.
+
+    ⚠ node_id 가 `kakao:*` → `sdsc:*` 로 바뀐다. node_id 로 조인하는 두 사이드카를
+    **이 빌더 뒤에 다시 만들어야 한다** — 안 하면 조인이 전부 빈다:
+      python -m data.pipelines.build_page_building_features
+      python -m data.pipelines.build_node_jipgyegu
+      python -m data.pipelines.build_store_graph_edges --platform13
     """
-    places = load_latest(SLUG13, "kakao_places.json")
-    if not places:
-        print("[gold] platform13 graph nodes: Bronze 없음 — kakao_local --platform13 먼저")
+    from data.config.page_hubs import ACTIVE_HUBS
+
+    rows: list[dict] = []
+    missing: list[str] = []
+    for slug in ACTIVE_HUBS:          # dict[str, PageHub] — 순회하면 거점 slug 다
+        got = _store_node_rows(slug, slug)
+        if not got:
+            missing.append(slug)
+        rows += got
+    if not rows:
+        print("[gold] platform13 graph nodes: Bronze 없음 — "
+              "python -m data.collectors.building_vacancy 먼저")
         return
-    rows = [{
-        "node_id": f"kakao:{d.get('id', '')}",
-        "name": d.get("place_name", ""),
-        "category": d.get("category_name", ""),
-        # GNN 분류 라벨 — 우리가 수집한 7개 카테고리 그룹(음식점/카페/편의점/병원/약국/
-        # 숙박/문화시설). category_name 의 1단계는 다른 분류체계(카페가 음식점 하위로
-        # 접혀 음식점 78%)라 라벨로 부적합 — category_group_name 이 균형 잡힌 대분류다.
-        "category_group": d.get("category_group_name", ""),
-        "lon": d.get("x"), "lat": d.get("y"),
-        # 동일 건물 엣지(build_store_graph_edges)의 그룹 키 — 지번(address_name)은
-        # 같은 건물에도 표기가 갈려 도로명을 쓴다(카카오 보유율 99.6%)
-        "road_address": d.get("road_address_name", ""),
-        "place_url": d.get("place_url", ""),
-        "district_id": d.get("district_id", ""),
-        "source": "kakao",
-    } for d in places]
     df = pd.DataFrame(rows)
     per = df.groupby("district_id").size()
-    print(f"[gold] platform13 graph nodes: {len(df)}노드 / 거점 {per.index.nunique()}곳"
+    print(f"[gold] platform13 graph nodes: {len(df):,}노드 / 거점 {per.index.nunique()}곳"
           f" (최소 {per.min()} · 최대 {per.max()})")
+    if missing:
+        print(f"       ⚠ stores_raw 없는 거점 {len(missing)}곳: {', '.join(missing[:8])}"
+              f"{' …' if len(missing) > 8 else ''}")
+    _report_group_coverage(df)
     _save(df, GOLD / SLUG13, "platform_store_graph_nodes")
 
 
 def build_store_graph_nodes() -> None:
-    """GNN 노드 테이블 — 카카오 현존 점포 + LOCALDATA 인허가를 소스 표기와 함께 통합."""
-    rows: list[dict] = []
-    for d in load_latest(SLUG, "kakao_places.json") or []:
-        rows.append({
-            "node_id": f"kakao:{d.get('id', '')}",
-            "name": d.get("place_name", ""),
-            "category": d.get("category_name", ""),
-            "lon": d.get("x"), "lat": d.get("y"),
-            "place_url": d.get("place_url", ""),
-            "source": "kakao",
-        })
-    for r in load_latest(SLUG, "localdata_biz.json") or []:
-        rows.append({
-            "node_id": f"localdata:{r.get('mgtNo', '')}",
-            "name": r.get("bplcNm", ""),
-            "category": r.get("uptaeNm", ""),
-            "lon": r.get("lon"), "lat": r.get("lat"),
-            "place_url": "",
-            "source": "localdata",
-        })
+    """GNN 노드 테이블(가로수길 단일 거점) — 상가정보 기반.
+
+    TODO(GNN): 인허가(licensing_biz) 통합은 보류다. 인허가 X/Y 는 표준 EPSG 어느 것과도
+    맞지 않아 **거점별 자가보정**이 필요하고(build_page_master `_licensed_by_pnu`:
+    지번 매칭 행으로 중위 오프셋 추정), 그 로직을 여기서 복제하면 두 곳이 조용히
+    어긋난다. 통합하려면 보정 함수를 공용화한 뒤 entity resolution(상가정보 bizesId ↔
+    인허가 MGTNO)을 먼저 정의할 것. 구 `localdata_biz.json` 분기는 소스가 폐쇄돼
+    (localdata.go.kr 2026-04-16) 함께 걷어냈다.
+    """
+    rows = _store_node_rows(SLUG, SLUG)
     if not rows:
-        print("[gold] platform_store_graph_nodes: Bronze 없음 — kakao_local/localdata 수집 먼저")
+        print("[gold] platform_store_graph_nodes: Bronze 없음 — "
+              "python -m data.collectors.building_vacancy 먼저")
         return
     df = pd.DataFrame(rows)
-    # TODO(GNN): 엣지 생성 — 공간 근접(kNN/PostGIS)·고객 공유·리뷰 유사도. §1-A bizesId 와
-    # 좌표/상호 매칭으로 노드 통합(entity resolution)도 Silver 단계 과제.
+    print(f"[gold] platform_store_graph_nodes: {len(df):,}노드")
+    _report_group_coverage(df)
     _save(df, _GOLD_DIR, "platform_store_graph_nodes")
 
 
@@ -453,7 +515,11 @@ def _program_context_rows(posts: list[dict], places: list[dict],
             rows.append({"kind": f"trend:{group.get('title', '')}",
                          "key": point.get("period", ""), "value": point.get("ratio", 0)})
 
-    cats = Counter(str(d.get("category_name", "")).split(" > ")[-1] for d in places)
+    # `places` 는 상가정보(stores_raw) 행이다 — 2026-09-15 카카오 로컬에서 갈았다.
+    # 계층 경로의 마지막 조각(= 소분류)을 쓴다. 카카오 category_name 의 마지막 조각과
+    # 같은 층위다("커피전문점" ↔ "커피전문점/카페/다방").
+    cats = Counter(category_path(d).split(" > ")[-1] for d in places)
+    cats.pop("", None)
     for cat, cnt in cats.most_common(30):
         rows.append({"kind": "category", "key": cat, "value": cnt})
     return rows
@@ -470,12 +536,14 @@ def build_program_context() -> None:
     stop = _PROGRAM_STOPWORDS | _query_tokens(posts) | {"신사동", "신사역"}
     rows = _program_context_rows(
         posts,
-        load_latest(SLUG, "kakao_places.json") or [],
+        # 업종 분포의 소스는 상가정보다(2026-09-15 카카오 로컬에서 교체 — 약관).
+        [s for s in (load_latest(SLUG, "stores_raw.json") or []) if is_storefront(s)],
         load_latest(SLUG, "naver_datalab_trend.json") or {},
         stop,
     )
     if not rows:
-        print("[gold] program_content_context: Bronze 없음 — naver_blog/kakao_local 수집 먼저")
+        print("[gold] program_content_context: Bronze 없음 — "
+              "naver_blog/building_vacancy 수집 먼저")
         return
     _save_csv(pd.DataFrame(rows), _GOLD_DIR, "program_content_context")
 
@@ -515,25 +583,34 @@ def _query_tokens(posts: list[dict]) -> set[str]:
 def build_program13_context() -> None:
     """[Program] 54거점 콘텐츠 컨텍스트 — gold/{거점}/program_content_context.
 
-    소스: bronze/platform13/{naver_blog,kakao_places}.json (행마다 district_id 부가됨).
+    소스: bronze/platform13/naver_blog.json(행마다 district_id 부가됨)
+          + 거점별 bronze/{거점}/stores_raw.json(업종 분포).
     services/marketing.py 가 가게 단위 생성 시 이 파일을 상권 컨텍스트로 결합하는데,
     지금까지 garosugil 한 곳만 있어 나머지 거점은 컨텍스트 없이 생성됐다 — 그 공백을 푼다.
 
     ⚠️ garosugil 은 전용 Bronze(검색 트렌드 포함)로 이미 만들어진 PoC 산출물이라 건드리지
        않는다(덮어쓰기 금지 규칙). platform13 Bronze 에는 datalab 트렌드가 없어 이 경로의
        산출물에는 trend:* 행이 없다 — 키워드·업종 분포만으로도 프롬프트 컨텍스트는 선다.
+
+    ⚠️ 업종 분포 소스가 2026-09-15 에 카카오 로컬(platform13 단일 Bronze)에서 **거점별
+       상가정보**로 바뀌었다. 카카오는 응답 저장을 허용하지 않는다 → finding §7-2.
     """
+    from data.config.page_hubs import ACTIVE_HUBS
+
     posts = load_latest(SLUG13, "naver_blog.json") or []
-    places = load_latest(SLUG13, "kakao_places.json") or []
-    if not posts and not places:
-        print("[gold] program13 context: Bronze 없음 — naver_blog/kakao_local --platform13 먼저")
+    by_places: dict[str, list[dict]] = {}
+    for slug in ACTIVE_HUBS:          # dict[str, PageHub] — 순회하면 거점 slug 다
+        got = [r for r in (load_latest(slug, "stores_raw.json") or []) if is_storefront(r)]
+        if got:
+            by_places[slug] = got
+    if not posts and not by_places:
+        print("[gold] program13 context: Bronze 없음 — "
+              "naver_blog --platform13 / building_vacancy 먼저")
         return
 
     by_posts: dict[str, list[dict]] = {}
-    by_places: dict[str, list[dict]] = {}
-    for src, dst in ((posts, by_posts), (places, by_places)):
-        for row in src:
-            dst.setdefault(str(row.get("district_id", "")), []).append(row)
+    for row in posts:
+        by_posts.setdefault(str(row.get("district_id", "")), []).append(row)
 
     built = 0
     for slug in sorted(set(by_posts) | set(by_places)):

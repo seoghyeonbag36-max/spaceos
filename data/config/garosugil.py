@@ -1,6 +1,7 @@
 """PoC 거점 상수 — 강남구 신사동 가로수길.
 
-B단계 수집기(seoul_trdar/localdata/kakao_local/naver_blog)와 Gold 빌더가 공유한다.
+B단계 수집기(seoul_trdar/localdata/naver_blog)와 Gold 빌더가 공유한다.
+(kakao_local 도 이 좌표를 쓰지만 2026-09-15 부터 실시간 조회 전용이다 — Bronze 를 쓰지 않는다)
 좌표·코드는 probe_garosu_d1.py 와 동일 축. ※ 표시는 실행 전 재확인 항목.
 """
 from __future__ import annotations

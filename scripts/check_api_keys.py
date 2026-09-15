@@ -152,6 +152,37 @@ if nid and nsec:
 else:
     report("네이버 개발자센터(검색)", False, "NAVER_CLIENT_ID/SECRET 미설정")
 
+# ── 5-B. 네이버 데이터랩 (검색어 트렌드) ───────────────────────────
+# 검색 API 와 **키는 같지만 앱 설정이 다르다** — 애플리케이션에 '데이터랩(검색어트렌드)'
+# 을 등록하지 않으면 검색은 200 인데 여기만 실패한다. 그래서 따로 센다.
+# (2026-09-15: 루트 `test_naver.py` 진단 스크립트를 여기로 흡수했다 — pytest 가 수집하는
+#  이름을 가진 비테스트 파일이라 헷갈렸고, 키 점검 창구가 둘이었다.)
+if nid and nsec:
+    body_req = json.dumps({
+        "startDate": "2025-01-01", "endDate": "2025-01-31", "timeUnit": "month",
+        "keywordGroups": [{"groupName": "강남", "keywords": ["강남맛집"]}],
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        "https://openapi.naver.com/v1/datalab/search", data=body_req,
+        headers={"X-Naver-Client-Id": nid, "X-Naver-Client-Secret": nsec,
+                 "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            dl_status, dl_body = r.status, r.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as e:
+        dl_status, dl_body = e.code, e.read().decode("utf-8", "replace")
+    except Exception as e:
+        dl_status, dl_body = None, f"{type(e).__name__}: {e}"
+    if dl_status == 200:
+        report("네이버 데이터랩(트렌드)", True, "트렌드 호출 성공")
+    else:
+        # errorCode 024/028 = 인증실패(ID/Secret) · 그 밖/403 = 앱에 데이터랩 미등록
+        report("네이버 데이터랩(트렌드)", False,
+               f"HTTP {dl_status}: {str(dl_body)[:140]} "
+               f"(024/028=인증실패 · 그 외=앱에 '데이터랩' API 미등록 가능)")
+else:
+    report("네이버 데이터랩(트렌드)", False, "NAVER_CLIENT_ID/SECRET 미설정")
+
 # ── 6. V-World (장소 검색 — 등록 도메인 Referer 포함) ──────────────
 key = data.get("VWORLD_API_KEY", "")
 if key:

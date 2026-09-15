@@ -33,7 +33,10 @@ _STEPS: list[tuple[str, list[str], bool]] = [
     ("길단위인구", ["data.collectors.seoul_trdar", "--platform13-flpop"], False),
     ("상권변화지표", ["data.collectors.seoul_trdar", "--platform13-income-ix"], False),
     ("R-ONE 공실률·임대료", ["data.collectors.rone_rent"], False),
-    ("점포(카카오)", ["data.collectors.kakao_local", "--platform13"], False),
+    # 점포 노드의 소스는 상가정보다. 거점별 수집이라 이 목록이 아니라 거점 체인
+    # (scripts/run_hub_chain_batch.py · data.collectors.building_vacancy)에서 돈다.
+    # 2026-09-15 에 여기 있던 ("점포(카카오)", kakao_local --platform13) 단계를 없앴다 —
+    # 카카오 로컬은 응답 저장을 허용하지 않는다(finding-map-provider-google §7-2).
     ("블로그 리뷰", ["data.collectors.naver_blog", "--platform13"], False),
     ("Gold 빌드(platform13 한정)", ["data.pipelines.build_gold", "--platform13"], True),
     ("GNN 엣지 빌드", ["data.pipelines.build_store_graph_edges", "--platform13"], True),

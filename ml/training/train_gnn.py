@@ -1,8 +1,31 @@
 """IndustryGNN 학습 — 점포 노드의 업종 대분류 분류 (업종 추천의 프록시 태스크).
 
 소스:
-  gold/platform13/platform_store_graph_nodes.parquet  (kakao 현존 점포)
+  gold/platform13/platform_store_graph_nodes.parquet  (상가정보 현존 점포)
   gold/platform13/platform_store_graph_edges.parquet  (spatial_knn + same_building + same_chain)
+
+⚠ **노드 소스가 2026-09-15 에 카카오 로컬 → 소상공인 상가(상권)정보로 바뀌었다.**
+카카오는 응답 결과의 저장을 허용하지 않아, 상호·좌표를 Bronze·Gold 로 영구화하던
+경로가 약관에 저촉했다(→ docs/finding-map-provider-google-2026-09-15.md §7-2).
+
+이 교체는 **학습 결과를 바꾼다.** 아래 '결과 해석'과 체크포인트·게이트는 전부
+카카오 7종 어휘(40,388→47,442노드) 위에서 산출된 값이다:
+
+  · node_id 체계  kakao:{장소id} → sdsc:{bizesId}
+  · 라벨          상가정보 계층을 같은 7종으로 **사상**한다(data/config/store_taxonomy).
+                  사상되지 않는 업종(소매·생활서비스·교육 등)은 `category_group` 이
+                  공란이고 `_labels` 가 '미분류' 클래스로 받는다 → **클래스가 8개가 된다.**
+  · 모집단        카카오 수집은 7개 카테고리만 골라 받았고, 상가정보는 가두 점포 전체다
+                  (상가정보 대분류 기준 222,260노드 규모, 2026-08-17 실측)
+
+그래서 **다음 학습 런은 기존 지표와 직접 비교되지 않는다.** 계층별 기준선은 이미
+측정돼 있다(docs/finding-sequence-and-accuracy-2026-08-17.md §6):
+7종 Top-3 89.7% ↔ 상가정보 대분류(10종) Top-3 69.9%. 재학습 전에 어휘를 정하고
+게이트를 다시 산정할 것 — `_labels` 가 미분류 비중이 크면 경고를 찍는다.
+
+⚠ 현행 서빙 산출물 `data/gold/platform_industry_recommend.json` 은 아직 카카오
+노드(kakao:*)로 만들어진 것이다. 재학습·재생성 전까지 그 파일이 남은 마지막
+카카오 유래 산출물이다(finding §7-2 의 '남은 노출' 항목).
 산출:
   ml/artifacts/industry_gnn.pt                        체크포인트(+ 라벨·피처 메타)
   data/gold/platform_industry_recommend.json          서빙용 배치 추천(토치 없는 Vercel 경로)
@@ -149,10 +172,12 @@ def load_graph() -> tuple[pd.DataFrame, pd.DataFrame]:
 def _labels(nodes: pd.DataFrame, level: str = "group") -> tuple[np.ndarray, list[str]]:
     """업종 라벨. `level` 로 태스크 입도를 고른다.
 
-    - `group`(기본) — 수집 기준인 category_group(7종). 서빙이 쓰는 라벨 체계다.
-      category_group_name = 음식점/카페/편의점/병원/약국/숙박/문화시설. 이게 없는 옛
-      노드(garosugil 단일 거점 gold)는 category 2단계로 폴백한다 — category 1단계는
-      카카오의 다른 분류체계(카페가 음식점 하위)라 음식점 78% 로 degenerate 하다.
+    - `group`(기본) — category_group(7종). 서빙이 쓰는 라벨 체계다.
+      음식점/카페/편의점/병원/약국/숙박/문화시설. 이게 없는 옛 노드(garosugil 단일
+      거점 gold)는 category 2단계로 폴백한다 — category 1단계는 다른 분류체계
+      (카페가 음식점 하위)라 음식점 78% 로 degenerate 하다.
+      2026-09-15 이후 노드는 상가정보 계층을 이 7종으로 사상한 값이 들어오고,
+      사상되지 않는 업종은 공란 → '미분류' 로 받는다(모듈 머리말의 경고 참조).
     - `category2` — category 2단계(≈30클래스) 세분 라벨. Top-1 천장이 피처가 아니라
       태스크 입도 때문이라는 가설을 재는 자리다(feature-platform.md §0). 라벨 체계가
       바뀌므로 **산출물을 저장하지 않는다** — `train()` 이 강제로 save 를 끈다.
@@ -168,6 +193,14 @@ def _labels(nodes: pd.DataFrame, level: str = "group") -> tuple[np.ndarray, list
         raw = nodes["category"].fillna("").map(
             lambda c: " > ".join(str(c).split(" > ")[:2]) or "미분류")
     counts = raw.value_counts()
+    # 미분류가 커지면 라벨 체계가 사실상 바뀐 것이다 — 조용히 넘기면 게이트 값이
+    # 옛 7종 기준과 비교되어 오독된다(모듈 머리말).
+    unlabeled = int(counts.get("미분류", 0))
+    if unlabeled:
+        pct = round(unlabeled / len(raw) * 100, 1)
+        print(f"[gnn] ⚠ 미분류 {unlabeled:,}노드({pct}%) — 라벨 어휘가 7종이 아니다. "
+              f"상가정보 사상률을 먼저 보고(python -m data.config.store_taxonomy --audit) "
+              f"게이트를 다시 산정할 것")
     small = set(counts[counts < MIN_CLASS_NODES].index)
     merged = raw.map(lambda c: "기타" if c in small else c)
     classes = sorted(merged.unique())

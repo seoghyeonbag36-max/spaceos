@@ -11,3 +11,10 @@ pyproj>=3.6            # 인허가 X/Y(중부원점 TM) -> WGS84 변환 (build_p
 pyshp>=2.3             # SGIS 집계구/행정동 경계 shapefile 읽기. 순수 파이썬 —
                        # geopandas/GDAL 을 쓰지 않는 건 의도적이다(폴리곤 읽기+투영이 전부라
                        # 무거운 의존성이 불필요하고, 이 환경은 메모리 여유가 빠듯하다)
+
+# ── 파이프라인 전용(선택) — CI `data` 잡은 설치하지 않는다 ─────────────────
+# 아래 둘은 일부 파이프라인이 **이미 쓰고 있다**. requirements 에 넣지 않은 것은
+# 의도다(설치 시간·메모리). 대신 각 모듈이 지연 임포트하고, 없으면 그 사실을 로그로
+# 밝히거나(build_hub_adong: PNU 조인만) 안내 후 건너뛴다(build_gold: pd is None).
+# pandas>=2.0    build_gold · build_store_graph_edges · build_district_zones
+# scipy>=1.11    cKDTree(kNN) — build_store_graph_edges · build_district_zones · build_hub_adong
