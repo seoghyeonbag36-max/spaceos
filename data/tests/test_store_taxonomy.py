@@ -113,6 +113,55 @@ def test_real_vocabulary_that_must_not_map(row, why):
     assert to_category_group(row) is None, why
 
 
+# ── 1-C. 소분류(scls) 어휘 — 실측이 막혀 상수를 넣지 못했다 (2026-09-15) ──────
+# 경위: `--audit` 를 전 거점에 돌렸으나 **66거점 전부 Bronze 없음**(0행)이었고,
+# 폴백인 building_vacancy 도 DATA_GO_KR_SERVICE_KEY 부재로 건너뛴다.
+# → docs/finding-store-taxonomy-scls-2026-09-15.md
+#
+# 그 조사에서 **함정 하나**가 확인됐다. `gold/*/program_content_context.csv` 의
+# `category` 행은 빌더상 소분류인데(build_gold.py:524), 커밋된 66파일은 소스 교체
+# 이전(2026-09-04) 산출물이라 **어휘가 카카오**다 — 브랜드명(CU·GS25·스타벅스)과
+# 쉼표 결합(`호프,요리주점`)이 그 증거다. 247개 고정 코드북에 상호는 없다.
+# 거기 보이는 `약국`·`커피전문점` 을 집어다 SCLS_* 에 넣으면 약관 때문에 걷어낸
+# 카카오 어휘가 규칙으로 되돌아온다. 그 사고를 **모양으로** 막는다.
+_KAKAO_BRAND_KEYS = ("CU", "GS25", "세븐일레븐", "이마트24", "스타벅스", "미니스톱")
+
+
+def _scls_constants() -> dict[str, tuple]:
+    """store_taxonomy 의 `SCLS_*` 상수 — 지금은 없고, 생기면 자동으로 검사된다."""
+    from data.config import store_taxonomy
+
+    return {n: getattr(store_taxonomy, n) for n in dir(store_taxonomy)
+            if n.startswith("SCLS_")}
+
+
+def test_scls_constants_carry_no_kakao_vocabulary():
+    """`SCLS_*` 가 생긴다면 그 값은 **상가정보 소분류**여야 한다 — 카카오가 아니라.
+
+    상수가 하나도 없는 지금은 공집합을 훑고 통과한다(실측이 막혀 넣지 않았다).
+    실측 뒤 누가 값을 채우면 그때부터 이 검사가 실제로 일한다. 카카오 어휘의 두 지문:
+      ① 브랜드명 — 상호는 247 코드북에 존재할 수 없다
+      ② 쉼표 결합 — `category_name` 의 형태다(상가정보는 `/` 로 묶는다)
+    """
+    for name, value in _scls_constants().items():
+        assert isinstance(value, tuple), f"{name} 은 중분류 상수와 같은 tuple 이어야 한다"
+        for term in value:
+            assert term not in _KAKAO_BRAND_KEYS, \
+                f"{name} 에 카카오 브랜드명 '{term}' — 상가정보 소분류가 아니다"
+            assert "," not in term, \
+                f"{name} 의 '{term}' 은 쉼표 결합(카카오 category_name 형)이다"
+
+
+def test_seven_group_vocabulary_is_frozen():
+    """7종 라벨 **문자열**이 체크포인트 `classes` 계약이다 — 바뀌면 서빙이 깨진다.
+
+    `ml/artifacts/industry_gnn.pt` 의 `classes` 와 같아야 하므로 이름을 바꿀 수 없다.
+    (torch 없이 돌아야 하는 검사라 체크포인트를 읽지 않고 문자열로 고정한다.)
+    """
+    assert CATEGORY_GROUPS == (
+        "음식점", "카페", "편의점", "병원", "약국", "숙박", "문화시설")
+
+
 def test_retail_marker_blocks_cafe_and_hospital():
     """'소매' 가 붙은 중분류는 카페·병원으로 가지 않는다 — 오사상 차단 규칙 자체를 고정."""
     assert to_category_group({"indsMclsNm": "음료 소매"}) is None
