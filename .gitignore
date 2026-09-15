@@ -32,7 +32,11 @@ data/gold/*
 # 집계구 PIP 배정표 3종. 원천 shapefile 은 bronze(전체 gitignore)라 git 으로 복구되지
 # 않는다 — 이 표들이 조인 결과의 유일한 durable 기록이므로 추적한다.
 #   unit  공실 유닛 528호   → 집계구 293곳   (Posting `foot` 서열)
-#   node  점포 노드 40,388  → 집계구 1,155곳 (Platform GNN 피처, 1.5MB)
+#   node  점포 노드 → 집계구 1,155곳 (Platform GNN 피처)
+#         ⚠ 2026-09-15: 노드 배정(kakao:* 키 40,388건)은 **삭제**했다 — 노드 소스가
+#         상가정보로 바뀌어 node_id 체계가 sdsc:* 로 갈렸다(약관: 카카오 응답 저장 금지).
+#         oa_codes 는 통계청 집계구 코드라 그대로 유효하고 keep-list 기능도 살아 있다.
+#         재생성: build_gold --platform13 → build_node_jipgyegu
 #   cell  100m 격자 셀 3,699 → 집계구 1,303곳 (Page 유동·밀도 레이어)
 # 셋의 합집합이 living_population_jipgyegu 의 keep-list 다(1,501곳). 하나라도 빠지면
 # 재수집 때 대상이 조용히 좁아지고, 그만큼의 셀·노드가 값 없이 폴백으로 내려간다.
@@ -42,6 +46,9 @@ data/gold/*
 !data/gold/.gitkeep
 *.parquet
 *.glb
+
+# 프론트 증분 빌드 캐시 — 빌드마다 바뀌어 diff 만 더럽힌다(2026-09-15 추적 해제)
+apps/frontend/tsconfig.tsbuildinfo
 # 가로수길 gold 실데이터(~0.8MB) 전체 예외 — **지금은 실효가 없다(2026-08-15 확인).**
 # 뒤따르는 43번 `data/gold/*/*` 가 마지막 매치 우선 규칙으로 이 두 줄을 덮는다.
 #   git check-ignore -v --no-index data/gold/garosugil/building_vacancy.json

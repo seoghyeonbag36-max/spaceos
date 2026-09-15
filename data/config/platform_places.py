@@ -1,4 +1,9 @@
-"""54거점 장소·리뷰 수집 상수 — kakao_local/naver_blog 의 platform13 모드가 사용.
+"""거점 장소·리뷰 수집 상수 — naver_blog 의 platform13 모드와 kakao_local 이 사용.
+
+⚠ 2026-09-15: `kakao_local` 은 이제 **실시간 크로스체크 전용**이다(Bronze 를 쓰지 않는다).
+GNN 노드의 원천은 거점별 상가정보(`stores_raw.json`)이고 반경은 `page_hubs.PageHub
+.stores_radius_m` 가 정한다 — 여기 반경은 블로그 질의와 카카오 실시간 조회에만 쓰인다.
+→ docs/finding-map-provider-google-2026-09-15.md §7-2
 
 center 좌표는 백엔드 시드(apps/backend/app/data/seoul_pages.py)의 center 와 동일 축.
 GNN 노드 확장(점포)·리뷰 유사도 엣지(블로그)의 원천 수집 범위를 정의한다.

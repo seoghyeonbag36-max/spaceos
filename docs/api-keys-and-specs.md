@@ -332,7 +332,10 @@ NAVER_MAPS_CLIENT_SECRET=
 
 ### 8-F. 인스타그램·구글 — 보류/선택
 - **인스타그램 Graph API**: 해시태그 검색에 비즈니스 계정 + 앱 검수 필요, 주 30개 해시태그 제한 → PoC 단계에서는 보류하고 [data/crawlers](../data/README.md)의 Playwright 크롤러로 대체. `.env` 슬롯(`INSTAGRAM_ACCESS_TOKEN`)만 유지.
-- **Google Places API**: 리뷰·평점·사진 확보 가능하나 유료 쿼터 관리 필요 → 네이버·카카오로 부족할 때만.
+- **Google Places API**: ⛔ **쓰지 않는다**(2026-09-15 검증). 유료 쿼터 문제가 아니라 **약관**이 막는다 —
+  Places 콘텐츠는 캐시·저장 금지(예외: place_id 무기한 · 좌표 30일)이고 파생 데이터셋 생성도 금지라
+  Bronze/Silver/Gold 영구 적재와 정면으로 부딪친다. 'No use with a non-Google map' 조항 때문에
+  네이버 지도 위에 얹는 하이브리드도 불가다. → `finding-map-provider-google-2026-09-15.md` §7-1
 
 ---
 

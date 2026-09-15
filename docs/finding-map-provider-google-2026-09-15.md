@@ -14,7 +14,7 @@
 |---|---|---|---|
 | 1 | **카카오 로컬 영구저장 해소** — 저장층을 상가정보(공공데이터)로 옮겼다 | §7-2 | **✅ 완료 2026-09-15** |
 | 1-a | 서빙 배치 `platform_industry_recommend.json` 재생성(재학습 필요) | §7-2-1·2-3 | 남음 |
-| 1-b | `build_hub_adong` 역지오코딩 캐시 — VWorld 대체 실측 후 교체 | §7-2-1 | 남음(위험도 낮음) |
+| 1-b | `build_hub_adong` 역지오코딩 제거 — 행정동은 상가정보에 이미 있었다 | §7-2-4 | **✅ 완료 2026-09-15** |
 | 2 | 구글 전환 **보류**(폐기 아님) — 재평가 트리거 5개를 걸어 둔다 | §13 | — |
 | 3 | 베이스맵 어댑터 경계 유지 — `lib/naverMap.ts` 한 파일에 SDK 의존을 계속 격리 | §4 | 유지 |
 
@@ -267,19 +267,47 @@ ml/training/train_gnn.py         → 그 노드로 GNN 학습
 
 **⚠ 남은 노출 2건 — 커밋된 `program_content_context.csv` 66개**
 
-`kind=category` 행이 카카오 카테고리 어휘의 집계다(`category,카페,44` · `category,"호프,요리주점",23`).
-장소 단위 레코드가 아니라 분포 집계라 노출 강도는 낮지만, 어휘가 카카오 것이다.
-**아래 런북 1단계가 이 66개 파일을 통째로 다시 쓴다**(상가정보 소분류 어휘로) —
-별도 조치가 아니라 재생성으로 해소되는 항목이라 이 커밋에서 손대지 않았다.
-지금 지우면 Program LLM 컨텍스트에서 업종 분포만 빠진 상태로 며칠 돌게 된다.
+`kind=category` 행이 카카오 카테고리 어휘의 집계다(`category,카페,44` ·
+`category,"호프,요리주점",23`). 장소 단위 레코드가 아니라 분포 집계라 노출 강도는
+낮지만 어휘가 카카오 것이다. **재생성으로만 해소한다** — 런북 1단계가 이 66개 파일을
+통째로 다시 쓴다(상가정보 소분류 어휘로).
 
-**⚠ 잔여 검토 1건 — `build_hub_adong.py`**
+⚠ **지금 지우면 안 된다(2026-09-15 실측).** 정리 삼아 1,980행을 제거해 봤더니
+백엔드 테스트 4건이 깨졌다 — `Program` 컨텍스트만 쓰는 줄 알았는데
+**상권 정체성(archetype) 판정이 이 `category` 행을 입력으로 쓴다.**
+`/commercial-districts/{id}/platform` 의 `identity.archetype` 이 66거점 전부
+`None` 이 됐다(`tests/test_platform_profile.py`). `services/marketing.py` 쪽은
+`if (cat := _top_n(rows, "category"))` 로 가드돼 있어 안전하다고 봤던 것이 반쪽
+판단이었다 — 소비처가 둘이다. 그래서 되돌렸다.
+
+### (2-4) ✅ 마지막 카카오 저장 경로 — `build_hub_adong` 도 걷어냈다
 
 거점↔행정동 사이드카(`silver/hub_adong.json`)가 카카오 `coord2regioncode` 응답을
-캐시한다. 저장하는 값이 **행정동 코드·명**(정부 공표 사실)이라 장소 테이블과는 위험도가
-다르지만, 취득 경로가 카카오인 것은 같다. 대체는 VWorld 행정구역(`LT_C_ADEMD_INFO`)
-질의가 후보인데 **레이어명·속성키를 실측하지 않았다** — `probe-first` 로 1콜 확인한 뒤
-갈 것. 이 커밋에서는 손대지 않았다(검증 없이 바꾸면 사이드카가 조용히 빈다).
+캐시하고 있었다. **불필요했다.** 이 커밋의 근거는 저장소에 이미 커밋돼 있던
+프로브 로그다 — `data/logs/probe_d1_2026-07-07.log` 의 상가정보 실측 샘플:
+
+    'signguNm': '강남구', 'adongCd': '11680510', 'adongNm': '신사동',
+    'ldongCd': '1168010700', 'ldongNm': '신사동'
+
+**행정동이 상가정보 응답에 `adongCd`(8자리)·`adongNm` 으로 들어 있다.** 그리고 그
+8자리는 이 저장소가 요구하는 형식과 정확히 같다(`test_page_footfall_hourly.py
+::test_adong8_*` 가 신사동 = `11680510` 을 고정한다).
+
+종전 모듈이 적어 둔 근거가 틀렸다 — "`stores_raw.lnoAdr` 에서 뽑히는 것은 법정동" 은
+**`lnoAdr` 문자열 파싱에만** 맞는 말이고, API 는 행정동을 별도 필드로 준다.
+`build_district_zones` 는 이미 `adongNm` 을 쓰고 있었는데(2026-09-05) 나중에 쓴
+`build_hub_adong` 이 그걸 모르고 카카오로 갔다.
+
+건물→행정동 배정은 **PNU 직접 조인 우선, 빈 자리만 최근접 점포 9개 다수결**이다.
+두 방법의 일치율은 이미 실측돼 있다(`build_district_zones`: 99.2%, PNU 조인은 79.3%만
+붙는다). `KNN_K=9` 는 두 파이프라인이 같은 값을 쓰도록 테스트로 묶었다.
+
+얻은 것이 둘이다:
+
+  ① **약관** — `silver/coord_adong_cache.json` 을 더 만들지 않는다(그 파일은 gitignore
+     대상이라 저장소에는 없었지만, 로컬 저장 자체가 저촉이었다)
+  ② **시간** — 거점당 약 80콜(66거점 **2시간대**)이 **0콜**이 된다.
+     `scripts/run_page_hourly_chain.py` 의 2시간 대기 로직은 부분 산출물 가드로만 남는다
 
 ### (2-2) 재생성 런북 — 이 순서로만 돈다
 
@@ -294,6 +322,7 @@ python -m data.config.store_taxonomy --audit
 # 1) 노드 재생성 (상가정보 기반)
 #    ⚠ 이 실행이 program_content_context.csv 66개를 통째로 다시 쓴다 —
 #      category 행의 어휘가 카카오 → 상가정보 소분류로 갈린다(위 '남은 노출 2').
+#      ⚠ 이 행을 손으로 지우면 상권 archetype 판정이 죽는다 — 재생성으로만 해소한다.
 python -m data.pipelines.build_gold --platform13
 python -m data.pipelines.build_gold                # 가로수길 단일 거점
 

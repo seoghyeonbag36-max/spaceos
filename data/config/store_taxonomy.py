@@ -208,6 +208,9 @@ def audit(slugs: list[str] | None = None) -> dict:
         print("[taxonomy] 미사상 소분류 상위")
         for k, n in unmapped_scls.most_common(15):
             print(f"    {k}: {n:,}")
+        # 여기서 찾지 말 것 — 분류체계에 아예 없는 수요다(2026-08-17 전수 검색).
+        print(f"[taxonomy] ※ 사상 불가(분류체계 부재): {' · '.join(UNMAPPABLE_DEMAND)}"
+              f" — 라벨을 만들 수 없다. 재학습으로 풀리지 않는다")
     else:
         print("[taxonomy] 셀 것이 없다 — building_vacancy 로 stores_raw 수집이 먼저다")
     return out
