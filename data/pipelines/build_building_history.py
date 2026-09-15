@@ -132,8 +132,8 @@ def build(slug: str, date: str | None = None) -> bool:
     }
     dst = GOLD / slug / "building_history.json"
     dst.parent.mkdir(parents=True, exist_ok=True)
-    # 들여쓰기 없이 쓴다 — 이 파일은 사람이 읽는 리포트가 아니라 **배포 번들에 실려
-    # 런타임에 읽히는 산출물**이다(.vercelignore 가 포함시킨다). page_building_master
+    # 들여쓰기 없이 쓴다 — 이 파일은 사람이 읽는 리포트가 아니라 **배포 이미지에 실려
+    # 런타임에 읽히는 산출물**이다(Dockerfile 이 data/gold/ 를 COPY 한다). page_building_master
     # .geojson 과 같은 규약이다. 54거점 합계 실측 40MB → 27MB.
     dst.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     shared = sum(1 for pnu in lots if len(pnu_to_ids[pnu]) > 1)

@@ -13,7 +13,7 @@
 ## 파케이를 런타임에 들이지 않는다
 
 `services/marketing._district_context` 가 `import pandas` 로 시작해 **배포에서 한 번도
-돈 적이 없던** 사고(feature-program.md §0-5)와 같은 조합이다. Vercel 서버리스에는
+돈 적이 없던** 사고(feature-program.md §0-5)와 같은 조합이다. 배포 이미지에는
 pandas·pyarrow 가 없다. 그래서 학습·분석은 파케이로 두되 **서빙은 이 JSON 만** 읽는다.
 같은 파일에서 파생시키고 이 스크립트가 유일한 생성 경로다.
 

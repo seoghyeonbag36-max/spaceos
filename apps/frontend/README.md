@@ -1,6 +1,12 @@
 # PlaceOS Frontend (React + TypeScript + Vite)
 
-공실 지도 UI. **네이버 지도**(지도 + 거리뷰 파노라마) + D3/Plotly.
+공실 지도 UI. **네이버 지도**(지도 + 거리뷰 파노라마) + `@visx/shape`(차트).
+
+⚠ **`d3`·`plotly` 는 설치돼 있지 않다.** 오래도록 이 줄이 "D3/Plotly" 라고 적고 있었지만
+`package.json` 의 런타임 의존성은 `react` · `react-dom` · `@visx/shape` 셋뿐이고, 소스의
+`d3`·`plotly` import 는 0건이다(2026-09-08 확인 · 2026-09-15 재확인). 차트는
+`components/PlatformComparison.tsx` 가 `@visx/shape` 로 그린다 — 이 줄을 보고 d3·plotly 를
+새로 끌어오지 말 것.
 
 ⚠ **Three.js / @react-three/fiber 는 2026-09-05 에 제거됐다.** 3D 트윈이 그리던
 절차적 박스는 실측 형상이 아니라 층 상태를 색으로 말하던 것뿐이라, 건물 상세를

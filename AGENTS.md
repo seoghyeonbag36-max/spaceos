@@ -62,7 +62,7 @@ python scripts/pppp_status.py | grep -v '└'
 | ~~`prem` · `foot` · `rec`~~ — [services/districts.py:97](apps/backend/app/services/districts.py#L97) `tier_scenarios()` | ~~시드 유지~~ → **셋 다 해소** | ~~공개 데이터 자체가 없다~~ → 셋이 각기 다른 방식으로 풀렸다: **`rec`** 08-16 *회수 최단*으로 정의(`recommend_tier()`) · **`foot`** 08-25 **집계구 생활인구** 실데이터(유닛 528/528, 525유닛 `flpop+jipgyegu`) · **`prem`** 08-24 **입력 계약으로 이관**(권리금은 협상값이라 그 자리에 들어갈 기업만 안다. 안 주면 0 전제 + `inputs_source['prem']` 이 `absent`/`contract` 를 밝힌다). ⚠ **원칙은 유지**: 임의값 금지 · 출처 표기 필수 |
 | ~~[build_vacant_units.py](data/pipelines/build_vacant_units.py) 산출물 → `/postings` 배선~~ | ~~산출만 하고 미배선~~ → **배선 완료 08-24** | 위 3개가 정해진 뒤 배선했다 — `services/vacant_inventory` 로 로더를 한 벌 두고 **서빙 66거점 664유닛**이 돈다(2026-09-05 실측 · 08-24 배선 당시엔 54거점 528유닛). ⚠ 그전까지 `resolved_units` 가 **시드 270유닛만** 읽어 Posting 화면이 손으로 적은 예시 위에서 돌고 있었다. 이 행이 '미배선'이라고 적혀 있었지만 실제로 필요한 것은 수집이 아니라 **배선**이었다 |
 | 감성 구역 → **행정동 실측 구역으로 교체(2026-09-05)**. 66거점 221구역(거점당 1~11, 중앙 3) · 손으로 적은 324개는 삭제 | 구역은 `실측`, **감성은 `null`** | ⚠ **이유가 바뀌었다.** ~~구역 단위 리뷰 원문이 **0건**~~ → 원문은 **16,605건 있다**(naver_blog.json · 54거점). 그런데도 못 쓴다: 공간 키가 `district_id` 하나뿐이라 어떤 집계값도 **거점 내 상수**이고, 점포 귀속 노드가 **3.18%** 이며, 부정어가 **0.53%** 다(08-25 실측 기각 · feature-platform §0-K). **결론은 같고 근거가 다르다** — "없어서 못 쓴다"가 아니라 "있는데 정보량이 0 이다". Gold 활력 지표(`opbiz_rt`·`flpop` 등)로 대체 금지는 그대로 |
-| 상권 행사가 비어 있는 거점 | 빈 상태 표시 | ⚠ **예시가 낡았다** — 가로수길은 이제 행사 **2건**이 있다. `gold/platform_events.json` 은 **52거점** 수록이고 그중 행사 0건인 거점은 **없다**. 여전히 표에 아예 없는 거점이 **둘(`garak`·`sillim`)** 이므로 원칙은 유효하다: 시드로 채우면 지어낸 행사를 지도에 찍는 셈이다 |
+| 상권 행사가 비어 있는 거점 | 빈 상태 표시 | ⚠ **예시가 낡았다** — 가로수길은 이제 행사 **2건**이 있다. `gold/platform_events.json` 은 **52거점** 수록이고 그중 행사 0건인 거점은 **없다**. ⚠ **2026-09-15 재확인 — 표에 아예 없는 서빙 거점은 둘이 아니라 14곳이다**(`sillim`·`garak` 에 2차 12거점이 더해졌다. 수록 52 ↔ 서빙 66). 원칙은 그만큼 더 유효하다: 시드로 채우면 지어낸 행사를 지도에 찍는 셈이다 |
 
 **막힌 값을 만나면 채우지 말고 실패하라.** 판단이 필요하면 작업을 멈추고 보고한다.
 
@@ -85,7 +85,8 @@ apps/backend     FastAPI (Python 3.11) — 라우터 app/api/v1/, 로직 app/ser
 apps/frontend    React + TypeScript + Vite — API 호출은 src/lib/api.ts 로 일원화, @/ 별칭
 ml               PyTorch LSTM(공실 예측) / GNN(업종 추천) + MLflow
 data             수집기 collectors/ · 파이프라인 pipelines/ · Bronze→Silver→Gold 3계층
-infra            docker-compose / k8s / GitHub Actions
+infra            docker-compose / nginx / GitHub Actions  (k8s/ 는 빈 디렉터리)
+배포             Dockerfile → Cloud Build → Cloud Run · 앞에 Firebase Hosting(placeos.web.app)
 docs             설계 문서 (진행 상태는 placeos-vibe-build-sequence.md 가 정본)
 ```
 
@@ -107,7 +108,8 @@ python -m data.pipelines.calibrate_vacancy <거점>     # R-ONE 앵커 대조
 
 ### LLM 테스트 — 목킹 통과는 실호출의 증거가 아니다
 `test_posting_marketing.py` 는 `_call_llm` 을 통째로 목킹한다. 모델 ID를 고의로 깨뜨려도
-전부 `except` 에 잡혀 **10 passed** 가 난다. 실호출 계약은 별도 스위트가 친다(외부 호출·크레딧 소모, opt-in):
+전부 `except` 에 잡혀 **전량 통과**한다(2026-09-15 기준 36 passed — 이 수는 늘어나니
+세어 인용하지 말고 "목킹이라 안 깨진다"만 읽을 것). 실호출 계약은 별도 스위트가 친다(외부 호출·크레딧 소모, opt-in):
 
 ```powershell
 $env:PLACEOS_LIVE_LLM=1; py -3.11 -m pytest tests/test_llm_live.py -v

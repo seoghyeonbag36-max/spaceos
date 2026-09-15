@@ -113,7 +113,7 @@ def _load_context_rows(slug: str) -> list[tuple[str, str, float]] | None:
     """컨텍스트 CSV 를 (kind, key, value) 행 목록으로. 없거나 깨졌으면 None.
 
     **표준 라이브러리로만 읽는다 — pandas 를 쓰지 않는다.** 예전에는 파케이를
-    `pd.read_parquet` 로 읽었는데, 배포(Vercel 서버리스)에는 pandas 도 pyarrow 도
+    `pd.read_parquet` 로 읽었는데, 배포에는 pandas 도 pyarrow 도
     없어서 `import pandas` 가 그대로 실패했다. 그 실패는 아래 호출부의 except 에
     잡혀 컨텍스트가 **항상 None** 이 됐고, 결과적으로 상권 단위 LLM 경로가
     프로덕션에서 한 번도 돈 적이 없다(2026-08-06 발견). 화면은 시드 카피를

@@ -40,20 +40,33 @@ Price 는 Posting 으로, Promotion 은 Program 으로만 간다.
     아니라 층 상태를 색으로 말하던 것뿐이라, 2D 층 스택 + 네이버 거리뷰로 대체했다(번들 832KB → 4KB).
     다시 끌어오지 말 것 → docs/feature-posting.md §0-V
   - `mapbox-gl` 은 **제거됐다**(2026-08-25 커밋 1979bb4 · package.json·lock 모두 정리 완료). 베이스맵은 네이버뿐이니 다시 끌어오지 말 것
-- **BE**: FastAPI + PostgreSQL/PostGIS + Redis + Celery
-- **ML**: PyTorch + PyTorch Geometric (GNN) + LSTM + MLflow + LangChain
-- **Data**: Airflow + Selenium/Playwright + Bronze/Silver/Gold 3계층
-- **Infra**: AWS (S3/EC2/RDS/EKS) + Docker + GitHub Actions
+- **BE**: FastAPI + PostgreSQL(계정층 · SQLAlchemy/Alembic)
+  - ⚠ `redis` · `celery` · `geoalchemy2` 는 `apps/backend/requirements.txt` 에 **있지만
+    `app/` 에서 import 0건**이다(2026-09-15 확인). PostGIS 도 마찬가지 — 분석 산출물은
+    Gold JSON 을 직독하고 DB 를 안 탄다. 설치돼 있다는 이유로 "쓰고 있다"고 읽지 말 것
+    → docs/decision-infra-layer-2026-08-25.md §1
+  - 실제로 DB 를 타는 것은 **계정·조직·사용량 층뿐**이다(`app/models/auth.py` · Alembic)
+- **ML**: PyTorch + PyTorch Geometric (GNN) + LSTM + MLflow
+  - LangChain 은 **설치된 적이 없다**(어느 requirements 에도 없고 import 0건). LLM 호출은
+    `anthropic` SDK 를 `services/marketing.py` 가 직접 부른다. 다시 적지 말 것
+- **Data**: Selenium/Playwright + Bronze/Silver/Gold 3계층
+  - Airflow DAG 골격이 `data/pipelines/dags/` 에 둘 있으나 **스케줄러가 돌고 있지 않다** —
+    수집·가공은 전부 수동 스크립트다. "Airflow 로 돌린다"고 읽지 말 것
+- **Infra**: **GCP Cloud Run**(`spaceos` · us-central1) + **Firebase Hosting**(placeos.web.app)
+  + Docker + GitHub Actions
+  - ⚠ 이 줄은 2026-09-15 까지 `AWS (S3/EC2/RDS/EKS)` 라고 적고 있었다. 이 저장소는 AWS 를
+    **한 번도 쓴 적이 없다**(리소스·SDK·설정 모두 0건). 배포 경로는
+    `Dockerfile` → Cloud Build → Cloud Run, 그 앞에 Firebase Hosting 이 선다
+    → docs/deploy-cloud-run.md · firebase.json
+  - `infra/k8s/` 는 **빈 디렉터리**다. k8s 로 나가는 것은 아무것도 없다
 - **바이브 코딩**: Cursor (Composer/Agent) + Claude Code (CLI) + Copilot 보조
-
-→ 상세: memory/context/tech-stack.md
 
 ## Key Terms
 | 용어 | 의미 |
 |------|------|
 | **PPPP** | Platform·Page·Posting·Program (디지털 4P 프레임워크). 전통 4P 와 1:1 — Place▶Platform · Product▶Page · Price▶Posting · Promotion▶Program (2026-09-05 재정의) |
 | **바이브 코딩** | 자연어 PRD → AI 코드 생성 → 검증 사이클 (Cursor + Claude Code) |
-| **거점 상권** | MVP 검증할 1개 상권. 1순위 신사동 가로수길, 2순위 홍대·연남동 |
+| **거점 상권(hub)** | 분석·서빙 단위 상권. PoC 출발점은 신사동 가로수길이었고 **지금은 서울 66곳 전부 Tier1**(건축물대장 실측)이다. 목록의 단일 출처는 `data/config/page_hubs.ACTIVE_HUBS` — 숫자는 `python scripts/pppp_status.py` 로 읽는다 |
 | **Bronze/Silver/Gold** | 데이터 레이크 3계층 (원본/정제/분석용) |
 | **GNN** | Graph Neural Network — 업종 간 시너지/잠식 분석 |
 | **LSTM** | 시계열 매출·공실 예측 모델 |
@@ -74,7 +87,7 @@ Price 는 Posting 으로, Promotion 은 Program 으로만 간다.
 - 응답 언어: 한국어
 
 ## Critical Technical Notes
-- **한글 docx 작성**: "맑은 고딕"/"Noto Sans KR" 폰트명만 지정하면 Cowork 프리뷰에서 박스(□)로 깨짐. 반드시 OOXML 폰트 임베딩 필요. → memory/context/docx-korean-fonts.md
+- **한글 docx 작성**: "맑은 고딕"/"Noto Sans KR" 폰트명만 지정하면 Cowork 프리뷰에서 박스(□)로 깨짐. 반드시 OOXML 폰트 임베딩 필요(Noto Sans KR subset → odttf 로 obfuscate). 구현 예: `scripts/build_business_plan_docx.py`
 - **docx-js 단락 테두리 순서**: top/left/bottom/right 4면 모두 지정하면 OOXML 스키마 위반. top+bottom만 사용 권장.
 - **거점 선정 기준**: 데이터 가용성(공공데이터·SNS) + B2B 잠재 고객 접근성
 

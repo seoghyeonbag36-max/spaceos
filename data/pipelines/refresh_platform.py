@@ -1,7 +1,7 @@
 """Platform 분기 갱신 파이프라인 — 수집→Gold→학습→검증을 한 번에 (분기 1회 실행).
 
 새 분기 데이터 공표 시점(대략 분기 종료 + 2~3개월) 후 실행하면 forecast 가 갱신된다.
-배포는 git push(main = Vercel 자동 배포)로 이어지며, 이 스크립트는 로컬 산출물까지만.
+배포는 git push(main → GitHub Actions → Cloud Run)로 이어지며, 이 스크립트는 로컬 산출물까지만.
 
 실행: python -m data.pipelines.refresh_platform            # 전체 (33거점 기준 약 40~50분)
       python -m data.pipelines.refresh_platform --skip-collect  # 수집 생략(빌드·학습만, 약 7분)

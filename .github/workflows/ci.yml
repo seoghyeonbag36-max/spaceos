@@ -55,23 +55,26 @@ jobs:
           PYTHONIOENCODING: utf-8     # 로그의 em dash 가 cp949 에서 죽는다(08-19 실측)
         run: python -m pytest -q
 
-  serverless:
-    name: 서버리스 임포트 (배포 의존성만)
+  minimal-deps:
+    name: 최소 의존성 임포트 (익명 분석 경로)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # ⚠ 이 잡이 없어서 2026-08-26~27 프로덕션이 약 18시간 죽어 있었다.
     #   백엔드 잡은 `apps/backend/requirements.txt`(sqlalchemy·psycopg2 포함)를 깔고
-    #   돌기 때문에 **배포가 쓰는 최소 셋으로는 import 조차 안 된다는 사실을 볼 수 없다.**
-    #   여기서는 루트 `requirements.txt` 만 깔아 배포 환경을 그대로 재현한다.
+    #   돌기 때문에 **최소 셋으로는 import 조차 안 된다는 사실을 볼 수 없다.**
+    #
+    # ⚠ **2026-08-28 이후 이 잡은 "배포 재현"이 아니다.** 프로덕션은 Cloud Run 이고
+    #   이미지는 `Dockerfile` 이 `apps/backend/requirements.txt`(Python 3.11)로 만든다.
+    #   그래도 잡을 남기는 이유는 **의존성 역류 감지**다: 익명 분석 경로(Gold 파일 직독)가
+    #   pandas·torch·DB 드라이버 없이 도는 것은 지금도 유지해야 하는 성질이고, 그게 깨지면
+    #   여기서 먼저 터진다. 배포 환경 재현이라고 다시 적지 말 것 — 그러면 연극이 된다.
     steps:
       - uses: actions/checkout@v4
 
-      # ⚠ Vercel 은 파이썬을 **두 버전** 쓴다(2026-08-27 배포 로그 실측):
-      #     의존성 해결 단계 = CPython 3.14.7   → 휠이 3.14 용으로 있어야 설치가 된다
-      #     함수 런타임      = 3.12             → 코드가 실제로 도는 곳
-      #   여기서 재현할 것은 **런타임**이라 3.12 다. 처음에 3.14 로 잡았다가 잡이 터졌고,
-      #   그게 실제 지뢰를 하나 찾았다 → docs/deploy-vercel.md 의 "SQLAlchemy 와 3.14".
-      #   런타임 버전이 바뀌면 이 값도 같이 바꿀 것(안 그러면 재현이 아니라 연극이 된다).
+      # 3.12 는 **의도적으로 프로덕션(3.11)보다 한 칸 위**다. 하나의 버전만 보면
+      # 버전 특정 지뢰를 못 보는데, 백엔드 잡이 이미 3.11 을 돌고 있으므로 여기서
+      # 위쪽을 맡는다. (원래는 Vercel 함수 런타임 3.12 를 재현하던 값이다 —
+      # 그때 3.14 로 잡았다가 실제 지뢰를 하나 찾았다: docs/deploy-vercel.md "SQLAlchemy 와 3.14".)
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -79,21 +82,21 @@ jobs:
           cache-dependency-path: requirements.txt
 
       # httpx 는 요청을 태워 보기 위한 **테스트 전용**이다. 앱이 import 하지 않으므로
-      # requirements.txt 에는 넣지 않는다 — 넣으면 배포 번들만 커진다.
-      - name: 배포 의존성만 설치
+      # requirements.txt 에는 넣지 않는다 — 넣으면 최소 셋의 의미가 흐려진다.
+      - name: 최소 의존성만 설치
         run: python -m pip install --upgrade pip && pip install -r requirements.txt httpx
 
       - name: 진입점 import + 익명 분석 요청
         env:
           PYTHONIOENCODING: utf-8
-          VERCEL: '1'                             # prod 판정을 배포와 똑같이 만든다
+          APP_ENV: prod                           # prod 판정을 배포(Dockerfile ENV)와 똑같이 만든다
           JWT_SECRET: ci-not-a-real-secret        # prod 가드가 요구한다(없으면 기동 실패)
         run: |
           python - <<'PY'
           import importlib.util
           from fastapi.testclient import TestClient
 
-          spec = importlib.util.spec_from_file_location("vercel_entry", "api/index.py")
+          spec = importlib.util.spec_from_file_location("asgi_entry", "api/index.py")
           entry = importlib.util.module_from_spec(spec)
           spec.loader.exec_module(entry)          # ① import 가 되는가
 
@@ -103,14 +106,16 @@ jobs:
               assert r.status_code == 200, f"{path} -> {r.status_code} {r.text[:300]}"
               print(f"OK {r.status_code} {path}")
 
-          # ③ DB 드라이버(psycopg2)가 없어야 의미가 있는 검사다. 누가 배포 셋에
+          # ③ DB 드라이버(psycopg2)가 없어야 의미가 있는 검사다. 누가 최소 셋에
           #    드라이버를 추가하면 ②가 통과해도 이 성질은 사라지므로 여기서 막는다.
+          #    ⚠ Cloud Run 이미지에는 psycopg2 가 **있다**(계정층이 쓴다). 여기서 막는 것은
+          #      "익명 분석 경로가 드라이버에 의존하지 않는다"이지 "배포에 드라이버가 없다"가 아니다.
           try:
               import psycopg2                     # noqa: F401
           except ModuleNotFoundError:
               print("OK psycopg2 없음 — 익명 경로가 드라이버에 의존하지 않는다")
           else:
-              raise SystemExit("배포 의존성에 psycopg2 가 들어왔다 — 이 검사가 무의미해진다")
+              raise SystemExit("최소 의존성에 psycopg2 가 들어왔다 — 이 검사가 무의미해진다")
           PY
 
   data:

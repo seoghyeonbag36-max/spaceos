@@ -34,7 +34,7 @@ R-ONE 임대료도 flpop 유동인구도 **거점 단위**라, 유닛에 그대�
 `inputs_source` 로 필드별 출처를 항상 함께 내려보낸다.
 
 파이프라인이 pandas 로 만든 결과를 여기서는 정적 JSON 으로만 읽는다
-(Vercel 서버리스에 pandas 를 싣지 않는다 — vacancy_forecast 와 같은 이유).
+(배포 이미지에 pandas 를 싣지 않는다 — vacancy_forecast 와 같은 이유).
 """
 from __future__ import annotations
 

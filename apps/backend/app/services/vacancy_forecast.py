@@ -1,8 +1,9 @@
 """Platform·LSTM 공실 예측 서빙 — gold/platform_vacancy_forecast.json 직접 로드.
 
-ml/inference/predictor.py 와 같은 배치 산출물을 읽지만, Vercel 서버리스에는
-torch/ml 의존을 싣지 않으므로 백엔드는 json 정적 서빙이 기본 경로다.
-Redis 부재 환경(서버리스) 고려 — 인메모리 TTL 캐시로 파일 재읽기를 줄인다.
+ml/inference/predictor.py 와 같은 배치 산출물을 읽지만, 배포 이미지(Cloud Run ·
+apps/backend/requirements.txt)에 torch/ml 의존을 싣지 않으므로 백엔드는 json 정적
+서빙이 기본 경로다.
+Redis 를 실제로 쓰는 코드가 아직 없다 — 인메모리 TTL 캐시로 파일 재읽기를 줄인다.
 """
 from __future__ import annotations
 

@@ -16,11 +16,12 @@
 
 | 경로 | 내용 | 스택 |
 |------|------|------|
-| `apps/backend` | API 서버 | FastAPI · PostgreSQL/PostGIS · Redis · Celery |
-| `apps/frontend` | 공실 지도 UI (히트맵 + 층별 매물 목록 + 거리뷰) | React · TypeScript · Vite · **네이버 지도**(`lib/naverMap.ts` — 지도 + 거리뷰 파노라마) · D3/Plotly |
+| `apps/backend` | API 서버 | FastAPI · Gold JSON 직독 · PostgreSQL(계정층만 · SQLAlchemy/Alembic) |
+| `apps/frontend` | 공실 지도 UI (히트맵 + 층별 매물 목록 + 거리뷰) | React · TypeScript · Vite · **네이버 지도**(`lib/naverMap.ts` — 지도 + 거리뷰 파노라마) · `@visx/shape`(차트) · CSS 변수 토큰 |
 | `ml` | AI 모델 | PyTorch · LSTM(공실 예측) · GNN(업종 추천) · MLflow |
-| `data` | ETL·크롤링 | Airflow · Playwright · Bronze/Silver/Gold |
-| `infra` | 배포 | Docker · k8s · GitHub Actions |
+| `data` | ETL·크롤링 | Selenium/Playwright · Bronze/Silver/Gold (Airflow DAG 은 골격만 — 스케줄러 미가동) |
+| `infra` | 로컬 스택·배포 보조 | Docker Compose · nginx · GitHub Actions (⚠ `infra/k8s/` 는 **빈 디렉터리**다) |
+| 배포 경로 | 프로덕션 | `Dockerfile` → Cloud Build → **Cloud Run**(us-central1), 앞에 **Firebase Hosting**(placeos.web.app) |
 | `docs` · `memory` | 문서·전략 메모리 | — | 
 
 ## 팀원 온보딩
@@ -59,9 +60,13 @@ cd apps/frontend && npm install && npm run dev
 # 3) 전체 로컬 스택 (DB + Redis + Backend)
 docker compose -f infra/docker/docker-compose.yml up
 
-# 4) 배포 — 프론트 정적 + FastAPI 서버리스 단일 Vercel 프로젝트
-vercel --prod        # 상세: docs/deploy-vercel.md
+# 4) 배포 — main 에 푸시하면 GitHub Actions 가 Cloud Run 으로 낸다(테스트→빌드→배포→검증)
+git push origin main   # 상세: docs/deploy-cloud-run.md
+#    → https://placeos.web.app  (Firebase Hosting → Cloud Run, 2026-09-13 정식 주소)
 ```
+
+⚠ **`vercel --prod` 를 쓰지 말 것.** Vercel 은 2026-08-28 프로덕션에서 내려왔다(무료 플랜이
+상업적 사용 금지). `docs/deploy-vercel.md` 는 **이력으로만** 남겼다.
 
 ### 지금 어디까지 와 있나
 
@@ -85,8 +90,10 @@ python scripts/pppp_status.py     # 트랙별 진행률 + 게이트 ([자동] = 
   체인 둘: `/hub-chain`(거점을 등록→배포까지 미는 선형) · `/loop-engine`(상태를 읽고 다음 수를 고르는 루프).
   체인이 읽는 상태는 `python scripts/chain_status.py <slug>` 가 산출물에서 낸다
   - 트랙 전환: `/platform` `/page` `/posting` `/program` `/design`
-  - 진행·검증: `/pppp-status` `/verify` `/quota`(건축HUB 일일 쿼터 소진)
+  - 진행·검증: `/pppp-status` `/verify` `/probe-first`(1콜 실측으로 확정) `/quota`(건축HUB 일일 쿼터 소진)
   - 개발: `/backend-dev` `/frontend-dev` `/ml-train` `/district-map` `/director`
+  - 데이터·거점: `/gold-build`(Bronze→Silver→Gold 재빌드) `/hub-onboard`(거점 하나를 Tier1 까지) `/city-expand`(서울 밖 확장)
+  - 운영: `/deploy`(Cloud Run 배포·롤백) `/autorun`(무인 장시간 작업) `/codex-handoff`(Codex 로 내보내기) `/eli5-placeos`(발표용 슬라이드)
 - `AGENTS.md` — Codex 병행 지침 (Claude Code 는 `feat/*`, Codex 는 `chore/*`·`fix/*`)
 
 ## Git

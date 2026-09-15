@@ -143,7 +143,7 @@ def test_context_reads_without_pandas(monkeypatch):
     """상권 컨텍스트가 **pandas 없이** 읽힌다 — 프로덕션 무동작 회귀 방지.
 
     2026-08-06 실사고: 서빙 코드가 `import pandas` 로 시작해 파케이를 읽었는데
-    배포(Vercel 서버리스)에는 pandas 도 pyarrow 도 없다. import 실패가 폴백에
+    배포 이미지에는 pandas 도 pyarrow 도 없다. import 실패가 폴백에
     삼켜져 컨텍스트가 **항상 None** 이었고, 상권 단위 LLM 경로는 프로덕션에서
     한 번도 돈 적이 없다. 화면은 시드 카피를 보여주므로 눈으로는 알 수 없었다.
 

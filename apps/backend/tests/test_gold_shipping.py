@@ -5,7 +5,7 @@
 찾았다. 형제 세 파일(`platform_posting_revenue`·`platform_posting_cost_rates`·
 `platform_posting_inputs`)은 전부 `!` 예외가 있는데 이것만 빠져 있었다.
 
-새로 클론한 환경(CI · Vercel 배포)에는 파일이 없으므로 `posting_revenue` 가 임차료
+새로 클론한 환경(CI · 컨테이너 빌드)에는 파일이 없으므로 `posting_revenue` 가 임차료
 **역산 폴백**으로 내려간다 — docs/feature-posting.md §0-I 가 *"한식집 7.1평은 실물이
 아니었다"* 며 기각한 바로 그 모델이다. 로컬에는 파일이 있어 전 테스트가 통과하므로,
 **개발 기계에서는 영원히 안 드러난다.**
@@ -74,6 +74,6 @@ def test_shipped_gold_file_is_tracked(rel: str):
         pytest.skip("git 저장소가 아니다(배포 아티팩트 등) — 추적 여부를 물을 수 없다")
     assert r.returncode == 0, (
         f"data/gold/{rel} 이 git 에 없다. 로컬에는 있으므로 이 기계에서는 전 테스트가 "
-        f"통과하지만, 새로 클론한 환경(CI·Vercel)에서는 파일이 없어 서비스가 조용히 "
+        f"통과하지만, 새로 클론한 환경(CI·컨테이너 빌드)에서는 파일이 없어 서비스가 조용히 "
         f"폴백으로 내려간다. `.gitignore` 에 `!data/gold/{rel}` 예외를 추가할 것."
     )

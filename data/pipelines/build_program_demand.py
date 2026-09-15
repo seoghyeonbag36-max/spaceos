@@ -14,8 +14,8 @@ Program 의 대상이 2026-08-16 에 **공실에 창업할 기업**으로 재정
 ## 왜 파케이를 그대로 쓰지 않는가
 
 원천은 `gold/features/trdar_demand.parquet`(190상권×46열, GNN 학습용)인데 **런타임은
-이걸 읽을 수 없다.** `.vercelignore` 가 `**/*.parquet` 를 배포에서 빼고, 서버리스에는
-pandas 도 pyarrow 도 없다. 2026-08-06 에 정확히 이 조합으로 사고가 났다 — 컨텍스트를
+이걸 읽을 수 없다.** 배포 이미지에는 pandas 도 pyarrow 도 없다(Dockerfile 이
+`apps/backend/requirements.txt` 하나만 깐다). 2026-08-06 에 정확히 이 조합으로 사고가 났다 — 컨텍스트를
 `pd.read_parquet` 로 읽던 코드가 프로덕션에서 항상 실패했고, 그 실패가 except 에 잡혀
 컨텍스트가 **늘 None** 이었는데 화면은 시드로 멀쩡해 보여 아무도 몰랐다.
 

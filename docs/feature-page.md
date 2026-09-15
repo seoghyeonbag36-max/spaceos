@@ -143,7 +143,7 @@ nokdu 에서 실패한다(`1 failed, 101 passed, 5 skipped`).
 - 조치 전까지 nokdu 수치는 **신뢰하지 말 것**. 테스트는 실패인 채로 둔다(가리지 않는다).
 
 **미착수(계획 §3 대비)**: 히스토리 타임라인(백엔드 `/history` 는 있으나 프론트 미연결) ·
-상세 차트(d3·plotly 설치돼 있으나 import 0건) · 유동/밀도 히트맵 레이어(샘플 상수).
+상세 차트(d3·plotly 는 애초에 미설치 — `@visx/shape` 로 갈 자리) · 유동/밀도 히트맵 레이어(샘플 상수).
 glTF 실측 모델은 자산 0개이며 `/buildings/{id}/model` 은 스텁이다.
 
 ### 유동·밀도 레이어 — 배선 완료 (2026-08-23)
@@ -626,29 +626,37 @@ apps/backend/app/api/v1/districts.py 상권 정보 + /heatmap GeoJSON
 
 ```bash
 cd apps/frontend
-npm install                 # react, d3, plotly (three 계열은 2026-09-05 제거됨)
+npm install                 # react, @visx/shape (three 계열은 2026-09-05 제거됨)
 npm run dev                 # http://localhost:5173
 
 # 네이버 지도 키 (.env) — NCP 콘솔 Web 서비스 URL 에 http://localhost:5173 등록 필수
 echo "VITE_NAVER_MAPS_KEY_ID=xxxx" > .env
 ```
 
-⚠ **2026-09-08 정정 — `d3`·`plotly` 는 `package.json` 에 없다.** 선언된 런타임 의존성은
-`react` · `react-dom` 둘뿐이고(`pretendard` 는 devDependencies), 소스의 `d3`·`plotly`
+⚠ **2026-09-08 정정 — `d3`·`plotly` 는 `package.json` 에 없다.** 소스의 `d3`·`plotly`
 import 도 0건이다. `node_modules` 에 남아 있는 것은 예전 설치의 잔재다 —
 `tailwind.config.ts` · Storybook 과 같은 양식이므로(`feature-design-system.md` §4) 이 줄을
-보고 다시 끌어오지 말 것. 아래 §3 의 6번(D3/Plotly 상세 차트)이 미착수라 그렇다.
+보고 다시 끌어오지 말 것. 아래 §3 의 6번(상세 차트)이 미착수라 그렇다.
+
+⚠ **2026-09-15 재정정 — 위 줄의 "런타임 의존성은 `react`·`react-dom` 둘뿐" 도 이제 낡았다.**
+`@visx/shape` 가 셋째로 들어와 있고, 실제로 쓰인다(`components/PlatformComparison.tsx`).
+차트를 새로 그릴 때 집을 것은 d3·plotly 가 아니라 이것이다.
 
 > 백엔드를 함께 띄워야 `/api` 프록시가 동작한다: `cd apps/backend && uvicorn app.main:app --reload`
 
 ## 3. 작성해야 할 코드 (순서)
 
-1. **히트맵 API** (`apps/backend/app/api/v1/districts.py`) — `/heatmap` 스텁을 Gold 레이어 공실 데이터 기반 GeoJSON FeatureCollection으로 교체. 각 Feature에 공실률·예측값(Platform 연동) 속성 부여.
-2. **Mapbox 베이스맵 컴포넌트** (`src/components/DistrictMap.tsx`) — Mapbox GL 지도 초기화, 거점 상권 좌표로 카메라 이동.
-3. **히트맵 레이어** (`src/components/VacancyHeatmap.tsx`) — `/api/v1/heatmap/{id}` GeoJSON을 fill-extrusion 또는 heatmap 레이어로 렌더. 공실률에 따라 색상 매핑.
-4. **3D 건물 트윈** (`src/components/BuildingTwin.tsx`) — @react-three/fiber + GLTFLoader로 `/buildings/{id}/model` glTF 로드. Mapbox custom layer로 좌표계 정합. **로딩 <3초 목표** (모델 LOD·캐싱).
-5. **공실 히스토리 타임라인** (`src/components/HistoryTimeline.tsx`) — `getBuildingHistory`로 업종 변천사를 타임라인 UI로 표시. 폐업 사유 AI 요약(Program/LLM) 노출.
-6. **상세 차트** — D3/Plotly로 공실 추이·예측 그래프.
+> ⚠ **2026-09-15 정정 — 2·4 번의 기술 선택은 폐기됐다.** 아래 목록은 원안(2026-07)이고,
+> 그 뒤 `mapbox-gl` 은 2026-08-25 에, `three`·`@react-three/fiber` 는 2026-09-05 에
+> 의존성에서 빠졌다. 지운 항목이 아니라 **다른 것으로 서 있는 항목**이라 줄을 긋고 남긴다 —
+> 무엇이 왜 바뀌었는지가 원안보다 중요하다.
+
+1. **히트맵 API** (`apps/backend/app/api/v1/districts.py`) — `/heatmap` 스텁을 Gold 레이어 공실 데이터 기반 GeoJSON FeatureCollection으로 교체. 각 Feature에 공실률·예측값(Platform 연동) 속성 부여. ✅ 완료
+2. ~~**Mapbox 베이스맵 컴포넌트** (`src/components/DistrictMap.tsx`) — Mapbox GL 지도 초기화~~ → **네이버 지도**(`src/lib/naverMap.ts` · `components/MapHost.tsx`). 베이스맵은 네이버뿐이다(2026-08-25 · `docs/decision-infra-layer-2026-08-25.md`)
+3. **히트맵 레이어** — `/api/v1/heatmap/{id}` GeoJSON을 공실률 색상으로 렌더. ~~별도 `VacancyHeatmap.tsx`~~ → `pages/MapShell.tsx` 안에 있다(§1 실측)
+4. ~~**3D 건물 트윈** (`src/components/BuildingTwin.tsx`) — @react-three/fiber + GLTFLoader로 glTF 로드~~ → **2D 층 스택 + 네이버 거리뷰**(`components/BuildingViewer.tsx`). 절차적 박스는 실측 형상이 아니었다(2026-09-05 · `feature-posting.md` §0-V · 번들 832KB → 4KB). **로딩 <3초 목표**는 그대로다
+5. **공실 히스토리 타임라인** (`src/components/HistoryTimeline.tsx`) — `getBuildingHistory`로 업종 변천사를 타임라인 UI로 표시. 폐업 사유 AI 요약(Program/LLM) 노출. ⏸ 미착수(백엔드 `/history` 만 있다)
+6. **상세 차트** — `@visx/shape` 로 공실 추이·예측 그래프. (원안은 D3/Plotly 였으나 둘 다 설치하지 않았다.) ⏸ 미착수
 
 ## 4. Claude Code 작업 예시
 
@@ -658,10 +666,13 @@ import 도 0건이다. `node_modules` 에 남아 있는 것은 예전 설치의 
   districts.py 의 /heatmap 스텁을 Gold 레이어 기반 FeatureCollection 으로 교체,
   각 Feature properties 에 vacancy_rate 와 predicted_rate 포함.
 
-/frontend-dev Mapbox 기반 DistrictMap + VacancyHeatmap 컴포넌트.
+/frontend-dev 네이버 지도 기반 히트맵 레이어.
   /api/v1/heatmap 데이터를 받아 공실률 색상 히트맵으로 렌더,
   src/lib/api.ts 에 getHeatmap 추가.
 ```
+
+⚠ 위 예시는 원래 "Mapbox 기반 DistrictMap + VacancyHeatmap" 이라고 적고 있었다 —
+그대로 부르면 제거된 의존성을 다시 끌어오게 된다(2026-09-15 정정).
 
 ## 5. 검증
 

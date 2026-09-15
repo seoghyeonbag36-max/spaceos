@@ -1,4 +1,10 @@
-"""[Page] 건물 단위 공실 확장 거점 레지스트리 — 핵심 13거점.
+"""[Page] 건물 단위 공실 확장 거점 레지스트리 — 서빙 66거점(2026-09-15 기준).
+
+⚠ 이 줄은 오래도록 "핵심 13거점" 이라고 적고 있었다. 레지스트리는 그 뒤 두 번 자랐다:
+  HUBS 54(서울 1차) + SEOUL_BATCH2_HUBS 12 = **ACTIVE_HUBS 66**(서빙) ·
+  GYEONGGI_HUBS 20(고양·파주, **서빙 보류** — 게이트가 세지 않는다) = ALL_HUBS 86.
+**수를 이 독스트링에서 읽지 말고 `len(ACTIVE_HUBS)` 로 셀 것** — 선언이 낡는 것이
+이 저장소의 주된 실패 양식이다.
 
 garosugil PoC 파이프라인(config/garosugil.py)을 다거점으로 일반화한 단일 출처(SSOT).
 각 거점은 수집기(vworld_bldg·building_vacancy)와 Gold 빌더(build_page_master)가

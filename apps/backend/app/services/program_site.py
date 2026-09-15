@@ -24,7 +24,7 @@
 (창업계획)과 출력 분리까지 가야 닫힌다. 여기서 하는 일은 자리의 사실을 **읽을 수 있게**
 만드는 것까지다.
 
-표준 라이브러리만 쓴다 — 배포(Vercel 서버리스) 의존성이 fastapi/pydantic 뿐이다
+표준 라이브러리만 쓴다 — 루트 `requirements.txt` 의 최소 의존성 계약을 지킨다
 (services/marketing._load_context_rows 가 파케이로 겪은 사고와 같은 이유).
 """
 from __future__ import annotations

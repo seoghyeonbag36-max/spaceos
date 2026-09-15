@@ -1,5 +1,12 @@
-# Vercel Python 서버리스 함수(api/index.py) 의존성 — 배포용 최소 셋.
-# 로컬 개발 전체 의존성은 apps/backend/requirements.txt (DB/Redis/Celery 포함) 사용.
+# `api/index.py` 의 **최소 의존성 계약** — 이 목록만으로 앱이 import 되고 익명 분석
+# 경로가 도는지를 CI 가 지킨다(.github/workflows/ci.yml 의 `최소 의존성 임포트` 잡).
+# 로컬 개발·프로덕션 전체 의존성은 apps/backend/requirements.txt (DB/Redis/Celery 포함) 사용.
+#
+# ⚠ **2026-08-28 이후 이 파일은 프로덕션 배포 목록이 아니다.** 프로덕션은 Cloud Run 이고
+#   이미지는 `Dockerfile` 이 `apps/backend/requirements.txt` 하나만 깔아 만든다(Python 3.11).
+#   아래 Vercel 관련 주석은 **왜 이 목록이 이 모양인지**의 이력이라 지우지 않는다.
+#   이 목록이 여전히 값을 하는 이유는 배포 재현이 아니라 **의존성 역류 감지**다 —
+#   서비스 코드가 pandas·torch·psycopg2 를 새로 끌어오면 여기서 먼저 터진다.
 #
 # ⚠ 2026-08-27 — "sqlalchemy 는 기동 시 import 되지 않는다"가 **더 이상 참이 아니다.**
 #   계정층 배선(2026-08-26 23:04, 커밋 1979bb4)이 `api/v1/router.py` 에 `auth` 를 무조건
@@ -8,7 +15,7 @@
 #   단계에서 죽었다**(FUNCTION_INVOCATION_FAILED). 프론트 정적 파일은 그대로 떠서
 #   화면은 멀쩡해 보였고, /api/* 만 전부 500 이었다 — 약 18시간 동안 아무도 몰랐다.
 #   ⚠ 이 주석을 지우지 말고, 여기 목록을 줄일 때는 `app/` 의 import 를 실제로 따라갈 것.
-#      재발 방지 가드: .github/workflows/ci.yml 의 `서버리스 임포트` 잡이 이 파일만으로
+#      재발 방지 가드: .github/workflows/ci.yml 의 `최소 의존성 임포트` 잡이 이 파일만으로
 #      `api/index.py` 를 import 해 본다. 의존성이 빠지면 CI 에서 먼저 터진다.
 #
 #   버전은 **apps/backend/requirements.txt 와 똑같이 핀한다.** 배포가 테스트와 다른
@@ -24,15 +31,19 @@
 #   컴파일 확장은 jiter(0.16.0)·pydantic-core(2.46.4) 둘뿐이고 둘 다 cp314
 #   manylinux2014 휠이 있다. 전체 4.7MB — 서버리스 상한에 영향 없다.
 #   ⚠ 버전을 올릴 때 이 확인을 다시 할 것 (휠이 없으면 소스 빌드 → 빌드 실패).
-# 버전 하한: Vercel 빌드가 Python 3.14 를 쓰므로 cp314 휠이 있는 pydantic 2.12+ 필수
+# 버전 하한: Vercel 빌드가 Python 3.14 를 써서 cp314 휠이 있는 pydantic 2.12+ 가 필요했다
 # (2.9.x 는 소스 빌드 시도 → PyO3 3.14 미지원으로 빌드 실패). fastapi 0.119+ 가 pydantic 2.12 호환.
+# ⚠ Cloud Run 전환(08-28) 뒤 이 하한을 강제하는 것은 배포가 아니라 **CI 잡(Python 3.12)** 이다.
+#   하한을 내릴 이유가 생기면 apps/backend/requirements.txt 의 핀과 **같이** 움직일 것 —
+#   두 목록이 갈라지는 것이 08-27 18시간 장애의 원인이었다.
 fastapi>=0.119,<1
 pydantic>=2.12,<3
 pydantic-settings>=2.8,<3
 anthropic==0.117.0
 
 # 계정층(app/api/v1/auth.py · app/core/security.py · app/schemas/auth.py) 이 import 한다.
-# 배포에는 DB 가 없어 가입·로그인은 실패하지만, **import 는 성공해야** 분석 API 가 뜬다.
+# 이 목록에는 DB 드라이버가 없어 가입·로그인은 실패하지만, **import 는 성공해야** 분석 API 가 뜬다.
+# (Cloud Run 이미지에는 psycopg2 가 들어 있어 계정층이 실제로 돈다 — apps/backend/requirements.txt.)
 sqlalchemy==2.0.35
 bcrypt==4.2.0
 pyjwt==2.9.0

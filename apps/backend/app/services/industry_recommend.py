@@ -1,8 +1,9 @@
 """Platform·GNN 업종 추천 서빙 — gold/platform_industry_recommend.json 직접 로드.
 
 ml/training/train_gnn.py 가 학습 후 전 노드의 Top-K 업종 확률을 배치로 떨어뜨린다.
-Vercel 서버리스에 torch/torch_geometric 을 싣지 않으므로 vacancy_forecast 와 동일하게
-json 정적 서빙이 기본 경로다. 인메모리 TTL 캐시로 파일 재읽기를 줄인다.
+배포 이미지(Cloud Run · apps/backend/requirements.txt)에 torch/torch_geometric 을 싣지
+않으므로 vacancy_forecast 와 동일하게 json 정적 서빙이 기본 경로다.
+인메모리 TTL 캐시로 파일 재읽기를 줄인다.
 
 조회 키는 좌표다 — 그래프 노드는 '현존 점포 자리'이므로, 빈 자리(공실 유닛)나 건물을
 물어보면 같은 거점 안에서 가장 가까운 노드의 추천을 돌려준다. 추천은 그 자리의 입지

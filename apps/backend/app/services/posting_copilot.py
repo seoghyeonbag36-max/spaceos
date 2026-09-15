@@ -48,8 +48,13 @@ PlaceOS 가 계약을 발행하고 공급자가 여기에 맞춘다.** 어댑터
 하나는 폴백인 시나리오 표는 비교표가 아니다 — 같은 자를 안 쓴 값을 나란히 놓으면
 읽는 사람이 그걸 비교로 오독한다.
 
-의존성은 표준 라이브러리만 쓴다 — Vercel 서버리스 의존성이 fastapi/pydantic 뿐이라
-httpx 를 쓰면 프로덕션에서만 죽는다(services/store_lookup 과 같은 이유).
+의존성은 표준 라이브러리만 쓴다(services/store_lookup 과 같은 이유).
+⚠ **근거가 2026-08-28 에 바뀌었다.** 종전 이유는 "Vercel 서버리스 의존성이 fastapi/pydantic
+뿐이라 httpx 를 쓰면 프로덕션에서만 죽는다"였는데, Cloud Run 이미지
+(apps/backend/requirements.txt)에는 httpx 가 들어 있어 그 문장은 더 이상 참이 아니다.
+그래도 규칙은 유지한다 — 루트 `requirements.txt` 의 최소 의존성 계약을 CI 가 지키고 있고
+(`최소 의존성 임포트` 잡), 외부 호출 하나 때문에 그 계약을 무르면 익명 분석 경로가
+무거워진다. httpx 가 실제로 필요하면 이 주석부터 고칠 것.
 """
 from __future__ import annotations
 

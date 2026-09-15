@@ -15,8 +15,12 @@
   1) 가게를 **후보 목록에서 사람이 고른다** → 주소가 확정된다
   2) 그 주소의 동(洞)을 질의에 붙인다 → "연남동 맡기다"
 
-의존성은 표준 라이브러리만 쓴다. 배포(Vercel) 서버리스 의존성이 fastapi/pydantic 뿐이라
-requests·httpx 를 쓰면 프로덕션에서만 죽는다.
+의존성은 표준 라이브러리만 쓴다.
+⚠ **근거가 2026-08-28 에 바뀌었다.** 종전 이유는 "배포 의존성이 fastapi/pydantic 뿐이라
+requests·httpx 를 쓰면 프로덕션에서만 죽는다"였는데, Cloud Run 이미지
+(apps/backend/requirements.txt)에는 httpx 가 들어 있다. 규칙을 유지하는 이유는
+루트 `requirements.txt` 의 최소 의존성 계약(CI `최소 의존성 임포트` 잡)이다 —
+익명 분석 경로가 무거워지지 않게 붙들어 둔다.
 """
 from __future__ import annotations
 

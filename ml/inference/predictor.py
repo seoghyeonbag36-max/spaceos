@@ -3,7 +3,7 @@
 로드 우선순위:
   1) ml/artifacts/vacancy_lstm.pt + Gold 시계열로 실시간 추론 (torch 필요)
   2) data/gold/platform_vacancy_forecast.json (train_lstm 산출 배치 예측) 폴백
-Vercel 서버리스에는 torch 를 싣지 않으므로 2)가 기본 경로다 — 백엔드는
+배포 이미지(Cloud Run)에는 torch 를 싣지 않으므로 2)가 기본 경로다 — 백엔드는
 apps/backend/app/services/vacancy_forecast.py 로 같은 json 을 직접 읽는다.
 """
 from __future__ import annotations

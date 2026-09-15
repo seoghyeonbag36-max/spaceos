@@ -2,7 +2,7 @@
 
 `build_page_footfall` 과 짝이다. 그쪽은 **얼마나 있나**(체류·밀도), 이쪽은
 **몇 시에 · 누가 · 어디서 왔나**(유입)를 답한다. 서빙 계층은 파케이도 CSV 도 읽지
-않고 이 JSON 하나만 본다 — Vercel 서버리스에 pandas 가 없다는 §0-5 사고와 같은 조합을
+않고 이 JSON 하나만 본다 — 배포 이미지에 pandas 가 없다는 §0-5 사고와 같은 조합을
 다시 만들지 않기 위해서다.
 
 입력: bronze/{slug}/{날짜}/living_migration.json (collectors/living_migration 산출)

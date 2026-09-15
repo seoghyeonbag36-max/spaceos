@@ -53,7 +53,7 @@ def _save(df: "pd.DataFrame", root: Path, name: str) -> None:
 def _save_csv(df: "pd.DataFrame", root: Path, name: str) -> None:
     """**CSV 로만** 저장 — 백엔드가 런타임에 읽는 산출물 전용.
 
-    파케이로 쓰면 안 되는 이유: 배포(Vercel 서버리스)에는 pandas 도 pyarrow 도 없다.
+    파케이로 쓰면 안 되는 이유: 배포 이미지(Cloud Run)에는 pandas 도 pyarrow 도 없다.
     서빙 코드가 파케이를 읽으려다 `import pandas` 에서 실패하고, 그 예외가 폴백으로
     삼켜져 **기능이 조용히 죽는다**(2026-08-06 상권 컨텍스트에서 실제로 발생 —
     프로덕션에서 한 번도 돈 적이 없었다). 서빙 산출물은 표준 라이브러리로 읽히는

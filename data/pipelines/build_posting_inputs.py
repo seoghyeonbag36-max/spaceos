@@ -29,7 +29,7 @@ R-ONE 환산/시드 비율이 층수에 따라 단조 증가한다(2026-08-01 �
 ## 산출
 
 `data/gold/platform_posting_inputs.json` — 백엔드가 pandas 없이 읽는 정적 JSON
-(Vercel 서버리스에 pandas 를 싣지 않는다. platform_vacancy_forecast.json 과 같은 이유).
+(배포 이미지에 pandas 를 싣지 않는다. platform_vacancy_forecast.json 과 같은 이유).
 
 실행: python -m data.pipelines.build_posting_inputs
 """

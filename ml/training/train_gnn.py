@@ -5,7 +5,7 @@
   gold/platform13/platform_store_graph_edges.parquet  (spatial_knn + same_building + same_chain)
 산출:
   ml/artifacts/industry_gnn.pt                        체크포인트(+ 라벨·피처 메타)
-  data/gold/platform_industry_recommend.json          서빙용 배치 추천(토치 없는 Vercel 경로)
+  data/gold/platform_industry_recommend.json          서빙용 배치 추천(토치 없는 배포 경로)
   ml/mlruns                                           MLflow 실험 industry_gnn
 
 태스크 정의 — "이 자리에 어떤 업종이 맞는가"를 노드 분류로 근사한다. 어떤 점포의 업종을
@@ -1009,7 +1009,7 @@ def _save_artifacts(model: IndustryGNN, nodes: pd.DataFrame, classes: list[str],
                 "in_dim": len(feat_names), "metrics": metrics}, _ARTIFACT)
     print(f"[gnn] 체크포인트: {_ARTIFACT}")
 
-    # 서빙용 배치 추천 — Vercel 서버리스에는 torch 를 싣지 않으므로 LSTM forecast json 과
+    # 서빙용 배치 추천 — 배포 이미지에는 torch 를 싣지 않으므로 LSTM forecast json 과
     # 같은 방식으로 미리 계산해 둔다. 키는 공실 유닛이 아니라 그래프 노드(=현존 점포 자리)
     # 이므로, 백엔드는 조회 좌표에서 가장 가까운 노드의 추천을 쓴다.
     prob = torch.exp(logits)

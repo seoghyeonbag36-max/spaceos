@@ -7,15 +7,36 @@ description: 서울 자치구 건물 단위 상권 세분화 HTML(Leaflet) 생�
 
 너는 지금 PlaceOS의 **서울 자치구 디지털 트윈 맵** 작업을 수행한다.
 
-## 필수 선독(先讀) 파일
+## ⚠ 먼저 — `html/Seoul/` 은 이 저장소에 없다 (2026-09-15 확인)
 
-작업 전 반드시 읽어라.
+아래 STEP 1·2 는 `html/Seoul/` 의 기준선 파일 셋을 읽고 고치는 절차로 적혀 있는데,
+**그 디렉터리는 이 저장소에 존재한 적이 없다**(전 git 이력 확인 · `html/` 에는
+`PlaceOS---Page/`(랜딩 빌드 산출물) · `index.html` · `serve.py` 뿐이다).
+기준선이 없으면 "패턴을 따라 병합" 이라는 지시가 **따를 대상 없이 도는** 상태가 된다.
+
+그래서 착수 전에 이것부터 가른다.
+
+| 상황 | 할 일 |
+|------|------|
+| 기준선 파일을 **가지고 있다**(작업 기계 로컬 등) | `html/Seoul/` 에 넣고 커밋한 뒤 STEP 1 로 간다. 그때 이 배너를 지운다 |
+| 기준선 파일이 **없다** | STEP 1·2 를 그대로 수행하지 말 것. 먼저 첫 구 파일을 새로 만들고(그것이 이후의 기준선이 된다), 통합 파일은 구가 둘 이상 생긴 뒤에 만든다 |
+
+어느 쪽이든 **실재하는 단일 출처는 아래 하나뿐**이다.
 
 ```
-html/Seoul/PlaceOS_Mapo_Building_Map.html          # 단일 구 파일 패턴 기준선
-html/Seoul/PlaceOS_Jongno_Building_Map.html        # 단일 구 파일 패턴 기준선 (종로구)
-html/Seoul/PlaceOS_Seoul_GangnamMapo_Building_Map.html  # 통합 파일 패턴 기준선
-data/config/seoul_districts.py                     # 구 코드·base 점수·키워드 SSOT
+data/config/seoul_districts.py   # 25개 구 코드·4기준 base 점수·대표 상권·키워드 SSOT (실재)
+```
+
+거점(상권) 단위 산출물이 필요하면 `data/config/page_hubs.ACTIVE_HUBS`(서빙 66거점)와
+`data/gold/<거점>/` 을 본다 — 이 스킬의 '구(자치구) 단위'와 축이 다르니 섞지 말 것.
+
+## 필수 선독(先讀) 파일 — 기준선이 있을 때만
+
+```
+html/Seoul/PlaceOS_Mapo_Building_Map.html          # 단일 구 파일 패턴 기준선 (⚠ 저장소에 없음)
+html/Seoul/PlaceOS_Jongno_Building_Map.html        # 단일 구 파일 패턴 기준선 (종로구) (⚠ 저장소에 없음)
+html/Seoul/PlaceOS_Seoul_GangnamMapo_Building_Map.html  # 통합 파일 패턴 기준선 (⚠ 저장소에 없음)
+data/config/seoul_districts.py                     # 구 코드·base 점수·키워드 SSOT (실재)
 ```
 
 ## 인수 파싱
@@ -125,6 +146,9 @@ map = L.map('map').setView([중심위도, 중심경도], 14);
 
 파일: `html/Seoul/PlaceOS_Seoul_GangnamMapo_Building_Map.html`  
 (파일명은 현재 그대로 유지 — 내용만 추가)
+
+⚠ 이 파일이 저장소에 없으면 이 STEP 을 건너뛴다(위 배너). 구가 하나뿐일 때 통합 파일을
+새로 만드는 것은 빈 껍데기를 하나 더 만드는 일이다.
 
 ### 2-1. CSS
 

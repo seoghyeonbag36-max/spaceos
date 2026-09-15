@@ -27,10 +27,28 @@ def test_prod_accepts_real_secret():
     assert s.is_prod is True
 
 
-def test_env_autodetected_from_vercel_marker(monkeypatch):
-    """APP_ENV 를 안 넣어도 Vercel 배포는 prod 로 판정돼야 한다 — 안 그러면
-    '넣는 걸 잊으면 가드가 통과'라는 구멍이 그대로 남는다."""
+def test_env_autodetected_from_cloud_run_marker(monkeypatch):
+    """APP_ENV 를 안 넣어도 Cloud Run 배포는 prod 로 판정돼야 한다.
+
+    Cloud Run 은 `K_SERVICE`(서비스명)를 컨테이너에 자동 주입한다. 2026-08-28 에
+    Vercel → Cloud Run 으로 옮기면서 판정이 `VERCEL` 하나만 보고 있었고, 그동안
+    가드를 살린 것은 `Dockerfile` 의 `ENV APP_ENV=prod` 한 줄뿐이었다 —
+    이미지를 재사용하면서 그 변수를 안 옮기면 개발용 JWT 키로 프로덕션이 뜬다.
+    """
     monkeypatch.delenv("APP_ENV", raising=False)
+    monkeypatch.delenv("VERCEL", raising=False)
+    monkeypatch.setenv("K_SERVICE", "spaceos")
+    assert _detect_env() == "prod"
+
+    monkeypatch.delenv("K_SERVICE", raising=False)
+    assert _detect_env() == "dev"
+
+
+def test_env_autodetected_from_vercel_marker(monkeypatch):
+    """옛 표식도 계속 본다 — 표식은 더하는 쪽이 안전하다(지우면 옛 배포가 되살아났을 때
+    가드가 조용히 통과한다)."""
+    monkeypatch.delenv("APP_ENV", raising=False)
+    monkeypatch.delenv("K_SERVICE", raising=False)
     monkeypatch.setenv("VERCEL", "1")
     assert _detect_env() == "prod"
 
@@ -40,5 +58,6 @@ def test_env_autodetected_from_vercel_marker(monkeypatch):
 
 def test_explicit_app_env_wins_over_marker(monkeypatch):
     monkeypatch.setenv("APP_ENV", "dev")
+    monkeypatch.setenv("K_SERVICE", "spaceos")
     monkeypatch.setenv("VERCEL", "1")
     assert _detect_env() == "dev"
