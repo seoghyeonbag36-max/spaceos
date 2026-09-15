@@ -66,7 +66,13 @@ Bronze 가 없는 데(신규 클론·CI)서 위 감사를 **재현**하려면:
     python -m data.config.store_taxonomy --gold
 
 ⚠ **소분류 어휘는 아직 실측하지 못했다.** `편의점`·`약국`·`커피전문점` 판정이 소분류
-문자열에 달려 있는데 저장소에 소분류 표본이 없다. 위 명령으로 먼저 확인할 것.
+문자열에 달려 있는데 저장소에 소분류 표본이 없다(Gold 는 중분류만 담는다).
+그 실측을 하는 절차·통과 조건·금지 사항이 프롬프트로 정리돼 있다:
+
+    docs/prompt-store-taxonomy-scls-2026-09-15.md
+
+⚠ 그 작업 전까지 세 규칙(`scls` 의 "편의점"·"약국"·"카페/커피/다방/찻집")은
+**미검증 추측**이다. 값이 안 맞으면 그 셋을 먼저 의심할 것.
 """
 from __future__ import annotations
 
@@ -256,8 +262,10 @@ def audit(slugs: list[str] | None = None) -> dict:
         print("[taxonomy] 미사상 대분류 상위")
         for k, n in unmapped_lcls.most_common(10):
             print(f"    {k}: {n:,}")
+        # 25개까지 찍는다 — 이 목록이 소분류 규칙을 조일 때의 판단 재료다
+        # (`docs/prompt-store-taxonomy-scls-2026-09-15.md` 가 이 출력을 전제한다).
         print("[taxonomy] 미사상 소분류 상위")
-        for k, n in unmapped_scls.most_common(15):
+        for k, n in unmapped_scls.most_common(25):
             print(f"    {k}: {n:,}")
         # 여기서 찾지 말 것 — 분류체계에 아예 없는 수요다(2026-08-17 전수 검색).
         print(f"[taxonomy] ※ 사상 불가(분류체계 부재): {' · '.join(UNMAPPABLE_DEMAND)}"
