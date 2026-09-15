@@ -1,0 +1,105 @@
+{
+ "generated_at": "2026-09-15",
+ "question": "확장(전국/서울추가) vs 내실(품질·검증)",
+ "method": "저장소 산출물 실측 27회 · 네트워크 0콜(프로덕션은 샌드박스 정책상 도달 불가)",
+ "hubs": {
+  "served": 66,
+  "registered_total": 86,
+  "gyeonggi_held": 20,
+  "reference_buildings": 28736,
+  "reference_coverage_pct_median": 100.0
+ },
+ "anchor_gap_pp": {
+  "n": 66,
+  "median": 8.95,
+  "mean": 8.67,
+  "min": -10.1,
+  "max": 24.2,
+  "abs_gt_10_count": 31,
+  "positive": 56,
+  "negative": 10,
+  "worst5": [
+   [
+    "gwangjang",
+    24.2
+   ],
+   [
+    "nambu",
+    22.6
+   ],
+   [
+    "oryudong",
+    21.3
+   ],
+   [
+    "chungmuro",
+    20.0
+   ],
+   [
+    "nokdu",
+    19.5
+   ]
+  ],
+  "shared_anchor_hypothesis": "기각 — 공유앵커 |격차| 중앙 10.8 vs 정확앵커 9.0 (1.2배)",
+  "root_cause": "큰 건물의 분자 결손 — 상가정보 flrNo 공란 35.8%(hoNo 100% 동시 공란). 08-01 '후보 B' 로 특정, 미해결"
+ },
+ "anchor_pool": {
+  "unique_rone_districts": 55,
+  "hubs": 66,
+  "shared_mapping": 9,
+  "seoul_uncovered_candidates_remaining": 0,
+  "note": "reports/seoul_uncovered_candidates.json 12건이 전부 SEOUL_BATCH2_HUBS 로 편입됨"
+ },
+ "model_vs_expansion": {
+  "lstm_dir_acc_by_hubs": {
+   "13": 84.6,
+   "27": 74.1,
+   "54": 72.2,
+   "66": 70.8
+  },
+  "lstm_kpi_target": 70.0,
+  "lstm_margin_pp": 0.8,
+  "lstm_slope_pp_per_hub": -0.1167,
+  "lstm_kpi_break_at_hubs": 73,
+  "gnn_54hub": {
+   "top1": 0.6512,
+   "top3": 0.9182,
+   "macro_f1": 0.2593,
+   "offprior_top3": 0.3592,
+   "lift_pct": 6.5
+  },
+  "gnn_66hub": {
+   "top1": 0.6494,
+   "top3": 0.9167,
+   "macro_f1": 0.2352,
+   "offprior_top3": 0.3383,
+   "lift_pct": 5.3
+  },
+  "verdict": "54→66 확장에서 두 모델 전 지표가 보합~악화. 단 GNN 은 피처 105→117·노드소스 교체가 겹쳐 순수 대조 아님"
+ },
+ "code_health": {
+  "backend_tests": "339 passed / 6 skipped",
+  "frontend_tests": "89 passed / 11 files",
+  "frontend_build": "pass",
+  "todo_markers": 63,
+  "source_files": 3136,
+  "full_verify_2026-09-15": "5/5 pass",
+  "note": "CLAUDE.md 의 '프론트에 단위 테스트가 없다' 는 낡음 — 89건 존재"
+ },
+ "validation_depth": {
+  "ground_truth_hubs": 1,
+  "ground_truth_of": 66,
+  "ground_truth_accuracy_pct": 75,
+  "declared_gates": 8,
+  "total_gates": 24
+ },
+ "pmf": {
+  "pilot_target": "5~10",
+  "observed": "샌드박스에서 확인 불가(프로덕션 403)",
+  "payments": "전 구간 TODO 스텁"
+ },
+ "expansion_cost": {
+  "gyeonggi": "Phase1 완료(20거점 등록·7 Gold) · Phase2~6 미착수 · 포털 키 3종 · 서울전용 소스 4종 교체",
+  "seoul_additional": "R-ONE 앵커 소진 — 66거점이 고유 55상권에 매핑, 추가분은 공유앵커(합성)"
+ }
+}
