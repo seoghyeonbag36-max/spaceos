@@ -18,7 +18,7 @@
 
 ## 이미 끝난 단계는 다시 돌리지 않는다
 
-09-03 수집분이 **이미 66거점**이다(실측: kakao 47,442행 / blog 23,966행 /
+09-03 수집분이 **이미 66거점**이다(실측: 점포 47,442행 / blog 23,966행 /
 trdar_relm 245행 — 셋 다 district 66, batch2 12/12). R-ONE 도 09-01 분이 86거점을
 덮는다. 그래서 기본 실행은 **분기 시계열 3종만** 다시 받는다:
 
@@ -66,7 +66,6 @@ STEPS: list[tuple[str, list[str], bool, bool]] = [
     ("trdar",     ["data.collectors.seoul_trdar", "--platform13"],            False, True),
     ("flpop",     ["data.collectors.seoul_trdar", "--platform13-flpop"],      False, True),
     ("incomeix",  ["data.collectors.seoul_trdar", "--platform13-income-ix"],  False, True),
-    ("kakao",     ["data.collectors.kakao_local", "--platform13"],            False, False),
     ("blog",      ["data.collectors.naver_blog", "--platform13"],             False, False),
     ("rone",      ["data.collectors.rone_rent"],                              False, False),
     ("datalab",   ["data.collectors.naver_datalab", "--hubs"],                False, True),

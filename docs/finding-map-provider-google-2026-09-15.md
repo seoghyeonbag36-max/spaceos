@@ -10,11 +10,13 @@
 **바꾸지 않는다.** 기능·비용·약관 세 축에서 모두 손실이고, 사업화(M&A) 축에서는 방향이 반대다.
 다만 이 검증에서 **현행 구조의 결함 1건**이 따라 나왔다 — 그건 지금 고쳐야 한다.
 
-| # | 조치 | 근거 | 급함 |
+| # | 조치 | 근거 | 상태 |
 |---|---|---|---|
-| 1 | **카카오 로컬 영구저장 해소** — `bronze/*/kakao_places.json` → Gold 영구 노드화가 카카오 약관에 저촉 | §7 | **높음** |
+| 1 | **카카오 로컬 영구저장 해소** — 저장층을 상가정보(공공데이터)로 옮겼다 | §7-2 | **✅ 완료 2026-09-15** |
+| 1-a | 서빙 배치 `platform_industry_recommend.json` 재생성(재학습 필요) | §7-2-1·2-3 | 남음 |
+| 1-b | `build_hub_adong` 역지오코딩 캐시 — VWorld 대체 실측 후 교체 | §7-2-1 | 남음(위험도 낮음) |
 | 2 | 구글 전환 **보류**(폐기 아님) — 재평가 트리거 5개를 걸어 둔다 | §13 | — |
-| 3 | 베이스맵 어댑터 경계 유지 — `lib/naverMap.ts` 한 파일에 SDK 의존을 계속 격리 | §4 | 낮음 |
+| 3 | 베이스맵 어댑터 경계 유지 — `lib/naverMap.ts` 한 파일에 SDK 의존을 계속 격리 | §4 | 유지 |
 
 ---
 
@@ -74,6 +76,8 @@ naver.maps.* 심볼 사용        15종 / 81회 / 프론트 6파일
 `data/validation/crosscheck_kakao.py`·`roadview_capacity_*.csv`(로드뷰 링크).
 → **"네이버와 카카오로 지도를 구현 중"은 정확히는 "네이버로 지도를 그리고, 카카오로 점포
 데이터를 받는다"** 다. 전환 논의의 대상이 서로 다른 두 문제로 갈라진다.
+(이 목록은 **검증 시점(2026-09-15 오전)의 상태**다. 같은 날 저장 경로는 상가정보로
+옮겼다 — §7-2-1. `build_gold`·`crosscheck_kakao` 는 더 이상 카카오 Bronze 를 읽지 않는다.)
 
 **② 지오코딩은 실사용이 없다.** `apps/backend/app/services/naver_geo.py`(86 LOC)를 import 하는
 코드는 `scripts/check_api_keys.py`(키 점검) 밖에 없다. 주소→좌표는 상가정보·인허가·VWorld 가
@@ -214,6 +218,115 @@ ml/training/train_gnn.py         → 그 노드로 GNN 학습
 이미 `build_page_master.py` 의 1차 소스다), 카카오는 **실시간 조회·크로스체크에만** 남긴다
 (`store_lookup.py` 의 가게 특정처럼 응답을 저장하지 않는 용도). 구글로 옮겨도 이 문제는
 해결되지 않고 **더 엄격해진다**(좌표 30일 캐시 상한).
+
+### (2-1) ✅ 조치 완료 — 저장층을 상가정보로 옮겼다 (2026-09-15)
+
+소스를 **소상공인 상가(상권)정보**(`bronze/{거점}/stores_raw.json`, 공공데이터포털
+15012005)로 바꿨다. 이미 `building_vacancy.py` 가 거점별로 모으고 있던 것이라
+**새로 수집할 것이 없다.**
+
+| 무엇 | 전 | 후 |
+|---|---|---|
+| 점포 노드 소스 | `kakao_places.json` | `stores_raw.json` (상가정보) |
+| `node_id` | `kakao:{장소id}` | `sdsc:{bizesId}` |
+| 라벨 | `category_group_name` 7종 | 상가정보 계층 → **같은 7종으로 사상** |
+| 동일건물 엣지 키 | 도로명 **문자열** 일치 | `bdMgtSn` → PNU → 도로명 폴백 |
+| `place_url` | 저장 | **폐기**(카카오 응답 내용) |
+| 카카오 수집기 | Bronze 적재 | **실시간 반환 전용** — 집계만 찍는다 |
+
+조인이 아니라 **사상**이다. 상가정보 라벨을 카카오 노드에 붙이는 조인은 2026-08-17 에
+기각됐다(상호 일치 42.01% · 동일좌표 중복 **92.31%** →
+`finding-sequence-and-accuracy-2026-08-17.md` §5). 여기서는 상가정보 행의 **자기 업종
+계층만** 보고 라벨을 정하므로 행 단위 식별 문제가 발생하지 않는다.
+
+교체는 **덤도 줬다** — 카카오에 없던 세 키가 들어온다: `bdMgtSn`(건물 정확 식별),
+`lnoCd`(PNU 19자리 — Page 건물 마스터와 직접 조인), `flrNo`/`hoNo`(층·호 — 공실 유닛과
+직접 연결). 동일건물 엣지가 문자열 대조에서 건축물대장 키로 올라간 것이 그 결과다.
+
+**손댄 곳**
+
+```
+신설  data/config/store_taxonomy.py          업종 계층 → 7종 사상 + 상업 필터 + --audit
+신설  data/tests/test_store_taxonomy.py      사상 규칙 + 약관 불변식 가드 (31건)
+수정  data/pipelines/build_gold.py           _store_node_rows 신설 · 두 노드 빌더 · 컨텍스트
+수정  data/collectors/kakao_local.py         save_json 제거 · summarize() 추가 · 실시간 전용
+수정  data/validation/crosscheck_kakao.py    실시간 호출 · kakao_names 열 폐지
+수정  data/pipelines/build_store_graph_edges.py  동일건물 키 3단 폴백
+수정  data/analyze_district_signals.py       kakao 블록 → store 블록(상가정보)
+수정  data/pipelines/refresh_platform.py · scripts/run_batch2_chain.py  kakao 수집 단계 제거
+수정  ml/training/train_gnn.py               소스·라벨 변경 경고 + 미분류 런타임 경고
+정리  data/validation/roadview_sample.csv    kakao_names 열 삭제(값 14/30행)
+정리  data/silver/node_jipgyegu.json         kakao:* 배정 40,388건 삭제 · oa_codes 보존
+```
+
+**⚠ 남은 노출 1건 — `data/gold/platform_industry_recommend.json`**
+
+서빙용 업종추천 배치(9.1MB)가 아직 `kakao:{장소id}` 47,442건을 키로 들고 있고 좌표도
+카카오 것이다. 이 파일은 GNN 학습의 산출물이라 **재학습해야 갈린다.** 지우면
+`/api/v1/ai/recommend-industry` 가 죽으므로 이 커밋에서는 건드리지 않았다.
+
+**⚠ 남은 노출 2건 — 커밋된 `program_content_context.csv` 66개**
+
+`kind=category` 행이 카카오 카테고리 어휘의 집계다(`category,카페,44` · `category,"호프,요리주점",23`).
+장소 단위 레코드가 아니라 분포 집계라 노출 강도는 낮지만, 어휘가 카카오 것이다.
+**아래 런북 1단계가 이 66개 파일을 통째로 다시 쓴다**(상가정보 소분류 어휘로) —
+별도 조치가 아니라 재생성으로 해소되는 항목이라 이 커밋에서 손대지 않았다.
+지금 지우면 Program LLM 컨텍스트에서 업종 분포만 빠진 상태로 며칠 돌게 된다.
+
+**⚠ 잔여 검토 1건 — `build_hub_adong.py`**
+
+거점↔행정동 사이드카(`silver/hub_adong.json`)가 카카오 `coord2regioncode` 응답을
+캐시한다. 저장하는 값이 **행정동 코드·명**(정부 공표 사실)이라 장소 테이블과는 위험도가
+다르지만, 취득 경로가 카카오인 것은 같다. 대체는 VWorld 행정구역(`LT_C_ADEMD_INFO`)
+질의가 후보인데 **레이어명·속성키를 실측하지 않았다** — `probe-first` 로 1콜 확인한 뒤
+갈 것. 이 커밋에서는 손대지 않았다(검증 없이 바꾸면 사이드카가 조용히 빈다).
+
+### (2-2) 재생성 런북 — 이 순서로만 돈다
+
+`node_id` 체계가 갈렸으므로 **node_id 로 조인하는 사이드카를 뒤에 다시 만들어야 한다.**
+안 하면 조인이 전부 비고, 그 상태가 조용하지는 않다(`train_gnn` 이 "집계구 귀속 0건"
+경고를 찍고 건너뛴다).
+
+```bash
+# 0) 사상률을 먼저 본다 — 규칙이 실제 어휘에 맞는지
+python -m data.config.store_taxonomy --audit
+
+# 1) 노드 재생성 (상가정보 기반)
+#    ⚠ 이 실행이 program_content_context.csv 66개를 통째로 다시 쓴다 —
+#      category 행의 어휘가 카카오 → 상가정보 소분류로 갈린다(위 '남은 노출 2').
+python -m data.pipelines.build_gold --platform13
+python -m data.pipelines.build_gold                # 가로수길 단일 거점
+
+# 2) node_id 로 조인하는 사이드카
+python -m data.pipelines.build_store_graph_edges --platform13
+python -m data.pipelines.build_page_building_features
+python -m data.pipelines.build_node_jipgyegu
+
+# 3) 게이트·회귀
+python -m pytest data/tests -q
+python scripts/pppp_status.py
+
+# 4) ⚠ 별도 판단 — 재학습(라벨 어휘·게이트가 움직인다. §(2-3))
+# OMP_NUM_THREADS=1 PYTHONIOENCODING=utf-8 python -u -m ml.training.train_gnn
+```
+
+### (2-3) 재학습은 왜 별도 판단인가
+
+라벨 어휘가 움직이기 때문이다. 상가정보는 가두 점포 **전체**를 주고(대분류 10종 ·
+222,260노드 규모), 7종에 사상되지 않는 업종(소매·생활서비스·교육 등)은
+`category_group` 이 공란이라 `_labels` 가 **'미분류'** 로 받는다 → 클래스가 8개가 된다.
+
+기준선은 이미 측정돼 있다(`finding-sequence-and-accuracy-2026-08-17.md` §6):
+
+| 라벨 체계 | 클래스 | 거점사전 Top-1 | 거점사전 Top-3 |
+|---|---|---|---|
+| 카카오 7종 (현행 체크포인트) | 7 | 61.2% | **89.7%** |
+| 상가정보 대분류 | 10 | 34.0% | **69.9%** |
+
+즉 **현행 게이트 값(Top-3 91.67% · off-prior 33.83%)과 다음 런의 값은 직접 비교되지
+않는다.** 그래서 이 커밋은 재학습을 하지 않고, 대신 `_labels` 가 미분류 비중을
+런타임에 경고하게 해 뒀다 — 조용히 갈리는 것만 막는다. 어휘(7종 유지 ↔ 대분류 10종
+전환)와 게이트 재산정은 값을 보고 결정할 일이다.
 
 ---
 

@@ -1,16 +1,36 @@
-"""[B단계·Program/Posting] 카카오 로컬 수집기 — 장소·카테고리 크로스체크 (docs §8-E).
+"""[검증] 카카오 로컬 **실시간** 크로스체크 — 저장하지 않는다 (2026-09-15 개정).
 
-`KAKAO_REST_API_KEY`(developers.kakao.com 즉시발급)로 거점 반경의 현존 점포를
-카테고리별로 수집한다. 용도: 상가정보 API(§1-A)의 폐업 반영 지연 보완 + 업종
-카테고리·place_url(리뷰 크롤링 시드) 확보.
+## ⚠ 이 모듈은 Bronze 를 쓰지 않는다
+
+카카오 로컬 API 는 **응답 결과의 저장을 허용하지 않는다**(실시간 호출만). 장소명·
+위경도·`place_url` 을 서비스 DB 나 파일에 영구 저장하는 것은 이용약관 위반으로
+안내되고, 2026년 데브톡에는 위반에 따른 API 차단 예정 조치 공지가 올라와 있다.
+
+그래서 2026-09-15 에 저장층을 걷어냈다. 종전에는 이 수집기가
+`bronze/{거점}/{날짜}/kakao_places.json` 을 남기고 `build_gold` 가 그것을 GNN 노드로
+영구화했다(47,442행). **점포 노드의 소스는 이제 소상공인 상가(상권)정보**다 —
+`building_vacancy.py` 가 모으는 `stores_raw.json`, 공공데이터라 보관에 제약이 없다.
+경위·근거: `docs/finding-map-provider-google-2026-09-15.md` §7-2.
+
+## 그래서 지금 이 모듈의 용도는
+
+`collect()` · `collect_platform13()` 은 결과를 **메모리로 돌려준다.** 호출자는 그
+자리에서 비교하고 **집계(건수·일치율)만** 남긴다. 원본 행을 파일·DB 에 쓰면 안 된다.
+용도는 하나다 — 상가정보(§1-A)의 폐업 반영 지연을 실시간으로 대조하는 것
+(`data/validation/crosscheck_kakao.py`).
+
+`KAKAO_REST_API_KEY` 는 developers.kakao.com 즉시발급. ⚠ 2026-07-21 부터 무료 쿼터는
+개발자 계정의 **첫 활성화 앱 1개**에만 제공되고, 초과분은 건당 과금이다
+(2026-02-02~12-31 할인가 10원 · 정상가 50원).
 
 ⚠️ 카카오 로컬은 쿼리당 최대 45건(15건×3페이지)만 노출한다. 다만 응답 meta.total_count
 는 상한과 무관하게 실제 총계를 알려주므로(강남역 음식점 600m = 925건, pageable_count 는
 45), 이 값을 보고 45건 아래로 떨어질 때까지 원을 재귀 분할해 전수에 가깝게 모은다.
 2026-07-23 분할 수집 도입 — 27거점 실측 총계 23,850건(분할 전 노출은 5,646건).
 
-실행: python -m data.collectors.kakao_local
-      python -m data.collectors.kakao_local --platform13          # 33거점 분할 수집
+실행(집계만 찍는다 — 파일을 남기지 않는다):
+      python -m data.collectors.kakao_local
+      python -m data.collectors.kakao_local --platform13          # 66거점 분할 집계
       python -m data.collectors.kakao_local --platform13 --no-split  # 구 동작(45건 상한)
 """
 from __future__ import annotations
@@ -26,8 +46,8 @@ try:
 except ImportError:  # pragma: no cover
     requests = None
 
-from data.collectors.common import load_env, save_json
-from data.config.garosugil import CX, CY, RADIUS_M, SLUG
+from data.collectors.common import load_env
+from data.config.garosugil import CX, CY, RADIUS_M
 
 _URL = "https://dapi.kakao.com/v2/local/search/category.json"
 
@@ -190,7 +210,10 @@ def _dist_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 def collect() -> list[dict]:
-    """카테고리별 반경 수집 → 중복(장소 id) 제거 → Bronze 저장."""
+    """카테고리별 반경 조회 → 중복(장소 id) 제거 → **메모리 반환**.
+
+    ⚠ 저장하지 않는다(모듈 머리말). 호출자는 이 자리에서 비교하고 집계만 남길 것.
+    """
     key = os.getenv("KAKAO_REST_API_KEY")
     if not key or requests is None:
         print("[kakao_local] KAKAO_REST_API_KEY 미설정(또는 requests 없음) — 건너뜀")
@@ -208,9 +231,7 @@ def collect() -> list[dict]:
         for d in docs:
             seen[d.get("id", d.get("place_url", ""))] = d
 
-    places = list(seen.values())
-    save_json(places, SLUG, "kakao_places.json")
-    return places
+    return list(seen.values())
 
 
 def _collect_district(key: str, did: str, lat: float, lng: float, radius: int,
@@ -258,9 +279,12 @@ def collect_platform13(split: bool = True, workers: int = _WORKERS) -> list[dict
     거점×카테고리 반경 수집, 행마다 district_id 부가.
     split=True(기본)면 total_count 기준 재귀 분할로 45건 상한을 넘어 전수에 가깝게 모은다.
     split=False 면 구 동작(카테고리당 45건) — 빠른 확인용.
-    거점을 workers 스레드로 병렬 수집하되, 병합은 DISTRICT_PLACES 순서로 결정적으로
+    거점을 workers 스레드로 병렬 조회하되, 병합은 DISTRICT_PLACES 순서로 결정적으로
     한다(인접 거점 반경 중복 시 먼저 정의된 거점 소속 유지 — 순차 실행과 동일 결과).
-    Bronze: data/bronze/platform13/{날짜}/kakao_places.json
+
+    ⚠ 저장하지 않는다(모듈 머리말). 종전 산출물
+    `bronze/platform13/{날짜}/kakao_places.json` 은 더 만들지 않는다 — GNN 노드의
+    소스는 상가정보(`stores_raw.json`)다.
     """
     from data.config.platform_places import DISTRICT_PLACES
 
@@ -297,16 +321,37 @@ def collect_platform13(split: bool = True, workers: int = _WORKERS) -> list[dict
     if split:
         print(f"[kakao_local] 총 {len(places)}건 · 요청 {tot_req}회 · 미수집 추정 {tot_resid}건")
     if failed:
-        print(f"[kakao_local] ⚠ 수집 실패 {len(failed)}건 — {'; '.join(failed)}")
-    save_json(places, "platform13", "kakao_places.json")
+        print(f"[kakao_local] ⚠ 조회 실패 {len(failed)}건 — {'; '.join(failed)}")
     return places
 
 
+def summarize(places: list[dict]) -> dict:
+    """집계만 뽑는다 — 이 함수의 출력은 저장해도 되는 것의 경계다.
+
+    장소명·좌표·`place_url` 같은 **행 내용은 담지 않는다.** 거점·업종 대분류별 건수만
+    센다(공공 통계와 같은 층위의 수치라 대조 기록으로 남길 수 있다).
+    """
+    from collections import Counter
+
+    per_district: Counter = Counter()
+    per_group: Counter = Counter()
+    for d in places:
+        per_district[str(d.get("district_id") or "(단일거점)")] += 1
+        per_group[str(d.get("category_group_name") or "(미상)")] += 1
+    return {
+        "places": len(places),
+        "districts": len(per_district),
+        "per_district": dict(per_district.most_common()),
+        "per_group": dict(per_group.most_common()),
+    }
+
+
 if __name__ == "__main__":
+    import json
     import sys
 
     load_env()
-    if "--platform13" in sys.argv:
-        collect_platform13(split="--no-split" not in sys.argv)
-    else:
-        collect()
+    got = (collect_platform13(split="--no-split" not in sys.argv)
+           if "--platform13" in sys.argv else collect())
+    # 원본 행은 찍지 않는다 — 콘솔 출력이 리다이렉트되면 그것도 저장이다.
+    print(json.dumps(summarize(got), ensure_ascii=False, indent=2))

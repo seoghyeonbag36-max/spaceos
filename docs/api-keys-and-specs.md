@@ -315,10 +315,20 @@ NAVER_MAPS_CLIENT_SECRET=
 - 모델: 품질 우선 `claude-sonnet-5`, 대량·저비용 생성 `claude-haiku-4-5-20251001`. **vision 내장**이라 상가 이미지 분석(Program의 이미지 정보 활용)에 별도 Vision API가 불필요.
 - `pip install anthropic langchain-anthropic` (requirements.txt에 추가). feature-program.md의 OpenAI/Gemini도 래퍼(`services/llm.py`)만 바꾸면 호환되도록 작성.
 
-### 8-E. 카카오 로컬 `KAKAO_REST_API_KEY` — 장소·카테고리 크로스체크
-1. [developers.kakao.com](https://developers.kakao.com) → 애플리케이션 추가 → **REST API 키** 복사(즉시발급, 무료 쿼터).
+### 8-E. 카카오 로컬 `KAKAO_REST_API_KEY` — **실시간** 크로스체크 (저장 금지)
+1. [developers.kakao.com](https://developers.kakao.com) → 애플리케이션 추가 → **REST API 키** 복사(즉시발급).
 2. 호출: `GET https://dapi.kakao.com/v2/local/search/keyword.json?query=…&x=…&y=…&radius=…` — 헤더 `Authorization: KakaoAK {KEY}`.
-- 용도: §1-A 상가정보의 폐업 반영 지연을 보완하는 **현존 점포 크로스체크** + 카테고리·장소URL(리뷰 크롤링 시드).
+- 용도: §1-A 상가정보의 폐업 반영 지연을 보완하는 **현존 점포 크로스체크**. 그리고 그것만이다.
+- ⚠ **응답 결과를 저장할 수 없다** (2026-09-15 확인). 카카오 로컬은 실시간 호출만 허용하고,
+  장소명·위경도·`place_url` 을 서비스 DB·파일에 영구 저장하는 것은 약관 위반으로 안내된다
+  (2026년 데브톡에 위반 시 API 차단 예정 조치 공지). 그래서:
+  - `bronze/*/kakao_places.json` 경로를 **없앴다**. 수집기는 메모리로만 돌려준다.
+  - 점포 노드(`gold/*/platform_store_graph_nodes`)의 소스는 **§1-A 상가정보**다.
+  - 리뷰 크롤링 시드로 쓰던 `place_url` 도 저장하지 않는다.
+  → 근거·경위 `finding-map-provider-google-2026-09-15.md` §7-2 · 사상 규칙
+    `data/config/store_taxonomy.py` · 가드 `data/tests/test_store_taxonomy.py`
+- ⚠ 무료 쿼터는 2026-07-21 부터 개발자 계정의 **첫 활성화 앱 1개**에만 제공된다.
+  초과분은 건당 과금(2026-02-02~12-31 할인가 10원 · 정상가 50원).
 
 ### 8-F. 인스타그램·구글 — 보류/선택
 - **인스타그램 Graph API**: 해시태그 검색에 비즈니스 계정 + 앱 검수 필요, 주 30개 해시태그 제한 → PoC 단계에서는 보류하고 [data/crawlers](../data/README.md)의 Playwright 크롤러로 대체. `.env` 슬롯(`INSTAGRAM_ACCESS_TOKEN`)만 유지.
@@ -334,6 +344,6 @@ NAVER_MAPS_CLIENT_SECRET=
 | `gold/platform_district_timeseries` | Platform(LSTM) | `TRDAR_CD` × 년분기 | 8-A + 2 + **1-C/4(부동산원 공실률·임대료 API)** + 8-B(폐업 집계) |
 | `gold/platform_store_graph` | Platform(GNN) | `bizesId`(노드) | 1-A + 8-A(업종·매출) + 리뷰 크롤링 |
 | `gold/posting_cost_benefit` | Posting | 업종코드 × 전략 | 8-C + 8-A(추정매출·소득소비) + **1-C/4(임대료·수익률)** + **6-B(허용업종·공시지가)** |
-| `gold/program_content_context` | Program | `TRDAR_CD` / `bizesId` | 5-B(블로그·트렌드) + 8-E + 크롤링(리뷰·이미지) |
+| `gold/program_content_context` | Program | `TRDAR_CD` / `bizesId` | 5-B(블로그·트렌드) + **1-A(업종 분포)** + 크롤링(리뷰·이미지) |
 
 - 공통 조인 축: **건물(`bdMgtSn`) ↔ 점포(`bizesId`) ↔ 상권(`TRDAR_CD`) ↔ 행정동(`adongCd`)**. Silver 단계에서 이 4개 키를 모든 테이블에 부여하는 것이 B단계 정제의 핵심 작업.

@@ -29,12 +29,22 @@ data/
 ```bash
 py -m data.collectors.seoul_trdar    # [Platform] 상권분석 분기 시계열 (SEOUL_OPENAPI_KEY)
 py -m data.collectors.localdata      # [Platform] 개·폐업 인허가 이력 (⚠ data.go.kr 이관 대기 — 수집기 TODO 참조)
-py -m data.collectors.kakao_local    # [Program/Posting] 현존 점포·카테고리 (KAKAO_REST_API_KEY)
+py -m data.collectors.building_vacancy  # [Page/Platform] 상가정보 점포 + 건축물대장 (DATA_GO_KR_SERVICE_KEY)
+                                     #   → stores_raw.json = **점포 노드의 소스**
+py -m data.collectors.kakao_local    # [검증] 현존 점포 실시간 크로스체크 (KAKAO_REST_API_KEY)
+                                     #   ⚠ 저장하지 않는다 — 집계만 찍는다(약관)
 py -m data.collectors.naver_blog     # [Program] 블로그 리뷰 + 데이터랩 트렌드 (NAVER_CLIENT_ID/SECRET)
 py -m data.pipelines.build_gold      # Bronze → Gold 4테이블 (platform_district_timeseries 등)
 ```
 
 키가 없는 수집기는 건너뛰고, Bronze 가 없는 Gold 테이블은 안내만 출력한다(부분 실행 안전).
+
+⚠ **카카오 로컬 응답은 Bronze 에 저장하지 않는다** (2026-09-15). 카카오 로컬 API 는
+실시간 호출만 허용하고 응답 결과의 저장을 금지한다 — 종전 `bronze/*/kakao_places.json`
+경로를 없앴고, 점포 노드(`platform_store_graph_nodes`)의 소스는 **소상공인 상가(상권)
+정보**(`stores_raw.json`, 공공데이터)다. 근거·경위:
+`docs/finding-map-provider-google-2026-09-15.md` §7-2 · 업종 사상 규칙:
+`config/store_taxonomy.py` · 불변식 가드: `tests/test_store_taxonomy.py`.
 
 ## 공유 규칙
 - 원시 데이터(개인정보 포함 가능)는 git 에 올리지 않는다(.gitignore). 비식별화 후 gold 산출물만 공유.
