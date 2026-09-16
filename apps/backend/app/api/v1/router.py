@@ -2,7 +2,9 @@
 from fastapi import APIRouter, Depends
 
 from app.api.deps import track_access
-from app.api.v1 import admin, ai, auth, buildings, districts, heatmap, marketing, metrics
+from app.api.v1 import (
+    admin, ai, auth, buildings, districts, feedback, heatmap, marketing, metrics,
+)
 
 # 분석 API 공통 — 자격증명이 오면 신원을 밝히고 사용량을 남긴다(익명은 그대로 통과).
 # 여기 한 곳에 걸어야 새 엔드포인트가 계측에서 조용히 빠지지 않는다.
@@ -25,3 +27,6 @@ api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
 # 저장 키에 `client:` 가 붙어 서버 실측과 구분된다(metrics.py 독스트링 §신뢰 경계).
 # 사용량 계측(_tracked)은 걸지 않는다 — 비콘은 분석 API 사용이 아니다.
 api_router.include_router(metrics.router, prefix="/metrics", tags=["metrics"])
+# 파일럿 피드백 — KPI③ 입력. 인증 필수라 익명 데모 트래픽이 PMF 로 새지 않는다.
+api_router.include_router(feedback.router, prefix="/feedback", tags=["feedback"],
+                          dependencies=_tracked)

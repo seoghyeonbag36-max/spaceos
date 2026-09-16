@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 
 from app.core.db import get_db
 from app.services import latency as latency_service
+from app.services import pmf as pmf_service
 from app.services import usage as usage_service
 
 router = APIRouter()
@@ -78,6 +79,21 @@ def latency() -> dict:
     구조를 드러내기 때문이다.
     """
     return latency_service.summary()
+
+
+@router.get("/pmf", dependencies=[Depends(require_admin)])
+def pmf(db: Session = Depends(get_db)) -> dict:
+    """NPS · 유료 전환 의향 — KPI③ 의 나머지 절반을 재는 관측 지점.
+
+    `/usage` 의 `active_orgs` 가 "파일럿이 살아 있나" 라면 여기는 "그래서 돈을 낼
+    생각인가 · 남에게 권할 생각인가" 다. 2026-09-16 이전에는 후자를 담을 곳이
+    아예 없었다.
+
+    ⚠ 표본이 `min_responses` 미만이면 `verdict: "표본부족"` 이다. 응답 한 건이 NPS 를
+    몇 포인트 흔드는지(`one_response_swing_nps`)도 함께 돌려준다 — n 이 작을 때
+    "NPS 40 달성" 이 얼마나 약한 말인지 숫자로 보라는 뜻이다.
+    """
+    return pmf_service.pmf_summary(db)
 
 
 @router.get("/usage", dependencies=[Depends(require_admin)])

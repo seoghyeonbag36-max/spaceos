@@ -104,11 +104,17 @@ Price 는 Posting 으로, Promotion 은 Program 으로만 간다.
 ⚠ 화면 쪽 값은 **클라이언트 자가보고**라 서버 실측과 등급이 다르다. 저장 키의
 `client:` 접두사가 그 구분을 지킨다(`api/v1/metrics.py` §신뢰 경계).
 
-### KPI③ 고객 검증(PMF)
-- **B2B 파일럿 5~10건** — 계측 있음(`GET /api/v1/admin/usage` 의 `active_orgs`).
-  ⚠ 진행률 100% 는 파일럿 0건과 양립한다 — 배선과 실적은 다른 것이다.
-- **유료 전환 의향 30%+ · NPS 30+** — 계측기 없음. 규칙 4 에 따라 **미계측**이고,
-  설문·전환 기록 배선이 선행 조건이다.
+### KPI③ 고객 검증(PMF) — **계측 배선 완료 (2026-09-16)**
+| 목표 | 계측 | 읽는 곳 |
+|---|---|---|
+| B2B 파일럿 5~10건 | `services/usage.record_access` | `GET /api/v1/admin/usage` 의 `active_orgs` |
+| NPS 30+ · 유료 전환 의향 30%+ | `POST /api/v1/feedback`(인증 필수) → `services/pmf` | `GET /api/v1/admin/pmf` |
+
+⚠ **배선 100% 는 파일럿 0건과 양립한다.** 이 트랙만은 코드가 아니라 실적이 남았다.
+⚠ 익명 응답은 받지 않는다 — 공개 데모 만족도가 B2B PMF 로 둔갑한다. 표본 단위는
+응답이 아니라 **조직**(조직당 최신 1건)이고, `min_responses`(5) 미만이면 계측기가
+`verdict: "표본부족"` 으로 물러난다. n 이 작을 때 한 응답이 NPS 를 몇 포인트 흔드는지
+(`one_response_swing_nps`)도 함께 나온다 — n=5 면 40포인트다.
 
 ## Preferences
 - 결과물: **Word(.docx)** 선호 (표·그래프 포함, 핵심 요약 + 상세 분석)
