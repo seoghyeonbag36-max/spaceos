@@ -83,7 +83,23 @@ def test_status_and_index_link_to_the_new_evidence() -> None:
     # 거짓말하는 셈이라 `prem` 을 분모에서 뺀 08-24 결정과 같은 처리를 했다.
     # **값은 사라지지 않았다**: 관측 전용 게이트 "유닛 면적 입도"가 50% 를 계속 찍는다
     # (아래 단언이 그것을 지킨다). 근거: docs/feature-posting.md §0-M·§0-Q·§0-R·§0-S
-    assert scores == {"Page": 100.0, "Platform": 100.0, "Posting": 100.0, "Program": 100.0}
+    #
+    # 2026-09-16 Platform 100.0 → 66.7. 이번에는 **내려간** 것이고, 수집이 후퇴해서가
+    # 아니라 **세는 자가 틀렸던 것**이다: KPI 게이트가 "정확도 70%+" 라는 임계값이었는데
+    # 같은 홀드아웃에서 무정보 규칙이 그 선을 이미 넘고 있었다(공실 예측 방향 '항상 하락'
+    # 78.5% vs 모델 70.8% · 업종추천 거점 사전분포 Top-3 89.4% vs 게이트 70%). 임계값을
+    # 베이스라인 대비 실력으로 갈아끼우자 방향 축이 실패로 드러났고, 학습 규약 게이트
+    # (누수 차단본 재학습)가 하나 더 붙었다. → docs/finding-kpi-leak-2026-09-16.md
+    #
+    # **그래서 여기에 100.0 을 다시 박지 않는다.** 이 파일이 2026-09-05 에 배운 그대로다 —
+    # 가드가 옛 값을 고정하면 가드 자신이 드리프트의 원인이 된다. 고정할 것은 숫자가
+    # 아니라 **성질**이다: 세 트랙은 게이트 배선이 끝나 100 이고, Platform 은 실력
+    # 게이트가 열려 있는 동안 100 미만이어야 한다(닫히면 자연히 오른다).
+    assert scores["Page"] == 100.0
+    assert scores["Posting"] == 100.0
+    assert scores["Program"] == 100.0
+    assert 0.0 < scores["Platform"] < 100.0, (
+        "Platform 이 100 이면 실력 게이트가 사라졌거나 베이스라인 대조가 꺼진 것이다")
 
     # 상한을 평균에서 뺐다면 **관측으로는 반드시 남아야 한다.** 둘 다 빠지면 균등분할이
     # 실측처럼 인용된다 — 이 저장소가 반복해 당한 실패 양식(선언이 낡는 것)의 다른 얼굴이다.
@@ -91,3 +107,12 @@ def test_status_and_index_link_to_the_new_evidence() -> None:
     ceiling = next(g for n, g in gates.items() if n.startswith("유닛 면적 입도"))
     assert ceiling["observe"] is True
     assert ceiling["value"] == 0.5
+
+    # KPI 게이트는 **베이스라인 대조를 이름에 걸고** 있어야 한다. 이름이 임계값으로
+    # 돌아가면(예: "Top-3 ≥70%") 무정보 규칙이 통과하는 자리로 되돌아간 것이다.
+    skill = [n for n in gates if "실력" in n]
+    assert len(skill) >= 3, f"실력 게이트가 줄었다: {skill}"
+    assert not any("≥70%" in n for n in gates), (
+        "임계값 게이트가 되돌아왔다 — 베이스라인이 그 선을 이미 넘는다")
+    assert any(n.startswith("LSTM 학습 규약") for n in gates), (
+        "학습 규약 게이트가 사라졌다 — 누수 차단본 재학습 여부를 못 본다")

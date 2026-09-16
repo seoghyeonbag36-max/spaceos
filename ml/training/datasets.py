@@ -72,20 +72,52 @@ class PooledDataset:
     y: np.ndarray
     district_ids: list[str]          # 원핫 인덱스 순서
     sample_district: np.ndarray      # 각 샘플의 거점 인덱스
-    sample_is_last: np.ndarray       # 홀드아웃(각 거점 마지막 윈도우) 여부
-    mu: np.ndarray                   # 피처 표준화 평균 (F,)
-    sd: np.ndarray                   # 피처 표준화 표준편차 (F,)
+    sample_is_last: np.ndarray       # test(각 거점 마지막 윈도우) 여부
+    sample_is_val: np.ndarray        # val(각 거점 끝에서 두 번째 윈도우) 여부
+    mu: np.ndarray                   # 피처 표준화 평균 (F,) — **train 행에서만** 계산
+    sd: np.ndarray                   # 피처 표준화 표준편차 (F,) — 위와 같다
     y_mu: float
     y_sd: float
 
 
 def build_dataset(look_back: int | None = None) -> PooledDataset:
-    """Gold → pooled 윈도우. look_back 미지정 시 min(8, 최소 가용-1)로 자동 조정."""
+    """Gold → pooled 윈도우. look_back 미지정 시 가용 분기 수에 맞춰 자동 조정.
+
+    ## 홀드아웃이 둘인 이유 (2026-09-16 누수 차단)
+
+    종전에는 거점별 **마지막 1분기**만 떼어 그것으로 하이퍼파라미터를 고르고 **같은
+    것으로** 지표를 보고했다. 그러면 보고값이 test 가 아니라 val 이다 —
+    `train_lstm.main` 이 8개 조합을 돌려 그중 가장 좋은 것을 고르고, 방향정확도가
+    0.70 을 넘는 순간 멈추기까지 했다. 그렇게 나온 70.8% 는 "이 모델의 성능"이 아니라
+    "8번 뽑아 목표를 넘긴 값"이라 위로 편향된다.
+
+    그래서 끝에서 두 번째 분기를 **val**(선택용), 마지막 분기를 **test**(보고용)로
+    가른다. 시계열이므로 무작위 분할이 아니라 시간 순서를 지킨다.
+
+    ## 표준화 통계도 train 에서만 낸다
+
+    `mu`·`sd`·`y_mu`·`y_sd` 를 전체 행에서 내면 **미래(홀드아웃)가 전처리에 샌다.**
+    분기 시계열에서 이건 고전적인 누수다 — 평가 시점에는 알 수 없는 값으로 스케일을
+    맞춰 놓고 그 스케일로 복원한 예측을 채점하게 된다. 방향 판정이 `pred - prev` 의
+    부호라 `y_mu` 이동이 그대로 판정을 흔든다(불변이 아니다).
+
+    ⚠ 이 함수를 고치면 **재학습 전까지 `ml/artifacts/vacancy_lstm.pt` 와 그 지표는
+    옛 규약(누수 포함)이다.** 산출물에 규약 표기를 남기는 것은 `train_lstm.main` 이
+    한다(`protocol` 블록).
+    """
     df = load_gold()
     dids = sorted(df["district_id"].unique())
     n_min = int(df.groupby("district_id").size().min())
     if look_back is None:
-        look_back = max(2, min(8, n_min - 2))  # 홀드아웃 1분기 확보
+        # val 1 + test 1 을 떼고도 train 윈도우가 최소 1개 남아야 한다.
+        look_back = max(2, min(8, n_min - 3))
+
+    # 표준화 통계의 모집단 = **각 거점의 마지막 2분기를 뺀 행**(= val·test 타깃 분기).
+    # 그 앞 분기들은 train 윈도우의 입력으로 실제로 쓰이므로 남긴다.
+    train_row = np.ones(len(df), dtype=bool)
+    for did in dids:
+        idx = np.flatnonzero((df["district_id"] == did).to_numpy())
+        train_row[idx[-2:]] = False
 
     feats = df[list(SEQ_FEATURES)].to_numpy(dtype=np.float64)
     # ⚠ nan 을 무시하고 센다. 2026-09-04 에 여기가 66거점 학습을 통째로 죽였다:
@@ -94,10 +126,11 @@ def build_dataset(look_back: int | None = None) -> PooledDataset:
     # 시작한다), `mean(axis=0)` 은 한 칸만 nan 이어도 **그 열 전체를 nan** 으로 만든다.
     # 그러면 표준화가 모든 거점·모든 샘플을 nan 으로 오염시켜 8 trial 이 전부
     # `MAE nan · 방향정확도 0.0%` 로 나온다 — 결측 18칸이 1,452행 학습을 죽였다.
-    mu, sd = np.nanmean(feats, axis=0), np.nanstd(feats, axis=0)
+    mu = np.nanmean(feats[train_row], axis=0)
+    sd = np.nanstd(feats[train_row], axis=0)
     sd[sd == 0] = 1.0
 
-    Xs, ys, s_did, s_last = [], [], [], []
+    Xs, ys, s_did, s_last, s_val = [], [], [], [], []
     dropped = 0
     for di, did in enumerate(dids):
         g = df[df["district_id"] == did]
@@ -120,21 +153,31 @@ def build_dataset(look_back: int | None = None) -> PooledDataset:
             Xs.append(win)
             ys.append(tgt)
             s_did.append(di)
-            s_last.append(end == n - 1)
+            s_last.append(end == n - 1)       # test — 보고 전용, 선택에 쓰지 않는다
+            s_val.append(end == n - 2)        # val  — 하이퍼파라미터 선택용
 
     if dropped:
         print(f"[dataset] 결측 윈도우 {dropped}개 제외 · 학습 윈도우 {len(Xs)}개")
     X = np.asarray(Xs, dtype=np.float32)
     y_raw = np.asarray(ys, dtype=np.float64)
-    y_mu, y_sd = float(y_raw.mean()), float(y_raw.std() or 1.0)
+    is_last = np.asarray(s_last, dtype=bool)
+    is_val = np.asarray(s_val, dtype=bool)
+    # 타깃 표준화도 **train 윈도우만**으로 낸다. `_train_once` 가 이 상수로 예측을
+    # 원단위로 되돌리고 방향을 `pred - prev` 로 판정하므로, 여기에 홀드아웃이 섞이면
+    # 판정 자체가 미래를 보고 내려진다.
+    y_train = y_raw[~(is_last | is_val)]
+    if y_train.size == 0:        # 거점당 분기가 극단적으로 적을 때만 — 전부로 물러난다
+        y_train = y_raw
+    y_mu, y_sd = float(y_train.mean()), float(y_train.std() or 1.0)
     y = ((y_raw - y_mu) / y_sd).astype(np.float32)
     return PooledDataset(
         X=X, y=y, district_ids=dids,
-        sample_district=np.asarray(s_did), sample_is_last=np.asarray(s_last),
+        sample_district=np.asarray(s_did), sample_is_last=is_last, sample_is_val=is_val,
         mu=mu, sd=sd, y_mu=y_mu, y_sd=y_sd,
     )
 
 
 if __name__ == "__main__":
     ds = build_dataset()
-    print(f"X={ds.X.shape} y={ds.y.shape} 거점={len(ds.district_ids)} 홀드아웃={int(ds.sample_is_last.sum())}")
+    print(f"X={ds.X.shape} y={ds.y.shape} 거점={len(ds.district_ids)} "
+          f"val={int(ds.sample_is_val.sum())} test={int(ds.sample_is_last.sum())}")

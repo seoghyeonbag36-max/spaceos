@@ -151,11 +151,33 @@ def _check_trend(generated: str, context: str | None) -> list[HAFinding]:
     2026-08-01 실사고가 이 검사의 이유다 — 입력이 하락인데 생성 카피가
     "신사동을 찾는 발걸음이 다시 늘고 있는 요즘"이라고 썼다.
     상승이 하나라도 섞여 있으면 증가 서술이 정당할 수 있으므로 걸지 않는다.
+
+    ## 못 돌린 것과 통과한 것을 가른다 (2026-09-16 fail-open 차단)
+
+    종전에는 컨텍스트나 트렌드 라벨이 없으면 `[]` 를 돌려줬다. 그러면 응답에서
+    **"검사했고 깨끗하다"와 "검사 자체를 못 했다"가 똑같이 보인다.** 이 검사는
+    violation 등급이라 응답을 버리는 힘이 있는데, 입력 하나가 비면 그 힘이 조용히
+    사라진다 — `pppp_status` 가 트렌드 라벨 게이트를 세우며 적어 둔 위험이 이것이다
+    ("라벨이 없으면 트렌드 역행 검사가 조용히 통과한다").
+
+    그래서 못 돌렸을 때는 `trend_unverified` 를 남긴다. 등급은 **warning** 이다 —
+    검사 불가는 허위의 증거가 아니므로 응답을 버릴 근거가 못 되지만, 무엇이 검증
+    안 됐는지는 드러나야 한다(§0-3 의 '통과시키되 findings 로 밝힌다'와 같은 처리).
     """
     if not context:
-        return []
+        return [HAFinding(
+            severity="warning", code="trend_unverified",
+            message=("상권 컨텍스트가 없어 트렌드 역행 검사를 돌리지 못했다 — "
+                     "이 응답은 '트렌드를 뒤집지 않았다'가 검증된 것이 아니다."),
+            evidence="context=None")]
     labels = set(_TREND_LABEL_RE.findall(context))
-    if not labels or "상승" in labels:
+    if not labels:
+        return [HAFinding(
+            severity="warning", code="trend_unverified",
+            message=("컨텍스트에 트렌드 라벨(상승/보합/하락)이 없어 역행 검사를 "
+                     "돌리지 못했다 — 검색 트렌드 수집이 비었을 때 이 값이 뜬다."),
+            evidence="라벨 0건")]
+    if "상승" in labels:
         return []
 
     for sent in _sentences(generated):

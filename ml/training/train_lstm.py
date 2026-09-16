@@ -6,8 +6,18 @@
 
 전략 (분기 데이터 → look_back 자동 조정, /platform-autorun B단계):
   - 거점당 분기 수가 적어(≈20) 단일 거점 학습 불가 → 전 거점 통합(pooled) + 거점 원핫.
-  - 홀드아웃 = 거점별 마지막 분기 1개(13샘플). 지표: MAE/RMSE(%p)·방향 정확도.
-  - 목표 방향 정확도 70%+. 미달 시 하이퍼파라미터 1~2회만 재시도 (무한 튜닝 금지).
+  - 분할 = 거점별 **끝에서 두 번째 분기 = val**(선택용) · **마지막 분기 = test**(보고용).
+    시계열이므로 무작위가 아니라 시간 순서를 지킨다.
+  - 지표는 항상 **같은 분할의 베이스라인과 함께** 낸다: 방향은 무정보 상수(다수 방향),
+    오차는 지속성(예측=직전값). 베이스라인 없는 정확도는 판정 근거가 아니다.
+
+⚠ 2026-09-16 누수 차단 — 그 전 규약으로 학습한 산출물은 지표가 위로 편향돼 있다:
+  ① 표준화 통계(mu/sd/y_mu/y_sd)를 홀드아웃 포함 전체 행에서 냈다(datasets.py).
+  ② 하이퍼파라미터를 **보고와 같은 홀드아웃**에서 골랐고, 방향정확도가 0.70 을 넘는
+     순간 멈췄다 — 즉 KPI 임계값이 곧 멈춤 규칙이었다.
+  그렇게 나온 70.8% 는 같은 홀드아웃의 무정보 상수(항상 하락 78.5%)보다 낮다.
+  → scripts/kpi_baseline.py · docs/finding-kpi-leak-2026-09-16.md
+  산출물의 `protocol` 블록이 어느 규약으로 잰 값인지 밝힌다. 블록이 없으면 옛 규약이다.
 
 산출:
   ml/artifacts/vacancy_lstm.pt              모델 + 전처리 메타 (predictor 가 로드)
@@ -53,9 +63,14 @@ def _train_once(hidden: int, layers: int, look_back: int | None, epochs: int = 4
     torch.manual_seed(_SEED)
     np.random.seed(_SEED)
     ds = build_dataset(look_back=look_back)
+    # 2026-09-16 누수 차단: 학습에서 val·test 를 **둘 다** 뺀다. 종전에는 test 만 빼고
+    # 그 test 로 하이퍼파라미터까지 골랐다(main 참조) — 보고값이 test 가 아니었다.
     holdout = ds.sample_is_last
-    Xtr, ytr = torch.from_numpy(ds.X[~holdout]), torch.from_numpy(ds.y[~holdout])
+    val = ds.sample_is_val
+    train = ~(holdout | val)
+    Xtr, ytr = torch.from_numpy(ds.X[train]), torch.from_numpy(ds.y[train])
     Xte, yte = torch.from_numpy(ds.X[holdout]), torch.from_numpy(ds.y[holdout])
+    Xva, yva = torch.from_numpy(ds.X[val]), torch.from_numpy(ds.y[val])
 
     model = VacancyLSTM(num_features=ds.X.shape[2], hidden=hidden, layers=layers,
                         dropout=0.2 if layers > 1 else 0.0)
@@ -69,18 +84,36 @@ def _train_once(hidden: int, layers: int, look_back: int | None, epochs: int = 4
         opt.step()
 
     model.eval()
-    with torch.no_grad():
-        pred_z = model(Xte).squeeze(-1).numpy()
-    pred = pred_z * ds.y_sd + ds.y_mu                # 원단위 복원
-    actual = yte.numpy() * ds.y_sd + ds.y_mu
-    # 방향 기준값 = 각 홀드아웃 윈도우 마지막 분기의 vac_proxy (피처 0 역표준화)
-    prev = ds.X[holdout][:, -1, 0] * ds.sd[0] + ds.mu[0]
-    mae = float(np.mean(np.abs(pred - actual)))
-    rmse = float(np.sqrt(np.mean((pred - actual) ** 2)))
-    dir_acc = float(np.mean(np.sign(pred - prev) == np.sign(actual - prev)))
+
+    def _score(X: torch.Tensor, ytrue: torch.Tensor, mask: np.ndarray) -> dict:
+        """한 분할의 지표. 방향 기준값 prev = 그 윈도우 마지막 분기의 vac_proxy."""
+        with torch.no_grad():
+            pred = model(X).squeeze(-1).numpy() * ds.y_sd + ds.y_mu   # 원단위 복원
+        actual = ytrue.numpy() * ds.y_sd + ds.y_mu
+        prev = ds.X[mask][:, -1, 0] * ds.sd[0] + ds.mu[0]
+        # 베이스라인: 같은 분할에서 **입력을 안 보는** 상수 규칙(다수 방향)과 지속성.
+        # 이것을 같이 내지 않으면 "70% 넘었다"가 실력인지 쏠림인지 구분할 수 없다
+        # (2026-09-16 실측 — scripts/kpi_baseline.py).
+        d_actual = np.sign(actual - prev)
+        n = max(len(d_actual), 1)
+        base_dir = max((d_actual > 0).sum(), (d_actual < 0).sum()) / n
+        return {
+            "pred": pred, "actual": actual, "prev": prev,
+            "mae": float(np.mean(np.abs(pred - actual))),
+            "rmse": float(np.sqrt(np.mean((pred - actual) ** 2))),
+            "dir_acc": float(np.mean(np.sign(pred - prev) == d_actual)),
+            "baseline_dir_acc": float(base_dir),
+            "persistence_mae": float(np.mean(np.abs(prev - actual))),
+            "n": int(n),
+        }
+
+    te = _score(Xte, yte, holdout)
+    va = _score(Xva, yva, val)
     return {
-        "model": model, "ds": ds, "pred": pred, "actual": actual, "prev": prev,
-        "mae": mae, "rmse": rmse, "dir_acc": dir_acc,
+        "model": model, "ds": ds,
+        "pred": te["pred"], "actual": te["actual"], "prev": te["prev"],
+        "mae": te["mae"], "rmse": te["rmse"], "dir_acc": te["dir_acc"],
+        "test": te, "val": va,
         "params": {"hidden": hidden, "layers": layers, "look_back": int(ds.X.shape[1]),
                    "epochs": epochs, "lr": lr, "train_loss": float(loss.item())},
     }
@@ -98,6 +131,16 @@ def _log_mlflow(res: dict, run_name: str) -> None:
     except Exception as exc:  # MLflow 실패가 학습을 막지 않도록
         print(f"[mlflow] 기록 실패(무시): {exc}")
 
+
+# 학습 규약 표기 — 산출물을 읽는 쪽이 **어느 규약으로 잰 값인지** 알 수 있어야 한다.
+# 이 블록이 없는 산출물은 2026-09-16 이전 규약(표준화·선택 모두 홀드아웃 포함)이다.
+_PROTOCOL = {
+    "version": "2026-09-16",
+    "scaling": "train_only",       # mu/sd/y_mu/y_sd 를 train 행에서만 적합
+    "selection": "val",            # 하이퍼파라미터는 val 로 고른다
+    "test_used_once": True,        # test 는 보고에만 쓴다(임계값 조기중단 없음)
+    "baselines": ["majority_direction", "persistence"],
+}
 
 _MAX_HORIZON = 4  # 재귀 예측 최대 분기 수
 
@@ -171,7 +214,8 @@ def _forecast_next(res: dict) -> dict:
 
 def main() -> None:
     now = datetime.datetime.now().isoformat(timespec="seconds")
-    # 1차 시도 + 미달 시 재시도(최대 2회) — 하이퍼파라미터 후보
+    # 하이퍼파라미터 후보 — **전부 끝까지 돈다.** 종전의 "미달 시 재시도" 서술은
+    # 임계값 조기중단을 전제한 것이라 2026-09-16 에 걷었다(아래 선택 블록 참조).
     # hidden=64/layers=1 은 2026-07-22 19거점 확장 때 추가. 기존 그리드에 32/1 과 64/2 는
     # 있었으나 그 사이 조합이 비어 있었고, 19거점에서는 이 조합이 MAE(0.937 vs 1.073)와
     # 방향정확도(78.9% vs 68.4%) 양쪽 모두에서 우위라 정식 후보로 편입한다.
@@ -188,22 +232,38 @@ def main() -> None:
         {"hidden": 96, "layers": 1, "look_back": 10},
         {"hidden": 64, "layers": 1, "look_back": 12},
     ]
+    # ── 선택은 val, 보고는 test (2026-09-16 누수 차단) ─────────────────────
+    # 종전 코드는 ① test 로 8개 조합을 고르고 ② `dir_acc >= 0.70` 이면 즉시 멈췄다.
+    # 그러면 보고되는 방향정확도는 "이 모델의 성능"이 아니라 **"8번 뽑아 목표를 넘긴
+    # 값"** 이다. 최댓값 편향이고, 멈춤 규칙이 KPI 임계값이라 사실상 목표 달성을
+    # 보장하는 절차였다. 실제로 그렇게 나온 70.8% 는 같은 홀드아웃의 무정보 상수
+    # 규칙(항상 하락 78.5%)보다 낮다 — scripts/kpi_baseline.py.
+    #
+    # 그래서: ① 선택 기준을 val 로 옮기고 ② 임계값 조기중단을 없앤다. 모든 조합을
+    # 끝까지 돌려야 test 가 **한 번만** 쓰인다.
     best = None
     for i, hp in enumerate(trials):
         res = _train_once(**hp)
-        print(f"[trial {i}] {hp} → MAE {res['mae']:.3f} RMSE {res['rmse']:.3f} "
-              f"방향정확도 {res['dir_acc']:.1%}")
+        v = res["val"]
+        print(f"[trial {i}] {hp} → val MAE {v['mae']:.3f} 방향 {v['dir_acc']:.1%} "
+              f"(상수 {v['baseline_dir_acc']:.1%})")
         _log_mlflow(res, run_name=f"trial{i}")
-        # 방향정확도 우선, 동률이면 MAE 가 낮은 쪽. (동률에 부등호만 쓰면 먼저 나온 trial 이
-        # 계속 남아 MAE 가 더 나쁜 모델이 채택된다 — 2026-07-22 27거점에서 실제로 발생)
-        if best is None or (res["dir_acc"], -res["mae"]) > (best["dir_acc"], -best["mae"]):
+        # val 방향정확도 우선, 동률이면 val MAE 가 낮은 쪽. (동률에 부등호만 쓰면 먼저
+        # 나온 trial 이 계속 남아 MAE 가 더 나쁜 모델이 채택된다 — 2026-07-22 실측)
+        key = (v["dir_acc"], -v["mae"])
+        if best is None or key > (best["val"]["dir_acc"], -best["val"]["mae"]):
             best = res
-        if res["dir_acc"] >= 0.70:
-            best = res
-            break
 
-    print(f"[best] {best['params']} → MAE {best['mae']:.3f} RMSE {best['rmse']:.3f} "
-          f"방향정확도 {best['dir_acc']:.1%} (목표 70%)")
+    bt, bv = best["test"], best["val"]
+    print(f"[best] {best['params']} (val 방향 {bv['dir_acc']:.1%} 로 선택)")
+    print(f"  test MAE {bt['mae']:.3f} (지속성 {bt['persistence_mae']:.3f}) · "
+          f"RMSE {bt['rmse']:.3f} · 방향 {bt['dir_acc']:.1%} "
+          f"(무정보 상수 {bt['baseline_dir_acc']:.1%})")
+    if bt["dir_acc"] <= bt["baseline_dir_acc"]:
+        print("  ⚠ 방향 축에 실력이 없다 — 상수 규칙 이하다. "
+              "임계값(70%)을 넘더라도 '달성'으로 적지 말 것.")
+    if bt["mae"] >= bt["persistence_mae"]:
+        print("  ⚠ 오차 축도 지속성 베이스라인 이하다.")
 
     # 거점별 홀드아웃 상세
     ds = best["ds"]
@@ -227,6 +287,7 @@ def main() -> None:
         "district_ids": ds.district_ids,
         "mu": ds.mu.tolist(), "sd": ds.sd.tolist(),
         "y_mu": ds.y_mu, "y_sd": ds.y_sd,
+        "protocol": _PROTOCOL,
     }, ARTIFACT)
     print(f"[artifact] {ARTIFACT}")
 
@@ -236,8 +297,19 @@ def main() -> None:
         "model": "vacancy-lstm-pooled-v2",
         "target": "vac_proxy(공실 프록시) — R-ONE 실측(vac_small/vac_mid/rent_small)은 피처",
         "trained_at": now,
-        "metrics": {"holdout_mae": round(best["mae"], 3), "holdout_rmse": round(best["rmse"], 3),
-                    "holdout_direction_acc": round(best["dir_acc"], 3)},
+        "metrics": {"holdout_mae": round(bt["mae"], 3), "holdout_rmse": round(bt["rmse"], 3),
+                    "holdout_direction_acc": round(bt["dir_acc"], 3),
+                    # 베이스라인을 **지표와 같은 칸에** 싣는다. 따로 두면 인용할 때
+                    # 떨어져 나가고, 떨어지는 순간 그 지표는 다시 판정 근거가 못 된다.
+                    "baseline_direction_acc": round(bt["baseline_dir_acc"], 3),
+                    "persistence_mae": round(bt["persistence_mae"], 3),
+                    "direction_skill_pp": round((bt["dir_acc"] - bt["baseline_dir_acc"]) * 100, 1),
+                    "mae_skill": round(1 - bt["mae"] / bt["persistence_mae"], 3)
+                    if bt["persistence_mae"] else None,
+                    "holdout_n": bt["n"],
+                    "val_direction_acc": round(bv["dir_acc"], 3),
+                    "val_mae": round(bv["mae"], 3)},
+        "protocol": _PROTOCOL,
         "params": best["params"],
         "holdout": per_district,
         "forecasts": fc,
