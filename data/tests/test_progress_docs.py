@@ -1,6 +1,7 @@
 """PPPP 진행 문서가 구현 계약과 함께 움직이는지 검증한다(기준 갱신 2026-09-05)."""
 
 import json
+import re
 import subprocess
 import sys
 
@@ -18,7 +19,10 @@ def test_canonical_progress_names_current_state_and_remaining_work() -> None:
     """정본은 완료된 작업을 다시 '다음 작업'으로 만들지 않아야 한다."""
     doc = _read("docs/placeos-vibe-build-sequence.md")
 
-    assert "현재 위치 요약 (2026-09-05)" in doc
+    # 날짜를 박아 두면 갱신할 때마다 이 줄이 먼저 낡는다 — 2026-09-16 에 실제로 그랬다.
+    # 고정할 것은 "요약 절이 날짜를 달고 있다" 는 성질이고, 내용의 최신성은 아래
+    # 부정 단언들이 지킨다.
+    assert re.search(r"## 현재 위치 요약 \(20\d\d-\d\d-\d\d\)", doc), "요약 절에 날짜가 없다"
     # 2026-09-05: `area` 게이트를 관측 전용으로 강등하며 Posting 이 97.6 → 100% 가 됐다.
     # 이 가드가 옛 값을 고정하고 있으면 **가드 자신이 드리프트의 원인**이 된다 —
     # 실제로 그날 아래 세 번째 테스트는 100.0 을 고정하는데 이 줄은 97.6% 를 요구해
@@ -26,6 +30,12 @@ def test_canonical_progress_names_current_state_and_remaining_work() -> None:
     assert "Posting" in doc
     assert "97.6%" not in doc and "99.7%" not in doc
     assert "Platform" in doc and "관측 전용" in doc
+    # 2026-09-16 KPI 재정의로 Platform 은 100% 가 아니다. 정본이 옛 값을 들고 있으면
+    # `pppp_status` 출력과 어긋난다 — 이 문서가 막으려는 바로 그 드리프트다.
+    assert "네 트랙 전부 100%" not in doc
+    assert "Platform 100 ·" not in doc and "· Platform 100" not in doc
+    assert "finding-kpi-leak-2026-09-16.md" in doc, (
+        "Platform 이 왜 내려갔는지 근거로 갈 수 있어야 한다")
     assert "상용 입력 온보딩" in doc
     assert "B2B 파일럿" in doc
     assert "다음 작업 (2026-08-20 기준)" not in doc

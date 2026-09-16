@@ -781,8 +781,8 @@ mlflow ui --port 5000   # http://localhost:5000 에서 실험 추적
 ## 3. 작성해야 할 코드 (순서) — §0 구현 현황 반영
 
 1. ~~**데이터 로더** (`ml/training/datasets.py`)~~ **완료** — Gold `platform13/platform_district_timeseries`(분기) 기반. R-ONE 공실률·임대료 + 유동인구 조인 완료(§0). 잔여: 실측 공실률 타깃 전환(노이즈 처리 후)·감성 피처.
-2. ~~**LSTM 학습** (`ml/training/train_lstm.py`)~~ **완료** — 분기 데이터라 look_back 은 30개월이 아닌 8분기. 방향 정확도 84.6% (목표 70% 달성).
-3. ~~**GNN 학습** (`ml/training/train_gnn.py`)~~ **완료** — 40,388노드·7 대분류 노드 분류, Top-3 90.8%(KPI 달성)·Top-1 63.8%·macro-F1 0.212. 엣지를 동일건물·체인으로 다양화(리뷰 유사도는 데이터 부재로 불가). 대분류 태스크는 거점 사전분포 대비 lift 가 +4.4%로 작다는 게 확인됨(§0 참조). **Top-1 70% 는 세분 라벨(태스크 재설계)로도, 균형 손실로도 닿지 않는다는 게 2026-08-17 실측으로 확인됨** — 남은 길은 감성 피처 등 새 피처 확보이고, Top-1 게이트 자체를 유지할지는 제품 판단(§0 참조).
+2. ~~**LSTM 학습** (`ml/training/train_lstm.py`)~~ **완료** — 분기 데이터라 look_back 은 30개월이 아닌 8분기. 방향 정확도는 당시 84.6% 였다. ⚠ **이 값도 '목표 70% 달성' 도 지금은 쓰지 않는다** — 84.6% 는 13거점 시절 값이고(현재 66거점 70.8%), 목표선 자체가 무정보 상수 아래였다(§0 상단).
+3. ~~**GNN 학습** (`ml/training/train_gnn.py`)~~ **완료** — 40,388노드·7 대분류 노드 분류, Top-3 90.8%(⚠ 'KPI 달성' 표기는 2026-09-16 에 걷었다 — 거점 사전분포만으로 Top-3 89.15% 라 70% 게이트가 모델을 보증하지 못했다)·Top-1 63.8%·macro-F1 0.212. 엣지를 동일건물·체인으로 다양화(리뷰 유사도는 데이터 부재로 불가). 대분류 태스크는 거점 사전분포 대비 lift 가 +4.4%로 작다는 게 확인됨(§0 참조). **Top-1 70% 는 세분 라벨(태스크 재설계)로도, 균형 손실로도 닿지 않는다는 게 2026-08-17 실측으로 확인됨** — 남은 길은 감성 피처 등 새 피처 확보이고, Top-1 게이트 자체를 유지할지는 제품 판단(§0 참조).
 4. ~~**추론 래퍼** (`ml/inference/predictor.py`)~~ **완료** — 체크포인트 실시간 추론 → forecast json 폴백. GNN 서빙은 별도 `services/industry_recommend.py`(json 직접 로드). MLflow Registry 대신 로컬 파일 스토어(`ml/mlruns`) 사용.
 5. ~~**API 연동** (`apps/backend/app/api/v1/ai.py`)~~ **완료** — Redis 대신 인메모리 TTL 캐시(서버리스 고려). `predict-vacancy`·`recommend-industry` 모두 스텁 교체 완료(추천 json 부재 시 `gnn-stub` 폴백).
 
@@ -792,7 +792,8 @@ mlflow ui --port 5000   # http://localhost:5000 에서 실험 추적
 /clear
 /ml-train 신사동 가로수길 공실률 LSTM 학습 스크립트 작성.
   ml/training/datasets.py 의 로더를 사용하고, look_back 30개월,
-  MLflow로 MAE/RMSE 기록, 목표 정확도 70%+ 검증 로직 포함.
+  MLflow로 MAE/RMSE 기록, **베이스라인(지속성·무정보 상수) 대비 실력** 검증 로직 포함
+  (임계값 70% 는 폐기 — scripts/kpi_baseline.py).
 
 # 이후 API 연동
 @apps/backend/app/api/v1/ai.py @ml/inference/predictor.py
@@ -803,7 +804,7 @@ ai.py 의 predict-vacancy 스텁을 predictor.predict_vacancy 호출로 교체�
 ## 5. 검증
 
 - `cd ml && python -m pytest`(테스트 추가 후) — 모델 입출력 shape, 추론 함수 동작
-- MLflow UI에서 메트릭 확인 — MAE/RMSE 기준 정확도 70%+
+- MLflow UI에서 메트릭 확인 — MAE/RMSE 를 **지속성 베이스라인과 대조**(임계값 70% 는 폐기)
 - `cd apps/backend && pytest` — `/api/v1/ai/*` 응답 스키마
 - 거점 데이터 순서: **신사동 가로수길 → 성수동** (Transfer Learning)
 

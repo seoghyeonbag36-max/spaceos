@@ -206,7 +206,7 @@ Data: Airflow+Selenium/Playwright+Bronze/Silver/Gold
 - 더미 데이터에는 반드시 `# TODO: 실제 연동` 주석으로 연동 지점 명시
 
 ## 성능 목표
-AI 공실 예측 70%+(Phase1) | 3D 맵 로딩 <3초 | API p95 <200ms
+AI 공실 예측 **베이스라인 대비 실력**(2026-09-16 에 '70%+' 폐기 — 무정보 규칙이 그 선을 넘었다) | 맵 로딩 <3초 · API p95 <200ms **(미계측)**
 ```
 
 ## 2.4 MCP 서버 연결 — `.mcp.json`
