@@ -6,14 +6,16 @@
 - /maps 에서 지구별 HTML 대시보드 서빙 (StaticFiles)
 """
 import os
+import time
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.services import latency as latency_service
 
 app = FastAPI(
     title="PlaceOS API",
@@ -30,6 +32,35 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix="/api/v1")
+
+
+# ── 응답시간 계측 (2026-09-16) ────────────────────────────────────────────────
+# KPI② 가 `API p95 <200ms` 인데 **재는 코드가 한 줄도 없었다.** 넘고 있는지 아닌지가
+# 아니라 잰 적이 없는 상태였고, 그래서 KPI 규칙 4(계측기 없는 목표는 KPI 가 아니다)를
+# 세웠다. 이 미들웨어가 그 0번 조건이다.
+#
+# 한 곳에 거는 이유는 `api/v1/router.py` 가 사용량 계측을 한 곳에 건 것과 같다 —
+# 새 엔드포인트가 조용히 빠지지 않는다.
+#
+# ⚠ 라우터보다 **뒤에** 등록해야 한다. Starlette 미들웨어는 나중에 추가된 것이 바깥을
+#   감싸므로, 여기 둬야 CORS 안쪽에서 실제 처리시간만 재고 정적 마운트는 안 탄다.
+@app.middleware("http")
+async def _measure_latency(request: Request, call_next):
+    if not request.url.path.startswith("/api/"):
+        return await call_next(request)          # 정적·프론트는 이 KPI 대상이 아니다
+    started = time.perf_counter()
+    try:
+        response = await call_next(request)
+    finally:
+        elapsed_ms = (time.perf_counter() - started) * 1000.0
+        # 라우트 템플릿을 키로 쓴다(`/buildings/{id}`). 실제 URL 을 쓰면 카디널리티가
+        # 터진다. 라우팅은 call_next 안에서 끝나므로 이 시점에 scope 에 들어와 있다.
+        route = getattr(request.scope.get("route"), "path", None) or "<unmatched>"
+        try:
+            latency_service.record(route, elapsed_ms)
+        except Exception:      # 계측 실패가 응답을 깨뜨리지 않는다
+            pass
+    return response
 
 # HTML 대시보드 정적 파일 서빙
 # Docker: HTML_DIR=/app/html 환경변수로 주입

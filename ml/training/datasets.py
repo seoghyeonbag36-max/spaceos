@@ -31,6 +31,23 @@ GOLD_TS = _REPO / "data" / "gold" / "platform13" / "platform_district_timeseries
 SEQ_FEATURES = ("vac_proxy", "vac_small", "vac_mid", "rent_small",
                 "log_selng", "stor_idx", "opbiz_rt", "clsbiz_rt")
 TARGET = "vac_proxy"
+
+# ── 롤링 오리진 분할 (2026-09-16) ────────────────────────────────────────────
+# 거점당 분기 22개 · look_back 8 → 윈도우 14개인데 **종전에는 그중 1개만** 홀드아웃으로
+# 썼다. 홀드아웃 65건에서 이항 표준오차가 5.7%p 라 3~5%p 짜리 차이를 원리적으로 못
+# 가른다 — KPI 판정이 "베이스라인 대비 실력" 인데 그 실력을 잴 분해능이 없었다는 뜻이다.
+#
+# 거점을 늘려 해결하려면 3%p 를 가리는 데 약 900거점이 필요하다(현재 66). 대신 **이미
+# 가진 분기를 쓴다**: 거점마다 마지막 K분기를 차례로 홀드아웃 원점으로 삼는다.
+#   test 3 → 홀드아웃 198건 · val 2 → 132건 · train 9윈도우/거점(594건)
+#
+# ⚠ 표준오차가 √3 배로 좁아지지는 않는다 — 같은 거점의 이웃 분기는 상관돼 있어
+#   표본이 독립이 아니다. 그래서 `scripts/kpi_baseline.py` 는 홀드아웃에 거점당
+#   표본이 여럿이면 **거점 단위 군집 부트스트랩**으로 구간을 낸다(이항 공식이 아니라).
+# ⚠ train 윈도우가 13 → 9 로 줄어든다. 그 대가가 얼마인지는 **재학습 전에는 모른다** —
+#   재학습할 때 `--test-quarters 1 --val-quarters 1` 대조군을 같이 돌려 비교할 것.
+TEST_QUARTERS = 3
+VAL_QUARTERS = 2
 # ablation 기각 피처 (2026-07-19, mlruns 기록 — gold 컬럼은 유지, 표본 확대 후 재시도 TODO):
 #   log_flpop(유동인구)        MAE 0.901→1.018 악화
 #   ix_opr_mt/ix_cls_mt(상권변화지표 평균 영업개월)  방향정확도 84.6%→76.9% 악화
@@ -72,15 +89,18 @@ class PooledDataset:
     y: np.ndarray
     district_ids: list[str]          # 원핫 인덱스 순서
     sample_district: np.ndarray      # 각 샘플의 거점 인덱스
-    sample_is_last: np.ndarray       # test(각 거점 마지막 윈도우) 여부
-    sample_is_val: np.ndarray        # val(각 거점 끝에서 두 번째 윈도우) 여부
+    sample_is_last: np.ndarray       # test(각 거점 뒤쪽 test_quarters 윈도우) 여부
+    sample_is_val: np.ndarray        # val(그 앞 val_quarters 윈도우) 여부
+    sample_quarter: np.ndarray       # 각 샘플의 타깃 분기 — 홀드아웃 기록의 키가 된다
     mu: np.ndarray                   # 피처 표준화 평균 (F,) — **train 행에서만** 계산
     sd: np.ndarray                   # 피처 표준화 표준편차 (F,) — 위와 같다
     y_mu: float
     y_sd: float
 
 
-def build_dataset(look_back: int | None = None) -> PooledDataset:
+def build_dataset(look_back: int | None = None,
+                  test_quarters: int = TEST_QUARTERS,
+                  val_quarters: int = VAL_QUARTERS) -> PooledDataset:
     """Gold → pooled 윈도우. look_back 미지정 시 가용 분기 수에 맞춰 자동 조정.
 
     ## 홀드아웃이 둘인 이유 (2026-09-16 누수 차단)
@@ -91,8 +111,10 @@ def build_dataset(look_back: int | None = None) -> PooledDataset:
     0.70 을 넘는 순간 멈추기까지 했다. 그렇게 나온 70.8% 는 "이 모델의 성능"이 아니라
     "8번 뽑아 목표를 넘긴 값"이라 위로 편향된다.
 
-    그래서 끝에서 두 번째 분기를 **val**(선택용), 마지막 분기를 **test**(보고용)로
-    가른다. 시계열이므로 무작위 분할이 아니라 시간 순서를 지킨다.
+    그래서 뒤쪽 분기를 **val**(선택용)과 **test**(보고용)로 가른다. 시계열이므로
+    무작위 분할이 아니라 시간 순서를 지킨다 — 거점마다 시간축 뒤에서부터
+    `test_quarters` 개가 test, 그 앞 `val_quarters` 개가 val, 나머지가 train 이다
+    (롤링 오리진). 기본값의 근거는 위 `TEST_QUARTERS` 주석에 있다.
 
     ## 표준화 통계도 train 에서만 낸다
 
@@ -108,16 +130,20 @@ def build_dataset(look_back: int | None = None) -> PooledDataset:
     df = load_gold()
     dids = sorted(df["district_id"].unique())
     n_min = int(df.groupby("district_id").size().min())
+    if test_quarters < 1 or val_quarters < 1:
+        raise ValueError("test_quarters·val_quarters 는 1 이상이어야 한다 — "
+                         "둘 중 하나가 0 이면 선택과 보고가 다시 한 표본에서 난다")
+    holdout_q = test_quarters + val_quarters
     if look_back is None:
-        # val 1 + test 1 을 떼고도 train 윈도우가 최소 1개 남아야 한다.
-        look_back = max(2, min(8, n_min - 3))
+        # 홀드아웃을 떼고도 train 윈도우가 최소 1개 남아야 한다.
+        look_back = max(2, min(8, n_min - holdout_q - 1))
 
-    # 표준화 통계의 모집단 = **각 거점의 마지막 2분기를 뺀 행**(= val·test 타깃 분기).
-    # 그 앞 분기들은 train 윈도우의 입력으로 실제로 쓰이므로 남긴다.
+    # 표준화 통계의 모집단 = **각 거점의 마지막 holdout_q 분기를 뺀 행**(= val·test
+    # 타깃 분기). 그 앞 분기들은 train 윈도우의 입력으로 실제로 쓰이므로 남긴다.
     train_row = np.ones(len(df), dtype=bool)
     for did in dids:
         idx = np.flatnonzero((df["district_id"] == did).to_numpy())
-        train_row[idx[-2:]] = False
+        train_row[idx[-holdout_q:]] = False
 
     feats = df[list(SEQ_FEATURES)].to_numpy(dtype=np.float64)
     # ⚠ nan 을 무시하고 센다. 2026-09-04 에 여기가 66거점 학습을 통째로 죽였다:
@@ -130,7 +156,7 @@ def build_dataset(look_back: int | None = None) -> PooledDataset:
     sd = np.nanstd(feats[train_row], axis=0)
     sd[sd == 0] = 1.0
 
-    Xs, ys, s_did, s_last, s_val = [], [], [], [], []
+    Xs, ys, s_did, s_last, s_val, s_quarter = [], [], [], [], [], []
     dropped = 0
     for di, did in enumerate(dids):
         g = df[df["district_id"] == did]
@@ -153,8 +179,10 @@ def build_dataset(look_back: int | None = None) -> PooledDataset:
             Xs.append(win)
             ys.append(tgt)
             s_did.append(di)
-            s_last.append(end == n - 1)       # test — 보고 전용, 선택에 쓰지 않는다
-            s_val.append(end == n - 2)        # val  — 하이퍼파라미터 선택용
+            s_quarter.append(str(g["quarter"].iloc[end]))
+            # 시간축 뒤에서부터 test → val 순. 겹치지 않는다.
+            s_last.append(end >= n - test_quarters)                  # test — 보고 전용
+            s_val.append(n - holdout_q <= end < n - test_quarters)   # val — 선택용
 
     if dropped:
         print(f"[dataset] 결측 윈도우 {dropped}개 제외 · 학습 윈도우 {len(Xs)}개")
@@ -173,11 +201,13 @@ def build_dataset(look_back: int | None = None) -> PooledDataset:
     return PooledDataset(
         X=X, y=y, district_ids=dids,
         sample_district=np.asarray(s_did), sample_is_last=is_last, sample_is_val=is_val,
+        sample_quarter=np.asarray(s_quarter, dtype=object),
         mu=mu, sd=sd, y_mu=y_mu, y_sd=y_sd,
     )
 
 
 if __name__ == "__main__":
     ds = build_dataset()
+    n_tr = int((~(ds.sample_is_val | ds.sample_is_last)).sum())
     print(f"X={ds.X.shape} y={ds.y.shape} 거점={len(ds.district_ids)} "
-          f"val={int(ds.sample_is_val.sum())} test={int(ds.sample_is_last.sum())}")
+          f"train={n_tr} val={int(ds.sample_is_val.sum())} test={int(ds.sample_is_last.sum())}")

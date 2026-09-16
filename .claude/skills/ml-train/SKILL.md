@@ -16,5 +16,11 @@ PlaceOS AI 모델 작업을 수행한다. 대상: 호출 인수(학습·수정�
      못했다. → `docs/finding-kpi-leak-2026-09-16.md`
    - **선택 ≠ 보고**: 하이퍼파라미터는 val 로 고르고 test 는 보고에만 한 번 쓴다.
      임계값을 넘겼다고 탐색을 멈추지 않는다(그 자체가 누수다).
+   - **LSTM 재학습은 두 팔을 같이 돌린다**(2026-09-16 롤링 오리진 도입):
+     `python -m ml.training.train_lstm` (기본 3/2) 과
+     `--test-quarters 1 --val-quarters 1` (대조군). 홀드아웃이 66 → 198건이 되어
+     분해능이 오르는 대신 train 윈도우가 거점당 13 → 9 로 준다 — **그 대가는 아직
+     미측정**이라 비교 없이 기본값을 신뢰하지 않는다.
+     → `docs/finding-lstm-direction-diagnosis-2026-09-16.md`
 4. 서빙은 `ml/inference/` 래퍼를 통해 backend `/api/v1/ai/*`와 연동.
 5. 거점 데이터 순서: 신사동 가로수길 → 성수동.
