@@ -82,6 +82,23 @@ def _load(path: Path) -> dict | None:
         return None
 
 
+def _kpi_baseline() -> dict | None:
+    """KPI 실력 검정 결과(`scripts/kpi_baseline.py`). 못 읽으면 None.
+
+    판정 규칙을 여기 옮겨 적지 않고 **권위 있는 모듈을 그대로 부른다** —
+    `_count_measured_foot_hubs` 가 백엔드 함수를 직접 부르는 것과 같은 이유다.
+    한쪽만 고쳐졌을 때 조용히 어긋나는 것을 막는다. 읽기 전용·표준 라이브러리라
+    네트워크도 파일 쓰기도 없다.
+    """
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from kpi_baseline import check
+
+        return check()
+    except Exception:
+        return None
+
+
 def _hubs() -> int:
     """전체 거점 수. page_hubs 를 못 읽으면 gold 디렉토리 수로 떨어진다."""
     try:
@@ -93,8 +110,19 @@ def _hubs() -> int:
         return sum(1 for p in GOLD.iterdir() if p.is_dir() and (p / "coverage.json").exists())
 
 
+# 거점 목록 로드 실패를 **삼키지 않기 위한** 자리. `_scored_slugs()` 가 None 으로
+# 물러나면 분자·분모가 조용히 다른 모집단(gold 디렉토리 73개 — 서빙 66 + 경기 보류)
+# 으로 바뀐다. 값은 여전히 그럴듯하게 찍히므로 화면만 보고는 알 수 없다.
+_HUB_LOAD_ERROR: str = ""
+
+
 def _scored_slugs() -> set[str] | None:
     """진행률의 **분모가 되는 거점**(= `ACTIVE_HUBS` 66). 못 읽으면 None = 필터하지 않는다.
+
+    ⚠ None 으로 물러나는 경로는 **조용하면 안 된다**(2026-09-16). 필터가 빠지면
+    `_gold_glob` 이 서빙 목록 밖 거점까지 세고, 그게 바로 2026-09-01 에 Page 를
+    120.4% 로 만든 버그다. 실패 사유를 `_HUB_LOAD_ERROR` 에 남겨 main() 이 출력
+    맨 위에 배너로 띄운다 — 숫자를 인용하기 전에 보이는 자리다.
 
     2026-09-03 에 `HUBS` 54 → `ACTIVE_HUBS` 66 으로 옮겼다. 아래 `_gold_glob` 이 적어 둔
     조건("새 배치가 진행률에 잡히려면 `HUBS` 에 올라야 하고, 그건 곧 서빙에 오른다는
@@ -103,12 +131,14 @@ def _scored_slugs() -> set[str] | None:
     **안 잡힌다**: 실제로 09-03 실측에서 12거점은 Platform·Posting·Program 산출물
     0/12 인데 세 트랙이 전부 100% 로 찍히고 있었다.
     """
+    global _HUB_LOAD_ERROR
     try:
         sys.path.insert(0, str(ROOT))
         from data.config.page_hubs import ACTIVE_HUBS
 
         return set(ACTIVE_HUBS)
-    except Exception:
+    except Exception as exc:
+        _HUB_LOAD_ERROR = f"{type(exc).__name__}: {exc}"
         return None
 
 
@@ -362,6 +392,72 @@ def platform_track() -> Track:
         else "platform_vacancy_forecast.json 없음 → API 가 lstm-stub 으로 떨어진다",
     ))
 
+    # ── KPI① 재정의 (2026-09-16) — 임계값이 아니라 **베이스라인 대비 실력**을 센다 ──
+    #
+    # 종전 KPI 는 "AI 정확도 70%+" 한 줄이었고 LSTM 쪽은 **게이트가 아예 없었다**
+    # (위 '학습·서빙' 은 산출물이 있나만 본다). 문서에만 "방향정확도 70.8% — 목표
+    # 70% 달성" 이 적혀 있었는데, 같은 홀드아웃을 다시 세어 보니:
+    #
+    #   모델 70.8%(46/65)  <  **항상 하락** 78.5%(51/65)
+    #
+    # 입력을 하나도 안 보는 상수 규칙이 모델보다 7.7%p 높다. 홀드아웃 65곳의 실제
+    # 방향이 하락 51 · 상승 14 로 쏠려 있어서다. 즉 **70% 임계값은 0 짜리 모델도
+    # 통과시킨다** — 그 게이트는 모델을 보증하지 못한다. 임계값을 올려도 같다
+    # (78.5% 를 넘기면 그건 "상수보다 낫다"를 에둘러 쓴 것이라 처음부터 실력을
+    # 재는 게 맞다).
+    #
+    # 그래서 축을 둘로 가른다. **두 축의 답이 서로 다르기 때문**이다:
+    #   · 방향 — 상수 베이스라인에 진다(실력 −7.7%p). 실패로 센다.
+    #   · 오차 — 지속성(예측=직전값) 대비 MAE +20.5%. 여기엔 실력이 있다.
+    # 하나만 인용하면 어느 쪽이든 거짓이 된다. 둘 다 게이트로 둔다.
+    #
+    # 임계값을 새로 **발명하지 않는다**: 기준은 전부 같은 홀드아웃에서 유도된
+    # 베이스라인이다(off-prior 목표 0.50 을 값싼 규칙 42.4% 에서 유도한 것과 같은 방식).
+    # 서빙 산출물이 **어느 규약으로 잰 값인지** 먼저 밝힌다. `protocol` 블록이 없으면
+    # 2026-09-16 이전, 즉 표준화·선택 모두 홀드아웃을 포함한 규약이다 — 아래 실력
+    # 게이트의 수치도 그 편향을 그대로 물려받는다.
+    proto = (fc or {}).get("protocol") or {}
+    t.gates.append(Gate(
+        "LSTM 학습 규약 (누수 차단본으로 재학습)",
+        1.0 if proto.get("scaling") == "train_only" and proto.get("selection") == "val" else 0.0,
+        f"protocol={proto.get('version')} · scaling={proto.get('scaling')} · "
+        f"selection={proto.get('selection')}" if proto else
+        "산출물에 protocol 블록이 없다 → **2026-09-16 이전 규약**(표준화 통계·"
+        "하이퍼파라미터 선택이 모두 홀드아웃 포함). 코드는 고쳤으나 재학습은 "
+        "Gold(platform13)가 있는 머신에서 해야 한다 — 아래 실력 수치는 그때까지 "
+        "옛 규약 값이다. `python -m ml.training.train_lstm`",
+    ))
+
+    kb = _kpi_baseline()
+    if kb and kb.get("lstm", {}).get("available"):
+        d = kb["lstm"]["direction"]
+        e = kb["lstm"]["error"]
+        lo, hi = d["model_ci95"]
+        mc = d["mcnemar"]
+        t.gates.append(Gate(
+            "KPI 공실예측 **방향** 실력 (vs 무정보 상수)",
+            1.0 if d["beats_baseline"] else 0.0,
+            f"모델 {d['model_acc']:.1%}({d['model_hits']}/{kb['lstm']['n']}) vs "
+            f"베이스라인 '{d['baseline_label']}' {d['baseline_acc']:.1%} → "
+            f"실력 **{d['skill_pp']:+.1f}%p**. "
+            f"모델 95%CI [{lo:.1%}, {hi:.1%}] 는 옛 목표 70% 를 품는다 — 점추정으로 "
+            f"달성/미달을 가를 수 없는 표본이다(n={kb['lstm']['n']}). "
+            f"McNemar b={mc['b_model_only']} c={mc['c_baseline_only']} "
+            f"p={mc['p_two_sided']:.3f} 이라 '모델이 더 나쁘다'까지 증명되지는 "
+            f"않는다 — 증명된 것은 '더 낫다고 말할 근거가 없다' 쪽이다. "
+            f"실제 방향 하락 {d['actual_down']}·상승 {d['actual_up']} 쏠림이 원인이고, "
+            f"쏠림이 풀리기 전에는 이 축에서 상수를 이기기 어렵다",
+        ))
+        t.gates.append(Gate(
+            "KPI 공실예측 **오차** 실력 (vs 지속성)",
+            1.0 if e["beats_persistence"] else 0.0,
+            f"MAE {e['model_mae']:.3f} vs 지속성 {e['persistence_mae']:.3f} → "
+            f"기술점수 **{e['mae_skill']:+.1%}** (RMSE {e['rmse_skill']:+.1%}). "
+            f"직전 분기값을 그대로 내미는 것보다 낫다는 뜻이고, 방향 축과 달리 "
+            f"여기엔 실력이 있다. 제품이 파는 것도 '오를까 내릴까' 이분법이 아니라 "
+            f"공실 압력의 크기다",
+        ))
+
     rec = _load(GOLD / "platform_industry_recommend.json")
     m = (rec or {}).get("metrics", {})
     t.gates.append(Gate(
@@ -385,13 +481,32 @@ def platform_track() -> Track:
     if top3 is not None:
         # lift 는 Top-1 기준값이다. Top-3 사전분포 옆에 그냥 붙이면 'Top-3 의 lift'로
         # 읽히므로 어느 지표의 lift 인지 명시한다.
-        t.gates.append(Gate(
-            "KPI 업종추천 Top-3 ≥70%", min(1.0, top3 / 0.70),
-            f"{top3:.1%} — 달성. 단 거점 사전분포가 이미 "
-            f"{m.get('baseline_district_prior_top3', 0):.1%} 라 "
-            f"Top-1 lift 는 {m.get('lift_vs_district_prior_pct')}% 다"
-            + (f" · Top-1 {top1:.1%}(게이트 폐기, 관측만)" if top1 is not None else ""),
-        ))
+        # 2026-09-16 KPI 재정의: **Top-3 ≥70% 임계값을 폐기하고 실력 게이트로 바꾼다.**
+        # 거점 사전분포(모델 없이 '이 거점에 흔한 업종 3개')가 이미 89.4% 라 70% 임계값은
+        # **그래프를 통째로 들어내도 통과한다.** 종전 문구가 사전분포를 옆에 적어 두긴
+        # 했지만 게이트 값은 top3/0.70 이라 1.0 으로 포화돼 있었고, 그래서 이 트랙이
+        # "KPI 달성"으로 찍히는 근거가 실제로는 사전분포였다. 기준을 그 사전분포로
+        # 옮긴다 — 임계값을 발명하는 대신 같은 test 분할에서 유도된 값을 쓴다.
+        b3 = m.get("baseline_district_prior_top3")
+        if b3 is not None:
+            t.gates.append(Gate(
+                "KPI 업종추천 Top-3 실력 (vs 거점 사전분포)",
+                1.0 if top3 > b3 else 0.0,
+                f"모델 {top3:.1%} vs 사전분포 {b3:.1%} → 실력 **{(top3 - b3) * 100:+.2f}%p**. "
+                f"옛 게이트(≥70%)는 사전분포가 이미 {b3 - 0.70:+.1%}p 로 넘겨 놓아 "
+                f"모델을 보증하지 못했다"
+                + (f" · Top-1 {top1:.1%} vs {m.get('baseline_district_prior_top1', 0):.1%} "
+                   f"(실력 {(top1 - m.get('baseline_district_prior_top1', 0)) * 100:+.2f}%p, "
+                   f"게이트 폐기·관측만)" if top1 is not None else "")
+                + ". ⚠ 실력이 양수라는 것과 **제품에 쓸 만큼 크다**는 것은 다르다 — "
+                  "아래 off-prior 관측 게이트가 그 크기를 잰다",
+            ))
+        else:
+            t.gates.append(Gate(
+                "KPI 업종추천 Top-3 실력 (vs 거점 사전분포)", 0.0,
+                f"{top3:.1%} — 그러나 metrics 에 baseline_district_prior_top3 이 없어 "
+                f"**실력을 못 잰다**. 베이스라인 없는 정확도는 판정 근거가 아니다",
+            ))
     # off-prior Top-3 회수율 — 거점 사전분포가 **원리적으로 못 맞히는** 자리에서의 회수율.
     # 이걸 게이트로 쓰는 이유(2026-08-17 분석):
     #   피처 95개 중 자리마다 값이 달라지는 것은 5개뿐이고 나머지 90개는 거점 상수라
@@ -1142,6 +1257,15 @@ def main() -> int:
         return 0
 
     print("PPPP 진행률 — 산출물에서 계산 (거점 %d)" % total)
+    if _HUB_LOAD_ERROR:
+        # 게이트 값이 전부 다른 모집단에서 나온 상태다. 배너 없이 숫자만 보면
+        # 오독하게 되므로 맨 위에서 막는다.
+        print("!" * 78)
+        print("⚠ 거점 목록(data.config.page_hubs.ACTIVE_HUBS)을 읽지 못했다 — "
+              f"{_HUB_LOAD_ERROR}")
+        print("  분자·분모가 서빙 목록이 아니라 gold 디렉토리 전체로 떨어졌다. "
+              "아래 진행률은 **다른 모집단의 값**이라 인용하면 안 된다.")
+        print("!" * 78)
     print("=" * 78)
     for t in tracks:
         print(f"\n{t.name}  {t.pct:5.1f}%  {_bar(t.pct)}   {t.phase}")

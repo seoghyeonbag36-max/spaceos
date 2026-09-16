@@ -2,13 +2,16 @@
   "_설명": "신청서·논문 공모에 쓸 수 있는 수치의 전부. 이 파일에 없는 수치는 docs/apply/ 원고에 쓰지 않는다. scripts/check_application.py 가 이 파일로 판정한다.",
   "_원본": "docs/papers/evidence-index.md · scripts/pppp_status.py · docs/feature-*.md. 원본이 바뀌면 여기를 먼저 고치고 원고를 고친다.",
   "_주의": "모집단이 다른 값을 섞지 말 것. 54거점 실험값과 66거점 서빙값은 비교 가능하지 않다.",
-  "updated": "2026-09-09",
-
+  "updated": "2026-09-16",
   "allow": [
     {
       "id": "HUB66",
       "value": "66거점",
-      "aliases": ["66개 거점", "66/66", "서울 66"],
+      "aliases": [
+        "66개 거점",
+        "66/66",
+        "서울 66"
+      ],
       "condition": "건축물대장",
       "why": "Tier1 판정·대표 집계 커버리지·R-ONE 앵커 대조가 모두 66/66. '건축물대장 기반'이라는 한정 없이 쓰면 실측 정확도 주장으로 읽힌다",
       "source": "scripts/pppp_status.py"
@@ -16,7 +19,9 @@
     {
       "id": "POLY",
       "value": "52,642",
-      "aliases": ["52642"],
+      "aliases": [
+        "52642"
+      ],
       "condition": "동결",
       "why": "마스터 폴리곤 수. 동결한 입력 묶음(audits/page-inventory-20260906)에 대한 값이다",
       "source": "docs/papers/evidence-index.md PAGE-D01"
@@ -24,7 +29,9 @@
     {
       "id": "FLOORCHK",
       "value": "30,912",
-      "aliases": ["30912"],
+      "aliases": [
+        "30912"
+      ],
       "condition": "동결",
       "why": "층 정보 검사 대상 폴리곤 수. 해당 분모에서의 계산 일관성 확인이지 현실 정답이 아니다",
       "source": "docs/papers/evidence-index.md PAGE-D02"
@@ -32,7 +39,10 @@
     {
       "id": "FLOORBAND",
       "value": "16.2%p",
-      "aliases": ["16.2%", "16.235"],
+      "aliases": [
+        "16.2%",
+        "16.235"
+      ],
       "condition": "범위",
       "why": "층 배정 범위 폭 중앙값. 정보 부족에 따른 범위이지 통계적 신뢰구간이나 현실 공실 오차가 아니다",
       "source": "docs/papers/evidence-index.md PAGE-D06"
@@ -56,7 +66,9 @@
     {
       "id": "GNN_LIFT",
       "value": "5.3%",
-      "aliases": ["+5.3%"],
+      "aliases": [
+        "+5.3%"
+      ],
       "condition": "기준선",
       "why": "거점 사전분포 기준선(Top-1 61.7% / Top-3 89.4%) 대비 lift. 기준선을 밝히지 않으면 절대 성능으로 오독된다",
       "source": "docs/papers/evidence-index.md P1"
@@ -64,7 +76,9 @@
     {
       "id": "GNN_NODES",
       "value": "47,442",
-      "aliases": ["47442"],
+      "aliases": [
+        "47442"
+      ],
       "condition": "",
       "why": "그래프 노드 수",
       "source": "docs/feature-platform.md 0"
@@ -72,7 +86,9 @@
     {
       "id": "GNN_EDGES",
       "value": "188,673",
-      "aliases": ["188673"],
+      "aliases": [
+        "188673"
+      ],
       "condition": "",
       "why": "그래프 엣지 수",
       "source": "docs/feature-platform.md 0"
@@ -88,10 +104,13 @@
     {
       "id": "LSTM_DIR",
       "value": "70.8%",
-      "aliases": ["46/65"],
-      "condition": "66거점",
-      "why": "공실 예측 방향 정확도. 66거점 홀드아웃 · 2026-09-04 서빙본. 목표 70%를 0.8%p 차로 넘고 있다는 점을 함께 적는다",
-      "source": "docs/feature-platform.md 0"
+      "aliases": [
+        "46/65",
+        "70.77%"
+      ],
+      "condition": "78.5%",
+      "why": "공실 예측 방향 정확도(66거점 홀드아웃 · 2026-09-04 서빙본). ⚠ 같은 홀드아웃에서 **입력을 안 보는 상수 규칙('항상 하락')이 78.5%** 라 이 값은 베이스라인보다 7.7%p 낮다. 베이스라인 없이 쓰면 '목표 70% 달성'으로 읽히는데 그건 성과가 아니다. 그래서 조건을 '78.5%' 로 걸어 **같은 절에 베이스라인이 함께 적히지 않으면 통과하지 못하게** 한다",
+      "source": "scripts/kpi_baseline.py · docs/finding-kpi-leak-2026-09-16.md"
     },
     {
       "id": "LSTM_MAE",
@@ -112,7 +131,9 @@
     {
       "id": "UNITS",
       "value": "664유닛",
-      "aliases": ["664"],
+      "aliases": [
+        "664"
+      ],
       "condition": "66거점",
       "why": "서빙 66거점의 실제 공실 유닛 인벤토리 (2026-09-05 실측). 배선 당시 54거점 528유닛이었으므로 옛 값과 섞지 않는다",
       "source": "AGENTS.md 0 · services/vacant_inventory"
@@ -128,7 +149,11 @@
     {
       "id": "BUNDLE",
       "value": "832KB",
-      "aliases": ["4KB", "224KB", "2KB"],
+      "aliases": [
+        "4KB",
+        "224KB",
+        "2KB"
+      ],
       "condition": "",
       "why": "3D 시각화를 걷어내고 2D 층 스택 + 거리뷰로 바꿨을 때의 프론트 번들 크기. 832KB(gzip 224KB) → 4KB(gzip 2KB). 앞뒤 값을 함께 쓴다 — 한쪽만 쓰면 의미가 없다",
       "source": "docs/feature-posting.md 0-V"
@@ -144,21 +169,86 @@
     {
       "id": "LSTM_MARGIN",
       "value": "0.8%p",
-      "aliases": ["0.8%"],
-      "condition": "",
-      "why": "목표선 70% 대비 초과폭(70.8% - 70%). 거점이 더 늘면 내려갈 수 있는 자리라는 점을 함께 쓴다",
+      "aliases": [
+        "0.8%"
+      ],
+      "condition": "78.5%",
+      "why": "⚠ 인용 금지에 가깝다 — 목표선 70% 대비 초과폭(70.8% − 70%)인데, 그 목표선 자체가 무정보 상수(78.5%) 아래라 초과폭에 의미가 없다. 성과로 쓰려면 이 값이 아니라 아래 LSTM_SKILL(지속성 대비 MAE 개선)을 쓴다",
       "source": "docs/feature-platform.md 0"
     },
     {
       "id": "GNN_BASE",
       "value": "89.4%",
-      "aliases": ["61.7%"],
+      "aliases": [
+        "61.7%"
+      ],
       "condition": "기준선",
       "why": "거점 사전분포 기준선 (Top-3 89.4% / Top-1 61.7%). Top-3 91.7% 를 이 값 없이 쓰면 절대 성능으로 오독된다 — 둘은 반드시 함께 간다",
       "source": "docs/papers/evidence-index.md P1"
+    },
+    {
+      "id": "LSTM_SKILL",
+      "value": "+20.5%",
+      "aliases": [
+        "20.5%"
+      ],
+      "condition": "지속성",
+      "why": "공실 예측 오차의 **기술점수** — 지속성 베이스라인(예측=직전 분기값) MAE 1.333 대비 모델 1.061. 방향 축과 달리 여기엔 실력이 있고, 베이스라인 대비 값이라 임계값 없이도 해석된다. 조건 '지속성' 은 무엇에 댄 값인지 밝히게 한다",
+      "source": "scripts/kpi_baseline.py"
+    },
+    {
+      "id": "LSTM_BASE",
+      "value": "78.5%",
+      "aliases": [
+        "51/65"
+      ],
+      "condition": "",
+      "why": "무정보 상수 규칙('항상 하락')의 방향 정확도. LSTM_DIR 의 조건값이라 이 수치 자체는 조건 없이 쓸 수 있다",
+      "source": "scripts/kpi_baseline.py"
+    },
+    {
+      "id": "LSTM_DIR_SKILL",
+      "value": "-7.7%p",
+      "aliases": [
+        "7.7%p",
+        "−7.7%p",
+        "7.7%"
+      ],
+      "condition": "78.5%",
+      "why": "방향 축의 실력 = 모델 70.8% − 무정보 상수 78.5%. **음수다** — 이 축은 아직 성과가 아니라는 사실 자체를 적는 수치이므로 베이스라인과 함께만 쓴다",
+      "source": "scripts/kpi_baseline.py"
+    },
+    {
+      "id": "GNN_TOP3_SKILL",
+      "value": "2.3%p",
+      "aliases": [
+        "+2.3%p",
+        "2.3%",
+        "2.32%p"
+      ],
+      "condition": "기준선",
+      "why": "업종추천 Top-3 실력 = 모델 91.7% − 거점 사전분포 기준선 89.4%. 절대 수치가 아니라 이 차이가 모델이 더한 몫이다",
+      "source": "scripts/kpi_baseline.py"
+    },
+    {
+      "id": "LSTM_CI",
+      "value": "58.8%",
+      "aliases": [
+        "95%"
+      ],
+      "condition": "신뢰구간",
+      "why": "방향 정확도 70.8%(n=65)의 Wilson 95% 신뢰구간 하한. 구간이 [58.8%, 80.4%] 로 넓어 점추정으로 목표선을 가를 수 없다는 근거다. 별칭 '95%' 는 신뢰수준 표기라 같은 조건('신뢰구간')을 공유한다",
+      "source": "scripts/kpi_baseline.py"
+    },
+    {
+      "id": "LSTM_CI_HI",
+      "value": "80.4%",
+      "aliases": [],
+      "condition": "신뢰구간",
+      "why": "위 신뢰구간의 상한. 하한과 반드시 짝으로 쓴다",
+      "source": "scripts/kpi_baseline.py"
     }
   ],
-
   "forbid": [
     {
       "id": "F_REAL_VACANCY",
@@ -176,7 +266,7 @@
       "id": "F_LSTM_OLD",
       "pattern": "84\\.6\\s*%|74\\.1\\s*%|72\\.2\\s*%",
       "why": "13·27·54거점 시절 값이다. 표본이 클수록 신뢰구간이 좁으므로 66거점 값만 인용한다",
-      "instead": "70.8% (66거점)"
+      "instead": "70.8% (66거점) — 단 같은 절에 무정보 상수 베이스라인 78.5% 를 반드시 함께 쓴다. 성과로 쓸 값은 LSTM_SKILL(+20.5%, 지속성 대비)이다"
     },
     {
       "id": "F_OFFPRIOR_MIX",
@@ -213,9 +303,14 @@
       "pattern": "공실\\s*예측\\s*정확도\\s*(?!방향)",
       "why": "측정한 것은 방향 정확도(오르는가 내리는가)이지 공실률 값의 정확도가 아니다",
       "instead": "공실 예측 방향 정확도"
+    },
+    {
+      "id": "F_LSTM_ACHIEVED",
+      "pattern": "방향\\s*정확도[^.\\n]{0,40}(목표|KPI)\\s*70\\s*%?\\s*(를)?\\s*(달성|넘|초과|상회)",
+      "why": "목표 70% 를 넘긴 것은 사실이나 **같은 홀드아웃의 무정보 상수가 78.5%** 라 '달성' 은 성과 주장이 된다. 임계값을 넘겼다는 사실에는 정보가 없다",
+      "instead": "'방향 축은 상수 베이스라인(78.5%)을 넘지 못했고, 실력은 오차 축에서 나온다(지속성 대비 MAE +20.5%)' 로 적는다"
     }
   ],
-
   "ignore": [
     "20\\d\\d",
     "0\\d{1,2}-\\d{3,4}-\\d{4}",

@@ -60,7 +60,7 @@ PlaceOS는 "자연어 PRD → AI 코드 생성 → 검증" 사이클로 개발�
 
 1. **컨텍스트 부여** — Claude Code는 `CLAUDE.md`를 자동 로드한다. 추가 파일은 `@경로`로 참조: `@apps/backend/app/api/v1/ai.py 를 참고해서...`
 2. **슬래시 커맨드로 작업 지시** — 예: `/backend-dev 공실 히트맵 GeoJSON 엔드포인트`
-3. **검증** — 백엔드는 `pytest`, 프론트는 `npm run build`, ML은 학습 스크립트 실행. CLAUDE.md의 성능 목표(정확도 70%+, 맵 로딩 <3초, API p95 <200ms)를 기준으로 확인.
+3. **검증** — 백엔드는 `pytest`, 프론트는 `npm run build`, ML은 학습 스크립트 실행. CLAUDE.md §KPI Priorities 를 기준으로 확인 — **정확도 임계값이 아니라 베이스라인 대비 실력**이다(`python scripts/kpi_baseline.py`). 맵 로딩·API p95 는 아직 미계측이다.
 4. **커밋** — 기능 단위로 작게 커밋.
 
 ### 자주 쓰는 슬래시 커맨드

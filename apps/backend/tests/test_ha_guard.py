@@ -156,10 +156,40 @@ def test_mixed_trend_does_not_block():
 
 
 def test_no_context_means_no_trend_check():
-    """컨텍스트가 없으면 방향 자체가 없다 — 판정하지 않는다 (음성 대조)."""
+    """컨텍스트가 없으면 방향 자체가 없다 — 위반으로 판정하지 않는다 (음성 대조)."""
     parsed = _store(online=[_perf(
         channel="인스타그램", content="손님이 늘고 있는 골목", rationale="근거")])
     assert "trend_contradiction" not in _codes(ha_guard.check_store(parsed, _PROFILE, None))
+
+
+def test_missing_context_is_reported_as_unverified_not_as_a_pass():
+    """**fail-open 차단.** 검사를 못 돌린 것과 통과한 것이 같아 보이면 안 된다.
+
+    이 검사는 violation 등급이라 응답을 버리는 힘이 있다. 입력 하나가 비었다고 그
+    힘이 조용히 사라지면, 트렌드를 뒤집는 카피가 검증을 통과한 것처럼 나간다.
+    """
+    parsed = _store(online=[_perf(
+        channel="인스타그램", content="손님이 늘고 있는 골목", rationale="근거")])
+    findings = ha_guard.check_store(parsed, _PROFILE, None)
+    assert "trend_unverified" in _codes(findings)
+    # 등급은 warning — 검사 불가는 허위의 증거가 아니므로 응답을 버릴 근거가 못 된다.
+    assert not ha_guard.has_violation(findings)
+
+
+def test_context_without_trend_labels_is_also_unverified():
+    """컨텍스트는 있는데 트렌드 라벨만 비어도 같다 — 수집이 비면 여기로 온다."""
+    parsed = _store(online=[_perf(
+        channel="인스타그램", content="손님이 늘고 있는 골목", rationale="근거")])
+    findings = ha_guard.check_store(parsed, _PROFILE, "신사동 상권 · 키워드: 브런치")
+    assert "trend_unverified" in _codes(findings)
+
+
+def test_ran_and_clean_does_not_emit_unverified():
+    """실제로 돌아서 깨끗한 경우에는 흔적을 남기지 않는다 (음성 대조)."""
+    parsed = _store(online=[_perf(
+        channel="인스타그램", content="조용한 골목의 이자카야", rationale="리뷰 근거")])
+    assert "trend_unverified" not in _codes(
+        ha_guard.check_store(parsed, _PROFILE, _CTX_DOWN))
 
 
 # ── 최상급 (warning) ─────────────────────────────────────────────────────────
@@ -290,7 +320,12 @@ def test_warning_keeps_llm_output(monkeypatch):
 
     body = client.post(f"{V1}/marketing/generate", json=_PROFILE).json()
     assert body["source"] == "llm", "경고인데 응답을 버렸다"
-    assert {f["code"] for f in body["ha_findings"]} == {"unsupported_superlative"}
+    codes = {f["code"] for f in body["ha_findings"]}
+    assert "unsupported_superlative" in codes
+    # 2026-09-16: 이 픽스처의 컨텍스트에는 트렌드 라벨이 없다. 종전에는 그 사실이
+    # 아무 흔적도 남기지 않아 "트렌드 검사를 통과했다"처럼 보였다 — 실제로는 검사가
+    # 돌지 않았다. 지금은 trend_unverified 가 그 자리를 밝힌다.
+    assert codes <= {"unsupported_superlative", "trend_unverified"}, codes
 
 
 def test_stub_without_llm_has_empty_findings(monkeypatch):
