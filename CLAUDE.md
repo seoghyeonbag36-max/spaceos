@@ -85,6 +85,7 @@ Price 는 Posting 으로, Promotion 은 Program 으로만 간다.
 | 공실 예측 · **방향** | 무정보 상수('항상 하락') 78.5% | **−7.7%p** | ❌ 미달 |
 | 업종 추천 · Top-3 | 거점 사전분포 89.4% | **+2.32%p** | ✅ 양수지만 작다 |
 | 업종 추천 · off-prior Top-3 | — | 33.8% | 관측만(게이트 폐기 2026-08-26) |
+| **검정력** | 가별 최소 차이 | off-prior ≈3.0%p | ⚠ 이보다 작은 차이는 **못 가른다** — 라벨 축(`--label-level category2`)으로 가면 자리 1,011 → 4,399, 분해능 ≈1.5%p |
 | 학습 규약 | 누수 차단본(train_only·val 선택) | 재학습 대기 | ❌ 산출물이 옛 규약 |
 
 단일 출처는 `python scripts/kpi_baseline.py` (미달이면 종료코드 1) · `python scripts/pppp_status.py`.

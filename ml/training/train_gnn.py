@@ -1114,6 +1114,10 @@ def train(edge_types: set[str] | None = None, epochs: int = 400,
     metrics["lift_vs_district_prior_pct"] = (
         round((metrics["test_top1"] - base) / base * 100, 1) if base else None)
     metrics.update({"nodes": len(nodes), "edges_used": int(ei.shape[1] // 2),
+                    # test 표본 수 — **검정력을 계산하려면 이 값이 필요하다**(2026-09-16).
+                    # 종전에는 `nodes`(전체 그래프)만 남아서, 읽는 쪽이 분할 비율을
+                    # 추정해야 했다. 추정한 n 으로 낸 신뢰구간은 근거가 아니다.
+                    "test_nodes": int(te.sum()),
                     "classes": len(classes), "features": len(feat_names),
                     "label_level": label_level,
                     # 어휘가 모집단을 얼마나 잘랐는지 산출물이 스스로 밝힌다 —

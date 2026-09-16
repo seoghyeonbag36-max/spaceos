@@ -24,6 +24,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from kpi_baseline import (  # noqa: E402
     check,
     cluster_bootstrap_ci,
+    detectability,
     gnn_skill,
     lstm_skill,
     mcnemar_exact,
@@ -199,6 +200,59 @@ def test_legacy_holdout_without_hub_field_still_reads() -> None:
     """옛 산출물(거점명이 곧 키, hub 필드 없음)도 그대로 읽혀야 한다."""
     res = lstm_skill({"holdout": {"anam": {"pred": 1, "actual": 1, "prev": 0}}})
     assert res["available"] and res["n"] == 1 and res["n_hubs"] == 1
+
+
+# ─────────────────────────── 검정력 ───────────────────────────
+
+def test_detectability_shrinks_with_sample_size() -> None:
+    """표본이 커질수록 가를 수 있는 차이가 작아진다 — 1/√n."""
+    small = detectability(0.34, 1011)
+    big = detectability(0.34, 4399)
+    assert small["min_detectable_pp"] > big["min_detectable_pp"]
+    # 저장소 자체 스코핑(scope-offprior-sample-2026-09-06)과 같은 눈금이어야 한다.
+    assert small["min_detectable_pp"] == pytest.approx(3.0, abs=0.2)
+    assert big["min_detectable_pp"] == pytest.approx(1.5, abs=0.2)
+
+
+def test_detectability_handles_empty_sample() -> None:
+    d = detectability(0.5, 0)
+    assert d["min_detectable_pp"] is None
+
+
+def test_gnn_skill_below_resolution_is_flagged_not_claimed() -> None:
+    """**핵심.** 실력이 양수라도 분해능 아래면 '말할 수 없는 차이'로 표시돼야 한다.
+
+    2026-08-26 레버 실험이 남긴 교훈이다 — 못 가른 것과 차이가 없는 것은 다르다.
+    """
+    res = gnn_skill({"metrics": {"test_top3": 0.9167,
+                                 "baseline_district_prior_top3": 0.8935,
+                                 "test_nodes": 300}})          # 작은 표본
+    assert res["beats_baseline"] is True          # 부호는 양수인데
+    assert res["skill_is_detectable"] is False    # 크기는 말할 수 없다
+
+
+def test_gnn_skill_above_resolution_is_detectable() -> None:
+    res = gnn_skill({"metrics": {"test_top3": 0.9167,
+                                 "baseline_district_prior_top3": 0.8935,
+                                 "test_nodes": 9493}})
+    assert res["skill_is_detectable"] is True
+
+
+def test_missing_test_nodes_does_not_get_estimated() -> None:
+    """test 표본 수가 없으면 **추정하지 않는다** — 추정한 n 으로 낸 검정력은 근거가 아니다."""
+    res = gnn_skill({"metrics": {"test_top3": 0.9167,
+                                 "baseline_district_prior_top3": 0.8935,
+                                 "nodes": 47442}})             # 전체 그래프뿐
+    assert res["test_nodes"] is None
+    assert res["skill_is_detectable"] is None
+    assert res["detectability"]["min_detectable_pp"] is None
+
+
+def test_train_gnn_records_test_sample_size() -> None:
+    """산출물이 test 표본 수를 남겨야 다음 판정이 검정력을 계산할 수 있다."""
+    src = (ROOT / "ml" / "training" / "train_gnn.py").read_text(encoding="utf-8")
+    assert '"test_nodes"' in src, "test_nodes 기록이 사라졌다 — 검정력을 못 낸다"
+
 
 # ─────────────────────────── 서빙 산출물 ───────────────────────────
 

@@ -218,6 +218,25 @@ def lstm_skill(forecast: dict) -> dict:
 
 # ─────────────────────────── GNN ───────────────────────────
 
+def detectability(p: float, n: int) -> dict:
+    """이 표본으로 **얼마나 작은 차이까지 가를 수 있나**.
+
+    2026-08-26 GNN 레버 실험이 남긴 교훈이 이것이다: +2.05%p 가 McNemar 에서
+    p=0.111 이라 "유의하지 않다" 로 끝났는데, 그건 **차이가 없다**가 아니라
+    **이 표본으로는 못 가른다**는 뜻이었다. 표본 크기를 옆에 안 적으면 그 둘이
+    구분되지 않고, 못 가른 것이 기각으로 읽힌다.
+
+    근사식은 `docs/scope-offprior-sample-2026-09-06.md` 가 쓴 것과 같다(단일 팔
+    표준오차의 2배). ⚠ 같은 test 집합 위의 **쌍대** 비교라 올바른 검정은 McNemar
+    이고, 그 2×2 표는 노드별 예측을 남겨야 만들 수 있다(`--dump-preds`).
+    여기 값은 "표본이 이 정도는 돼야 말할 수 있다" 는 눈금이지 검정 결과가 아니다.
+    """
+    if n <= 0:
+        return {"n": 0, "se_pp": None, "min_detectable_pp": None}
+    se = math.sqrt(max(p * (1 - p), 0.0) / n) * 100.0
+    return {"n": n, "se_pp": round(se, 2), "min_detectable_pp": round(2 * se, 2)}
+
+
 def gnn_skill(recommend: dict) -> dict:
     """업종추천 — 학습이 남긴 거점 사전분포 기준선에 댄다.
 
@@ -231,13 +250,28 @@ def gnn_skill(recommend: dict) -> dict:
     b1 = m.get("baseline_district_prior_top1")
     if top3 is None or b3 is None:
         return {"available": False, "reason": "metrics 에 test_top3/baseline 이 없다"}
+    skill_pp = (top3 - b3) * 100.0
+    # test 표본 수. 옛 산출물에는 `nodes`(전체 그래프)뿐이라 없으면 **추정하지 않고**
+    # None 으로 둔다 — 추정한 n 으로 낸 검정력은 근거가 아니다.
+    n_test = m.get("test_nodes")
+    det = detectability(top3, n_test) if n_test else {"n": None, "se_pp": None,
+                                                      "min_detectable_pp": None}
+    mdp = det.get("min_detectable_pp")
     out = {
         "available": True,
-        "top3": top3, "baseline_top3": b3, "skill_pp_top3": (top3 - b3) * 100.0,
+        "top3": top3, "baseline_top3": b3, "skill_pp_top3": skill_pp,
         "beats_baseline": top3 > b3,
+        "detectability": det,
+        # 실력이 양수라도 그 크기가 분해능 아래면 **말할 수 없는 차이**다.
+        "skill_is_detectable": (abs(skill_pp) >= mdp) if mdp is not None else None,
         "offprior_top3": m.get("test_offprior_top3"),
         "offprior_nodes": m.get("offprior_nodes"),
-        "test_nodes": m.get("nodes"),
+        "offprior_detectability": (
+            detectability(m["test_offprior_top3"], m["offprior_nodes"])
+            if m.get("test_offprior_top3") is not None and m.get("offprior_nodes")
+            else None),
+        "test_nodes": n_test,
+        "graph_nodes": m.get("nodes"),
     }
     if top1 is not None and b1 is not None:
         out.update({"top1": top1, "baseline_top1": b1,
@@ -329,6 +363,20 @@ def _fmt(res: dict) -> str:
         out.append(f"   Top-3       모델 {gnn['top3']:.1%} · "
                    f"거점 사전분포 {gnn['baseline_top3']:.1%}")
         out.append(f"   {mark} 실력 {gnn['skill_pp_top3']:+.2f}%p")
+        det = gnn.get("detectability") or {}
+        if det.get("min_detectable_pp") is not None:
+            verdict = ("가를 수 있다" if gnn.get("skill_is_detectable")
+                       else "**이 표본으로는 못 가른다**")
+            out.append(f"   [검정력] test {det['n']}자리 · SE {det['se_pp']}%p · "
+                       f"가별 최소 차이 ≈{det['min_detectable_pp']}%p → {verdict}")
+        else:
+            out.append("   [검정력] test 표본 수가 산출물에 없다 — 재학습하면 "
+                       "`test_nodes` 가 채워진다(추정으로 대신하지 않는다)")
+        od = gnn.get("offprior_detectability")
+        if od and od.get("min_detectable_pp") is not None:
+            out.append(f"   [검정력] off-prior {od['n']}자리 · 가별 최소 차이 "
+                       f"≈{od['min_detectable_pp']}%p — 라벨 축(category2)으로 가면 "
+                       f"자리가 4.35배가 된다(scope-offprior-sample-2026-09-06)")
         if "top1" in gnn:
             out.append(f"   Top-1       모델 {gnn['top1']:.1%} · "
                        f"사전분포 {gnn['baseline_top1']:.1%} "
