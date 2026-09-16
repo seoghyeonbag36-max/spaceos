@@ -421,7 +421,9 @@ def platform_track() -> Track:
         "LSTM 학습 규약 (누수 차단본으로 재학습)",
         1.0 if proto.get("scaling") == "train_only" and proto.get("selection") == "val" else 0.0,
         f"protocol={proto.get('version')} · scaling={proto.get('scaling')} · "
-        f"selection={proto.get('selection')}" if proto else
+        f"selection={proto.get('selection')} · split={proto.get('split', '단일 원점')}"
+        f" (test {proto.get('test_quarters', 1)}원점/거점 · val {proto.get('val_quarters', 1)})"
+        if proto else
         "산출물에 protocol 블록이 없다 → **2026-09-16 이전 규약**(표준화 통계·"
         "하이퍼파라미터 선택이 모두 홀드아웃 포함). 코드는 고쳤으나 재학습은 "
         "Gold(platform13)가 있는 머신에서 해야 한다 — 아래 실력 수치는 그때까지 "

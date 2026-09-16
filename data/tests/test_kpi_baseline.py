@@ -23,9 +23,11 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from kpi_baseline import (  # noqa: E402
     check,
+    cluster_bootstrap_ci,
     gnn_skill,
     lstm_skill,
     mcnemar_exact,
+    skew_robust,
     wilson,
 )
 
@@ -123,6 +125,80 @@ def test_gnn_at_or_below_prior_fails() -> None:
                                  "baseline_district_prior_top3": 0.8935}})
     assert res["beats_baseline"] is False
 
+
+# ─────────────────────────── 쏠림에 강한 관측 지표 ───────────────────────────
+
+def test_constant_rule_scores_zero_on_skew_robust_metrics() -> None:
+    """**진단의 핵심.** 상수 규칙은 균형정확도 50%·MCC 0 이다 — 정의상.
+
+    원시 정확도로는 상수가 이기지만(78.5%), 이 두 지표로는 못 이긴다. 그래서 모델에
+    신호가 있는지를 표본 쏠림과 분리해 볼 수 있다.
+    """
+    ob = skew_robust(tp=0, fp=0, fn=14, tn=51)   # 전부 하락이라 찍은 경우
+    assert ob["balanced_acc"] == pytest.approx(0.5)
+    assert ob["mcc"] == 0.0
+    assert ob["recall_up"] == 0.0
+
+
+def test_skew_robust_detects_minority_signal() -> None:
+    """서빙 산출물의 실측 혼동행렬에서는 신호가 잡혀야 한다(상승 8/14 적중)."""
+    ob = skew_robust(tp=8, fp=13, fn=6, tn=38)
+    assert ob["balanced_acc"] > 0.5
+    assert ob["mcc"] > 0.0
+    assert ob["precision_up"] > 14 / 65, "상승 정밀도가 기저율보다 높아야 신호다"
+
+
+def test_observed_block_is_not_used_for_the_verdict() -> None:
+    """관측 지표가 판정을 뒤집으면 안 된다 — 그게 metric shopping 이다."""
+    res = check()
+    d = res["lstm"]["direction"]
+    assert "observed" in d
+    assert d["observed"]["balanced_acc"] > 0.5      # 신호는 있는데
+    assert d["beats_baseline"] is False             # 판정은 여전히 미달이다
+    assert any("베이스라인" in m for m in res["failures"])
+
+
+# ─────────────────────────── 롤링 오리진 · 군집 구간 ───────────────────────────
+
+def _holdout_rolling(per_hub: dict) -> dict:
+    out = {}
+    for hub, rows in per_hub.items():
+        for i, (p, a, v) in enumerate(rows):
+            out[f"{hub}@q{i}"] = {"hub": hub, "pred": p, "actual": a, "prev": v}
+    return {"holdout": out}
+
+
+def test_rolling_origin_keys_do_not_collapse_samples() -> None:
+    """거점당 여러 건이면 표본이 그대로 세어져야 한다 — 키가 겹치면 조용히 1/K 로 준다."""
+    res = lstm_skill(_holdout_rolling({"a": [(1, 1, 0)] * 3, "b": [(-1, -1, 0)] * 3}))
+    assert res["n"] == 6
+    assert res["n_hubs"] == 2
+    assert res["samples_per_hub"] == pytest.approx(3.0)
+
+
+def test_cluster_bootstrap_is_used_when_hubs_repeat() -> None:
+    """거점당 표본이 여럿이면 이항 공식이 아니라 군집 부트스트랩을 쓴다."""
+    many = _holdout_rolling({f"h{i}": [(1, 1, 0), (-1, 1, 0)] for i in range(8)})
+    assert lstm_skill(many)["direction"]["ci_kind"] == "cluster_bootstrap"
+    single = _holdout_rolling({f"h{i}": [(1, 1, 0)] for i in range(8)})
+    assert lstm_skill(single)["direction"]["ci_kind"] == "wilson"
+
+
+def test_cluster_bootstrap_is_wider_than_binomial_under_clustering() -> None:
+    """군집이 있으면 구간이 이항보다 넓어야 한다 — 좁으면 독립을 가정한 것이다.
+
+    거점 안에서는 결과가 완전히 같고 거점끼리만 갈리는 극단적 군집 표본을 쓴다.
+    이항 공식은 20건으로 보지만 실제 정보량은 거점 10곳뿐이다.
+    """
+    lo_b, hi_b = wilson(10, 20)
+    lo_c, hi_c = cluster_bootstrap_ci([[True] * 2] * 5 + [[False] * 2] * 5)
+    assert (hi_c - lo_c) > (hi_b - lo_b), "군집 구간이 이항보다 좁다 — 독립 가정이 남아 있다"
+
+
+def test_legacy_holdout_without_hub_field_still_reads() -> None:
+    """옛 산출물(거점명이 곧 키, hub 필드 없음)도 그대로 읽혀야 한다."""
+    res = lstm_skill({"holdout": {"anam": {"pred": 1, "actual": 1, "prev": 0}}})
+    assert res["available"] and res["n"] == 1 and res["n_hubs"] == 1
 
 # ─────────────────────────── 서빙 산출물 ───────────────────────────
 

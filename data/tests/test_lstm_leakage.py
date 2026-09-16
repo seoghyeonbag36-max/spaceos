@@ -65,6 +65,7 @@ def test_dataset_fits_scaler_on_training_rows_only_in_source() -> None:
     src = DATASETS.read_text(encoding="utf-8")
     assert "feats[train_row]" in src, "표준화 통계가 다시 전체 행에서 계산되고 있다"
     assert "sample_is_val" in src, "val 분할이 사라졌다"
+    assert "TEST_QUARTERS" in src and "VAL_QUARTERS" in src, "롤링 오리진 분할이 사라졌다"
 
 
 def test_reported_metric_keys_exist_in_what_scoring_returns() -> None:
@@ -121,7 +122,7 @@ def _dataset_module():
     return m
 
 
-def _synthetic(n_districts: int = 3, n_quarters: int = 14):
+def _synthetic(n_districts: int = 3, n_quarters: int = 16):
     """마지막 2분기만 값이 튀는 표 — 누수가 있으면 통계가 눈에 띄게 달라진다."""
     pd = pytest.importorskip("pandas")
     rows = []
@@ -145,26 +146,54 @@ def test_scaler_excludes_the_holdout_quarters(monkeypatch) -> None:
     monkeypatch.setattr(m, "load_gold", lambda: prepared)
     ds = m.build_dataset(look_back=4)
 
+    # 제외 폭은 분할 설정을 따라간다 — 숫자를 박으면 롤링 오리진을 바꿀 때 이 줄이
+    # 먼저 낡는다(2026-09-16 에 실제로 그랬다: 2분기 고정 → 기본이 5분기로 바뀜).
+    holdout_q = m.TEST_QUARTERS + m.VAL_QUARTERS
     feats = prepared[list(m.SEQ_FEATURES)].to_numpy(dtype=float)
     keep = np.ones(len(prepared), dtype=bool)
     for did in prepared["district_id"].unique():
         idx = np.flatnonzero((prepared["district_id"] == did).to_numpy())
-        keep[idx[-2:]] = False
+        keep[idx[-holdout_q:]] = False
 
     assert np.allclose(ds.mu, np.nanmean(feats[keep], axis=0)), "train 행 통계와 달라졌다"
     # 전체 행 통계와는 **달라야** 한다 — 같으면 누수가 되돌아온 것이다.
     assert not np.allclose(ds.mu, np.nanmean(feats, axis=0))
 
 
-def test_val_and_test_masks_are_disjoint_and_one_per_district(monkeypatch) -> None:
+def test_val_and_test_masks_are_disjoint_and_sized_by_the_split(monkeypatch) -> None:
+    """겹치지 않고, 거점마다 설정한 원점 수만큼 나와야 한다(롤링 오리진)."""
     m = _dataset_module()
     np = pytest.importorskip("numpy")
     prepared = _prep(m, _synthetic())
     monkeypatch.setattr(m, "load_gold", lambda: prepared)
     ds = m.build_dataset(look_back=4)
+    n_d = len(ds.district_ids)
     assert not (ds.sample_is_val & ds.sample_is_last).any(), "val 과 test 가 겹친다"
-    assert int(ds.sample_is_last.sum()) == len(ds.district_ids)
-    assert int(ds.sample_is_val.sum()) == len(ds.district_ids)
+    assert int(ds.sample_is_last.sum()) == n_d * m.TEST_QUARTERS
+    assert int(ds.sample_is_val.sum()) == n_d * m.VAL_QUARTERS
+    # test 는 시간축에서 val 보다 **뒤**에 있어야 한다 — 뒤섞이면 미래로 고르게 된다.
+    assert min(ds.sample_quarter[ds.sample_is_last]) > max(ds.sample_quarter[ds.sample_is_val])
+
+
+def test_single_origin_split_is_still_available(monkeypatch) -> None:
+    """대조군(1/1)은 그대로 돌아야 한다 — 재학습 때 롤링 오리진과 비교할 팔이다."""
+    m = _dataset_module()
+    prepared = _prep(m, _synthetic())
+    monkeypatch.setattr(m, "load_gold", lambda: prepared)
+    ds = m.build_dataset(look_back=4, test_quarters=1, val_quarters=1)
+    n_d = len(ds.district_ids)
+    assert int(ds.sample_is_last.sum()) == n_d
+    assert int(ds.sample_is_val.sum()) == n_d
+
+
+def test_zero_holdout_is_rejected(monkeypatch) -> None:
+    """test 나 val 이 0 이면 선택과 보고가 다시 한 표본에서 난다 — 막는다."""
+    m = _dataset_module()
+    prepared = _prep(m, _synthetic())
+    monkeypatch.setattr(m, "load_gold", lambda: prepared)
+    for kw in ({"test_quarters": 0}, {"val_quarters": 0}):
+        with pytest.raises(ValueError):
+            m.build_dataset(look_back=4, **kw)
 
 
 def test_target_scaling_excludes_holdout_targets(monkeypatch) -> None:

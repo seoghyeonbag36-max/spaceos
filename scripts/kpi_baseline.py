@@ -79,6 +79,55 @@ def mcnemar_exact(b: int, c: int) -> float:
     return min(1.0, 2.0 * tail)
 
 
+def cluster_bootstrap_ci(hits_by_cluster: list[list[bool]], reps: int = 2000,
+                         seed: int = 42) -> tuple[float, float]:
+    """거점 단위 군집 부트스트랩 95% 구간.
+
+    롤링 오리진으로 거점당 표본이 여럿이면 **이항 공식을 쓰면 안 된다** — 같은 거점의
+    이웃 분기는 상관돼 있어 표본이 독립이 아니고, Wilson 구간은 그만큼 좁게 나온다.
+    거점(군집)을 복원추출해 구간을 낸다. 거점당 1건이면 보통 부트스트랩과 같아진다.
+    """
+    import random
+
+    k = len(hits_by_cluster)
+    if k == 0:
+        return (0.0, 0.0)
+    rng = random.Random(seed)
+    accs: list[float] = []
+    for _ in range(reps):
+        picked = [hits_by_cluster[rng.randrange(k)] for _ in range(k)]
+        flat = [h for c in picked for h in c]
+        if flat:
+            accs.append(sum(flat) / len(flat))
+    if not accs:
+        return (0.0, 0.0)
+    accs.sort()
+    return (accs[int(0.025 * len(accs))], accs[min(len(accs) - 1, int(0.975 * len(accs)))])
+
+
+def skew_robust(tp: int, fp: int, fn: int, tn: int) -> dict:
+    """쏠린 이진 표본에서 **상수 규칙이 구조적으로 못 이기는** 지표들.
+
+    원시 정확도는 다수 클래스 비율에 지배된다(실측: 하락 51 · 상승 14 에서 '항상 하락'
+    이 78.5%). 균형정확도와 MCC 는 상수 규칙이 각각 정확히 50%·0 이므로, 모델에
+    신호가 있는지를 원시 정확도와 **독립적으로** 드러낸다.
+
+    ⚠ 이 값들은 **관측**이다. 판정 지표를 결과를 보고 바꾸면 그 자체가 metric shopping
+    이라 이 저장소가 막아 온 누수와 같은 종류가 된다. 판정에 쓰려면 재학습 **전에**
+    확정해야 한다 — docs/finding-lstm-direction-diagnosis-2026-09-16.md §무엇을 하면 되나.
+    """
+    rec_pos = tp / (tp + fn) if tp + fn else 0.0
+    rec_neg = tn / (tn + fp) if tn + fp else 0.0
+    den = math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    return {
+        "recall_up": rec_pos, "recall_down": rec_neg,
+        "precision_up": tp / (tp + fp) if tp + fp else 0.0,
+        "balanced_acc": (rec_pos + rec_neg) / 2,      # 상수 규칙 = 0.5
+        "mcc": ((tp * tn - fp * fn) / den) if den else 0.0,   # 상수 규칙 = 0
+        "confusion": {"tp": tp, "fp": fp, "fn": fn, "tn": tn},
+    }
+
+
 def _sgn(x: float) -> int:
     return (x > 0) - (x < 0)
 
@@ -92,7 +141,10 @@ def lstm_skill(forecast: dict) -> dict:
     하나만 인용하면 어느 쪽이든 거짓이 된다** — 그래서 둘 다 돌려준다.
     """
     hold = forecast.get("holdout") or {}
-    rows = [(k, v.get("pred"), v.get("actual"), v.get("prev")) for k, v in hold.items()]
+    # 키는 `거점@분기`(롤링 오리진) 또는 `거점`(단일 원점). 군집 단위는 **거점**이라
+    # `hub` 필드를 우선 쓰고, 없으면 키에서 `@` 앞을 떼어 옛 산출물도 읽는다.
+    rows = [(v.get("hub") or str(k).split("@")[0],
+             v.get("pred"), v.get("actual"), v.get("prev")) for k, v in hold.items()]
     rows = [r for r in rows if None not in r[1:]]
     n = len(rows)
     if n == 0:
@@ -118,12 +170,31 @@ def lstm_skill(forecast: dict) -> dict:
     mae_p = sum(abs(pr - a) for _, _, a, pr in rows) / n        # 지속성
     rmse_p = math.sqrt(sum((pr - a) ** 2 for _, _, a, pr in rows) / n)
 
+    # 혼동행렬(상승=양성) — 소수 클래스에 신호가 있는지 본다
+    tp = sum(1 for _, p, a, pr in rows if p - pr > 0 and a - pr > 0)
+    fp = sum(1 for _, p, a, pr in rows if p - pr > 0 and a - pr <= 0)
+    fn = sum(1 for _, p, a, pr in rows if p - pr <= 0 and a - pr > 0)
+    tn = n - tp - fp - fn
+
+    # 군집(거점) 단위 적중 목록 → 부트스트랩 구간
+    by_hub: dict[str, list[bool]] = {}
+    for hub, p, a, pr in rows:
+        by_hub.setdefault(hub, []).append(_sgn(p - pr) == _sgn(a - pr))
+    n_hubs = len(by_hub)
+    per_hub = n / n_hubs if n_hubs else 0.0
+    # 거점당 1건이면 Wilson 과 사실상 같으므로 굳이 부트스트랩을 돌리지 않는다.
+    ci_kind = "wilson" if per_hub <= 1.0 else "cluster_bootstrap"
+    ci = (list(wilson(hits, n)) if ci_kind == "wilson"
+          else list(cluster_bootstrap_ci(list(by_hub.values()))))
+
     acc, base_acc = hits / n, base_hits / n
     return {
         "available": True,
         "n": n,
+        "n_hubs": n_hubs,
+        "samples_per_hub": per_hub,
         "direction": {
-            "model_hits": hits, "model_acc": acc, "model_ci95": list(wilson(hits, n)),
+            "model_hits": hits, "model_acc": acc, "model_ci95": ci, "ci_kind": ci_kind,
             "baseline_label": base_label, "baseline_hits": base_hits,
             "baseline_acc": base_acc, "baseline_ci95": list(wilson(base_hits, n)),
             "skill_pp": (acc - base_acc) * 100.0,
@@ -131,6 +202,8 @@ def lstm_skill(forecast: dict) -> dict:
                         "p_two_sided": mcnemar_exact(b, c)},
             "actual_up": up, "actual_down": down,
             "beats_baseline": acc > base_acc,
+            # 관측 전용 — 판정에 쓰지 않는다(위 skew_robust 독스트링 참조)
+            "observed": skew_robust(tp, fp, fn, tn),
         },
         "error": {
             "model_mae": mae_m, "model_rmse": rmse_m,
@@ -223,6 +296,24 @@ def _fmt(res: dict) -> str:
                    f"p={d['mcnemar']['p_two_sided']:.3f}")
         out.append(f"      실제 방향 상승 {d['actual_up']} · 하락 {d['actual_down']} "
                    f"— 한쪽으로 쏠려 있어 상수 규칙이 강하다")
+        ob = d.get("observed") or {}
+        if ob:
+            c = ob["confusion"]
+            out.append(f"   [관측] 균형정확도 {ob['balanced_acc']:.1%}(상수 50.0%) · "
+                       f"MCC {ob['mcc']:+.3f}(상수 0)")
+            out.append(f"          상승 재현율 {ob['recall_up']:.1%}"
+                       f"({c['tp']}/{c['tp'] + c['fn']}) · "
+                       f"정밀도 {ob['precision_up']:.1%} · "
+                       f"하락 재현율 {ob['recall_down']:.1%}"
+                       f"({c['tn']}/{c['tn'] + c['fp']})")
+            out.append("          → 상수 규칙은 균형정확도 50%·MCC 0 이다. 이 둘이 그보다 "
+                       "높으면 **모델에 신호는 있다**는 뜻이고,")
+            out.append("            원시 정확도가 지는 것은 표본 쏠림 탓이다. "
+                       "⚠ 관측일 뿐 판정 지표가 아니다(결과를 보고 바꾸면 metric shopping)")
+        if lstm.get("samples_per_hub", 0) > 1:
+            out.append(f"   [분할] 거점 {lstm['n_hubs']}곳 × 거점당 "
+                       f"{lstm['samples_per_hub']:.1f}건 (롤링 오리진) · "
+                       f"구간은 {d['ci_kind']} — 같은 거점의 이웃 분기는 독립이 아니다")
         mark2 = "✅" if e["beats_persistence"] else "❌"
         out.append(f"   오차        모델 MAE {e['model_mae']:.3f} · "
                    f"지속성 {e['persistence_mae']:.3f}")

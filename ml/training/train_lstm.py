@@ -49,7 +49,14 @@ except (AttributeError, ValueError):  # 재설정 불가 스트림이면 그대�
     pass
 
 from ml.models.lstm.vacancy_lstm import VacancyLSTM  # noqa: E402
-from ml.training.datasets import SEQ_FEATURES, TARGET, build_dataset, load_gold  # noqa: E402
+from ml.training.datasets import (  # noqa: E402
+    SEQ_FEATURES,
+    TARGET,
+    TEST_QUARTERS,
+    VAL_QUARTERS,
+    build_dataset,
+    load_gold,
+)
 
 ARTIFACT = _REPO / "ml" / "artifacts" / "vacancy_lstm.pt"
 FORECAST_JSON = _REPO / "data" / "gold" / "platform_vacancy_forecast.json"
@@ -59,10 +66,12 @@ _SEED = 42
 
 
 def _train_once(hidden: int, layers: int, look_back: int | None, epochs: int = 400,
-                lr: float = 1e-3) -> dict:
+                lr: float = 1e-3, test_quarters: int = TEST_QUARTERS,
+                val_quarters: int = VAL_QUARTERS) -> dict:
     torch.manual_seed(_SEED)
     np.random.seed(_SEED)
-    ds = build_dataset(look_back=look_back)
+    ds = build_dataset(look_back=look_back, test_quarters=test_quarters,
+                       val_quarters=val_quarters)
     # 2026-09-16 누수 차단: 학습에서 val·test 를 **둘 다** 뺀다. 종전에는 test 만 빼고
     # 그 test 로 하이퍼파라미터까지 골랐다(main 참조) — 보고값이 test 가 아니었다.
     holdout = ds.sample_is_last
@@ -115,7 +124,9 @@ def _train_once(hidden: int, layers: int, look_back: int | None, epochs: int = 4
         "mae": te["mae"], "rmse": te["rmse"], "dir_acc": te["dir_acc"],
         "test": te, "val": va,
         "params": {"hidden": hidden, "layers": layers, "look_back": int(ds.X.shape[1]),
-                   "epochs": epochs, "lr": lr, "train_loss": float(loss.item())},
+                   "epochs": epochs, "lr": lr, "train_loss": float(loss.item()),
+                   "test_quarters": test_quarters, "val_quarters": val_quarters,
+                   "n_train": int(train.sum())},
     }
 
 
@@ -140,6 +151,7 @@ _PROTOCOL = {
     "selection": "val",            # 하이퍼파라미터는 val 로 고른다
     "test_used_once": True,        # test 는 보고에만 쓴다(임계값 조기중단 없음)
     "baselines": ["majority_direction", "persistence"],
+    "split": "rolling_origin",     # 거점마다 뒤쪽 K분기를 차례로 홀드아웃 원점으로
 }
 
 _MAX_HORIZON = 4  # 재귀 예측 최대 분기 수
@@ -212,7 +224,7 @@ def _forecast_next(res: dict) -> dict:
     return out
 
 
-def main() -> None:
+def main(test_quarters: int = TEST_QUARTERS, val_quarters: int = VAL_QUARTERS) -> None:
     now = datetime.datetime.now().isoformat(timespec="seconds")
     # 하이퍼파라미터 후보 — **전부 끝까지 돈다.** 종전의 "미달 시 재시도" 서술은
     # 임계값 조기중단을 전제한 것이라 2026-09-16 에 걷었다(아래 선택 블록 참조).
@@ -243,7 +255,7 @@ def main() -> None:
     # 끝까지 돌려야 test 가 **한 번만** 쓰인다.
     best = None
     for i, hp in enumerate(trials):
-        res = _train_once(**hp)
+        res = _train_once(**hp, test_quarters=test_quarters, val_quarters=val_quarters)
         v = res["val"]
         print(f"[trial {i}] {hp} → val MAE {v['mae']:.3f} 방향 {v['dir_acc']:.1%} "
               f"(상수 {v['baseline_dir_acc']:.1%})")
@@ -265,17 +277,23 @@ def main() -> None:
     if bt["mae"] >= bt["persistence_mae"]:
         print("  ⚠ 오차 축도 지속성 베이스라인 이하다.")
 
-    # 거점별 홀드아웃 상세
+    # 홀드아웃 상세 — 키는 **거점@분기** 다. 롤링 오리진이면 한 거점이 여러 건을
+    # 내므로 거점명만 키로 쓰면 dict 가 덮어써져 표본이 조용히 1/K 로 준다.
+    # `hub` 필드를 따로 실어 `scripts/kpi_baseline.py` 가 **거점 단위로 군집**해
+    # 부트스트랩 구간을 낼 수 있게 한다(같은 거점의 이웃 분기는 독립이 아니다).
     ds = best["ds"]
     hold_dids = [ds.district_ids[d] for d in ds.sample_district[ds.sample_is_last]]
+    hold_qs = list(ds.sample_quarter[ds.sample_is_last])
     per_district = {
-        did: {"pred": round(float(p), 3), "actual": round(float(a), 3),
-              "prev": round(float(v), 3),
-              "direction_hit": bool(np.sign(p - v) == np.sign(a - v))}
-        for did, p, a, v in zip(hold_dids, best["pred"], best["actual"], best["prev"])
+        f"{did}@{q}": {"hub": did, "quarter": str(q),
+                       "pred": round(float(p), 3), "actual": round(float(a), 3),
+                       "prev": round(float(v), 3),
+                       "direction_hit": bool(np.sign(p - v) == np.sign(a - v))}
+        for did, q, p, a, v in zip(hold_dids, hold_qs, best["pred"], best["actual"],
+                                   best["prev"])
     }
-    for did, m in per_district.items():
-        print(f"  {did}: pred {m['pred']} vs actual {m['actual']} "
+    for key, m in per_district.items():
+        print(f"  {key}: pred {m['pred']} vs actual {m['actual']} "
               f"({'O' if m['direction_hit'] else 'X'})")
 
     # 모델 아티팩트
@@ -309,7 +327,8 @@ def main() -> None:
                     "holdout_n": bt["n"],
                     "val_direction_acc": round(bv["dir_acc"], 3),
                     "val_mae": round(bv["mae"], 3)},
-        "protocol": _PROTOCOL,
+        "protocol": {**_PROTOCOL, "test_quarters": test_quarters,
+                     "val_quarters": val_quarters},
         "params": best["params"],
         "holdout": per_district,
         "forecasts": fc,
@@ -319,4 +338,12 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    _ap = argparse.ArgumentParser(description="VacancyLSTM 학습 — 롤링 오리진 분할")
+    _ap.add_argument("--test-quarters", type=int, default=TEST_QUARTERS,
+                     help="거점당 test 원점 수(보고용). 1 이면 2026-09-16 이전 규약과 같은 분할")
+    _ap.add_argument("--val-quarters", type=int, default=VAL_QUARTERS,
+                     help="거점당 val 원점 수(하이퍼파라미터 선택용)")
+    _a = _ap.parse_args()
+    main(test_quarters=_a.test_quarters, val_quarters=_a.val_quarters)
