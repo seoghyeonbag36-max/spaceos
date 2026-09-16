@@ -18,6 +18,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
+from app.services import latency as latency_service
 from app.services import usage as usage_service
 
 router = APIRouter()
@@ -63,6 +64,20 @@ def coverage() -> dict:
             "coverage_pct": round(shown / total * 100, 1) if total else None,
         },
     }
+
+
+@router.get("/latency", dependencies=[Depends(require_admin)])
+def latency() -> dict:
+    """경로별 응답시간 — KPI② (`API p95 <200ms`) 를 재는 유일한 관측 지점.
+
+    2026-09-16 이전에는 이 목표를 재는 코드가 없어 KPI 가 **선언만** 남아 있었다.
+
+    ⚠ 값은 **프로세스 로컬 표본**이다(응답의 `scope`·`note` 참조) — 재시작하면 0 이고
+    인스턴스가 여럿이면 인스턴스마다 다르다. 표본이 `min_samples` 미만인 경로는
+    `verdict: "표본부족"` 으로 물러난다. 관리자 전용인 이유는 경로별 지연이 내부
+    구조를 드러내기 때문이다.
+    """
+    return latency_service.summary()
 
 
 @router.get("/usage", dependencies=[Depends(require_admin)])

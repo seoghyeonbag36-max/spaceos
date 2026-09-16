@@ -24,6 +24,8 @@
  * (2026-08-01 실측). `width/height:100%` 를 같이 준다.
  */
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+
+import { endTiming, startTiming } from "@/lib/clientTiming";
 import { loadNaverMaps, describeNaverMapError } from "@/lib/naverMap";
 import "./MapHost.css";
 
@@ -83,6 +85,9 @@ export default function MapHost({ active, children }: { active: boolean; childre
   useEffect(() => {
     if (!everActive || mapRef.current) return;
     let alive = true;
+    // KPI② 계측 — "지도 탭을 연 시점"부터 잰다. 여기가 사용자가 기다리기 시작하는
+    // 지점이고, SDK 내려받기까지 포함해야 체감 시간이 된다(→ lib/clientTiming.ts).
+    startTiming("map_ready");
     loadNaverMaps()
       .then(() => {
         if (!alive || !elRef.current || mapRef.current) return;
@@ -93,6 +98,7 @@ export default function MapHost({ active, children }: { active: boolean; childre
         });
         setMap(mapRef.current);
         setReady(true);
+        endTiming("map_ready");
       })
       .catch((e) => alive && setError(describeNaverMapError(e)));
     return () => { alive = false; };
