@@ -536,10 +536,125 @@ def build_portfolio(out: Path) -> Path:
 
 
 # ══════════════════════════════════════════════════════════════════════════
+# ══════════════════════════════════════════════════════════════════════════
+#  4) 인재풀 등록 프로필 (공고가 없을 때 — 1~2쪽)
+# ══════════════════════════════════════════════════════════════════════════
+def build_talent_profile(out: Path) -> Path:
+    """공고 없이 보내는 인재풀 등록용. 심사 통과가 아니라 기억에 남는 것이 목적이라
+    이력서보다 짧고, 대신 '무엇을 줄 수 있는가'와 '보관 동의'를 명시한다."""
+    doc = Document()
+    sec = bp.setup(doc)
+    bp.add_footer(sec, "인재풀 등록 프로필")
+
+    doc_title(doc, "인재풀 등록 프로필",
+              "Talent Pool Profile · 채용 공고 없이 제출하는 사전 등록용 요약본")
+
+    # 1. 신원 · 희망 조건
+    bp.h2(doc, "01", "기본 정보 및 희망 조건")
+    bp.make_table(doc, [
+        ["성명", BLANK, "희망 직무", "기술사업화 / 창업보육 / 데이터 엔지니어링"],
+        ["연락처", BLANK, "고용 형태", "정규직 · 계약직 모두 가능"],
+        ["이메일", "seoghyeonbag36@gmail.com", "근무 가능 시점", FILL],
+        ["포트폴리오", "https://placeos.web.app", "근무 희망 지역", "서울 전역"],
+    ], [2.2, 5.4, 2.8, 5.4], head=False, sizes=[8.5, 9.0, 8.5, 9.0],
+        aligns=[L, L, L, L], zebra=False, bold_first_col=True)
+
+    # 2. 한 줄 요약
+    bp.h2(doc, "02", "한 줄 요약")
+    bp.body(doc,
+            "오프라인 상권을 데이터로 재구성하는 SaaS 두 종(PlaceOS · Co.I)을 기획부터 배포까지 "
+            "단독으로 만들어 운영 중입니다. 창업자 당사자이면서 동시에 수집 파이프라인부터 "
+            "모델, API, 배포까지 전 구간을 다루는 개발자입니다. 창업기업의 사업계획서에 적힌 "
+            "기술이 실제로 구현 가능한지를 직접 판단할 수 있다는 점이 제 차별점입니다.",
+            before=2)
+
+    # 3. 기여 가능 직무
+    bp.h2(doc, "03", "기여할 수 있는 직무")
+    bp.make_table(doc, [
+        ["직무", "무엇을 할 수 있는가"],
+        ["기술사업화 (TLO)",
+         "기술 실사 · 사업화 가능성 판단. 공공 API와 특허 정보를 직접 수집 · 정규화해 "
+         "근거 자료를 만들 수 있습니다."],
+        ["창업보육 · 창업지원",
+         "입주기업 기술 검토, 사업계획서의 기술 항목 검증, 데모데이 자료 구조화. "
+         "창업 당사자로서 보육 프로그램을 받는 쪽의 입장을 압니다."],
+        ["데이터 · AI",
+         "Bronze / Silver / Gold 3계층 파이프라인 설계, 시계열 · 그래프 모델 학습과 서빙, "
+         "FastAPI 기반 API 구축 및 클라우드 배포."],
+    ], [3.2, 12.6], sizes=[9.0, 9.0], aligns=[L, L], bold_first_col=True)
+
+    # 4. 대표 실적
+    bp.h2(doc, "04", "대표 실적 (모두 계측 산출물 기준)")
+    bp.make_table(doc, [
+        ["프로젝트", "핵심 성과"],
+        ["PlaceOS\n(운영 중)",
+         f"서울 {M['hubs']}개 상권을 건축물대장으로 실측해 건물 단위 공실 인벤토리 구축 "
+         f"({M['units']}유닛 · 층 단위 {M['floor_units']}개)\n"
+         f"공실 예측 MAE {M['lstm_mae']} — 지속성 베이스라인 대비 {M['lstm_skill']}% 개선\n"
+         f"업종 추천 Top-3 {M['gnn_top3']}% — 거점 사전분포 대비 {M['gnn_skill']}%p 개선\n"
+         f"코드 {M['loc']} 라인 · GitHub Actions - Cloud Run 자동 배포"],
+        ["Co.I", FILL],
+    ], [3.0, 12.8], sizes=[9.0, 8.5], aligns=[C, L], bold_first_col=True)
+    bp.caption(doc,
+               f"미달 항목도 함께 밝힙니다. 공실 예측의 방향 정확도는 {M['lstm_dir']}% 로 "
+               f"무정보 상수 베이스라인 {M['lstm_dir_base']}% 에 {M['lstm_dir_skill']}%p 미달입니다. "
+               "재지 않은 값을 달성으로 적지 않는 것이 이 프로젝트의 기본 규칙입니다.")
+
+    # 5. 기술
+    bp.h2(doc, "05", "보유 기술")
+    bp.make_table(doc, [
+        ["구분", "내용"],
+        ["Backend · Data",
+         "Python, FastAPI, PostgreSQL / PostGIS, Redis, Celery, Airflow, Selenium / Playwright"],
+        ["ML", "PyTorch, PyTorch Geometric (GNN), LSTM, MLflow"],
+        ["Frontend · Infra",
+         "React, TypeScript, Vite, 네이버 지도 API / Docker, GitHub Actions, Cloud Run"],
+        ["공공데이터",
+         "건축HUB 건축물대장, 서울시 상권분석, R-ONE 부동산통계, KOSIS, 공정위 정보공개서"],
+    ], [3.2, 12.6], sizes=[9.0, 8.5], aligns=[L, L], bold_first_col=True)
+
+    # 6. 학력 · 경력
+    bp.h2(doc, "06", "학력 · 경력 요약")
+    bp.make_table(doc, [
+        ["구분", "기간", "내용"],
+        ["학력", BLANK, BLANK],
+        ["경력", BLANK, BLANK],
+        ["자격", BLANK, BLANK],
+    ], [2.2, 4.0, 9.6], sizes=[9.0, 8.5, 9.0], aligns=[C, C, L], bold_first_col=True)
+    bp.caption(doc, "상세 경력기술서와 포트폴리오는 요청 시 즉시 제출 가능합니다.")
+
+    # 7. 제안
+    bp.h2(doc, "07", "제안드릴 수 있는 것")
+    bp.body(doc,
+            "채용 여부와 무관하게, 귀 기관의 보육 · 입주 기업 중 오프라인 점포나 공간을 기반으로 "
+            "하는 팀이 있다면 PlaceOS의 상권 분석 리포트를 무상으로 제공해 드릴 수 있습니다. "
+            "대상 상권의 건물 단위 공실 현황, 업종 구성, 유동 특성을 정리한 자료이며, "
+            "필요하시면 샘플을 먼저 보내 드리겠습니다.", before=2)
+
+    # 8. 보관 동의
+    bp.h2(doc, "08", "개인정보 보관 및 활용 동의")
+    guide(doc, [
+        ("본인은 채용 목적의 인재풀 등록을 위해 아래와 같이 개인정보 보관 및 활용에 동의합니다.", True),
+        ("수집 항목: 성명, 연락처, 이메일, 학력, 경력, 자격 사항", False),
+        ("이용 목적: 향후 채용 공고 발생 시 지원 안내 및 서류 검토", False),
+        ("보관 기간: 등록일로부터 1년. 기간 경과 시 파기하여 주시기 바랍니다.", False),
+        ("철회 방법: 위 이메일로 요청 시 즉시 파기 (동의 철회로 불이익 없음)", False),
+        ("", False),
+        ("등록일 " + BLANK + "          성명 " + BLANK + "  (서명)", False),
+    ])
+    bp.caption(doc,
+               "기관 채용 담당자는 동의 없는 개인정보를 보관할 수 없습니다. "
+               "이 문구가 없으면 등록 요청 자체를 거절해야 하는 경우가 있으므로 반드시 넣습니다.")
+
+    doc.save(out)
+    return out
+
+
 BUILDERS = [
     ("PlaceOS_지원서류_1_이력서.docx", build_resume),
     ("PlaceOS_지원서류_2_경력기술서.docx", build_experience),
     ("PlaceOS_지원서류_3_포트폴리오.docx", build_portfolio),
+    ("PlaceOS_지원서류_4_인재풀등록프로필.docx", build_talent_profile),
 ]
 
 
