@@ -1,4 +1,4 @@
-/* PlaceOS Program 스튜디오(가게 단위) — 스코프 .progstudio (PageDashboard 톤 계승) */
+/* PlaceOS Program 스튜디오(검증 program) — 스코프 .progstudio (PageDashboard 톤 계승) */
 .progstudio{--card:var(--surface);--sub:var(--muted);--blue:var(--track-program);
  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);background:#eef1f4;padding:20px;line-height:1.4}
 .progstudio *{box-sizing:border-box}
@@ -15,8 +15,6 @@
 .progstudio .cols>form.panel{position:sticky;top:14px}
 .progstudio .ptitle{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);font-size:14px;font-weight:700;margin-bottom:var(--sp-3)}
 .progstudio .ptools{display:flex;gap:6px}
-.progstudio .ghost.active{color:var(--surface);background:#3a5a98;border-color:#3a5a98}
-.progstudio .onboardIntro{font-size:11.5px;color:#1e3a5f;background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:9px 10px;line-height:1.55;margin:-2px 0 var(--sp-3)}
 
 /* 필드 — 힌트를 `<label>` 밖 `<details>` 로 뺐다(요약줄 클릭이 라벨 활성화로 새지 않게). */
 .progstudio .field{display:block;margin-bottom:11px}
@@ -51,24 +49,6 @@
 .progstudio button.primary:hover:not(:disabled){background:#31507f}
 .progstudio .primary:disabled{opacity:.45;cursor:not-allowed}
 
-/* 입력 + 우측 버튼(가게 검색) */
-.progstudio .inputbtn{display:flex;gap:6px}
-.progstudio .inputbtn input{flex:1;min-width:0}
-.progstudio .inputbtn .ghost{flex:0 0 auto;padding:0 var(--sp-3);border-radius:9px}
-.progstudio .inputbtn .ghost:disabled{opacity:.4;cursor:not-allowed}
-
-/* 가게 후보 목록 — 자동 선택하지 않고 사람이 고른다 */
-.progstudio .cands{border:1px solid var(--line);border-radius:11px;overflow:hidden;margin:0 0 11px}
-.progstudio .candhd{font-size:10.5px;font-weight:700;color:var(--sub);background:#f6f8fa;padding:7px 11px;line-height:1.5;border-bottom:1px solid var(--line)}
-.progstudio .cand{display:block;width:100%;text-align:left;font-family:inherit;background:var(--card);border:none;border-bottom:1px solid var(--line);padding:9px 11px}
-.progstudio .cand:last-child{border-bottom:none}
-.progstudio .cand:hover{background:#f6f9fd}
-.progstudio .cname{font-size:12.5px;font-weight:700;margin-right:6px}
-.progstudio .ccat{font-size:10px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:5px;padding:1px 6px}
-.progstudio .caddr{display:block;font-size:11px;color:var(--sub);margin-top:3px}
-.progstudio .sourcebox{display:flex;flex-direction:column;gap:2px;font-size:10.5px;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:var(--sp-2) 10px;margin:0 0 10px}
-.progstudio .sourcebox b{font-size:11px;color:#334155}
-
 /* 안내·경고 */
 .progstudio .note{font-size:10.5px;color:#9aa3af;line-height:1.55;margin:6px 0}
 .progstudio .warn{font-size:11.5px;color:#78350f;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:var(--sp-2) 10px;line-height:1.55;margin:6px 0}
@@ -82,19 +62,6 @@
 .progstudio .err{background:#fef2f2;border:1px solid #fecaca;border-radius:11px;padding:13px 15px;font-size:12.5px;color:#7f1d1d;line-height:1.7}
 .progstudio .err code{background:var(--surface);border:1px solid #fecaca;border-radius:5px;padding:1px 6px;font-size:11.5px}
 .progstudio .errdetail{font-size:11px;color:#b91c1c;margin-top:6px;word-break:break-all}
-.progstudio .consentbox{background:#f8fafc;border:1px solid #cbd5e1;border-radius:11px;padding:10px 11px;margin:10px 0}
-.progstudio .consent{display:flex;align-items:flex-start;gap:7px;font-size:10.8px;color:#475569;line-height:1.5;margin:7px 0;cursor:pointer}
-.progstudio .consent input{width:auto;flex:0 0 auto;margin:2px 0 0}
-.progstudio .receipt{font-size:11px;color:#0f6b4d;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:9px;padding:var(--sp-2) 10px;margin:10px 0}
-.progstudio .receipt code{font-size:10px;word-break:break-all}
-
-/* 사진 미리보기 — vision 상한 밖은 흐리게(넣었는데 안 쓰인 걸 숨기지 않는다) */
-.progstudio .thumbs{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 var(--sp-2)}
-.progstudio .thumb{width:62px;height:62px;border-radius:8px;border:1px solid var(--line);overflow:hidden;background:#f1f4f8;display:flex;align-items:center;justify-content:center}
-.progstudio .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.progstudio .thumb.unused{opacity:.35}
-.progstudio .thumb.failed{border-style:dashed;border-color:#fecaca;background:#fef2f2}
-.progstudio .thumbx{font-size:9px;font-weight:700;color:#b91c1c;text-align:center;padding:0 var(--sp-1);line-height:1.3}
 
 /* 패널 안에 든 접이식 상세 — 패널이 흰색이라 한 톤 내려 경계를 준다 */
 .progstudio .panel .vfold{background:#fafbfc;margin:0 0 11px}
@@ -115,8 +82,6 @@
 
 .progstudio .rlabel{font-size:12px;font-weight:700;color:var(--sub);margin:14px 0 7px}
 .progstudio .rlabel em{font-style:normal;font-weight:700;color:#9aa3af;margin-left:5px}
-.progstudio .chips{display:flex;flex-wrap:wrap;gap:5px}
-.progstudio .chip{font-size:11px;font-weight:700;color:#5a6b85;background:#f1f4f8;border-radius:6px;padding:3px 9px}
 
 .progstudio .prationale{font-size:11px;color:var(--sub);line-height:1.55;margin-top:7px;padding-top:7px;border-top:1px solid var(--line)}
 .progstudio .prationale b{font-weight:700;color:#5a6b85;margin-right:var(--sp-1)}
@@ -170,13 +135,10 @@
 }
 
 
-/* 입점 예정 자리 안내 · 오프라인 홍보 장소 (2026-09-13, 화면설계서 2판 §Program) */
+/* 검증할 자리 안내 · 오프라인 연계 후보 (2026-09-13 신설 · 2026-09-17 대상 재정의) */
 .progstudio .arrival{display:grid;gap:var(--sp-1);font-size:var(--fs-caption);line-height:var(--lh-caption);background:var(--track-posting-soft);border:1px solid var(--line);border-left:3px solid var(--track-posting);border-radius:var(--radius-md);padding:var(--sp-2) var(--sp-3);margin:0 0 var(--sp-3)}
 .progstudio .arrival b{color:var(--track-posting)}
 .progstudio .arrival span{color:var(--muted)}
-/* 3판 — 기존 사업자(업종 바꾸기·상권 옮기기) 안내 줄 */
-.progstudio .existing-biz{margin:0 0 var(--sp-3);font-size:var(--fs-caption);line-height:var(--lh-caption);background:var(--track-program-soft);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--sp-2) var(--sp-3)}
-.progstudio .existing-biz b{color:var(--track-program)}
 .progstudio .offline-places{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--sp-3);margin:0 0 var(--sp-3)}
 .progstudio .op-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-2);flex-wrap:wrap;font-size:var(--fs-body)}
 .progstudio .op-head b{color:var(--track-program)}
@@ -193,3 +155,25 @@
 .progstudio .op-detail dt{color:var(--muted)}
 .progstudio .op-detail dd{margin:0}
 .progstudio .op-detail a{color:var(--track-program);font-weight:700}
+
+/* 단계·검증 방식 선택 (2026-09-17) — 라디오 그룹. 방식마다 판정 신호가 달라 한눈에 갈라 보이게 한다. */
+.progstudio .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.progstudio .seg.seg3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.progstudio .seg button{display:grid;gap:2px;text-align:left;padding:var(--sp-2) 10px;border:1px solid var(--line);border-radius:9px;background:#fafbfc;color:var(--ink);font-size:12.5px;font-weight:700}
+.progstudio .seg button small{font-size:10.5px;font-weight:500;color:var(--muted)}
+.progstudio .seg button:hover{border-color:var(--track-program)}
+.progstudio .seg button.on{border-color:var(--track-program);background:var(--track-program-soft);box-shadow:inset 3px 0 var(--track-program)}
+.progstudio .seg button:focus-visible{outline:2px solid var(--track-program);outline-offset:2px}
+
+/* 검증 지표 — 이 결과의 결론이라 초안보다 먼저 둔다. 표는 좁은 화면에서 자기 칸 안에서만 가로 스크롤. */
+.progstudio .signals{margin:var(--sp-4) 0 0}
+.progstudio .signals h2{display:flex;align-items:baseline;gap:var(--sp-2);flex-wrap:wrap;margin:0 0 var(--sp-2);font-size:var(--fs-heading);line-height:var(--lh-heading)}
+.progstudio .signals h2 span{font-size:var(--fs-caption);font-weight:var(--fw-regular);color:var(--muted)}
+.progstudio .sig-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius-md)}
+.progstudio .signals table{width:100%;min-width:520px;border-collapse:collapse;font-size:var(--fs-caption);line-height:var(--lh-caption)}
+.progstudio .signals th,.progstudio .signals td{padding:var(--sp-2) var(--sp-3);text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.progstudio .signals thead th{background:var(--bg);color:var(--muted);font-weight:var(--fw-semibold)}
+.progstudio .signals tbody tr:last-child th,.progstudio .signals tbody tr:last-child td{border-bottom:none}
+.progstudio .signals tbody th{font-weight:var(--fw-semibold)}
+.progstudio .signals .sig-target{color:var(--track-program);font-weight:var(--fw-semibold);white-space:nowrap}
+.progstudio .draft-meta{margin:var(--sp-2) 0 0;font-size:var(--fs-caption);color:var(--muted);overflow-wrap:anywhere}

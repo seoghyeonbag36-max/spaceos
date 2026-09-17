@@ -670,53 +670,97 @@ export interface DistrictIndustries {
 export const getDistrictIndustries = (districtId: string) =>
   getJSON<DistrictIndustries>(`/ai/district-industries/${encodeURIComponent(districtId)}`);
 
-/* ===== 가게 단위 마케팅 솔루션(Program 1단계) — POST /marketing/generate ===== */
+/* ===== 검증 프로그램(Program) — POST /marketing/generate =====
+ *
+ * 2026-09-17 대상 재정의. 종전에는 **영업 중인 가게의 리뷰·사진·메뉴**를 보내고 홍보안을
+ * 받았다. 지금 대상은 예비창업자와, 팝업·가오픈·MVP 로 아이템을 확인하려는 기창업자다 —
+ * 그 자리에서 장사한 적이 없어 리뷰가 존재하지 않는다. 그래서 보내는 것은 과거의 축적이
+ * 아니라 **앞으로의 계획**(검증 브리프)이고, 받는 것은 홍보안이 아니라 **검증 프로그램**이다.
+ *
+ * 함께 사라진 것: 카카오 상호검색(`/places`)·네이버 블로그 스니펫(`/reviews`)·상용 온보딩
+ * (`/onboarding/generate`). 특정할 가게도, 받을 점주 원문도 없다.
+ */
 
-/** 가게 프로필. 수집 채널(점주 제공·네이버 지역검색·카카오 로컬)에 무관한 정규화 입력 계약.
- *  백엔드 schemas/marketing.py::StoreProfile 와 1:1 대응한다. */
-export interface StoreProfileInput {
-  name: string; category: string; district_id?: string; address?: string;
-  reviews?: string[]; image_urls?: string[]; menu?: string[]; keywords?: string[];
+/** 검증 방식. 셋을 가르는 이유는 **판정에 쓸 신호가 다르기 때문**이다 —
+ *  팝업은 유입, 가오픈은 객단가·회전, MVP 는 사전 수요를 본다. */
+export type ValidationMode = "popup" | "soft_open" | "mvp";
+
+/** 누가 묻는가. 예비창업자는 자리부터 찾고, 기창업자는 옮길지를 묻는다. */
+export type FounderStage = "pre_founder" | "founder";
+
+export const VALIDATION_MODES: { key: ValidationMode; label: string; hint: string }[] = [
+  { key: "popup", label: "팝업스토어", hint: "빈 자리를 며칠~몇 주 빌려 유입과 구매를 본다" },
+  { key: "soft_open", label: "가오픈", hint: "운영을 축소해 열고 객단가·회전을 본다" },
+  { key: "mvp", label: "MVP 테스트", hint: "점포 없이 사전예약·사전주문으로 수요만 본다" },
+];
+
+export const MODE_LABEL: Record<string, string> = {
+  popup: "팝업스토어", soft_open: "가오픈", mvp: "MVP 테스트",
+};
+export const STAGE_LABEL: Record<string, string> = {
+  pre_founder: "예비창업자", founder: "기창업자",
+};
+
+/** 검증 브리프 — Program 의 유일한 입력 계약.
+ *  백엔드 schemas/marketing.py::ProgramBrief 와 1:1 대응한다.
+ *  ⚠ `budget_krw_min/max` 는 **함께** 보내거나 둘 다 비운다(반쪽은 422). */
+export interface ProgramBriefInput {
+  item: string;
+  category: string;
+  mode: ValidationMode;
+  stage: FounderStage;
+  district_id?: string;
+  unit_id?: string;
+  address?: string;
+  hypothesis?: string;
+  target_customer?: string;
+  /** YYYY-MM-DD */
+  start_date?: string;
+  run_days?: number;
+  budget_krw_min?: number;
+  budget_krw_max?: number;
+  /** 차별점 — 창업자 주장이지 확인된 사실이 아니다. 이게 통하는지가 검증 대상이다 */
+  differentiators?: string[];
+  tier?: string;
 }
 
-/** 카카오 로컬 키워드 검색 후보 1건 — 같은 상호가 전국에 있어 사람이 골라야 한다 */
-export interface StorePlace {
-  name: string; category: string;
-  address: string | null; road_address: string | null; phone: string | null;
-  lat: number | null; lng: number | null;
-  place_url: string | null; distance_m: number | null;
-}
-export interface StorePlaceLookup {
-  query: string; places: StorePlace[];
-  /** "kakao-local" 정상 | "unavailable" 키 미설정·조회 실패 */
-  source: string; note: string | null;
-}
-/** ⚠ 플레이스 방문자 리뷰가 아니라 **네이버 블로그 스니펫**이다(공식 API 없음) */
-export interface StoreReviewLookup {
-  query: string; reviews: string[];
-  source: string; note: string | null;
-}
-
-/** 상호로 가게 후보 검색(카카오 로컬) — GET /marketing/places */
-export const lookupStorePlaces = (query: string, districtId?: string) =>
-  getJSON<StorePlaceLookup>(`/marketing/places?query=${encodeURIComponent(query)}`
-    + (districtId ? `&district_id=${encodeURIComponent(districtId)}` : ""));
-
-/** 가게 언급 블로그 스니펫(네이버 블로그) — GET /marketing/reviews.
- *  address 를 주면 그 동(洞)으로 질의를 좁혀 동명이지 오염을 줄인다. */
-export const lookupStoreReviews = (name: string, address?: string | null) =>
-  getJSON<StoreReviewLookup>(`/marketing/reviews?name=${encodeURIComponent(name)}`
-    + (address ? `&address=${encodeURIComponent(address)}` : ""));
-
-/** 제안 1건 — 채널·실행안·근거. 근거 없는 제안은 만들지 않는 것이 Program 의 원칙이다. */
+/** 제안 1건 — 채널·실행안·근거. 근거 없는 제안은 만들지 않는 것이 Program 의 원칙이다.
+ *
+ *  온라인(모객)과 오프라인(자리·연계)은 대칭이 아니라 **주체가 다르다**. 온라인은 창업자
+ *  단독이고 오프라인은 건물주·상인회와 함께해야 한다 — 그래서 유효한 필드가 갈린다.
+ *  `kind` 로 어느 쪽인지 가른다. */
 export interface ChannelPlan {
-  channel: string; kind: "online" | "offline"; content: string; rationale: string;
+  channel: string;
+  kind: "online" | "offline";
+  content: string;
+  rationale: string;
+  /** 온라인 전용 — 목표 세그먼트 · 예산 배분 비율(%) · 이 채널의 목표 지표.
+   *  budget_share 가 int 퍼센트인 것이 설계다: 절대액이 구조적으로 못 들어간다. */
+  target?: string | null;
+  budget_share?: number | null;
+  kpi?: string | null;
+  /** 오프라인 전용 — 시기 · 협업 주체 · 성격(cite 인용 | propose 신규제안 | own 자체접점) */
+  timing?: string | null;
+  actors?: string[];
+  mode?: string | null;
+}
+
+/** 검증 지표 1건 — **이 트랙의 결론**이다.
+ *
+ *  `decision`(가설을 기각할 조건)이 요점이다. 목표선만 있고 판정선이 없으면 결과를 보고
+ *  사후에 말을 맞추게 된다 — 그건 검증이 아니라 지출이다. */
+export interface ValidationSignal {
+  name: string;
+  method: string;
+  target: string;
+  decision: string;
 }
 
 /** Humanistic Authority 후처리 검증 결과 1건 (백엔드 services/ha_guard.py).
  *
  *  `ha_check` 가 **LLM 의 자기신고**인 것과 달리 이건 서버가 입력과 대조해 낸 판정이다.
- *  - "violation": 거짓이 확정된 것(지어낸 금액·확정 트렌드 역행) → 생성물이 폐기됐다
+ *  - "violation": 거짓이 확정된 것(지어낸 금액·확정 트렌드 역행·있지도 않은 경험 주장)
+ *    → 생성물이 폐기됐다
  *  - "warning": 사전 매칭이라 오탐이 섞인다 → 응답은 살리고 밝히기만 한다 */
 export interface HAFinding {
   severity: "violation" | "warning" | string;
@@ -725,49 +769,21 @@ export interface HAFinding {
 
 /** 생성 결과. `source` 가 "rule-stub" 이면 LLM 을 못 탄 폴백이라 내용이 일반론이다 —
  *  화면에서 반드시 구분해 보여준다(실호출 결과처럼 읽히면 안 된다). */
-export interface StoreMarketing {
-  store_name: string; category: string; tone_keywords: string[];
-  online: ChannelPlan[]; offline: ChannelPlan[]; ha_check: string;
+export interface ProgramPlan {
+  item: string;
+  category: string;
+  mode: string;
+  stage: string;
+  online: ChannelPlan[];
+  offline: ChannelPlan[];
+  signals: ValidationSignal[];
+  ha_check: string;
   source: "llm" | "rule-stub" | string;
   /** 서버 후처리 검증 결과. rule-stub 인데 violation 이 있으면 **키가 없어서가 아니라
    *  생성물이 검증에 걸려 폐기된 것**이다 — 화면이 두 경우를 구분해야 한다. */
   ha_findings?: HAFinding[];
 }
 
-/** 가게 단위 마케팅 광고 솔루션 자동 생성(Program) — 상가 사진·정보·리뷰 기반 */
-export const generateStoreMarketing = (profile: StoreProfileInput) =>
-  postJSON<StoreMarketing>("/marketing/generate", profile);
-
-/** 점주 제공 원문을 처리하는 상용 온보딩 동의 계약. 모든 true 값은 UI에서 사용자가
- *  각각 확인한 뒤에만 전송한다. 백엔드는 누락·false 를 422로 거절한다. */
-export interface ProgramCommercialConsent {
-  contract_version: "spaceos.program-onboarding/1";
-  data_origin: "merchant-provided";
-  processing_purpose: "program-marketing-generation";
-  consent_to_process: true;
-  rights_confirmed: true;
-  allow_external_model_processing: true;
-  raw_input_retention: "request-only";
-}
-
-export interface ProgramCommercialOnboardingResponse {
-  onboarding_id: string;
-  org_id: string;
-  accepted_at: string;
-  contract_version: "spaceos.program-onboarding/1";
-  input_source: "merchant-provided";
-  raw_input_persisted: false;
-  marketing: StoreMarketing;
-}
-
-/** 조직 API 키를 쓰는 상용 Program 경로. 키는 호출 헤더에만 쓰고 브라우저 저장소에
- *  보관하지 않는다. 공개 데모 `/marketing/generate`와 계약을 섞지 않는다. */
-export const generateCommercialStoreMarketing = (
-  profile: StoreProfileInput,
-  consent: ProgramCommercialConsent,
-  apiKey: string,
-) => postJSON<ProgramCommercialOnboardingResponse>(
-  "/marketing/onboarding/generate",
-  { profile, consent },
-  { "X-API-Key": apiKey },
-);
+/** 검증 프로그램 생성 — 모객 · 자리·연계 · 검증 지표 한 벌 */
+export const generateProgram = (brief: ProgramBriefInput) =>
+  postJSON<ProgramPlan>("/marketing/generate", brief);
