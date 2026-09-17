@@ -1,0 +1,342 @@
+{
+  "probe": "통신사 공공데이터 × SNS/IT 로 고객 이동 동선을 시각화할 수 있는가",
+  "date": "2026-09-17",
+  "runs": 6,
+  "definition": {
+    "동선": "한 사람이 A→B→C 로 지난 **순서 있는 궤적** (개인 축 필요)",
+    "유입 흐름": "출발지별 도착 **인원 집계** (개인 축 불필요)"
+  },
+  "conclusion": {
+    "개인 동선 시각화": "불가 — 원천에 개인 축이 없고(P2) 집계에서 복원되지 않는다(P3)",
+    "유입 흐름 시각화": "가능 — 체인은 돈다(P6). 막는 것은 능력이 아니라 취득(P1)과 화면(P6)",
+    "거점 내부 동선": "불가 — 최소 단위가 행정동이라 거점이 한 점으로 접힌다(P4)",
+    "SNS/IT 보완": "불가 — 사람·좌표·시각을 함께 주는 소스가 0종(P5)"
+  },
+  "probes": [
+    {
+      "id": "P1",
+      "name": "취득 — 통신사 공공데이터를 이 환경에서 받을 수 있는가",
+      "measured": {
+        "hosts_tried": 5,
+        "hosts_reachable": 0,
+        "detail": [
+          {
+            "host": "data.seoul.go.kr",
+            "via": "proxy",
+            "result": "URLError: <urlopen error Tunnel connection failed: 403 Forbidden>",
+            "ok": false,
+            "note": "서울 열린데이터광장 — 수도권 생활이동(OA-22300, 서울시×KT) 파일"
+          },
+          {
+            "host": "openapi.seoul.go.kr",
+            "via": "proxy",
+            "result": "URLError: <urlopen error timed out>",
+            "ok": false,
+            "note": "서울 열린데이터광장 OpenAPI — 생활인구(체류) REST"
+          },
+          {
+            "host": "www.data.go.kr",
+            "via": "proxy",
+            "result": "URLError: <urlopen error Tunnel connection failed: 403 Forbidden>",
+            "ok": false,
+            "note": "공공데이터포털 — 통신사 유동인구 계열"
+          },
+          {
+            "host": "sgisapi.kostat.go.kr",
+            "via": "proxy",
+            "result": "URLError: <urlopen error Tunnel connection failed: 403 Forbidden>",
+            "ok": false,
+            "note": "통계청 SGIS — 경계·집계구"
+          },
+          {
+            "host": "data.gg.go.kr",
+            "via": "proxy",
+            "result": "URLError: <urlopen error Tunnel connection failed: 403 Forbidden>",
+            "ok": false,
+            "note": "경기데이터드림 — 유입/유출 생활이동인구"
+          }
+        ],
+        "bronze_living_migration_files": 0,
+        "gold_platform_page_migration_exists": false
+      },
+      "verdict": "취득 불가",
+      "reading": "후보 배포처 5곳 중 도달 0곳. 저장소의 생활이동 원본 0건 · Gold 산출물 없음. OA-22300 은 REST 가 아니라 **포털 로그인 뒤 ZIP 파일**이라, 키가 있어도 무인 수집이 되지 않는다(수집기가 디렉터리를 인자로 받는 이유)."
+    },
+    {
+      "id": "P2",
+      "name": "식별자 — 원천 스키마에 사람/트립을 잇는 축이 있는가",
+      "measured": {
+        "columns": 10,
+        "identifier_columns": 0,
+        "axes_present": [
+          "값",
+          "공간",
+          "속성",
+          "시간"
+        ],
+        "person_axis_present": false,
+        "detail": [
+          {
+            "logical": "ym",
+            "portal_names": [
+              "대상연월",
+              "연월"
+            ],
+            "axis": "시간",
+            "is_identifier": false
+          },
+          {
+            "logical": "dow",
+            "portal_names": [
+              "요일"
+            ],
+            "axis": "시간",
+            "is_identifier": false
+          },
+          {
+            "logical": "hour",
+            "portal_names": [
+              "도착시간",
+              "시간대",
+              "도착시각"
+            ],
+            "axis": "시간",
+            "is_identifier": false
+          },
+          {
+            "logical": "org",
+            "portal_names": [
+              "출발행정동",
+              "출발시군구",
+              "출발지"
+            ],
+            "axis": "공간",
+            "is_identifier": false
+          },
+          {
+            "logical": "dst",
+            "portal_names": [
+              "도착행정동",
+              "도착시군구",
+              "도착지"
+            ],
+            "axis": "공간",
+            "is_identifier": false
+          },
+          {
+            "logical": "sex",
+            "portal_names": [
+              "성별"
+            ],
+            "axis": "속성",
+            "is_identifier": false
+          },
+          {
+            "logical": "age",
+            "portal_names": [
+              "나이",
+              "연령"
+            ],
+            "axis": "속성",
+            "is_identifier": false
+          },
+          {
+            "logical": "purpose",
+            "portal_names": [
+              "이동유형",
+              "이동목적"
+            ],
+            "axis": "속성",
+            "is_identifier": false
+          },
+          {
+            "logical": "mins",
+            "portal_names": [
+              "평균이동시간",
+              "이동시간"
+            ],
+            "axis": "값",
+            "is_identifier": false
+          },
+          {
+            "logical": "pop",
+            "portal_names": [
+              "이동인구",
+              "이동인구합"
+            ],
+            "axis": "값",
+            "is_identifier": false
+          }
+        ],
+        "schema_source": "data/collectors/living_migration.py::_COLS (배포분 헤더 매핑표)"
+      },
+      "verdict": "개인 축 없음",
+      "reading": "열 10개 중 식별자 0개. 축은 값·공간·속성·시간 뿐이고 **개인 축이 없다**. 한 행은 '이 시각에 A동에서 B동으로 n명'이라는 집계이지 '누가 어디를 거쳐 갔다'가 아니다. 즉 동선(순서 있는 궤적)은 **가려진 것이 아니라 원천에 존재하지 않는다** — KT 가 비식별 집계로 만들어 배포한다."
+    },
+    {
+      "id": "P3",
+      "name": "복원 — OD 집계에서 동선이 결정되는가",
+      "measured": {
+        "uniqueness": [
+          {
+            "rows": [
+              2,
+              2
+            ],
+            "cols": [
+              2,
+              2
+            ],
+            "consistent_paths": 3
+          },
+          {
+            "rows": [
+              5,
+              5
+            ],
+            "cols": [
+              5,
+              5
+            ],
+            "consistent_paths": 6
+          },
+          {
+            "rows": [
+              10,
+              10,
+              10
+            ],
+            "cols": [
+              10,
+              10,
+              10
+            ],
+            "consistent_paths": 2211
+          }
+        ],
+        "coupling": {
+          "origins": 50,
+          "people": 100000,
+          "true_return_share": 0.62,
+          "tv_distance": 0.6025,
+          "roundtrip_true": 0.6307,
+          "roundtrip_inferred": 0.0281,
+          "roundtrip_missed_people": 60255,
+          "note": "진짜 결합은 공개되지 않으므로 시뮬레이션이다 — 그것이 곧 요점이다. 원천은 주변분포 둘만 주고, 결합은 어떤 모양이든 될 수 있다."
+        }
+      },
+      "verdict": "복원 불가(비유일 · 편향)",
+      "reading": "2×2(각 변 2명) 최소 표에서도 같은 집계를 내는 동선이 3가지다. 3×3(각 변 10명)이면 2,211가지. 즉 OD 집계는 동선을 **결정하지 않는다**. 그리고 결정되지 않는 것을 최선으로 추론하면(독립 결합) 총변동거리 0.603, 왕복 인원을 10만 명 중 60,255명 놓친다."
+    },
+    {
+      "id": "P4",
+      "name": "해상도 — 거점 안에서 이동이 몇 노드로 갈리는가",
+      "measured": {
+        "hubs": 66,
+        "adong_per_hub": {
+          "min": 1,
+          "median": 4.0,
+          "mean": 3.94,
+          "max": 11
+        },
+        "distinct_adong_codes": 187,
+        "hub_share_of_top_adong": {
+          "median": 0.689,
+          "max": 1.0
+        },
+        "movement_nodes_inside_hub": 1,
+        "contrast_stay_layer": {
+          "cells_per_hub_median": 68,
+          "jipgyegu_per_hub_median": 27,
+          "vacant_units_distinct": 617
+        },
+        "source": [
+          "data/gold/page_footfall_hourly.json",
+          "data/silver/cell_jipgyegu.json",
+          "data/silver/unit_jipgyegu.json"
+        ]
+      },
+      "verdict": "거점 내부 동선 해상도 = 1(통째로 한 점)",
+      "reading": "이동 데이터의 최소 공간 단위는 행정동이고, 거점 하나는 행정동 1~11개(중앙 4)에 걸린다. 거점은 행정동보다 **작으므로** 거점 안에서는 노드가 1개다 — 내부 이동이 0개로 접힌다. 같은 거점을 체류 레이어는 셀 68개 (집계구 27개)로 가른다. 68 대 1 이다."
+    },
+    {
+      "id": "P5",
+      "name": "SNS/IT — 빠진 축(사람×좌표×시각)을 채워 주는가",
+      "measured": {
+        "gold_files_scanned": 487,
+        "gold_files_with_person_key": 0,
+        "person_key_files": [],
+        "gold_files_with_person_geo_time": 0,
+        "sns_it_sources": [
+          {
+            "source": "네이버 블로그 검색 OpenAPI",
+            "collector": "data/collectors/naver_blog.py",
+            "grain": "문서(포스트)",
+            "person": false,
+            "geo": false,
+            "time": "작성일",
+            "why": "응답에 작성자 식별자도 좌표도 없다. 문서 단위 텍스트다"
+          },
+          {
+            "source": "네이버 데이터랩 검색어트렌드",
+            "collector": "data/collectors/naver_datalab.py",
+            "grain": "키워드×기간 상대비율",
+            "person": false,
+            "geo": false,
+            "time": "월",
+            "why": "절대량조차 아니다 — 배치 내 최댓값 100 정규화. 개인 축이 설계상 없다"
+          },
+          {
+            "source": "인스타그램 Graph API 해시태그",
+            "collector": "data/collectors/sns_mentions.py",
+            "grain": "해시태그 집계",
+            "person": false,
+            "geo": false,
+            "time": "최근",
+            "why": "hashtag search 는 작성자를 돌려주지 않는다(플랫폼 정책)"
+          },
+          {
+            "source": "카카오 로컬",
+            "collector": "data/collectors/kakao_local.py",
+            "grain": "POI",
+            "person": false,
+            "geo": true,
+            "time": null,
+            "why": "장소 좌표이지 사람의 방문이 아니다. 게다가 약관상 응답 저장 금지"
+          }
+        ],
+        "sources_with_person_geo_time": 0
+      },
+      "verdict": "채우지 못함",
+      "reading": "Gold 산출물 487개를 전수로 훑어 작성자/사용자 키를 가진 파일 0개, 그 중 좌표·시각까지 함께 가진 파일 0개. SNS·IT 소스 4종 중 (사람×좌표×시각) 세 축을 함께 주는 것은 0종이다. SNS 는 **어디서 말했나**를 모르고 (좌표 없음), 지도/검색은 **누가 갔나**를 모른다(개인 축 없음). 두 결손이 서로를 메우지 못하므로 SNS/IT 로 동선을 복원할 수 없다."
+    },
+    {
+      "id": "P6",
+      "name": "시각화 — 그릴 수 있는 것은 무엇인가 (체인 실행)",
+      "measured": {
+        "synthetic_rows": 4000,
+        "chain_ran": true,
+        "chain_error": null,
+        "hubs_built": 3,
+        "axes_in_gold": [
+          "adong",
+          "by_hour",
+          "hour_share",
+          "origin_top",
+          "peak",
+          "purpose_share",
+          "sex_age_share"
+        ],
+        "hours_filled": 24,
+        "origin_dongs_in_output": 50,
+        "adong_coords_available": 163,
+        "origin_adong_with_coords": 162,
+        "serving_endpoint_exists": false,
+        "frontend_layer_exists": false,
+        "wrote_to_repo": false
+      },
+      "verdict": "동선 ✗ / 유입 흐름 ✓(체인 동작, 화면 없음)",
+      "reading": "배포분과 같은 헤더의 합성 4,000행을 수집기→Gold 체인에 흘렸더니 거점 3곳이 만들어졌다. 채워지는 축은 시간 24/24 · 출발지 50곳 · 이동유형 · 성연령이다. 즉 **'몇 시에 · 어디서 · 왜 왔나'는 그릴 수 있고 '어디를 거쳐 갔나'는 못 그린다.** 유선용 행정동 좌표는 163개 보유. 서빙 엔드포인트 없음 · 프론트 레이어 없음 — 데이터가 와도 화면이 아직 없다."
+    }
+  ]
+}
