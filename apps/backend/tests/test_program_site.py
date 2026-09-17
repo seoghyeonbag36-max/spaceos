@@ -150,7 +150,8 @@ def test_generate_accepts_unit_id():
     """`unit_id` 를 실은 생성 요청이 통과한다(LLM 미설정이면 스텁)."""
     u = program_site.unit(DISTRICT, None)
     r = client.post(f"{V1}/marketing/generate", json={
-        "name": "(가칭) 신규 창업", "category": "카페",
+        "item": "(가칭) 산미 중심 원두 팝업", "category": "카페",
+        "mode": "popup", "stage": "pre_founder",
         "district_id": DISTRICT, "unit_id": u["id"],
     })
     assert r.status_code == 200, r.text

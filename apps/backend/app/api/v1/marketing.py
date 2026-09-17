@@ -1,79 +1,31 @@
-"""마케팅 엔드포인트 — 가게 단위 생성·조회 + 상권 단위 조회(Program).
+"""마케팅 엔드포인트 — 검증 프로그램 생성 + 자리·행사·상권 조회(Program).
 
 ⚠ 라우트 등록 순서 주의: 아래 `/{district_id}` 가 아무 문자열이나 삼키므로,
-정적 경로(`/generate`·`/places`·`/reviews`)는 **반드시 그보다 먼저** 선언한다.
-"""
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
+정적 경로(`/generate`·`/sites`·`/events`)는 **반드시 그보다 먼저** 선언한다.
 
-from app.core.db import get_db
-from app.core.security import Principal, get_current_principal
+2026-09-17 에 `/places`·`/reviews`(영업 중인 가게 상호 검색과 블로그 스니펫)와
+`/onboarding/generate`(점주 제공 원문의 상용 동의 경계)가 **삭제됐다**. 대상이 아직
+그 자리에서 장사한 적 없는 창업자로 바뀌면서 그 입력 자체가 사라졌다
+→ docs/feature-program.md §0-V.
+"""
+from fastapi import APIRouter, HTTPException, Query
+
 from app.schemas.district import DistrictEvents, Marketing
-from app.schemas.marketing import (
-    ProgramCommercialOnboardingRequest, ProgramCommercialOnboardingResponse,
-    StoreMarketing, StorePlaceLookup, StoreProfile, StoreReviewLookup, VacantSiteList,
-)
+from app.schemas.marketing import ProgramBrief, ProgramPlan, VacantSiteList
 from app.services import marketing as mkt
-from app.services import program_onboarding, program_site, store_lookup
+from app.services import program_site
 
 router = APIRouter()
 
 
-@router.post("/generate", response_model=StoreMarketing)
-async def generate_store_marketing(profile: StoreProfile) -> dict:
-    """가게 단위 온/오프라인 마케팅 광고 솔루션 자동 생성.
+@router.post("/generate", response_model=ProgramPlan)
+async def generate_program(brief: ProgramBrief) -> dict:
+    """검증 프로그램 생성 — 모객(online) · 자리·연계(offline) · **검증 지표(signals)**.
 
-    입력(StoreProfile)은 상가 사진·정보·리뷰·메뉴의 정규화 계약 — 수집 채널 무관.
+    입력(ProgramBrief)은 팝업스토어·가오픈·MVP 로 아이템을 확인하려는 창업자의 브리프다.
     LLM 키 미설정 시 규칙 기반 스텁으로 응답한다 (source 필드로 구분).
     """
-    return mkt.generate_store_marketing(profile.model_dump())
-
-
-@router.post(
-    "/onboarding/generate",
-    response_model=ProgramCommercialOnboardingResponse,
-    status_code=status.HTTP_201_CREATED,
-)
-def onboard_and_generate(
-    request: ProgramCommercialOnboardingRequest,
-    principal: Principal = Depends(get_current_principal),
-    db: Session = Depends(get_db),
-) -> dict:
-    """조직 인증 + 점주 동의가 있는 상용 입력으로 Program 결과를 생성한다.
-
-    공개 데모 ``/generate`` 와 분리한 이유는 검색 스니펫과 점주 제공 원문을 같은
-    계약으로 섞지 않기 위해서다. 원문은 생성 중에만 쓰고 DB에는 동의 영수증과
-    항목별 건수만 남긴다.
-    """
-    return program_onboarding.generate(db, principal, request)
-
-
-@router.get("/places", response_model=StorePlaceLookup)
-async def find_places(
-    query: str = Query(..., min_length=1, max_length=60, description="가게 상호"),
-    district_id: str | None = Query(None, description="거점 — 주면 그 반경을 우선 검색"),
-    limit: int = Query(10, ge=1, le=15),
-) -> dict:
-    """상호로 가게 후보를 찾는다 (카카오 로컬 키워드 검색, 공식 API).
-
-    후보를 그대로 프로필에 넣지 않고 **사람이 고르게** 하는 것이 요점이다 — 같은 상호가
-    전국에 있어 자동 선택은 엉뚱한 가게를 집는다. 키 미설정 시 source="unavailable".
-    """
-    return store_lookup.find_places(query, district_id, limit)
-
-
-@router.get("/reviews", response_model=StoreReviewLookup)
-async def find_reviews(
-    name: str = Query(..., min_length=1, max_length=60, description="가게 상호"),
-    address: str | None = Query(None, max_length=120, description="선택한 후보의 주소(동 추출용)"),
-    limit: int = Query(15, ge=1, le=30),
-) -> dict:
-    """가게를 언급한 블로그 글의 스니펫을 모은다 (네이버 블로그 검색, 공식 API).
-
-    ⚠ 플레이스 방문자 리뷰가 아니다 — 공식 API 가 없어 블로그로 대신한다.
-    address 를 주면 그 동(洞)으로 질의를 좁혀 동명이지 오염을 줄인다.
-    """
-    return store_lookup.find_reviews(name, address, limit)
+    return mkt.generate_program(brief.model_dump())
 
 
 @router.get("/sites", response_model=VacantSiteList)
@@ -83,9 +35,8 @@ async def list_vacant_sites(
 ) -> dict:
     """거점의 공실 유닛 목록 — Program 입력 계약 ①층(자리)의 후보다.
 
-    영업 중인 가게를 고르는 `/places` 와 목적이 정반대다: 저기는 이미 있는 가게를
-    특정하고, 여기는 **아직 아무도 없는 자리**를 고른다. 대상이 '공실에 창업할 기업'
-    으로 재정의되면서(docs/feature-program.md §0-B) 필요해진 표면이다.
+    팝업·가오픈은 **아직 아무도 없는 자리**를 짧게 빌려 도는 것이라, 이 목록이 검증의
+    무대 후보가 된다.
 
     Gold 미적재면 `site_source == "unavailable"` 로 빈 목록을 준다 — 404 가 아니다.
     "이 거점을 모른다"와 "이 거점에 공실 산출물이 없다"는 다른 상태다.
