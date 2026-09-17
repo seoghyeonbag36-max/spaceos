@@ -63,12 +63,10 @@ class Settings(BaseSettings):
     # 외부 AI 창업 코파일럿 (Posting) — 미설정 시 내부 3-Tier 폴백
     posting_copilot_url: str = ""
     posting_copilot_key: str = ""
-    # 가게 반자동 조회(Program) — 미설정 시 조회 엔드포인트가 source="unavailable" 로 응답한다.
-    # 플레이스 리뷰·사진에는 공식 API 가 없어(docs/feature-program.md §0) 이 둘로 대신한다:
-    #   카카오 로컬  = 상호·카테고리·주소·좌표    네이버 블로그 검색 = 리뷰성 텍스트(스니펫)
-    kakao_rest_api_key: str = ""
-    naver_client_id: str = ""
-    naver_client_secret: str = ""
+    # (2026-09-17) 카카오 로컬·네이버 검색 키는 서버 설정에서 뺐다. Program 의 가게 반자동 조회
+    # (/marketing/places·/reviews)만 쓰던 값인데, 대상이 영업 중인 가게에서 검증하려는 창업자로
+    # 바뀌면서 그 조회가 삭제됐다. 데이터 수집기는 data/.env 를 직접 읽으므로 영향이 없고,
+    # env 에 키가 남아 있어도 extra="ignore" 라 기동은 그대로다. → docs/feature-program.md §0-V
 
     @model_validator(mode="after")
     def _guard_prod_secrets(self) -> "Settings":

@@ -1,5 +1,5 @@
 <title>PlaceOS PPPP 화면설계서</title>
-<meta name="description" content="Platform → Page → Posting → Program 네 화면의 목적·레이아웃 수치·상태·상호작용·데이터 바인딩·통과 조건을 사용 순서대로 정리한 화면설계서 (2026-09-13 개정 3판 — 주요 고객: 업종이 정해진 창업자 · 업종 바꾸기/상권 옮기기 사업자)">
+<meta name="description" content="Platform → Page → Posting → Program 네 화면의 목적·레이아웃 수치·상태·상호작용·데이터 바인딩·통과 조건을 사용 순서대로 정리한 화면설계서 (2026-09-13 개정 3판 — 주요 고객: 업종이 정해진 창업자 · 업종 바꾸기/상권 옮기기 사업자 · 2026-09-17 4판 — Program 대상: 예비창업자 · 팝업/가오픈/MVP 로 검증하려는 기창업자)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
@@ -326,9 +326,9 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>고객</th><th>앱을 열 때 머릿속 한 문장</th><th>출발 값</th><th>네 화면에서 얻는 것</th><th>3판</th></tr></thead>
           <tbody>
-            <tr><th>① 업종이 정해진 창업자<span class="src">소상공인</span></th><td><q>카페를 차리려는데, 어느 상권 어느 빈 자리가 월 얼마고 몇 달이면 본전인가?</q></td><td>업종</td><td>Platform 내 업종 기준 상권 비교 → Page 그 상권 빈 건물 → Posting 내 업종으로 회수기간 → Program 오픈 홍보</td><td><span class="tag real">구현</span></td></tr>
-            <tr><th>②-a 업종을 바꾸려는 사업자<span class="src">피벗 · 같은 상권</span></th><td><q>지금 상권에서 장사가 안 된다. 여기서 무엇으로 바꾸면 되나?</q></td><td>지금 상권 · 지금 업종</td><td>Platform 이 상권에서 업종별 입지 적합도 순위(지금 업종 위치 표시) → Posting 바꿀 업종으로 계산 → Program 업종 전환 안내</td><td><span class="tag real">구현</span></td></tr>
-            <tr><th>②-b 상권을 옮기려는 사업자<span class="src">이전 · 같은 업종</span></th><td><q>같은 장사를 다른 상권에서 하면 나을까?</q></td><td>지금 업종 · 지금 상권</td><td>Platform 상권 비교에 지금 상권을 고정해 견줌 → Page·Posting 새 자리 → Program 이전 안내(지금 가게 리뷰가 근거)</td><td><span class="tag real">구현</span></td></tr>
+            <tr><th>① 업종이 정해진 창업자<span class="src">소상공인</span></th><td><q>카페를 차리려는데, 어느 상권 어느 빈 자리가 월 얼마고 몇 달이면 본전인가?</q></td><td>업종</td><td>Platform 내 업종 기준 상권 비교 → Page 그 상권 빈 건물 → Posting 내 업종으로 회수기간 → Program 팝업·가오픈으로 먼저 검증</td><td><span class="tag real">구현</span></td></tr>
+            <tr><th>②-a 업종을 바꾸려는 사업자<span class="src">피벗 · 같은 상권</span></th><td><q>지금 상권에서 장사가 안 된다. 여기서 무엇으로 바꾸면 되나?</q></td><td>지금 상권 · 지금 업종</td><td>Platform 이 상권에서 업종별 입지 적합도 순위(지금 업종 위치 표시) → Posting 바꿀 업종으로 계산 → Program 바꿀 아이템을 팝업·MVP 로 검증</td><td><span class="tag real">구현</span></td></tr>
+            <tr><th>②-b 상권을 옮기려는 사업자<span class="src">이전 · 같은 업종</span></th><td><q>같은 장사를 다른 상권에서 하면 나을까?</q></td><td>지금 업종 · 지금 상권</td><td>Platform 상권 비교에 지금 상권을 고정해 견줌 → Page·Posting 새 자리 → Program 새 상권에서 팝업·가오픈으로 검증(4판 — 지금 가게 리뷰는 근거로 쓰지 않는다)</td><td><span class="tag real">구현</span></td></tr>
             <tr><th>③ 건물주</th><td><q>우리 건물 빈 층에 들어올 사업자를 찾고 싶다.</q></td><td>건물</td><td>사업자가 저장한 후보 건물로 입점 문의가 온다</td><td><span class="tag est">추후</span> 연결 지점만 정의 — <a href="#landlord">건물주 연결</a></td></tr>
           </tbody>
         </table>
@@ -338,7 +338,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <div class="box"><h4>그래서 디자인이 바뀐다</h4><ol>
           <li><b>출발 값이 업종이다</b> → 네 화면이 공유하는 「내 사업」 설정(목적 · 업종 · 지금 상권)을 둔다. 상권 선택처럼 한 번 정하면 모든 트랙이 읽는다.</li>
           <li><b>창업자에게는 동네가 먼저 정해져 있지 않다</b> → Platform 이 「이 상권은 어떤가」보다 먼저 「내 업종이면 어느 상권인가」를 답한다. 2026-09-07 페르소나 지도에서 창업자에게 Platform 이 세 번째로 밀렸던 문제를 뒤집는다.</li>
-          <li><b>기존 사업자는 이미 리뷰·메뉴가 있다</b> → 창업 전에는 빈칸뿐이던 Program 이 피벗·이전 사업자에게는 바로 쓰인다. 그 사실을 화면이 먼저 말한다.</li>
+          <li><b>아무도 새 자리에서 장사해 본 적이 없다</b> → 창업자든 바꾸거나 옮기는 사업자든 <b>그 상권·그 아이템</b>의 리뷰는 없다. 그래서 Program 은 홍보가 아니라 검증(팝업스토어·가오픈·MVP)을 설계하고, 무엇을 세면 통했다고 할지를 먼저 정한다(4판 · 09-17).</li>
           <li><b>말이 사업자의 말이어야 한다</b> → 결론 줄은 업종·금액·개월로 말하고, 모델 이름(GNN·LSTM)과 원자료 경로는 접힘 안 근거로만 둔다.</li>
         </ol></div>
         <div class="box"><h4>3판에서 주사용자에서 뺀 사람</h4><ul>
@@ -381,8 +381,8 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
       <div class="flow">
         <div class="step" data-t="platform"><span class="conv">PLACE ▶ PLATFORM</span><h3>1 · Platform</h3><span class="q">이 입지·상권은 어떤 플랫폼인가?</span><span class="hand">다음으로 <b>자리 한 곳</b> → 「Page에서 이 건물 보기 →」</span></div>
         <div class="step" data-t="page"><span class="conv">PRODUCT ▶ PAGE</span><h3>2 · Page</h3><span class="q">이 platform 안에 어떤 page 가 만들어져야 하나?</span><span class="hand">다음으로 <b>건물 한 동</b> → 「이 건물로 입점 검토 →」</span></div>
-        <div class="step" data-t="posting"><span class="conv">PRICE ▶ POSTING</span><h3>3 · Posting</h3><span class="q">어느 가격대의 page 를 이 자리에 올릴까?</span><span class="hand">다음으로 <b>입점 예정 자리</b> → 「이 자리로 홍보 program 만들기 →」</span></div>
-        <div class="step" data-t="program"><span class="conv">PROMOTION ▶ PROGRAM</span><h3>4 · Program</h3><span class="q">posting 한 page 를 어떤 홍보 program 으로 돌릴까?</span><span class="hand">내는 것 <b>채널별 초안</b> — 복사해서 쓴다</span></div>
+        <div class="step" data-t="posting"><span class="conv">PRICE ▶ POSTING</span><h3>3 · Posting</h3><span class="q">어느 가격대의 page 를 이 자리에 올릴까?</span><span class="hand">다음으로 <b>검증할 자리</b> → 「이 자리로 검증 program 만들기 →」</span></div>
+        <div class="step" data-t="program"><span class="conv">PROMOTION ▶ PROGRAM</span><h3>4 · Program</h3><span class="q">이 아이템이 통하는지 어떤 검증 program 으로 확인할까?</span><span class="hand">내는 것 <b>검증 지표 + 채널별 초안</b> — 판정선을 먼저 정한다</span></div>
       </div>
 
       <h3>인계 표</h3>
@@ -390,12 +390,12 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>출발 → 도착</th><th>트리거</th><th>넘기는 값</th><th>받는 쪽이 하는 일</th><th>없을 때</th></tr></thead>
           <tbody>
-            <tr><th>「내 사업」 → 모든 트랙 <span class="tag new" style="--tc:var(--page);--tsoft:var(--page-soft)">3판</span></th><td>「내 사업」 카드 「시작」 · 칩에서 바꾸기</td><td>목적(창업 · 업종 바꾸기 · 상권 옮기기) · 업종 key · 지금 상권 id(바꾸기·옮기기만)</td><td>Platform 으로 전환해 「내 업종으로 본 상권」을 연다. 바꾸기·옮기기면 공유 상권을 지금 상권으로 둔다. Posting 업종칸 · Program 카테고리칸의 <b>기본값</b>이 된다. Page 건물 상세 업종 추천에서 내 업종을 표시한다</td><td>「그냥 둘러보기」 → 아무것도 채우지 않는다(2판 화면)</td></tr>
+            <tr><th>「내 사업」 → 모든 트랙 <span class="tag new" style="--tc:var(--page);--tsoft:var(--page-soft)">3판</span></th><td>「내 사업」 카드 「시작」 · 칩에서 바꾸기</td><td>목적(창업 · 업종 바꾸기 · 상권 옮기기) · 업종 key · 지금 상권 id(바꾸기·옮기기만)</td><td>Platform 으로 전환해 「내 업종으로 본 상권」을 연다. 바꾸기·옮기기면 공유 상권을 지금 상권으로 둔다. Posting 업종칸 · Program 업종칸의 <b>기본값</b>이 되고, Program 단계(창업 → 예비창업자 · 바꾸기·옮기기 → 기창업자)도 정한다. Page 건물 상세 업종 추천에서 내 업종을 표시한다</td><td>「그냥 둘러보기」 → 아무것도 채우지 않는다(2판 화면)</td></tr>
             <tr><th>Platform → Posting <span class="tag new" style="--tc:var(--page);--tsoft:var(--page-soft)">3판</span></th><td>업종 바꾸기 표 「이 업종으로 입점 계산 →」</td><td>상권 id · 업종 입력어</td><td>Posting 업종칸을 그 업종으로 채운다(자리는 사용자가 고른다)</td><td>—</td></tr>
             <tr><th>모든 트랙 ↔ 모든 트랙</th><td>상권 선택기 변경</td><td>상권 id 하나</td><td>다른 트랙을 열면 같은 상권. Page 의 검색어·상태 필터·선택 건물은 비운다(저장 후보는 상권별로 남는다)</td><td>상권이 목록에 없으면 첫 거점으로 떨어진다</td></tr>
             <tr><th>Platform → Page</th><td>자리 카드 「Page에서 이 건물 보기 →」</td><td>상권 id · 건물 id(<span class="mono">unit_id</span> 에서 <span class="mono">vu-</span> 를 뗀 값) · 건물명</td><td>Page 로 전환, 레이어는 공실, 그 건물 상세를 열고 카메라를 그 건물로 옮긴다</td><td><q>선택한 건물을 이 상권 건물 목록에서 찾지 못했습니다.</q> — 목록은 그대로 둔다</td></tr>
             <tr><th>Page → Posting</th><td>건물 상세 「이 건물로 입점 검토 →」</td><td>상권 id · 건물 id · 건물명</td><td><span class="mono">vu-{건물 id}</span> 유닛을 찾아 자동 선택하고 한 번 계산</td><td><q>{건물명}과 일치하는 입점 계산 유닛이 없습니다. 계산할 자리를 직접 선택해 주세요.</q> — 첫 자리를 멋대로 고르지 않는다</td></tr>
-            <tr><th>Posting → Program</th><td>결과 아래 「이 자리로 홍보 program 만들기 →」</td><td>상권 id · 자리명 · 좌표 · 면적 · 층 · 월 임대료 · 업종(계산에 쓴 업종, 없으면 직전 업종) · 추천 전략명(계산했을 때만)</td><td>Program 폼의 <b>거점 · 카테고리 · 주소</b>를 채우고 「입점 예정 자리」 안내와 지도 핀을 띄운다. 가게명·리뷰는 비워 둔다(입점할 기업이 넣는다)</td><td>업종이 없으면 카테고리를 비운다. 자리가 없으면 버튼이 비활성</td></tr>
+            <tr><th>Posting → Program</th><td>결과 아래 「이 자리로 검증 program 만들기 →」</td><td>상권 id · 자리명 · 좌표 · 면적 · 층 · 월 임대료 · 업종(계산에 쓴 업종, 없으면 직전 업종) · 추천 전략명(계산했을 때만)</td><td>Program 브리프의 <b>거점 · 업종 · 주소</b>를 채우고 「검증할 자리」 안내와 지도 핀을 띄운다. 생성 요청에 자리 <span class="mono">unit_id</span>·전략 <span class="mono">tier</span> 를 싣는다(같은 거점일 때만). 아이템·가설은 비워 둔다(창업자가 넣는다). 임대료는 안내에만 — 창업자의 예산 구간과 섞지 않는다</td><td>업종이 없으면 업종칸을 비운다. 자리가 없으면 버튼이 비활성</td></tr>
           </tbody>
         </table>
       </div>
@@ -487,7 +487,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>표식</th><th>쓰는 곳</th><th>모양</th><th>누르면</th></tr></thead>
           <tbody>
-            <tr><th>라벨 칩</th><td>금액·업종·이름처럼 글자로 말해야 하는 값 — Platform 자리 · Page 임대시세 · Posting 자리 · Program 행사·가게</td><td>흰 바탕 + 1.5px 테두리(트랙 색 · 실측 출처 색 · 잉크) + 꼬리. <b>선택되면 색으로 채움</b>, <b>점선 = 추정</b></td><td><b>패널에서 같은 항목을 고른 것과 똑같이 동작한다.</b> 칩마다 패널에 키보드로 닿는 같은 동작이 반드시 있다</td></tr>
+            <tr><th>라벨 칩</th><td>금액·업종·이름처럼 글자로 말해야 하는 값 — Platform 자리 · Page 임대시세 · Posting 자리 · Program 행사·검증할 자리</td><td>흰 바탕 + 1.5px 테두리(트랙 색 · 실측 출처 색 · 잉크) + 꼬리. <b>선택되면 색으로 채움</b>, <b>점선 = 추정</b></td><td><b>패널에서 같은 항목을 고른 것과 똑같이 동작한다.</b> 칩마다 패널에 키보드로 닿는 같은 동작이 반드시 있다</td></tr>
             <tr><th>공실 점</th><td>Page 공실 z≤16</td><td>지름 13px 빨간 점 + 흰 테두리</td><td>그 건물 선택</td></tr>
             <tr><th>건물 폴리곤</th><td>Page 공실 z≥17</td><td>공실 4색 채움 60% · 호버는 잉크 테두리 4px(색은 안 바꾼다)</td><td>그 건물 선택</td></tr>
             <tr><th>실측 범위 선</th><td>Platform</td><td>트랙 색 점선 2.5px · 채움 7% · 1칸짜리 조각은 채우지 않음</td><td>반응 없음(밑의 칩이 클릭을 받는다)</td></tr>
@@ -547,7 +547,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
       </div>
       <ul class="note" style="padding-left:18px">
         <li><b>저장</b>: 이 브라우저에만 남긴다(<span class="mono">localStorage</span>). 서버로 보내지 않는다 — 계정이 생기면 옮긴다(미해결 표). 읽기가 실패하면 처음 방문으로 본다.</li>
-        <li><b>칩을 눌러 바꾸면</b> 이미 채운 Posting 업종칸 · Program 카테고리칸은 건드리지 않는다 — 사용자가 고친 값을 덮지 않는다. 새로 여는 트랙의 기본값만 바뀐다.</li>
+        <li><b>칩을 눌러 바꾸면</b> 이미 채운 Posting 업종칸 · Program 업종칸·단계는 건드리지 않는다 — 사용자가 고친 값을 덮지 않는다. 새로 여는 트랙의 기본값만 바뀐다.</li>
         <li><b>Esc</b>: 카드가 펼쳐져 있으면 가장 위의 한 겹으로 본다 — 입력칸 규칙은 같다.</li>
       </ul>
 
@@ -969,7 +969,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
               <div class="tier"><b>기능중심</b><span class="kv">초기 투자<i>—</i></span><span class="kv">월 순익<i>—</i></span><span class="kv">회수<i>—</i></span></div>
             </div>
             <div class="row"><span class="pill" style="color:var(--real)">면적 대장 실측</span><span class="pill" style="color:var(--real)">임대료 R-ONE 실측</span><span class="pill" style="border-style:dashed;color:var(--warn)">권리금 전제(0)</span></div>
-            <div class="btn ghost">이 자리로 홍보 program 만들기 →</div>
+            <div class="btn ghost">이 자리로 검증 program 만들기 →</div>
           </div>
           <span class="co" style="left:42%;top:21%">1</span><span class="co" style="left:42%;top:40%">2</span><span class="co" style="left:42%;top:55%">3</span><span class="co" style="left:42%;top:69%">4</span><span class="co" style="left:42%;top:82%">5</span><span class="co" style="left:42%;top:91%">6</span><span class="co" style="left:64%;top:31%">7</span>
         </div>
@@ -985,7 +985,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
             <tr><td class="no"><span class="num-badge">3</span></td><td>2. 비용 조건</td><td>권리금(입력 계약) · 세부 조건에 전략 선택 · 「시뮬레이션」</td><td>입력이 바뀌면 <q>입력이 변경되었습니다. 다시 계산하면 결과에 반영됩니다.</q></td></tr>
             <tr><td class="no"><span class="num-badge">4</span></td><td>세 가격대 결과</td><td>카드 셋: 초기 투자 · 월 비용 · 월 매출 · 월 순익 · 회수기간. 권리금만 바꿔 재계산하면 <q>직전 계산 대비</q></td><td>—</td></tr>
             <tr><td class="no"><span class="num-badge">5</span></td><td>출처 배지</td><td>면적·임대료·권리금·유동·층 = 실측(초록) / 프록시(회색 점선) / 전제(노랑 점선) · 코파일럿/내부 폴백 · 기준 분기</td><td>—</td></tr>
-            <tr><td class="no"><span class="num-badge">6</span></td><td>인계 버튼</td><td>「이 자리로 홍보 program 만들기 →」 — 자리가 있을 때 켜진다</td><td>Program 인계(인계 표)</td></tr>
+            <tr><td class="no"><span class="num-badge">6</span></td><td>인계 버튼</td><td>「이 자리로 검증 program 만들기 →」 — 자리가 있을 때 켜진다</td><td>Program 인계(인계 표)</td></tr>
             <tr><td class="no"><span class="num-badge">7</span></td><td>지도 · 자리 칩</td><td>계산할 수 있는 자리마다 <q>월 {rent}만 · {area}평</q>. 선택 자리는 채움. 카메라는 자리들에 맞춘다</td><td>칩 = 드롭다운 선택</td></tr>
           </tbody>
         </table>
@@ -1028,65 +1028,65 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <li data-id="PS-03">권리금을 비워 두면 결론 줄에 <q>권리금 0 을 전제</q> 가 들어간다.</li>
         <li data-id="PS-04">입력 출처 배지가 실측·프록시·전제 세 모양으로 갈린다.</li>
         <li data-id="PS-05">같은 자리에서 권리금만 바꿔 다시 계산하면 카드마다 <q>직전 계산 대비</q> 차이가 뜬다.</li>
-        <li data-id="PS-06">「이 자리로 홍보 program 만들기 →」를 누르면 Program 으로 넘어가 거점·카테고리·주소가 채워지고 「입점 예정 자리」 안내와 지도 핀이 뜬다.</li>
+        <li data-id="PS-06">「이 자리로 검증 program 만들기 →」를 누르면 Program 으로 넘어가 거점·업종·주소가 채워지고 「검증할 자리」 안내와 지도 핀이 뜬다.</li>
         <li data-id="PS-07">자리가 0곳인 상권에서 시뮬레이션·인계 버튼이 비활성이다.</li>
         <li data-id="PS-08">「내 사업」이 카페·디저트면 Posting 을 열었을 때 업종칸이 <q>카페</q> 이고, 자리를 바꿔도 <q>카페</q> 로 돌아간다. 사용자가 고친 뒤에는 자리를 바꾸기 전까지 그 값이 유지된다.</li>
       </ol>
-      <div class="handoff"><span class="arrow">3 → 4</span><span>「이 자리로 홍보 program 만들기 →」 — 인계 표 참조.</span></div>
+      <div class="handoff"><span class="arrow">3 → 4</span><span>「이 자리로 검증 program 만들기 →」 — 인계 표 참조.</span></div>
     </section>
 
     <!-- ═════════ 4 Program ═════════ -->
     <section id="program" data-t="program">
-      <div class="track-head"><span class="big">4</span><span class="conv">PROMOTION ▶ PROGRAM · 진입점: 레일 네 번째 · Posting 인계</span><h2>Program — 홍보 program</h2></div>
-      <p class="question">posting 한 page 를 온라인·오프라인에서 어떤 홍보 program 으로 돌릴 것인가?</p>
+      <div class="track-head"><span class="big">4</span><span class="conv">PROMOTION ▶ PROGRAM · 진입점: 레일 네 번째 · Posting 인계</span><h2>Program — 검증 program</h2></div>
+      <p class="question">이 아이템이 이 platform 에서 통하는지, 온라인·오프라인에서 어떤 검증 program 으로 확인할 것인가?</p>
       <dl class="screen-card">
-        <div><dt>화면 목적</dt><dd>입점할(또는 입점한) 가게의 리뷰·메뉴·사진을 근거로 온·오프라인 채널별 홍보 초안을 만들고, 오프라인은 상권의 실제 행사 장소와 잇는다.</dd></div>
-        <div><dt>막는 오해</dt><dd>규칙 기반 스텁을 LLM 생성으로 · 편집한 초안을 검증된 초안으로 · 종료된 행사를 앞으로 열릴 행사로 읽는 것.</dd></div>
-        <div><dt>주사용자</dt><dd>창업자 — 오픈 홍보 · 바꾸는 사업자 — 업종 전환 안내 · 옮기는 사업자 — 이전 안내. 뒤의 둘은 <b>이미 리뷰·메뉴가 있어</b> 근거 있는 초안이 바로 나온다</dd></div>
-        <div><dt>이 화면의 결론</dt><dd>채널별 초안(복사 가능) + 붙일 수 있는 오프라인 행사 후보</dd></div>
-        <div class="wide"><dt>다루지 않는 것</dt><dd>광고 집행·예산 · 네이버 플레이스 리뷰 크롤링(공식 API 없음 — 붙여넣기만)</dd></div>
+        <div><dt>화면 목적</dt><dd>아이템과 검증 방식(팝업스토어 · 가오픈 · MVP)을 받아, 정해진 기간 안에 <b>통했는지 판정할 수 있는</b> program 을 낸다 — 모객(온라인) · 자리·상권 연계(오프라인) · 검증 지표(기각 조건).</dd></div>
+        <div><dt>막는 오해</dt><dd>규칙 기반 스텁을 LLM 생성으로 · 편집한 초안을 검증된 초안으로 · 종료된 행사를 앞으로 열릴 행사로 · <b>창업자의 차별점을 확인된 사실로</b> 읽는 것.</dd></div>
+        <div><dt>주사용자</dt><dd><b>예비창업자</b> — 아직 가게가 없고, 자기 아이템이 통하는 상권을 찾는다 · <b>기창업자</b> — 사업은 하지만 이 상권·이 아이템은 안 해 봤고, 팝업·가오픈·MVP 로 확인한다. 「내 사업」 목적이 기본 단계를 정한다(창업 → 예비창업자, 바꾸기·옮기기 → 기창업자)</dd></div>
+        <div><dt>이 화면의 결론</dt><dd>검증 지표 표(지표 · 측정 방법 · 목표선 · 기각 조건) + 채널별 실행 초안(복사 가능) + 붙일 수 있는 오프라인 행사 후보</dd></div>
+        <div class="wide"><dt>다루지 않는 것</dt><dd><b>영업 중인 가게의 홍보</b>(4판에서 삭제 — 리뷰·사진·메뉴 입력, 상호 검색, 상용 온보딩) · 광고 집행 · 검증이 끝난 뒤 실측값으로 기각/채택을 판정하는 표면(후속)</dd></div>
       </dl>
 
       <div class="wf-scroll">
-        <div class="wf" role="img" aria-label="Program 화면 와이어프레임: 좌측 패널에 입점 예정 자리 안내, 행사 목록, 가게 프로필 입력, 지도에 입점 예정 자리 핀과 행사 칩">
-          <div class="wf-rail"><div class="wf-logo"><i>P</i><b>PlaceOS</b></div><span>Platform</span><span>Page</span><span>Posting</span><span class="on">Program</span></div>
+        <div class="wf" role="img" aria-label="Program 화면 와이어프레임: 좌측 패널에 검증할 자리 안내, 오프라인 연계 후보, 검증 브리프 입력, 지도에 검증할 자리 핀과 행사 칩">
+          <div class="wf-rail"><div class="wf-logo"><i>P</i><b>PlaceOS</b></div><span>Page</span><span>Platform</span><span>Posting</span><span class="on">Program</span></div>
           <div class="m-chip on" style="left:58%;top:30%"><span>{행사명}<small>09-20~09-27</small></span></div>
           <div class="m-chip" style="left:78%;top:62%"><span>{행사명}<small>10-02</small></span></div>
-          <div class="m-chip dark" style="left:84%;top:36%"><span>{가게 후보}<small>카페</small></span></div>
-          <div class="m-chip on" style="left:64%;top:72%;--cc:var(--posting)"><span>입점 예정 자리<small>20평 · 1F</small></span></div>
+          <div class="m-chip on" style="left:64%;top:72%;--cc:var(--posting)"><span>검증할 자리<small>20평 · 1F</small></span></div>
           <div class="wf-panel">
             <span class="wf-x">‹</span>
             <div class="ey">PLACEOS · PROGRAM · PROMOTION ▶ PROGRAM</div>
-            <div class="hq">posting 한 page 를 어떤 홍보 program 으로 돌릴 것인가</div>
-            <div class="verdict">아직 돌릴 program 이 없다 — 가게 프로필을 넣으면 온·오프라인 채널안을 근거와 함께 낸다.</div>
-            <div class="banner"><b>입점 예정 자리</b> — {자리명} · {n}평 · {층} · 월 {rent}만원 · Posting {전략} 전략</div>
-            <div class="card" style="display:grid;gap:.35cqw"><div class="row" style="justify-content:space-between"><b style="font-size:.95cqw">오프라인 홍보 장소 · N곳</b><span class="lbl">종료된 행사 M곳은 뺐다</span></div>
+            <div class="hq">이 아이템이 이 platform 에서 통하는지, 어떤 검증 program 으로 확인할 것인가</div>
+            <div class="verdict">아직 돌릴 검증 program 이 없다 — 아이템과 검증 방식을 넣으면 모객·자리·판정 세 벌을 근거와 함께 낸다.</div>
+            <div class="banner"><b>검증할 자리</b> — {자리명} · {n}평 · {층} · 월 {rent}만원 · Posting {전략} 전략</div>
+            <div class="card" style="display:grid;gap:.35cqw"><div class="row" style="justify-content:space-between"><b style="font-size:.95cqw">오프라인 연계 후보 · N곳</b><span class="lbl">종료된 행사 M곳은 뺐다</span></div>
               <div class="row"><span class="pill" style="border-color:var(--tc);color:var(--tc)">● {행사명} · 09-20~09-27</span><span class="pill">{행사명} · 10-02</span></div>
               <div class="lbl">일정 · 장소 · 주최 · 요금 · 대상 · 행사 페이지 열기 ↗</div></div>
             <div class="card" style="display:grid;gap:.4cqw">
-              <div class="row" style="justify-content:space-between"><b style="font-size:.95cqw">가게 프로필</b><span class="row"><span class="pill">예시 채우기</span><span class="pill">상용 온보딩</span><span class="pill">비우기</span></span></div>
-              <div class="row"><span class="ctl grow">가게명 · 검색</span><span class="ctl">카테고리 {업종}</span></div>
-              <div class="ctl">거점 {상권명} ▾ · 주소 {자리명}</div>
-              <div class="ctl" style="height:2.6cqw;color:var(--muted)">리뷰 · 블로그 텍스트 (한 줄에 하나)</div>
-              <div class="btn">마케팅 솔루션 생성</div>
+              <div class="row" style="justify-content:space-between"><b style="font-size:.95cqw">검증 브리프</b><span class="row"><span class="pill">예시 채우기</span><span class="pill">비우기</span></span></div>
+              <div class="row"><span class="pill" style="border-color:var(--tc);color:var(--tc)">● 예비창업자</span><span class="pill">기창업자</span></div>
+              <div class="row"><span class="pill" style="border-color:var(--tc);color:var(--tc)">● 팝업스토어</span><span class="pill">가오픈</span><span class="pill">MVP 테스트</span></div>
+              <div class="row"><span class="ctl grow">아이템</span><span class="ctl">업종 {업종}</span></div>
+              <div class="ctl">거점 {상권명} ▾ · 검증 가설</div>
+              <div class="ctl" style="color:var(--muted)">▸ 검증 조건 — 목표 고객 · 기간 · 예산 구간 · 차별점</div>
+              <div class="btn">검증 program 생성</div>
             </div>
           </div>
-          <span class="co" style="left:42%;top:33%">1</span><span class="co" style="left:42%;top:44%">2</span><span class="co" style="left:42%;top:66%">3</span><span class="co" style="left:58%;top:22%">4</span><span class="co" style="left:88%;top:28%">5</span><span class="co" style="left:64%;top:63%">6</span>
+          <span class="co" style="left:42%;top:33%">1</span><span class="co" style="left:42%;top:44%">2</span><span class="co" style="left:42%;top:66%">3</span><span class="co" style="left:58%;top:22%">4</span><span class="co" style="left:64%;top:63%">5</span>
         </div>
       </div>
-      <p class="wf-cap">생성 결과(채널별 초안 · HA 검증)는 프로필 아래에 이어진다.</p>
+      <p class="wf-cap">생성 결과(검증 지표 표 → 채널별 실행 초안 → HA 검증)는 브리프 아래에 이어진다.</p>
 
       <h3>구성요소</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>#</th><th>영역</th><th>내용</th><th>동작</th></tr></thead>
           <tbody>
-            <tr><td class="no"><span class="num-badge">1</span></td><td>입점 예정 자리 안내</td><td>Posting 인계 때만. <q>입점 예정 자리 — {자리명} · {면적}평 · {층} · 월 {임대료}만원</q>(+ <q>· Posting {전략} 전략</q>) + <q>가게명·리뷰를 넣으면 이 자리 기준으로 홍보 program 을 만든다. 거점·카테고리·주소는 Posting 에서 채웠다(바꿀 수 있다).</q></td><td>「비우기」·「상용 온보딩」 전환 시 사라진다</td></tr>
-            <tr><td class="no"><span class="num-badge">2</span></td><td>오프라인 홍보 장소</td><td>상권(폼 거점, 없으면 공유 상권)의 공공 문화행사 목록. 종료일이 지난 행사는 뺀다. 고른 행사 상세: 일정 · 장소 · 주최 · 요금 · 대상 · <q>행사 페이지 열기 ↗</q></td><td>목록 클릭 = 칩 선택 + 지도가 그 행사로 이동</td></tr>
-            <tr><td class="no"><span class="num-badge">3</span></td><td>가게 프로필 · 결과</td><td>가게명(+검색) · 카테고리 · 거점 · 리뷰 · 접힘(주소·사진·메뉴·키워드) · 모드(공개 데모/상용 온보딩: API 키 + 동의 4개) · 결과(채널별 초안 편집·미리보기·복사 · HA 검증 접힘)</td><td>후보는 자동 선택하지 않는다. <b>3판</b>: 카테고리 기본값 = Posting 인계 업종 → 없으면 「내 사업」 입력어. 바꾸기·옮기기면 프로필 위에 한 줄 <q>지금 가게의 리뷰·메뉴를 붙여넣으면 {업종 전환|이전} 안내 초안의 근거가 됩니다</q>(가게명 검색으로 지금 가게를 찾을 수 있다)</td></tr>
+            <tr><td class="no"><span class="num-badge">1</span></td><td>검증할 자리 안내</td><td>Posting 인계 때만. <q>검증할 자리 — {자리명} · {면적}평 · {층} · 월 {임대료}만원</q>(+ <q>· Posting {전략} 전략</q>) + <q>아이템과 검증 방식을 넣으면 이 공실에서 돌릴 검증 program 을 만든다. 거점·업종·주소는 Posting 에서 채웠다(바꿀 수 있다).</q></td><td>「비우기」·「예시 채우기」·<b>거점 변경</b> 시 사라진다. 사라지면 <span class="mono">unit_id</span> 도 싣지 않는다</td></tr>
+            <tr><td class="no"><span class="num-badge">2</span></td><td>오프라인 연계 후보</td><td>상권(폼 거점, 없으면 공유 상권)의 공공 문화행사 목록. 종료일이 지난 행사는 뺀다. 고른 행사 상세: 일정 · 장소 · 주최 · 요금 · 대상 · <q>행사 페이지 열기 ↗</q></td><td>목록 클릭 = 칩 선택 + 지도가 그 행사로 이동</td></tr>
+            <tr><td class="no"><span class="num-badge">3</span></td><td>검증 브리프 · 결과</td><td>단계(예비창업자·기창업자) · 검증 방식(팝업스토어·가오픈·MVP 테스트) · 아이템* · 업종* · 거점 · 검증 가설 · 접힘 「검증 조건」(목표 고객 · 시작 예정일 · 검증 기간(일) · 예산 하한/상한 · 차별점 · 자리 주소) · 결과(<b>검증 지표 표</b> → 채널별 실행 초안 편집·미리보기·복사, 타겟·예산 비율·협업 주체 병기 → HA 검증 접힘)</td><td>업종 기본값 = Posting 인계 업종 → 없으면 「내 사업」 입력어. 단계 기본값 = 「내 사업」 목적. 예산은 하한·상한을 함께 넣거나 둘 다 비운다(한쪽만이면 경고 + 생성 버튼 꺼짐)</td></tr>
             <tr><td class="no"><span class="num-badge">4</span></td><td>지도 · 행사 칩</td><td><q>{행사명(13자)} · {기간 MM-DD~MM-DD}</q>. 시드 폴백이면 점선 + <q>예시</q>. 선택된 행사는 채움</td><td>칩 = 목록에서 고른 것과 같다</td></tr>
-            <tr><td class="no"><span class="num-badge">5</span></td><td>지도 · 가게 후보</td><td>상호 검색 결과를 잉크색 칩으로. 고른 가게는 <q>이 가게</q> 채움 칩</td><td>칩 = 후보 목록에서 고른 것과 같다</td></tr>
-            <tr><td class="no"><span class="num-badge">6</span></td><td>지도 · 입점 예정 자리</td><td>Posting 색 채움 칩 <q>입점 예정 자리</q> + 면적·층</td><td>반응 없음</td></tr>
+            <tr><td class="no"><span class="num-badge">5</span></td><td>지도 · 검증할 자리</td><td>Posting 색 채움 칩 <q>검증할 자리</q> + 면적·층</td><td>반응 없음</td></tr>
           </tbody>
         </table>
       </div>
@@ -1096,12 +1096,14 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>상태</th><th>지도</th><th>패널</th><th>문구</th></tr></thead>
           <tbody>
-            <tr><th>결과 전</th><td>행사 칩</td><td>결과 자리</td><td><q>왼쪽에 가게 프로필을 넣고 «마케팅 솔루션 생성»을 누르면 여기에 결과가 나온다. …</q></td></tr>
+            <tr><th>결과 전</th><td>행사 칩</td><td>결과 자리</td><td><q>왼쪽에 아이템과 검증 방식을 넣고 «검증 program 생성»을 누르면 여기에 결과가 나온다. …</q></td></tr>
+            <tr><th>아이템·업종 빔</th><td>그대로</td><td>생성 버튼</td><td>꺼짐</td></tr>
+            <tr><th>예산 한쪽만</th><td>그대로</td><td>검증 조건 안 경고</td><td><q>예산은 하한·상한을 함께 넣거나 둘 다 비운다 — 한쪽만으로는 구간이 아니다.</q></td></tr>
             <tr><th>생성 중</th><td>그대로</td><td>결론 · 버튼</td><td><q>생성 중… {n}초</q></td></tr>
-            <tr><th>행사 실데이터 0곳</th><td>칩 없음</td><td>장소 목록</td><td><q>이 상권에 예정된 공공 문화행사가 없다 — 예시로 채우지 않는다.</q></td></tr>
+            <tr><th>검증 지표 0건</th><td>그대로</td><td>판정표 자리</td><td><q>검증 지표가 없다 — 무엇을 세면 통했다고 할지 정하지 않은 검증은 판정이 아니라 지출이다.</q></td></tr>
+            <tr><th>행사 실데이터 0곳</th><td>칩 없음</td><td>연계 후보 목록</td><td><q>이 상권에 예정된 공공 문화행사가 없다 — 예시로 채우지 않는다.</q></td></tr>
             <tr><th>행사 미적재(시드)</th><td>점선 칩</td><td>목록 머리</td><td><q>행사 실데이터 미적재 — 점선 칩은 예시다</q></td></tr>
             <tr><th>행사 요청 실패</th><td>칩 없음</td><td>목록 머리</td><td><q>행사 목록을 불러오지 못했다</q></td></tr>
-            <tr><th>가게 검색 0건</th><td>후보 칩 없음</td><td>경고</td><td><q>검색 결과가 없다. 지도에 표기된 상호 그대로 넣거나, 아래에 직접 입력하라.</q></td></tr>
             <tr><th>생성 실패</th><td>그대로</td><td>오류</td><td><q>생성에 실패했습니다.</q> + 백엔드 기동 명령 + 원문</td></tr>
             <tr><th>LLM 못 탐 · HA 폐기</th><td>그대로</td><td>결론에 남김</td><td><q>단 LLM 을 타지 못해 아래는 규칙 기반 스텁이다.</q> / <q>단 LLM 생성물이 HA 검증에 걸려 폐기됐고({n}건), 아래는 규칙 기반 스텁이다.</q></td></tr>
           </tbody>
@@ -1114,23 +1116,21 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
           <thead><tr><th>화면 요소 · 트리거</th><th>API · 필드</th><th>없을 때</th><th>목표 시간 · 배지</th></tr></thead>
           <tbody>
             <tr><td>행사 칩 · 목록</td><td class="mono">GET /marketing/events?district_id= → events[] (id · n · lat · lng · when · place · org · fee · target · link) · events_source — LLM 을 부르지 않는다</td><td>상태표</td><td class="tnum">1초 · 서울열린데이터광장</td></tr>
-            <tr><td>가게 검색</td><td class="mono">GET /marketing/places?query=&amp;district_id=</td><td>0건 경고</td><td class="tnum">1초 · 카카오 로컬</td></tr>
-            <tr><td>후보 선택 → 스니펫</td><td class="mono">GET /marketing/reviews?name=&amp;address=</td><td>안내 줄</td><td>네이버 블로그 검색(방문자 리뷰 아님)</td></tr>
-            <tr><td>「마케팅 솔루션 생성」</td><td class="mono">POST /marketing/generate · POST /marketing/onboarding/generate</td><td>오류</td><td class="tnum">10~20초(사진 포함) · LLM/스텁 배지 · HA</td></tr>
+            <tr><td>「검증 program 생성」</td><td class="mono">POST /marketing/generate ← ProgramBrief(item · category · mode · stage · district_id · unit_id · address · hypothesis · target_customer · start_date · run_days · budget_krw_min/max · differentiators · tier) → ProgramPlan(online · offline · signals · ha_check · source · ha_findings)</td><td>오류</td><td class="tnum">10~20초 · LLM/스텁 배지 · HA</td></tr>
           </tbody>
         </table>
       </div>
 
       <h3>통과 조건 <span class="tpl">양식 9번</span></h3>
       <ol class="checks">
-        <li data-id="PR-01">상권의 공공 문화행사가 지도 칩과 「오프라인 홍보 장소」 목록에 같은 수로 뜨고, 종료일이 지난 행사는 둘 다에서 빠진다(뺀 수를 적는다).</li>
+        <li data-id="PR-01">상권의 공공 문화행사가 지도 칩과 「오프라인 연계 후보」 목록에 같은 수로 뜨고, 종료일이 지난 행사는 둘 다에서 빠진다(뺀 수를 적는다).</li>
         <li data-id="PR-02">행사 칩을 누르면 목록에서 그 행사가 선택되고 상세(일정·장소·주최·요금·대상)가 뜬다. 목록에서 누르면 지도 칩이 채워진다.</li>
-        <li data-id="PR-03">가게명을 검색하면 후보가 목록과 지도 칩으로 함께 뜨고, 어느 쪽을 눌러도 같은 가게가 채워진다.</li>
-        <li data-id="PR-04">「예시 채우기」 → 「마케팅 솔루션 생성」 → 결론 줄이 온라인·오프라인 건수를 말한다.</li>
-        <li data-id="PR-05">LLM 을 타지 못하면 결론 줄에 <q>규칙 기반 스텁</q> 이 남는다(상세를 접어도).</li>
-        <li data-id="PR-06">상용 온보딩은 API 키와 네 동의를 모두 채워야 생성 버튼이 켜진다.</li>
-        <li data-id="PR-07">Posting 에서 넘어오면 「입점 예정 자리」 안내·지도 핀이 뜨고, 「비우기」를 누르면 둘 다 사라진다.</li>
-        <li data-id="PR-08">「내 사업」이 옮기기 · 카페·디저트면 Program 을 바로 열었을 때 카테고리가 <q>카페</q> 이고 <q>이전 안내 초안의 근거가 됩니다</q> 한 줄이 뜬다. 창업이면 그 줄이 없다.</li>
+        <li data-id="PR-03">아이템·업종이 비면 생성 버튼이 꺼지고, 예산을 한쪽만 넣으면 경고가 뜨며 생성 요청을 보내지 않는다.</li>
+        <li data-id="PR-04">「예시 채우기」 → 「검증 program 생성」 → 결론 줄이 온라인·오프라인·검증 지표 건수를 말하고, 검증 지표 표가 채널 초안보다 먼저 뜬다.</li>
+        <li data-id="PR-05">LLM 을 타지 못하면 결론 줄에 <q>규칙 기반 스텁</q> 이 남는다(상세를 접어도). 스텁도 검증 지표를 채운다.</li>
+        <li data-id="PR-06">생성 요청 본문이 브리프 계약 그대로다 — 단계·검증 방식이 <span class="mono">stage</span>·<span class="mono">mode</span> 로, 예산이 원 단위 정수로, 차별점이 빈 줄 없는 목록으로 간다.</li>
+        <li data-id="PR-07">Posting 에서 넘어오면 「검증할 자리」 안내·지도 핀이 뜨고 생성 요청에 <span class="mono">unit_id</span>·<span class="mono">tier</span> 가 실린다. 거점을 바꾸거나 「비우기」를 누르면 안내가 사라지고 <span class="mono">unit_id</span> 도 빠진다.</li>
+        <li data-id="PR-08">「내 사업」이 창업이면 기본 단계가 예비창업자, 업종 바꾸기·상권 옮기기면 기창업자다.</li>
       </ol>
     </section>
 
@@ -1190,7 +1190,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
           <tbody>
             <tr><td>트랙 — Platform</td><td class="mono">--track-platform · -soft</td><td class="mono"><span class="sw" style="background:#6460C4"></span>#6460C4 · #F0F0FB</td><td>레일 활성 · 패널 윗변 · 자리 칩 · 실측 범위 선</td></tr>
             <tr><td>트랙 — Page</td><td class="mono">--track-page · -soft</td><td class="mono"><span class="sw" style="background:#753DA6"></span>#753DA6 · #F6F0FB</td><td>레일 · 필터 눌림 · 선택 줄</td></tr>
-            <tr><td>트랙 — Posting</td><td class="mono">--track-posting · -soft</td><td class="mono"><span class="sw" style="background:#A23C9F"></span>#A23C9F · #FBF0FB</td><td>레일 · 자리 칩 · 입점 검토 버튼 · 입점 예정 자리 핀</td></tr>
+            <tr><td>트랙 — Posting</td><td class="mono">--track-posting · -soft</td><td class="mono"><span class="sw" style="background:#A23C9F"></span>#A23C9F · #FBF0FB</td><td>레일 · 자리 칩 · 입점 검토 버튼 · 검증할 자리 핀</td></tr>
             <tr><td>트랙 — Program</td><td class="mono">--track-program · -soft</td><td class="mono"><span class="sw" style="background:#7E2F53"></span>#7E2F53 · #FBF0F5</td><td>레일 · 행사 칩 · 안내 줄</td></tr>
             <tr><td>실측 출처 <span class="tag new" style="--tc:var(--real);--tsoft:var(--real-soft)">신설</span></td><td class="mono">--source-real · -soft · -line</td><td class="mono"><span class="sw" style="background:#0F7A55"></span>#0F7A55 · #E3F5EE · #B7E3D2</td><td>R-ONE 배지 · 임대시세 표·칩·금액 · Posting 실측 배지</td></tr>
             <tr><td>공실 4단계</td><td class="mono">colors.vacancy[0·2·3·4]</td><td class="mono">#22B07D · #EFA50F · #F2682C · #E03E36</td><td>점 · 폴리곤 · 목록 점 · 범례</td></tr>
@@ -1214,9 +1214,9 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
           <tbody>
             <tr><th>대비</th><td>본문·트랙 색 글자는 --bg · --surface · 자기 soft 위에서 AA 4.5:1 이상. 채운 칩의 흰 글자도 같은 기준</td></tr>
             <tr><th>지도 위 글자</th><td>칩은 흰 바탕 + 1.5px 테두리 + 그림자 — 위성·일반 지도 어느 바탕에서도 읽힌다. 범례는 표면 94% 불투명</td></tr>
-            <tr><th>키보드 대체</th><td>지도 칩·점·도형은 키보드로 닿지 않는다. <b>모든 표식 동작은 패널의 버튼·체크박스·드롭다운으로 똑같이 할 수 있어야 한다</b>(Platform 체크박스 · Page 목록 · Posting 드롭다운 · Program 후보·행사 목록)</td></tr>
+            <tr><th>키보드 대체</th><td>지도 칩·점·도형은 키보드로 닿지 않는다. <b>모든 표식 동작은 패널의 버튼·체크박스·드롭다운으로 똑같이 할 수 있어야 한다</b>(Platform 체크박스 · Page 목록 · Posting 드롭다운 · Program 단계·검증 방식 라디오·행사 목록)</td></tr>
             <tr><th>알림(aria-live)</th><td>상권 변경 <q>상권 {이름} 선택됨</q> · 「내 사업」 시작 <q>{칩 문구}로 설정됨</q> · Page 건수 · Platform 비교 후보 수(<span class="mono">role=status</span>) · Posting 인계 결과 · Program 지도 안내</td></tr>
-            <tr><th>이름</th><td>패널 <span class="mono">aside</span> 에 패널 이름(<q>상권 정체성</q> · <q>입점 계산</q> · <q>홍보 program</q>) · 레일 <span class="mono">nav "주요 화면"</span> · 현재 탭 <span class="mono">aria-current="page"</span> · 지도 레이어 <span class="mono">group "지도 데이터 레이어"</span></td></tr>
+            <tr><th>이름</th><td>패널 <span class="mono">aside</span> 에 패널 이름(<q>상권 정체성</q> · <q>입점 계산</q> · <q>검증 program</q>) · 레일 <span class="mono">nav "주요 화면"</span> · 현재 탭 <span class="mono">aria-current="page"</span> · 지도 레이어 <span class="mono">group "지도 데이터 레이어"</span></td></tr>
             <tr><th>포커스</th><td>보이는 포커스 링(트랙 색 2px) · 패널 접기/펴기와 대화상자 닫기 뒤 포커스 복귀 · <kbd>Esc</kbd> 규칙(공통 프레임)</td></tr>
             <tr><th>움직임</th><td>카메라 이동 외 장식 애니메이션 없음. 스켈레톤 반짝임은 <span class="mono">prefers-reduced-motion</span> 에서 멈춘다</td></tr>
           </tbody>
@@ -1263,7 +1263,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>용어</th><th>뜻</th></tr></thead>
           <tbody>
-            <tr><th>Platform · Page · Posting · Program</th><td>PPPP. 전통 4P(Place · Product · Price · Promotion)의 디지털 전환 — 상권을 플랫폼으로, 빈 자리를 page 로, 가격대를 posting 으로, 홍보를 program 으로 읽는다</td></tr>
+            <tr><th>Platform · Page · Posting · Program</th><td>PPPP. 전통 4P(Place · Product · Price · Promotion)의 디지털 전환 — 상권을 플랫폼으로, 빈 자리를 page 로, 가격대를 posting 으로, 홍보를 <b>통하는지 확인하는 검증 program</b> 으로 읽는다</td></tr>
             <tr><th>내 사업</th><td>목적(창업 · 업종 바꾸기 · 상권 옮기기) + 업종 + 지금 상권. 네 트랙이 공유하는 값(공통 프레임)</td></tr>
             <tr><th>입지 적합도</th><td>그 상권 점포 자리마다 모델(GNN)이 매긴 “그 업종이 있을 확률”의 평균. 비슷한 입지에 그 업종이 이미 모여 있는 정도이지 매출·생존이 아니다. 모델 7종 업종만 있다</td></tr>
             <tr><th>거점 · 상권</th><td>서빙하는 분석 단위 상권. 수는 API 응답으로 센다</td></tr>
@@ -1310,6 +1310,7 @@ footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line);
         <table>
           <thead><tr><th>판</th><th>변경</th></tr></thead>
           <tbody>
+            <tr><td class="mono">4판 · 09-17</td><td><b>Program 대상 재정의</b>: 영업 중인 가게 홍보 → 예비창업자 · 팝업스토어/가오픈/MVP 로 검증하려는 기창업자. 입력 가게 프로필(리뷰·사진·메뉴·키워드·상호 검색) → 검증 브리프(단계 · 검증 방식 · 아이템 · 가설 · 기간 · 예산 구간 · 차별점). 결과에 검증 지표 표(기각 조건) 신설 · 상용 온보딩 삭제 · 「홍보 program」→「검증 program」 · 「입점 예정 자리」→「검증할 자리」 · 「오프라인 홍보 장소」→「오프라인 연계 후보」 · Posting 인계가 unit_id·tier 를 실제로 싣는다 · PR-03·04·06·07·08 재작성 (docs/feature-program.md §0-V)</td></tr>
             <tr><td class="mono">3판 · 09-13</td><td><b>주요 고객 재정의</b>: 분석가(출점팀·자산운용사·지자체) → 업종이 정해진 창업자 · 업종 바꾸기/상권 옮기기 사업자 · (추후) 건물주. 주요 고객 절 · 업종 12종 대응표 신설</td></tr>
             <tr><td class="mono">3판 · 09-13</td><td><b>새 동작</b>: 공통 「내 사업」 설정(카드·칩·저장) · Platform 「내 업종으로 본 상권」(상권 순위 · 지금 상권 고정 · 업종 순위) · 자리 칩·카드 내 업종 점수 순 · Platform→Posting 업종 인계 · Posting 업종칸·Program 카테고리칸 기본값 · Page 상세 내 업종 표식 · Program 기존 사업자 안내 줄 · 건물주 연결 연결 지점</td></tr>
             <tr><td class="mono">3판 · 09-13</td><td><b>실사이트 대조 반영</b>: Page 목록 공실 순 정렬(PG-09) · 트랙 카메라 여백을 그려진 패널로 재고 중심 보정(C-11) · index.html no-cache</td></tr>

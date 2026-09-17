@@ -11,7 +11,7 @@ Claude Code(CLI) 기반 PlaceOS 개발 가이드. PPPP 프레임워크 4기능�
 | [feature-platform.md](feature-platform.md) | **Platform** — 상권 AI 추천 엔진 (LSTM 공실 예측 + GNN 업종 추천) |
 | [feature-page.md](feature-page.md) | **Page** — 공실 히트맵 + 층별 매물 목록 + 네이버 거리뷰 |
 | [feature-posting.md](feature-posting.md) | **Posting** — 입점 솔루션 (전략별 비용-효용·ROI 분석) |
-| [feature-program.md](feature-program.md) | **Program** — LLM 마케팅 자동화 + 상용 입력 온보딩 |
+| [feature-program.md](feature-program.md) | **Program** — 예비창업자·검증하려는 기창업자의 팝업/가오픈/MVP 검증 program 생성 (2026-09-17 대상 재정의 §0-V) |
 | [placeos-vibe-build-sequence.md](placeos-vibe-build-sequence.md) | **빌드 순서 + 현재 위치** — Phase 0~6 의존 순서, 막힌 것의 종류 구분 |
 | [deploy-cloud-run.md](deploy-cloud-run.md) | **배포(현행)** — main 푸시 → GitHub Actions → Cloud Run. 빌드 시점 가드·수동 배포·무료 한도 |
 | [deploy-vercel.md](deploy-vercel.md) | ~~배포~~ **이력 전용** — Vercel 은 2026-08-28 프로덕션에서 내려왔다(무료 플랜 상업적 사용 금지). `vercel --prod` 를 쓰지 말 것 |
@@ -77,7 +77,7 @@ python scripts/pppp_status.py
    → [decision-infra-layer-2026-08-25.md](decision-infra-layer-2026-08-25.md) §8
 
 2026-08-29에는 Program 상용 입력 온보딩의 조직 인증·명시 동의·원문 비저장 계약까지
-배선됐다. 이것도 **파일럿 고객이 생겼다는 뜻은 아니다**. 기술 계약 통과와 KPI②의
+배선됐다(2026-09-17 Program 대상 재정의로 삭제 — 받을 점주 원문이 없다). 이것도 **파일럿 고객이 생겼다는 뜻은 아니었다**. 기술 계약 통과와 KPI②의
 `active_orgs` 실측을 분리해 읽는다.
 
 **선언이 낡는 것이 이 저장소의 주된 실패 양식이다.** 2026-08-25 에 Platform 게이트가
