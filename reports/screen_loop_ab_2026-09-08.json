@@ -1,0 +1,603 @@
+{
+  "started": "2026-09-08T21:36:56",
+  "n_hubs": 10,
+  "budget_ms": 3000,
+  "node_timeout_ms": 20000,
+  "hub_order": [
+    "garosugil",
+    "apgujeong-rodeo",
+    "hongdae",
+    "yeonnam",
+    "ikseon",
+    "seochon",
+    "myeongdong",
+    "euljiro",
+    "seongsu",
+    "seoulsup"
+  ],
+  "B_baseline": {
+    "sdk_boot_ms": 3375,
+    "naver_probe": {
+      "hasEvent": true,
+      "typeof_clearInstanceListeners": "function",
+      "typeof_hasListener": "function",
+      "hasListener_beforeSetMapNull": true,
+      "hasListener_afterSetMapNull": true
+    },
+    "rows": [
+      {
+        "i": 1,
+        "hub": "garosugil",
+        "status": "pass",
+        "render_ms": 937,
+        "tab_open_ms": 766,
+        "trigger": "tab-open",
+        "gate_seen": null,
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 840,
+          "dot": 0,
+          "paths": 840,
+          "divs": 53,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 6980,
+          "svgPaths": 850
+        }
+      },
+      {
+        "i": 2,
+        "hub": "apgujeong-rodeo",
+        "status": "fail",
+        "render_ms": 5422,
+        "tab_open_ms": 390,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 769,
+          "dot": 0,
+          "paths": 769,
+          "divs": 55,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 5422ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 6426,
+          "svgPaths": 779
+        }
+      },
+      {
+        "i": 3,
+        "hub": "hongdae",
+        "status": "fail",
+        "render_ms": 5531,
+        "tab_open_ms": 593,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1325,
+          "dot": 0,
+          "paths": 1325,
+          "divs": 48,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 5531ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 10900,
+          "svgPaths": 1335
+        }
+      },
+      {
+        "i": 4,
+        "hub": "yeonnam",
+        "status": "fail",
+        "render_ms": 14359,
+        "tab_open_ms": 969,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1133,
+          "dot": 0,
+          "paths": 1133,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 14359ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 9338,
+          "svgPaths": 1143
+        }
+      },
+      {
+        "i": 5,
+        "hub": "ikseon",
+        "status": "fail",
+        "render_ms": 11469,
+        "tab_open_ms": 921,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1748,
+          "dot": 0,
+          "paths": 1748,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 11469ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 14258,
+          "svgPaths": 1758
+        }
+      },
+      {
+        "i": 6,
+        "hub": "seochon",
+        "status": "fail",
+        "render_ms": 22468,
+        "tab_open_ms": 1719,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 846,
+          "dot": 0,
+          "paths": 846,
+          "divs": 55,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 22468ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 7052,
+          "svgPaths": 856
+        }
+      },
+      {
+        "i": 7,
+        "hub": "myeongdong",
+        "status": "fail",
+        "render_ms": 6735,
+        "tab_open_ms": 563,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1084,
+          "dot": 0,
+          "paths": 1084,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 6735ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 8956,
+          "svgPaths": 1094
+        }
+      },
+      {
+        "i": 8,
+        "hub": "euljiro",
+        "status": "fail",
+        "render_ms": 7734,
+        "tab_open_ms": 562,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1972,
+          "dot": 0,
+          "paths": 1972,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 7734ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 16076,
+          "svgPaths": 1982
+        }
+      },
+      {
+        "i": 9,
+        "hub": "seongsu",
+        "status": "fail",
+        "render_ms": 31688,
+        "tab_open_ms": 1797,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 831,
+          "dot": 0,
+          "paths": 831,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 31688ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 6922,
+          "svgPaths": 841
+        }
+      },
+      {
+        "i": 10,
+        "hub": "seoulsup",
+        "status": "fail",
+        "render_ms": 10031,
+        "tab_open_ms": 1953,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 698,
+          "dot": 0,
+          "paths": 698,
+          "divs": 48,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 10031ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 37300000,
+          "totalJSHeapSize": 60300000,
+          "domNodes": 5858,
+          "svgPaths": 708
+        }
+      }
+    ]
+  },
+  "A_reset": {
+    "sdk_boot_ms": 2047,
+    "naver_probe": {
+      "hasEvent": true,
+      "typeof_clearInstanceListeners": "function",
+      "typeof_hasListener": "function",
+      "hasListener_beforeSetMapNull": true,
+      "hasListener_afterSetMapNull": true
+    },
+    "rows": [
+      {
+        "i": 1,
+        "hub": "garosugil",
+        "status": "pass",
+        "render_ms": 1218,
+        "tab_open_ms": 812,
+        "trigger": "tab-open",
+        "gate_seen": null,
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 840,
+          "dot": 0,
+          "paths": 840,
+          "divs": 53,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 7008,
+          "svgPaths": 850
+        }
+      },
+      {
+        "i": 2,
+        "hub": "apgujeong-rodeo",
+        "status": "fail",
+        "render_ms": 6594,
+        "tab_open_ms": 672,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 769,
+          "dot": 0,
+          "paths": 769,
+          "divs": 55,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 6594ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 6426,
+          "svgPaths": 779
+        }
+      },
+      {
+        "i": 3,
+        "hub": "hongdae",
+        "status": "fail",
+        "render_ms": 12187,
+        "tab_open_ms": 828,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1325,
+          "dot": 0,
+          "paths": 1325,
+          "divs": 48,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 12187ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 10900,
+          "svgPaths": 1335
+        }
+      },
+      {
+        "i": 4,
+        "hub": "yeonnam",
+        "status": "fail",
+        "render_ms": 13671,
+        "tab_open_ms": 1187,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1133,
+          "dot": 0,
+          "paths": 1133,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 13671ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 9338,
+          "svgPaths": 1143
+        }
+      },
+      {
+        "i": 5,
+        "hub": "ikseon",
+        "status": "fail",
+        "render_ms": 17688,
+        "tab_open_ms": 1187,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1748,
+          "dot": 0,
+          "paths": 1748,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 17688ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 14258,
+          "svgPaths": 1758
+        }
+      },
+      {
+        "i": 6,
+        "hub": "seochon",
+        "status": "fail",
+        "render_ms": 16078,
+        "tab_open_ms": 2578,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 846,
+          "dot": 0,
+          "paths": 846,
+          "divs": 55,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 16078ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 7052,
+          "svgPaths": 856
+        }
+      },
+      {
+        "i": 7,
+        "hub": "myeongdong",
+        "status": "fail",
+        "render_ms": 14578,
+        "tab_open_ms": 1657,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1084,
+          "dot": 0,
+          "paths": 1084,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 14578ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 8946,
+          "svgPaths": 1094
+        }
+      },
+      {
+        "i": 8,
+        "hub": "euljiro",
+        "status": "fail",
+        "render_ms": 10297,
+        "tab_open_ms": 984,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1972,
+          "dot": 0,
+          "paths": 1972,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 10297ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 16062,
+          "svgPaths": 1982
+        }
+      },
+      {
+        "i": 9,
+        "hub": "seongsu",
+        "status": "fail",
+        "render_ms": 7484,
+        "tab_open_ms": 828,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 831,
+          "dot": 0,
+          "paths": 831,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 7484ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 6922,
+          "svgPaths": 841
+        }
+      },
+      {
+        "i": 10,
+        "hub": "seoulsup",
+        "status": "fail",
+        "render_ms": 6422,
+        "tab_open_ms": 688,
+        "trigger": "hub-switch",
+        "gate_seen": "200",
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 698,
+          "dot": 0,
+          "paths": 698,
+          "divs": 48,
+          "canvases": 0,
+          "note": ""
+        },
+        "why": "초기 렌더 6422ms — 예산 3000ms 초과",
+        "heap": {
+          "usedJSHeapSize": 44700000,
+          "totalJSHeapSize": 64000000,
+          "domNodes": 5858,
+          "svgPaths": 708
+        }
+      }
+    ]
+  },
+  "finished": "2026-09-08T21:42:37"
+}

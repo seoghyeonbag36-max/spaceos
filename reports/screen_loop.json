@@ -1,0 +1,2624 @@
+{
+  "started": "2026-09-07T22:27:46",
+  "updated": "2026-09-07T22:51:15",
+  "preflight": {
+    "base_url": "http://localhost:5173",
+    "app_status": 200,
+    "served": 66,
+    "served_missing": [],
+    "served_extra": []
+  },
+  "budget_ms": 3000,
+  "hubs_total": 66,
+  "tabs": [
+    "platform",
+    "map",
+    "posting",
+    "program"
+  ],
+  "canary": false,
+  "results": {
+    "garosugil|platform": {
+      "hub": "garosugil",
+      "name": "신사동 가로수길",
+      "tab": "platform",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 7375ms — 예산 3000ms 초과",
+          "trigger": "tab-open"
+        }
+      ],
+      "obs": {
+        "trigger": "tab-open",
+        "tab_open_ms": 5328,
+        "render_ms": 7375,
+        "gate": "/commercial-districts/garosugil/platform",
+        "gate_seen": null,
+        "selected": "garosugil",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "신사동 가로수길 — 「의료·뷰티·카페·디저트 복합형」 플랫폼이다 (의료·뷰티 28.5% 최대 군 · 점포 186곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "의료·뷰티 28.5% (53곳) · 카페·디저트 23.1% (43곳) · 문화·전시 14.0% (26곳) · 총 186곳 / 7군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/garosugil__platform.png",
+      "at": "2026-09-07T22:28:15"
+    },
+    "garosugil|map": {
+      "hub": "garosugil",
+      "name": "신사동 가로수길",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 5078ms — 예산 3000ms 초과",
+          "trigger": "tab-open"
+        }
+      ],
+      "obs": {
+        "trigger": "tab-open",
+        "tab_open_ms": 4703,
+        "render_ms": 5078,
+        "gate": "/heatmap/buildings?district=garosugil",
+        "gate_seen": null,
+        "selected": "garosugil",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "신사동 가로수길 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "강남구 · 840동 · 실측(추정) · 거점 15.8%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 840,
+            "text": "신사동 516-14\n기타 간이 · 만실\n0%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 840,
+          "dot": 0,
+          "paths": 840,
+          "divs": 53,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "신사동 516-14",
+          "panel": "신사동 516-14"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/garosugil__map.png",
+      "at": "2026-09-07T22:28:22"
+    },
+    "garosugil|posting": {
+      "hub": "garosugil",
+      "name": "신사동 가로수길",
+      "tab": "posting",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 4750ms — 예산 3000ms 초과",
+          "trigger": "tab-open"
+        }
+      ],
+      "obs": {
+        "trigger": "tab-open",
+        "tab_open_ms": 4625,
+        "render_ms": 4750,
+        "gate": "/commercial-districts/garosugil/postings",
+        "gate_seen": null,
+        "selected": "garosugil",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n추천\n객단가 높이고 회전 낮게\n초기 투자\n24만원\n월 비용\n10,359만원\n월 매출\n11,016만원\n월 순익\n657만원\n회수기간\n3.6개월"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/garosugil__posting.png",
+      "at": "2026-09-07T22:28:27"
+    },
+    "garosugil|program": {
+      "hub": "garosugil",
+      "name": "신사동 가로수길",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1047,
+        "render_ms": 140,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "garosugil",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:28:28"
+    },
+    "apgujeong-rodeo|platform": {
+      "hub": "apgujeong-rodeo",
+      "name": "압구정로데오",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 125,
+        "render_ms": 468,
+        "gate": "/commercial-districts/apgujeong-rodeo/platform",
+        "gate_seen": "200",
+        "selected": "apgujeong-rodeo",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "압구정로데오 — 「음식점·의료·뷰티 복합형」 플랫폼이다 (음식점 27.4% 최대 군 · 점포 632곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "음식점 27.4% (173곳) · 의료·뷰티 22.8% (144곳) · 카페·디저트 19.1% (121곳) · 총 632곳 / 6군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:28:31"
+    },
+    "apgujeong-rodeo|map": {
+      "hub": "apgujeong-rodeo",
+      "name": "압구정로데오",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 13234ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 6719,
+        "render_ms": 13234,
+        "gate": "/heatmap/buildings?district=apgujeong-rodeo",
+        "gate_seen": "200",
+        "selected": "apgujeong-rodeo",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "압구정로데오 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "강남구 · 769동 · 실측(추정) · 거점 16.9%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 769,
+            "text": "청담동 93-13\n· 고공실\n80%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 769,
+          "dot": 0,
+          "paths": 769,
+          "divs": 55,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "청담동 93-13",
+          "panel": "청담동 93-13"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/apgujeong-rodeo__map.png",
+      "at": "2026-09-07T22:28:53"
+    },
+    "apgujeong-rodeo|posting": {
+      "hub": "apgujeong-rodeo",
+      "name": "압구정로데오",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 4547,
+        "render_ms": 437,
+        "gate": "/commercial-districts/apgujeong-rodeo/postings",
+        "gate_seen": "200",
+        "selected": "apgujeong-rodeo",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n23만원\n월 비용\n11,336만원\n월 매출\n12,443만원\n월 순익\n1,108만원\n회수기간\n2개월"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:28:58"
+    },
+    "apgujeong-rodeo|program": {
+      "hub": "apgujeong-rodeo",
+      "name": "압구정로데오",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1062,
+        "render_ms": 187,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "apgujeong-rodeo",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:28:59"
+    },
+    "hongdae|platform": {
+      "hub": "hongdae",
+      "name": "홍대",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 328,
+        "render_ms": 438,
+        "gate": "/commercial-districts/hongdae/platform",
+        "gate_seen": "200",
+        "selected": "hongdae",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "홍대 — 「카페·디저트·음식점 복합형」 플랫폼이다 (카페·디저트 32.3% 최대 군 · 점포 1,076곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "카페·디저트 32.3% (348곳) · 음식점 21.0% (226곳) · 주점·야간 12.6% (135곳) · 총 1,076곳 / 7군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:29:01"
+    },
+    "hongdae|map": {
+      "hub": "hongdae",
+      "name": "홍대",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 18203ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 4828,
+        "render_ms": 18203,
+        "gate": "/heatmap/buildings?district=hongdae",
+        "gate_seen": "200",
+        "selected": "hongdae",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "홍대 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "마포구 · 1,325동 · 실측(추정) · 거점 15.0%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 1325,
+            "text": "운복빌딩\n섬유·의복·신발 소매 · 고공실\n80%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1325,
+          "dot": 0,
+          "paths": 1325,
+          "divs": 48,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "운복빌딩",
+          "panel": "운복빌딩"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/hongdae__map.png",
+      "at": "2026-09-07T22:29:26"
+    },
+    "hongdae|posting": {
+      "hub": "hongdae",
+      "name": "홍대",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 8016,
+        "render_ms": 422,
+        "gate": "/commercial-districts/hongdae/postings",
+        "gate_seen": "200",
+        "selected": "hongdae",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n25만원\n월 비용\n7,465만원\n월 매출\n7,792만원\n월 순익\n327만원\n회수기간\n7.6개월"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:29:35"
+    },
+    "hongdae|program": {
+      "hub": "hongdae",
+      "name": "홍대",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1203,
+        "render_ms": 172,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "hongdae",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:29:36"
+    },
+    "yeonnam|platform": {
+      "hub": "yeonnam",
+      "name": "연남동",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 281,
+        "render_ms": 406,
+        "gate": "/commercial-districts/yeonnam/platform",
+        "gate_seen": "200",
+        "selected": "yeonnam",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "연남동 — 「카페·디저트·음식점 복합형」 플랫폼이다 (카페·디저트 31.5% 최대 군 · 점포 734곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "카페·디저트 31.5% (231곳) · 음식점 29.3% (215곳) · 주점·야간 13.6% (100곳) · 총 734곳 / 7군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:29:38"
+    },
+    "yeonnam|map": {
+      "hub": "yeonnam",
+      "name": "연남동",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 24172ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 15672,
+        "render_ms": 24172,
+        "gate": "/heatmap/buildings?district=yeonnam",
+        "gate_seen": "200",
+        "selected": "yeonnam",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "연남동 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "마포구 · 1,133동 · 실측(추정) · 거점 12.5%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 1133,
+            "text": "동교동 152-18\n주점 · 만실\n0%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1133,
+          "dot": 0,
+          "paths": 1133,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "동교동 152-18",
+          "panel": "동교동 152-18"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/yeonnam__map.png",
+      "at": "2026-09-07T22:30:19"
+    },
+    "yeonnam|posting": {
+      "hub": "yeonnam",
+      "name": "연남동",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 6859,
+        "render_ms": 297,
+        "gate": "/commercial-districts/yeonnam/postings",
+        "gate_seen": "200",
+        "selected": "yeonnam",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n16만원\n월 비용\n2,770만원\n월 매출\n2,671만원\n월 순익\n-99만원\n회수기간\n회수 불가"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:30:26"
+    },
+    "yeonnam|program": {
+      "hub": "yeonnam",
+      "name": "연남동",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1047,
+        "render_ms": 94,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "yeonnam",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:30:27"
+    },
+    "ikseon|platform": {
+      "hub": "ikseon",
+      "name": "익선동",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 140,
+        "render_ms": 594,
+        "gate": "/commercial-districts/ikseon/platform",
+        "gate_seen": "200",
+        "selected": "ikseon",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "익선동 — 「음식점·주점·야간 복합형」 플랫폼이다 (음식점 36.8% 최대 군 · 점포 495곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "음식점 36.8% (182곳) · 주점·야간 19.4% (96곳) · 카페·디저트 16.2% (80곳) · 총 495곳 / 5군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:30:29"
+    },
+    "ikseon|map": {
+      "hub": "ikseon",
+      "name": "익선동",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 48860ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 13547,
+        "render_ms": 48860,
+        "gate": "/heatmap/buildings?district=ikseon",
+        "gate_seen": "200",
+        "selected": "ikseon",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "익선동 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "종로구 · 1,748동 · 실측(추정) · 거점 28.0%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 1748,
+            "text": "관철동삼진빌딩\n한식 · 만실\n0%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1748,
+          "dot": 0,
+          "paths": 1748,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "관철동삼진빌딩",
+          "panel": "관철동삼진빌딩"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/ikseon__map.png",
+      "at": "2026-09-07T22:31:33"
+    },
+    "ikseon|posting": {
+      "hub": "ikseon",
+      "name": "익선동",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 13906,
+        "render_ms": 360,
+        "gate": "/commercial-districts/ikseon/postings",
+        "gate_seen": "200",
+        "selected": "ikseon",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n22만원\n월 비용\n4,953만원\n월 매출\n5,251만원\n월 순익\n298만원\n회수기간\n7.4개월"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:31:48"
+    },
+    "ikseon|program": {
+      "hub": "ikseon",
+      "name": "익선동",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1250,
+        "render_ms": 94,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "ikseon",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:31:49"
+    },
+    "seochon|platform": {
+      "hub": "seochon",
+      "name": "서촌",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 156,
+        "render_ms": 390,
+        "gate": "/commercial-districts/seochon/platform",
+        "gate_seen": "200",
+        "selected": "seochon",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "서촌 — 「음식점·카페·디저트 복합형」 플랫폼이다 (음식점 30.1% 최대 군 · 점포 552곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "음식점 30.1% (166곳) · 카페·디저트 28.1% (155곳) · 주점·야간 11.1% (61곳) · 총 552곳 / 6군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:31:51"
+    },
+    "seochon|map": {
+      "hub": "seochon",
+      "name": "서촌",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 36234ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 16422,
+        "render_ms": 36234,
+        "gate": "/heatmap/buildings?district=seochon",
+        "gate_seen": "200",
+        "selected": "seochon",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "서촌 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "종로구 · 846동 · 실측(추정) · 거점 11.9%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 846,
+            "text": "필운동 55-1\n· 공실의심\n100%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 846,
+          "dot": 0,
+          "paths": 846,
+          "divs": 55,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "필운동 55-1",
+          "panel": "필운동 55-1"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/seochon__map.png",
+      "at": "2026-09-07T22:32:44"
+    },
+    "seochon|posting": {
+      "hub": "seochon",
+      "name": "서촌",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 4031,
+        "render_ms": 281,
+        "gate": "/commercial-districts/seochon/postings",
+        "gate_seen": "200",
+        "selected": "seochon",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n52만원\n월 비용\n23,788만원\n월 매출\n24,741만원\n월 순익\n952만원\n회수기간\n5.5개월"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:32:49"
+    },
+    "seochon|program": {
+      "hub": "seochon",
+      "name": "서촌",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 578,
+        "render_ms": 62,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "seochon",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:32:49"
+    },
+    "myeongdong|platform": {
+      "hub": "myeongdong",
+      "name": "명동",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 125,
+        "render_ms": 625,
+        "gate": "/commercial-districts/myeongdong/platform",
+        "gate_seen": "200",
+        "selected": "myeongdong",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "명동 — 「음식점·의료·뷰티 복합형」 플랫폼이다 (음식점 29.0% 최대 군 · 점포 592곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "음식점 29.0% (172곳) · 의료·뷰티 20.9% (124곳) · 카페·디저트 19.3% (114곳) · 총 592곳 / 6군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:32:51"
+    },
+    "myeongdong|map": {
+      "hub": "myeongdong",
+      "name": "명동",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 29969ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1359,
+        "render_ms": 29969,
+        "gate": "/heatmap/buildings?district=myeongdong",
+        "gate_seen": "200",
+        "selected": "myeongdong",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "명동 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "중구 · 1,084동 · 실측(추정) · 거점 14.8%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 1084,
+            "text": "남산동1가 13-6\n한식 · 만실\n0%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1084,
+          "dot": 0,
+          "paths": 1084,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "남산동1가 13-6",
+          "panel": "남산동1가 13-6"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/myeongdong__map.png",
+      "at": "2026-09-07T22:33:23"
+    },
+    "myeongdong|posting": {
+      "hub": "myeongdong",
+      "name": "명동",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 4671,
+        "render_ms": 141,
+        "gate": "/commercial-districts/myeongdong/postings",
+        "gate_seen": "200",
+        "selected": "myeongdong",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n26만원\n월 비용\n8,779만원\n월 매출\n8,949만원\n월 순익\n170만원\n회수기간\n15.3개월"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:33:28"
+    },
+    "myeongdong|program": {
+      "hub": "myeongdong",
+      "name": "명동",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 453,
+        "render_ms": 47,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "myeongdong",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:33:28"
+    },
+    "euljiro|platform": {
+      "hub": "euljiro",
+      "name": "을지로(힙지로)",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 94,
+        "render_ms": 360,
+        "gate": "/commercial-districts/euljiro/platform",
+        "gate_seen": "200",
+        "selected": "euljiro",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "을지로(힙지로) — 「음식점·주점·야간 복합형」 플랫폼이다 (음식점 31.6% 최대 군 · 점포 637곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "음식점 31.6% (201곳) · 주점·야간 26.8% (171곳) · 카페·디저트 17.3% (110곳) · 총 637곳 / 6군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:33:30"
+    },
+    "euljiro|map": {
+      "hub": "euljiro",
+      "name": "을지로(힙지로)",
+      "tab": "map",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Page.wait_for_selector: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator(\".hub-select:not([disabled])\") to be visible\n"
+        }
+      ],
+      "obs": {},
+      "shot": "reports/screens/euljiro__map.png",
+      "at": "2026-09-07T22:33:51"
+    },
+    "euljiro|posting": {
+      "hub": "euljiro",
+      "name": "을지로(힙지로)",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 3031,
+        "render_ms": 297,
+        "gate": "/commercial-districts/euljiro/postings",
+        "gate_seen": "200",
+        "selected": "euljiro",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n22만원\n월 비용\n5,253만원\n월 매출\n5,125만원\n월 순익\n-128만원\n회수기간\n회수 불가"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:33:54"
+    },
+    "euljiro|program": {
+      "hub": "euljiro",
+      "name": "을지로(힙지로)",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1156,
+        "render_ms": 94,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "euljiro",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:33:56"
+    },
+    "seongsu|platform": {
+      "hub": "seongsu",
+      "name": "성수동 카페거리",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 187,
+        "render_ms": 547,
+        "gate": "/commercial-districts/seongsu/platform",
+        "gate_seen": "200",
+        "selected": "seongsu",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "성수동 카페거리 — 「음식점·카페·디저트 복합형」 플랫폼이다 (음식점 34.8% 최대 군 · 점포 463곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "음식점 34.8% (161곳) · 카페·디저트 33.7% (156곳) · 의료·뷰티 8.2% (38곳) · 총 463곳 / 5군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:33:58"
+    },
+    "seongsu|map": {
+      "hub": "seongsu",
+      "name": "성수동 카페거리",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 40328ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 16860,
+        "render_ms": 40328,
+        "gate": "/heatmap/buildings?district=seongsu",
+        "gate_seen": "200",
+        "selected": "seongsu",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "성수동 카페거리 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "성동구 · 831동 · 실측(추정) · 거점 11.2%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 831,
+            "text": "성수동2가 310-57\n오락용품 소매 · 부분공실\n50%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 831,
+          "dot": 0,
+          "paths": 831,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "성수동2가 310-57",
+          "panel": "성수동2가 310-57"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/seongsu__map.png",
+      "at": "2026-09-07T22:34:55"
+    },
+    "seongsu|posting": {
+      "hub": "seongsu",
+      "name": "성수동 카페거리",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 3125,
+        "render_ms": 391,
+        "gate": "/commercial-districts/seongsu/postings",
+        "gate_seen": "200",
+        "selected": "seongsu",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n10만원\n월 비용\n1,318만원\n월 매출\n1,249만원\n월 순익\n-69만원\n회수기간\n회수 불가"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:34:59"
+    },
+    "seongsu|program": {
+      "hub": "seongsu",
+      "name": "성수동 카페거리",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1125,
+        "render_ms": 110,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "seongsu",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:35:00"
+    },
+    "seoulsup|platform": {
+      "hub": "seoulsup",
+      "name": "서울숲 아틀리에길",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 203,
+        "render_ms": 453,
+        "gate": "/commercial-districts/seoulsup/platform",
+        "gate_seen": "200",
+        "selected": "seoulsup",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "서울숲 아틀리에길 — 「카페·디저트·음식점 복합형」 플랫폼이다 (카페·디저트 35.4% 최대 군 · 점포 378곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "카페·디저트 35.4% (134곳) · 음식점 33.6% (127곳) · 주점·야간 11.6% (44곳) · 총 378곳 / 6군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:35:02"
+    },
+    "seoulsup|map": {
+      "hub": "seoulsup",
+      "name": "서울숲 아틀리에길",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 39422ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 19703,
+        "render_ms": 39422,
+        "gate": "/heatmap/buildings?district=seoulsup",
+        "gate_seen": "200",
+        "selected": "seoulsup",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "서울숲 아틀리에길 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "성동구 · 698동 · 실측(추정) · 거점 11.5%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 698,
+            "text": "갤러리아포레\n비알코올 · 고공실\n74%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 698,
+          "dot": 0,
+          "paths": 698,
+          "divs": 48,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "갤러리아포레",
+          "panel": "갤러리아포레"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/heatmap/rent",
+            "status": 404
+          }
+        ]
+      },
+      "shot": "reports/screens/seoulsup__map.png",
+      "at": "2026-09-07T22:36:01"
+    },
+    "seoulsup|posting": {
+      "hub": "seoulsup",
+      "name": "서울숲 아틀리에길",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1437,
+        "render_ms": 156,
+        "gate": "/commercial-districts/seoulsup/postings",
+        "gate_seen": "200",
+        "selected": "seoulsup",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n10만원\n월 비용\n634만원\n월 매출\n543만원\n월 순익\n-92만원\n회수기간\n회수 불가"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:36:03"
+    },
+    "seoulsup|program": {
+      "hub": "seoulsup",
+      "name": "서울숲 아틀리에길",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 500,
+        "render_ms": 32,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "seoulsup",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:36:04"
+    },
+    "itaewon|platform": {
+      "hub": "itaewon",
+      "name": "이태원",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 110,
+        "render_ms": 375,
+        "gate": "/commercial-districts/itaewon/platform",
+        "gate_seen": "200",
+        "selected": "itaewon",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "이태원 — 「음식점·주점·야간 복합형」 플랫폼이다 (음식점 31.5% 최대 군 · 점포 470곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "음식점 31.5% (148곳) · 주점·야간 29.8% (140곳) · 카페·디저트 14.0% (66곳) · 총 470곳 / 7군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:36:05"
+    },
+    "itaewon|map": {
+      "hub": "itaewon",
+      "name": "이태원",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 43219ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 15500,
+        "render_ms": 43219,
+        "gate": "/heatmap/buildings?district=itaewon",
+        "gate_seen": "200",
+        "selected": "itaewon",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "이태원 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "용산구 · 845동 · 실측(추정) · 거점 12.4%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 845,
+            "text": "이태원동 66-2\n서양식 · 만실\n0%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 845,
+          "dot": 0,
+          "paths": 845,
+          "divs": 48,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "이태원동 66-2",
+          "panel": "이태원동 66-2"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/itaewon__map.png",
+      "at": "2026-09-07T22:37:04"
+    },
+    "itaewon|posting": {
+      "hub": "itaewon",
+      "name": "이태원",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 2031,
+        "render_ms": 141,
+        "gate": "/commercial-districts/itaewon/postings",
+        "gate_seen": "200",
+        "selected": "itaewon",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n16만원\n월 비용\n4,431만원\n월 매출\n4,617만원\n월 순익\n186만원\n회수기간\n8.4개월"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:37:06"
+    },
+    "itaewon|program": {
+      "hub": "itaewon",
+      "name": "이태원",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 500,
+        "render_ms": 31,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "itaewon",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:37:07"
+    },
+    "hannam|platform": {
+      "hub": "hannam",
+      "name": "한남동·용리단길",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 157,
+        "render_ms": 375,
+        "gate": "/commercial-districts/hannam/platform",
+        "gate_seen": "200",
+        "selected": "hannam",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "한남동·용리단길 — 「음식점·카페·디저트 복합형」 플랫폼이다 (음식점 32.8% 최대 군 · 점포 253곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "음식점 32.8% (83곳) · 카페·디저트 28.8% (73곳) · 문화·전시 9.9% (25곳) · 총 253곳 / 6군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:37:08"
+    },
+    "hannam|map": {
+      "hub": "hannam",
+      "name": "한남동·용리단길",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 43218ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 16594,
+        "render_ms": 43218,
+        "gate": "/heatmap/buildings?district=hannam",
+        "gate_seen": "200",
+        "selected": "hannam",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "한남동·용리단길 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "용산구 · 714동 · 실측(추정) · 거점 13.7%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 714,
+            "text": "보광동 273-3\n기타 간이 · 만실\n0%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 714,
+          "dot": 0,
+          "paths": 714,
+          "divs": 55,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "보광동 273-3",
+          "panel": "보광동 273-3"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/heatmap/rent",
+            "status": 404
+          }
+        ]
+      },
+      "shot": "reports/screens/hannam__map.png",
+      "at": "2026-09-07T22:38:08"
+    },
+    "hannam|posting": {
+      "hub": "hannam",
+      "name": "한남동·용리단길",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1531,
+        "render_ms": 234,
+        "gate": "/commercial-districts/hannam/postings",
+        "gate_seen": "200",
+        "selected": "hannam",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n24만원\n월 비용\n9,456만원\n월 매출\n10,013만원\n월 순익\n558만원\n회수기간\n4.4개월"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:38:10"
+    },
+    "hannam|program": {
+      "hub": "hannam",
+      "name": "한남동·용리단길",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 531,
+        "render_ms": 47,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "hannam",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:38:11"
+    },
+    "songridan|platform": {
+      "hub": "songridan",
+      "name": "송리단길",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 157,
+        "render_ms": 407,
+        "gate": "/commercial-districts/songridan/platform",
+        "gate_seen": "200",
+        "selected": "songridan",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "송리단길 — 「카페·디저트·음식점 복합형」 플랫폼이다 (카페·디저트 36.0% 최대 군 · 점포 300곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "카페·디저트 36.0% (108곳) · 음식점 32.3% (97곳) · 주점·야간 11.3% (34곳) · 총 300곳 / 5군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:38:12"
+    },
+    "songridan|map": {
+      "hub": "songridan",
+      "name": "송리단길",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 37469ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 15828,
+        "render_ms": 37469,
+        "gate": "/heatmap/buildings?district=songridan",
+        "gate_seen": "200",
+        "selected": "songridan",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "송리단길 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "송파구 · 453동 · 실측(추정) · 거점 9.0%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 453,
+            "text": "석촌동 175-7\n· 공실의심\n100%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 453,
+          "dot": 0,
+          "paths": 453,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "석촌동 175-7",
+          "panel": "석촌동 175-7"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/songridan__map.png",
+      "at": "2026-09-07T22:39:06"
+    },
+    "songridan|posting": {
+      "hub": "songridan",
+      "name": "송리단길",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1015,
+        "render_ms": 172,
+        "gate": "/commercial-districts/songridan/postings",
+        "gate_seen": "200",
+        "selected": "songridan",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n10만원\n월 비용\n773만원\n월 매출\n741만원\n월 순익\n-32만원\n회수기간\n회수 불가"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:39:07"
+    },
+    "songridan|program": {
+      "hub": "songridan",
+      "name": "송리단길",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 578,
+        "render_ms": 47,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "songridan",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:39:08"
+    },
+    "gangnam|platform": {
+      "hub": "gangnam",
+      "name": "강남역·강남대로",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 110,
+        "render_ms": 422,
+        "gate": "/commercial-districts/gangnam/platform",
+        "gate_seen": "200",
+        "selected": "gangnam",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "강남역·강남대로 — 「의료·뷰티 중심형」 플랫폼이다 (의료·뷰티 48.8% 최대 군 · 점포 1,352곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "의료·뷰티 48.8% (660곳) · 음식점 21.5% (291곳) · 카페·디저트 11.2% (151곳) · 총 1,352곳 / 5군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:39:09"
+    },
+    "gangnam|map": {
+      "hub": "gangnam",
+      "name": "강남역·강남대로",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 48046ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 16109,
+        "render_ms": 48046,
+        "gate": "/heatmap/buildings?district=gangnam",
+        "gate_seen": "200",
+        "selected": "gangnam",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "강남역·강남대로 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "강남구 · 987동 · 실측(추정) · 거점 10.3%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 987,
+            "text": "아르누보씨티\n한식 · 만실\n9%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 987,
+          "dot": 0,
+          "paths": 987,
+          "divs": 55,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "아르누보씨티",
+          "panel": "아르누보씨티"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/gangnam__map.png",
+      "at": "2026-09-07T22:40:14"
+    },
+    "gangnam|posting": {
+      "hub": "gangnam",
+      "name": "강남역·강남대로",
+      "tab": "posting",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 2219,
+        "render_ms": 156,
+        "gate": "/commercial-districts/gangnam/postings",
+        "gate_seen": "200",
+        "selected": "gangnam",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n58만원\n월 비용\n32,717만원\n월 매출\n35,135만원\n월 순익\n2,418만원\n회수기간\n2.4개월"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": null,
+      "at": "2026-09-07T22:40:16"
+    },
+    "gangnam|program": {
+      "hub": "gangnam",
+      "name": "강남역·강남대로",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 515,
+        "render_ms": 62,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "gangnam",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:40:17"
+    },
+    "hapjeong|platform": {
+      "hub": "hapjeong",
+      "name": "합정",
+      "tab": "platform",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 109,
+        "render_ms": 359,
+        "gate": "/commercial-districts/hapjeong/platform",
+        "gate_seen": "200",
+        "selected": "hapjeong",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "합정 — 「음식점·카페·디저트 복합형」 플랫폼이다 (음식점 36.4% 최대 군 · 점포 236곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "음식점 36.4% (86곳) · 카페·디저트 23.3% (55곳) · 주점·야간 14.0% (33곳) · 총 236곳 / 6군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:40:19"
+    },
+    "hapjeong|map": {
+      "hub": "hapjeong",
+      "name": "합정",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S3",
+          "why": ".mapshell .sp-head .sp-title 이(가) 0개 — 1개 이상이어야 한다",
+          "why_node": "이 거점의 화면인가",
+          "text": "[selector-error] Locator.inner_text: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator(\".mapshell .sp-head .sp"
+        },
+        {
+          "stage": "S3",
+          "why": "거점을 바꿨는데 /heatmap/buildings?district=hapjeong 를 부르지 않았다"
+        },
+        {
+          "stage": "S4",
+          "why": "초기 렌더 234687ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 19812,
+        "render_ms": 234687,
+        "gate": "/heatmap/buildings?district=hapjeong",
+        "gate_seen": "timeout",
+        "selected": "hapjeong",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 0,
+            "text": "[selector-error] Locator.inner_text: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator(\".mapshell .sp-head .sp-title\").first\n"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "마포구 · 292동 · 실측(추정) · 거점 10.7%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 292,
+            "text": "호호빌\n한식 · 부분공실\n33%"
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 292,
+          "dot": 0,
+          "paths": 292,
+          "divs": 48,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "호호빌",
+          "panel": "호호빌"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/heatmap/rent",
+            "status": 404
+          }
+        ]
+      },
+      "shot": "reports/screens/hapjeong__map.png",
+      "at": "2026-09-07T22:44:39"
+    },
+    "hapjeong|posting": {
+      "hub": "hapjeong",
+      "name": "합정",
+      "tab": "posting",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Page.wait_for_selector: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator(\".postconsole select:has(optgroup):not([disabled])\") to be visible\n"
+        }
+      ],
+      "obs": {},
+      "shot": "reports/screens/hapjeong__posting.png",
+      "at": "2026-09-07T22:45:18"
+    },
+    "hapjeong|program": {
+      "hub": "hapjeong",
+      "name": "합정",
+      "tab": "program",
+      "status": "pass",
+      "failures": [],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 9750,
+        "render_ms": 469,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "hapjeong",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": null,
+      "at": "2026-09-07T22:45:29"
+    },
+    "mangwon|platform": {
+      "hub": "mangwon",
+      "name": "망원동·망리단길",
+      "tab": "platform",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S4",
+          "why": "초기 렌더 6172ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 922,
+        "render_ms": 6172,
+        "gate": "/commercial-districts/mangwon/platform",
+        "gate_seen": "200",
+        "selected": "mangwon",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "망원동·망리단길 — 「카페·디저트·음식점 복합형」 플랫폼이다 (카페·디저트 35.4% 최대 군 · 점포 605곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "카페·디저트 35.4% (214곳) · 음식점 29.4% (178곳) · 주점·야간 10.4% (63곳) · 총 605곳 / 5군"
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/mangwon__platform.png",
+      "at": "2026-09-07T22:45:56"
+    },
+    "mangwon|map": {
+      "hub": "mangwon",
+      "name": "망원동·망리단길",
+      "tab": "map",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Page.wait_for_selector: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator(\".hub-select:not([disabled])\") to be visible\n    - locator resolved to visible <select class=\"hub-select\">…</select>\n"
+        }
+      ],
+      "obs": {},
+      "shot": null,
+      "at": "2026-09-07T22:46:39"
+    },
+    "mangwon|posting": {
+      "hub": "mangwon",
+      "name": "망원동·망리단길",
+      "tab": "posting",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"Posting\", exact=True).first\n"
+        }
+      ],
+      "obs": {},
+      "shot": null,
+      "at": "2026-09-07T22:47:19"
+    },
+    "mangwon|program": {
+      "hub": "mangwon",
+      "name": "망원동·망리단길",
+      "tab": "program",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"Program\", exact=True).first\n"
+        }
+      ],
+      "obs": {},
+      "shot": null,
+      "at": "2026-09-07T22:47:59"
+    },
+    "samcheong|platform": {
+      "hub": "samcheong",
+      "name": "삼청동·북촌",
+      "tab": "platform",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"Platform\", exact=True).first\n"
+        }
+      ],
+      "obs": {},
+      "shot": null,
+      "at": "2026-09-07T22:48:39"
+    },
+    "samcheong|map": {
+      "hub": "samcheong",
+      "name": "삼청동·북촌",
+      "tab": "map",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"Page\", exact=True).first\n"
+        }
+      ],
+      "obs": {},
+      "shot": null,
+      "at": "2026-09-07T22:49:20"
+    },
+    "samcheong|posting": {
+      "hub": "samcheong",
+      "name": "삼청동·북촌",
+      "tab": "posting",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"Posting\", exact=True).first\n"
+        }
+      ],
+      "obs": {},
+      "shot": null,
+      "at": "2026-09-07T22:50:00"
+    },
+    "samcheong|program": {
+      "hub": "samcheong",
+      "name": "삼청동·북촌",
+      "tab": "program",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"Program\", exact=True).first\n"
+        }
+      ],
+      "obs": {},
+      "shot": null,
+      "at": "2026-09-07T22:50:40"
+    },
+    "gwangjang|platform": {
+      "hub": "gwangjang",
+      "name": "광장시장·종로4가",
+      "tab": "platform",
+      "status": "error",
+      "failures": [
+        {
+          "stage": "S0",
+          "why": "조작 실패: Locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for get_by_role(\"button\", name=\"Platform\", exact=True).first\n"
+        }
+      ],
+      "obs": {},
+      "shot": "reports/screens/gwangjang__platform.png",
+      "at": "2026-09-07T22:51:15"
+    }
+  },
+  "sdk_boot_ms": 4469
+}
