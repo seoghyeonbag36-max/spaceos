@@ -36,7 +36,8 @@ def test_canonical_progress_names_current_state_and_remaining_work() -> None:
     assert "Platform 100 ·" not in doc and "· Platform 100" not in doc
     assert "finding-kpi-leak-2026-09-16.md" in doc, (
         "Platform 이 왜 내려갔는지 근거로 갈 수 있어야 한다")
-    assert "상용 입력 온보딩" in doc
+    # 2026-09-17 Program 대상 재정의 — 상용 온보딩은 삭제됐다. 정본이 지금 계약을 말해야 한다.
+    assert "검증 브리프" in doc
     assert "B2B 파일럿" in doc
     assert "다음 작업 (2026-08-20 기준)" not in doc
 
@@ -51,10 +52,12 @@ def test_feature_docs_name_source_contracts_targets_and_tests() -> None:
     assert "test_no_public_source_is_eligible_for_existing_private_units" in posting
     assert "test_partial_public_stock_cannot_promote_the_existing_area_contract" in posting
 
-    assert "ProgramCommercialOnboardingRequest" in program
-    assert "apps/backend/app/services/program_onboarding.py" in program
-    assert "test_commercial_onboarding_requires_org_auth" in program
-    assert "test_commercial_onboarding_returns_receipt_without_persisting_raw_input" in program
+    # 2026-09-17: 상용 온보딩 계약(ProgramCommercialOnboardingRequest)은 대상 재정의로 삭제됐다.
+    # 지금 문서가 이름 대야 하는 것은 검증 브리프 계약과 그것을 고정하는 테스트다.
+    assert "ProgramBrief" in program and "ValidationSignal" in program
+    assert "apps/backend/app/services/program_brief.py" in program
+    assert "test_measuring_revisit_rate_is_not_a_claim" in program
+    assert "test_rule_stub_carries_validation_signals" in program
     assert "npm run build" in program
 
 
@@ -64,7 +67,7 @@ def test_status_and_index_link_to_the_new_evidence() -> None:
     index = _read("docs/README.md")
 
     assert "공식 공개 소스를 다시 탐색했지만 적격 후보는 0건" in status
-    assert "상용 입력 온보딩 계약" in status
+    assert "검증 브리프·지표 계약" in status
     assert "finding-posting-unit-area-sources-2026-08-29.md" in index
     assert "기술 계약 통과와 KPI②" in index
 

@@ -228,3 +228,6 @@ reports/logs/
 # 반복 실행 및 기존 Gold와의 일치 여부는 reproduction-comparison.json으로 확인한다.
 # 실행별 추가 제외 규칙은 audit 폴더의 .gitignore를 따른다.
 docs/papers/audits/**/repeat-a/gold/
+
+# 논문 원문(외부 PDF) 로컬 서고 — 저장소가 public 이라 제3자 저작물을 재배포하지 않는다.
+docs/papers/library/private/

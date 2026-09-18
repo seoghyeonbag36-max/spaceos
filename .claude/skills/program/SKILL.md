@@ -1,6 +1,6 @@
 ---
 name: program
-description: PPPP 트랙 — Program(가게·상권 단위 마케팅 솔루션 자동 생성). LLM 콘텐츠 생성과 데이터 채널 제약(크롤링 금지선)을 다룰 때.
+description: PPPP 트랙 — Program(예비창업자·검증하려는 기창업자의 팝업스토어·가오픈·MVP 검증 program 자동 생성 + 상권 단위 콘텐츠). 검증 브리프·검증 지표·HA 가드를 다룰 때.
 ---
 
 # 트랙 컨텍스트: Program (Promotion ▶ Program)
@@ -8,36 +8,48 @@ description: PPPP 트랙 — Program(가게·상권 단위 마케팅 솔루션 �
 너는 지금 PlaceOS의 **Program 트랙** 담당이다. `CLAUDE.md` 규칙을 따른다.
 
 ## 먼저 읽기
-- docs/feature-program.md
+- docs/feature-program.md — **§0-V 가 정본**(2026-09-17 대상 재정의)
 
-## 트랙 정의 (2026-07-18 개정 — 2단계)
-- 묻는 질문: **이 platform 에 posting 한 page 를 온·오프라인에서 어떤 홍보 program 으로 돌릴 것인가?**
-- ⚠ **2026-09-05 재정의로 Promotion 은 이 트랙이 단독으로 받는다**(종전엔 Posting 과 나눠 가졌다).
-  정본 `CLAUDE.md` §PPPP Framework.
-1. **가게 단위(우선)**: 네이버 지도에 노출되는 상가의 **사진·정보·이미지·리뷰** 데이터를 활용해 그 가게의 **온/오프라인 마케팅 광고 솔루션을 자동 생성**.
-2. **상권 단위(후속)**: **Platform에서 수집한 정보**(상권분석 시계열·감성·리뷰 키워드, `gold/program_content_context`)를 바탕으로 상권 마케팅 솔루션 생성.
+## 트랙 정의 (2026-09-17 재정의)
+- 묻는 질문: **이 아이템이 이 platform 에서 통하는지, 온·오프라인에서 어떤 검증 program 으로 확인할 것인가?**
+- 대상:
+  1. **예비창업자** — 아직 가게가 없다. 자기 아이템이 통하는 상권을 찾는다.
+  2. **기창업자** — 사업은 하지만 이 상권·이 아이템은 안 해 봤다. **팝업스토어·가오픈·MVP** 로 검증한다.
+- ⚠ **영업 중인 가게의 마케팅은 이 트랙이 아니다.** 리뷰·사진·메뉴 입력, 상호 검색, 블로그 스니펫
+  주입, 상용 온보딩(점주 원문 동의)은 전부 삭제됐다. 되살리지 말 것 — 둘 다 그 자리에서 장사한 적이
+  없어 리뷰가 존재하지 않는다.
+- 산출물 세 벌: **online(모객, 창업자 단독)** · **offline(자리·상권 연계, 건물주·상인회와 함께)** ·
+  **signals(검증 지표 = 지표·측정 방법·목표선·기각 조건)**. 지표가 결론이다.
 - 윤리 기준(필수): **Humanistic Authority** — 균형(Balance)·공생(Symbiosis)·공감(Empathy).
-- 핵심 기술: LLM(Claude — **vision 내장**, 상가 이미지 분석) + LangChain, 리뷰 키워드 기반 톤앤매너.
 
-## 데이터 채널 제약 (검증 결과 — 반드시 준수)
-- 상가 기본정보(이름·카테고리·좌표)
-  - **저장**: 소상공인 상가(상권)정보 `stores_raw.json` (**공공데이터, 허용**).
-    업종 계층 → 라벨 사상은 `data/config/store_taxonomy.py`.
-  - **실시간 조회만**: 네이버 지역검색 API·카카오 로컬 (**공식**). ⚠ 카카오 응답은
-    화면에 돌려주고 버린다 — 파일·DB·CSV 에 남기면 약관 위반이다
-    (2026-09-15, `docs/finding-map-provider-google-2026-09-15.md` §7-2).
-- 리뷰성 텍스트: 네이버 **블로그 검색 API** (**공식, 허용**).
-- **네이버 플레이스 리뷰·사진: 공식 API 없음** → PoC 내부 검증에 한해 크롤러(`data/crawlers/review_crawler.py`) 사용, **상용 서비스는 점주 제공 데이터(B2B 온보딩 동의) 원칙**. 크롤링 산출물을 고객 노출 화면에 직접 서빙하지 말 것.
+## 입력 계약 — 세 층, 따로 싣는다
+| 층 | 출처 | 등급 |
+|---|---|---|
+| ① 자리 | `unit_id` → `gold/{거점}/vacant_units.json` (`services/program_site`) | 대장 사실 |
+| ② 상권 | `district_id` → `gold/{거점}/program_content_context.csv` + 행사 (`services/marketing._district_context`) | 관측 수치 |
+| ③ 검증 브리프 | `ProgramBrief` — item·category·mode(popup/soft_open/mvp)·stage(pre_founder/founder)·hypothesis·기간·예산 구간·차별점 (`services/program_brief`) | **창업자 주장** — 사실로 단정하지 않는다 |
+
+## 지켜야 할 규칙
+- **있지도 않은 경험 금지** — 단골·기존 고객·쌓인 후기를 전제하면 `unproven_experience_claim`(폐기).
+  재방문율·후기 수집을 **측정할 지표**로 적는 것은 정상이다(측정 문장 면제). 금칙어를 넓히지 말 것 —
+  넓히면 검증 지표가 통째로 죽는다.
+- **금액은 브리프 예산 구간에서만.** `budget_share` 는 int 퍼센트(절대액이 구조적으로 못 들어간다).
+- **행사는 cite/propose/own 으로 가른다**(§0-F). 컨텍스트에 없는 행사를 cite 하면 폐기.
+- 지표는 방식마다 다르다 — 기간 안에 잴 수 없는 지표(팝업에 재구매율)를 내지 않는다.
+- HA 검사에 넘기는 생성물은 조각을 **줄바꿈으로** 잇는다(공백이면 문장 단위 판정이 무력해진다).
 
 ## 화이트리스트 경로
-- BE: `apps/backend/app/services/marketing.py`, `app/schemas/marketing.py`, `app/api/v1/marketing.py`
-- FE 소비: `apps/frontend/src/lib/api.ts` 의 `getMarketing(id)`, `generateStoreMarketing(...)`
-- 데이터: `data/gold/serving/sentiment_*.json`, `data/bronze/program/`, `data/crawlers/review_crawler.py`
-- 키: `.env` 의 LLM 키 (git 커밋 금지)
+- BE: `apps/backend/app/services/{marketing,program_brief,program_site,ha_guard,events}.py`,
+  `app/schemas/marketing.py`, `app/api/v1/marketing.py`
+- FE: `apps/frontend/src/pages/ProgramStudio.tsx`(+`.css`·테스트), `src/lib/api.ts` 의 `generateProgram`
+- 데이터: `data/gold/{거점}/program_content_context.csv`, `data/gold/{거점}/vacant_units.json`, 행사 Gold
+- 키: `.env` 의 `LLM_API_KEY` (git 커밋 금지)
 
-## 실제 엔드포인트 / 함수 (현 코드 기준)
-- GET  `/api/v1/marketing/{id}`          ← FE `getMarketing(id)` (상권 단위 — TODO: Platform Gold 연동)
-- POST `/api/v1/marketing/generate`      ← FE `generateStoreMarketing(...)` (가게 단위 — **현존**, LLM 연동 TODO)
+## 실제 엔드포인트 (현 코드 기준)
+- POST `/api/v1/marketing/generate`     ← FE `generateProgram(brief)` — 검증 program (LLM · 스텁 폴백)
+- GET  `/api/v1/marketing/sites`        ← 거점 공실 유닛(①층 후보)
+- GET  `/api/v1/marketing/events`       ← 오프라인 연계 후보(행사, LLM 안 부름)
+- GET  `/api/v1/marketing/{id}`         ← 상권 단위 온라인 콘텐츠 + 행사
 
 ## 이번 목표
 
@@ -46,4 +58,5 @@ description: PPPP 트랙 — Program(가게·상권 단위 마케팅 솔루션 �
 ## 작업 방식
 1. 작은 작업으로 분해 → 승인 → 진행.
 2. 생성 콘텐츠는 과장·허위 금지, 톤은 균형·공생·공감. 더미엔 `# TODO: 실제 연동`.
-3. 마치면 `/verify` (`pytest`, 더미 상가 프로필로 생성 확인).
+3. 마치면 `/verify` (`pytest` · `npm run build`, 예시 브리프로 생성 확인).
+   새 프롬프트는 `PLACEOS_LIVE_LLM=1 pytest tests/test_llm_live.py` 로 실호출 확인.

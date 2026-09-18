@@ -1,5 +1,7 @@
 /**
- * ProgramStudio 지도 쪽 — 화면설계서 2판 PR-01(종료 행사 제외) · PR-02(칩 ↔ 목록 같은 선택).
+ * ProgramStudio 지도 쪽 — 화면설계서 PR-01(종료 행사 제외) · PR-02(칩 ↔ 목록 같은 선택).
+ * 2026-09-17 대상 재정의로 목록 이름이 「오프라인 홍보 장소」→「오프라인 연계 후보」가 됐다
+ * (검증 기간에 유입을 붙일 수 있는 행사라는 뜻).
  * 지도가 있어야 행사를 부르므로 실제 MapHost 안에서 렌더한다(SDK 로더만 목킹).
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -50,12 +52,12 @@ describe("splitEvents · eventRange", () => {
   });
 });
 
-describe("ProgramStudio — 오프라인 홍보 장소", () => {
+describe("ProgramStudio — 오프라인 연계 후보", () => {
   it("PR-01 지도 칩과 목록이 같은 수이고, 종료된 행사는 둘 다에서 빠진다", async () => {
     mount();
     // 파일 첫 테스트는 모듈 변환·지도 로더를 같이 탄다 — 전체 병렬 실행에서 1초 기본값을 넘겼다(09-13).
-    const section = await screen.findByRole("region", { name: "오프라인 홍보 장소" }, { timeout: 10000 });
-    expect(within(section).getByText("오프라인 홍보 장소 · 2곳")).toBeTruthy();
+    const section = await screen.findByRole("region", { name: "오프라인 연계 후보" }, { timeout: 10000 });
+    expect(within(section).getByText("오프라인 연계 후보 · 2곳")).toBeTruthy();
     expect(within(section).getByText("종료된 행사 1곳은 뺐다")).toBeTruthy();
     expect(within(section).queryByText(/지난 행사/)).toBeNull();
     await waitFor(() => expect(eventChips()).toHaveLength(2));
@@ -65,7 +67,7 @@ describe("ProgramStudio — 오프라인 홍보 장소", () => {
 
   it("PR-02 칩을 누르면 목록에서 선택·상세가 뜨고, 목록을 누르면 지도가 그 행사로 간다", async () => {
     mount();
-    await screen.findByRole("region", { name: "오프라인 홍보 장소" }, { timeout: 10000 });
+    await screen.findByRole("region", { name: "오프라인 연계 후보" }, { timeout: 10000 });
     await waitFor(() => expect(eventChips()).toHaveLength(2));
     const soonChip = eventChips().find((o) => String((o.options.icon as { content: string }).content).includes("가까운 행사"))!;
     naver.emit(soonChip, "click");
@@ -93,6 +95,6 @@ describe("ProgramStudio — 오프라인 홍보 장소", () => {
     render(<ProgramStudio mapDistrictId="garosugil" />);
     await waitFor(() => expect(api.count(/commercial-districts$/)).toBe(1));
     expect(api.count(/marketing\/events/)).toBe(0);
-    expect(screen.queryByRole("region", { name: "오프라인 홍보 장소" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "오프라인 연계 후보" })).toBeNull();
   });
 });

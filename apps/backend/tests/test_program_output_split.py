@@ -1,44 +1,52 @@
-"""Program 출력 분리 — 퍼포먼스(온라인) / 상권활성화(오프라인) 계약 검증.
+"""Program 출력 분리 — 모객(온라인) / 자리·연계(오프라인) / **검증 지표** 계약 검증.
 
 ## 왜 갈랐나
 
 `ChannelPlan` 은 channel·kind·content·rationale 넷뿐이었다. 그 넷으로는
 **타겟·예산배분·협업주체**를 담을 자리가 없다. 특히 협업주체가 빠지면 오프라인
-제안이 "상권 플리마켓 참여하세요"가 되는데, 신규 창업자는 혼자 축제를 열 수 없다 —
+제안이 "상권 플리마켓 참여하세요"가 되는데, 창업자는 혼자 축제를 열 수 없다 —
 실측으로 상권 행사 785건 중 57%가 공공·준공공 주최다(docs/feature-program.md §0-B).
 
-## 두 출력은 대칭이 아니다. **주체가 다르다**
+## 세 출력은 성격이 다르다
 
-| | 온라인 | 오프라인 |
-|---|---|---|
-| 주체 | 창업 기업 단독 | 기업 + 상권 주체 협업 |
-| 필드 | target · budget_share · kpi | timing · actors · mode |
+| | 온라인(모객) | 오프라인(자리·연계) | signals(판정) |
+|---|---|---|---|
+| 주체 | 창업자 단독 | 창업자 + 상권 주체 | — |
+| 필드 | target · budget_share · kpi | timing · actors · mode | name · method · target · decision |
 
 ## 행사: 금지가 아니라 분리
 
 2026-08-06 에는 신규 행사 제안을 **통째로 금지**해 지어낸 행사를 막았다. 그런데
-대상이 공실 창업 기업으로 바뀌면서 신규 제안이 이 출력의 **목적**이 됐다. 금지를
+대상이 검증하려는 창업자로 바뀌면서 신규 제안이 이 출력의 **목적**이 됐다. 금지를
 없애면 지어낸 행사가 돌아오고, 두면 새 출력을 못 만든다. 그래서 `mode` 로 가른다 —
 `cite`(기존 행사 인용)는 사실 주장이라 검증하고, `propose`(신규 제안)는 계획이라
 허용하되 빈 시간대 수치 인용을 요구한다.
+
+## 검증 지표는 이 트랙의 결론이다 (2026-09-17)
+
+팝업·가오픈·MVP 는 홍보가 아니라 **판정**이 목적이다. 채널안만 내려보내면 이 트랙이
+홍보 생성기로 되돌아간다 — 그래서 스텁조차 지표를 채우는지 여기서 고정한다.
 """
 from __future__ import annotations
 
-from app.schemas.marketing import ChannelPlan, LLMStoreMarketing
+from app.schemas.marketing import ChannelPlan, LLMProgramPlan, ValidationSignal
 from app.services import ha_guard, marketing
-from tests.conftest import _act, _perf
+from tests.conftest import _act, _perf, _signal
 
-_PROFILE = {"name": "테스트가게", "category": "F&B", "reviews": ["분위기가 좋다"]}
+_BRIEF = {
+    "item": "산미 중심 원두 팝업", "category": "카페",
+    "mode": "popup", "stage": "pre_founder",
+}
 _NO_EVENT_CTX = ("상권 행사: 확인된 예정 행사가 없다(공공 문화행사 기준). "
                  "행사 참여·연계를 제안하지 말 것 — 없는 행사를 지어내는 셈이다.")
 
 
-def _store(online=None, offline=None) -> LLMStoreMarketing:
-    return LLMStoreMarketing(
-        tone_keywords=["키워드"],
-        online=online or [_perf("인스타그램", "릴스 주 2회", "리뷰에 분위기 언급이 반복된다")],
+def _plan(online=None, offline=None, signals=None) -> LLMProgramPlan:
+    return LLMProgramPlan(
+        online=online or [_perf("인스타그램", "릴스 주 2회", "검증 기간이 짧아 사전 인지가 필요하다")],
         offline=offline or [_act("공동 프로모션", "스탬프 연계",
                                  "6~11시 유동 19.2 / 매출 10.7 = +8.5%p 로 비어 있다")],
+        signals=signals if signals is not None else [_signal()],
         ha_check="점검 통과")
 
 
@@ -46,7 +54,7 @@ def _codes(f) -> set[str]:
     return {x.code for x in f}
 
 
-# ── 계약: 두 출력이 서로 다른 필드를 갖는다 ─────────────────────────────────
+# ── 계약: 세 출력이 서로 다른 필드를 갖는다 ─────────────────────────────────
 
 def test_online_carries_performance_fields():
     p = _perf("인스타그램", "릴스", "근거를 충분히 적었다",
@@ -60,10 +68,24 @@ def test_offline_carries_activation_fields():
     assert p.actors == ["상인회", "구청"] and p.mode == "propose"
 
 
+def test_signal_requires_a_decision_rule():
+    """지표는 네 칸을 **모두** 요구한다 — 판정선이 빠지면 검증이 아니다.
+
+    이걸 선택 필드로 두면 LLM 이 목표선만 적고 기각 조건을 생략한다. 스키마가
+    존재를 강제하고, 내용이 실제로 판정에 쓸 수 있는지는 ha_guard 가 본다.
+    """
+    import pydantic
+    try:
+        ValidationSignal(name="일 방문객", method="카운터", target="60명")
+    except pydantic.ValidationError:
+        return
+    raise AssertionError("decision 없이 지표가 만들어졌다")
+
+
 def test_budget_share_cannot_hold_absolute_amount():
     """예산은 **비율(int)** 이라 '월 30만원' 같은 절대액이 구조적으로 못 들어간다.
 
-    "얼마를 쓸지는 기업 몫"(§0-B 원칙 2)을 프롬프트 문구가 아니라 타입으로 강제한다.
+    "얼마를 쓸지는 창업자 몫"(§0-B 원칙 2)을 프롬프트 문구가 아니라 타입으로 강제한다.
     """
     import pydantic
     try:
@@ -82,33 +104,33 @@ def test_channel_plan_keeps_four_original_fields():
 # ── 행사: 인용(cite) 은 검증하고 제안(propose) 은 허용한다 ──────────────────
 
 def test_cite_when_context_says_no_events_is_violation():
-    parsed = _store(offline=[_act("지역 행사 참여", "인근 축제 부스 참여",
-                                  "상권 공동 활성화 근거", mode="cite")])
-    f = ha_guard.check_store(parsed, _PROFILE, _NO_EVENT_CTX)
+    parsed = _plan(offline=[_act("지역 행사 참여", "인근 축제 부스 참여",
+                                 "상권 공동 활성화 근거", mode="cite")])
+    f = ha_guard.check_program(parsed, _BRIEF, _NO_EVENT_CTX)
     assert "fabricated_event" in _codes(f)
     assert ha_guard.has_violation(f)
 
 
 def test_propose_when_context_says_no_events_is_allowed():
-    """신규 제안은 금지되지 않는다 — 이게 이번 변경의 요점이다."""
-    parsed = _store(offline=[_act("플리마켓", "주말 공동 부스를 새로 열자고 제안",
-                                  "6~11시 유동 19.2 / 매출 10.7 = +8.5%p", mode="propose")])
-    f = ha_guard.check_store(parsed, _PROFILE, _NO_EVENT_CTX)
+    """신규 제안은 금지되지 않는다 — 팝업을 새로 여는 것이 이 트랙의 목적이다."""
+    parsed = _plan(offline=[_act("플리마켓", "주말 공동 부스를 새로 열자고 제안",
+                                 "6~11시 유동 19.2 / 매출 10.7 = +8.5%p", mode="propose")])
+    f = ha_guard.check_program(parsed, _BRIEF, _NO_EVENT_CTX)
     assert "fabricated_event" not in _codes(f)
     assert not ha_guard.has_violation(f)
 
 
 def test_cite_is_fine_when_context_has_events():
     ctx = "상권 행사(공공 문화행사 실데이터, 걸어갈 거리 안): 서울아트위크(59m, 무료)"
-    parsed = _store(offline=[_act("행사 연계", "서울아트위크 기간 공동 배너",
-                                  "59m 거리에서 열린다", mode="cite")])
-    assert "fabricated_event" not in _codes(ha_guard.check_store(parsed, _PROFILE, ctx))
+    parsed = _plan(offline=[_act("행사 연계", "서울아트위크 기간 공동 배너",
+                                 "59m 거리에서 열린다", mode="cite")])
+    assert "fabricated_event" not in _codes(ha_guard.check_program(parsed, _BRIEF, ctx))
 
 
 def test_propose_without_gap_figure_warns():
-    parsed = _store(offline=[_act("플리마켓", "주말 부스를 제안한다",
-                                  "상권 공동 활성화에 도움이 된다", mode="propose")])
-    f = ha_guard.check_store(parsed, _PROFILE, None)
+    parsed = _plan(offline=[_act("플리마켓", "주말 부스를 제안한다",
+                                 "상권 공동 활성화에 도움이 된다", mode="propose")])
+    f = ha_guard.check_program(parsed, _BRIEF, None)
     assert "unsupported_event_proposal" in _codes(f)
     assert not ha_guard.has_violation(f)      # 경고이지 폐기가 아니다
 
@@ -117,52 +139,69 @@ def test_propose_without_gap_figure_warns():
 
 def test_offline_without_actors_warns():
     """공동 행사(propose)인데 함께할 주체가 없으면 경고. own 은 이 검사에서 빠진다."""
-    parsed = _store(offline=[_act("플리마켓", "부스 운영", "6~11시 +8.5%p",
-                                  actors=[], mode="propose")])
-    assert "missing_actors" in _codes(ha_guard.check_store(parsed, _PROFILE, None))
+    parsed = _plan(offline=[_act("플리마켓", "부스 운영", "6~11시 +8.5%p",
+                                 actors=[], mode="propose")])
+    assert "missing_actors" in _codes(ha_guard.check_program(parsed, _BRIEF, None))
 
 
 def test_offline_with_actors_is_clean():
-    parsed = _store(offline=[_act("플리마켓", "부스 운영", "6~11시 +8.5%p",
-                                  actors=["상인회", "구청"])])
-    assert "missing_actors" not in _codes(ha_guard.check_store(parsed, _PROFILE, None))
+    parsed = _plan(offline=[_act("플리마켓", "부스 운영", "6~11시 +8.5%p",
+                                 actors=["상인회", "구청"])])
+    assert "missing_actors" not in _codes(ha_guard.check_program(parsed, _BRIEF, None))
 
 
 def test_budget_shares_must_sum_to_100():
-    parsed = _store(online=[
+    parsed = _plan(online=[
         _perf("인스타그램", "릴스", "근거를 충분히 적었다", budget_share=30),
         _perf("네이버 블로그", "포스팅", "근거를 충분히 적었다", budget_share=30)])
-    assert "budget_share_mismatch" in _codes(ha_guard.check_store(parsed, _PROFILE, None))
+    assert "budget_share_mismatch" in _codes(ha_guard.check_program(parsed, _BRIEF, None))
 
 
 def test_budget_shares_summing_to_100_is_clean():
-    parsed = _store(online=[
+    parsed = _plan(online=[
         _perf("인스타그램", "릴스", "근거를 충분히 적었다", budget_share=60),
         _perf("네이버 블로그", "포스팅", "근거를 충분히 적었다", budget_share=40)])
-    assert "budget_share_mismatch" not in _codes(ha_guard.check_store(parsed, _PROFILE, None))
+    assert "budget_share_mismatch" not in _codes(ha_guard.check_program(parsed, _BRIEF, None))
 
 
 # ── 폴백 스텁도 새 계약을 채운다 ────────────────────────────────────────────
 
-def test_rule_stub_fills_both_contracts():
-    out = marketing.generate_store_marketing(dict(_PROFILE))
+def test_rule_stub_fills_all_three_contracts():
+    out = marketing.generate_program(dict(_BRIEF))
     assert out["source"] == "rule-stub"
     assert sum(p["budget_share"] for p in out["online"]) == 100
     for p in out["online"]:
         assert p["target"] and p["kpi"]
     modes = [p["mode"] for p in out["offline"]]
-    # 스텁은 실제 행사를 모르므로 cite 를 쓰지 않는다. 공동 제안 1건 + 매장 자체 1건.
+    # 스텁은 실제 행사를 모르므로 cite 를 쓰지 않는다. 공동 제안 1건 + 자체 접점 1건.
     assert "cite" not in modes and "propose" in modes
     for p in out["offline"]:
         assert p["actors"], "오프라인 제안에 협업 주체가 비었다"
 
 
-def test_rule_stub_does_not_claim_visits_for_a_vacancy():
-    """리뷰가 없는 입력(= 아직 영업하지 않는 자리)에 '방문 후기형'을 제안하지 않는다.
+def test_rule_stub_carries_validation_signals():
+    """스텁도 **판정**을 낸다 — 지표 없이 내려보내면 이 트랙이 홍보 생성기로 되돌아간다."""
+    out = marketing.generate_program(dict(_BRIEF))
+    assert out["signals"], "스텁에 검증 지표가 없다"
+    for s in out["signals"]:
+        assert s["decision"], "가설을 기각할 조건이 비었다"
+        assert s["method"], "측정 방법이 비었다"
 
-    2026-08-16 에 실측한 증상이다 — 공실에 방문 후기를 제안하면 있지도 않은 방문을
-    전제하는 거짓이 된다.
+
+def test_stub_signals_match_the_validation_mode():
+    """검증 방식마다 잴 수 있는 것이 다르다 — 팝업에 회전율을 물으면 기간 안에 못 잰다."""
+    popup = marketing.generate_program({**_BRIEF, "mode": "popup"})
+    mvp = marketing.generate_program({**_BRIEF, "mode": "mvp"})
+    assert popup["signals"][0]["name"] != mvp["signals"][0]["name"]
+    assert popup["mode"] == "popup" and mvp["mode"] == "mvp"
+
+
+def test_rule_stub_does_not_claim_unproven_experience():
+    """스텁이 단골·기존 고객처럼 아직 없는 경험을 전제하지 않는다.
+
+    2026-08-16 에 '방문 후기형 포스팅'으로 실측한 증상의 후신이다 — 아직 이 자리에서
+    장사한 적이 없는데 쌓인 경험을 근거로 삼으면 그대로 거짓이 된다.
     """
-    out = marketing.generate_store_marketing(
-        {"name": "새가게", "category": "F&B", "reviews": []})
-    assert not any("방문 후기" in p["content"] for p in out["online"])
+    out = marketing.generate_program(dict(_BRIEF))
+    blob = str(out["online"]) + str(out["offline"]) + str(out["signals"])
+    assert "단골 고객" not in blob and "기존 고객" not in blob

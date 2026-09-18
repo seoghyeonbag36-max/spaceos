@@ -1,9 +1,9 @@
-"""Posting(코파일럿 어댑터) / Program(가게 단위 생성) API 테스트."""
+"""Posting(코파일럿 어댑터) / Program(검증 프로그램 생성) API 테스트."""
 import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from tests.conftest import _act, _perf
+from tests.conftest import _act, _perf, _signal
 
 client = TestClient(app)
 V1 = "/api/v1"
@@ -203,75 +203,88 @@ def test_falls_back_to_seed_when_gold_missing(monkeypatch):
     monkeypatch.setattr(posting_inputs, "_cache", {})   # 뒤 테스트에 캐시 오염 방지
 
 
-def test_generate_store_marketing_stub(monkeypatch):
-    """LLM 키 미설정 시 규칙 기반 스텁이 StoreMarketing 스키마로 응답한다."""
+def test_generate_program_stub(monkeypatch):
+    """LLM 키 미설정 시 규칙 기반 스텁이 ProgramPlan 스키마로 응답한다."""
     from app.core.config import settings
     monkeypatch.setattr(settings, "llm_api_key", "")
-    profile = {
-        "name": "가로수 카페",
+    brief = {
+        "item": "산미 중심 스페셜티 원두 팝업",
         "category": "카페",
+        "mode": "popup",
+        "stage": "pre_founder",
         "district_id": "gangnam-garosugil",
-        "reviews": ["분위기 좋은 카페", "커피 맛집 분위기 최고", "디저트 맛집"],
     }
-    r = client.post(f"{V1}/marketing/generate", json=profile)
+    r = client.post(f"{V1}/marketing/generate", json=brief)
     assert r.status_code == 200
     body = r.json()
-    assert body["store_name"] == "가로수 카페"
+    assert body["item"] == "산미 중심 스페셜티 원두 팝업"
+    assert body["mode"] == "popup" and body["stage"] == "pre_founder"
     assert body["source"] == "rule-stub"
-    assert body["tone_keywords"]  # 리뷰에서 키워드 추출됨
     assert len(body["online"]) >= 1 and len(body["offline"]) >= 1
+    assert body["signals"], "검증 지표 없이 내려보내면 홍보 생성기로 되돌아간다"
     assert all(p["kind"] == "online" for p in body["online"])
     assert all(p["kind"] == "offline" for p in body["offline"])
 
 
-_PROFILE = {
-    "name": "맡기다",
+_BRIEF = {
+    "item": "제철 해산물 오마카세 가오픈",
     "category": "F&B",
+    "mode": "soft_open",
+    "stage": "founder",
     "district_id": "hongdae-yeonnam",
-    "reviews": ["사장님 손맛이 담긴 특제 소스", "우니 사시미가 인상적"],
+    "hypothesis": "연남동 저녁 수요가 객단가 5만원대를 받아준다",
+    "start_date": "2026-10-05",
+    "run_days": 14,
 }
 
 
-def test_generate_store_marketing_llm(monkeypatch):
-    """LLM 키 설정 시 _call_llm 결과가 StoreMarketing(source=llm)으로 매핑된다."""
+def test_generate_program_llm(monkeypatch):
+    """LLM 키 설정 시 _call_llm 결과가 ProgramPlan(source=llm)으로 매핑된다."""
     from app.core.config import settings
-    from app.schemas.marketing import (LLMActivationPlan, LLMPerformancePlan,
-                                       LLMStoreMarketing)
+    from app.schemas.marketing import LLMProgramPlan
     from app.services import marketing as mkt
 
     monkeypatch.setattr(settings, "llm_api_key", "test-key")
-    fake = LLMStoreMarketing(
-        tone_keywords=["특제소스", "사시미"],
-        online=[_perf(channel="인스타그램", content="릴스 게시", rationale="리뷰 근거")],
+    fake = LLMProgramPlan(
+        online=[_perf(channel="인스타그램", content="릴스 게시", rationale="자리 근거")],
         offline=[_act(channel="전단", content="시식 이벤트", rationale="유동객 근거")],
+        signals=[_signal()],
         ha_check="균형·공생·공감 점검 통과",
     )
-    monkeypatch.setattr(mkt, "_call_llm", lambda profile, tone, ctx, site=None, venture=None: fake)
+    monkeypatch.setattr(mkt, "_call_llm",
+                        lambda brief, ctx, site=None, brief_ctx=None: fake)
 
-    r = client.post(f"{V1}/marketing/generate", json=_PROFILE)
+    r = client.post(f"{V1}/marketing/generate", json=_BRIEF)
     assert r.status_code == 200
     body = r.json()
     assert body["source"] == "llm"
-    assert body["tone_keywords"] == ["특제소스", "사시미"]
     assert body["online"][0]["kind"] == "online"
     assert body["offline"][0]["kind"] == "offline"
+    assert body["signals"][0]["decision"], "판정선이 응답에서 사라졌다"
 
 
-def test_generate_store_marketing_llm_error_falls_back(monkeypatch):
+def test_generate_program_llm_error_falls_back(monkeypatch):
     """LLM 호출 실패 시 규칙 기반 스텁으로 폴백한다 (요청은 200 유지)."""
     from app.core.config import settings
     from app.services import marketing as mkt
 
     monkeypatch.setattr(settings, "llm_api_key", "test-key")
 
-    def boom(profile, tone, ctx):
+    def boom(brief, ctx, site=None, brief_ctx=None):
         raise RuntimeError("api down")
 
     monkeypatch.setattr(mkt, "_call_llm", boom)
 
-    r = client.post(f"{V1}/marketing/generate", json=_PROFILE)
+    r = client.post(f"{V1}/marketing/generate", json=_BRIEF)
     assert r.status_code == 200
     assert r.json()["source"] == "rule-stub"
+
+
+def test_generate_rejects_a_half_budget_band():
+    """예산은 하한·상한을 함께 준다 — 반쪽짜리를 구간처럼 인용하게 두지 않는다."""
+    r = client.post(f"{V1}/marketing/generate",
+                    json={**_BRIEF, "budget_krw_min": 300000})
+    assert r.status_code == 422, r.text
 
 
 def test_district_context_mapping():
@@ -399,131 +412,60 @@ def test_trend_summary_direction_rule():
     assert summarize([100, 90, 80, 70, 60]) is None
 
 
-# ───────────── 메뉴 입력 + 가게 반자동 조회 (2026-08-03) ─────────────
+# ───────────── 검증 브리프가 프롬프트에 닿는가 (2026-09-17) ─────────────
+#
+# 2026-08-03 에 있던 "메뉴 입력 + 가게 반자동 조회" 스위트는 통째로 사라졌다. 카카오
+# 상호 검색(/places)과 네이버 블로그 스니펫(/reviews)은 **영업 중인 가게**를 특정하는
+# 표면인데, 대상이 아직 그 자리에서 장사한 적 없는 창업자로 바뀌면서 특정할 가게가
+# 없어졌다. 그 자리를 대신하는 것이 아래 세 검사다 — 브리프가 실제로 쓰이는가.
 
 
-def test_menu_reaches_llm_prompt(monkeypatch):
-    """메뉴가 LLM 프롬프트에 실린다 — 스키마에만 있고 안 쓰이면 죽은 필드다."""
+def test_brief_reaches_llm_prompt(monkeypatch):
+    """브리프가 LLM 컨텍스트에 실린다 — 스키마에만 있고 안 쓰이면 죽은 필드다."""
     from app.core.config import settings
+    from app.schemas.marketing import LLMProgramPlan
     from app.services import marketing as mkt
 
     monkeypatch.setattr(settings, "llm_api_key", "test-key")
     seen: dict = {}
 
-    import app.services.marketing as m
-
-    def spy(profile, tone, ctx, site=None, venture=None):
-        seen["menu"] = profile.get("menu")
-        seen["prompt"] = m._SYSTEM_PROMPT
-        from app.schemas.marketing import (LLMActivationPlan, LLMPerformancePlan,
-                                       LLMStoreMarketing)
-        return LLMStoreMarketing(
-            tone_keywords=["x"],
+    def spy(brief, ctx, site=None, brief_ctx=None):
+        seen["brief_ctx"] = brief_ctx
+        seen["prompt"] = mkt._SYSTEM_PROMPT
+        return LLMProgramPlan(
             online=[_perf(channel="a", content="b", rationale="c")],
             offline=[_act(channel="d", content="e", rationale="f")],
-            ha_check="ok",
-        )
+            signals=[_signal()], ha_check="ok")
 
     monkeypatch.setattr(mkt, "_call_llm", spy)
-    r = client.post(f"{V1}/marketing/generate",
-                    json={**_PROFILE, "menu": ["우니 사시미 32,000원", "맡김술상 55,000원"]})
+    r = client.post(f"{V1}/marketing/generate", json=_BRIEF)
     assert r.status_code == 200
-    assert seen["menu"] == ["우니 사시미 32,000원", "맡김술상 55,000원"]
-    assert "메뉴" in seen["prompt"], "시스템 프롬프트가 메뉴를 다루지 않는다"
+    assert "제철 해산물 오마카세 가오픈" in seen["brief_ctx"]
+    assert "가오픈" in seen["brief_ctx"], "검증 방식이 컨텍스트에 없다"
+    assert "2026-10-05" in seen["brief_ctx"], "검증 기간이 컨텍스트에 없다"
+    assert "검증 지표" in seen["prompt"], "시스템 프롬프트가 판정을 다루지 않는다"
 
 
-def test_menu_quoted_verbatim_in_stub(monkeypatch):
-    """스텁도 메뉴를 흘리지 않는다 — 첫 품목을 **적힌 그대로** 인용한다."""
-    from app.core.config import settings
-    monkeypatch.setattr(settings, "llm_api_key", "")
+def test_brief_context_marks_claims_as_unverified():
+    """차별점은 **주장**이라고 밝혀 싣는다 — 관측값과 같은 자리에 두면 출처가 섞인다."""
+    from app.services import program_brief
 
-    body = client.post(f"{V1}/marketing/generate", json={
-        "name": "맡기다", "category": "이자카야", "menu": ["맡김술상 55,000원"],
-    }).json()
-    offline = " ".join(p["content"] for p in body["offline"])
-    assert "맡김술상 55,000원" in offline
+    ctx = program_brief.brief_context({
+        **_BRIEF, "differentiators": ["당일 경매 직송"]})
+    assert "당일 경매 직송" in ctx
+    assert "검증된 사실 아님" in ctx
 
 
-def test_lookup_routes_are_not_swallowed_by_district_route(monkeypatch):
-    """/places·/reviews 가 /{district_id} 에 먹히지 않는다 (라우트 등록 순서).
+def test_brief_context_always_warns_about_absent_track_record():
+    """③층이 있으면 '이 자리에서 해 본 적 없다'를 **항상** 싣는다.
 
-    키를 비워 두는 이유는 네트워크를 타지 않기 위해서다 — 라우팅만 보면 되고,
-    거점 라우트에 먹혔다면 404(unknown district)가 났을 것이다.
+    종전에는 개업예정일이 있을 때만 이 경고가 붙었다. 대상이 전부 미검증으로 바뀌어
+    가를 '영업 중'이 없으므로 조건이 사라졌다.
     """
-    from app.core.config import settings
-    monkeypatch.setattr(settings, "kakao_rest_api_key", "")
-    monkeypatch.setattr(settings, "naver_client_id", "")
+    from app.services import program_brief
 
-    r = client.get(f"{V1}/marketing/places", params={"query": "x"})
-    assert r.status_code == 200, r.text
-    assert r.json()["source"] == "unavailable"
-    r2 = client.get(f"{V1}/marketing/reviews", params={"name": "x"})
-    assert r2.status_code == 200, r2.text
-    assert r2.json()["source"] == "unavailable"
-
-
-def test_lookup_unavailable_when_keys_missing(monkeypatch):
-    """키 미설정은 조용한 빈 목록이 아니라 source='unavailable' 로 드러난다."""
-    from app.core.config import settings
-    monkeypatch.setattr(settings, "kakao_rest_api_key", "")
-    monkeypatch.setattr(settings, "naver_client_id", "")
-    monkeypatch.setattr(settings, "naver_client_secret", "")
-
-    b = client.get(f"{V1}/marketing/places", params={"query": "맡기다"}).json()
-    assert b["source"] == "unavailable" and b["note"]
-    b2 = client.get(f"{V1}/marketing/reviews", params={"name": "맡기다"}).json()
-    assert b2["source"] == "unavailable" and b2["note"]
-
-
-def test_review_query_is_narrowed_by_dong(monkeypatch):
-    """리뷰 질의에 주소의 동(洞)이 붙는다 — 동명이지 오염 방어의 1차선."""
-    from app.core.config import settings
-    from app.services import store_lookup as sl
-
-    monkeypatch.setattr(settings, "naver_client_id", "id")
-    monkeypatch.setattr(settings, "naver_client_secret", "secret")
-    captured: dict = {}
-
-    def fake_get(url, params, headers):
-        captured["query"] = params["query"]
-        return {"items": [{"title": "연남동 <b>맡기다</b> 후기",
-                           "description": "오마카세가 좋았습니다 재방문 의사 있어요"}]}
-
-    monkeypatch.setattr(sl, "_get_json", fake_get)
-    out = sl.find_reviews("맡기다", "서울 마포구 연남동 260-2")
-    assert captured["query"] == "연남동 맡기다"
-    assert out["source"] == "naver-blog"
-    # <b> 태그가 남으면 프롬프트에 마크업이 섞인다
-    assert "<b>" not in out["reviews"][0]
-
-    # 주소가 없으면 최소한 '서울'로는 좁힌다
-    sl.find_reviews("맡기다", None)
-    assert captured["query"] == "서울 맡기다"
-
-
-def test_reviews_drop_posts_without_store_name(monkeypatch):
-    """상호가 본문에 없는 글은 버린다 — 목록형 광고·타 지역 글이 이렇게 섞인다."""
-    from app.core.config import settings
-    from app.services import store_lookup as sl
-
-    monkeypatch.setattr(settings, "naver_client_id", "id")
-    monkeypatch.setattr(settings, "naver_client_secret", "secret")
-    monkeypatch.setattr(sl, "_get_json", lambda *a, **k: {"items": [
-        {"title": "연남동 맡기다 방문", "description": "오마카세 코스가 알찼습니다 추천해요"},
-        {"title": "연남동 맛집 총정리", "description": "이번엔 다른 가게들을 모아봤습니다 참고하세요"},
-    ]})
-    out = sl.find_reviews("맡기다", "서울 마포구 연남동 260-2")
-    assert len(out["reviews"]) == 1
-    assert "제외했다" in (out["note"] or "")
-
-
-def test_dong_extraction_handles_numbered_ga():
-    """'을지로3가'처럼 숫자가 낀 주소도 뽑는다 (2026-08-03 회귀)."""
-    from app.services.store_lookup import dong_of
-
-    assert dong_of("서울 마포구 연남동 260-2") == "연남동"
-    assert dong_of("서울 중구 을지로3가 1") == "을지로3가"
-    assert dong_of(None) is None
+    minimal = {"item": "x", "category": "카페", "mode": "mvp", "stage": "pre_founder"}
+    assert "장사한 적이 **없다**" in program_brief.brief_context(minimal)
 
 
 # ── foot 거점 내 서열: 시드 → 최근접 상권 실측 (2026-08-24) ─────────────────

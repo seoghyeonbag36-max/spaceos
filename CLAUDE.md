@@ -17,9 +17,9 @@ Price 는 Posting 으로, Promotion 은 Program 으로만 간다.
 | **Platform** | **Place ▶ Platform** | 이 입지·상권은 **어떤 플랫폼인가?** 이 물리적 공간을 SNS·디지털 관점에서 하나의 공간/플랫폼으로 읽는다 | 상권 AI 추천 엔진 (LSTM 공실 예측 · GNN 업종 추천 · 상권 정체성) |
 | **Page** | **Product ▶ Page** | 제품·상품이 아니라, 이 platform 안에 **어떤 page 가 만들어져야 하는가?** | 공실 히트맵 + **층별 매물 목록 + 네이버 거리뷰** (어느 건물 몇 층이 비었나 = 어디에 page 자리가 있나) — 3D 트윈은 2026-09-05 폐기 |
 | **Posting** | **Price ▶ Posting** | "얼마에 팔 것인가"가 아니라, **어떤 가격대의 page 가 이 platform 에 posting 되어야 하는가?** | 입점 솔루션 — **외부 AI 창업 코파일럿 연동**(어댑터) + 3-Tier(고급화/가성비/기능중심) 비용-효용 폴백. 임대료·회수기간이 곧 가격대 판단이다 |
-| **Program** | **Promotion ▶ Program** | 이 platform 에 posting 한 page 를 **온라인·오프라인에서 어떤 홍보 program 으로 돌릴 것인가?** | 마케팅 자동화 — **대상은 Platform(상권) 내 빈 Page(공실 건물)에 Posting(입점)할 기업**이다. 그 기업에게 온/오프라인 홍보 방법을 알려준다 (2026-08-16 대상 재정의) |
+| **Program** | **Promotion ▶ Program** | 이 아이템이 이 platform 에서 **통하는지, 온라인·오프라인에서 어떤 검증 program 으로 확인할 것인가?** | 검증 program 자동 생성 — **대상은 예비창업자, 그리고 자기 아이템이 통하는 상권을 찾아 팝업스토어·가오픈·MVP 로 검증하려는 기창업자**다. 모객(온라인)·자리·상권 연계(오프라인)·**검증 지표(기각 조건)** 세 벌을 낸다. 영업 중인 가게 마케팅은 이 트랙이 아니다 (2026-09-17 대상 재정의 → docs/feature-program.md §0-V) |
 
-한 줄로: **어떤 플랫폼인가 → 어떤 page 를 놓을까 → 어느 가격대로 posting 할까 → 어떻게 program 을 돌릴까.**
+한 줄로: **어떤 플랫폼인가 → 어떤 page 를 놓을까 → 어느 가격대로 posting 할까 → 어떤 program 으로 통하는지 확인할까.**
 
 ## Active Projects
 | 이름 | 내용 |

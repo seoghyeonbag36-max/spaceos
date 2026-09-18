@@ -11,8 +11,8 @@ import "./Verdict.css";
  *
  *   1. **헤드라인** — 그 탭이 답하는 질문 그대로. Platform "이 입지·상권은 어떤
  *      플랫폼인가" · Page "이 platform 안에 어떤 page 가 만들어져야 하는가" ·
- *      Posting "어떤 가격대의 page 가 posting 되어야 하는가" · Program "posting 한
- *      page 를 어떤 홍보 program 으로 돌릴 것인가"
+ *      Posting "어떤 가격대의 page 가 posting 되어야 하는가" · Program "이 아이템이
+ *      이 platform 에서 통하는지, 어떤 검증 program 으로 확인할 것인가"
  *   2. **결론 한 문장** — 그 질문에 대한 답. 두 문장으로 늘리지 않는다.
  *   3. **근거 세 줄** — 그 결론을 세운 값. 네 줄째는 접는 자리다.
  *   4. **출처 줄** — 아래 상세를 접어도 **출처만은 접지 않는다**. 출처가 곧 근거다.

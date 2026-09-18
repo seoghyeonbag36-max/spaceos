@@ -1,40 +1,114 @@
-# Program — 마케팅 광고 솔루션 자동 생성 (가게 단위 → 상권 단위)
+# Program — 검증 program 자동 생성 (아이템 단위 → 상권 단위)
 
-> PPPP: **Promotion ▶ Program** — *이 platform 에 posting 한 page 를 온라인·오프라인에서
-> 어떤 홍보 program 으로 돌릴 것인가?* Humanistic Authority(균형·공생·공감)를 윤리 기준으로 적용.
+> PPPP: **Promotion ▶ Program** — *이 아이템이 이 platform 에서 통하는지, 온라인·오프라인에서
+> 어떤 검증 program 으로 확인할 것인가?* Humanistic Authority(균형·공생·공감)를 윤리 기준으로 적용.
 >
-> ⚠ **2026-09-05 — Program 이 Promotion 을 단독으로 받는다.** 종전에는 Posting 과
-> Promotion 하나를 나눠 가졌으나, Posting 이 **Price** 로 옮겨가면서 홍보는 전부 여기다.
-> 아래 **2026-08-16 대상 재정의**는 그대로 유효하다. 정본은 `CLAUDE.md` §PPPP Framework.
->
-> ## ⚠ 2026-08-16 대상 재정의 — 아래 07-18 구조는 대상이 다르다
->
-> **대상 = Platform(상권) 내 '빈 Page'(아직 기업이 입점하지 않은 공실 건물)에 Posting(창업)할 기업.**
-> 그 기업에게 온/오프라인으로 어떻게 마케팅·홍보할지 알려주는 것이 Program 이다.
->
-> 07-18 구조는 **이미 영업 중인 가게의 점주**를 대상으로 삼았다. 리뷰·사진·메뉴가 이미
-> 쌓여 있어야 입력이 성립하는데, 창업 예정 기업에게는 그 자리에서의 리뷰가 존재하지
-> 않는다. 입력의 시제가 반대다 — 그래서 대상만 바꾸면 되는 게 아니라 **입력 계약을 다시
-> 정의해야 한다**(현행 구현으로 공실 유닛을 넣으면 "방문 후기형 포스팅"처럼 거짓을
-> 생성한다. 실측: 2026-08-16, 아래 §0-B).
->
-> **2026-07-18 개정 — 2단계 구조 (대상이 재정의되기 전 기록)**:
-> 1. **가게 단위(우선)**: 네이버 지도에 노출되는 상가의 **사진·정보·이미지·리뷰** 데이터를 활용해 해당 가게의 온/오프라인 마케팅 광고 솔루션을 자동 생성한다.
-> 2. **상권 단위(후속)**: **Platform에서 수집한 정보**(상권분석 시계열·감성·리뷰 키워드)를 바탕으로 상권 마케팅 솔루션을 생성한다.
+> ⚠ **2026-09-17 대상 재정의 — 정본은 아래 §0-V 다.** 영업 중인 가게의 마케팅은 이 트랙에서
+> **빠졌다**. 대상은 예비창업자와, 팝업스토어·가오픈·MVP 로 아이템을 검증하려는 기창업자다.
+> §0-V 뒤의 날짜 절은 이력이다 — 컨텍스트·HA·행사·수요신호 절(§0-1·0-3~0-5·0-B~0-F)은
+> 그대로 살아 있고, 가게 단위 입력(§0-2)·창업계획 층(§0-J)·상용 온보딩(§0-K)은 대체·삭제됐다.
+
+## 0-V. 대상 재정의 — 검증하려는 창업자 (2026-09-17)
+
+### 무엇이 바뀌었나
+
+| | 종전 (07-18 → 08-16 → 08-29) | 지금 |
+|---|---|---|
+| 대상 | 상권 안 **영업 중인 가게**(08-16 에 '공실에 입점할 기업'이 더해졌지만 입력은 가게 전제였다) | **예비창업자** · 자기 아이템이 통하는 상권을 찾아 **팝업스토어·가오픈·MVP 로 검증하려는 기창업자** |
+| 묻는 것 | 이 가게를 온/오프라인에서 어떻게 홍보하나 | 이 아이템이 이 상권에서 **통하는지 어떻게 판정하나** |
+| 입력 | `StoreProfile` — 상호·리뷰·사진·메뉴·키워드 (+ 중첩 `VenturePlan`) | `ProgramBrief` — 아이템·업종·**검증 방식**·**단계**·가설·기간·예산 구간·차별점 (+ 자리 `unit_id`·거점 `district_id` 참조) |
+| 출력 | `StoreMarketing` — online · offline · tone_keywords | `ProgramPlan` — online(모객) · offline(자리·연계) · **signals(검증 지표)** |
+| 근거 | 리뷰·메뉴 → 자리·상권 수치로 옮겨가던 중 | 자리(대장 사실) · 상권(Gold 수치) · 브리프(창업자 주장) 세 층, 따로 싣는다 |
+
+둘의 공통점은 **아직 검증되지 않은 아이템 + 아직 확정되지 않은 자리**다. 리뷰·사진·메뉴는
+그 자리에서 이미 장사해야 생기는 과거의 축적이라 입력으로 성립하지 않는다. 그래서 대상만
+바꾼 것이 아니라 입력·출력 계약을 통째로 갈았다.
+
+### 검증 방식 셋 — 판정 신호가 다르다
+
+| `mode` | 형태 | 기간 안에 잴 수 있는 것 |
+|---|---|---|
+| `popup` 팝업스토어 | 빈 자리를 며칠~몇 주 빌린다 | 유입·체류·구매전환 |
+| `soft_open` 가오픈 | 운영을 축소해 연다 | 객단가·회전·재료 소진·응대 부하 |
+| `mvp` MVP 테스트 | 점포 없이 매대·예약·사전주문 | 사전 수요(전환율) |
+
+같은 지표를 셋에 붙이면 둘에서 잴 수 없는 값이 된다 — 팝업에 재구매율을 물으면 기간 안에 못 잰다.
+`stage`(`pre_founder`·`founder`)는 어조와 협업 주체를 가른다. 화면에서는 「내 사업」 목적이
+기본값을 정한다(창업 → 예비창업자, 업종 바꾸기·상권 옮기기 → 기창업자).
+
+### 검증 지표(signals)가 이 트랙의 결론이다
+
+`ValidationSignal` = 지표명 · 측정 방법 · 목표선 · **기각 조건**. 네 칸 모두 필수다.
+무엇을 세면 통했다고 할지 **시작 전에** 정하지 않은 검증은 결과를 보고 사후에 말을 맞추게
+된다 — 판정이 아니라 지출이다. 그래서 규칙 기반 스텁도 방식별 지표를 채우고, 화면은 판정표를
+채널 초안보다 **먼저** 둔다.
+
+### HA 가드가 바뀐 곳 (`services/ha_guard.check_program`)
+
+| 코드 | 등급 | 바뀐 점 |
+|---|---|---|
+| `unproven_experience_claim` | violation | 종전 `pre_open_visit_claim` 대체. 개업예정일이 있을 때만 켜지던 검사가 **항상** 켜진다 — 가를 '영업 중'이 없다. 대신 **주장과 측정을 가른다**: "단골 고객에게"는 걸고 "재방문 고객 비율을 집계한다"는 안 건다(측정 문장 면제). 금칙어도 "재방문"·"후기" 맨몸이 아니라 "단골 고객"·"기존 고객"·"방문 후기에"처럼 **경험을 전제하는 표현**으로 좁혔다 |
+| `fabricated_price` | violation | 금액의 정본이 점주 메뉴·리뷰에서 **브리프의 예산 구간**으로 옮겨갔다 |
+| `missing_validation_signal` · `unmeasurable_signal` · `missing_decision_rule` | warning | 신설. 지표 없음 / 목표선에 셀 수 있는 값 없음 / 기각 조건이 비었거나 형식뿐 |
+
+곁에서 잡은 결함 하나: 생성물 조각을 **공백**으로 이어 검사하고 있어 `_sentences` 가 전체를
+한 문장으로 봤다. 실측(2026-09-17) — 한 지표의 "…미만이면 기각한다"가 측정 표현으로 인정되면서
+**다른 제안**의 "단골 고객에게"까지 함께 면제됐다. 같은 함정이 트렌드 역행 검사에도 있었다
+(주장과 유입어가 서로 다른 제안에 있어도 한 문장으로 읽혔다). 조각을 줄바꿈으로 잇도록 고쳤다.
+
+### 삭제한 것 — 입력에서 원문이 사라지면 그 경계가 지킬 것이 없다
+
+| 삭제 | 종전 역할 | 이유 |
+|---|---|---|
+| `GET /marketing/places`·`/reviews` + `services/store_lookup` | 카카오 상호 검색 → 네이버 블로그 스니펫 반자동 채우기(§0-2) | 특정할 **영업 중인 가게**가 없다 |
+| `POST /marketing/onboarding/generate` + `services/program_onboarding` + 동의 스키마·UI | 점주 제공 리뷰·사진·메뉴 원문의 조직 인증·4중 동의·원문 비저장(§0-K) | 받을 **점주 원문**이 없다. 브리프는 창업자가 직접 쓴 계획이다. 인증(`core/security`)·`AuditLog` 자체는 다른 곳이 쓰므로 남겼다 |
+| `services/program_venture` · `VenturePlan` | ③층 창업계획(§0-J) | `ProgramBrief` 한 겹으로 흡수(`services/program_brief`) |
+| `data/crawlers/review_crawler.py` | 플레이스 리뷰 크롤러 골격(수집 0건) | 영업 중인 가게 리뷰를 쓰지 않는다 |
+| vision(사진) 입력 · `tone_keywords` | 상가 사진 분석 · 리뷰 빈도 키워드 | 찍을 가게도, 셀 리뷰도 없다 |
+| `settings.kakao_rest_api_key`·`naver_client_id/secret` | 위 조회 전용 | 서버에서 쓰는 곳이 0이 됐다. 데이터 수집기는 `data/.env` 를 직접 읽는다 |
+
+**남긴 것**: 상권 컨텍스트(업종 분포·블로그 키워드·검색 트렌드·TRDAR 수요신호·행사), 자리층
+(`/marketing/sites`·`services/program_site`), 행사 경로(`/marketing/events`), 상권 단위 온라인
+콘텐츠(`GET /marketing/{id}`), 출력 분리 규칙(§0-F — 온라인 단독·오프라인 협업·`mode`
+cite/propose/own·예산은 int 퍼센트). 이것들은 대상이 바뀌어도 그대로 참이다 — 오히려 리뷰가
+없는 대상에게는 이 수치들이 근거의 전부다.
+
+### 화면 (`pages/ProgramStudio.tsx`)
+
+- 입력은 「검증 브리프」: 단계·검증 방식(라디오) · 아이템·업종 · 거점 · 가설, 접힌 「검증 조건」에
+  목표 고객·시작일·기간·예산 하한/상한·차별점·주소
+- 결과: 판정표(지표·측정 방법·목표선·기각 조건) → 채널별 실행 초안(타겟·예산 비율·협업 주체 병기)
+  → 접힌 HA 검증
+- Posting 인계 자리는 **같은 거점일 때만** `unit_id`·`tier` 로 싣는다. 거점을 바꾸면 「검증할 자리」
+  안내와 함께 걷는다 — 다른 상권의 공실을 검증 무대로 인용하지 않게
+- 이름: 패널 「검증 program」 · 인계 버튼 「이 자리로 검증 program 만들기 →」 · 목록 「오프라인 연계 후보」
+
+### 검증
+
+- 백엔드 `pytest` 360 passed · 5 skipped — `test_ha_guard.py`(37) · `test_program_output_split.py`
+  · `test_posting_marketing.py` 의 브리프 배선 3건 · 예산 반쪽 422. 계약을 고정하는 핵심 테스트:
+  `test_measuring_revisit_rate_is_not_a_claim`(측정 문장 면제) · `test_unproven_experience_claim_is_violation`
+  · `test_rule_stub_carries_validation_signals`(스텁도 판정선) · `test_signal_requires_a_decision_rule`
+- 진행률 게이트 `scripts/pppp_status.py` 「검증 브리프·지표 계약」·「입력 계약 3층 (자리·상권·검증 브리프)」가
+  위 배선을 코드에서 센다(삭제된 program_venture·program_onboarding 을 세던 게이트를 갈았다)
+- 프론트 `vitest` 96 passed(12파일) · `npm run build` 통과
+- ⚠ **LLM 실호출로 새 프롬프트를 돌려 본 검증은 아직 없다.** `PLACEOS_LIVE_LLM=1 pytest
+  tests/test_llm_live.py` 가 그 자리다(지표 네 칸이 실제로 채워지는지, 측정 문장 면제가 실제
+  생성물에서 오탐 없이 도는지)
 
 ## 0. 타당성 검증 (2026-07-18) — 데이터 채널별 가능 여부
 
 | 데이터 | 채널 | 판단 | 비고 |
 |---|---|---|---|
 | 상가 기본정보(이름·카테고리·좌표·주소) — **저장** | 소상공인 상가(상권)정보 (§1-A) | **가능(공공데이터)** | `DATA_GO_KR_SERVICE_KEY`. 2026-09-15 저장층을 여기로 옮겼다 |
-| 상가 기본정보 — **실시간 조회만** | 네이버 지역검색 API + 카카오 로컬 API | **가능(공식)** | `NAVER_CLIENT_ID/SECRET`, `KAKAO_REST_API_KEY` (§8-E). ⚠ 카카오는 **응답 저장 금지** — 화면에 돌려주고 버린다 |
-| 리뷰성 텍스트 | 네이버 **블로그 검색 API** | **가능(공식)** | `data/collectors/naver_blog.py` 이미 구현 |
+| ~~상가 기본정보 — 실시간 조회만~~ | 네이버 지역검색 API + 카카오 로컬 API | **삭제(2026-09-17)** | Program 의 가게 반자동 조회에만 쓰였다. 대상 재정의로 조회 자체가 없어졌다(§0-V) |
+| 리뷰성 텍스트 — **거점 단위 키워드** | 네이버 **블로그 검색 API** | **가능(공식)** | `data/collectors/naver_blog.py`. 상권 컨텍스트로만 쓴다(가게 단위 스니펫 주입은 2026-09-17 삭제) |
 | 검색 트렌드 | 네이버 데이터랩 | **가능(공식)** | 동일 수집기 |
-| **플레이스 리뷰·사진** | 공식 API **없음** | **조건부** | PoC 내부 검증 한정 크롤러(`data/crawlers/review_crawler.py`, 약관·저작권 리스크) → **상용은 점주 또는 권한을 받은 조직이 제공한 데이터와 명시 동의만 허용**(§0-K). 크롤링 원본(특히 사진)을 고객 화면에 직접 서빙 금지 |
-| 이미지 분석 | Claude(vision 내장) | **가능** | 별도 Vision API 불필요 (§8-D) |
+| ~~플레이스 리뷰·사진~~ | 공식 API 없음 | **쓰지 않음(2026-09-17)** | 영업 중인 가게가 대상에서 빠졌다. PoC 크롤러 골격도 삭제(§0-V) |
+| ~~이미지 분석~~ | Claude(vision 내장) | **쓰지 않음(2026-09-17)** | 찍을 가게가 없다 |
 | 상권 단위 컨텍스트 | Platform Gold (`gold/program_content_context`, 8-A 상권분석·감성) | **가능** | 기존 Gold 매핑 설계(§9)와 일치 |
 
-**결론: 가능.** 단, 플레이스 리뷰·사진은 위 조건을 지침으로 강제한다 (`.claude/commands/program.md`에도 명시).
+**결론(07-18): 가능.** 2026-09-17 대상 재정의로 가게 단위 채널(상호 조회·플레이스 리뷰·사진)은 쓰지 않는다 — 남은 입력은 상권 컨텍스트·자리·검증 브리프다(§0-V).
 
 ## 0-1. 컨텍스트 품질 결함 2건 — 해소 (2026-08-01)
 
@@ -82,35 +156,13 @@ cityhall 33.5%, garosugil 31.8% ← 창원 가로수길, nonhyeon 23.1% ← 인�
 회귀 방지: `data/tests/test_program_context.py`(8건) + `tests/test_posting_marketing.py`
 의 방향 판정 2건.
 
-## 0-2. 화면과 반자동 입력 (2026-08-03)
+## 0-2. ~~화면과 반자동 입력~~ (2026-08-03) — 삭제 (2026-09-17)
 
-`POST /marketing/generate` 는 2026-07-18 부터 있었지만 **이걸 부르는 화면이 없어** Program
-1단계가 API 로만 존재했다. 네비에 **Program 탭**(`pages/ProgramStudio.tsx`)을 붙였다.
-
-입력을 어디까지 자동화할 수 있는지는 §0 표가 이미 답을 정해 뒀다 — 플레이스 리뷰·사진·메뉴는
-공식 API 가 없다. 그래서 **공식 API 로 얻히는 것만** 자동으로 채운다.
-
-| 입력 | 자동 채우기 | 근거 |
-|---|---|---|
-| 상호·카테고리·주소·좌표 | ✅ 카카오 로컬 키워드 검색 | `GET /marketing/places` |
-| 리뷰성 텍스트 | ✅ 네이버 블로그 검색 스니펫 | `GET /marketing/reviews` |
-| 사진 | ❌ 붙여넣기 (점주 제공 원칙) | 공식 API 없음 |
-| 메뉴 | ❌ 붙여넣기 (`StoreProfile.menu`) | 공식 API 없음 |
-
-**동명이지 방어를 여기서도 건다** — §0-1 ① 과 같은 실패가 가게 단위에서도 그대로 난다.
-상호만으로 블로그를 치면 타 지역 동명 가게 글이 섞이므로 두 겹으로 막는다:
-
-1. 후보를 **사람이 고른다**(자동 선택 안 함) → 주소가 확정된다
-2. 그 주소의 동(洞)을 질의에 붙인다 → `연남동 맡기다`. 그러고도 **상호가 본문에 없는 글은 버린다**
-
-실측(2026-08-03, 연남동 맡기다): 카카오 후보 1건(60m) → 블로그 15건 주입, 질의 `연남동 맡기다`.
-
-> ⚠ 화면·응답 어디서도 이걸 "방문자 리뷰"라고 부르지 않는다. 블로그 스니펫이고 광고가 섞인다
-> — `source` 필드(`naver-blog` / `kakao-local` / `unavailable`)로 출처를 밝힌다.
-
-**키 위치**: 카카오·네이버 키는 예전부터 `data/.env` 에 산다. 복사해 두 벌로 두면 반드시
-어긋나므로 `core/config.py` 가 `data/.env` 와 `apps/backend/.env` 를 **둘 다** 읽는다
-(뒤가 우선). 배포판에는 `data/.env` 가 올라가지 않으므로 Vercel 환경변수로 따로 넣어야 한다.
+카카오 상호 검색(`/marketing/places`) → 네이버 블로그 스니펫(`/marketing/reviews`)으로 **영업 중인
+가게**의 기본정보·리뷰성 텍스트를 반자동으로 채우던 경로다. 대상이 아직 그 자리에서 장사한 적
+없는 창업자로 바뀌어 특정할 가게가 없어졌으므로 서비스·엔드포인트·화면·테스트를 모두 지웠다.
+여기서 배운 동명이지 방어(후보를 사람이 고른다 · 주소의 동으로 질의를 좁힌다)는 거점 단위
+블로그 수집(§0-1)에 그대로 남아 있다. → §0-V
 
 ## 0-3. Humanistic Authority 후처리 검증 (2026-08-06)
 
@@ -135,12 +187,14 @@ cityhall 33.5%, garosugil 31.8% ← 창원 가로수길, nonhyeon 23.1% ← 인�
 
 | 코드 | 등급 | 잡는 것 |
 |---|---|---|
-| `fabricated_price` | violation | 입력 메뉴·리뷰에 없는 금액. 할인액·쿠폰액도 포함 — 얼마를 깎을지는 점주 몫이다 |
+| `fabricated_price` | violation | 입력에 없는 금액. 할인액·쿠폰액도 포함 — 얼마를 깎을지는 창업자 몫이다. (2026-09-17 부터 정본은 브리프 예산 구간 · 종전엔 점주 메뉴·리뷰) |
 | `trend_contradiction` | violation | 서버가 확정한 트렌드 방향(하락·보합)을 뒤집는 유입 증가 주장 |
 | `unsupported_superlative` | warning | 입력에 근거 없는 최상급("최고의") |
 | `competitor_disparagement` | warning | 이웃 비교·출혈 경쟁 암시 — 공생 원칙 |
 | `channel_concentration` | warning | 온라인 제안이 전부 한 플랫폼 계열 — 균형 원칙 |
 | `missing_rationale` | warning | 근거가 비었거나 형식뿐인 제안 |
+| `unproven_experience_claim` | violation | (2026-09-17) 단골·기존 고객·쌓인 후기를 전제한 제안. 측정 문장은 면제 — §0-V |
+| `missing_validation_signal` · `unmeasurable_signal` · `missing_decision_rule` | warning | (2026-09-17) 검증 지표 없음 / 목표선에 셀 수 있는 값 없음 / 기각 조건 비어 있음 — §0-V |
 
 ### 오탐을 어디서 끊었나 (음성 대조로 고정)
 
@@ -325,6 +379,11 @@ nonhyeon→논현동·논현역, jangan→장안동·장안평, kyunghee→회�
 정밀도라 계산은 되지만, 인용할 때 이 점을 감안할 것.
 
 ## 0-J. 입력 계약 ③층 — 창업 계획(Venture) (2026-08-23 오후)
+
+> ⚠ **2026-09-17 대체됨 — §0-V.** `VenturePlan`·`services/program_venture`·`is_pre_open()` 은
+> `ProgramBrief`·`services/program_brief` 로 흡수됐다. 아래의 "개업 전일 때만 검사를 켠다"는
+> 이제 **항상 켠다**(가를 '영업 중'이 없다). 금액은 예산 구간에만 절대액이 있다는 원칙,
+> 강점(차별점)은 주장이라는 원칙은 그대로다.
 
 3층 입력의 마지막 층. ①자리·②상권은 우리 데이터에서 자동으로 나오지만 **③층은
 기업이 넣는다** — 아직 없는 가게의 강점과 의도는 어떤 데이터에도 없다. 그래서 이
@@ -521,118 +580,66 @@ int 에는 넣을 수 없다. `test_budget_share_cannot_hold_absolute_amount` �
 검증: `tests/test_program_output_split.py` 14건(계약 4 + 행사 분리 4 + 주체·예산 4 +
 스텁 2). 기존 스위트의 `LLMChannelPlan` 사용처 35곳은 `conftest._perf` / `_act` 로 옮겼다.
 
-## 0-K. 상용 입력 온보딩 — 조직 인증·명시 동의·원문 비저장 (2026-08-29)
+## 0-K. ~~상용 입력 온보딩 — 조직 인증·명시 동의·원문 비저장~~ (2026-08-29) — 삭제 (2026-09-17)
 
-공개 데모 `POST /api/v1/marketing/generate`는 그대로 둔다. 상용 입력은 별도 경로
-`POST /api/v1/marketing/onboarding/generate`로 분리해, 공개 네이버 블로그 스니펫이
-점주 제공 원문으로 둔갑하지 않게 했다. 이 경로는 신규 창업 기업이 자기 메뉴·사진·
-키워드·창업계획을 안전하게 넣는 신뢰 경계이며, 08-16 대상 재정의를 되돌리지 않는다.
-
-### 요청 계약
-
-- Bearer JWT 또는 `X-API-Key`로 **조직 인증**이 있어야 한다. 인증이 없거나 잘못되면 401이다.
-- 계약 버전은 `spaceos.program-onboarding/1`, 입력 출처는 `merchant-provided`, 처리 목적은
-  `program-marketing-generation`으로 고정한다.
-- 처리 동의, 입력 제공·처리 권한 확인, 외부 LLM 처리 동의, `request-only` 보존 확인을
-  각각 명시적으로 받아야 한다. bool 기본값으로 동의를 만들지 않으며 하나라도 빠지면 422다.
-- 리뷰·사진·메뉴·키워드·창업계획 중 하나는 실제로 있어야 한다. 빈 프로필도 422다.
-- 권리 확인은 **조직의 진술**이다. PlaceOS가 저작권·개인정보 권리의 사실성을 별도로
-  검증했다는 뜻으로 표시하지 않는다.
-
-### 저장·처리 경계
-
-감사 영수증을 DB에 먼저 확정한 뒤 생성 처리를 시작한다. 감사 저장이 실패하면 외부 모델에
-원문을 보내기 전에 요청이 실패한다. `AuditLog(action=program.onboarding.accepted)`에는
-조직/사용자(있는 경우), 계약 버전, 고정 목적, `merchant-provided`, `district_id`, 입력 종류별
-건수, 동의 확인값, `raw_input_retention=request-only`, `raw_input_persisted=false`만 저장한다.
-상호·주소·리뷰·사진 URL·메뉴·키워드 원문은 앱 DB에 저장하지 않고 응답에도 `profile`·
-`consent`를 되돌리지 않는다.
-
-`request-only`는 **PlaceOS 애플리케이션 DB의 원문 보존 범위**다. 외부 LLM 공급자의 보존
-정책까지 없다고 보장하는 표현이 아니므로, UI도 외부 모델 처리 동의를 별도로 받는다.
-ProgramStudio는 공개 스니펫을 `publicReviews`로 분리하고 상용 모드에서 자동 검색을 끈다.
-API key는 현재 메모리의 요청 헤더에만 쓰며 브라우저 저장소에는 보관하지 않는다.
-
-### 대상 파일과 통과 조건
-
-- 대상 파일
-  - `apps/backend/app/core/security.py`
-  - `apps/backend/app/schemas/marketing.py`
-  - `apps/backend/app/services/program_onboarding.py`
-  - `apps/backend/app/api/v1/marketing.py`
-  - `apps/backend/tests/test_program_commercial_onboarding.py`
-  - `apps/frontend/src/lib/api.ts`
-  - `apps/frontend/src/pages/ProgramStudio.tsx`
-  - `apps/frontend/src/pages/ProgramStudio.css`
-- 통과 테스트
-  - `test_commercial_onboarding_requires_org_auth`
-  - `test_commercial_onboarding_rejects_incomplete_consent`
-  - `test_commercial_onboarding_rejects_empty_merchant_content`
-  - `test_commercial_onboarding_returns_receipt_without_persisting_raw_input`
-  - `test_commercial_onboarding_is_scoped_to_authenticated_org`
-  - `test_commercial_onboarding_accepts_jwt_as_well_as_api_key`
-  - 프론트: `npm run build`(TypeScript 포함)
-- 금지 사항
-  - 공개 검색 스니펫을 `merchant-provided`로 전용하지 않는다.
-  - 원문을 감사로그·응답·브라우저 저장소에 남기지 않는다.
-  - 기술 온보딩 완료를 실제 B2B 파일럿 완료로 세지 않는다.
+점주 또는 권한을 받은 조직이 제공한 **리뷰·사진·메뉴 원문**을 조직 인증 + 4중 동의 + 원문
+비저장으로 받던 `POST /marketing/onboarding/generate` 경로다. 대상 재정의로 입력에서 그 원문이
+사라져 경계가 지킬 것이 없어졌다 — 검증 브리프는 창업자가 직접 쓴 계획이지 제3자 저작물이
+아니다. 서비스(`program_onboarding`)·스키마(`CommercialStoreProfile`·`ProgramCommercialConsent`·
+영수증)·화면(API 키·동의 체크박스)·테스트 6건을 지웠다. 조직 인증(`core/security`)과
+`AuditLog` 는 다른 경로가 쓰므로 남겼다. B2B 파일럿 실적은 여전히 `active_orgs` 로만 센다. → §0-V
 
 ## 1. 담당 코드 영역
 
 ```
-apps/backend/app/services/marketing.py    가게/상권 마케팅 솔루션 생성 서비스 (현존)
-apps/backend/app/services/ha_guard.py     HA 후처리 검증 — 생성물이 지시를 지켰는지 서버가 판정
-apps/backend/app/services/store_lookup.py 가게 반자동 조회 — 카카오 로컬 + 네이버 블로그
-apps/backend/app/services/program_onboarding.py  조직별 상용 입력 영수증·원문 비저장 경계
-apps/backend/app/schemas/marketing.py     StoreProfile(menu 포함) / StoreMarketing 스키마
-                                          + ProgramCommercialOnboardingRequest/Response
-apps/backend/app/api/v1/marketing.py      공개 POST /generate + 상용 POST /onboarding/generate
-                                          + GET /{id}(상권)·/places·/reviews
-                                          ⚠ 정적 경로는 /{district_id} 보다 먼저 등록할 것
-apps/backend/app/core/security.py         JWT/API key 공통 Principal + 상용 필수 인증
-apps/backend/app/models/auth.py           AuditLog(원문 아닌 동의·건수 메타데이터)
-apps/backend/app/core/config.py           llm_api_key + kakao/naver 키 (data/.env 병행 로드)
-apps/frontend/src/pages/ProgramStudio.tsx 공개 데모/상용 온보딩 분리 입력 + 영수증
-data/collectors/naver_blog.py             블로그 리뷰·트렌드 수집 (거점 단위, 공식 API)
-data/crawlers/review_crawler.py           플레이스 리뷰 크롤러 골격 (PoC 한정, 미구현)
+apps/backend/app/services/marketing.py       검증 program 생성(generate_program) + 상권 단위 콘텐츠
+apps/backend/app/services/program_brief.py   ③층 검증 브리프 — 컨텍스트 · 예산 구간 · 미검증 경험 금칙어/측정 면제
+apps/backend/app/services/program_site.py    ①층 자리 — gold/{거점}/vacant_units.json
+apps/backend/app/services/ha_guard.py        HA 후처리 검증 — check_program · check_district
+apps/backend/app/services/events.py          상권 행사(서울열린데이터광장 문화행사)
+apps/backend/app/schemas/marketing.py        ProgramBrief / ProgramPlan / ValidationSignal / ChannelPlan
+apps/backend/app/api/v1/marketing.py         POST /generate · GET /sites · GET /events · GET /{district_id}
+                                             ⚠ 정적 경로는 /{district_id} 보다 먼저 등록할 것
+apps/frontend/src/pages/ProgramStudio.tsx    검증 브리프 입력 · 판정표 · 채널 초안 · 오프라인 연계 후보
+apps/frontend/src/lib/api.ts                 generateProgram · ProgramBriefInput · ProgramPlan
+data/collectors/naver_blog.py                거점 단위 블로그 키워드·트렌드 수집 (공식 API)
 ```
 
 ## 2. 환경 설정
 
 ```bash
 cd apps/backend && source .venv/bin/activate
-pip install anthropic langchain-anthropic   # requirements.txt 에도 추가
+pip install anthropic                         # requirements.txt 에 포함
 echo "LLM_API_KEY=sk-ant-..." >> .env        # .gitignore 로 보호됨
 ```
 
 ## 3. 작업 순서
 
-1. ~~**가게 프로필 입력 계약**~~ — ✅ 공개 `StoreProfile` + 상용 `CommercialStoreProfile`로 분리 완료.
-2. ~~**가게 단위 생성**~~ — ✅ LLM/규칙 기반 폴백, 출력 분리, HA 후처리 배선 완료.
-3. ~~**상권 단위 생성**~~ — ✅ Platform Gold 컨텍스트와 수요신호·행사 배선 완료.
-4. ~~**Humanistic Authority 가드레일**~~ — ✅ 2026-08-06 완료. 프롬프트 + 후처리 검증
-   (`services/ha_guard.py`, 2단 등급). → §0-3
-5. **폐업 사유 요약(연계)** — 건물 히스토리(Page)의 closure_reason LLM 요약은 기존 계획 유지.
-6. ~~**상용 입력 온보딩**~~ — ✅ 2026-08-29 완료. 조직 인증·명시 동의·원문 비저장 (§0-K).
+1. ~~검증 브리프 입력 계약~~ — ✅ 2026-09-17 `ProgramBrief` (§0-V).
+2. ~~검증 program 생성~~ — ✅ LLM/규칙 기반 폴백, 출력 분리(online·offline·signals), HA 후처리 배선.
+3. ~~상권 단위 생성~~ — ✅ Platform Gold 컨텍스트와 수요신호·행사 배선 완료.
+4. ~~Humanistic Authority 가드레일~~ — ✅ 2026-08-06 완료, 2026-09-17 미검증 경험·지표 검사 추가.
+5. **새 프롬프트 LLM 실호출 검증** — `PLACEOS_LIVE_LLM=1 pytest tests/test_llm_live.py`. 지표 네 칸이
+   실제로 채워지는지, 측정 문장 면제가 실제 생성물에서 오탐 없이 도는지 본다.
+6. **검증 결과를 되받는 경로(후속)** — 지금은 판정선을 **정해 주는** 데서 끝난다. 팝업이 끝난 뒤
+   실측값을 넣어 기각/채택을 판정하는 표면은 없다.
 
-기술 트랙 다음 검증은 **실제 B2B 파일럿**이다. 온보딩 API가 201을 반환하는 것과 고객이
-반복 사용해 가치를 확인하는 것은 다른 지표이며, 후자는 `active_orgs`로만 센다.
+기술 트랙 다음 검증은 **실제 B2B 파일럿**이다. API 가 200 을 반환하는 것과 고객이 반복 사용해
+가치를 확인하는 것은 다른 지표이며, 후자는 `active_orgs` 로만 센다.
 
 ## 4. Claude Code 작업 예시
 
 ```
 /clear
-/program 가로수길 카페 1곳의 StoreProfile(블로그 리뷰 20건 + 이미지 3장)로
-  generate_store_marketing 을 LLM(Claude vision) 실호출로 전환.
-  Humanistic Authority 후처리 검증 포함. 실패 시 규칙 기반 스텁 폴백 유지.
+/program 가로수길 공실 1곳(unit_id)에 '산미 중심 원두 팝업'(popup · pre_founder · 10일 ·
+  예산 30~80만원) 브리프로 generate_program 을 LLM 실호출로 돌려 signals 네 칸과
+  HA 판정(unproven_experience_claim 오탐 여부)을 확인. 실패 시 규칙 기반 스텁 폴백 유지.
 ```
 
 ## 5. 검증
 
-- `cd apps/backend && pytest` — LLM은 mock, `POST /marketing/generate` 응답 스키마 검증
-- 생성 콘텐츠 샘플을 균형·공생·공감 기준으로 정성 평가
-- 크롤링 산출물이 고객 노출 경로에 직접 서빙되지 않는지 확인 (PoC 내부 검증 한정)
+- `cd apps/backend && pytest` — LLM은 mock, `POST /marketing/generate` 응답 스키마(`ProgramPlan`) 검증
+- 생성 콘텐츠 샘플을 균형·공생·공감 기준으로 정성 평가 — 특히 **있지도 않은 경험**을 전제하지 않는지
+- 검증 지표마다 목표선에 숫자가, 기각 조건이 **시작 전 판정선**으로 적혀 있는지
+- `cd apps/frontend && npm run build` — 검증 브리프 UI TypeScript·프로덕션 번들
 - API 키는 `.env`(`.gitignore` 보호)에만 — `.claude/settings.json`이 `.env` 읽기를 차단함
-- `pytest tests/test_program_commercial_onboarding.py -q` — §0-K의 정확한 6개 계약 테스트
-- `cd apps/frontend && npm run build` — 상용/공개 입력 분리 UI TypeScript·프로덕션 번들
-- 감사로그에는 원문이 없고 조직·계약·동의·항목별 건수만 있는지 확인한다.
