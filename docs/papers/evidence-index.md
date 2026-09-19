@@ -3,6 +3,8 @@
 **이 파일에 없는 숫자는 논문에 쓰지 않는다.** 새 수치가 필요하면 먼저 여기에
 출처·재현 경로와 함께 등재한 뒤 본문에 쓴다. → [README.md](README.md) 작성 규칙
 
+**2026-09-20 가설 명시:** 네 원고의 RQ·H 식별자는 사후 분석 구조이며 새로운 실험 수치를 뜻하지 않는다. Platform H1/H2는 P1 및 PLATFORM-E01–E06, Page H1–H4는 PAGE-D03–D09, Posting H1–H4는 POSTING-E01–E05, Program H1–H3은 PROGRAM-E02–E05에 연결했다. 미검증 가설은 성과 자료가 없는 상태를 그대로 유지한다.
+
 ⚠ **모집단이 다른 값을 섞지 말 것.** 아래 표는 세 종류의 실험 조건을 담고 있고
 서로 비교 가능하지 않다. 각 수치의 조건을 반드시 확인한다.
 
@@ -20,6 +22,19 @@ Page의 **조건 D(2026-09-06 동결 구조 감사)**는 아래 별도 절에 �
 ---
 
 ## P1 · Platform — GNN 업종추천
+
+### 집필 시 해석 정정 및 재현 범위 2026-09-19
+
+아래 원래 기록의 수치는 보존하되 해석은 이 절을 우선한다. 기각 결과를 개선으로 바꾸는 정정이 아니라 과도한 통계적 단정을 제한하는 정정이다.
+
+- PLATFORM-E01: `train_gnn.py::_split`, `_district_top3`, `_offprior_top3` 대조. 클래스별 60/20/20 노드 분할, train 라벨만으로 거점 Top-3 정의. 같은 그래프의 전이적 평가이며 새 거점·미래 시점 외부 검증이 아니다. off-prior는 사전분포 실패 부분집합이며 그래프 구조의 순수 인과 기여를 분리하지 않는다.
+- PLATFORM-E02: `train_gnn.py`의 lift 계산은 Top-1 기준선 대비 상대 증가율이다. +5.3%를 Top-3 차이로 해석하지 않는다. `ml/models/gnn/industry_gnn.py`는 GCNConv 기반이다.
+- PLATFORM-E03: 조건 B 표는 기준 포함 네 행으로, 서로 다른 시드·모집단의 독립 반복 네 번이 아니다. 단일 팔 SE 1.63%p와 차이 비교만으로 쌍대 유의성을 판정하지 않는다. 조건 C의 4.32배는 off-prior 표본 수 증가이며 검정력 자체의 배수가 아니다. p=1.0은 효과 영 또는 동등성의 증명이 아니다.
+- PLATFORM-E04: §0-O의 MDE는 유의수준 0.05에서 `1.96√D/n`으로 계산한 근사 검출 경계다. 목표 검정력·대립가설 오차를 포함한 정식 표본설계가 아니다. 다른 라벨 과제의 경계를 비교해 같은 효과를 검출한다고 주장하지 않는다. 노드 간 공간 의존성도 반영하지 않았다.
+- PLATFORM-E05: 2026-09-15 노드 소스 교체와 과거 Bronze 삭제로 현행 학습 명령은 옛 그래프의 재현을 보장하지 않는다. 출처 `ml/training/train_gnn.py` 머리말, `docs/finding-map-provider-google-2026-09-15.md`. 본 원고 조건 A/B/C는 역사적 보존 결과이며 현재 신규 학습의 성능이 아니다.
+- PLATFORM-E06: `reports/gnn_category2_mcnemar_2026-08-27.json`은 노드별 덤프가 gitignore 대상이고 요약만 새 클론에서 검증 가능하다고 명시한다. 합계 741+2747+148+149=3785, 불일치 148+149=297, 두 팔 차이 +0.03pp, 연속성 보정 chi2=0.0·p=1.0을 요약에서 검산한다. 학습 재실행과 구별한다.
+- PLATFORM-E07: Kipf, T. N. & Welling, M. (2017), *Semi-Supervised Classification with Graph Convolutional Networks*, ICLR, arXiv:1609.02907. [저자 PDF](https://arxiv.org/pdf/1609.02907)의 초록·서론·전파식 확인.
+- PLATFORM-E08: Shchur, O., Mumme, M., Bojchevski, A. & Günnemann, S. (2018), *Pitfalls of Graph Neural Network Evaluation*, Relational Representation Learning Workshop, NeurIPS, arXiv:1811.05868. [저자 연구실 서지](https://www.cs.cit.tum.de/daml/gnn-benchmark/)와 [PDF](https://arxiv.org/pdf/1811.05868)의 초록·서론 확인. 원문 성능 숫자 전재 없음.
 
 ### 서빙본 성능 (조건 A)
 
@@ -254,8 +269,9 @@ a_only 148 · b_only 149 · discordant 297 · 델타 **+0.03pp** · chi2 = 0.0 �
 | 검색 트렌드 라벨 | 66/66거점 | `pppp_status.py` |
 | 데이터 채널 타당성 | 채널별 가능/불가 전수 판정 (크롤링 금지선 포함) | §0 (2026-07-18) |
 
-> **트렌드 라벨의 의미**: 라벨이 없으면 `ha_guard` 의 트렌드 역행 검사가 **조용히 통과한다.**
-> 가드레일이 "켜져 있는데 아무것도 막지 않는" 상태 — 논문에서 다룰 가치가 있는 실패 양식이다.
+> **트렌드 라벨의 의미와 수정 이력**: 종전에는 라벨이 없으면 트렌드 검사가 조용히 통과했다.
+> 현재 `_check_trend`는 컨텍스트·라벨 부재에 `trend_unverified` 경고를 반환한다.
+> 아래 P3·P4 집필 보완 근거의 PROGRAM-E02를 따른다. 과거 실패를 현행 동작으로 서술하지 않는다.
 
 ---
 
@@ -316,3 +332,41 @@ a_only 148 · b_only 149 · discordant 297 · 델타 **+0.03pp** · chi2 = 0.0 �
 마스터 키·계산식 등의 통과를 현실 정답으로 승격하지 않는다. 같은 지번에 대한 넓은 검사에서 표시된 613행·428그룹은 [후속 분류](audits/page-analysis-20260906/same-lot-flag-qualification.json)에 따라 **확정 오류로 등재하지 않는다**. 기존 코드의 집계 제외 규칙과 출처 표기를 유지한다. 기존 릴리스 변경을 신규 개업·폐업·수집 오류로 해석하지 않는다.
 
 문헌 근거: Alsudais, *Incorrect Data in the Widely Used Inside Airbnb Dataset*, 저자 공개본 `arXiv:2007.03019v2`, 관련 출판 DOI `10.1016/j.dss.2020.113453`, 출판연도 2021. [원문 등록·읽기 범위](page-study/source-register.json). 원문 내 수치 불일치는 읽기 장부에 남겼으며 원고에 해당 수치·검정 결과를 옮기지 않는다. 우리의 표집·해시·행 순서 검사가 원문에 그대로 있었던 것으로 서술하지 않는다.
+
+## Page 문헌 보완의 서지 식별값
+
+2026-09-19 확인. 아래는 문헌 식별용 연도·권호·쪽·DOI이며 조건 D의 실증 수치가 아니다. 실제 확인 위치와 적용 제한은 [문헌 검토 기록](page-study/literature-review-20260919.md)에 있다.
+
+| 문헌 | 확인한 서지 | 일차 출처 |
+|---|---|---|
+| Alsudais | 2021 · Decision Support Systems 141 · 113453 · arXiv:2007.03019v2 · DOI 10.1016/j.dss.2020.113453 | https://www.sciencedirect.com/science/article/pii/S0167923620302086 |
+| Marsden, J. R. & Pingry, D. E. | 2018 · Decision Support Systems 115 · A1–A7 · DOI 10.1016/j.dss.2018.10.007 | https://www.sciencedirect.com/science/article/pii/S0167923618301647 |
+| National Academies of Sciences, Engineering, and Medicine | 2019 · Reproducibility and Replicability in Science · 제3장 정의 절 · DOI 10.17226/25303 | https://www.nationalacademies.org/read/25303/chapter/6 |
+| Sandve, G. K., Nekrutenko, A., Taylor, J. & Hovig, E. | 2013 · PLOS Computational Biology 9(10) · e1003285 · DOI 10.1371/journal.pcbi.1003285 | https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003285 |
+| Timmerman, Y. & Bronselaer, A. | 2019 · Decision Support Systems 126 · 113138 · DOI 10.1016/j.dss.2019.113138 | https://biblio.ugent.be/publication/8634924 |
+
+<a id="posting-program-update"></a>
+
+## P3·P4 집필 보완 근거
+
+확인일 2026-09-19. 과거 프로브의 모집단과 이번 코드 계약 검사를 분리한다. 원천·Gold·제품 코드는 변경하지 않았다. 세부 검수와 문헌 확인 범위는 [집필 기록](posting-program-writing-20260919.md)에 있다.
+
+| ID | 근거·판정 | 출처와 확인 범위 |
+|---|---|---|
+| POSTING-E01 | 역사적 공식 소스 조사: 54거점·528 후보행. 건축HUB·서울교통공사·LH·온비드의 면적·임대가능 상태·모집단·키 적격성 대조. 모든 공개 데이터의 불가능성 증명 아님 | `docs/finding-posting-unit-area-sources-2026-08-29.md`; `data/validation/posting_unit_area_sources.py` |
+| POSTING-E02 | 층번호 프로브: 66거점·664유닛, 단일층 30개(4.5%), 해당 용량 분포 `{1: 30}`, 면적 차이 n=30·min=0·max=0·median=0.0평 | `reports/posting_unit_area_flrno_probe_2026-09-06.json`의 `served_hubs/units_total/single_floor_units/single_floor_pct/single_floor_capacity_dist/delta_pyeong_on_single` 직접 대조. 이번에 프로브 재실행 아님 |
+| POSTING-E03 | 층번호 후속은 층별 유닛 분할에 종속되므로 독립 성공·실패 실험으로 중복 계수하지 않음 | `docs/finding-posting-unit-area-flrno-2026-09-06.md`의 「왜 §0-Q 와 같은 것인가」 |
+| POSTING-E04 | 매출 앵커의 기준 모집단 오류는 수정됐지만 설명 가설은 기각. 후속 R-ONE 대조에서 ‘전부 프라임’ 전제도 반증 | `docs/feature-posting.md` §0-N 「매출 앵커」, §0-O 「진짜 소득」. 과거 운영 판정을 사실상 공실·ROI 정답으로 승격하지 않음 |
+| POSTING-E05 | 현재 통계 기반 매출·비용 계산과 수기 계수 폴백은 `basis`로 구분. 초기 투자 계수와 유닛 면적 가정은 실제 계약·성과 정답이 아님 | `apps/backend/app/services/districts.py::tier_scenarios`, `posting_revenue.py`, `vacant_inventory.py` 읽기 대조 |
+| POSTING-E06 | 공식 소스 적격성 계약 검사 3 passed | 저장소 루트 `python -m pytest data/tests/test_posting_unit_area_sources.py -q`. 외부 API 호출·실측 정확도 평가 아님 |
+| PROGRAM-E01 | 현행 대상은 검증하려는 창업자. 입력 ProgramBrief, 출력 online/offline/signals. 점주 원문 온보딩은 삭제 | `docs/feature-program.md` §0-V; `program_brief.py`, `marketing.py` |
+| PROGRAM-E02 | 트렌드 컨텍스트·라벨 부재는 `trend_unverified` warning. 상승 라벨 혼재 시 모순 검사 차단을 하지 않는 한계 유지 | `ha_guard.py::_check_trend`; `test_no_context_means_no_trend_check`, `test_context_without_trend_labels_is_also_unverified`, `test_mixed_trend_does_not_block` |
+| PROGRAM-E03 | 미검증 경험 주장 차단과 앞으로 측정할 지표를 구별. 생성 조각은 줄바꿈으로 연결 | `ha_guard.py::check_program`, `_check_unproven_evidence`; `docs/feature-program.md` §0-V의 문장 경계 결함 |
+| PROGRAM-E04 | violation이면 생성물을 버리고 규칙 스텁으로 폴백, warning이면 생성물을 유지하고 findings 표시. 빈 findings는 전 항목 검증 완료 아님 | `marketing.py::generate_program`; `test_violation_falls_back_to_stub`, `test_warning_keeps_llm_output`, `test_stub_without_llm_has_empty_findings` |
+| PROGRAM-E05 | HA 가드·출력 계약 검사 합계 54 passed | `apps/backend`에서 `python -m pytest tests/test_ha_guard.py tests/test_program_output_split.py -q`. 고정 예시·목킹 검사이며 LLM 실호출·사실성 위반율·광고 효과 평가 아님 |
+| PROGRAM-E06 | 지표명·측정 방법·목표선·기각 조건의 구조와 내용 경고를 구별 | `test_signal_requires_a_decision_rule`, `test_missing_signals_is_warning`, `test_signal_without_number_is_warning`, `test_signal_without_decision_rule_is_warning` |
+
+### P4 문헌 서지 식별값
+
+- Min 등, 2023, *FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation*. EMNLP, 12076–12100. DOI `10.18653/v1/2023.emnlp-main.741`. ACL 서지·PDF 초록·서론과 평가 정의를 확인. 원문 성능 수치를 본 원고로 옮기지 않는다.
+- Gao, Yen, Yu, Chen, 2023, *Enabling Large Language Models to Generate Text with Citations*. EMNLP, 6465–6488. DOI `10.18653/v1/2023.emnlp-main.398`. ACL 서지·PDF 초록·평가 차원 설명을 확인. 전체 부록 정독·벤치마크 실행 완료를 뜻하지 않는다.
