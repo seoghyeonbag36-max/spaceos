@@ -17,6 +17,11 @@ for track in ('Platform','Page','Posting','Program'):
     src=(BASE/f'paper-{track.lower()}.md').read_text(encoding='utf-8-sig')
     assert '<!-- FILL' not in src and '<!-- TODO' not in src,track
     assert all(x in src for x in ('초록','서론','결론','참고문헌')),track
+    assert '연구질문 RQ와 가설' in src and '가설 검증 결과' in src,track
+    expected=3 if track in ('Platform','Program') else 4
+    for number in range(1,expected+1):
+        assert f'**RQ{number}.' in src and f'**H{number}:' in src,(track,number)
+        assert f'| H{number} ' in src,(track,number,'판정 누락')
     for target in re.findall(r'\]\(([^)]+)\)',src):
         if not target.startswith('http'):
             assert (BASE/target.split('#')[0]).exists(),(track,target)
@@ -29,6 +34,9 @@ for track in ('Platform','Page','Posting','Program'):
         root=etree.fromstring(z.read('word/document.xml'))
         text=''.join(root.xpath('//w:t/text()',namespaces=NS))
         assert all(x in text for x in ('초록','서론','결론','참고문헌')),track
+        assert '연구질문 RQ와 가설' in text and '가설 검증 결과' in text,track
+        for number in range(1,expected+1):
+            assert f'RQ{number}.' in text and f'H{number}:' in text,(track,number,'Word 누락')
         assert '\ufffd' not in text
         assert len([n for n in z.namelist() if n.endswith('.odttf')])==2
         assert not root.xpath('//w:trHeight[@w:hRule="exact"]',namespaces=NS)
