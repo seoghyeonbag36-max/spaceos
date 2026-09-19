@@ -1,0 +1,4 @@
+# 생성물: 원고 Word 파일은 파일당 약 15MB(한글 글꼴 임베딩 포함)라 저장소에 두지 않는다.
+# paper-*.md 에서 `python docs/papers/build_papers_docx.py` 로 언제든 다시 만든다.
+# 제출 목록(제출목록.md)은 무엇을 냈는지 남겨야 하므로 추적한다.
+output/*.docx
