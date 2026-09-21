@@ -115,6 +115,7 @@ docs/papers/paper-platform.md 의 §3.2(성능 천장 4회 확인)만 채운다.
 아래는 클라우드에서 **시작조차 못 한다.** 데스크톱이 켜져 있고 절전이 억제된 상태여야 한다.
 
 - **건축HUB 대장 수집** → `/quota` 스킬 (프리플라이트 → 재개 → 소진 시 층별개요)
+  - 폰에서 붙여넣을 하루치 프롬프트: [docs/prompts-mobile-hub-quota-2026-09-21.md](docs/prompts-mobile-hub-quota-2026-09-21.md) — 잘린 대장 판정 · 150동 보고 · 층별개요 분리까지 09-20 실측을 반영했다
 - **GNN/LSTM 재학습** → `OMP_NUM_THREADS=1 PYTHONIOENCODING=utf-8` 필수
 - **새 거점 온보딩** → `/hub-chain` (후보 판정 → 등록 → 수집 → Gold → 앵커 → 서빙 → 검증)
 - **`/verify` 전체** — 로컬 앱을 띄워 지도 픽셀까지 보는 단계는 GUI 가 필요하다
