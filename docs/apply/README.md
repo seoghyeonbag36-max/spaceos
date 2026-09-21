@@ -6,6 +6,8 @@
 갈린다.
 
 작성 규칙은 [AGENTS.md](AGENTS.md). 근거 대장은 [claims.json](claims.json).
+**어느 서류에 무엇을 쓸지**는 [submission-plan-2026-09-21.md](submission-plan-2026-09-21.md) —
+출품 캘린더의 각 자리를 절 구성·근거 ID·금지 항목으로 펼쳐 둔 계획표다.
 
 ## 검사
 
