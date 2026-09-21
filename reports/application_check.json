@@ -1,5 +1,5 @@
 {
-  "started": "2026-09-16T06:28:36",
+  "started": "2026-09-21T00:27:01",
   "claims": "docs/apply/claims.json",
   "require_complete": false,
   "docs": [
@@ -17,6 +17,12 @@
     },
     {
       "doc": "docs/apply/data-sources.md",
+      "fill_remaining": 0,
+      "violations": [],
+      "ok": true
+    },
+    {
+      "doc": "docs/apply/submission-plan-2026-09-21.md",
       "fill_remaining": 0,
       "violations": [],
       "ok": true
