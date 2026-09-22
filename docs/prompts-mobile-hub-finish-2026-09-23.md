@@ -10,23 +10,25 @@
 
 ## 09-22 밤 기준 상태 — 이 프롬프트의 출발점
 
-| 단계 | 상태 (09-22 22:18) |
+| 단계 | 상태 (09-22 22:45) |
 |---|---|
 | 전유부(대장) | **15/15 완주** · 11,311동 · 429 강등 0 — 내일 이 15거점에 쓸 전유부 콜은 없다 |
-| 층별개요 | 22:09 시작 · 미시도 6,878동 · poi 회수율 96.5% 확인까지 |
-| 파이프라인·앵커 | 층별개요 뒤 자동 · 예상 완료 **09-22 23:20~09-23 00:25** |
-| 체인 | PID 29724 (WMI 로 띄움) · 로그 `data/logs/finish-chain-2026-09-22.log` — 끝나면 `FINAL:` · `END` 줄 |
-| 후속 게시 | 체인이 끝나면 별도 스크립트가 `anchor` 거점의 **행정동 구역**을 만들고, 그 Gold 를 **PR #39 브랜치**(`feat/seoul-hubs-batch3-4-20260921`)에 커밋·push 한다(작업트리가 아니라 별도 worktree 에서). 로그 `data/logs/publish-gold-2026-09-22.log` |
+| 층별개요 | 22:09 시작 → **22:35 노트북 강제 종료로 중단**(poi·bangbang·ydp-gucheong 완료, daerim 350/528) → 22:43 재개 |
+| 파이프라인·앵커 | 층별개요 뒤 자동 · 예상 완료 AC 면 **09-23 00:30~01:30**(배터리면 더 늦다) |
+| 무인 스크립트 | PID 23424 (22:43 재기동) · 로그 `data/logs/publish-gold-2026-09-22.log` — 층별개요 → 파이프라인 → **행정동 구역** → Gold 를 **PR #39 브랜치**(`feat/seoul-hubs-batch3-4-20260921`)에 커밋·push(별도 worktree 에서). 마지막 줄 `PUSH ok`/`PUSH fail` 다음 `END` |
+| (폐기) | 첫 체인 PID 29724 · `finish-chain-2026-09-22.log` — 22:35 강제 종료로 죽었다. 이 로그는 끝이 없다 |
 | git | 이 작업트리(현재 브랜치)에는 커밋 안 함. 등록(`page_hubs.py` 의 `SEOUL_BATCH3_HUBS`·`SEOUL_BATCH4_HUBS`)은 여기서는 **미커밋**, PR #39 브랜치에는 같은 내용이 커밋돼 있다 |
 
 노트북이 꺼져 있는 날은 [클라우드 프롬프트](prompts-cloud-hub-verify-2026-09-23.md)를 쓴다 — PR #39 브랜치의 Gold 로 판정만 한다.
 
 ## 09-21 프롬프트와 다른 곳
 
-1. **긴 작업은 WMI 로 띄운다.** 09-22 21:57 세션 재시작 때 `Start-Process` 로 띄운 수집기와
-   keep_awake 가 **동시에** 죽었다(maebong 수집 중). 세션의 작업 그룹을 물려받아 함께 정리된 것으로
-   본다. `Invoke-CimMethod Win32_Process Create` 는 부모가 WmiPrvSE 라 그 밖이다. 아래 두 명령 형태는
+1. **작업이 사라지면 재부팅부터 본다.** 09-22 밤 무인 작업이 두 번 죽었는데 원인은 세션이 아니라
+   **노트북 재부팅**이었다 — 21:57 시작 메뉴 '다시 시작'(이벤트 1074), 22:35 **전원 버튼 길게 누름**
+   강제 종료(이벤트 41 `LongPowerButtonPressDetected`). 어떤 띄우는 방식도 재부팅은 못 버티므로 모든 단계를
+   **산출물로 재개**한다(2단계 `--check`). 긴 작업은 세션 밖(WMI)으로 띄운다 — 아래 두 명령 형태는
    09-22 22:2x 에 WMI 로 실제 띄워 python·cwd·`PYTHONIOENCODING`·리다이렉트를 확인했다.
+       (Get-CimInstance Win32_OperatingSystem).LastBootUpTime
 2. until-done 의 **"진행 0동" 중단은 강등분 재수집에서 정상이다** — 행을 교체할 뿐 동수가 늘지 않는다.
    완주는 로그가 아니라 산출물(행 수 == 후보 수 · `rate_limited` 0)로 판정한다.
 3. **이미 `anchor` 인 거점에는 층별개요를 다시 돌리지 않는다.** 층별개요는 `building_vacancy.json` 을
@@ -63,13 +65,14 @@
 - 배터리 구동이면 나에게 "AC 연결해 주세요" 한 줄을 보내고 그대로 진행한다.
 
 ## 1. 어젯밤 체인이 아직 도는가
-    tail -n 6 data/logs/finish-chain-2026-09-22.log
     tail -n 8 data/logs/publish-gold-2026-09-22.log
-    powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'finish_chain|publish_gold|building_vacancy|floor_capacity|run_hub_chain_batch|run_bldgvac|build_district_zones' } | Select-Object ProcessId,CommandLine | Format-List"
-- publish-gold 로그의 마지막 줄이 "PUSH ok" 면 어젯밤 Gold 가 PR #39 에 올라갔다. "PUSH fail" 이면 보고에 그 줄을 옮긴다
+    powershell -NoProfile -Command "(Get-CimInstance Win32_OperatingSystem).LastBootUpTime"
+    powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'finish_publish|finish_chain|building_vacancy|floor_capacity|run_hub_chain_batch|run_bldgvac|build_district_zones' } | Select-Object ProcessId,CommandLine | Format-List"
+- 부팅 시각이 09-22 22:43 보다 뒤인데 END 줄이 없으면 또 재부팅으로 죽은 것이다 → 2단계부터 산출물로 이어간다.
+- publish-gold 로그에 "PUSH ok" 줄이 있으면 어젯밤 Gold 가 PR #39 에 올라갔다. "PUSH fail" 이면 보고에 그 줄을 옮긴다
   (push 를 다시 시도하지 말 것 — 내가 정한다).
 - 프로세스가 하나라도 살아 있으면 **아무것도 새로 띄우지 않는다.** Monitor 를 하나 걸고 END 줄을 기다린다:
-    tail -n 0 -f data/logs/finish-chain-2026-09-22.log data/logs/floor-capacity.log data/logs/hub-chain-batch.log | grep -E --line-buffered "STEP|FINAL|END|회수율|✓|✗|배치 완료|배터리|Traceback"
+    tail -n 0 -f data/logs/publish-gold-2026-09-22.log data/logs/floor-capacity.log data/logs/hub-chain-batch.log | grep -E --line-buffered "^\[20|회수율|✓|✗|배치 완료|배터리|Traceback"
 - 로그에 END 줄이 있거나 프로세스가 없으면 2단계로 간다.
 
 ## 2. 산출물로 판정한다
@@ -79,8 +82,8 @@
   stores 라면 무언가 지워졌거나 점포가 다시 받혔다는 뜻이다. 추측해서 고치지 말 것.
 - ledger 또는 master 가 있으면 3단계로.
 
-## 3. 남은 것만 이어서 — 반드시 WMI 로 띄운다
-세션 안 백그라운드와 Start-Process 는 세션 재시작 때 같이 죽는다(09-22 실측).
+## 3. 남은 것만 이어서 — 세션 밖(WMI)으로 띄운다
+세션 안 백그라운드는 세션과 같이 죽는다. 재부팅은 어떤 방식도 못 버티니, 죽으면 2단계부터 다시 판정한다.
 
 ### 3-a. 층별개요 — 2단계에서 ledger/master 였던 거점만
     python scripts/quota_preflight.py
@@ -152,7 +155,7 @@
    push 하면 Gold 가 선 거점이 그대로 프로덕션(placeos.web.app)에 뜬다.
 3. 거점 등록 · SERVED_CITIES · seoul_pages.DISTRICTS 수정.
 4. 층별개요와 다른 수집기 동시 실행. 429 는 키 단위라 서로를 죽인다.
-5. Start-Process 나 세션 안 백그라운드로 긴 작업 띄우기. scripts/run_batch3_chain.sh · run_batch4_after.sh 사용.
+5. 세션 안 백그라운드로 긴 작업 띄우기. scripts/run_batch3_chain.sh · run_batch4_after.sh 사용.
 6. 모르는 게 나오면 추측해서 채우지 말고 멈추고 물어본다.
 ```
 

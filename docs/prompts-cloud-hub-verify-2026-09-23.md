@@ -18,7 +18,8 @@
 
 ## 전제 — 09-22 밤 노트북이 해 두는 일
 
-노트북의 무인 체인(`data/logs/finish-chain-2026-09-22.log`)이 끝나면 후속 스크립트가 이어서:
+노트북의 무인 스크립트(22:43 재기동 · 로그 `data/logs/publish-gold-2026-09-22.log`)가 남은 층별개요와
+파이프라인을 끝낸 뒤 이어서:
 1. 15거점 중 `anchor` 까지 온 거점의 **행정동 구역**(`build_district_zones`)을 만들고
 2. 그 거점들의 Gold(`page_building_master` · `coverage` · `calibration` · `vacant_units` · `district_zones`)를
    **`feat/seoul-hubs-batch3-4-20260921`**(draft PR #39)에 커밋해 push 한다. `main` 에는 안 간다.
@@ -133,8 +134,10 @@ PR #39 커밋 목록에 `data(gold): 서울 3·4차 …` 가 보이면 꺼도 �
 
 ## 사용자 메모 (프롬프트 밖)
 
-- **노트북을 끄는 시점**: PR #39 에 `data(gold): 서울 3·4차 …` 커밋이 보인 뒤. 예상 09-23 00:00~01:30.
-  그 전에 끄면 체인과 자동 push 가 같이 죽는다 — 그때는 이 프롬프트가 "Gold 없음"만 보고한다.
+- **노트북을 끄는 시점**: PR #39 에 `data(gold): 서울 3·4차 …` 커밋이 보인 뒤. AC 기준 예상 09-23 00:30~01:30,
+  배터리면 더 늦다. 그 전에 끄면(다시 시작·전원 버튼 강제 종료 포함 — 09-22 밤 실제로 두 번 이렇게 죽었다)
+  스크립트와 자동 push 가 같이 죽는다. 그때는 이 프롬프트가 "Gold 없음"만 보고하고, 이어받기는
+  노트북을 켤 수 있는 날 [Dispatch 프롬프트](prompts-mobile-hub-finish-2026-09-23.md)로 한다.
 - **자동 push 가 실패했으면**(커밋이 안 보이는데 체인은 끝남): 노트북을 켤 수 있는 날
   [Dispatch 프롬프트](prompts-mobile-hub-finish-2026-09-23.md)로 이어받는다. 원인은 노트북
   `data/logs/publish-gold-2026-09-22.log` 에 남는다.

@@ -116,7 +116,7 @@ docs/papers/paper-platform.md 의 §3.2(성능 천장 4회 확인)만 채운다.
 
 - **건축HUB 대장 수집** → `/quota` 스킬 (프리플라이트 → 재개 → 소진 시 층별개요)
   - 폰에서 붙여넣을 하루치 프롬프트: [docs/prompts-mobile-hub-quota-2026-09-21.md](docs/prompts-mobile-hub-quota-2026-09-21.md) — 잘린 대장 판정 · 150동 보고 · 층별개요 분리까지 09-20 실측을 반영했다
-  - 그 다음날 마무리: [docs/prompts-mobile-hub-finish-2026-09-23.md](docs/prompts-mobile-hub-finish-2026-09-23.md) — 무인 체인 확인·재개 · 앵커 5거점 · 머지까지 남은 거리. ⚠ 긴 작업은 Start-Process 가 아니라 **WMI 로** 띄운다(09-22 세션 재시작에 같이 죽었다)
+  - 그 다음날 마무리: [docs/prompts-mobile-hub-finish-2026-09-23.md](docs/prompts-mobile-hub-finish-2026-09-23.md) — 무인 체인 확인·재개 · 앵커 5거점 · 머지까지 남은 거리. ⚠ 무인 작업이 사라지면 **재부팅부터** 본다(09-22 밤 두 번 죽은 원인은 다시 시작·전원 버튼 강제 종료였다) — 단계는 산출물로 재개한다
   - 노트북이 꺼져 있을 때: [docs/prompts-cloud-hub-verify-2026-09-23.md](docs/prompts-cloud-hub-verify-2026-09-23.md) — 클라우드 세션이 PR #39 브랜치의 Gold 로 개수·서빙·pytest 를 **판정만** 한다(수집·빌드는 못 한다)
 - **GNN/LSTM 재학습** → `OMP_NUM_THREADS=1 PYTHONIOENCODING=utf-8` 필수
 - **새 거점 온보딩** → `/hub-chain` (후보 판정 → 등록 → 수집 → Gold → 앵커 → 서빙 → 검증)
