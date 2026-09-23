@@ -1,0 +1,129 @@
+/* 계정 화면 3종(Login · Signup · ApiKeys)과 그 틀(AccountDialog) — 2026-09-23 B9.
+   세 화면이 같은 폼·같은 틀이라 파일을 하나로 둔다(셋으로 나누면 같은 규칙이 세 벌 생긴다).
+   색은 토큰만 쓴다 — 새 색을 짓지 않는다. 실패·폐기 경고는 전역 .caveat-note.caveat-withheld
+   (styles/tokens.css, 공실 축 경고색)를 그대로 빌린다. 강조색은 PlaceOS 고유 기능색 --brand 다:
+   계정은 PPPP 네 트랙 어디에도 속하지 않아 트랙 색을 쓰지 않는다. */
+
+/* ── 틀: 지도 위 모달 ── */
+.acct-dialog {
+  box-sizing: border-box;
+  width: min(480px, calc(100vw - var(--sp-4)));
+  max-height: 90dvh;
+  padding: var(--sp-5);
+  border: 1px solid var(--line); border-radius: var(--radius-lg);
+  background: var(--surface); color: var(--ink);
+  box-shadow: var(--shadow-sheet);
+  font: inherit;
+}
+.acct-dialog:has(.acct-wide) { width: min(640px, calc(100vw - var(--sp-4))); }
+.acct-dialog::backdrop { background: color-mix(in srgb, var(--ink) 45%, transparent); }
+.acct-close {
+  float: right; margin: 0 0 var(--sp-2) var(--sp-3);
+  min-height: 44px; padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--ink); font: inherit; cursor: pointer;
+}
+.acct-close:hover { background: var(--bg); }
+.acct-dialog :is(button, input, a):focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* ── 화면 공통 ── */
+.acct h2 {
+  margin: var(--sp-1) 0 var(--sp-2);
+  font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-bold);
+}
+.acct h3 {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-body); line-height: var(--lh-body); font-weight: var(--fw-bold);
+}
+.acct-eyebrow {
+  margin: 0; color: var(--brand-pressed);
+  font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: var(--fw-bold);
+}
+.acct-lede { margin: 0 0 var(--sp-4); color: var(--muted); }
+.acct-muted { color: var(--muted); font-size: var(--fs-caption); line-height: var(--lh-caption); }
+.acct-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.acct-switch { margin: var(--sp-4) 0 0; color: var(--muted); font-size: var(--fs-caption); }
+
+/* 글자처럼 보이는 버튼 — 화면 전환(가입 ↔ 로그인)에만 쓴다 */
+.acct-link {
+  padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--brand-pressed); font: inherit; font-weight: var(--fw-semibold);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.acct-error .acct-link { margin-left: var(--sp-2); }
+
+/* ── 폼 ── */
+.acct-form { display: flex; flex-direction: column; gap: var(--sp-3); }
+.acct-field { display: flex; flex-direction: column; gap: var(--sp-1); }
+/* 라벨이 입력칸을 감싸는 꼴(<label><span/><input/></label>)과 도움말이 붙어 라벨을 따로 두는 꼴
+   (<div><label/><input/><small/></div>) 둘 다 같은 모양으로 보이게 한다. */
+.acct-field > span, .acct-field > label { font-size: var(--fs-caption); font-weight: var(--fw-semibold); }
+.acct-field > small { color: var(--muted); font-size: var(--fs-caption); }
+.acct-field input, .acct-key {
+  box-sizing: border-box; width: 100%; min-height: 44px;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+  background: var(--bg); color: var(--ink); font: inherit;
+}
+.acct-field input:focus { border-color: var(--brand); background: var(--surface); }
+.acct-error, .acct-note { margin: 0; }
+.acct-form .ds-btn { align-self: flex-start; }
+
+/* ── API 키 화면 ── */
+.acct-whoami {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  margin: 0 0 var(--sp-4); padding: var(--sp-3) 0;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.acct-whoami > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+/* 발급 줄 — 버튼을 도움말이 아니라 **입력칸**과 같은 줄에 세운다. 필드 div 를 풀어(display: contents)
+   라벨·입력칸·도움말·버튼을 한 격자에 놓는다. div 는 역할이 없어 풀어도 접근성 트리가 그대로다. */
+.acct-issue {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--sp-2); row-gap: var(--sp-1); align-items: center;
+  margin-bottom: var(--sp-4);
+}
+.acct-issue .acct-field { display: contents; }
+.acct-issue label { grid-column: 1; grid-row: 1; }
+.acct-issue input { grid-column: 1; grid-row: 2; }
+.acct-issue .ds-btn { grid-column: 2; grid-row: 2; align-self: stretch; }
+.acct-issue small { grid-column: 1 / -1; grid-row: 3; }
+
+/* 원문 키 — 한 번만 보이는 상자. 경고가 아니라 "지금 챙겨 두라"는 안내라 브랜드색 테두리다 */
+.acct-reveal {
+  display: flex; flex-direction: column; gap: var(--sp-2);
+  margin: 0 0 var(--sp-4); border-color: var(--brand);
+}
+.acct-reveal p { margin: 0; }
+.acct-reveal-title { font-weight: var(--fw-bold); }
+.acct-reveal-warn { font-size: var(--fs-caption); line-height: var(--lh-caption); }
+.acct-reveal-row { display: flex; gap: var(--sp-2); }
+.acct-key {
+  flex: 1; min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--fs-caption);
+}
+.acct-reveal > .ds-btn { align-self: flex-start; }
+
+.acct-keys { margin-top: var(--sp-4); }
+.acct-keys p { margin: 0; }
+.acct-keylist { list-style: none; margin: 0; padding: 0; }
+.acct-keylist li {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-3) 0; border-top: 1px solid var(--line);
+}
+.acct-keylist li:first-child { border-top: 0; padding-top: 0; }
+.acct-keyinfo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.acct-keyinfo code {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--fs-caption);
+}
+.acct-keylist li.is-revoked .acct-keyinfo strong { color: var(--muted); text-decoration: line-through; }
+.acct-confirm { flex: 0 1 280px; margin: 0; }
+.acct-confirm p { margin: 0 0 var(--sp-2); }
+
+@media (max-width: 768px) {
+  .acct-dialog { padding: var(--sp-4); }
+  .acct h2 { font-size: var(--fs-heading); line-height: var(--lh-heading); }
+  .acct-keylist li { flex-direction: column; }
+  .acct-confirm { flex-basis: auto; width: 100%; }
+}

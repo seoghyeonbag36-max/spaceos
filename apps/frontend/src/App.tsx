@@ -5,6 +5,7 @@ import AdminCoverage from "@/pages/AdminCoverage";
 import MapHost from "@/components/MapHost";
 import TrackMapFrame from "@/components/TrackMapFrame";
 import BusinessSetup from "@/components/BusinessSetup";
+import AccountDialog, { type AccountScreen } from "@/components/AccountDialog";
 import { listDistricts, listIndustries, type DistrictSummary, type IndustryOption } from "@/lib/api";
 import { businessChipText, findIndustry, loadBusiness, saveBusiness, type BusinessProfile, type BusinessState } from "@/lib/businessProfile";
 import { createPageWorkspace, type BuildingSelection, type ProgramHandoff } from "@/lib/workspaceState";
@@ -20,6 +21,11 @@ const MapShell = lazy(loadMapShell);
 const PlatformConsole = lazy(loadPlatform);
 const PostingConsole = lazy(loadPosting);
 const ProgramStudio = lazy(loadProgram);
+// 계정 화면 3종(B9)은 누를 때만 받는다 — 첫 화면(지도) 번들에 싣지 않는다.
+const Login = lazy(() => import("@/pages/Login"));
+const Signup = lazy(() => import("@/pages/Signup"));
+const ApiKeys = lazy(() => import("@/pages/ApiKeys"));
+const ACCOUNT_SCREENS: Record<string, AccountScreen> = { "#login": "login", "#signup": "signup", "#account": "account" };
 
 /** 첫 화면이 선 뒤 나머지 트랙 청크를 미리 받아 둔다(2026-09-13 로컬 실화면 확인).
  *  아직 안 받은 트랙 탭을 누르면 React 가 Suspense 폴백을 띄우는 동안 **이전 탭 화면을 지우지 않고
@@ -58,6 +64,10 @@ const PRELOAD_DELAY_MS = 1500;
  *   분석가에서 업종·지금 가게에서 출발하는 사업자(창업 · 업종 바꾸기 · 상권 옮기기)로 바뀌었다.
  *   상권과 같은 급의 공유 값이라 여기 둔다 — 처음 방문이면 Page 지도 위에 카드를 펴고,
  *   「시작」하면 Platform 으로 넘어가 「내 업종으로 본 상권」부터 답한다.
+ *
+ * 2026-09-23(B9): **계정 화면 3종**은 해시로 연다 — #login · #signup · #account(API 키).
+ *   화면을 갈아끼우지 않고 지도 위 모달(AccountDialog)로 띄운다. 트랙 패널도 그대로 남아,
+ *   키를 받고 닫으면 Program 상용 입력칸에 바로 붙여 넣을 수 있다. 레일 맨 아래 「계정」이 입구다.
  *
  * #admin 해시는 관리자 커버리지 패널로 간다. 네비게이션에 버튼을 두지 않는다 —
  * 지도에서 제외된 건물 수는 공개 대상이 아니다(2026-07-26). 데이터 자체도
@@ -168,16 +178,29 @@ export default function App() {
     }, PRELOAD_DELAY_MS);
     return () => window.clearTimeout(t);
   }, []);
-  const [isAdmin, setIsAdmin] = useState(() => window.location.hash === "#admin");
-  const [isBoard, setIsBoard] = useState(() => window.location.hash === "#board");
+  const [hash, setHash] = useState(() => window.location.hash);
+  const isAdmin = hash === "#admin";
+  const isBoard = hash === "#board";
+  const accountScreen = ACCOUNT_SCREENS[hash];
 
   useEffect(() => {
-    const onHash = () => {
-      setIsAdmin(window.location.hash === "#admin");
-      setIsBoard(window.location.hash === "#board");
-    };
+    const onHash = () => setHash(window.location.hash);
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  // 레일에서 열 때만 기록을 남긴다(휴대폰 뒤로가기가 창을 닫게). 창 안에서 화면을 옮기거나
+  // 닫을 때는 기록을 바꿔치기만 한다 — 가입→로그인→키를 오간 만큼 뒤로가기를 누르게 하지 않는다.
+  const openAccount = useCallback(() => {
+    window.location.hash = "#account";
+    setHash("#account");
+  }, []);
+  const goAccount = useCallback((screen: AccountScreen) => {
+    window.history.replaceState(null, "", `#${screen}`);
+    setHash(`#${screen}`);
+  }, []);
+  const closeAccount = useCallback(() => {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    setHash("");
   }, []);
 
   if (isAdmin) return <AdminCoverage />;
@@ -207,6 +230,12 @@ export default function App() {
             <span>{n.label}</span>
           </button>
         ))}
+        {/* 트랙이 아니다 — data-track 을 주지 않아 레일의 남색 폴백을 쓴다(App.css) */}
+        <button type="button" className={"rail-btn rail-account" + (accountScreen ? " active" : "")}
+          aria-haspopup="dialog" onClick={openAccount}>
+          <IconUser />
+          <span>계정</span>
+        </button>
       </nav>
 
       {/* 지도는 앱 수명 동안 **하나**다. 탭이 바뀌어도 언마운트하지 않고 오버레이만
@@ -240,6 +269,15 @@ export default function App() {
           open={bizOpen} onOpenChange={setBizOpen} onStart={startBusiness} onBrowse={browse} />
       </MapHost>
       <span className="sr-only" aria-live="polite">{bizAnnounce}</span>
+      {accountScreen && (
+        <AccountDialog onClose={closeAccount}>
+          <Suspense fallback={<p className="acct-lede">불러오는 중…</p>}>
+            {accountScreen === "login" && <Login go={goAccount} />}
+            {accountScreen === "signup" && <Signup go={goAccount} />}
+            {accountScreen === "account" && <ApiKeys go={goAccount} />}
+          </Suspense>
+        </AccountDialog>
+      )}
     </div>
   );
 }
@@ -281,6 +319,16 @@ function IconKey() {
       <path d="m10.5 12.5 8-8" />
       <path d="m16.5 6.5 2 2" />
       <path d="m14 9 2 2" />
+    </svg>
+  );
+}
+
+/* 계정 — 사람 머리와 어깨 */
+function IconUser() {
+  return (
+    <svg {...SVG}>
+      <circle cx="12" cy="8" r="3.6" />
+      <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
     </svg>
   );
 }

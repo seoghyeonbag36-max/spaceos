@@ -771,3 +771,79 @@ export const generateCommercialStoreMarketing = (
   { profile, consent },
   { "X-API-Key": apiKey },
 );
+
+/* ===== 계정 — 가입·로그인·조직 API 키 (2026-09-23 B9) =====
+ * 계약의 정본은 백엔드다: app/api/v1/auth.py · app/schemas/auth.py. 필드를 여기서 짓지 않는다.
+ * 가입은 곧 **조직 생성**이다(개인 계정 없음) — 가입한 사람이 그 조직의 admin 이 된다.
+ *
+ * ⚠ 액세스 토큰은 **이 함수들에만** 인자로 넘긴다. 공개 분석 API(getJSON·postJSON)에 전역으로
+ *   붙이지 말 것 — security.get_optional_principal 은 잘못되거나 만료된 토큰을 익명으로 강등하지
+ *   않고 **401 로 거절한다.** 전역으로 붙이면 토큰이 만료되는 순간 지도·네 트랙이 전부 401 로 선다.
+ * ⚠ 비밀번호는 JSON 본문으로만 보낸다(경로·쿼리스트링 금지). 이 파일은 요청·응답을 로그로 남기지 않는다.
+ */
+
+/** 계정 API 실패 — 화면이 상태 코드로 문구를 고른다. `status` 0 은 서버에 닿지 못한 경우다. */
+export class ApiError extends Error {
+  readonly status: number;
+  /** 백엔드 HTTPException 의 detail 문자열. 422(검증 실패)는 배열이라 null 이 된다 */
+  readonly detail: string | null;
+  constructor(status: number, detail: string | null, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.detail = detail;
+  }
+}
+
+/** POST /auth/signup · /auth/login 응답(TokenResponse) */
+export interface AuthToken { access_token: string; token_type: string }
+/** GET /auth/me 응답(MeResponse). role 은 멤버십 역할 — 가입자는 "admin" */
+export interface AuthMe { user_id: string; email: string; org: { id: string; name: string }; role: string }
+/** 목록·폐기 응답(ApiKeyOut). **원문 키가 없다** — 발급 응답에만 한 번 실린다 */
+export interface ApiKeyInfo { id: string; name: string; created_at: string; revoked_at: string | null }
+/** 발급 응답(ApiKeyCreatedResponse). `key` 는 이 응답에서만 볼 수 있고 서버에도 남지 않는다 */
+export interface ApiKeyCreated extends ApiKeyInfo { key: string }
+
+async function authRequest<T>(
+  method: "GET" | "POST" | "DELETE",
+  path: string,
+  opt: { body?: unknown; token?: string } = {},
+): Promise<T> {
+  const headers: Record<string, string> = {};
+  if (opt.body !== undefined) headers["Content-Type"] = "application/json";
+  if (opt.token) headers.Authorization = `Bearer ${opt.token}`;
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}/auth${path}`, {
+      method, headers, body: opt.body === undefined ? undefined : JSON.stringify(opt.body),
+    });
+  } catch {
+    throw new ApiError(0, null, `API /auth${path} unreachable`);
+  }
+  if (!res.ok) {
+    let detail: string | null = null;
+    try {
+      const j = (await res.json()) as { detail?: unknown };
+      if (typeof j?.detail === "string") detail = j.detail;
+    } catch { /* 본문이 JSON 이 아니면 상태 코드만으로 문구를 고른다 */ }
+    throw new ApiError(res.status, detail, `API /auth${path} failed: ${res.status}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+/** 조직 가입 — 201 · 409(이미 가입된 이메일) · 422(검증: 비밀번호 8~200자 · 조직명 1~200자) */
+export const signup = (req: { org_name: string; email: string; password: string }) =>
+  authRequest<AuthToken>("POST", "/signup", { body: req });
+/** 로그인 — 200 · 401(이메일 또는 비밀번호 불일치) */
+export const login = (req: { email: string; password: string }) =>
+  authRequest<AuthToken>("POST", "/login", { body: req });
+/** 토큰의 주인 — 401 이면 토큰이 만료됐거나 계정이 없다 */
+export const getMe = (token: string) => authRequest<AuthMe>("GET", "/me", { token });
+/** 조직 키 목록(폐기분 포함 — 언제까지 유효했는지가 감사 정보다) */
+export const listApiKeys = (token: string) => authRequest<ApiKeyInfo[]>("GET", "/api-keys", { token });
+/** 키 발급 — 조직 관리자만(403). 원문은 응답에 한 번만 실린다 */
+export const createApiKey = (token: string, name: string) =>
+  authRequest<ApiKeyCreated>("POST", "/api-keys", { token, body: { name } });
+/** 키 폐기 — 조직 관리자만(403) · 404(없는 키) */
+export const revokeApiKey = (token: string, keyId: string) =>
+  authRequest<ApiKeyInfo>("DELETE", `/api-keys/${encodeURIComponent(keyId)}`, { token });
