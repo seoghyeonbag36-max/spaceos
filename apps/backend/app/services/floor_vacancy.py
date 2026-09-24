@@ -44,7 +44,7 @@ _GOLD_DIR = Path(__file__).resolve().parents[4] / "data" / "gold"
 
 _CERTAINTIES = ("confirmed", "probable")
 
-_cache: dict[str, dict | None] = {}
+_cache: dict[str, dict] = {}   # slug → {"mtime", "data"}
 
 
 def path(slug: str) -> Path:
@@ -57,26 +57,45 @@ def clear_cache() -> None:
 
 
 def load(district_id: str | None) -> dict | None:
-    """파일 통째로. 없거나 깨졌으면 None.
+    """파일 통째로. 없거나 깨졌으면 None. **slug별 mtime 캐시.**
 
     파일이 없는 것은 **정상 상태**다(거점에 빈 층이 없거나 아직 안 돌렸거나).
     예외를 올리지 않고 None 을 주어 호출부가 "아직 없다"고 말하게 한다.
+
+    ⚠ **2026-09-24: 없음(None)을 캐싱하던 것을 고쳤다.** 종전에는 `slug in _cache`
+    하나로만 갈라 **파일이 없다는 사실이 프로세스 수명 내내 굳었다.** 거점을 새로
+    올리는 날 그 자리가 정확히 깨진다 — 산출물이 나중에 생기는 것이 이 저장소의
+    정상 흐름이기 때문이다.
+
+    실측 2026-09-24: 15거점 배포 뒤 `vacant_floor_units.json` 이 아직 없던 시점에
+    bangbang·nowon·poi 를 두드렸고, 다음 배포로 파일이 들어온 **뒤에도 그 셋만
+    404** 였다(안 두드린 6거점은 200). 프로브가 심은 `None` 이 그대로 살아 있었다.
+
+    그래서 둘을 같이 바꿨다:
+      · 읽은 것은 **mtime 과 함께** 캐싱해 파이프라인 재실행이 자동 반영되게 한다
+        (`services/building_vacancy.py` 가 이미 쓰는 방식과 같다).
+      · **파일이 없으면 캐싱하지 않는다.** 없는 상태는 곧 바뀔 수 있고, 그때 stat
+        한 번 더 하는 비용이 굳은 404 보다 싸다.
     """
     slug = vacant_inventory.slug_of(district_id)
     if slug is None:
         return None
-    if slug in _cache:
-        return _cache[slug]
-    p = path(slug)
+    try:
+        mtime = path(slug).stat().st_mtime
+    except OSError:
+        _cache.pop(slug, None)   # 있다가 사라졌으면 캐시도 버린다
+        return None
+    hit = _cache.get(slug)
+    if hit and hit["mtime"] == mtime:
+        return hit["data"]
     data: dict | None = None
-    if p.exists():
-        try:
-            loaded = json.loads(p.read_text(encoding="utf-8"))
-            if isinstance(loaded, dict) and isinstance(loaded.get("units"), list):
-                data = loaded
-        except (OSError, ValueError):
-            data = None
-    _cache[slug] = data
+    try:
+        loaded = json.loads(path(slug).read_text(encoding="utf-8"))
+        if isinstance(loaded, dict) and isinstance(loaded.get("units"), list):
+            data = loaded
+    except (OSError, ValueError):
+        data = None
+    _cache[slug] = {"mtime": mtime, "data": data}
     return data
 
 

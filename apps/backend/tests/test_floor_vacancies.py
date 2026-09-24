@@ -11,6 +11,7 @@ ROI 계산에 들어가면 프라임 프리미엄 트립와이어가 부호를 �
   4. 필터를 걸어도 **분모**(counts_all)가 같이 온다 — 잘린 것인지 원래 없는 것인지
   5. 산출물이 없는 거점은 404 이고, 슬러그가 아닌 입력도 404 다(경로 조작 차단)
   6. 면적은 같은 건물 안에서도 층마다 다르다 (균등분할이 아니다)
+  7. **없던 산출물이 생기면 다음 요청에 반영된다** — 없음을 캐싱하지 않는다
 
 실행: (apps/backend 에서) python -m pytest tests/test_floor_vacancies.py -q
 """
@@ -203,3 +204,53 @@ def test_fit_meta_discloses_the_join_rate() -> None:
     st = meta.get("stats") or {}
     assert st.get("joined", 0) > 0 and st.get("stores", 0) > st.get("joined", 0)
     assert "관측" in (meta.get("note") or "")
+
+
+def test_missing_output_is_not_cached_so_a_later_build_shows_up(tmp_path) -> None:
+    """**없던 산출물이 생기면 다음 요청에 보인다.**
+
+    2026-09-24 프로덕션에서 실제로 깨진 자리다. 15거점을 배포한 뒤
+    `vacant_floor_units.json` 이 아직 없던 시점에 bangbang·nowon·poi 를 두드렸고,
+    다음 배포로 파일이 들어온 **뒤에도 그 셋만 404** 였다(안 두드린 6거점은 200).
+    로더가 `_cache[slug] = None` 로 **없다는 사실을 영구 캐싱**했기 때문이다.
+
+    산출물이 나중에 생기는 것은 이 저장소의 **정상 흐름**이다(거점을 올리는 날마다
+    그렇다). 그래서 없음은 캐싱하지 않고, 읽은 것은 mtime 과 함께 캐싱한다.
+    """
+    slug = "zz-cache-probe"
+    d = tmp_path / slug
+    d.mkdir()
+    target = d / "vacant_floor_units.json"
+
+    orig_gold = floor_vacancy._GOLD_DIR
+    floor_vacancy._GOLD_DIR = tmp_path
+    floor_vacancy.clear_cache()
+    try:
+        # 1) 아직 없다 → None (그리고 이 None 이 굳으면 안 된다)
+        assert floor_vacancy.load(slug) is None
+
+        # 2) 파이프라인이 산출물을 냈다
+        target.write_text(json.dumps(
+            {"units": [{"id": "u1", "floor": 1}], "counts": {"confirmed": 1}},
+            ensure_ascii=False), encoding="utf-8")
+
+        # 3) 같은 프로세스에서 곧바로 보여야 한다
+        got = floor_vacancy.load(slug)
+        assert got is not None, "없음이 캐싱돼 새 산출물이 안 보인다 — 2026-09-24 회귀"
+        assert len(got["units"]) == 1
+
+        # 4) 내용이 바뀌면 mtime 캐시가 다시 읽는다
+        import os
+        target.write_text(json.dumps(
+            {"units": [{"id": "u1", "floor": 1}, {"id": "u2", "floor": 2}]},
+            ensure_ascii=False), encoding="utf-8")
+        st = target.stat()
+        os.utime(target, (st.st_atime, st.st_mtime + 10))   # mtime 해상도에 안 기댄다
+        assert len(floor_vacancy.load(slug)["units"]) == 2
+
+        # 5) 사라지면 다시 None 이고, 굳어 있던 값이 남지 않는다
+        target.unlink()
+        assert floor_vacancy.load(slug) is None
+    finally:
+        floor_vacancy._GOLD_DIR = orig_gold
+        floor_vacancy.clear_cache()

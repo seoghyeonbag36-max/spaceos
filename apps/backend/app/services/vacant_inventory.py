@@ -38,7 +38,7 @@ _SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
 # 같은 요청이 층마다 다른 거점을 가리킨다 — 늘릴 때는 셋을 같이 고친다.
 _DISTRICT_ALIAS: dict[str, str] = {}
 
-_cache: dict[str, dict | None] = {}
+_cache: dict[str, dict] = {}   # slug → {"mtime", "data"}
 
 
 def path(slug: str) -> Path:
@@ -62,22 +62,32 @@ def load(district_id: str | None) -> dict | None:
     파일이 없는 것은 **정상 상태**다(거점에 공실이 없거나 아직 안 돌렸거나). 예외를
     올리지 않고 None 을 주어 호출부가 시드로 물러나게 한다 — 다만 그 사실이 응답에
     드러나야 한다(`inputs_source` · `site_source`).
+
+    ⚠ **2026-09-24: 없음(None)을 캐싱하던 것을 고쳤다.** `floor_vacancy.load()` 와
+    같은 결함이었고 같은 방식으로 바꿨다 — 읽은 것은 **mtime 과 함께** 캐싱해
+    파이프라인 재실행이 자동 반영되게 하고, **파일이 없으면 캐싱하지 않는다.**
+    종전에는 없다는 사실이 프로세스 수명 내내 굳어, 거점을 새로 올리는 날 그 자리가
+    정확히 깨졌다(실측 경위는 `floor_vacancy.load()` 주석).
     """
     slug = slug_of(district_id)
     if slug is None:
         return None
-    if slug in _cache:
-        return _cache[slug]
-    p = path(slug)
+    try:
+        mtime = path(slug).stat().st_mtime
+    except OSError:
+        _cache.pop(slug, None)   # 있다가 사라졌으면 캐시도 버린다
+        return None
+    hit = _cache.get(slug)
+    if hit and hit["mtime"] == mtime:
+        return hit["data"]
     data: dict | None = None
-    if p.exists():
-        try:
-            loaded = json.loads(p.read_text(encoding="utf-8"))
-            if isinstance(loaded, dict) and isinstance(loaded.get("units"), list):
-                data = loaded
-        except (OSError, ValueError):
-            data = None
-    _cache[slug] = data
+    try:
+        loaded = json.loads(path(slug).read_text(encoding="utf-8"))
+        if isinstance(loaded, dict) and isinstance(loaded.get("units"), list):
+            data = loaded
+    except (OSError, ValueError):
+        data = None
+    _cache[slug] = {"mtime": mtime, "data": data}
     return data
 
 
