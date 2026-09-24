@@ -1,46 +1,46 @@
 {
-  "started": "2026-09-24T20:34:31",
+  "started": "2026-09-24T20:59:52",
   "results": [
     {
       "step": "backend-pytest",
-      "status": "pass",
-      "exit": 0,
-      "seconds": 159.6,
+      "status": "fail",
+      "exit": 1,
+      "seconds": 131.8,
       "log": "reports\\logs\\verify_backend-pytest.log"
     },
     {
       "step": "data-pytest",
-      "status": "pass",
-      "exit": 0,
-      "seconds": 42.0,
+      "status": "fail",
+      "exit": 1,
+      "seconds": 26.0,
       "log": "reports\\logs\\verify_data-pytest.log"
     },
     {
       "step": "gnn-import",
       "status": "pass",
       "exit": 0,
-      "seconds": 13.1,
+      "seconds": 8.2,
       "log": "reports\\logs\\verify_gnn-import.log"
     },
     {
       "step": "pppp-status",
       "status": "pass",
       "exit": 0,
-      "seconds": 1.5,
+      "seconds": 1.3,
       "log": "reports\\logs\\verify_pppp-status.log"
     },
     {
       "step": "application-check",
       "status": "pass",
       "exit": 0,
-      "seconds": 0.3,
+      "seconds": 0.2,
       "log": "reports\\logs\\verify_application-check.log"
     },
     {
       "step": "frontend-build",
       "status": "pass",
       "exit": 0,
-      "seconds": 21.1,
+      "seconds": 18.7,
       "log": "reports\\logs\\verify_frontend-build.log"
     }
   ]

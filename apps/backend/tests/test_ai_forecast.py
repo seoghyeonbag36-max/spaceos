@@ -29,8 +29,27 @@ def test_predict_vacancy_all_districts():
         # 1.1~1.36 으로 안정적이다. "70%"는 Phase 1(13거점·동질적)에서 정한 값이라 43개 이질적
         # Page(오피스 teheran·도매 garak·패션 namdaemun)에는 하드 게이트로 맞지 않는다.
         m = body["metrics"]
-        # 주지표: MAE. 정상 학습이면 시드 최악치(1.36)에도 여유. 이 상한을 넘으면 실제 모델 붕괴다.
-        assert m["holdout_mae"] <= 1.5, did
+        # 주지표: MAE.
+        #
+        # ⚠ **2026-09-24 절대 임계 1.5 를 베이스라인 상대로 바꿨다.** 그 값은 홀드아웃이
+        # 거점당 **1분기**(43점)일 때 시드 최악치 1.36 에 여유를 둔 것이었는데, 누수 차단
+        # 재학습이 롤링 오리진으로 가며 거점당 **3분기**(240점)가 됐다. 더 먼 분기까지
+        # 예측하니 MAE 가 커지는 것은 파손이 아니라 **재는 대상이 달라진 것**이고,
+        # 실제로 1.061 → 2.224 가 됐다. 낡은 절대선을 그대로 두면 정상 산출물이 매번 깨진다.
+        #
+        # 이 단언은 **붕괴 감지기**이지 KPI 판정이 아니다. "지속성보다 나은가"라는 실력
+        # 판정은 `scripts/kpi_baseline.py` 와 `pppp_status` 의 `KPI 공실예측 오차 실력`
+        # 게이트가 맡는다 — 그 게이트는 2026-09-24 현재 **0% 로 열려 있고**, 그게 맞다
+        # (모델 2.224 vs 지속성 1.190). 여기서 같은 것을 두 번 재면 한쪽을 완화하려는
+        # 압력이 판정 지표까지 흔든다.
+        #
+        # 그래서 여기서는 **같은 산출물이 들고 있는 지속성 값의 3배**를 상한으로 둔다.
+        # NaN 붕괴·전 거점 동일값·스케일 파손처럼 자릿수가 틀어지는 것만 잡는 느슨한 선이다.
+        persistence = m.get("persistence_mae")
+        cap = persistence * 3 if persistence else 5.0
+        assert m["holdout_mae"] <= cap, (
+            f"{did}: MAE {m['holdout_mae']} > 지속성×3 {cap:.3f} — 모델 붕괴 의심. "
+            f"실력 판정은 scripts/kpi_baseline.py 를 볼 것")
         # 하한: 방향정확도. NaN 붕괴(전 거점 동일값 → 0%)·랜덤(≈50%) 같은 실제 파손만 잡는
         # 느슨한 바닥. 시드 스터디 최저(58%)보다 아래로 두어 시드 변동에 오탐하지 않는다.
         assert m["holdout_direction_acc"] >= 0.55, did
@@ -75,18 +94,35 @@ def test_predict_vacancy_garosugil_ground_anchor():
 def test_predict_vacancy_carries_this_districts_holdout():
     """거점별 홀드아웃 1점이 응답에 실려야 한다 — 전체 MAE 뒤에 거점 오차를 숨기지 않는다.
 
-    값은 박제하지 않는다(재학습마다 바뀐다). 산출물과 대조하고, 54/54거점 보유를 센다.
+    값은 박제하지 않는다(재학습마다 바뀐다). 산출물과 대조하고 전 거점 보유를 센다.
+
+    ⚠ **2026-09-24 키 형식이 바뀌었다.** 누수 차단 재학습이 롤링 오리진으로 가며
+    홀드아웃이 거점당 1점 → **3점**(test_quarters)이 됐고, 키가 `anam` → `anam@20254`
+    로 갈렸다. 종전처럼 키 집합을 거점 id 와 직접 비교하면 **전 거점이 미보유로 잡힌다.**
+    거점 부분만 떼어 비교한다(옛 형식도 그대로 통과한다).
     """
     fc = json.loads((_GOLD / "platform_vacancy_forecast.json").read_text(encoding="utf-8"))
-    expected = fc["holdout"]
-    assert set(expected) >= set(SEOUL_DISTRICT_IDS), "홀드아웃 미보유 거점이 있다"
+    expected = {k.split("@", 1)[0] for k in fc["holdout"]}
+    missing = set(SEOUL_DISTRICT_IDS) - expected
+    assert not missing, f"홀드아웃 미보유 거점: {sorted(missing)}"
+    rows = fc["holdout"]
     for did in SEOUL_DISTRICT_IDS:
         body = client.post(f"{V1}/ai/predict-vacancy", json={"district_id": did}).json()
         h = body.get("district_holdout")
         assert h is not None, did
-        assert h == expected[did], did
         assert isinstance(h["pred"], (int, float)) and isinstance(h["actual"], (int, float))
         assert isinstance(h["direction_hit"], bool), did
+
+        # 산출물과 대조 — 롤링 오리진이면 **가장 최근 분기 1점**이 이 키로 온다.
+        mine = {k.split("@", 1)[1]: v for k, v in rows.items()
+                if "@" in k and k.split("@", 1)[0] == did}
+        if mine:
+            assert h == mine[max(mine)], did
+            # 전 분기는 별도 키로 순서대로 함께 온다 — 거점 오차 추이를 화면이 그릴 수 있어야 한다.
+            pts = body.get("district_holdout_points")
+            assert pts == [mine[q] for q in sorted(mine)], did
+        else:                                    # 옛 형식(거점 키 = 1점)
+            assert h == rows[did], did
 
 
 def test_district_summaries_carry_predicted_rate():

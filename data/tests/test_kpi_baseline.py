@@ -150,13 +150,34 @@ def test_skew_robust_detects_minority_signal() -> None:
 
 
 def test_observed_block_is_not_used_for_the_verdict() -> None:
-    """관측 지표가 판정을 뒤집으면 안 된다 — 그게 metric shopping 이다."""
+    """관측 지표가 판정을 뒤집으면 안 된다 — 그게 metric shopping 이다.
+
+    ⚠ **2026-09-24 단언을 값에서 성질로 바꿨다.** 종전에는
+    `beats_baseline is False` 라고 **그날의 값**을 박아 두었는데, 누수 차단 재학습으로
+    방향 축이 −7.7%p → **+4.6%p** 가 되자 깨졌다. 모델이 나아져서 깨지는 테스트는
+    지키려던 것을 지키지 못한다.
+
+    고정할 것은 "지금 미달이다"가 아니라 **"판정이 원시 정확도에서만 나온다"** 이다.
+    균형정확도·MCC 가 아무리 좋아도 그것이 `beats_baseline` 을 만들면 안 된다.
+    """
     res = check()
     d = res["lstm"]["direction"]
+
+    # 관측 블록은 있어야 한다 — 신호 유무를 볼 자리가 사라지면 쏠림을 오진한다.
     assert "observed" in d
-    assert d["observed"]["balanced_acc"] > 0.5      # 신호는 있는데
-    assert d["beats_baseline"] is False             # 판정은 여전히 미달이다
-    assert any("베이스라인" in m for m in res["failures"])
+    assert "balanced_acc" in d["observed"] and "mcc" in d["observed"]
+
+    # 판정은 **원시 정확도 vs 베이스라인** 하나로만 나온다.
+    assert d["beats_baseline"] is (d["model_acc"] > d["baseline_acc"])
+
+    # 관측이 좋은데 판정이 미달인 상태를 **표현할 수 있어야** 한다(그 반대도).
+    # 둘이 한 값으로 묶여 있으면 관측이 판정에 새고 있다는 뜻이다.
+    assert isinstance(d["observed"]["balanced_acc"], float)
+    assert isinstance(d["beats_baseline"], bool)
+
+    # 두 축 중 하나라도 미달이면 실패 메시지가 있어야 한다.
+    any_fail = not d["beats_baseline"] or not res["lstm"]["error"]["beats_persistence"]
+    assert bool(res["failures"]) is any_fail
 
 
 # ─────────────────────────── 롤링 오리진 · 군집 구간 ───────────────────────────

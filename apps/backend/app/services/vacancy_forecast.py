@@ -95,12 +95,25 @@ def get_forecast(district_id: str, quarters: int = 1) -> dict | None:
             "direction": "up" if sel["forecast_vac_proxy"] > item.get("last_vac_proxy", 0.0) else "down",
         })
     out["horizon_quarters"] = q
-    # 이 거점의 홀드아웃 1점(pred/actual/prev/direction_hit) — 전체 MAE 옆에 붙여
-    # "이 거점에서 실제로 얼마나 틀렸나"를 같이 보여준다. 평균만 내놓으면 거점별
-    # 오차가 평균 뒤에 숨는다(garosugil 0.155 ↔ anam 3.348). 54/54거점 보유.
-    holdout = (fc.get("holdout") or {}).get(district_id)
-    if holdout:
-        out["district_holdout"] = holdout
+    # 이 거점의 홀드아웃 — 전체 MAE 옆에 붙여 "이 거점에서 실제로 얼마나 틀렸나"를
+    # 같이 보여준다. 평균만 내놓으면 거점별 오차가 평균 뒤에 숨는다.
+    #
+    # ⚠ **2026-09-24 키 형식이 바뀌었다.** 누수 차단 재학습이 롤링 오리진
+    # (`protocol.split == "rolling_origin"`)으로 가면서 거점당 홀드아웃이 1점 → **3점**
+    # (test_quarters)이 됐고, 키도 `anam` → **`anam@20254`** 로 갈렸다. 종전처럼
+    # `.get(district_id)` 로 집으면 **전 거점이 조용히 None** 이 된다 — 에러가 아니라
+    # `district_holdout` 키가 통째로 빠져서, 화면이 "이 거점 오차"를 못 그린다.
+    # 옛 형식(거점 키 = 1점)도 계속 받는다.
+    rows = fc.get("holdout") or {}
+    if district_id in rows:                      # 옛 형식
+        out["district_holdout"] = rows[district_id]
+    else:                                        # 롤링 오리진 — 분기 오름차순
+        mine = {k.split("@", 1)[1]: v for k, v in rows.items()
+                if k.split("@", 1)[0] == district_id and "@" in k}
+        if mine:
+            out["district_holdout_points"] = [mine[q] for q in sorted(mine)]
+            # 하위호환: 가장 최근 분기 1점을 종전 키로도 준다
+            out["district_holdout"] = out["district_holdout_points"][-1]
     anchor = _anchor(district_id)
     if anchor:
         out["ground_anchor"] = anchor
