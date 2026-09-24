@@ -42,7 +42,7 @@ const PRELOAD_DELAY_MS = 1500;
  *   Platform → PlatformConsole  (상권 정체성 + 자리별 업종)
  *   Page     → MapShell         (공실 히트맵 4레이어 + 2D 층 스택·거리뷰)
  *   Posting  → PostingConsole   (3-Tier 비용-효용 + 권리금 입력 계약)
- *   Program  → ProgramStudio    (가게 단위 마케팅 생성)
+ *   Program  → ProgramStudio    (검증 program 생성 — 팝업·가오픈·MVP)
  *
  * 2026-08-29: 상단 네비바를 **좌측 아이콘 레일**로 옮겼다(네이버지도식).
  *
@@ -56,7 +56,7 @@ const PRELOAD_DELAY_MS = 1500;
  *   Platform·Posting·Program 은 지도가 없는 대시보드였다. 이제 넷 다 같은 지도(MapHost)
  *   위에 좌측 패널로 뜨고(TrackMapFrame), 각자 자기 답을 지도에 그린다 —
  *   Platform=실측 범위·자리별 추천 / Page=공실·임대시세 / Posting=입점 자리와 월임대료 /
- *   Program=가게 후보·홍보 행사 장소.
+ *   Program=검증할 자리·오프라인 연계 행사.
  *   상권 선택도 **네 트랙이 하나를 공유한다.** 같은 place 에 대한 네 질문이라, 탭을 옮길
  *   때마다 상권을 다시 고르게 하면 흐름이 끊긴다.
  *
@@ -67,7 +67,7 @@ const PRELOAD_DELAY_MS = 1500;
  *
  * 2026-09-23(B9): **계정 화면 3종**은 해시로 연다 — #login · #signup · #account(API 키).
  *   화면을 갈아끼우지 않고 지도 위 모달(AccountDialog)로 띄운다. 트랙 패널도 그대로 남아,
- *   키를 받고 닫으면 Program 상용 입력칸에 바로 붙여 넣을 수 있다. 레일 맨 아래 「계정」이 입구다.
+ *   닫으면 보던 자리로 돌아온다. 레일 맨 아래 「계정」이 입구다.
  *
  * #admin 해시는 관리자 커버리지 패널로 간다. 네비게이션에 버튼을 두지 않는다 —
  * 지도에서 제외된 건물 수는 공개 대상이 아니다(2026-07-26). 데이터 자체도
@@ -258,7 +258,7 @@ export default function App() {
             </TrackMapFrame>
           )}
           {view === "program" && (
-            <TrackMapFrame track="program" label="홍보 program">
+            <TrackMapFrame track="program" label="검증 program">
               <ProgramStudio key={programHandoff?.requestId ?? "direct"} mapDistrictId={districtId}
                 handoff={programHandoff?.dismissed ? undefined : programHandoff} onArrivalDismiss={dismissArrival}
                 defaultCategory={myIndustry?.input} businessGoal={profile?.goal} />

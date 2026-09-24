@@ -138,7 +138,7 @@ export default function ApiKeys({ go }: AccountScreenProps) {
         <p className="acct-eyebrow">PlaceOS 계정</p>
         <h2 id={ACCOUNT_TITLE_ID}>API 키</h2>
         {load.note && <p className="caveat-note caveat-withheld acct-error" role="alert">{load.note}</p>}
-        <p className="acct-lede">조직 API 키를 보려면 로그인해 주세요. 키는 Program 상용 입력과 외부 연동에 씁니다.</p>
+        <p className="acct-lede">조직 API 키를 보려면 로그인해 주세요. 키는 외부 시스템이 분석 API 를 부를 때(X-API-Key 헤더) 조직을 밝히는 데 씁니다.</p>
         <div className="acct-actions">
           <Button onClick={() => go("login")}>로그인</Button>
           <Button variant="ghost" onClick={() => go("signup")}>조직 가입</Button>
@@ -212,7 +212,7 @@ export default function ApiKeys({ go }: AccountScreenProps) {
           <div className="acct-field">
             <label htmlFor="key-name">새 키 이름</label>
             <input id="key-name" name="key-name" autoComplete="off" maxLength={KEY_NAME_MAX} required
-              placeholder="예: 본사 BI 연동 · Program 상용 입력" aria-describedby="key-name-hint"
+              placeholder="예: 본사 BI 연동" aria-describedby="key-name-hint"
               value={name} onChange={(e) => setName(e.target.value)} />
             <small id="key-name-hint">어디에 쓴 키인지 나중에 알아보는 이름입니다(1~{KEY_NAME_MAX}자).</small>
           </div>

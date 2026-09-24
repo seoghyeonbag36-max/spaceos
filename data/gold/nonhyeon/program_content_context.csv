@@ -1,84 +1,84 @@
 kind,key,value
-blog_keyword,강남구,310
-blog_keyword,강남,158
-blog_keyword,학동역,73
-blog_keyword,논현동맛집,61
-blog_keyword,논현역,51
-blog_keyword,논현동에,49
-blog_keyword,논현,47
-blog_keyword,논현동카페,45
-blog_keyword,논현로,41
-blog_keyword,위치한,41
-blog_keyword,주차,39
-blog_keyword,베이커리,39
-blog_keyword,마르케,36
-blog_keyword,강남카페,35
-blog_keyword,오늘은,32
-blog_keyword,학동로,30
+blog_keyword,강남구,269
+blog_keyword,강남,166
+blog_keyword,학동역,76
+blog_keyword,논현동맛집,57
+blog_keyword,논현동에,50
+blog_keyword,논현역,50
+blog_keyword,논현동카페,46
+blog_keyword,논현,44
+blog_keyword,위치한,43
+blog_keyword,주차,42
+blog_keyword,논현로,36
+blog_keyword,강남카페,36
+blog_keyword,마르케,35
+blog_keyword,오늘은,34
+blog_keyword,베이커리,34
+blog_keyword,분위기,32
+blog_keyword,논현점,29
 blog_keyword,디저트,29
-blog_keyword,분위기,29
-blog_keyword,매장,28
-blog_keyword,시간,28
+blog_keyword,매장,29
 blog_keyword,서울특별시,28
-blog_keyword,매일,27
-blog_keyword,출구에서,27
-blog_keyword,언주역,26
-blog_keyword,안녕하세요,25
-blog_keyword,강남맛집,24
-blog_keyword,강남대로,24
-blog_keyword,논현점,23
-blog_keyword,가능,22
-blog_keyword,논현동에서,21
-blog_keyword,강남구청역,21
-blog_keyword,술집,21
+blog_keyword,학동로,28
+blog_keyword,매일,26
+blog_keyword,논현동에서,26
+blog_keyword,출구에서,24
+blog_keyword,강남구청역,24
+blog_keyword,강남대로,23
+blog_keyword,안녕하세요,23
+blog_keyword,언주역,23
+blog_keyword,시간,21
 blog_keyword,언주로,21
-blog_keyword,점심,20
-blog_keyword,도산대로,20
-blog_keyword,쁠로,20
-blog_keyword,일요일,19
-blog_keyword,수목금토,19
-blog_keyword,평일,18
-blog_keyword,평양냉면,18
-blog_keyword,진전복삼계탕,18
-blog_keyword,위치해,18
-blog_keyword,카페를,18
-blog_keyword,신논현역,17
+blog_keyword,쁠로,19
+blog_keyword,카페를,19
+blog_keyword,예약,18
+blog_keyword,특별한,18
+blog_keyword,술집,18
+blog_keyword,가능,18
+blog_keyword,수목금토,18
+blog_keyword,강남맛집,17
 blog_keyword,커피,17
-blog_keyword,한우,17
-blog_keyword,본점,17
-blog_keyword,있어서,16
-blog_keyword,신사역,16
-blog_keyword,도보,16
-category,성형외과,76
-category,카페,65
-category,한식,49
-category,"육류,고기",41
-category,"호프,요리주점",30
-category,피부과,27
-category,치과,25
-category,약국,23
-category,양식,21
-category,일본식주점,20
-category,실내포장마차,20
-category,일식,18
-category,일반의원,18
-category,GS25,17
-category,"제과,베이커리",16
-category,분식,15
-category,술집,15
-category,커피전문점,13
-category,칵테일바,12
-category,"돈까스,우동",11
-category,닭요리,10
-category,회,10
-category,중국요리,10
-category,와인바,10
-category,삼겹살,10
-category,디저트카페,10
-category,"해물,생선",9
-category,갈비,9
-category,산부인과,9
-category,"찌개,전골",8
+blog_keyword,위치해,16
+blog_keyword,점심,16
+blog_keyword,다양한,16
+blog_keyword,도보,15
+blog_keyword,신논현,15
+blog_keyword,원카츠,15
+blog_keyword,신논현역,14
+blog_keyword,서초구,14
+blog_keyword,한우,14
+blog_keyword,있어서,14
+blog_keyword,맛집으로,13
+category,백반/한정식,257
+category,카페,194
+category,미용실,176
+category,성형외과 의원,131
+category,피부 관리실,114
+category,요리 주점,96
+category,돼지고기 구이/찜,78
+category,화장품 소매업,77
+category,편의점,70
+category,기타 의류 소매업,70
+category,경양식,67
+category,피부/비뇨기과 의원,64
+category,일식 회/초밥,60
+category,네일숍,54
+category,입시·교과학원,50
+category,약국,48
+category,내과/소아과 의원,47
+category,기타 교육지원 서비스업,44
+category,헬스장,43
+category,노래방,43
+category,요가/필라테스 학원,42
+category,치킨,40
+category,김밥/만두/분식,40
+category,치과의원,40
+category,기타 기술/직업 훈련학원,39
+category,가구 소매업,38
+category,그 외 기타 상품 전문 소매업,37
+category,슈퍼마켓,35
+category,꽃집,35
+category,여성 의류 소매업,34
 trend:논현동,2024-08-01,2.88182
 trend:논현동,2024-09-01,2.7287
 trend:논현동,2024-10-01,2.91952

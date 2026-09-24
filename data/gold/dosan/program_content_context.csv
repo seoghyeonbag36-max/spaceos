@@ -1,84 +1,84 @@
 kind,key,value
-blog_keyword,강남구,120
-blog_keyword,압구정,119
-blog_keyword,도산,109
-blog_keyword,도산공원맛집,52
+blog_keyword,강남구,123
+blog_keyword,압구정,118
+blog_keyword,도산,108
+blog_keyword,도산공원맛집,53
+blog_keyword,브런치,51
 blog_keyword,카멜커피,51
 blog_keyword,도산대로,50
-blog_keyword,도산공원카페,49
-blog_keyword,브런치,49
+blog_keyword,도산공원카페,50
 blog_keyword,압구정로데오,44
-blog_keyword,언주로,39
+blog_keyword,언주로,40
 blog_keyword,미남옥,36
-blog_keyword,도산공원에,35
+blog_keyword,도산공원에,33
+blog_keyword,매일,32
 blog_keyword,위치한,31
-blog_keyword,도산점,31
-blog_keyword,매일,31
+blog_keyword,도산점,30
 blog_keyword,근처에,29
 blog_keyword,분위기,26
 blog_keyword,근처,26
 blog_keyword,유명한,25
+blog_keyword,안녕하세요,25
 blog_keyword,압구정로데오역,24
-blog_keyword,안녕하세요,24
 blog_keyword,점심,22
-blog_keyword,데이트,22
 blog_keyword,호점,22
+blog_keyword,데이트,21
 blog_keyword,세시셀라,21
 blog_keyword,신사동,20
-blog_keyword,핫플,20
-blog_keyword,도산공원에서,19
+blog_keyword,핫플,19
 blog_keyword,히키니쿠토코메,19
-blog_keyword,주차,18
+blog_keyword,주차,19
+blog_keyword,도산공원에서,18
 blog_keyword,압구정카페,18
-blog_keyword,런던베이글뮤지엄,18
-blog_keyword,서울카페,18
 blog_keyword,루이비통,18
 blog_keyword,강남,17
 blog_keyword,디저트,17
+blog_keyword,압구정로,17
 blog_keyword,꽁티드툴레아,17
-blog_keyword,서울맛집,16
+blog_keyword,서울카페,17
+blog_keyword,베이커리,17
 blog_keyword,커피,16
-blog_keyword,압구정로,16
+blog_keyword,오늘은,16
+blog_keyword,서울도산공원맛집,16
 blog_keyword,가능,16
-blog_keyword,로데오,16
-blog_keyword,베이커리,16
 blog_keyword,웨이팅,16
+blog_keyword,서울맛집,15
 blog_keyword,맛집을,15
-blog_keyword,오늘은,15
 blog_keyword,누데이크,15
+blog_keyword,로데오,15
+blog_keyword,런던베이글뮤지엄,15
 blog_keyword,미나미,15
 blog_keyword,압구정맛집,14
-blog_keyword,근처에서,14
-category,성형외과,70
-category,피부과,60
-category,카페,50
-category,양식,41
-category,"육류,고기",34
-category,한식,33
-category,일식,20
-category,치과,20
-category,약국,19
-category,일반의원,14
-category,술집,13
-category,와인바,13
-category,"초밥,롤",12
-category,"해물,생선",12
-category,"제과,베이커리",12
-category,칵테일바,11
-category,이탈리안,11
-category,중국요리,10
-category,미술관,10
-category,"공연장,연극극장",9
-category,전시관,8
-category,일식집,7
-category,커피전문점,7
-category,세븐일레븐,7
-category,"호프,요리주점",6
-category,디저트카페,6
-category,동물병원,6
-category,정신건강의학과,6
-category,"돈까스,우동",5
-category,분식,5
+category,백반/한정식,359
+category,미용실,252
+category,경양식,209
+category,카페,209
+category,성형외과 의원,186
+category,기타 의류 소매업,178
+category,입시·교과학원,168
+category,요리 주점,145
+category,화장품 소매업,131
+category,일식 회/초밥,128
+category,피부/비뇨기과 의원,125
+category,피부 관리실,121
+category,돼지고기 구이/찜,84
+category,헬스장,78
+category,요가/필라테스 학원,77
+category,기타 교육지원 서비스업,71
+category,내과/소아과 의원,66
+category,치과의원,66
+category,여성 의류 소매업,64
+category,꽃집,64
+category,편의점,63
+category,김밥/만두/분식,61
+category,빵/도넛,61
+category,예술품 소매업,59
+category,약국,57
+category,한의원,56
+category,운동용품 소매업,54
+category,중국집,48
+category,외국어학원,47
+category,네일숍,47
 trend:도산공원,2024-08-01,1.14309
 trend:도산공원,2024-09-01,1.01191
 trend:도산공원,2024-10-01,1.13575

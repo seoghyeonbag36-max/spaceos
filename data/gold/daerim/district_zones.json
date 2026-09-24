@@ -1,0 +1,108 @@
+{
+ "slug": "daerim",
+ "built_at": "2026-09-24T08:12:48+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 377,
+  "knn_vs_pnu_compared": 377,
+  "knn_vs_pnu_agree_pct": 99.5
+ },
+ "dropped_spillover": [
+  {
+   "n": "구로5동",
+   "buildings": 1,
+   "stores": 161,
+   "capacity": 2,
+   "active": 2
+  }
+ ],
+ "residual": {
+  "buildings": 1,
+  "capacity": 2,
+  "active": 2
+ },
+ "zones": [
+  {
+   "n": "대림3동",
+   "grp": "대림동",
+   "lat": 37.49586,
+   "lng": 126.897839,
+   "stores": 975,
+   "buildings": 155,
+   "capacity": 356,
+   "active": 300,
+   "vacancy_rate": 15.73,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "대림2동",
+   "grp": "대림동",
+   "lat": 37.491587,
+   "lng": 126.899414,
+   "stores": 938,
+   "buildings": 132,
+   "capacity": 308,
+   "active": 259,
+   "vacancy_rate": 15.91,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "구로4동",
+   "grp": "구로동",
+   "lat": 37.492499,
+   "lng": 126.892851,
+   "stores": 485,
+   "buildings": 41,
+   "capacity": 104,
+   "active": 84,
+   "vacancy_rate": 19.23,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "대림1동",
+   "grp": "대림동",
+   "lat": 37.494098,
+   "lng": 126.902158,
+   "stores": 359,
+   "buildings": 39,
+   "capacity": 91,
+   "active": 72,
+   "vacancy_rate": 20.88,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  },
+  {
+   "n": "구로3동",
+   "grp": "구로동",
+   "lat": 37.490783,
+   "lng": 126.894249,
+   "stores": 66,
+   "buildings": 9,
+   "capacity": 37,
+   "active": 32,
+   "vacancy_rate": 13.51,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z5"
+  }
+ ]
+}

@@ -162,12 +162,12 @@ describe("ApiKeys — #account", () => {
     render(<ApiKeys go={vi.fn()} />);
     await screen.findByText("테스트자산운용");
 
-    type("새 키 이름", " Program 상용 입력 ");
+    type("새 키 이름", " 본사 BI 연동 ");
     fireEvent.click(screen.getByRole("button", { name: "키 발급" }));
 
     const raw = (await screen.findByLabelText("발급된 API 키 원문")) as HTMLInputElement;
     expect(raw.value).toBe(RAW_KEY);
-    expect(api.matching(/api-keys$/).find((c) => c.method === "POST")?.body).toEqual({ name: "Program 상용 입력" });
+    expect(api.matching(/api-keys$/).find((c) => c.method === "POST")?.body).toEqual({ name: "본사 BI 연동" });
     // 목록에는 원문이 없다 — 두 키 모두 가려진 앞머리로만 보인다
     expect(screen.getAllByLabelText("가려진 키")).toHaveLength(2);
     const stored = [window.sessionStorage, window.localStorage]

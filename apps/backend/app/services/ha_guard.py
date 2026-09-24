@@ -20,9 +20,12 @@
 - 금액: `1만원` 은 잡고 `1만 5천원` 같은 혼합 표기는 못 잡는다 — 아래 한계 참조.
 - 트렌드: **주장과 목표를 가른다.** "손님이 늘고 있다"(주장)는 걸고 "손님을 늘리는
   전단"(목표)은 안 건다. 후자는 정당한 오프라인 제안이라 이걸 죽이면 기능이 망가진다.
-- 최상급: 입력 텍스트에 같은 표현이 있으면 면제한다(리뷰에 "최고예요"가 있으면 인용할
-  근거가 있는 것이다). `최대한` 은 `최대` 로 오인되므로 스캔 전에 걷어낸다.
+- 최상급: 입력 텍스트에 같은 표현이 있으면 면제한다(창업자가 낸 차별점에 "최고"가
+  있으면 인용할 근거가 있는 것이다). `최대한` 은 `최대` 로 오인되므로 스캔 전에 걷어낸다.
 - 비방: `경쟁력` 은 비방이 아니라 제외한다.
+- 미검증 경험: **주장과 측정을 가른다.** "단골 고객에게"(주장)는 걸고 "재방문율을
+  집계한다"(측정)는 안 건다. 후자는 팝업 검증의 핵심 지표라 이걸 죽이면 이 트랙의
+  결론이 통째로 사라진다(services/program_brief).
 
 ## 알려진 한계
 
@@ -36,9 +39,9 @@ from __future__ import annotations
 
 import re
 
-from app.schemas.marketing import HAFinding, LLMDistrictContents, LLMStoreMarketing
-from app.services import program_venture
-from app.services.program_venture import PRE_OPEN_FORBIDDEN
+from app.schemas.marketing import HAFinding, LLMDistrictContents, LLMProgramPlan
+from app.services import program_brief
+from app.services.program_brief import MEASUREMENT_MARKS, UNPROVEN_EVIDENCE
 
 # ── 금액 ─────────────────────────────────────────────────────────────────────
 # "6,000원" / "6000 원" / "1만원". 앞의 숫자만 잡고 콤마는 지운다.
@@ -108,27 +111,78 @@ def _sentences(text: str) -> list[str]:
     return [s.strip() for s in _SENTENCE_RE.split(text or "") if s.strip()]
 
 
-def _check_pre_open(generated: str, pre_open: bool | None) -> list[HAFinding]:
-    """개업 전인데 방문·후기·재방문을 전제하는가 (입력 계약 ③층, services/program_venture).
+def _check_unproven_evidence(generated: str) -> list[HAFinding]:
+    """아직 없는 경험(단골·기존 고객·쌓인 후기)을 근거로 삼는가.
 
-    §0-B 설계원칙 1 이 지적한 '방문 후기형 포스팅' 의 근본 해소 지점이다. 08-23 오전에
-    스텁 문구는 고쳤지만 판정 근거가 `reviews 가 비었는가` 라는 **추정**이었다 —
-    리뷰를 아직 못 모은 영업 중인 가게도 개업 전으로 오인된다. ③층의 개업예정일이
-    있으면 확정이므로, 그때만 이 검사를 켠다.
+    Program 의 대상은 전부 **이 자리에서 이 아이템을 아직 해 보지 않은** 사람이다
+    (예비창업자 · 팝업·가오픈·MVP 로 검증하려는 기창업자). 그래서 이 검사는 조건 없이
+    **항상 켜진다** — 종전에는 '영업 중인 가게'가 대상에 섞여 있어 개업예정일이 있을
+    때만 켰지만, 이제 갈라야 할 '영업 중'이 없다.
 
-    `pre_open` 이 None(③층 없음)이면 **아무것도 하지 않는다.** 모르는 것을 위반으로
-    만들면 기존 요청이 전부 깨진다.
+    ## 주장과 측정을 가른다
+
+    금칙어가 **측정 문장**에 있으면 면제한다. 재방문율은 팝업 검증의 핵심 지표이고
+    후기 수집은 가오픈의 목적이라, 그 문장까지 잡으면 이 트랙의 결론인 검증 지표가
+    통째로 폐기된다. 거르는 것은 지표가 아니라 **이미 있다고 말하는 것**이다.
     """
-    if not pre_open:
-        return []
-    hit = sorted({w for w in PRE_OPEN_FORBIDDEN if w in generated})
+    hits: list[str] = []
+    for sent in _sentences(generated):
+        if any(mark in sent for mark in MEASUREMENT_MARKS):
+            continue    # 측정·판정 문장은 주장이 아니다
+        hits.extend(w for w in UNPROVEN_EVIDENCE if w in sent)
+    hit = sorted(set(hits))
     if not hit:
         return []
     return [HAFinding(
-        severity="violation", code="pre_open_visit_claim",
-        message=("아직 문을 열지 않은 자리에 방문·후기·재방문을 전제하는 제안을 한다 — "
-                 "있지도 않은 경험을 근거로 삼는 것이라 그대로 거짓이 된다."),
+        severity="violation", code="unproven_experience_claim",
+        message=("아직 이 자리에서 해 보지 않은 아이템에 단골·기존 고객·쌓인 후기를 "
+                 "전제하는 제안을 한다 — 있지도 않은 경험을 근거로 삼는 것이라 그대로 "
+                 "거짓이 된다. 앞으로 측정할 지표로 적는 것은 정상이다."),
         evidence=", ".join(hit[:5]))]
+
+
+# 검증 지표의 목표선·판정선에 있어야 하는 것 — **셀 수 있는 값**이다.
+# "많이 오면 성공" 같은 문장은 사후에 말을 맞추게 되므로 지표가 아니다.
+_COUNTABLE_RE = re.compile(r"\d")
+_MIN_DECISION_LEN = 8
+
+
+def _check_signals(signals: list) -> list[HAFinding]:
+    """검증 지표가 실제로 판정에 쓸 수 있는 모양인가 (2026-09-17 신설).
+
+    팝업·가오픈·MVP 는 홍보가 아니라 **판정**이 목적이다. 지표가 아예 없거나, 목표선에
+    숫자가 없거나, 가설을 기각할 조건이 비어 있으면 그 검증은 결과를 보고 사후에 말을
+    맞추게 된다.
+
+    등급은 **warning** 이다. 표기 방식이 다양해("절반 이하", "손익분기 미만") 숫자
+    없는 정당한 판정선이 있을 수 있고, 여기서 응답을 버리면 나머지 채널안까지 함께
+    사라진다 — 밝히고 사람이 보게 하는 쪽이 낫다(§0-3 의 등급 판단과 같다).
+    """
+    if not signals:
+        return [HAFinding(
+            severity="warning", code="missing_validation_signal",
+            message=("검증 지표가 없다 — 무엇을 세면 '통했다'고 할지 정하지 않은 검증은 "
+                     "판정이 아니라 지출이다."),
+            evidence="signals=0")]
+
+    out: list[HAFinding] = []
+    vague = [s.name for s in signals
+             if not _COUNTABLE_RE.search(f"{s.target or ''} {s.method or ''}")]
+    if vague:
+        out.append(HAFinding(
+            severity="warning", code="unmeasurable_signal",
+            message=(f"목표선에 셀 수 있는 값이 없는 지표 {len(vague)}건 — 숫자가 없으면 "
+                     "결과를 보고 나서 성공이었다고 말하게 된다."),
+            evidence=", ".join(vague[:5])))
+
+    bare = [s.name for s in signals if len((s.decision or "").strip()) < _MIN_DECISION_LEN]
+    if bare:
+        out.append(HAFinding(
+            severity="warning", code="missing_decision_rule",
+            message=(f"가설을 기각할 조건이 비었거나 너무 짧은 지표 {len(bare)}건 — "
+                     "기각 조건은 검증을 **시작하기 전에** 적어야 한다."),
+            evidence=", ".join(bare[:5])))
+    return out
 
 
 def _check_prices(generated: str, allowed_text: str) -> list[HAFinding]:
@@ -252,7 +306,7 @@ def _check_rationales(plans: list) -> list[HAFinding]:
     return [HAFinding(
         severity="warning", code="missing_rationale",
         message=f"근거(rationale)가 비었거나 너무 짧은 제안 {len(bare)}건 — 각 제안은 "
-                "리뷰 키워드나 상권 데이터로 근거를 밝혀야 한다.",
+                "자리·상권의 수치나 창업자가 낸 가설로 근거를 밝혀야 한다.",
         evidence=", ".join(bare[:5]))]
 
 
@@ -346,29 +400,36 @@ def _check_budget_shares(online: list) -> list[HAFinding]:
         evidence=" + ".join(f"{p.channel} {p.budget_share}%" for p in online[:5]))]
 
 
-def check_store(parsed: LLMStoreMarketing, profile: dict,
-                context: str | None) -> list[HAFinding]:
-    """가게 단위 생성물 검증. violation 이 하나라도 있으면 호출부가 응답을 버린다."""
+def check_program(parsed: LLMProgramPlan, brief: dict,
+                  context: str | None) -> list[HAFinding]:
+    """검증 프로그램 생성물 검증. violation 이 하나라도 있으면 호출부가 응답을 버린다."""
     plans = list(parsed.online) + list(parsed.offline)
-    generated = " ".join(f"{p.content} {p.rationale}" for p in plans)
-    generated = f"{generated} {parsed.ha_check or ''}"
-    # 금액의 근거는 메뉴가 정본이고, 리뷰에 적힌 가격도 점주 입력에서 온 것이라 인정한다.
+    # ⚠ 조각을 **줄바꿈으로** 잇는다. 공백으로 이으면 `_sentences` 가 전체를 한 문장으로
+    # 보고, 문장 단위로 판정하는 검사들이 무력해진다 — 실측(2026-09-17): 어느 지표의
+    # "…미만이면 기각한다"가 측정 표현으로 인정되면서 **다른 제안**의 "단골 고객에게"가
+    # 함께 면제됐다. 같은 함정이 트렌드 검사에도 있었다(주장과 유입어가 서로 다른
+    # 제안에 있어도 한 문장으로 읽혔다).
+    parts = [p.content for p in plans] + [p.rationale for p in plans]
+    # 검증 지표도 검사 대상에 넣는다 — 지표 문장에 지어낸 금액이나 미검증 경험이
+    # 들어가면 채널안에 든 것과 똑같이 거짓이다.
+    for s in parsed.signals:
+        parts += [s.name, s.method, s.target, s.decision]
+    parts.append(parsed.ha_check or "")
+    generated = "\n".join(p for p in parts if p)
+
+    # 금액의 근거는 **창업자가 준 예산 구간**이 정본이다. 종전에는 점주가 준 메뉴·리뷰가
+    # 그 자리였는데, 대상이 바뀌면서 그 입력이 사라졌다(2026-09-17).
     # **상권 컨텍스트도 근거에 넣는다** — 행사가 컨텍스트에 합류(2026-08-06)하면서 행사
     # 요금·기간의 숫자가 거기 실린다. 빼면 실린 행사비를 인용한 것이 지어낸 금액으로
-    # 잘못 걸린다. 대가로 컨텍스트의 금액을 가게 가격처럼 쓰는 경우는 못 잡지만,
-    # 정상 인용을 폐기하는 쪽이 더 나쁘다.
-    # ③층(창업계획)도 근거에 넣는다 — 기업이 제출한 강점과 예산 범위는 점주가 준
-    # 메뉴·리뷰와 같은 등급이다. 빼면 기업이 준 예산을 인용한 문장이 '지어낸 금액'으로
-    # 폐기된다(행사 요금을 컨텍스트에 넣어야 했던 2026-08-06 과 같은 이유).
-    venture = profile.get("venture") or None
-    allowed_text = " ".join([*(profile.get("menu") or []), *(profile.get("reviews") or []),
-                             program_venture.strengths_text(venture),
-                             program_venture.allowed_prices_text(venture),
+    # 잘못 걸린다. 대가로 컨텍스트의 금액을 가격처럼 쓰는 경우는 못 잡지만, 정상 인용을
+    # 폐기하는 쪽이 더 나쁘다.
+    allowed_text = " ".join([program_brief.claims_text(brief),
+                             program_brief.allowed_prices_text(brief),
                              context or ""])
-    source_text = f"{allowed_text} {profile.get('name', '')}"
+    source_text = f"{allowed_text} {brief.get('item', '')} {brief.get('category', '')}"
 
     return [
-        *_check_pre_open(generated, program_venture.is_pre_open(venture)),
+        *_check_unproven_evidence(generated),
         *_check_prices(generated, allowed_text),
         *_check_trend(generated, context),
         *_check_superlatives(generated, source_text),
@@ -379,6 +440,7 @@ def check_store(parsed: LLMStoreMarketing, profile: dict,
         *_check_proposed_events(list(parsed.offline)),
         *_check_actors(list(parsed.offline)),
         *_check_budget_shares(list(parsed.online)),
+        *_check_signals(list(parsed.signals)),
     ]
 
 
@@ -388,7 +450,9 @@ def check_district(parsed: LLMDistrictContents, context: str) -> list[HAFinding]
     상권 컨텍스트에는 가격 정보가 없다(키워드 빈도·업종 분포·트렌드뿐). 그래서 카피에
     나오는 금액은 근거가 컨텍스트에 있지 않는 한 지어낸 값이다.
     """
-    generated = " ".join(parsed.online_contents) + f" {parsed.ha_check or ''}"
+    # 줄바꿈으로 잇는 이유는 check_program 과 같다 — 카피 하나의 주장이 옆 카피의
+    # 표현과 한 문장으로 읽히면 문장 단위 판정이 어긋난다.
+    generated = "\n".join([*parsed.online_contents, parsed.ha_check or ""])
     return [
         *_check_prices(generated, context or ""),
         *_check_trend(generated, context),

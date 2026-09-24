@@ -1,5 +1,5 @@
 {
-  "started": "2026-09-16T06:28:36",
+  "started": "2026-09-24T18:12:25",
   "claims": "docs/apply/claims.json",
   "require_complete": false,
   "docs": [
@@ -12,6 +12,12 @@
     {
       "doc": "docs/apply/02-govtech/draft.md",
       "fill_remaining": 3,
+      "violations": [],
+      "ok": true
+    },
+    {
+      "doc": "docs/apply/09-digitalsolveup/draft.md",
+      "fill_remaining": 0,
       "violations": [],
       "ok": true
     },

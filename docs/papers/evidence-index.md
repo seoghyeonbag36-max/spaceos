@@ -263,9 +263,10 @@ a_only 148 · b_only 149 · discordant 297 · 델타 **+0.03pp** · chi2 = 0.0 �
 | 근거 | 내용 | 출처 |
 |---|---|---|
 | 생성 엔진 | `POST /marketing/generate` + ProgramStudio + `ha_guard` 후처리 | `services/marketing.py` · `services/ha_guard.py` |
-| 입력 계약 3층 | 자리 · 상권 · 창업계획 | §0-J · `tests/test_program_venture.py` (13건) |
+| 입력 계약 3층 | 자리 · 상권 · 검증 브리프(2026-09-17 대상 재정의 — 예비창업자·팝업/가오픈/MVP 검증) | §0-V · `tests/test_posting_marketing.py` 브리프 배선 · `tests/test_ha_guard.py` 미검증 경험 |
 | 출력 분리 | 퍼포먼스 / 상권활성화 | §0-F · `tests/test_program_output_split.py` (14건) |
-| 상용 온보딩 | 조직 인증 · 명시 동의 · **원문 비저장** | §0-K · `tests/test_program_commercial_onboarding.py` (6건) |
+| ~~상용 온보딩~~ | 2026-09-17 삭제 — 받을 점주 원문이 없다 | §0-K · §0-V |
+| 검증 지표 | 지표 · 측정 방법 · 목표선 · 기각 조건 | §0-V · `tests/test_program_output_split.py` · `tests/test_ha_guard.py` 지표 검사 |
 | 검색 트렌드 라벨 | 66/66거점 | `pppp_status.py` |
 | 데이터 채널 타당성 | 채널별 가능/불가 전수 판정 (크롤링 금지선 포함) | §0 (2026-07-18) |
 

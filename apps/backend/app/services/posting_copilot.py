@@ -48,8 +48,8 @@ PlaceOS 가 계약을 발행하고 공급자가 여기에 맞춘다.** 어댑터
 하나는 폴백인 시나리오 표는 비교표가 아니다 — 같은 자를 안 쓴 값을 나란히 놓으면
 읽는 사람이 그걸 비교로 오독한다.
 
-의존성은 표준 라이브러리만 쓴다 — Vercel 서버리스 의존성이 fastapi/pydantic 뿐이라
-httpx 를 쓰면 프로덕션에서만 죽는다(services/store_lookup 과 같은 이유).
+의존성은 표준 라이브러리만 쓴다 — 서버리스 의존성이 fastapi/pydantic 뿐이라 httpx 를
+쓰면 프로덕션에서만 죽는다(services/marketing 이 파케이로 겪은 사고와 같은 양식).
 """
 from __future__ import annotations
 

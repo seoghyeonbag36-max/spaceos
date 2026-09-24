@@ -1,0 +1,414 @@
+{
+  "source": "Gold 건물 마스터(공실 건물) + 건축물대장 상업면적(silver building_attrs.com_area_flr)",
+  "built_at": "2026-09-24T02:21:27+00:00",
+  "note": "면적은 건물 상업면적 ÷ 호실 수(호실당 평균, 평). 대장 면적이 없는 건물은 제외했다 — 면적을 가정하면 그 위 투자비·매출이 전부 가정이 된다. 층은 층별개요(bldg_flr_raw) 상업층의 **면적 비중**이다(floor_mix) — 유닛이 호실당 평균이므로 임대료도 층 가중평균으로 계산한다. 종전 '전부 1F 가정'은 계수를 최댓값에 고정해 임대료 상한을 만들었다. 그 층 가중평균도 여전히 상한이었다 — 공실 유닛은 점포가 있는 층에 있을 수 없는데 상업층 **전체**를 평균에 넣었기 때문이다. vac_floor_mix 는 점유가 확인된 층(occ_floors)을 덜어낸 것이고, vac_floor_mix_lo 는 층 미상 점포까지 낮은 층부터 점유로 배정한 것이다 — 임대료의 참값은 이 둘 사이에 있고 괄호 폭의 원인은 상가정보 flrNo 공란(약 30%)이다. 권리금은 거점 단위 소스가 없어 유닛에 없다 — 통계(상가건물임대차 실태조사 142006)는 있으나 전국 7,000 표본이라 시도·상권유형 단위다.",
+  "units": [
+    {
+      "id": "vu-1165010800115500013-1",
+      "n": "소소헌 빌딩",
+      "grp": "비알코올 ",
+      "lat": 37.490584,
+      "lng": 127.010403,
+      "area": 45,
+      "floor": "1~3F",
+      "floor_mix": {
+        "1F": 0.2652,
+        "2F": 0.3674,
+        "3F": 0.3674
+      },
+      "vac_floor_mix": {
+        "1F": 0.2652,
+        "2F": 0.3674,
+        "3F": 0.3674
+      },
+      "vac_floor_mix_lo": {
+        "1F": 0.2652,
+        "2F": 0.3674,
+        "3F": 0.3674
+      },
+      "occ_floors": [
+        4
+      ],
+      "unknown_n": 0,
+      "floor_basis": "flr_ouln",
+      "was": "비알코올 ",
+      "capacity": 4,
+      "active": 1,
+      "vacancy_rate": 75.0,
+      "bld_floors": 6,
+      "com_area_m2": 590.8
+    },
+    {
+      "id": "vu-1165010800117170001-1",
+      "n": "서초동 1717-1",
+      "grp": "일식",
+      "lat": 37.492872,
+      "lng": 127.009635,
+      "area": 77,
+      "floor": "1~3F",
+      "floor_mix": {
+        "1F": 0.494,
+        "2F": 0.4342,
+        "3F": 0.0718
+      },
+      "vac_floor_mix": {
+        "2F": 0.8581,
+        "3F": 0.1419
+      },
+      "vac_floor_mix_lo": {
+        "2F": 0.8581,
+        "3F": 0.1419
+      },
+      "occ_floors": [
+        1
+      ],
+      "unknown_n": 0,
+      "floor_basis": "flr_ouln",
+      "was": "일식",
+      "capacity": 3,
+      "active": 1,
+      "vacancy_rate": 66.7,
+      "bld_floors": 1,
+      "com_area_m2": 763.4
+    },
+    {
+      "id": "vu-1165010800117170001-2",
+      "n": "서초동 1717-1",
+      "grp": "일식",
+      "lat": 37.49302,
+      "lng": 127.009922,
+      "area": 77,
+      "floor": "1~3F",
+      "floor_mix": {
+        "1F": 0.494,
+        "2F": 0.4342,
+        "3F": 0.0718
+      },
+      "vac_floor_mix": {
+        "2F": 0.8581,
+        "3F": 0.1419
+      },
+      "vac_floor_mix_lo": {
+        "2F": 0.8581,
+        "3F": 0.1419
+      },
+      "occ_floors": [
+        1
+      ],
+      "unknown_n": 0,
+      "floor_basis": "flr_ouln",
+      "was": "일식",
+      "capacity": 3,
+      "active": 1,
+      "vacancy_rate": 66.7,
+      "bld_floors": 3,
+      "com_area_m2": 763.4
+    },
+    {
+      "id": "vu-1165010800117200001-1",
+      "n": "서초동 1720-1",
+      "grp": "한식",
+      "lat": 37.493639,
+      "lng": 127.007205,
+      "area": 69,
+      "floor": "1~3F",
+      "floor_mix": {
+        "1F": 0.5511,
+        "2F": 0.3933,
+        "3F": 0.0557
+      },
+      "vac_floor_mix": {
+        "1F": 0.551,
+        "2F": 0.3933,
+        "3F": 0.0557
+      },
+      "vac_floor_mix_lo": {
+        "2F": 0.8759,
+        "3F": 0.1241
+      },
+      "occ_floors": [],
+      "unknown_n": 1,
+      "floor_basis": "flr_ouln",
+      "was": "한식",
+      "capacity": 3,
+      "active": 1,
+      "vacancy_rate": 66.7,
+      "bld_floors": 3,
+      "com_area_m2": 683.8
+    },
+    {
+      "id": "vu-1165010800115760010-1",
+      "n": "신화빌딩",
+      "grp": "주점",
+      "lat": 37.490259,
+      "lng": 127.013752,
+      "area": 68,
+      "floor": "1~3F",
+      "floor_mix": {
+        "1F": 0.3845,
+        "2F": 0.4165,
+        "3F": 0.1989
+      },
+      "vac_floor_mix": {
+        "2F": 0.6768,
+        "3F": 0.3232
+      },
+      "vac_floor_mix_lo": {
+        "2F": 0.6768,
+        "3F": 0.3232
+      },
+      "occ_floors": [
+        1
+      ],
+      "unknown_n": 0,
+      "floor_basis": "flr_ouln",
+      "was": "주점",
+      "capacity": 3,
+      "active": 1,
+      "vacancy_rate": 66.7,
+      "bld_floors": 3,
+      "com_area_m2": 673.9
+    },
+    {
+      "id": "vu-1165010800115570017-1",
+      "n": "한라빌딩",
+      "grp": "주점",
+      "lat": 37.49135,
+      "lng": 127.01154,
+      "area": 63,
+      "floor": "1~3F",
+      "floor_mix": {
+        "1F": 0.3524,
+        "2F": 0.3708,
+        "3F": 0.2767
+      },
+      "vac_floor_mix": {
+        "2F": 0.5727,
+        "3F": 0.4273
+      },
+      "vac_floor_mix_lo": {
+        "2F": 0.5727,
+        "3F": 0.4273
+      },
+      "occ_floors": [
+        1
+      ],
+      "unknown_n": 0,
+      "floor_basis": "flr_ouln",
+      "was": "주점",
+      "capacity": 3,
+      "active": 1,
+      "vacancy_rate": 66.7,
+      "bld_floors": 4,
+      "com_area_m2": 625.1
+    },
+    {
+      "id": "vu-1165010800115620001-1",
+      "n": "네오클래식",
+      "grp": "식물 소매",
+      "lat": 37.48984,
+      "lng": 127.012479,
+      "area": 55,
+      "floor": "1~3F",
+      "floor_mix": {
+        "1F": 0.3333,
+        "2F": 0.3333,
+        "3F": 0.3333
+      },
+      "vac_floor_mix": {
+        "2F": 0.5,
+        "3F": 0.5
+      },
+      "vac_floor_mix_lo": {
+        "2F": 0.5,
+        "3F": 0.5
+      },
+      "occ_floors": [
+        1
+      ],
+      "unknown_n": 0,
+      "floor_basis": "flr_ouln",
+      "was": "식물 소매",
+      "capacity": 3,
+      "active": 1,
+      "vacancy_rate": 66.7,
+      "bld_floors": 6,
+      "com_area_m2": 546.7
+    },
+    {
+      "id": "vu-1165010800115440003-1",
+      "n": "석정빌딩",
+      "grp": "의원",
+      "lat": 37.488908,
+      "lng": 127.009495,
+      "area": 51,
+      "floor": "1~7F",
+      "floor_mix": {
+        "1F": 0.2934,
+        "2F": 0.2752,
+        "3F": 0.257,
+        "6F": 0.0515,
+        "7F": 0.123
+      },
+      "vac_floor_mix": {
+        "1F": 0.4047,
+        "3F": 0.3545,
+        "6F": 0.071,
+        "7F": 0.1697
+      },
+      "vac_floor_mix_lo": {
+        "1F": 0.4047,
+        "3F": 0.3545,
+        "6F": 0.071,
+        "7F": 0.1697
+      },
+      "occ_floors": [
+        2,
+        4
+      ],
+      "unknown_n": 0,
+      "floor_basis": "flr_ouln",
+      "was": "의원",
+      "capacity": 6,
+      "active": 2,
+      "vacancy_rate": 66.7,
+      "bld_floors": 7,
+      "com_area_m2": 1010.0
+    },
+    {
+      "id": "vu-1165010800115500012-1",
+      "n": "템스코 타워",
+      "grp": "비알코올 ",
+      "lat": 37.49061,
+      "lng": 127.010511,
+      "area": 46,
+      "floor": "1~5F",
+      "floor_mix": {
+        "1F": 0.3328,
+        "4F": 0.3533,
+        "5F": 0.3138
+      },
+      "vac_floor_mix": {
+        "4F": 0.5296,
+        "5F": 0.4704
+      },
+      "vac_floor_mix_lo": {
+        "4F": 0.5296,
+        "5F": 0.4704
+      },
+      "occ_floors": [
+        1
+      ],
+      "unknown_n": 0,
+      "floor_basis": "flr_ouln",
+      "was": "비알코올 ",
+      "capacity": 3,
+      "active": 1,
+      "vacancy_rate": 66.7,
+      "bld_floors": 6,
+      "com_area_m2": 455.7
+    },
+    {
+      "id": "vu-1165010800115950008-1",
+      "n": "서초동 1595-8",
+      "grp": "한식",
+      "lat": 37.48695,
+      "lng": 127.014053,
+      "area": 33,
+      "floor": "1~3F",
+      "floor_mix": {
+        "1F": 0.0082,
+        "2F": 0.4959,
+        "3F": 0.4959
+      },
+      "vac_floor_mix": {
+        "1F": 0.0082,
+        "2F": 0.4959,
+        "3F": 0.4959
+      },
+      "vac_floor_mix_lo": {
+        "2F": 0.5,
+        "3F": 0.5
+      },
+      "occ_floors": [],
+      "unknown_n": 1,
+      "floor_basis": "flr_ouln",
+      "was": "한식",
+      "capacity": 3,
+      "active": 1,
+      "vacancy_rate": 66.7,
+      "bld_floors": 3,
+      "com_area_m2": 330.0
+    },
+    {
+      "id": "vu-1165010800115780003-1",
+      "n": "서초동 1578-3",
+      "grp": "한식",
+      "lat": 37.48872,
+      "lng": 127.014238,
+      "area": 29,
+      "floor": "1~5F",
+      "floor_mix": {
+        "1F": 0.494,
+        "2F": 0.4266,
+        "5F": 0.0794
+      },
+      "vac_floor_mix": {
+        "1F": 0.494,
+        "2F": 0.4266,
+        "5F": 0.0794
+      },
+      "vac_floor_mix_lo": {
+        "2F": 0.8431,
+        "5F": 0.1569
+      },
+      "occ_floors": [],
+      "unknown_n": 1,
+      "floor_basis": "flr_ouln",
+      "was": "한식",
+      "capacity": 3,
+      "active": 1,
+      "vacancy_rate": 66.7,
+      "bld_floors": 5,
+      "com_area_m2": 287.0
+    },
+    {
+      "id": "vu-1165010800115640013-1",
+      "n": "서초동 1564-13",
+      "grp": "한식",
+      "lat": 37.488783,
+      "lng": 127.013725,
+      "area": 76,
+      "floor": "1~5F",
+      "floor_mix": {
+        "1F": 0.1891,
+        "2F": 0.2131,
+        "3F": 0.2131,
+        "4F": 0.2131,
+        "5F": 0.1717
+      },
+      "vac_floor_mix": {
+        "2F": 0.3333,
+        "3F": 0.3333,
+        "4F": 0.3333
+      },
+      "vac_floor_mix_lo": {
+        "2F": 0.3333,
+        "3F": 0.3333,
+        "4F": 0.3333
+      },
+      "occ_floors": [
+        1,
+        5
+      ],
+      "unknown_n": 0,
+      "floor_basis": "flr_ouln",
+      "was": "한식",
+      "capacity": 5,
+      "active": 2,
+      "vacancy_rate": 60.0,
+      "bld_floors": 6,
+      "com_area_m2": 1254.0
+    }
+  ]
+}

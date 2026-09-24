@@ -1,84 +1,84 @@
 kind,key,value
-blog_keyword,스타벅스,212
-blog_keyword,동대문구,194
-blog_keyword,경동,180
-blog_keyword,청량리역,99
-blog_keyword,시장,80
-blog_keyword,제기동,55
-blog_keyword,고산자로,55
-blog_keyword,청량,54
+blog_keyword,스타벅스,208
+blog_keyword,동대문구,197
+blog_keyword,경동,178
+blog_keyword,청량리역,92
+blog_keyword,시장,87
+blog_keyword,제기동,57
+blog_keyword,청량,57
+blog_keyword,고산자로,54
 blog_keyword,카페청량,53
-blog_keyword,경동시장맛집,43
-blog_keyword,홍릉로,43
-blog_keyword,매일,40
-blog_keyword,레트로,39
-blog_keyword,근처,37
-blog_keyword,청량리맛집,35
-blog_keyword,경동시장에,30
+blog_keyword,경동시장맛집,50
+blog_keyword,매일,45
+blog_keyword,홍릉로,41
+blog_keyword,레트로,41
+blog_keyword,청량리맛집,39
+blog_keyword,근처,38
+blog_keyword,경동시장에,33
+blog_keyword,가성비,32
+blog_keyword,감성,32
 blog_keyword,위치한,30
-blog_keyword,이색,30
-blog_keyword,감성,30
-blog_keyword,청년몰,27
-blog_keyword,오늘은,26
-blog_keyword,주차,25
-blog_keyword,왕산로,24
-blog_keyword,동대문,24
-blog_keyword,가성비,23
-blog_keyword,남원통닭,23
+blog_keyword,이색,29
+blog_keyword,오늘은,28
+blog_keyword,데이트,26
+blog_keyword,청년몰,26
+blog_keyword,안에,23
+blog_keyword,경동시장카페,23
 blog_keyword,스타벅스경동,23
 blog_keyword,디저트,23
-blog_keyword,참다정,23
-blog_keyword,데이트,22
-blog_keyword,청량리카페,22
-blog_keyword,안녕하세요,21
-blog_keyword,평양냉면,21
+blog_keyword,주차,22
+blog_keyword,참다정,22
 blog_keyword,제기동역,21
-blog_keyword,안에,21
-blog_keyword,경동시장카페,21
+blog_keyword,동대문,21
+blog_keyword,청량리카페,21
+blog_keyword,왕산로,20
+blog_keyword,안녕하세요,20
+blog_keyword,다퍼줘,20
+blog_keyword,띵베이크샵,20
 blog_keyword,핫플,20
-blog_keyword,신관,19
-blog_keyword,띵베이크샵,19
+blog_keyword,신관,18
+blog_keyword,청량리시장,17
+blog_keyword,남원통닭,17
 blog_keyword,경동시장에서,16
-blog_keyword,청량리점,16
+blog_keyword,커피한약방,16
+blog_keyword,있어서,15
 blog_keyword,노포,15
-blog_keyword,시간,14
-blog_keyword,있어서,14
-blog_keyword,커피한약방,14
-blog_keyword,출구에서,14
+blog_keyword,카페가,15
 blog_keyword,분위기,14
-blog_keyword,청량리시장,13
-blog_keyword,서울맛집,13
-blog_keyword,본관,13
-category,한식,103
-category,약국,42
-category,"육류,고기",29
-category,카페,29
-category,치과,28
-category,분식,25
-category,"제과,베이커리",23
-category,치킨,20
-category,"여관,모텔",15
-category,순대,13
-category,피부과,13
-category,"해물,생선",12
-category,냉면,12
-category,"호프,요리주점",12
-category,중국요리,12
-category,실내포장마차,11
-category,장어,11
-category,내과,11
-category,회,10
-category,"족발,보쌈",9
-category,정형외과,9
-category,"떡,한과",8
-category,갈비,8
-category,칼국수,8
-category,국밥,7
-category,"돈까스,우동",7
-category,국수,7
-category,간식,7
-category,커피전문점,7
-category,세븐일레븐,7
+blog_keyword,시간,13
+blog_keyword,코스,13
+blog_keyword,제기동맛집,13
+blog_keyword,소개해,12
+category,백반/한정식,332
+category,채소/과일 소매업,239
+category,그 외 기타 상품 전문 소매업,182
+category,미용실,151
+category,건강보조식품 소매업,120
+category,기타 의류 소매업,120
+category,카페,117
+category,슈퍼마켓,100
+category,약국,99
+category,요리 주점,81
+category,여성 의류 소매업,79
+category,반찬/식료품 소매업,77
+category,한의원,72
+category,수산물 소매업,68
+category,여관/모텔,62
+category,건어물/젓갈 소매업,58
+category,돼지고기 구이/찜,55
+category,김밥/만두/분식,54
+category,정육점,53
+category,치킨,46
+category,편의점,44
+category,가축 사료 소매업,44
+category,국/탕/찌개류,38
+category,빵/도넛,38
+category,피부 관리실,37
+category,입시·교과학원,37
+category,남성 의류 소매업,34
+category,신발 소매업,33
+category,중국집,32
+category,세탁소,32
 trend:청량리·경동시장,2024-08-01,5.2426
 trend:청량리·경동시장,2024-09-01,6.42025
 trend:청량리·경동시장,2024-10-01,9.18084

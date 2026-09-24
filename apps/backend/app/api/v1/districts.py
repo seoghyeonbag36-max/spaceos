@@ -42,7 +42,8 @@ async def get_sentiment(district_id: str) -> list[dict]:
 
     점수(s)·표본수(r)·증감(d)·키워드(f) 모두 app/data/seoul_pages.py 의 시드값이며
     실제로 리뷰를 센 적이 없다. 구역 단위 감성을 만들려면 리뷰 원문 수집이 먼저다:
-      - data/crawlers/review_crawler.py 는 NotImplementedError (골격만)
+      - 플레이스 리뷰 크롤러 골격(data/crawlers/review_crawler.py)은 수집 0건인 채로
+        2026-09-17 에 삭제됐다(Program 대상 재정의 — 영업 중인 가게 리뷰를 쓰지 않는다)
       - 네이버 블로그 코퍼스(17,653건)는 **거점 단위 광고성 스니펫**이라
         324개 구역으로 내릴 수 없고, 감성분석을 돌리면 광고 톤을 재게 된다
     자세한 판단 근거는 docs/placeos-vibe-build-sequence.md 의 5번 항목 참조.

@@ -33,6 +33,12 @@ BACKEND_PY = str(_BACKEND_VENV) if _BACKEND_VENV.exists() else sys.executable
 # (이름, 커맨드, 작업디렉터리, 셸필요)
 STEPS = [
     ("backend-pytest", [BACKEND_PY, "-m", "pytest", "-q"], ROOT / "apps" / "backend", False),
+    # ⚠ **2026-09-24 추가.** 이 스텝이 없어서 로컬은 초록인데 CI 가 47건으로 깨졌다.
+    #   `data/tests` 는 CI 의 "데이터 파이프라인 pytest" 잡이 도는 자리인데 여기에는
+    #   없었고, 그래서 "정적 검증 통과"라고 보고한 뒤에야 드러났다. 거점을 늘리면
+    #   `gold/{slug}/district_zones.json` 같은 **거점별 산출물이 없는 것**을 잡는 게
+    #   정확히 이쪽 테스트다(파라미터라이즈가 거점마다 돌아 한 번에 수십 건이 깨진다).
+    ("data-pytest", [sys.executable, "-m", "pytest", "data/tests", "-q"], ROOT, False),
     ("gnn-import", [sys.executable, "-c",
                     "import ml.training.train_gnn as t; "
                     "print('SELECT_BY', t.SELECT_BY); "

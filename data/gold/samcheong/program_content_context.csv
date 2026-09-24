@@ -1,84 +1,84 @@
 kind,key,value
-blog_keyword,종로구,197
-blog_keyword,북촌,119
-blog_keyword,삼청로,116
-blog_keyword,삼청동카페,98
-blog_keyword,안국역,83
-blog_keyword,삼청점,81
-blog_keyword,포스톤즈,65
-blog_keyword,종로,59
-blog_keyword,매일,55
-blog_keyword,수제비,51
-blog_keyword,삼청동맛집,49
-blog_keyword,국립현대미술관,47
-blog_keyword,주차,46
-blog_keyword,안국,38
-blog_keyword,삼청동수제비,37
-blog_keyword,근처,37
-blog_keyword,데이트,33
-blog_keyword,삼청동데이트,32
-blog_keyword,삼청동에,31
-blog_keyword,분위기,31
-blog_keyword,스낵서울,30
+blog_keyword,종로구,200
+blog_keyword,삼청로,117
+blog_keyword,북촌,114
+blog_keyword,안국역,91
+blog_keyword,삼청동카페,90
+blog_keyword,삼청점,84
+blog_keyword,삼청동맛집,57
+blog_keyword,국립현대미술관,54
+blog_keyword,포스톤즈,53
+blog_keyword,수제비,50
+blog_keyword,매일,49
+blog_keyword,주차,45
+blog_keyword,종로,45
+blog_keyword,안국,42
+blog_keyword,삼청동수제비,42
+blog_keyword,근처,41
+blog_keyword,데이트,38
+blog_keyword,스낵서울,35
+blog_keyword,허스밴즈,34
+blog_keyword,분위기,32
+blog_keyword,삼청동데이트,31
 blog_keyword,경복궁,30
-blog_keyword,허스밴즈,27
-blog_keyword,삼청,26
-blog_keyword,북촌카페,26
-blog_keyword,디저트,24
-blog_keyword,한식,23
-blog_keyword,북촌로,22
-blog_keyword,예쁜,21
-blog_keyword,한옥,20
-blog_keyword,미쉐린,20
-blog_keyword,도트블랭킷,20
-blog_keyword,안녕하세요,20
-blog_keyword,골목,20
+blog_keyword,미쉐린,26
+blog_keyword,북촌카페,25
+blog_keyword,북촌로,25
+blog_keyword,삼청동에,24
+blog_keyword,한옥,24
+blog_keyword,카페에서,24
+blog_keyword,황남쫀드기,22
+blog_keyword,예쁜,22
+blog_keyword,도보,21
+blog_keyword,떡볶이,20
+blog_keyword,삼청,20
 blog_keyword,지유가오카핫초메,20
-blog_keyword,삼청동샤브,19
-blog_keyword,도보,19
-blog_keyword,고즈넉한,19
-blog_keyword,카페를,19
+blog_keyword,전시,19
+blog_keyword,퀸즈베이커리,19
 blog_keyword,안국역카페,19
-blog_keyword,위치한,18
-blog_keyword,삼청동에서,18
-blog_keyword,정보,18
-blog_keyword,포비,18
-blog_keyword,나들이,17
-blog_keyword,유명한,17
-blog_keyword,메뉴,17
-blog_keyword,삼청동카페추천,17
-blog_keyword,북촌한옥마을,16
-blog_keyword,한옥카페,16
-category,카페,62
-category,한옥숙소,57
-category,미술관,22
-category,게스트하우스,20
-category,전시관,18
-category,"제과,베이커리",16
-category,한식,15
-category,디저트카페,15
-category,전통찻집,12
-category,박물관,10
-category,양식,9
-category,분식,8
-category,이탈리안,6
-category,호텔,6
-category,숙박,5
-category,와인바,4
-category,간식,4
-category,한정식,4
-category,"호프,요리주점",4
-category,"초밥,롤",3
-category,피자,3
-category,커피전문점,3
-category,닭요리,2
-category,삼계탕,2
-category,칼국수,2
-category,국밥,2
-category,"돈까스,우동",2
-category,떡볶이,2
-category,북촌손만두,2
-category,"육류,고기",2
+blog_keyword,북촌맛집,18
+blog_keyword,한식,18
+blog_keyword,디저트,18
+blog_keyword,골목,17
+blog_keyword,삼청동에서,17
+blog_keyword,황생가칼국수,17
+blog_keyword,메뉴,16
+blog_keyword,웨이팅,16
+blog_keyword,미옥,16
+blog_keyword,블루보틀,16
+blog_keyword,카페를,16
+blog_keyword,포비,16
+blog_keyword,북촌한옥마을,15
+category,카페,125
+category,백반/한정식,109
+category,예술품 소매업,98
+category,펜션,78
+category,경양식,45
+category,기타 의류 소매업,33
+category,여성 의류 소매업,26
+category,액세서리/잡화 소매업,26
+category,화장품 소매업,25
+category,빵/도넛,25
+category,기념품점,24
+category,김밥/만두/분식,21
+category,슈퍼마켓,20
+category,요리 주점,18
+category,기타 기술/직업 훈련학원,18
+category,꽃집,14
+category,주방/가정용품 소매업,14
+category,시계/귀금속 소매업,13
+category,그 외 기타 상품 전문 소매업,13
+category,국수/칼국수,12
+category,여관/모텔,10
+category,편의점,10
+category,기타 오락관련 서비스업,9
+category,가방 소매업,9
+category,일식 회/초밥,9
+category,피자,9
+category,그 외 기타 간이 음식점,9
+category,미용실,9
+category,가구 소매업,8
+category,그 외 기타 교육기관,8
 trend:삼청동·북촌,2024-08-01,2.24947
 trend:삼청동·북촌,2024-09-01,2.67372
 trend:삼청동·북촌,2024-10-01,3.4685
