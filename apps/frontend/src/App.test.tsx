@@ -39,14 +39,17 @@ const TAB_LOAD = { timeout: 20000 };
 const MULTI_TAB = { timeout: 60000 };
 
 describe("App — 레일과 지도 셸 (2026-09-13)", MULTI_TAB, () => {
-  it("레일에는 PlaceOS 로고와 PPPP 네 트랙만 있다 — 서울·거점 탭은 없다", async () => {
+  it("레일에는 PlaceOS 로고와 PPPP 네 트랙, 맨 아래 「계정」만 있다 — 서울·거점 탭은 없다", async () => {
     mount(true);
     const rail = screen.getByRole("navigation", { name: "주요 화면" });
     expect(rail.textContent).toContain("PlaceOS");
     expect(rail.textContent).not.toMatch(/SpaceOS/);
-    const labels = Array.from(rail.querySelectorAll("button")).map((b) => b.textContent);
+    const tracks = Array.from(rail.querySelectorAll("button[data-track]")).map((b) => b.textContent);
     // 레일 순서는 첫 화면(Page)부터 사용자가 밟는 순서다(2026-09-15).
-    expect(labels).toEqual(["Page", "Platform", "Posting", "Program"]);
+    expect(tracks).toEqual(["Page", "Platform", "Posting", "Program"]);
+    // 트랙이 아닌 버튼은 「계정」(B9, 2026-09-23) 하나뿐이고 맨 아래에 있다.
+    const labels = Array.from(rail.querySelectorAll("button")).map((b) => b.textContent);
+    expect(labels).toEqual([...tracks, "계정"]);
     expect(screen.queryByRole("button", { name: "서울" })).toBeNull();
     expect(screen.queryByRole("button", { name: "거점" })).toBeNull();
     await screen.findByRole("button", { name: "검토 건물 후보 저장" }, TAB_LOAD);

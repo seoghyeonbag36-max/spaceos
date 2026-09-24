@@ -17,6 +17,8 @@ export interface ApiCall {
   url: string;
   /** POST 본문(JSON 파싱). GET 이면 undefined */
   body: unknown;
+  /** 요청 헤더(평문 객체로 넘긴 것만). 계정 토큰이 **어느 호출에만** 붙는지 보려고 남긴다(2026-09-23 B9) */
+  headers: Record<string, string>;
 }
 
 export interface Route {
@@ -42,19 +44,20 @@ export interface FetchStub {
 export function installFetchStub(routes: Route[]): FetchStub {
   const calls: ApiCall[] = [];
 
-  const impl = (input: unknown, init?: { method?: string; body?: string }) => {
+  const impl = (input: unknown, init?: { method?: string; body?: string; headers?: Record<string, string> }) => {
     const url = typeof input === "string" ? input : String(input);
     const method = (init?.method ?? "GET").toUpperCase();
     let body: unknown;
     if (init?.body) { try { body = JSON.parse(init.body); } catch { body = init.body; } }
-    calls.push({ method, url, body });
+    const headers = { ...(init?.headers ?? {}) };
+    calls.push({ method, url, body, headers });
 
     for (const r of routes) {
       const m = new RegExp(r.match.source, r.match.flags.replace("g", "")).exec(url);
       if (!m) continue;
       const status = r.status ?? 200;
       const payload = typeof r.body === "function"
-        ? (r.body as (mm: RegExpExecArray, call: ApiCall) => unknown)(m, { method, url, body })
+        ? (r.body as (mm: RegExpExecArray, call: ApiCall) => unknown)(m, { method, url, body, headers })
         : r.body;
       return Promise.resolve({
         ok: status < 400,
