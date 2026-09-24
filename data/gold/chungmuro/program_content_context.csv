@@ -49,36 +49,36 @@ blog_keyword,대만,16
 blog_keyword,충무로에서,16
 blog_keyword,출구,16
 blog_keyword,남산도담,16
-category,한식,74
-category,카페,64
-category,"호프,요리주점",46
-category,호텔,20
-category,중국요리,18
-category,"육류,고기",17
-category,커피전문점,17
-category,치과,16
-category,분식,14
-category,"제과,베이커리",12
-category,실내포장마차,12
-category,CU,12
-category,약국,12
-category,게스트하우스,12
-category,"해물,생선",11
-category,양식,11
-category,GS25,11
-category,"돈까스,우동",10
-category,술집,10
-category,숙박,10
-category,세븐일레븐,9
-category,순대,8
-category,갈비,8
-category,"찌개,전골",8
-category,닭요리,8
-category,디저트카페,8
-category,회,7
-category,일식,7
-category,중식,6
-category,베트남음식,6
+category,백반/한정식,446
+category,카페,306
+category,요리 주점,145
+category,펜션,126
+category,꽃집,104
+category,편의점,100
+category,경양식,95
+category,기타 의류 소매업,91
+category,슈퍼마켓,84
+category,일반 유흥 주점,83
+category,일식 회/초밥,71
+category,돼지고기 구이/찜,63
+category,미용실,59
+category,김밥/만두/분식,59
+category,생맥주 전문,53
+category,건어물/젓갈 소매업,53
+category,국/탕/찌개류,51
+category,여관/모텔,50
+category,화장품 소매업,47
+category,중국집,43
+category,그 외 기타 상품 전문 소매업,41
+category,빵/도넛,40
+category,서점,34
+category,기숙사/고시원,32
+category,호텔/리조트,30
+category,주방/가정용품 소매업,30
+category,베트남식 전문,29
+category,약국,28
+category,국수/칼국수,28
+category,치과의원,27
 trend:충무로,2024-08-01,0.8288
 trend:충무로,2024-09-01,0.79826
 trend:충무로,2024-10-01,0.80023

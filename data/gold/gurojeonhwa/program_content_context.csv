@@ -1,0 +1,83 @@
+kind,key,value
+category,백반/한정식,122
+category,요리 주점,116
+category,미용실,107
+category,카페,71
+category,노래방,60
+category,슈퍼마켓,57
+category,돼지고기 구이/찜,56
+category,편의점,51
+category,기타 의류 소매업,40
+category,피부 관리실,39
+category,국/탕/찌개류,39
+category,중국집,35
+category,치킨,30
+category,김밥/만두/분식,29
+category,자동차 정비소,29
+category,생맥주 전문,29
+category,화장품 소매업,28
+category,네일숍,28
+category,기숙사/고시원,27
+category,입시·교과학원,27
+category,일반 유흥 주점,26
+category,핸드폰 소매업,24
+category,빵/도넛,21
+category,여성 의류 소매업,21
+category,세탁소,20
+category,치과의원,20
+category,일식 회/초밥,19
+category,정육점,19
+category,당구장,18
+category,약국,18
+trend:구로전화국,2024-08-01,0.06106
+trend:구로전화국,2024-09-01,0.05462
+trend:구로전화국,2024-10-01,0.04915
+trend:구로전화국,2024-11-01,0.05479
+trend:구로전화국,2024-12-01,0.05497
+trend:구로전화국,2025-01-01,0.04351
+trend:구로전화국,2025-02-01,0.04674
+trend:구로전화국,2025-03-01,0.04951
+trend:구로전화국,2025-04-01,0.05506
+trend:구로전화국,2025-05-01,0.05157
+trend:구로전화국,2025-06-01,0.11309
+trend:구로전화국,2025-07-01,0.03563
+trend:구로전화국,2025-08-01,0.04047
+trend:구로전화국,2025-09-01,0.05533
+trend:구로전화국,2025-10-01,0.03796
+trend:구로전화국,2025-11-01,0.0359
+trend:구로전화국,2025-12-01,0.04557
+trend:구로전화국,2026-01-01,0.03698
+trend:구로전화국,2026-02-01,0.04468
+trend:구로전화국,2026-03-01,0.03769
+trend:구로전화국,2026-04-01,0.03098
+trend:구로전화국,2026-05-01,0.03438
+trend:구로전화국,2026-06-01,0.03769
+trend:구로전화국,2026-07-01,0.03375
+trend:구로전화국,2026-08-01,0.03653
+demand,flpop_tmzon_00_06,25.03
+demand,selng_tmzon_00_06,2.55
+demand,flpop_tmzon_06_11,20.58
+demand,selng_tmzon_06_11,16.82
+demand,flpop_tmzon_11_14,12.72
+demand,selng_tmzon_11_14,19.52
+demand,flpop_tmzon_14_17,12.75
+demand,selng_tmzon_14_17,19.03
+demand,flpop_tmzon_17_21,16.52
+demand,selng_tmzon_17_21,32.76
+demand,flpop_tmzon_21_24,12.4
+demand,selng_tmzon_21_24,9.31
+demand,agrde_10,8.78
+demand,agrde_20,16.96
+demand,agrde_30,21.55
+demand,agrde_40,18.35
+demand,agrde_50,15.22
+demand,agrde_60_above,19.13
+demand,fml_share,49.6
+demand,flpop_wkend,27.39
+demand,selng_wkend,25.73
+demand,frc_share,6.97
+demand,opbiz_rt,2.21
+demand,clsbiz_rt,2.37
+demand,stor_co,1247.0
+demand,trdar_n,10.0
+demand,trdar_selng_n,9.0

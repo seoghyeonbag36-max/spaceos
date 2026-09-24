@@ -1,0 +1,83 @@
+kind,key,value
+category,백반/한정식,201
+category,카페,168
+category,요리 주점,90
+category,미용실,76
+category,편의점,75
+category,중국집,73
+category,돼지고기 구이/찜,70
+category,노래방,55
+category,김밥/만두/분식,52
+category,국/탕/찌개류,50
+category,기타 교육지원 서비스업,48
+category,핸드폰 소매업,47
+category,일식 회/초밥,46
+category,기타 의류 소매업,46
+category,슈퍼마켓,42
+category,화장품 소매업,40
+category,피부 관리실,36
+category,컴퓨터/소프트웨어 소매업,35
+category,교육컨설팅업,34
+category,국수/칼국수,31
+category,치과의원,30
+category,네일숍,29
+category,입시·교과학원,28
+category,직원 훈련기관,27
+category,기숙사/고시원,27
+category,치킨,26
+category,그 외 기타 교육기관,26
+category,약국,25
+category,헬스장,25
+category,생맥주 전문,25
+trend:구로디지털단지,2024-08-01,0.59527
+trend:구로디지털단지,2024-09-01,0.55498
+trend:구로디지털단지,2024-10-01,0.67022
+trend:구로디지털단지,2024-11-01,0.73908
+trend:구로디지털단지,2024-12-01,0.78546
+trend:구로디지털단지,2025-01-01,0.78734
+trend:구로디지털단지,2025-02-01,0.80722
+trend:구로디지털단지,2025-03-01,0.74042
+trend:구로디지털단지,2025-04-01,0.66556
+trend:구로디지털단지,2025-05-01,1.24481
+trend:구로디지털단지,2025-06-01,0.61927
+trend:구로디지털단지,2025-07-01,0.76289
+trend:구로디지털단지,2025-08-01,0.68311
+trend:구로디지털단지,2025-09-01,0.86372
+trend:구로디지털단지,2025-10-01,0.60924
+trend:구로디지털단지,2025-11-01,0.69386
+trend:구로디지털단지,2025-12-01,0.72502
+trend:구로디지털단지,2026-01-01,0.64721
+trend:구로디지털단지,2026-02-01,0.58882
+trend:구로디지털단지,2026-03-01,0.62957
+trend:구로디지털단지,2026-04-01,0.59411
+trend:구로디지털단지,2026-05-01,0.57477
+trend:구로디지털단지,2026-06-01,0.56975
+trend:구로디지털단지,2026-07-01,0.57808
+trend:구로디지털단지,2026-08-01,0.56904
+demand,flpop_tmzon_00_06,22.27
+demand,selng_tmzon_00_06,7.83
+demand,flpop_tmzon_06_11,20.92
+demand,selng_tmzon_06_11,8.28
+demand,flpop_tmzon_11_14,13.86
+demand,selng_tmzon_11_14,20.85
+demand,flpop_tmzon_14_17,13.71
+demand,selng_tmzon_14_17,16.82
+demand,flpop_tmzon_17_21,17.26
+demand,selng_tmzon_17_21,30.37
+demand,flpop_tmzon_21_24,11.99
+demand,selng_tmzon_21_24,15.86
+demand,agrde_10,4.87
+demand,agrde_20,20.77
+demand,agrde_30,24.97
+demand,agrde_40,18.97
+demand,agrde_50,14.72
+demand,agrde_60_above,15.7
+demand,fml_share,47.32
+demand,flpop_wkend,25.86
+demand,selng_wkend,26.77
+demand,frc_share,10.31
+demand,opbiz_rt,1.83
+demand,clsbiz_rt,2.51
+demand,stor_co,3641.75
+demand,trdar_n,6.0
+demand,trdar_selng_n,6.0

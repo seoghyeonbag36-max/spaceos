@@ -1,0 +1,83 @@
+kind,key,value
+category,백반/한정식,151
+category,카페,125
+category,미용실,70
+category,요가/필라테스 학원,54
+category,요리 주점,49
+category,편의점,48
+category,입시·교과학원,44
+category,화장품 소매업,42
+category,김밥/만두/분식,39
+category,기타 교육지원 서비스업,39
+category,기타 기술/직업 훈련학원,39
+category,피부 관리실,38
+category,경양식,37
+category,돼지고기 구이/찜,36
+category,기타 의류 소매업,36
+category,일식 회/초밥,33
+category,기숙사/고시원,33
+category,건강보조식품 소매업,31
+category,헬스장,31
+category,약국,30
+category,꽃집,30
+category,국/탕/찌개류,28
+category,치과의원,27
+category,한의원,26
+category,노래방,25
+category,교육컨설팅업,25
+category,음악학원,24
+category,생맥주 전문,22
+category,빵/도넛,21
+category,슈퍼마켓,21
+trend:양재역,2024-08-01,3.49867
+trend:양재역,2024-09-01,3.37045
+trend:양재역,2024-10-01,3.7964
+trend:양재역,2024-11-01,3.85845
+trend:양재역,2024-12-01,3.71268
+trend:양재역,2025-01-01,3.03556
+trend:양재역,2025-02-01,3.21527
+trend:양재역,2025-03-01,3.63648
+trend:양재역,2025-04-01,3.60639
+trend:양재역,2025-05-01,3.38576
+trend:양재역,2025-06-01,3.30025
+trend:양재역,2025-07-01,3.25628
+trend:양재역,2025-08-01,3.23596
+trend:양재역,2025-09-01,3.3272
+trend:양재역,2025-10-01,3.06054
+trend:양재역,2025-11-01,3.25396
+trend:양재역,2025-12-01,3.39158
+trend:양재역,2026-01-01,3.09842
+trend:양재역,2026-02-01,2.5438
+trend:양재역,2026-03-01,3.24608
+trend:양재역,2026-04-01,3.28198
+trend:양재역,2026-05-01,3.01156
+trend:양재역,2026-06-01,2.89507
+trend:양재역,2026-07-01,2.7878
+trend:양재역,2026-08-01,2.85791
+demand,flpop_tmzon_00_06,15.87
+demand,selng_tmzon_00_06,1.46
+demand,flpop_tmzon_06_11,22.06
+demand,selng_tmzon_06_11,10.47
+demand,flpop_tmzon_11_14,17.31
+demand,selng_tmzon_11_14,31.53
+demand,flpop_tmzon_14_17,16.35
+demand,selng_tmzon_14_17,19.13
+demand,flpop_tmzon_17_21,18.78
+demand,selng_tmzon_17_21,28.3
+demand,flpop_tmzon_21_24,9.63
+demand,selng_tmzon_21_24,9.12
+demand,agrde_10,12.29
+demand,agrde_20,15.21
+demand,agrde_30,22.53
+demand,agrde_40,20.06
+demand,agrde_50,14.51
+demand,agrde_60_above,15.4
+demand,fml_share,51.31
+demand,flpop_wkend,22.01
+demand,selng_wkend,15.94
+demand,frc_share,11.61
+demand,opbiz_rt,1.82
+demand,clsbiz_rt,2.04
+demand,stor_co,1540.75
+demand,trdar_n,3.0
+demand,trdar_selng_n,3.0

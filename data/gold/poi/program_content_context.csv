@@ -1,0 +1,83 @@
+kind,key,value
+category,카페,151
+category,백반/한정식,137
+category,미용실,65
+category,경양식,64
+category,자동차 정비소,59
+category,편의점,52
+category,요리 주점,49
+category,돼지고기 구이/찜,44
+category,꽃집,41
+category,빵/도넛,41
+category,요가/필라테스 학원,40
+category,화장품 소매업,39
+category,노래방,38
+category,일식 회/초밥,37
+category,기타 교육지원 서비스업,35
+category,기타 의류 소매업,30
+category,국/탕/찌개류,28
+category,중국집,28
+category,김밥/만두/분식,28
+category,슈퍼마켓,27
+category,건강보조식품 소매업,26
+category,기타 기술/직업 훈련학원,25
+category,입시·교과학원,25
+category,피자,24
+category,자동차 세차장,24
+category,그 외 기타 교육기관,23
+category,피부 관리실,22
+category,당구장,22
+category,운동용품 소매업,20
+category,예술품 소매업,19
+trend:포이사거리,2024-08-01,0.0607
+trend:포이사거리,2024-09-01,0.06187
+trend:포이사거리,2024-10-01,0.05157
+trend:포이사거리,2024-11-01,0.06464
+trend:포이사거리,2024-12-01,0.04683
+trend:포이사거리,2025-01-01,0.04503
+trend:포이사거리,2025-02-01,0.0445
+trend:포이사거리,2025-03-01,0.05641
+trend:포이사거리,2025-04-01,0.0496
+trend:포이사거리,2025-05-01,0.04647
+trend:포이사거리,2025-06-01,0.04468
+trend:포이사거리,2025-07-01,0.05282
+trend:포이사거리,2025-08-01,0.04047
+trend:포이사거리,2025-09-01,0.0513
+trend:포이사거리,2025-10-01,0.03993
+trend:포이사거리,2025-11-01,0.04262
+trend:포이사거리,2025-12-01,0.03921
+trend:포이사거리,2026-01-01,0.0419
+trend:포이사거리,2026-02-01,0.0445
+trend:포이사거리,2026-03-01,0.03653
+trend:포이사거리,2026-04-01,0.05515
+trend:포이사거리,2026-05-01,0.04011
+trend:포이사거리,2026-06-01,0.03751
+trend:포이사거리,2026-07-01,0.05282
+trend:포이사거리,2026-08-01,0.05479
+demand,flpop_tmzon_00_06,20.85
+demand,selng_tmzon_00_06,0.97
+demand,flpop_tmzon_06_11,21.06
+demand,selng_tmzon_06_11,13.22
+demand,flpop_tmzon_11_14,14.98
+demand,selng_tmzon_11_14,33.63
+demand,flpop_tmzon_14_17,14.76
+demand,selng_tmzon_14_17,23.74
+demand,flpop_tmzon_17_21,17.11
+demand,selng_tmzon_17_21,23.11
+demand,flpop_tmzon_21_24,11.24
+demand,selng_tmzon_21_24,5.33
+demand,agrde_10,11.04
+demand,agrde_20,13.65
+demand,agrde_30,21.06
+demand,agrde_40,20.47
+demand,agrde_50,16.36
+demand,agrde_60_above,17.41
+demand,fml_share,48.99
+demand,flpop_wkend,25.13
+demand,selng_wkend,16.33
+demand,frc_share,6.51
+demand,opbiz_rt,1.46
+demand,clsbiz_rt,1.86
+demand,stor_co,2563.75
+demand,trdar_n,9.0
+demand,trdar_selng_n,9.0

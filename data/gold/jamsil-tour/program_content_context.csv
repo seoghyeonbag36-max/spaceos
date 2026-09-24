@@ -1,0 +1,83 @@
+kind,key,value
+category,백반/한정식,142
+category,요리 주점,87
+category,카페,84
+category,미용실,80
+category,돼지고기 구이/찜,61
+category,일식 회/초밥,61
+category,피부 관리실,57
+category,요가/필라테스 학원,46
+category,편의점,46
+category,화장품 소매업,45
+category,노래방,45
+category,일반 유흥 주점,40
+category,약국,35
+category,여관/모텔,34
+category,입시·교과학원,31
+category,중국집,31
+category,김밥/만두/분식,30
+category,경양식,30
+category,펜션,29
+category,생맥주 전문,27
+category,세탁소,26
+category,기숙사/고시원,26
+category,네일숍,25
+category,국/탕/찌개류,25
+category,슈퍼마켓,24
+category,헬스장,23
+category,치킨,22
+category,치과의원,21
+category,교육컨설팅업,21
+category,기타 의류 소매업,21
+trend:잠실 관광특구,2024-08-01,6.33465
+trend:잠실 관광특구,2024-09-01,4.84592
+trend:잠실 관광특구,2024-10-01,4.94263
+trend:잠실 관광특구,2024-11-01,4.42355
+trend:잠실 관광특구,2024-12-01,5.65297
+trend:잠실 관광특구,2025-01-01,4.073
+trend:잠실 관광특구,2025-02-01,4.44334
+trend:잠실 관광특구,2025-03-01,4.77653
+trend:잠실 관광특구,2025-04-01,5.25576
+trend:잠실 관광특구,2025-05-01,5.36008
+trend:잠실 관광특구,2025-06-01,4.39633
+trend:잠실 관광특구,2025-07-01,4.99152
+trend:잠실 관광특구,2025-08-01,5.00343
+trend:잠실 관광특구,2025-09-01,4.19728
+trend:잠실 관광특구,2025-10-01,4.30079
+trend:잠실 관광특구,2025-11-01,4.1389
+trend:잠실 관광특구,2025-12-01,4.73409
+trend:잠실 관광특구,2026-01-01,3.49626
+trend:잠실 관광특구,2026-02-01,3.19656
+trend:잠실 관광특구,2026-03-01,3.44656
+trend:잠실 관광특구,2026-04-01,3.83562
+trend:잠실 관광특구,2026-05-01,3.74393
+trend:잠실 관광특구,2026-06-01,25.28534
+trend:잠실 관광특구,2026-07-01,4.33697
+trend:잠실 관광특구,2026-08-01,3.86365
+demand,flpop_tmzon_00_06,22.0
+demand,selng_tmzon_00_06,4.87
+demand,flpop_tmzon_06_11,18.55
+demand,selng_tmzon_06_11,6.7
+demand,flpop_tmzon_11_14,12.95
+demand,selng_tmzon_11_14,21.78
+demand,flpop_tmzon_14_17,13.62
+demand,selng_tmzon_14_17,22.9
+demand,flpop_tmzon_17_21,19.91
+demand,selng_tmzon_17_21,31.84
+demand,flpop_tmzon_21_24,12.97
+demand,selng_tmzon_21_24,11.92
+demand,agrde_10,11.41
+demand,agrde_20,21.1
+demand,agrde_30,23.79
+demand,agrde_40,17.35
+demand,agrde_50,11.9
+demand,agrde_60_above,14.44
+demand,fml_share,53.01
+demand,flpop_wkend,29.65
+demand,selng_wkend,31.63
+demand,frc_share,10.54
+demand,opbiz_rt,2.08
+demand,clsbiz_rt,2.48
+demand,stor_co,5157.5
+demand,trdar_n,5.0
+demand,trdar_selng_n,5.0

@@ -49,36 +49,36 @@ blog_keyword,월요일,18
 blog_keyword,구로맛집,17
 blog_keyword,호선,17
 blog_keyword,출구,17
-category,한식,14
-category,치과,14
-category,GS25,11
-category,분식,10
-category,중국요리,10
-category,약국,10
-category,"여관,모텔",10
-category,"육류,고기",9
-category,카페,9
-category,실내포장마차,8
-category,"제과,베이커리",8
-category,"호프,요리주점",8
-category,CU,7
-category,삼겹살,6
-category,치킨,5
-category,순대,5
-category,국수,5
-category,내과,5
-category,"해물,생선",4
-category,닭요리,4
-category,갈비,4
-category,칼국수,4
-category,일반의원,4
-category,정형외과,4
-category,술집,3
-category,"찌개,전골",3
-category,회,3
-category,양꼬치,3
-category,추어,3
-category,감자탕,3
+category,미용실,76
+category,요리 주점,42
+category,백반/한정식,40
+category,카페,38
+category,슈퍼마켓,37
+category,편의점,30
+category,돼지고기 구이/찜,26
+category,치킨,26
+category,입시·교과학원,22
+category,국/탕/찌개류,21
+category,김밥/만두/분식,21
+category,여성 의류 소매업,20
+category,펜션,18
+category,빵/도넛,16
+category,약국,16
+category,기타 의류 소매업,15
+category,세탁소,15
+category,네일숍,15
+category,노래방,14
+category,일반 유흥 주점,14
+category,여관/모텔,14
+category,요가/필라테스 학원,13
+category,국수/칼국수,13
+category,한의원,13
+category,중국집,12
+category,일식 회/초밥,12
+category,치과의원,12
+category,화장품 소매업,11
+category,채소/과일 소매업,11
+category,횟집,10
 trend:오류동,2024-08-01,1.02803
 trend:오류동,2024-09-01,0.95971
 trend:오류동,2024-10-01,0.94019

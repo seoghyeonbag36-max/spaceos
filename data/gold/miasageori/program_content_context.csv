@@ -49,36 +49,36 @@ blog_keyword,영업,16
 blog_keyword,매주,15
 blog_keyword,휴무,15
 blog_keyword,치킨,15
-category,"호프,요리주점",40
-category,한식,37
-category,"육류,고기",26
-category,카페,25
-category,치과,25
-category,약국,17
-category,분식,15
-category,"여관,모텔",14
-category,치킨,12
-category,술집,12
-category,"곱창,막창",12
-category,"제과,베이커리",11
-category,중국요리,11
-category,"해물,생선",11
-category,"족발,보쌈",10
-category,갈비,8
-category,닭요리,8
-category,CU,7
-category,GS25,7
-category,피부과,7
-category,일반의원,7
-category,일식,6
-category,삼겹살,6
-category,"찌개,전골",6
-category,세븐일레븐,6
-category,정신건강의학과,6
-category,내과,6
-category,"떡,한과",5
-category,일본식주점,5
-category,"초밥,롤",5
+category,기타 의류 소매업,155
+category,백반/한정식,123
+category,미용실,117
+category,여성 의류 소매업,102
+category,카페,89
+category,요리 주점,74
+category,입시·교과학원,63
+category,돼지고기 구이/찜,53
+category,남성 의류 소매업,44
+category,김밥/만두/분식,41
+category,신발 소매업,41
+category,피부 관리실,39
+category,슈퍼마켓,35
+category,편의점,34
+category,노래방,33
+category,빵/도넛,32
+category,약국,31
+category,치킨,31
+category,치과의원,31
+category,네일숍,29
+category,화장품 소매업,29
+category,생맥주 전문,27
+category,국/탕/찌개류,25
+category,한의원,25
+category,핸드폰 소매업,24
+category,자동차 정비소,22
+category,세탁소,21
+category,여관/모텔,21
+category,시계/귀금속 소매업,20
+category,가전제품 수리업,19
 trend:미아사거리,2024-08-01,0.7423
 trend:미아사거리,2024-09-01,0.98684
 trend:미아사거리,2024-10-01,0.62536

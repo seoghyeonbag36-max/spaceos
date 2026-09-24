@@ -1,0 +1,83 @@
+kind,key,value
+category,백반/한정식,110
+category,카페,101
+category,경양식,59
+category,미용실,56
+category,요리 주점,40
+category,입시·교과학원,40
+category,편의점,39
+category,요가/필라테스 학원,35
+category,돼지고기 구이/찜,34
+category,빵/도넛,34
+category,기타 의류 소매업,30
+category,일식 회/초밥,27
+category,기타 교육지원 서비스업,26
+category,노래방,25
+category,자동차 정비소,25
+category,약국,24
+category,김밥/만두/분식,23
+category,피부 관리실,22
+category,꽃집,22
+category,기타 기술/직업 훈련학원,21
+category,음악학원,21
+category,국/탕/찌개류,20
+category,피자,20
+category,한의원,20
+category,화장품 소매업,19
+category,교육컨설팅업,18
+category,슈퍼마켓,18
+category,국수/칼국수,17
+category,헬스장,17
+category,당구장,16
+trend:매봉역,2024-08-01,0.89318
+trend:매봉역,2024-09-01,0.83121
+trend:매봉역,2024-10-01,0.86667
+trend:매봉역,2024-11-01,0.88279
+trend:매봉역,2024-12-01,0.87133
+trend:매봉역,2025-01-01,0.80999
+trend:매봉역,2025-02-01,0.84321
+trend:매봉역,2025-03-01,0.89748
+trend:매봉역,2025-04-01,0.95245
+trend:매봉역,2025-05-01,0.85235
+trend:매봉역,2025-06-01,0.82611
+trend:매봉역,2025-07-01,0.97878
+trend:매봉역,2025-08-01,0.76128
+trend:매봉역,2025-09-01,0.7637
+trend:매봉역,2025-10-01,0.78223
+trend:매봉역,2025-11-01,0.77588
+trend:매봉역,2025-12-01,0.78985
+trend:매봉역,2026-01-01,0.74212
+trend:매봉역,2026-02-01,0.62733
+trend:매봉역,2026-03-01,0.79549
+trend:매봉역,2026-04-01,0.91995
+trend:매봉역,2026-05-01,0.77838
+trend:매봉역,2026-06-01,0.73523
+trend:매봉역,2026-07-01,0.73934
+trend:매봉역,2026-08-01,0.70756
+demand,flpop_tmzon_00_06,21.34
+demand,selng_tmzon_00_06,2.2
+demand,flpop_tmzon_06_11,20.78
+demand,selng_tmzon_06_11,11.24
+demand,flpop_tmzon_11_14,14.96
+demand,selng_tmzon_11_14,36.02
+demand,flpop_tmzon_14_17,14.68
+demand,selng_tmzon_14_17,15.09
+demand,flpop_tmzon_17_21,17.23
+demand,selng_tmzon_17_21,25.15
+demand,flpop_tmzon_21_24,11.01
+demand,selng_tmzon_21_24,10.31
+demand,agrde_10,12.09
+demand,agrde_20,13.2
+demand,agrde_30,19.41
+demand,agrde_40,18.83
+demand,agrde_50,15.91
+demand,agrde_60_above,20.57
+demand,fml_share,52.23
+demand,flpop_wkend,25.0
+demand,selng_wkend,16.65
+demand,frc_share,6.4
+demand,opbiz_rt,1.43
+demand,clsbiz_rt,1.59
+demand,stor_co,1255.25
+demand,trdar_n,5.0
+demand,trdar_selng_n,5.0

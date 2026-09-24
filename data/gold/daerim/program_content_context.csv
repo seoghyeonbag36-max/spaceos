@@ -1,0 +1,83 @@
+kind,key,value
+category,중국집,224
+category,노래방,128
+category,미용실,127
+category,백반/한정식,100
+category,슈퍼마켓,92
+category,생맥주 전문,89
+category,요리 주점,83
+category,기타 오락장,81
+category,카페,69
+category,편의점,58
+category,핸드폰 소매업,57
+category,화장품 소매업,56
+category,돼지고기 구이/찜,43
+category,국/탕/찌개류,39
+category,김밥/만두/분식,39
+category,약국,33
+category,기타 의류 소매업,31
+category,치킨,30
+category,네일숍,28
+category,입시·교과학원,27
+category,건강보조식품 소매업,26
+category,마라탕/훠궈,26
+category,기타 오락관련 서비스업,26
+category,체형/비만 관리,26
+category,기숙사/고시원,23
+category,반찬/식료품 소매업,22
+category,자동차 정비소,21
+category,피부 관리실,21
+category,치과의원,21
+category,채소/과일 소매업,20
+trend:대림역,2024-08-01,1.42882
+trend:대림역,2024-09-01,1.35924
+trend:대림역,2024-10-01,1.47493
+trend:대림역,2024-11-01,1.4084
+trend:대림역,2024-12-01,1.43204
+trend:대림역,2025-01-01,1.29415
+trend:대림역,2025-02-01,1.25914
+trend:대림역,2025-03-01,1.4204
+trend:대림역,2025-04-01,1.35656
+trend:대림역,2025-05-01,1.3776
+trend:대림역,2025-06-01,1.2654
+trend:대림역,2025-07-01,1.38682
+trend:대림역,2025-08-01,1.29979
+trend:대림역,2025-09-01,1.41261
+trend:대림역,2025-10-01,1.29039
+trend:대림역,2025-11-01,1.21795
+trend:대림역,2025-12-01,1.27758
+trend:대림역,2026-01-01,1.23863
+trend:대림역,2026-02-01,1.09841
+trend:대림역,2026-03-01,1.22878
+trend:대림역,2026-04-01,1.20165
+trend:대림역,2026-05-01,1.2338
+trend:대림역,2026-06-01,1.14013
+trend:대림역,2026-07-01,1.1182
+trend:대림역,2026-08-01,1.11032
+demand,flpop_tmzon_00_06,24.68
+demand,selng_tmzon_00_06,4.37
+demand,flpop_tmzon_06_11,20.13
+demand,selng_tmzon_06_11,11.58
+demand,flpop_tmzon_11_14,11.98
+demand,selng_tmzon_11_14,25.0
+demand,flpop_tmzon_14_17,12.25
+demand,selng_tmzon_14_17,23.8
+demand,flpop_tmzon_17_21,17.86
+demand,selng_tmzon_17_21,25.91
+demand,flpop_tmzon_21_24,13.1
+demand,selng_tmzon_21_24,9.34
+demand,agrde_10,8.26
+demand,agrde_20,11.73
+demand,agrde_30,15.72
+demand,agrde_40,17.44
+demand,agrde_50,19.83
+demand,agrde_60_above,27.02
+demand,fml_share,51.49
+demand,flpop_wkend,29.74
+demand,selng_wkend,26.66
+demand,frc_share,6.4
+demand,opbiz_rt,2.4
+demand,clsbiz_rt,2.87
+demand,stor_co,2761.25
+demand,trdar_n,14.0
+demand,trdar_selng_n,14.0

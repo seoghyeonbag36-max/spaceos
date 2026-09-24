@@ -1,0 +1,83 @@
+kind,key,value
+category,미용실,171
+category,카페,117
+category,백반/한정식,100
+category,입시·교과학원,79
+category,요리 주점,65
+category,돼지고기 구이/찜,55
+category,편의점,52
+category,김밥/만두/분식,45
+category,피부 관리실,43
+category,노래방,41
+category,빵/도넛,38
+category,슈퍼마켓,35
+category,화장품 소매업,32
+category,국/탕/찌개류,32
+category,치과의원,32
+category,치킨,31
+category,기타 의류 소매업,31
+category,약국,30
+category,네일숍,30
+category,요가/필라테스 학원,27
+category,자동차 정비소,25
+category,음악학원,25
+category,세탁소,24
+category,기타 기술/직업 훈련학원,24
+category,국수/칼국수,24
+category,헬스장,23
+category,중국집,22
+category,가전제품 수리업,22
+category,한의원,22
+category,당구장,21
+trend:본서부병원,2024-08-01,0.21212
+trend:본서부병원,2024-09-01,0.22591
+trend:본서부병원,2024-10-01,0.23916
+trend:본서부병원,2024-11-01,0.21955
+trend:본서부병원,2024-12-01,0.21561
+trend:본서부병원,2025-01-01,0.23952
+trend:본서부병원,2025-02-01,0.22134
+trend:본서부병원,2025-03-01,0.24588
+trend:본서부병원,2025-04-01,0.24104
+trend:본서부병원,2025-05-01,0.23406
+trend:본서부병원,2025-06-01,0.20737
+trend:본서부병원,2025-07-01,0.22591
+trend:본서부병원,2025-08-01,0.22421
+trend:본서부병원,2025-09-01,0.18875
+trend:본서부병원,2025-10-01,0.19994
+trend:본서부병원,2025-11-01,0.17997
+trend:본서부병원,2025-12-01,0.20728
+trend:본서부병원,2026-01-01,0.22645
+trend:본서부병원,2026-02-01,0.22242
+trend:본서부병원,2026-03-01,0.27659
+trend:본서부병원,2026-04-01,0.24731
+trend:본서부병원,2026-05-01,0.26522
+trend:본서부병원,2026-06-01,0.23657
+trend:본서부병원,2026-07-01,0.24104
+trend:본서부병원,2026-08-01,0.22689
+demand,flpop_tmzon_00_06,27.55
+demand,selng_tmzon_00_06,3.68
+demand,flpop_tmzon_06_11,19.95
+demand,selng_tmzon_06_11,9.88
+demand,flpop_tmzon_11_14,10.89
+demand,selng_tmzon_11_14,21.34
+demand,flpop_tmzon_14_17,11.1
+demand,selng_tmzon_14_17,22.15
+demand,flpop_tmzon_17_21,16.88
+demand,selng_tmzon_17_21,32.04
+demand,flpop_tmzon_21_24,13.63
+demand,selng_tmzon_21_24,10.91
+demand,agrde_10,15.11
+demand,agrde_20,13.13
+demand,agrde_30,15.15
+demand,agrde_40,17.07
+demand,agrde_50,15.85
+demand,agrde_60_above,23.7
+demand,fml_share,55.78
+demand,flpop_wkend,29.93
+demand,selng_wkend,24.54
+demand,frc_share,11.64
+demand,opbiz_rt,1.91
+demand,clsbiz_rt,2.53
+demand,stor_co,2059.5
+demand,trdar_n,10.0
+demand,trdar_selng_n,10.0

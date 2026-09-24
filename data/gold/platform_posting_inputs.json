@@ -1,7 +1,7 @@
 {
   "source": "R-ONE 소규모상가 임대료(rent_small) + 서울 상권분석 유동인구(flpop)",
   "quarter": "20262",
-  "built_at": "2026-09-04T12:25:13+00:00",
+  "built_at": "2026-09-24T06:15:17+00:00",
   "rent_unit": "천원/㎡·월 (R-ONE 소규모상가, 사실상 1층 기준)",
   "floor_factor": {
     "B2": 0.6,
@@ -23,10 +23,20 @@
       "flpop": 4000514,
       "foot": "중"
     },
+    "bangbang": {
+      "rent_per_m2_krw_thousand": 44.29,
+      "flpop": 2990282,
+      "foot": "저"
+    },
     "banpo": {
       "rent_per_m2_krw_thousand": 46.44,
       "flpop": 1586083,
       "foot": "저"
+    },
+    "bonseobu": {
+      "rent_per_m2_krw_thousand": 37.99,
+      "flpop": 7636191,
+      "foot": "고"
     },
     "bulgwang": {
       "rent_per_m2_krw_thousand": 37.99,
@@ -58,10 +68,20 @@
       "flpop": 2102049,
       "foot": "저"
     },
+    "daerim": {
+      "rent_per_m2_krw_thousand": 67.9,
+      "flpop": 9190550,
+      "foot": "고"
+    },
     "dangsan": {
       "rent_per_m2_krw_thousand": 41.82,
       "flpop": 1554018,
       "foot": "저"
+    },
+    "dogok": {
+      "rent_per_m2_krw_thousand": 72.97,
+      "flpop": 5313270,
+      "foot": "중"
     },
     "doksan": {
       "rent_per_m2_krw_thousand": 31.76,
@@ -98,6 +118,11 @@
       "flpop": 4935594,
       "foot": "중"
     },
+    "gildong": {
+      "rent_per_m2_krw_thousand": 57.58,
+      "flpop": 16498339,
+      "foot": "고"
+    },
     "gongdeok": {
       "rent_per_m2_krw_thousand": 59.84,
       "flpop": 2890371,
@@ -107,6 +132,21 @@
       "rent_per_m2_krw_thousand": 36.59,
       "flpop": 3614299,
       "foot": "중"
+    },
+    "gurodigital": {
+      "rent_per_m2_krw_thousand": 31.76,
+      "flpop": 5710806,
+      "foot": "중"
+    },
+    "gurojeonhwa": {
+      "rent_per_m2_krw_thousand": 31.76,
+      "flpop": 7993920,
+      "foot": "고"
+    },
+    "guui": {
+      "rent_per_m2_krw_thousand": 51.45,
+      "flpop": 11946467,
+      "foot": "고"
     },
     "gwangjang": {
       "rent_per_m2_krw_thousand": 71.75,
@@ -131,7 +171,7 @@
     "hwagok": {
       "rent_per_m2_krw_thousand": 30.15,
       "flpop": 5146982,
-      "foot": "고"
+      "foot": "중"
     },
     "hyehwa": {
       "rent_per_m2_krw_thousand": 60.03,
@@ -141,7 +181,7 @@
     "ikseon": {
       "rent_per_m2_krw_thousand": 71.75,
       "flpop": 5880897,
-      "foot": "고"
+      "foot": "중"
     },
     "itaewon": {
       "rent_per_m2_krw_thousand": 69.17,
@@ -153,6 +193,11 @@
       "flpop": 1142072,
       "foot": "저"
     },
+    "jamsil-tour": {
+      "rent_per_m2_krw_thousand": 35.99,
+      "flpop": 10522897,
+      "foot": "고"
+    },
     "jamsilsaenae": {
       "rent_per_m2_krw_thousand": 34.34,
       "flpop": 3449201,
@@ -161,7 +206,7 @@
     "jangan": {
       "rent_per_m2_krw_thousand": 34.47,
       "flpop": 2993659,
-      "foot": "중"
+      "foot": "저"
     },
     "kkachisan": {
       "rent_per_m2_krw_thousand": 31.84,
@@ -176,6 +221,11 @@
     "kyunghee": {
       "rent_per_m2_krw_thousand": 50.36,
       "flpop": 4681855,
+      "foot": "중"
+    },
+    "maebong": {
+      "rent_per_m2_krw_thousand": 72.97,
+      "flpop": 3168609,
       "foot": "중"
     },
     "mangwon": {
@@ -211,7 +261,7 @@
     "namdaemun": {
       "rent_per_m2_krw_thousand": 77.42,
       "flpop": 3121848,
-      "foot": "중"
+      "foot": "저"
     },
     "nokdu": {
       "rent_per_m2_krw_thousand": 67.9,
@@ -228,9 +278,19 @@
       "flpop": 4380444,
       "foot": "중"
     },
+    "nowon": {
+      "rent_per_m2_krw_thousand": 24.41,
+      "flpop": 9348964,
+      "foot": "고"
+    },
     "oryudong": {
       "rent_per_m2_krw_thousand": 55.7,
       "flpop": 3753202,
+      "foot": "중"
+    },
+    "poi": {
+      "rent_per_m2_krw_thousand": 44.29,
+      "flpop": 4237950,
       "foot": "중"
     },
     "sadang": {
@@ -258,10 +318,15 @@
       "flpop": 1814680,
       "foot": "저"
     },
+    "seochoyeok": {
+      "rent_per_m2_krw_thousand": 44.29,
+      "flpop": 8431466,
+      "foot": "고"
+    },
     "seolleung": {
       "rent_per_m2_krw_thousand": 72.97,
       "flpop": 5441918,
-      "foot": "고"
+      "foot": "중"
     },
     "seongsu": {
       "rent_per_m2_krw_thousand": 64.98,
@@ -318,6 +383,16 @@
       "flpop": 8212006,
       "foot": "고"
     },
+    "yangjae": {
+      "rent_per_m2_krw_thousand": 44.29,
+      "flpop": 2723046,
+      "foot": "저"
+    },
+    "ydp-gucheong": {
+      "rent_per_m2_krw_thousand": 41.82,
+      "flpop": 4391158,
+      "foot": "중"
+    },
     "yeonhui": {
       "rent_per_m2_krw_thousand": 56.58,
       "flpop": 1959300,
@@ -341,7 +416,7 @@
     "yongsan": {
       "rent_per_m2_krw_thousand": 40.32,
       "flpop": 3038508,
-      "foot": "중"
+      "foot": "저"
     }
   },
   "seoul": {
