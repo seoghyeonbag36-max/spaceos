@@ -57,7 +57,7 @@ describe("App — 레일과 지도 셸 (2026-09-13)", MULTI_TAB, () => {
     await screen.findByRole("button", { name: "검토 건물 후보 저장" }, TAB_LOAD);
     const map = naver.map();
     expect(map).not.toBeNull();
-    for (const [tab, panel] of [["Platform", "상권 정체성"], ["Posting", "입점 계산"], ["Program", "홍보 program"]] as const) {
+    for (const [tab, panel] of [["Platform", "상권 정체성"], ["Posting", "입점 계산"], ["Program", "검증 program"]] as const) {
       fireEvent.click(screen.getByRole("button", { name: tab }));
       const aside = await screen.findByRole("complementary", { name: panel }, TAB_LOAD);
       // 패널은 지도 호스트 **안에** 뜬다 — 지도 없는 대시보드로 되돌아가면 여기가 운다.
@@ -114,14 +114,14 @@ describe("App — 트랙 간 인계 (화면설계서 2판)", MULTI_TAB, () => {
     expect(document.querySelector(".b-detail .b-name")!.textContent).toBe("검토 건물");
   });
 
-  it("PS-06 · PR-07 「이 자리로 홍보 program 만들기 →」가 Program 의 거점·카테고리·주소와 안내를 채우고, 비우기로 걷힌다", async () => {
+  it("PS-06 · PR-07 「이 자리로 검증 program 만들기 →」가 Program 의 거점·업종·주소와 검증할 자리를 채우고, 비우기로 걷힌다", async () => {
     const api = mount(true);
     fireEvent.click(screen.getByRole("button", { name: "Posting" }));
     await screen.findByRole("complementary", { name: "입점 계산" }, TAB_LOAD);
     await waitFor(() => expect(api.count(/simulate-revenue$/)).toBe(1));
-    fireEvent.click(await screen.findByRole("button", { name: "이 자리로 홍보 program 만들기 →" }));
+    fireEvent.click(await screen.findByRole("button", { name: "이 자리로 검증 program 만들기 →" }));
 
-    const title = await screen.findByText("입점 예정 자리", { selector: "b" }, TAB_LOAD);
+    const title = await screen.findByText("검증할 자리", { selector: "b" }, TAB_LOAD);
     const banner = title.closest(".arrival")!;
     expect(banner.textContent).toContain("garosugil 1번 자리");
     expect(banner.textContent).toContain("Posting 가성비 전략");
@@ -129,17 +129,17 @@ describe("App — 트랙 간 인계 (화면설계서 2판)", MULTI_TAB, () => {
     expect((screen.getByPlaceholderText("예: 서울 강남구 신사동 …") as HTMLInputElement).value).toBe("garosugil 1번 자리");
     const hub = document.querySelector(".progstudio form select") as HTMLSelectElement;
     await waitFor(() => expect(hub.value).toBe("garosugil"));
-    // 지도에 입점 예정 자리 핀이 선다.
-    await waitFor(() => expect(naver.live().some((o) => String((o.options.icon as { content?: string })?.content ?? "").includes("입점 예정 자리"))).toBe(true));
+    // 지도에 검증할 자리 핀이 선다.
+    await waitFor(() => expect(naver.live().some((o) => String((o.options.icon as { content?: string })?.content ?? "").includes("검증할 자리"))).toBe(true));
 
     fireEvent.click(screen.getByRole("button", { name: "비우기" }));
-    expect(screen.queryByText("입점 예정 자리", { selector: "b" })).toBeNull();
+    expect(screen.queryByText("검증할 자리", { selector: "b" })).toBeNull();
     // 탭을 다녀와도 걷은 안내가 되살아나지 않는다.
     fireEvent.click(screen.getByRole("button", { name: "Posting" }));
     await screen.findByRole("complementary", { name: "입점 계산" }, TAB_LOAD);
     fireEvent.click(screen.getByRole("button", { name: "Program" }));
-    await screen.findByRole("complementary", { name: "홍보 program" }, TAB_LOAD);
-    expect(screen.queryByText("입점 예정 자리", { selector: "b" })).toBeNull();
+    await screen.findByRole("complementary", { name: "검증 program" }, TAB_LOAD);
+    expect(screen.queryByText("검증할 자리", { selector: "b" })).toBeNull();
   });
 });
 

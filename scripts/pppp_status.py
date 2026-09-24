@@ -1032,14 +1032,14 @@ def _context_kinds() -> dict[str, int]:
 
 
 def program_track(total: int) -> Track:
-    """대상 재정의(2026-08-16)와 상용 입력 계약(2026-08-29) 기준.
+    """대상 재정의(2026-09-17) 기준 — 예비창업자와, 팝업스토어·가오픈·MVP 로 아이템을 검증하려는
+    기창업자.
 
-    Program 의 대상은 **공실에 창업할 기업**이다. 게이트도 그 기준으로 센다 —
-    옛 정의(영업 중 점주 / 324개 구역 감성)로 재면 이미 끝난 것처럼 보인다.
-    이미 영업 중인 기업이 직접 제공한 자료를 쓰는 상용 온보딩은 별도 인증·동의
-    계약으로 받으며, 공개 블로그 스니펫을 그 계약에 섞지 않는다.
+    옛 정의(영업 중 점주의 홍보 · 08-29 상용 온보딩)로 재면 삭제된 경로를 세게 된다. 게이트는
+    검증 브리프 입력 · 검증 지표 출력 · 미검증 경험 검사가 **코드에 배선됐는지**를 센다
+    (docs/feature-program.md §0-V).
     """
-    t = Track("Program", "Phase 6-2 (공실 창업 기업 대상)")
+    t = Track("Program", "Phase 6-2 (검증하려는 창업자 대상)")
     kinds = _context_kinds()
 
     t.gates.append(Gate(
@@ -1049,33 +1049,34 @@ def program_track(total: int) -> Track:
     ))
 
     schema_src = (ROOT / "apps/backend/app/schemas/marketing.py").read_text(encoding="utf-8")
-    router_src = (ROOT / "apps/backend/app/api/v1/marketing.py").read_text(encoding="utf-8")
-    onboarding_src = (ROOT / "apps/backend/app/services/program_onboarding.py").read_text(
-        encoding="utf-8"
-    ) if (ROOT / "apps/backend/app/services/program_onboarding.py").exists() else ""
+    mkt_src = (ROOT / "apps/backend/app/services/marketing.py").read_text(encoding="utf-8")
+    ha_src = (ROOT / "apps/backend/app/services/ha_guard.py").read_text(encoding="utf-8")
     studio_src = (ROOT / "apps/frontend/src/pages/ProgramStudio.tsx").read_text(encoding="utf-8")
-    commercial_ok = (
-        "ProgramCommercialOnboardingRequest" in schema_src
-        and 'Literal["merchant-provided"]' in schema_src
-        and 'Literal["request-only"]' in schema_src
-        and '"/onboarding/generate"' in router_src
-        and "get_current_principal" in router_src
-        and '"raw_input_persisted": False' in onboarding_src
-        and '"counts": counts' in onboarding_src
-        and "publicReviews" in studio_src
-        and "generateCommercialStoreMarketing" in studio_src
+    # 검증 계약 — 선언이 아니라 배선을 센다. 스키마에 필드가 있는 것만으로는 안 올라간다:
+    # 지표에 기각 조건(decision)이 **필수**이고, ha_guard 가 지표 형식과 미검증 경험을 실제로
+    # 검사하며, 화면이 생성 함수를 부르고 판정표를 그려야 한다.
+    validation_ok = (
+        "class ProgramBrief" in schema_src
+        and 'Literal["popup", "soft_open", "mvp"]' in schema_src
+        and "class ValidationSignal" in schema_src and "decision: str" in schema_src
+        and "signals" in mkt_src and "_MODE_SIGNAL" in mkt_src
+        and "unproven_experience_claim" in ha_src and "missing_decision_rule" in ha_src
+        and "generateProgram" in studio_src and "SignalTable" in studio_src
     )
     t.gates.append(Gate(
-        "상용 입력 온보딩 계약", 1.0 if commercial_ok else 0.0,
-        "2026-08-29 배선 완료 — 조직 JWT/API key 인증, `merchant-provided` 출처, "
-        "처리·권리·외부 모델 처리·request-only 보관 동의를 요청 스키마가 강제한다. "
-        "원문은 DB에 저장하지 않고 조직·계약 버전·항목 수·거점 감사 메타데이터만 남긴다. "
-        "ProgramStudio 는 공개 블로그 스니펫과 기업 제공 입력을 분리하고 API key 를 "
-        "브라우저 저장소에 보관하지 않으며 온보딩 영수증을 표시한다"
-        if commercial_ok else
-        "미배선 — 인증·명시 동의·원문 비저장·공개 스니펫 분리 중 하나 이상이 없다",
-        evidence=("apps/backend/tests/test_program_commercial_onboarding.py (6건) · "
-                  "apps/frontend npm run build · docs/feature-program.md §0-G"),
+        "검증 브리프·지표 계약", 1.0 if validation_ok else 0.0,
+        "2026-09-17 배선 — 입력은 검증 브리프(아이템·검증 방식 popup/soft_open/mvp·단계·가설·"
+        "기간·예산 구간·차별점), 출력은 모객·자리·연계에 더해 **검증 지표**(지표·측정 방법·"
+        "목표선·기각 조건)다. 무엇을 세면 통했다고 할지 시작 전에 정하지 않은 검증은 판정이 "
+        "아니라 지출이라, 규칙 기반 스텁도 방식별 지표를 채운다. ha_guard 는 단골·기존 고객처럼 "
+        "아직 없는 경험을 전제한 제안을 폐기하되(unproven_experience_claim) 재방문율 집계 같은 "
+        "**측정 문장은 면제**한다. 영업 중인 가게 홍보(리뷰·사진·메뉴 입력 · 상호 검색 · 상용 "
+        "온보딩)는 대상에서 빠져 삭제됐다"
+        if validation_ok else
+        "미배선 — 브리프 스키마·지표 기각 조건·HA 검사·판정표 중 하나 이상이 없다",
+        evidence=("docs/feature-program.md §0-V · apps/backend/tests/test_ha_guard.py · "
+                  "apps/backend/tests/test_program_output_split.py · "
+                  "apps/frontend/src/pages/ProgramStudio.test.tsx"),
     ))
 
     ctx = kinds.get("blog_keyword", 0)
@@ -1101,8 +1102,6 @@ def program_track(total: int) -> Track:
     # 이 게이트는 2026-08-23 까지 **선언**이었고, 그래서 "공실 유닛 49/54" 라고 적힌 채
     # 08-22 의 54/54 완주를 두 번의 상태 점검 동안 놓쳤다. 층마다 배선의 흔적을
     # 코드에서 직접 센다 — 문구만 고쳐서는 올라가지 않게.
-    mkt_src = (ROOT / "apps/backend/app/services/marketing.py").read_text(encoding="utf-8")
-    profile_src = (ROOT / "apps/backend/app/schemas/marketing.py").read_text(encoding="utf-8")
     site_mod = ROOT / "apps/backend/app/services/program_site.py"
     # ① 자리 — 모듈이 산출물을 읽고, marketing 이 실제로 그 모듈을 부른다
     site_ok = (site_mod.exists()
@@ -1110,38 +1109,30 @@ def program_track(total: int) -> Track:
                and "program_site" in mkt_src)
     # ② 상권 — 기존 컨텍스트 빌더
     market_ok = "_district_context" in mkt_src
-    # ③ 창업계획 — 스키마에 필드가 **있는 것만으로는 안 센다.** ①층과 같은 기준으로,
-    # 모듈이 있고 marketing 과 ha_guard 가 실제로 그것을 부르는지까지 본다.
-    # 필드만 보면 계약을 적어 두고 아무도 안 읽는 상태가 100% 로 잡힌다.
-    venture_mod = ROOT / "apps/backend/app/services/program_venture.py"
-    ha_src = (ROOT / "apps/backend/app/services/ha_guard.py").read_text(encoding="utf-8")
-    venture_ok = (venture_mod.exists()
-                  and all(f in profile_src for f in ("budget", "open_date"))
-                  and "program_venture" in mkt_src
-                  and "program_venture" in ha_src)
+    # ③ 검증 브리프 — 필드가 **있는 것만으로는 안 센다.** ①층과 같은 기준으로, 모듈이 있고
+    # marketing 과 ha_guard 가 실제로 그것을 부르는지까지 본다. (2026-09-17 창업계획층
+    # program_venture 를 대체했다 — 그 모듈을 계속 세면 삭제된 파일 때문에 0 이 된다.)
+    brief_mod = ROOT / "apps/backend/app/services/program_brief.py"
+    brief_ok = (brief_mod.exists()
+                and all(f in schema_src for f in ("budget_krw_min", "hypothesis", "run_days"))
+                and "program_brief" in mkt_src
+                and "program_brief" in ha_src)
     done = [n for n, ok in (("자리", site_ok), ("상권", market_ok),
-                            ("창업계획", venture_ok)) if ok]
-    miss = [n for n in ("자리", "상권", "창업계획") if n not in done]
+                            ("검증 브리프", brief_ok)) if ok]
+    miss = [n for n in ("자리", "상권", "검증 브리프") if n not in done]
     t.gates.append(Gate(
-        "입력 계약 3층 (자리·상권·창업계획)", len(done) / 3,
+        "입력 계약 3층 (자리·상권·검증 브리프)", len(done) / 3,
         f"{'·'.join(done)}층 배선됨" + (f" / {'·'.join(miss)}층 미구현" if miss else "")
-        + ". 자리층은 08-23 오전(services/program_site + GET /marketing/sites), "
-        "**창업계획층은 08-23 오후**(services/program_venture)에 붙였다. "
-        "③층은 앞의 둘과 성격이 다르다 — 아직 없는 가게의 강점은 어떤 데이터에도 "
-        "없어서 **기업이 넣는다**. 그래서 수집이 아니라 계약·검증 과제다. "
-        "이 층이 닫은 것: '방문 후기형 포스팅'. 08-23 오전에 스텁 문구는 고쳤지만 "
-        "판정이 `reviews 가 비었는가` 라는 **추정**이었고, 그러면 리뷰를 아직 못 모은 "
-        "영업 중인 가게가 개업 전으로 오인된다. ③층의 개업예정일이 있으면 **확정**이라, "
-        "ha_guard 가 개업 전 생성물의 방문·후기·재방문 전제를 violation "
-        "(`pre_open_visit_claim`)으로 잡는다. ③층을 안 준 요청은 `is_pre_open()` 이 "
-        "None 이라 검사가 켜지지 않는다 — 모르는 것을 위반으로 만들면 기존 요청이 "
-        "전부 깨진다. 예산은 ③층에만 절대액이 있고(출력 budget_share 는 int 퍼센트라 "
-        "구조적으로 절대액이 못 들어간다) 그 범위를 HA allowed_text 에 실어, 기업이 준 "
-        "예산을 인용한 문장이 '지어낸 금액'으로 폐기되지 않게 했다. "
-        "⚠ `strengths` 는 검증된 사실이 아니라 **기업 주장**이라 컨텍스트에 그렇게 "
-        "밝혀 싣는다 — 우리가 관측한 수치와 같은 자리에 두면 근거가 오염된다",
-        evidence=("docs/feature-program.md §0-B · services/program_venture.py · "
-                  "apps/backend/tests/test_program_venture.py (13건)"),
+        + ". 자리층은 08-23(services/program_site + GET /marketing/sites), 검증 브리프층은 "
+        "**09-17**(services/program_brief — 08-23 의 창업계획층 program_venture 를 대체)이다. "
+        "③층은 앞의 둘과 성격이 다르다 — 아직 해 보지 않은 아이템의 가설은 어떤 데이터에도 "
+        "없어서 **창업자가 넣는다**. 그래서 수집이 아니라 계약·검증 과제다. 종전에는 개업예정일이 "
+        "있을 때만 방문·후기 전제 검사를 켰지만, 대상이 전부 미검증이 되어 **항상** 켠다. "
+        "예산은 ③층에만 절대액이 있고(출력 budget_share 는 int 퍼센트) 그 범위를 HA allowed_text "
+        "에 싣는다. ⚠ 차별점은 검증된 사실이 아니라 **창업자 주장**이라 컨텍스트에 그렇게 밝혀 "
+        "싣는다 — 우리가 관측한 수치와 같은 자리에 두면 근거가 오염된다",
+        evidence=("docs/feature-program.md §0-V · §0-B · services/program_brief.py · "
+                  "apps/backend/tests/test_posting_marketing.py (브리프 배선)"),
     ))
 
     t.gates.append(Gate(
@@ -1166,8 +1157,8 @@ def program_track(total: int) -> Track:
         "주된 실패 모양이라, 지우지 않고 경위를 남긴다",
         auto=False,
         evidence=("docs/feature-program.md §0-F · apps/backend/tests/"
-                  "test_program_output_split.py (14건) · services/ha_guard.py · "
-                  "③층 해소는 services/program_venture.py"),
+                  "test_program_output_split.py · services/ha_guard.py · "
+                  "③층은 2026-09-17 services/program_brief.py 로 대체"),
     ))
     return t
 

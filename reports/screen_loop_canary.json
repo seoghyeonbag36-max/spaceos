@@ -1,0 +1,252 @@
+{
+  "started": "2026-09-08T21:15:53",
+  "updated": "2026-09-08T21:16:51",
+  "preflight": {
+    "base_url": "http://localhost:5173",
+    "app_status": 200,
+    "served": 66,
+    "served_missing": [],
+    "served_extra": []
+  },
+  "budget_ms": 3000,
+  "hubs_total": 66,
+  "tabs": [
+    "platform",
+    "map",
+    "posting",
+    "program"
+  ],
+  "canary": true,
+  "results": {
+    "yeonnam|platform": {
+      "hub": "yeonnam",
+      "name": "연남동",
+      "tab": "platform",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S3",
+          "why": ".spaceos-canary-does-not-exist 이(가) 0개 — 1개 이상이어야 한다",
+          "why_node": "자기검사 카나리 — 이게 통과하면 검사기가 화면을 안 보는 것",
+          "text": ""
+        },
+        {
+          "stage": "S4",
+          "why": "초기 렌더 8218ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1922,
+        "render_ms": 8218,
+        "gate": "/commercial-districts/yeonnam/platform",
+        "gate_seen": "200",
+        "selected": "yeonnam",
+        "options": 66,
+        "nodes": {
+          ".platconsole .verdict .vone": {
+            "count": 1,
+            "text": "연남동 — 「카페·디저트·음식점 복합형」 플랫폼이다 (카페·디저트 31.5% 최대 군 · 점포 734곳)."
+          },
+          ".platconsole .verdict .vgrounds .gv": {
+            "count": 4,
+            "text": "카페·디저트 31.5% (231곳) · 음식점 29.3% (215곳) · 주점·야간 13.6% (100곳) · 총 734곳 / 7군"
+          },
+          ".spaceos-canary-does-not-exist": {
+            "count": 0,
+            "text": ""
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/yeonnam__platform.png",
+      "at": "2026-09-08T21:16:14"
+    },
+    "yeonnam|map": {
+      "hub": "yeonnam",
+      "name": "연남동",
+      "tab": "map",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S3",
+          "why": ".spaceos-canary-does-not-exist 이(가) 0개 — 1개 이상이어야 한다",
+          "why_node": "자기검사 카나리 — 이게 통과하면 검사기가 화면을 안 보는 것",
+          "text": ""
+        },
+        {
+          "stage": "S4",
+          "why": "초기 렌더 12703ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 1328,
+        "render_ms": 12703,
+        "gate": "/heatmap/buildings?district=yeonnam",
+        "gate_seen": "200",
+        "selected": "yeonnam",
+        "options": 66,
+        "nodes": {
+          ".mapshell .sp-head .sp-title": {
+            "count": 1,
+            "text": "연남동 · 건물 공실"
+          },
+          ".mapshell .side-panel .sp-sub": {
+            "count": 1,
+            "text": "마포구 · 1,133동 · 실측(추정) · 거점 12.5%"
+          },
+          ".mapshell .sp-list .b-item": {
+            "count": 1133,
+            "text": "동교동 152-18\n주점 · 만실\n0%"
+          },
+          ".spaceos-canary-does-not-exist": {
+            "count": 0,
+            "text": ""
+          }
+        },
+        "map": {
+          "found": true,
+          "w": 1376,
+          "h": 900,
+          "children": 2,
+          "poly": 1133,
+          "dot": 0,
+          "paths": 1133,
+          "divs": 61,
+          "canvases": 0,
+          "note": ""
+        },
+        "detail": {
+          "row": "동교동 152-18",
+          "panel": "동교동 152-18"
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/yeonnam__map.png",
+      "at": "2026-09-08T21:16:29"
+    },
+    "yeonnam|posting": {
+      "hub": "yeonnam",
+      "name": "연남동",
+      "tab": "posting",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S3",
+          "why": ".spaceos-canary-does-not-exist 이(가) 0개 — 1개 이상이어야 한다",
+          "why_node": "자기검사 카나리 — 이게 통과하면 검사기가 화면을 안 보는 것",
+          "text": ""
+        },
+        {
+          "stage": "S4",
+          "why": "초기 렌더 8156ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 3531,
+        "render_ms": 8156,
+        "gate": "/commercial-districts/yeonnam/postings",
+        "gate_seen": "200",
+        "selected": "yeonnam",
+        "options": 66,
+        "nodes": {
+          ".postconsole .results .tiers .tier": {
+            "count": 3,
+            "text": "고급화\n객단가 높이고 회전 낮게\n초기 투자\n16만원\n월 비용\n2,770만원\n월 매출\n2,671만원\n월 순익\n-99만원\n회수기간\n회수 불가"
+          },
+          ".postconsole .results .rsrc": {
+            "count": 1,
+            "text": "비용 기준: KOSIS 실측비용 · 자리 = 건축물대장 실측 공실 인벤토리 · 임대료 = R-ONE · 매출 앵커 = KOSIS 서비스업조사 + 공정위 가맹사업 면적\n권리금을 넣으면 회수기간이 바뀐다 — 실측 감도(270유닛 전수)로 추천 5.2% 뒤집힘 · 회수 가부 판정은 0건 변화였다. 즉 \"회수 불가\" 결론은 권리금과 무관하게 성립한다."
+          },
+          ".spaceos-canary-does-not-exist": {
+            "count": 0,
+            "text": ""
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [
+          "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "api_5xx": [],
+        "api_4xx": [
+          {
+            "url": "http://localhost:5173/api/v1/ai/recommend-industry",
+            "status": 404
+          }
+        ]
+      },
+      "shot": "reports/screens/yeonnam__posting.png",
+      "at": "2026-09-08T21:16:41"
+    },
+    "yeonnam|program": {
+      "hub": "yeonnam",
+      "name": "연남동",
+      "tab": "program",
+      "status": "fail",
+      "failures": [
+        {
+          "stage": "S3",
+          "why": ".spaceos-canary-does-not-exist 이(가) 0개 — 1개 이상이어야 한다",
+          "why_node": "자기검사 카나리 — 이게 통과하면 검사기가 화면을 안 보는 것",
+          "text": ""
+        },
+        {
+          "stage": "S4",
+          "why": "초기 렌더 8093ms — 예산 3000ms 초과",
+          "trigger": "hub-switch"
+        }
+      ],
+      "obs": {
+        "trigger": "hub-switch",
+        "tab_open_ms": 437,
+        "render_ms": 8093,
+        "gate": null,
+        "gate_seen": null,
+        "selected": "yeonnam",
+        "options": 67,
+        "nodes": {
+          ".progstudio .panel": {
+            "count": 2,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기\n입력 규칙과 한계\n공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선\n가게명\n*\n검색\n입력 규칙\n카테고리\n*\n거점(상권 컨텍스트)\n66곳\n— 결합 안 함 —\n신사동 가로수길 · 강남구\n압구정로데오 · 강남구\n홍대 · 마포구\n연남동 · 마포구\n익선동 · 종로구\n서촌 · 종로구\n명동 · 중구\n을지로(힙지로) · 중구\n성수동 카페거리 · 성동구\n서울숲 아틀리에길 · 성동구\n이태원 · 용산구\n한남동·용리단길 · 용산구\n송리단길 · 송파구\n강남역·강남대로 · 강남구\n합정 · 마포구\n망원동·망리"
+          },
+          ".progstudio .panel .ptitle": {
+            "count": 1,
+            "text": "가게 프로필\n예시 채우기\n상용 온보딩\n비우기"
+          },
+          ".spaceos-canary-does-not-exist": {
+            "count": 0,
+            "text": ""
+          }
+        },
+        "console_errors": [],
+        "page_errors": [],
+        "resource_errors": [],
+        "api_5xx": [],
+        "api_4xx": []
+      },
+      "shot": "reports/screens/yeonnam__program.png",
+      "at": "2026-09-08T21:16:51"
+    }
+  },
+  "sdk_boot_ms": 3672,
+  "summary": {
+    "measured": 4,
+    "pass": 0,
+    "fail": 4,
+    "error": 0
+  }
+}

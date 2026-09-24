@@ -1,0 +1,133 @@
+kind,key,value
+blog_keyword,강남구,230
+blog_keyword,호두까끼형제,95
+blog_keyword,도곡동맛집,66
+blog_keyword,양재천,63
+blog_keyword,강남,62
+blog_keyword,도곡,62
+blog_keyword,양재역,61
+blog_keyword,남부순환로,56
+blog_keyword,양재,51
+blog_keyword,논현로,48
+blog_keyword,도곡점,46
+blog_keyword,브런치,43
+blog_keyword,호두파이,41
+blog_keyword,매일,40
+blog_keyword,도곡로,38
+blog_keyword,디저트,33
+blog_keyword,도곡동카페,32
+blog_keyword,뱅뱅막국수,27
+blog_keyword,주차,27
+blog_keyword,서울특별시,26
+blog_keyword,그로어스,25
+blog_keyword,국고집,24
+blog_keyword,위치한,23
+blog_keyword,양재맛집,21
+blog_keyword,출구에서,21
+blog_keyword,매봉역,21
+blog_keyword,평일,20
+blog_keyword,오늘은,20
+blog_keyword,가능,19
+blog_keyword,수제,19
+blog_keyword,파이,19
+blog_keyword,도곡동에,18
+blog_keyword,돈까스,18
+blog_keyword,매장,17
+blog_keyword,정보,16
+blog_keyword,매봉역맛집,16
+blog_keyword,도곡맛집,16
+blog_keyword,도보,15
+blog_keyword,근처,15
+blog_keyword,서한빌딩,14
+blog_keyword,분위기,14
+blog_keyword,안녕하세요,14
+blog_keyword,리애,14
+blog_keyword,무설탕,14
+blog_keyword,양재천맛집,13
+blog_keyword,도곡본점,13
+blog_keyword,전문점,13
+blog_keyword,생생정보,12
+blog_keyword,양재역맛집,12
+blog_keyword,막국수,12
+category,백반/한정식,195
+category,카페,129
+category,미용실,77
+category,입시·교과학원,60
+category,편의점,52
+category,요가/필라테스 학원,46
+category,피부 관리실,38
+category,경양식,38
+category,화장품 소매업,37
+category,기숙사/고시원,37
+category,돼지고기 구이/찜,36
+category,헬스장,36
+category,요리 주점,36
+category,펜션,36
+category,일식 회/초밥,35
+category,기타 교육지원 서비스업,33
+category,김밥/만두/분식,33
+category,네일숍,32
+category,기타 의류 소매업,30
+category,치킨,29
+category,운동용품 소매업,29
+category,국/탕/찌개류,28
+category,골프 연습장,27
+category,슈퍼마켓,25
+category,꽃집,24
+category,기타 기술/직업 훈련학원,23
+category,세탁소,23
+category,음악학원,23
+category,건강보조식품 소매업,22
+category,교육컨설팅업,21
+trend:도곡동,2024-08-01,0.69959
+trend:도곡동,2024-09-01,0.5591
+trend:도곡동,2024-10-01,0.59617
+trend:도곡동,2024-11-01,0.56536
+trend:도곡동,2024-12-01,0.52973
+trend:도곡동,2025-01-01,0.52982
+trend:도곡동,2025-02-01,0.58274
+trend:도곡동,2025-03-01,0.57897
+trend:도곡동,2025-04-01,0.55605
+trend:도곡동,2025-05-01,0.69341
+trend:도곡동,2025-06-01,0.63673
+trend:도곡동,2025-07-01,0.59724
+trend:도곡동,2025-08-01,0.58121
+trend:도곡동,2025-09-01,0.52632
+trend:도곡동,2025-10-01,0.50054
+trend:도곡동,2025-11-01,0.49704
+trend:도곡동,2025-12-01,0.48263
+trend:도곡동,2026-01-01,0.56465
+trend:도곡동,2026-02-01,0.39891
+trend:도곡동,2026-03-01,0.42138
+trend:도곡동,2026-04-01,0.4674
+trend:도곡동,2026-05-01,0.41816
+trend:도곡동,2026-06-01,0.45012
+trend:도곡동,2026-07-01,0.47403
+trend:도곡동,2026-08-01,0.51558
+demand,flpop_tmzon_00_06,21.89
+demand,selng_tmzon_00_06,2.69
+demand,flpop_tmzon_06_11,21.78
+demand,selng_tmzon_06_11,12.32
+demand,flpop_tmzon_11_14,15.03
+demand,selng_tmzon_11_14,29.85
+demand,flpop_tmzon_14_17,14.72
+demand,selng_tmzon_14_17,21.78
+demand,flpop_tmzon_17_21,15.87
+demand,selng_tmzon_17_21,25.03
+demand,flpop_tmzon_21_24,10.73
+demand,selng_tmzon_21_24,8.33
+demand,agrde_10,11.82
+demand,agrde_20,16.26
+demand,agrde_30,22.78
+demand,agrde_40,20.92
+demand,agrde_50,14.03
+demand,agrde_60_above,14.19
+demand,fml_share,50.25
+demand,flpop_wkend,24.33
+demand,selng_wkend,18.48
+demand,frc_share,7.67
+demand,opbiz_rt,2.17
+demand,clsbiz_rt,2.18
+demand,stor_co,2184.5
+demand,trdar_n,6.0
+demand,trdar_selng_n,5.0

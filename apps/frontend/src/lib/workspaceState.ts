@@ -25,9 +25,10 @@ export interface BuildingSelection {
 /**
  * Posting → Program 인계(화면설계서 2판 인계 표).
  *
- * Program 은 이 값으로 **보이는 입력칸**(거점·카테고리·주소)만 채우고 「입점 예정 자리」 안내·지도
- * 핀을 띄운다. 가게명·리뷰는 입점할 기업이 넣는다 — 여기 없는 값을 지어 채우지 않는다.
- * 금액·전략명은 안내 문구에만 쓰고 생성 요청에는 싣지 않는다(StoreProfile 에 그 필드가 없다).
+ * Program 은 이 값으로 거점·업종·주소를 채우고 그 공실을 **검증할 자리**(`unit_id`)로 싣는다.
+ * 「검증할 자리」 안내·지도 핀도 띄운다. 아이템·가설은 창업자가 넣는다 — 여기 없는 값을 지어
+ * 채우지 않는다. 임대료는 안내 문구에만 쓴다(Posting 추정값이라 창업자의 예산 구간과 섞지 않는다).
+ * 전략명은 브리프의 `tier` 로 간다.
  */
 export interface ProgramHandoff {
   districtId: string;

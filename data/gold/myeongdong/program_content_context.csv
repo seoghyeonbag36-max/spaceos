@@ -1,84 +1,84 @@
 kind,key,value
-blog_keyword,중구,150
-blog_keyword,미쓰족발,111
-blog_keyword,메리어트,82
-blog_keyword,서울명동점,78
-blog_keyword,코트야드,70
-blog_keyword,족발,67
-blog_keyword,호텔,63
-blog_keyword,명동맛집,56
-blog_keyword,명동점,54
-blog_keyword,매일,53
-blog_keyword,명동역,53
-blog_keyword,명동에서,51
-blog_keyword,명동에,50
-blog_keyword,명동교자,43
-blog_keyword,본점,40
-blog_keyword,남대문,39
-blog_keyword,모모카페,36
-blog_keyword,르메르디앙,34
-blog_keyword,명동카페,34
-blog_keyword,위치한,32
-blog_keyword,주차,30
-blog_keyword,뷔페,28
-blog_keyword,롯데백화점,28
-blog_keyword,안녕하세요,27
-blog_keyword,을지로입구역,27
+blog_keyword,중구,127
+blog_keyword,미쓰족발,93
+blog_keyword,메리어트,80
+blog_keyword,코트야드,71
+blog_keyword,명동교자,67
+blog_keyword,명동역,61
+blog_keyword,족발,61
+blog_keyword,서울명동점,59
+blog_keyword,본점,55
+blog_keyword,매일,54
+blog_keyword,명동맛집,53
+blog_keyword,명동점,52
+blog_keyword,명동에,48
+blog_keyword,남대문,44
+blog_keyword,호텔,42
+blog_keyword,명동에서,41
+blog_keyword,칼국수,33
+blog_keyword,명동카페,32
+blog_keyword,모모카페,32
+blog_keyword,주차,31
+blog_keyword,위치한,25
+blog_keyword,베이커리,25
+blog_keyword,롯데백화점,24
+blog_keyword,을지로,24
+blog_keyword,안녕하세요,24
+blog_keyword,데이트,24
 blog_keyword,디저트,24
-blog_keyword,오늘은,23
-blog_keyword,정보,22
-blog_keyword,을지로,22
-blog_keyword,헬로키티,22
+blog_keyword,분위기,23
+blog_keyword,헬로키티,23
+blog_keyword,명동성당,22
+blog_keyword,오늘은,21
+blog_keyword,매장,21
 blog_keyword,유명한,21
-blog_keyword,메뉴,21
-blog_keyword,가성비,21
-blog_keyword,남대문로,21
-blog_keyword,간장게장,21
-blog_keyword,분위기,21
-blog_keyword,칼국수,20
-blog_keyword,데이트,20
-blog_keyword,퇴근후,20
-blog_keyword,바이,19
-blog_keyword,황제족발,19
-blog_keyword,한식,18
-blog_keyword,주말,18
-blog_keyword,가볼만한곳,18
-blog_keyword,베이커리,18
-blog_keyword,루이비통,18
-blog_keyword,먹고,17
-blog_keyword,명동성당,17
-blog_keyword,맛집을,17
-blog_keyword,층에,16
-category,카페,66
-category,"육류,고기",52
-category,한식,49
-category,피부과,49
-category,약국,38
-category,호텔,38
-category,게스트하우스,27
-category,치과,24
-category,분식,22
-category,커피전문점,21
-category,중국요리,19
-category,"제과,베이커리",18
-category,"여관,모텔",14
-category,"호프,요리주점",13
-category,일반의원,13
-category,세븐일레븐,12
-category,양식,11
-category,갈비,10
-category,닭요리,9
-category,디저트카페,9
-category,CU,9
-category,숙박,9
-category,뷔페,8
-category,술집,8
-category,중식,8
-category,일식,8
-category,음식점,7
-category,"게,대게",7
-category,"돈까스,우동",7
-category,이탈리안,7
+blog_keyword,황제족발,21
+blog_keyword,웨이팅,20
+blog_keyword,을지로입구역,20
+blog_keyword,정보,19
+blog_keyword,뷔페,19
+blog_keyword,근처,19
+blog_keyword,서울특별시,18
+blog_keyword,오랜만에,17
+blog_keyword,삼호정,17
+blog_keyword,외국인,17
+blog_keyword,주말,17
+blog_keyword,스팟,17
+blog_keyword,바이,17
+blog_keyword,명동의,16
+blog_keyword,명동은,16
+blog_keyword,많은,16
+blog_keyword,가볼만한곳,16
+category,백반/한정식,531
+category,기타 의류 소매업,482
+category,카페,384
+category,여성 의류 소매업,233
+category,화장품 소매업,163
+category,펜션,129
+category,경양식,124
+category,요리 주점,119
+category,신발 소매업,115
+category,편의점,114
+category,돼지고기 구이/찜,108
+category,액세서리/잡화 소매업,105
+category,가방 소매업,105
+category,미용실,102
+category,그 외 기타 상품 전문 소매업,100
+category,김밥/만두/분식,95
+category,일식 회/초밥,91
+category,슈퍼마켓,88
+category,중국집,76
+category,여관/모텔,76
+category,시계/귀금속 소매업,72
+category,남성 의류 소매업,72
+category,국/탕/찌개류,65
+category,피부 관리실,65
+category,일반 유흥 주점,65
+category,안경렌즈 소매업,60
+category,빵/도넛,56
+category,호텔/리조트,56
+category,기타 교육지원 서비스업,52
+category,유아용 의류 소매업,49
 trend:명동,2024-08-01,3.44755
 trend:명동,2024-09-01,3.31762
 trend:명동,2024-10-01,3.71008

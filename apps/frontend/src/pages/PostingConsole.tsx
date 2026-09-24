@@ -53,7 +53,7 @@ interface PostingConsoleProps {
    *  안 주면 종전대로 화면이 스스로 상권을 든다(단독 렌더·테스트). */
   districtId?: string;
   onDistrictChange?: (id: string) => void;
-  /** Posting → Program 인계(화면설계서 2판). 주면 결과 아래 「이 자리로 홍보 program 만들기 →」가 뜬다. */
+  /** Posting → Program 인계(화면설계서 2판). 주면 결과 아래 「이 자리로 검증 program 만들기 →」가 뜬다. */
   onMakeProgram?: (handoff: ProgramHandoff) => void;
   /** 「내 사업」 업종의 입력어(화면설계서 3판). 업종칸의 기본값이다 — 상권·자리를 바꾸면 빈칸이 아니라 이 값으로 돌아간다. */
   defaultIndustry?: string;
@@ -375,7 +375,7 @@ function PostingSession({ selection, districtId: sharedDistrict, onDistrictChang
         <div className="results">
           {onMakeProgram && (
             <Button type="button" variant="ghost" className="posting-to-program" disabled={!unit}
-              onClick={makeProgram}>이 자리로 홍보 program 만들기 →</Button>
+              onClick={makeProgram}>이 자리로 검증 program 만들기 →</Button>
           )}
           <div className="posting-result-heading"><h2>세 가격대의 비용과 회수기간</h2><p>처음 필요한 돈 · 매달 나가는 돈 · 투자 회수까지</p></div>
           {!result && !busy && <div className="empty">자리를 고르면 계산한다.</div>}

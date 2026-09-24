@@ -1,40 +1,47 @@
 {
-  "started": "2026-09-16T00:21:27",
+  "started": "2026-09-24T17:58:01",
   "results": [
     {
       "step": "backend-pytest",
       "status": "pass",
       "exit": 0,
-      "seconds": 33.9,
-      "log": "reports/logs/verify_backend-pytest.log"
+      "seconds": 715.0,
+      "log": "reports\\logs\\verify_backend-pytest.log"
+    },
+    {
+      "step": "data-pytest",
+      "status": "pass",
+      "exit": 0,
+      "seconds": 94.2,
+      "log": "reports\\logs\\verify_data-pytest.log"
     },
     {
       "step": "gnn-import",
       "status": "pass",
       "exit": 0,
-      "seconds": 1.6,
-      "log": "reports/logs/verify_gnn-import.log"
+      "seconds": 46.3,
+      "log": "reports\\logs\\verify_gnn-import.log"
     },
     {
       "step": "pppp-status",
       "status": "pass",
       "exit": 0,
-      "seconds": 0.5,
-      "log": "reports/logs/verify_pppp-status.log"
+      "seconds": 6.7,
+      "log": "reports\\logs\\verify_pppp-status.log"
     },
     {
       "step": "application-check",
       "status": "pass",
       "exit": 0,
-      "seconds": 0.0,
-      "log": "reports/logs/verify_application-check.log"
+      "seconds": 1.8,
+      "log": "reports\\logs\\verify_application-check.log"
     },
     {
       "step": "frontend-build",
       "status": "pass",
       "exit": 0,
-      "seconds": 6.2,
-      "log": "reports/logs/verify_frontend-build.log"
+      "seconds": 221.8,
+      "log": "reports\\logs\\verify_frontend-build.log"
     }
   ]
 }

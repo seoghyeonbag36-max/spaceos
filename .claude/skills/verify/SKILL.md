@@ -9,9 +9,16 @@ description: PlaceOS 변경분을 실제 표면에서 확인하는 절차 — �
 
 ```bash
 cd apps/backend && pytest -q                 # 백엔드 테스트/임포트
+python -m pytest data/tests -q               # 데이터 파이프라인 (CI 의 별도 잡)
 cd apps/frontend && npm run build            # 프론트 타입체크 + 빌드
 cd ml && python -c "import torch; print('torch', torch.__version__)"
 ```
+
+⚠ **`data/tests` 를 빠뜨리지 말 것.** CI 는 이것을 **별도 잡**("데이터 파이프라인
+pytest")으로 돌리는데 로컬 레시피와 `run_full_verify.py` 에는 둘 다 없었다 —
+2026-09-24 에 "정적 검증 통과"라고 보고한 뒤 CI 가 **47건**을 잡았다. 거점을 늘렸을 때
+`gold/{slug}/district_zones.json` 처럼 **거점별 산출물이 안 만들어진 것**을 잡는 게
+정확히 이쪽이고, 파라미터라이즈가 거점마다 돌아 한 번에 수십 건이 깨진다.
 
 무인으로 한 번에: `python scripts/run_full_verify.py`
 (→ `reports/full_verify.json` + `reports/logs/verify_*.log`)

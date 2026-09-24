@@ -1,84 +1,84 @@
 kind,key,value
-blog_keyword,성수,218
-blog_keyword,성동구,143
-blog_keyword,서울숲,124
+blog_keyword,성수,231
+blog_keyword,성동구,147
+blog_keyword,서울숲,133
 blog_keyword,성수역,86
-blog_keyword,디저트,63
-blog_keyword,데이트,61
-blog_keyword,위치한,52
+blog_keyword,디저트,67
+blog_keyword,데이트,57
+blog_keyword,위치한,50
 blog_keyword,거리,49
-blog_keyword,핫플,48
-blog_keyword,출구에서,42
-blog_keyword,성수동카페,41
+blog_keyword,핫플,49
 blog_keyword,거리에,40
-blog_keyword,뚝섬역,38
-blog_keyword,감성,36
-blog_keyword,성수카페,32
-blog_keyword,성수점,30
-blog_keyword,있어,30
+blog_keyword,성수동카페,39
+blog_keyword,출구에서,39
+blog_keyword,감성,35
+blog_keyword,성수점,33
+blog_keyword,있어,33
+blog_keyword,오늘은,31
+blog_keyword,뚝섬역,31
+blog_keyword,성수카페,30
 blog_keyword,분위기,28
-blog_keyword,도보,28
-blog_keyword,성수동은,28
-blog_keyword,커피,27
-blog_keyword,오늘은,27
-blog_keyword,서울숲카페,25
-blog_keyword,성수동에,24
-blog_keyword,성수이로,23
-blog_keyword,코스,22
-blog_keyword,성수동카페거리,21
-blog_keyword,대림창고,21
-blog_keyword,도보로,21
-blog_keyword,안녕하세요,20
-blog_keyword,매일,20
-blog_keyword,성수동에서,20
-blog_keyword,많은,19
+blog_keyword,커피,26
+blog_keyword,도보,26
+blog_keyword,성수동은,26
+blog_keyword,성수이로,25
+blog_keyword,안녕하세요,24
+blog_keyword,서울숲카페,24
+blog_keyword,코스,24
+blog_keyword,성수동카페거리,22
+blog_keyword,성수동에,22
+blog_keyword,매일,21
+blog_keyword,성수동에서,21
+blog_keyword,우스블랑,20
+blog_keyword,도보로,20
+blog_keyword,베이커리,19
 blog_keyword,주차,19
-blog_keyword,카페거리에,19
-blog_keyword,베이커리,18
-blog_keyword,출구,18
-blog_keyword,연무장길,18
+blog_keyword,가길,19
+blog_keyword,대림창고,19
+blog_keyword,많은,18
+blog_keyword,주말,17
+blog_keyword,카페거리에,17
 blog_keyword,해례커피,17
 blog_keyword,성수본점,17
-blog_keyword,서울에서,17
-blog_keyword,스페셜,17
-blog_keyword,소금빵,17
-blog_keyword,가길,16
+blog_keyword,성수동의,17
+blog_keyword,연무장길,16
 blog_keyword,클래식,16
 blog_keyword,팝업스토어,16
-blog_keyword,소품샵,16
-blog_keyword,이곳은,16
-blog_keyword,성수동의,16
-blog_keyword,카페를,15
-category,카페,81
-category,한식,39
-category,"제과,베이커리",28
-category,양식,28
-category,"육류,고기",27
-category,일식,20
-category,디저트카페,20
-category,커피전문점,20
-category,"호프,요리주점",15
-category,GS25,14
-category,중국요리,13
-category,약국,13
-category,분식,12
-category,칵테일바,12
-category,치과,12
-category,"해물,생선",9
-category,국밥,9
-category,일본식주점,9
-category,"찌개,전골",9
-category,와인바,8
-category,칼국수,7
-category,"돈까스,우동",7
-category,아이스크림,7
-category,"초밥,롤",7
-category,일반의원,7
-category,음식점,6
-category,피자,6
-category,CU,6
-category,세븐일레븐,6
-category,피부과,6
+blog_keyword,서울에서,16
+blog_keyword,스페셜,16
+blog_keyword,입니다,15
+blog_keyword,메인,15
+blog_keyword,골목,15
+category,백반/한정식,229
+category,카페,180
+category,기타 의류 소매업,176
+category,미용실,106
+category,경양식,87
+category,자동차 정비소,85
+category,화장품 소매업,73
+category,일식 회/초밥,66
+category,편의점,59
+category,요리 주점,51
+category,신발 소매업,50
+category,돼지고기 구이/찜,46
+category,빵/도넛,44
+category,그 외 기타 상품 전문 소매업,34
+category,피자,32
+category,중국집,31
+category,여성 의류 소매업,31
+category,김밥/만두/분식,30
+category,기타 교육지원 서비스업,29
+category,슈퍼마켓,28
+category,국/탕/찌개류,27
+category,꽃집,26
+category,자동차 세차장,25
+category,기타 기술/직업 훈련학원,25
+category,헬스장,24
+category,입시·교과학원,24
+category,네일숍,23
+category,국수/칼국수,22
+category,교육컨설팅업,22
+category,운동용품 소매업,22
 trend:성수동 카페거리,2024-08-01,6.31997
 trend:성수동 카페거리,2024-09-01,6.61572
 trend:성수동 카페거리,2024-10-01,7.21709

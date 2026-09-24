@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { caveatKind, CaveatNote } from "@/components/DistrictPicker";
 import Verdict, { Fold, type Ground } from "@/components/Verdict";
-import {
-  listDistricts, generateCommercialStoreMarketing, generateStoreMarketing,
-  getDistrictEvents, lookupStorePlaces, lookupStoreReviews,
-} from "@/lib/api";
+import { generateProgram, getDistrictEvents, listDistricts, MODE_LABEL, STAGE_LABEL, VALIDATION_MODES } from "@/lib/api";
 import type {
-  ChannelPlan, DistrictSummary, MarketingEvent, StoreMarketing, StorePlace,
+  ChannelPlan, DistrictSummary, FounderStage, MarketingEvent, ProgramBriefInput, ProgramPlan,
+  ValidationMode, ValidationSignal,
 } from "@/lib/api";
 import { Button } from "@/design/components/Button";
 import { Card } from "@/design/components/Card";
@@ -19,144 +17,125 @@ import type { BusinessGoal } from "@/lib/businessProfile";
 import "./ProgramStudio.css";
 
 /**
- * Program 스튜디오 — 가게 단위 마케팅 솔루션 생성 화면.
+ * Program 스튜디오 — **검증 program** 생성 화면.
  *
- * 백엔드 `POST /marketing/generate`(services/marketing.py)는 2026-07-18 부터 있었지만
- * 이걸 부르는 화면이 없어서 기능이 API 로만 존재했다. 이 페이지가 그 표면이다.
+ * ## 2026-09-17 대상 재정의
  *
- * ## 화면이 한 번에 펴는 양 (2026-09-07)
+ * 종전 화면은 **영업 중인 가게**의 리뷰·사진·메뉴를 넣고(상호 검색으로 반자동 채우기까지)
+ * 홍보안을 받았다. 지금 대상은 둘이다:
  *
- * **결론 1줄 + 근거 3줄**이 규칙이다. 맨 위 `Verdict` 가 이 탭의 질문("posting 한
- * page 를 어떤 홍보 program 으로 돌릴 것인가") → 결론 한 문장 → 근거 세 줄
- * (무엇을 읽고 냈나 / 어떤 채널로 / 믿을 만한가) → 출처 줄을 낸다.
+ *   · 예비창업자 — 아직 가게가 없다. 자기 아이템이 통하는 상권을 찾는다.
+ *   · 기창업자   — 사업은 하지만 이 상권·이 아이템은 안 해 봤다. 팝업스토어·가오픈·MVP 로 확인한다.
  *
- * 나머지는 접는다 — **지우는 것이 아니다**:
- *   · 입력칸 일곱 개의 설명은 칸마다 `입력 규칙` 으로 접힌다(`Field`).
- *   · 입력 경로의 한계(네이버 플레이스 무API·크롤링 금지선)는 `입력 규칙과 한계` 로 접힌다.
- *   · HA 검증 상세(폐기 사유·경고 목록·LLM 자체점검)는 `Humanistic Authority 검증` 으로
- *     접힌다. 다만 **폐기·경고가 있다는 사실 자체는 결론 줄에 남는다** — 접힌 자리가
- *     "문제 없음"으로 읽히면 안 된다.
- *   · 채널 목록에서 초안을 고르면 본문을 편집하고 미리 본다. 생성 원본의 근거·HA는 보존한다.
- *   · 상용 온보딩 동의문은 접지 않는다. 읽지 않고 체크하게 만들면 동의가 아니다.
+ * 둘 다 그 자리에서 장사한 적이 없어 리뷰가 존재하지 않는다. 그래서 입력은 **검증 브리프**
+ * (아이템·검증 방식·가설·기간·예산)이고, 결과는 모객(online)·자리·연계(offline)·
+ * **검증 지표(signals)** 세 벌이다. 지표가 이 화면의 결론이다 — 무엇을 세면 통했다고 할지
+ * 정하지 않은 검증은 판정이 아니라 지출이다.
  *
- * ## 입력 원칙 — 화면에도 그대로 드러낸다(docs/feature-program.md §0)
+ * 사라진 것: 상호 검색(카카오)·블로그 스니펫(네이버)·리뷰/사진/메뉴/키워드 칸·vision 미리보기·
+ * 상용 온보딩(점주 제공 원문 동의). 특정할 가게도, 받을 점주 원문도 없다.
  *
- * 네이버 플레이스의 **방문자 리뷰·사진·메뉴에는 공식 API 가 없다.** 그래서 공식 API 로
- * 얻을 수 있는 것만 자동으로 채운다 — 카카오 로컬(상호·카테고리·주소)과 네이버 블로그
- * 검색(리뷰성 스니펫). 사진·메뉴는 여전히 붙여넣기다. 크롤링해 온 원본(특히 사진)은
- * PoC 내부 검증 한정이고, 상용 경로는 점주 제공(B2B 온보딩 동의) 데이터다.
+ * ## 화면이 한 번에 펴는 양 (2026-09-07 규칙 유지)
+ *
+ * **결론 1줄 + 근거 3줄.** 나머지는 접는다 — 지우는 것이 아니다. HA 폐기·경고와 스텁 여부는
+ * 상세를 접어도 결론 줄에 남긴다. 접힌 자리가 "문제 없음"으로 읽히면 안 된다.
  */
 
-/** 백엔드가 vision 에 넘기는 사진 수 상한 — services/marketing.py `image_urls[:4]` 와 맞춘다.
- *  화면에서 5장째부터 흐리게 처리해 "넣었는데 안 쓰인" 상태를 숨기지 않는다. */
-const VISION_MAX = 4;
-
-/** 카테고리 자동완성 후보. 자유 입력이며 이 목록은 힌트일 뿐이다(백엔드는 문자열을 그대로 받는다). */
+/** 업종 자동완성 후보. 자유 입력이며 이 목록은 힌트일 뿐이다(백엔드는 문자열을 그대로 받는다). */
 const CATEGORY_HINTS = [
-  "카페", "베이커리", "F&B", "이자카야", "주점", "한식", "일식", "양식",
-  "의류", "뷰티", "헬스·필라테스", "공방", "반려동물",
+  "카페", "베이커리", "디저트", "F&B", "주점", "한식", "일식", "양식",
+  "의류", "뷰티", "리빙·소품", "공방", "반려동물",
 ];
 
 interface FormState {
-  name: string;
+  item: string;
   category: string;
+  mode: ValidationMode;
+  stage: FounderStage;
   districtId: string;
   address: string;
-  reviewsText: string;
-  imagesText: string;
-  menuText: string;
-  keywordsText: string;
+  hypothesis: string;
+  targetCustomer: string;
+  startDate: string;
+  runDays: string;
+  budgetMin: string;
+  budgetMax: string;
+  differentiatorsText: string;
 }
 
-const EMPTY: FormState = {
-  name: "", category: "", districtId: "", address: "",
-  reviewsText: "", imagesText: "", menuText: "", keywordsText: "",
-};
+/** 「내 사업」 목적 → 단계. 창업은 예비창업자, 바꾸기·옮기기는 이미 사업을 하는 기창업자다. */
+const stageOf = (goal?: BusinessGoal): FounderStage => (goal === "pivot" || goal === "move" ? "founder" : "pre_founder");
 
-/** 데모용 예시 입력. **가상의 가게**다 — 실존 상호의 리뷰를 지어내 붙이면
- *  그 가게에 대한 허위 근거가 되므로 이름부터 예시임을 밝힌다. */
+const emptyForm = (stage: FounderStage = "pre_founder"): FormState => ({
+  item: "", category: "", mode: "popup", stage, districtId: "", address: "",
+  hypothesis: "", targetCustomer: "", startDate: "", runDays: "",
+  budgetMin: "", budgetMax: "", differentiatorsText: "",
+});
+
+/** 데모용 예시 입력. **가상의 아이템**이다 — 실존 브랜드의 계획처럼 읽히지 않게 이름부터 예시임을 밝힌다. */
 const SAMPLE: FormState = {
-  name: "예시 카페 로우(가로수길점)",
+  item: "예시 — 산미 중심 스페셜티 원두 팝업",
   category: "카페",
+  mode: "popup",
+  stage: "pre_founder",
   districtId: "garosugil",
-  address: "서울 강남구 신사동 가로수길 일대",
-  reviewsText: [
-    "원두를 매주 바꿔서 소개해주는 게 좋아요. 산미 있는 걸 좋아한다 했더니 딱 맞게 추천해주심.",
-    "2층 창가 자리가 조용해서 노트북 작업하기 좋았습니다. 콘센트도 자리마다 있어요.",
-    "말차 라떼가 진하고 안 달아서 좋았어요. 디저트는 바스크 치즈케이크 추천.",
-    "주말 오후엔 웨이팅 20분 정도 있었어요. 회전은 빠른 편.",
-    "사장님이 커피 설명을 길게 해주셔서 좋았는데, 바쁠 땐 주문이 좀 밀립니다.",
-    "인테리어가 차분하고 사진 찍기 좋아요. 조명이 따뜻한 편.",
-  ].join("\n"),
-  imagesText: "",
-  menuText: [
-    "오늘의 드립 6,000원",
-    "말차 라떼 6,500원",
-    "바스크 치즈케이크 8,000원",
-  ].join("\n"),
-  keywordsText: "",
+  address: "",
+  hypothesis: "가로수길 20~30대 직장인에게 산미가 강한 싱글오리진이 통한다",
+  targetCustomer: "20~30대 직장인",
+  startDate: "",
+  runDays: "10",
+  budgetMin: "300000",
+  budgetMax: "800000",
+  differentiatorsText: ["주간 단위 원두 교체", "로스팅 당일 추출"].join("\n"),
 };
 
 /** 이 화면을 읽는 법 — 접히지만 지우지 않는다 */
-const HOW_TO_READ = "가게의 리뷰·사진·메뉴·기본정보를 넣으면 온라인/오프라인 광고 솔루션을 근거와 "
-  + "함께 생성한다. 상호를 검색하면 카카오 로컬(기본정보)과 네이버 블로그(리뷰성 스니펫)로 절반쯤 "
-  + "자동으로 채워진다. 거점을 고르면 Platform 이 모은 상권 컨텍스트(블로그 키워드·업종 분포·검색 "
-  + "트렌드)가 함께 반영된다. 상권 단위(2단계)는 Platform 탭의 거점 심층에서 본다. "
-  + "이 화면에서 접힌 자리는 한 번 눌러 그대로 편다 — 아무것도 지우지 않았다.";
+const HOW_TO_READ = "아이템과 검증 방식(팝업스토어·가오픈·MVP)을 넣으면, 그 아이템이 이 상권에서 통하는지 "
+  + "정해진 기간 안에 판정할 수 있는 program 을 낸다 — 사람을 모으는 온라인안, 자리를 빌리고 상권과 잇는 "
+  + "오프라인안, 그리고 무엇을 세면 통했다고 할지 정한 검증 지표. 거점을 고르면 Platform 이 모은 상권 "
+  + "수치(업종 분포·검색 트렌드·시간대별 유동/매출·행사)가, Posting 에서 넘어오면 그 공실의 대장 사실이 "
+  + "근거로 합류한다. 아직 이 자리에서 장사한 적이 없으므로 단골·기존 고객·쌓인 후기를 전제한 제안은 "
+  + "서버가 폐기한다. 이 화면에서 접힌 자리는 한 번 눌러 그대로 편다 — 아무것도 지우지 않았다.";
 
 const linesOf = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean);
-const commaOf = (t: string) => t.split(",").map((s) => s.trim()).filter(Boolean);
-const isHttp = (u: string) => /^https?:\/\//.test(u);
+const toInt = (t: string): number | undefined => {
+  const n = Number(t.replace(/[,\s]/g, ""));
+  return t.trim() && Number.isInteger(n) && n > 0 ? n : undefined;
+};
 
 export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss, defaultCategory, businessGoal }: {
   /** 지도가 비출 상권(App 공유 상권). 폼의 「거점」을 고르지 않았을 때 카메라만 여기로 간다 —
    *  **생성 요청에는 넣지 않는다.** 컨텍스트 결합은 사용자가 폼에서 고른 것만 쓴다. */
   mapDistrictId?: string;
-  /** Posting → Program 인계(화면설계서 2판). **보이는 입력칸만** 채운다 — 거점·카테고리·주소.
+  /** Posting → Program 인계. 거점·업종·주소를 채우고 그 공실을 **검증할 자리**(unit_id)로 싣는다.
    *  App 이 인계마다 key 를 바꿔 새로 마운트하므로 초기값으로만 읽는다. */
   handoff?: ProgramHandoff;
   /** 안내를 걷었을 때 App 에 알린다 — 탭을 다녀와 다시 마운트돼도 걷은 안내가 되살아나지 않게. */
   onArrivalDismiss?: () => void;
-  /** 「내 사업」 업종의 입력어(화면설계서 3판). 카테고리칸의 기본값 — Posting 인계 업종이 있으면 그쪽이 앞선다. */
+  /** 「내 사업」 업종의 입력어. 업종칸의 기본값 — Posting 인계 업종이 있으면 그쪽이 앞선다. */
   defaultCategory?: string;
-  /** 「내 사업」 목적. 바꾸기·옮기기면 지금 가게 리뷰·메뉴가 근거가 된다는 안내를 띄운다. */
+  /** 「내 사업」 목적. 창업이면 예비창업자, 바꾸기·옮기기면 기창업자가 기본 단계다. */
   businessGoal?: BusinessGoal;
 } = {}) {
+  const baseStage = stageOf(businessGoal);
   const [form, setForm] = useState<FormState>(() => handoff
-    ? { ...EMPTY, districtId: handoff.districtId, category: handoff.industry ?? defaultCategory ?? "", address: handoff.unitName }
-    : { ...EMPTY, category: defaultCategory ?? "" });
-  // 「입점 예정 자리」 안내·지도 핀. 폼을 통째로 갈아엎는 동작(비우기·예시·모드 전환)에서 걷는다 —
-  // 폼은 다른 가게가 됐는데 안내만 남으면 엉뚱한 자리를 가리킨다.
+    ? { ...emptyForm(baseStage), districtId: handoff.districtId, category: handoff.industry ?? defaultCategory ?? "", address: handoff.unitName }
+    : { ...emptyForm(baseStage), category: defaultCategory ?? "" });
+  // 「검증할 자리」 안내·지도 핀. 폼을 통째로 갈아엎는 동작(비우기·예시)이나 거점 변경에서 걷는다 —
+  // 폼은 다른 상권이 됐는데 안내와 unit_id 만 남으면 엉뚱한 자리를 검증 무대로 싣는다.
   const [arrival, setArrivalState] = useState<ProgramHandoff | null>(handoff ?? null);
   const setArrival = (next: null) => { setArrivalState(next); onArrivalDismiss?.(); };
-  // 고른 오프라인 홍보 장소(행사). 지도 칩과 패널 목록이 같은 상태를 본다.
   const [eventId, setEventId] = useState<string | null>(null);
-  // 후보 목록에서 고른 가게 — 지도에 "이 가게" 핀을 남기는 데만 쓴다. 입력이 바뀌면 걷는다.
-  const [pickedPlace, setPickedPlace] = useState<StorePlace | null>(null);
   const [districts, setDistricts] = useState<DistrictSummary[] | null>(null);
   const [districtErr, setDistrictErr] = useState(false);
-  const [result, setResult] = useState<StoreMarketing | null>(null);
+  const [result, setResult] = useState<ProgramPlan | null>(null);
   const [resultVersion, setResultVersion] = useState(0);
   const [busy, setBusy] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [commercialMode, setCommercialMode] = useState(false);
-  const [apiKey, setApiKey] = useState("");
-  const [rightsConfirmed, setRightsConfirmed] = useState(false);
-  const [processingConsent, setProcessingConsent] = useState(false);
-  const [externalConsent, setExternalConsent] = useState(false);
-  const [retentionAcknowledged, setRetentionAcknowledged] = useState(false);
-  const [onboardingReceipt, setOnboardingReceipt] = useState<string | null>(null);
-  // 비우기·모드 전환 뒤 늦게 도착한 이전 요청이 원문과 초안을 되살리지 않게 한다.
+  // 비우기·입력 변경 뒤 늦게 도착한 이전 요청이 초안을 되살리지 않게 한다.
   const generationVersion = useRef(0);
-  const lookupVersion = useRef(0);
-  useEffect(() => () => { generationVersion.current += 1; lookupVersion.current += 1; }, []);
-
-  // 반자동 채우기 — 후보 검색(카카오) → 선택 → 블로그 스니펫 주입(네이버)
-  const [places, setPlaces] = useState<StorePlace[] | null>(null);
-  const [publicReviews, setPublicReviews] = useState<string[]>([]);
-  const [lookupBusy, setLookupBusy] = useState(false);
-  const [lookupNote, setLookupNote] = useState<string | null>(null);
+  useEffect(() => () => { generationVersion.current += 1; }, []);
 
   useEffect(() => {
     // 거점 목록은 상권 컨텍스트 결합용(선택)이라 실패해도 생성 자체는 된다. 다만 **조용히**
@@ -164,8 +143,7 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
     listDistricts().then(setDistricts).catch(() => { setDistricts([]); setDistrictErr(true); });
   }, []);
 
-  // 실호출은 vision 포함 시 10~20초가 걸린다(2026-08-01 실측 12~14초). 멈춘 화면처럼
-  // 보이지 않게 경과 초를 센다 — 시연 중 "죽었나?" 소리가 나오지 않게 하는 장치다.
+  // LLM 실호출은 10~20초가 걸린다. 멈춘 화면처럼 보이지 않게 경과 초를 센다.
   const timer = useRef<number | null>(null);
   useEffect(() => {
     if (!busy) { if (timer.current) window.clearInterval(timer.current); return; }
@@ -173,38 +151,28 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
     return () => { if (timer.current) window.clearInterval(timer.current); };
   }, [busy]);
 
-  const merchantReviews = useMemo(() => linesOf(form.reviewsText), [form.reviewsText]);
-  const reviews = useMemo(
-    () => commercialMode ? merchantReviews : [...merchantReviews, ...publicReviews],
-    [commercialMode, merchantReviews, publicReviews],
-  );
-  const images = useMemo(() => linesOf(form.imagesText), [form.imagesText]);
-  const menu = useMemo(() => linesOf(form.menuText), [form.menuText]);
-  const keywords = useMemo(() => commaOf(form.keywordsText), [form.keywordsText]);
-  const badImages = images.filter((u) => !isHttp(u));
+  const differentiators = useMemo(() => linesOf(form.differentiatorsText), [form.differentiatorsText]);
+  const budgetMin = toInt(form.budgetMin);
+  const budgetMax = toInt(form.budgetMax);
+  const runDays = toInt(form.runDays);
+  // 예산은 구간이다. 한쪽만 채우면 서버가 422 로 거절한다 — 보내기 전에 여기서 막고 이유를 말한다.
+  const halfBudget = (budgetMin === undefined) !== (budgetMax === undefined);
+  // 인계된 자리는 **같은 거점일 때만** 싣는다. 거점을 바꿨는데 unit_id 가 남으면 다른 상권의 공실을 인용한다.
+  const siteUnitId = arrival && arrival.districtId === form.districtId ? arrival.unitId : undefined;
 
-  const hasMerchantContent = merchantReviews.length > 0 || images.length > 0
-    || menu.length > 0 || keywords.length > 0;
-  const commercialReady = apiKey.trim() !== "" && hasMerchantContent
-    && rightsConfirmed && processingConsent && externalConsent && retentionAcknowledged;
-  const canSubmit = form.name.trim() !== "" && form.category.trim() !== "" && !busy
-    && (!commercialMode || commercialReady);
+  const canSubmit = form.item.trim() !== "" && form.category.trim() !== "" && !halfBudget && !busy;
 
   const hub = (districts ?? []).find((d) => d.id === form.districtId);
   const eventsDistrict = form.districtId || mapDistrictId || null;
   useEffect(() => { setEventId(null); }, [eventsDistrict]);
   const mapEvents = useProgramMap({
-    districtId: eventsDistrict,
-    districts: districts ?? [], places, pickedPlace, arrival, eventId,
-    onPickPlace: (p) => { if (!lookupBusy) applyPlace(p); },
-    onPickEvent: setEventId,
+    districtId: eventsDistrict, districts: districts ?? [], arrival, eventId, onPickEvent: setEventId,
   });
 
   function changeField<K extends keyof FormState>(k: K, value: FormState[K]) {
-    // 생성 원본의 입력이 바뀌면 이전 응답·초안·근거를 새 프로필에 붙이지 않는다.
+    // 생성 원본의 입력이 바뀌면 이전 응답·초안·근거를 새 브리프에 붙이지 않는다.
     discardResult();
-    discardLookup(["name", "category", "address", "districtId"].includes(k));
-    if (["name", "address"].includes(k)) setPickedPlace(null);
+    if (k === "districtId" && arrival && value !== arrival.districtId) setArrival(null);
     setForm((f) => ({ ...f, [k]: value }));
   }
 
@@ -213,89 +181,6 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
     setResult(null);
     setBusy(false);
     setError(null);
-    setOnboardingReceipt(null);
-  }
-
-  function discardLookup(clearReviews = false) {
-    lookupVersion.current += 1;
-    setLookupBusy(false); setPlaces(null); setLookupNote(null);
-    // 다른 가게·상권으로 바뀐 뒤 이전 가게의 공개 스니펫을 재사용하지 않는다.
-    if (clearReviews) setPublicReviews([]);
-  }
-
-  function toggleCommercialMode() {
-    // 공개 검색 스니펫·합성 예시가 점주 제공 데이터로 둔갑하지 않도록 모드를 바꿀 때
-    // 입력을 비운다. API 키도 브라우저 저장소에 남기지 않고 현재 메모리에서만 가진다.
-    setCommercialMode(!commercialMode);
-    setApiKey("");
-    setForm(EMPTY);
-    setPickedPlace(null);
-    setArrival(null);
-    setPublicReviews([]);
-    setPlaces(null);
-    setLookupNote(null);
-    discardResult();
-    discardLookup(true);
-    setRightsConfirmed(false);
-    setProcessingConsent(false);
-    setExternalConsent(false);
-    setRetentionAcknowledged(false);
-  }
-
-  /** 상호로 가게 후보를 찾는다. 자동 선택하지 않는다 — 같은 상호가 전국에 있다. */
-  async function searchPlaces() {
-    const q = form.name.trim();
-    if (!q || lookupBusy) return;
-    const version = ++lookupVersion.current;
-    setLookupBusy(true);
-    setPlaces(null);
-    setLookupNote(null);
-    try {
-      const r = await lookupStorePlaces(q, form.districtId || undefined);
-      if (version !== lookupVersion.current) return;
-      setPlaces(r.places);
-      setLookupNote(r.source === "unavailable"
-        ? `가게 검색을 쓸 수 없다 — ${r.note ?? "카카오 로컬 키 확인 필요"}`
-        : r.note);
-    } catch (err) {
-      if (version !== lookupVersion.current) return;
-      setPlaces([]);
-      setLookupNote(`가게 검색 실패: ${String(err)}`);
-    } finally {
-      if (version === lookupVersion.current) setLookupBusy(false);
-    }
-  }
-
-  /** 후보 선택 → 기본정보를 채우고, 그 주소로 좁힌 블로그 스니펫을 별도 상태에 넣는다.
-   *  직접 입력한 원문은 보존하고 공개 검색분만 선택한 가게의 것으로 바꾼다. */
-  async function applyPlace(p: StorePlace) {
-    discardResult(); discardLookup(true);
-    const version = ++lookupVersion.current;
-    setPickedPlace(p);
-    setForm((f) => ({
-      ...f,
-      name: p.name,
-      category: p.category || f.category,
-      address: p.road_address || p.address || f.address,
-    }));
-    setPlaces(null);
-    setLookupBusy(true);
-    setLookupNote(null);
-    try {
-      const r = await lookupStoreReviews(p.name, p.address ?? p.road_address);
-      if (version !== lookupVersion.current) return;
-      if (r.reviews.length) {
-        // 조회를 기다리는 동안 생성한 결과도 새로 합류한 입력을 읽은 결과는 아니다.
-        discardResult();
-        setPublicReviews(r.reviews);
-      }
-      setLookupNote(`'${r.query}' 검색 → ${r.reviews.length}건 주입. ${r.note ?? ""}`.trim());
-    } catch (err) {
-      if (version !== lookupVersion.current) return;
-      setLookupNote(`리뷰 스니펫 조회 실패: ${String(err)}`);
-    } finally {
-      if (version === lookupVersion.current) setLookupBusy(false);
-    }
   }
 
   async function submit(e: React.FormEvent) {
@@ -307,40 +192,26 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
     setBusy(true);
     setResult(null);
     setError(null);
-    setOnboardingReceipt(null);
+    const brief: ProgramBriefInput = {
+      item: form.item.trim(),
+      category: form.category.trim(),
+      mode: form.mode,
+      stage: form.stage,
+      district_id: form.districtId || undefined,
+      unit_id: siteUnitId,
+      address: form.address.trim() || undefined,
+      hypothesis: form.hypothesis.trim() || undefined,
+      target_customer: form.targetCustomer.trim() || undefined,
+      start_date: form.startDate || undefined,
+      run_days: runDays,
+      budget_krw_min: budgetMin,
+      budget_krw_max: budgetMax,
+      differentiators: differentiators.length ? differentiators : undefined,
+      tier: arrival?.strategy ?? undefined,
+    };
     try {
-      const profile = {
-        name: form.name.trim(),
-        category: form.category.trim(),
-        district_id: form.districtId || undefined,
-        address: form.address.trim() || undefined,
-        // 상용 경로는 점주가 직접 넣은 원문만 보낸다. 공개 검색 스니펫은 별도 state라
-        // 구조적으로 섞일 수 없다.
-        reviews: commercialMode ? merchantReviews : reviews,
-        image_urls: images.filter(isHttp),
-        menu,
-        keywords,
-      };
-      if (commercialMode) {
-        // canSubmit 이 네 확인을 모두 요구한다. 여기서는 그 확인 뒤에만 Literal true
-        // 계약을 만든다 — 체크박스의 기본값으로 동의를 만들어 보내지 않는다.
-        const onboarded = await generateCommercialStoreMarketing(profile, {
-          contract_version: "spaceos.program-onboarding/1",
-          data_origin: "merchant-provided",
-          processing_purpose: "program-marketing-generation",
-          consent_to_process: true,
-          rights_confirmed: true,
-          allow_external_model_processing: true,
-          raw_input_retention: "request-only",
-        }, apiKey.trim());
-        if (version === generationVersion.current) {
-          setResult(onboarded.marketing);
-          setOnboardingReceipt(onboarded.onboarding_id);
-        }
-      } else {
-        const generated = await generateStoreMarketing(profile);
-        if (version === generationVersion.current) setResult(generated);
-      }
+      const generated = await generateProgram(brief);
+      if (version === generationVersion.current) setResult(generated);
     } catch (err) {
       if (version === generationVersion.current) setError(String(err));
     } finally {
@@ -349,10 +220,11 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
   }
 
   const head = headline({
-    result, busy, elapsed, error, commercialMode, hub,
-    counts: {
-      merchantReviews: merchantReviews.length, publicReviews: publicReviews.length,
-      images: images.filter(isHttp).length, menu: menu.length, keywords: keywords.length,
+    result, busy, elapsed, error, hub, form, siteUnitId,
+    filled: {
+      hypothesis: form.hypothesis.trim() !== "", target: form.targetCustomer.trim() !== "",
+      period: runDays !== undefined || form.startDate !== "", budget: budgetMin !== undefined && budgetMax !== undefined,
+      differentiators: differentiators.length,
     },
   });
 
@@ -360,101 +232,72 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
     <div className="progstudio"><div className="wrap">
       <Verdict
         eyebrow="PlaceOS · Program" conversion="PROMOTION ▶ PROGRAM"
-        question="posting 한 page 를 어떤 홍보 program 으로 돌릴 것인가"
+        question="이 아이템이 이 platform 에서 통하는지, 어떤 검증 program 으로 확인할 것인가"
         verdict={head.verdict} grounds={head.grounds} sources={head.sources}
         note={HOW_TO_READ}
       />
 
-      {/* Posting → Program 인계 안내(화면설계서 2판 §Program ①). 금액·전략은 안내에만 쓰고
-          생성 요청에는 싣지 않는다 — 요청 계약(StoreProfile)에 그 필드가 없다. */}
+      {/* Posting → Program 인계 안내. 금액은 안내에만 쓰고 생성 요청에는 싣지 않는다 —
+          임대료는 Posting 의 추정값이라 브리프의 예산(창업자가 정한 값)과 섞이면 안 된다. */}
       {arrival && (
         <div className="arrival" role="status">
-          <b>입점 예정 자리</b> — {arrival.unitName} · {arrival.area}평 · {arrival.floor} · 월 {arrival.rent.toLocaleString("ko-KR")}만원
+          <b>검증할 자리</b> — {arrival.unitName} · {arrival.area}평 · {arrival.floor} · 월 {arrival.rent.toLocaleString("ko-KR")}만원
           {arrival.strategy && <> · Posting {arrival.strategy} 전략</>}
-          <span>가게명·리뷰를 넣으면 이 자리 기준으로 홍보 program 을 만든다. 거점·카테고리·주소는 Posting 에서 채웠다(바꿀 수 있다).</span>
+          <span>아이템과 검증 방식을 넣으면 이 공실에서 돌릴 검증 program 을 만든다. 거점·업종·주소는 Posting 에서 채웠다(바꿀 수 있다).</span>
         </div>
       )}
 
-      {/* 오프라인 홍보 장소(화면설계서 2판 §Program ②) — 지도 칩과 **같은 목록**이다. 칩은
-          키보드로 닿지 않으므로 여기서 같은 선택을 할 수 있어야 한다. 지도가 없으면 그리지 않는다. */}
+      {/* 오프라인 연계 후보 — 지도 칩과 **같은 목록**이다. 칩은 키보드로 닿지 않으므로
+          여기서 같은 선택을 할 수 있어야 한다. 지도가 없으면 그리지 않는다. */}
       {mapEvents && (
-        <OfflinePlaces data={mapEvents} selectedId={eventId} hasPlaceChips={!!places?.some((p) => p.lat != null)}
+        <OfflinePlaces data={mapEvents} selectedId={eventId}
           onSelect={(e) => { setEventId(e.id); mapEvents.panTo(e.lat, e.lng); }} />
       )}
 
       <div className="cols">
-        {/* ── 입력 ── */}
+        {/* ── 입력: 검증 브리프 ── */}
         <form className="panel" onSubmit={submit}>
           <div className="ptitle">
-            {commercialMode ? "상용 입력 온보딩" : "가게 프로필"}
+            검증 브리프
             <div className="ptools">
-              {!commercialMode && (
-                <Button variant="ghost" type="button" className="ghost" onClick={() => {
-                  setForm(SAMPLE); setPickedPlace(null); setArrival(null); discardResult(); discardLookup(true);
-                }}>예시 채우기</Button>
-              )}
-              <Button variant="ghost" type="button" className={`ghost ${commercialMode ? "active" : ""}`}
-                onClick={toggleCommercialMode}>
-                {commercialMode ? "공개 데모로" : "상용 온보딩"}
-              </Button>
               <Button variant="ghost" type="button" className="ghost" onClick={() => {
-                setForm(EMPTY); setPickedPlace(null); setArrival(null); setPublicReviews([]); discardResult(); discardLookup(true);
-                setApiKey(""); setRightsConfirmed(false); setProcessingConsent(false);
-                setExternalConsent(false); setRetentionAcknowledged(false);
+                setForm(SAMPLE); setArrival(null); discardResult();
+              }}>예시 채우기</Button>
+              <Button variant="ghost" type="button" className="ghost" onClick={() => {
+                setForm(emptyForm(baseStage)); setArrival(null); discardResult();
               }}>비우기</Button>
             </div>
           </div>
 
-          {/* 기존 사업자(업종 바꾸기·상권 옮기기)는 이미 리뷰·메뉴가 있다 — 창업 전 빈칸 문제가 없다는 것을 먼저 말한다(3판 PR-08). */}
-          {!commercialMode && (businessGoal === "pivot" || businessGoal === "move") && (
-            <p className="existing-biz" role="note">
-              지금 가게의 리뷰·메뉴를 붙여넣으면 <b>{businessGoal === "pivot" ? "업종 전환" : "이전"} 안내</b> 초안의 근거가 됩니다.
-              가게명으로 검색하면 지금 가게를 찾을 수 있습니다.
-            </p>
-          )}
-
-          {/* 입력 경로의 한계 — 지우면 안 되는 문장들이라 접어 둔다 */}
-          <Fold title="입력 규칙과 한계" summary="공식 API 로 얻는 것 / 붙여넣기 / 크롤링 금지선">
-            <div className="note">
-              네이버 플레이스의 <b>방문자 리뷰·사진·메뉴에는 공식 API 가 없다.</b> 그래서 공식
-              API 로 얻을 수 있는 것만 자동으로 채운다 — 카카오 로컬(상호·카테고리·주소)과
-              네이버 블로그 검색(리뷰성 스니펫). 사진·메뉴는 여전히 붙여넣기다.
-              <br />
-              사진 미리보기는 PoC 내부 검증용이다. 크롤링해 온 원본 사진은 고객 노출 화면에
-              직접 서빙하지 않는다 — 상용은 점주 제공 이미지가 원칙이다(B2B 온보딩 동의).
-              <br />
-              앞의 {VISION_MAX}장만 vision 분석에 쓰인다. 그 뒤 사진은 흐리게 그려
-              &ldquo;넣었는데 안 쓰인&rdquo; 상태를 숨기지 않는다.
-              <br />
-              리뷰·사진·메뉴가 모두 비면 근거가 없어 가게 특성이 빠진 일반론이 나온다.
-              없는 품목·가격은 생성기가 지어내지 않는다.
+          <Field label="단계" required group>
+            <div className="seg" role="radiogroup" aria-label="단계">
+              {(["pre_founder", "founder"] as FounderStage[]).map((s) => (
+                <button key={s} type="button" role="radio" aria-checked={form.stage === s}
+                  className={form.stage === s ? "on" : ""} onClick={() => changeField("stage", s)}>
+                  {STAGE_LABEL[s]}
+                  <small>{s === "pre_founder" ? "아직 가게가 없다" : "사업 중 · 새 상권·아이템 확인"}</small>
+                </button>
+              ))}
             </div>
-          </Fold>
+          </Field>
 
-          {commercialMode && (
-            <div className="onboardIntro">
-              이 경로는 <b>점주 또는 권한을 받은 조직이 직접 제공한 데이터만</b> 받는다.
-              카카오·블로그 자동 검색은 끄고, 원문은 생성 요청 중에만 사용한다.
+          <Field label="검증 방식" required group
+            hint="방식마다 기간 안에 잴 수 있는 것이 다르다 — 팝업은 유입, 가오픈은 객단가·회전, MVP 는 사전 수요. 지표도 이에 맞춰 나온다.">
+            <div className="seg seg3" role="radiogroup" aria-label="검증 방식">
+              {VALIDATION_MODES.map((m) => (
+                <button key={m.key} type="button" role="radio" aria-checked={form.mode === m.key}
+                  className={form.mode === m.key ? "on" : ""} onClick={() => changeField("mode", m.key)} title={m.hint}>
+                  {m.label}
+                </button>
+              ))}
             </div>
-          )}
+          </Field>
 
           <div className="row2">
-            <Field label="가게명" required
-              hint={commercialMode
-                ? "점주 또는 권한을 받은 조직이 확인한 상호를 직접 입력한다."
-                : "상호를 넣고 검색하면 카카오 로컬에서 후보를 찾아 기본정보·블로그 스니펫을 채운다."}>
-              {commercialMode ? (
-                <input value={form.name} onChange={(e) => changeField("name", e.target.value)} placeholder="점주 확인 상호" />
-              ) : <div className="inputbtn">
-                <input value={form.name} onChange={(e) => changeField("name", e.target.value)} placeholder="예: 맡기다"
-                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); searchPlaces(); } }} />
-                <Button variant="ghost" type="button" className="ghost" onClick={searchPlaces}
-                  disabled={!form.name.trim() || lookupBusy}>
-                  {lookupBusy ? "…" : "검색"}
-                </Button>
-              </div>}
+            <Field label="아이템" required hint="무엇을 팔거나 보여줄지 한 줄. 아직 브랜드명이 없어도 된다.">
+              <input value={form.item} onChange={(e) => changeField("item", e.target.value)} placeholder="예: 산미 중심 원두 팝업" />
             </Field>
-            <Field label="카테고리" required>
+            <Field label="업종" required>
               <input value={form.category} onChange={(e) => changeField("category", e.target.value)} list="cat-hints" placeholder="예: 카페" />
               <datalist id="cat-hints">
                 {CATEGORY_HINTS.map((c) => <option key={c} value={c} />)}
@@ -462,38 +305,14 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
             </Field>
           </div>
 
-          {/* 후보를 자동 선택하지 않는다 — 같은 상호가 전국에 있어(2026-08-01 코퍼스 오염의
-              원인) 사람이 골라야 리뷰 질의를 그 동네로 좁힐 수 있다. */}
-          {places && places.length > 0 && (
-            <div className="cands">
-              <div className="candhd">후보 {places.length}곳 — 맞는 가게를 고르면 기본정보와 블로그 스니펫이 채워진다</div>
-              {places.map((p, i) => (
-                <button type="button" key={i} className="cand" onClick={() => applyPlace(p)}>
-                  <span className="cname">{p.name}</span>
-                  <span className="ccat">{p.category}</span>
-                  <span className="caddr">
-                    {p.road_address || p.address}
-                    {p.distance_m != null && ` · ${p.distance_m}m`}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-          {places && places.length === 0 && !lookupBusy && (
-            <div className="warn">검색 결과가 없다. 지도에 표기된 상호 그대로 넣거나, 아래에 직접 입력하라.</div>
-          )}
-          {lookupNote && <div className="note">{lookupNote}</div>}
-
           <Field label="거점(상권 컨텍스트)"
             hint={districtErr
               ? "거점 목록을 불러오지 못했다 — 백엔드 확인 필요. 지금은 컨텍스트 결합 없이만 생성된다."
-              : "선택 시 해당 거점의 Gold 컨텍스트가 프롬프트에 결합된다. Gold 미적재 거점이면 컨텍스트 없이 생성된다."}
+              : "선택 시 그 거점의 상권 수치(업종 분포·검색 트렌드·시간대별 유동/매출·행사)가 근거로 합류한다. 검증 지표의 목표선도 여기서 나온다."}
             count={districts?.length ? `${districts.length}곳` : undefined}>
             <select value={form.districtId} onChange={(e) => changeField("districtId", e.target.value)} disabled={districts === null}>
               <option value="">{districts === null ? "거점 불러오는 중…" : "— 결합 안 함 —"}</option>
               {(districts ?? []).map((d) => (
-                // 이 select 는 "— 결합 안 함 —" 빈 옵션을 갖고 있어 DistrictPicker 로
-                // 통째로 바꾸지 못한다. 예외 표식만 같은 규칙으로 단다.
                 <option key={d.id} value={d.id}>
                   {caveatKind(d) ? (caveatKind(d) === "mall" ? "▣ " : "▤ ") : ""}{d.name} · {d.gu}
                 </option>
@@ -502,94 +321,48 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
             <CaveatNote district={hub} />
           </Field>
 
-          {!commercialMode && publicReviews.length > 0 && (
-            <div className="sourcebox">
-              <b>공개 검색 스니펫 {publicReviews.length}건</b>
-              <span>네이버 블로그 검색 결과이며 점주 제공 원문이 아니다. 공개 데모에만 합류한다.</span>
-            </div>
-          )}
-
-          <Field label={commercialMode ? "점주 제공 리뷰" : "직접 입력 리뷰 · 블로그 텍스트"}
-            hint={commercialMode
-              ? "한 줄에 하나. 제공·처리 권한을 확인한 원문만 입력한다."
-              : "한 줄에 하나. 자동 검색분은 위에 별도 표시되고, 이 칸에는 직접 입력한 원문만 둔다."}
-            count={merchantReviews.length ? `${merchantReviews.length}건` : undefined}>
-            <textarea rows={8} value={form.reviewsText} onChange={(e) => changeField("reviewsText", e.target.value)}
-              placeholder={"원두를 매주 바꿔서 소개해주는 게 좋아요.\n2층 창가 자리가 조용해서 작업하기 좋았습니다.\n…"} />
+          <Field label="검증 가설"
+            hint="이 program 으로 맞는지 확인하려는 한 문장. 기각 조건(지표)이 이 가설을 겨냥해 나온다. 비우면 지표가 일반론이 된다.">
+            <textarea rows={2} aria-label="검증 가설" value={form.hypothesis} onChange={(e) => changeField("hypothesis", e.target.value)}
+              placeholder="예: 가로수길 20~30대에게 산미 강한 원두가 통한다" />
           </Field>
 
-          {/* 선택 입력 — 필수는 가게명·카테고리·리뷰다. 나머지는 접어 두고 필요할 때 편다.
-              요약줄이 지금 몇 개 들어와 있는지 말하므로 접힌 채로도 빈 칸인지 알 수 있다. */}
-          <Fold title="더 넣을 수 있는 근거"
-            summary={`주소 ${form.address ? "입력됨" : "없음"} · 사진 ${images.length}장`
-              + ` · 메뉴 ${menu.length}개 · 키워드 ${keywords.length}개`}>
-            <Field label="주소">
+          {/* 선택 조건 — 넣을수록 근거가 구체적이다. 요약줄이 무엇이 채워졌는지 말하므로 접힌 채로도 빈 칸을 안다. */}
+          <Fold title="검증 조건"
+            summary={`목표 고객 ${form.targetCustomer.trim() ? "입력됨" : "없음"} · 기간 ${runDays ? `${runDays}일` : "미정"}`
+              + ` · 예산 ${budgetMin && budgetMax ? "구간 입력됨" : "없음"} · 차별점 ${differentiators.length}개`}>
+            <Field label="목표 고객">
+              <input value={form.targetCustomer} onChange={(e) => changeField("targetCustomer", e.target.value)} placeholder="예: 20~30대 직장인" />
+            </Field>
+            <div className="row2">
+              <Field label="시작 예정일">
+                <input type="date" aria-label="시작 예정일" value={form.startDate} onChange={(e) => changeField("startDate", e.target.value)} />
+              </Field>
+              <Field label="검증 기간(일)" hint="오프라인 제안의 시기가 이 안에 들어와야 한다 — 3일짜리 팝업에 '둘째 달부터'는 말이 안 된다.">
+                <input inputMode="numeric" aria-label="검증 기간(일)" value={form.runDays} onChange={(e) => changeField("runDays", e.target.value)} placeholder="예: 10" />
+              </Field>
+            </div>
+            <div className="row2">
+              <Field label="예산 하한(원)" hint="검증 기간 마케팅 예산의 구간. 생성물은 비율로만 배분하고 절대액은 이 구간에서만 나온다.">
+                <input inputMode="numeric" aria-label="예산 하한(원)" value={form.budgetMin} onChange={(e) => changeField("budgetMin", e.target.value)} placeholder="예: 300000" />
+              </Field>
+              <Field label="예산 상한(원)">
+                <input inputMode="numeric" aria-label="예산 상한(원)" value={form.budgetMax} onChange={(e) => changeField("budgetMax", e.target.value)} placeholder="예: 800000" />
+              </Field>
+            </div>
+            {halfBudget && <div className="warn">예산은 하한·상한을 함께 넣거나 둘 다 비운다 — 한쪽만으로는 구간이 아니다.</div>}
+            <Field label="차별점" hint="한 줄에 하나. 창업자의 주장이지 확인된 사실이 아니다 — 이게 통하는지가 검증 대상이다."
+              count={differentiators.length ? `${differentiators.length}개` : undefined}>
+              <textarea rows={3} aria-label="차별점" value={form.differentiatorsText} onChange={(e) => changeField("differentiatorsText", e.target.value)}
+                placeholder={"주간 단위 원두 교체\n로스팅 당일 추출"} />
+            </Field>
+            <Field label="자리 주소">
               <input value={form.address} onChange={(e) => changeField("address", e.target.value)} placeholder="예: 서울 강남구 신사동 …" />
-            </Field>
-
-            <Field label="사진 URL"
-              hint={`한 줄에 하나. 앞의 ${VISION_MAX}장만 vision 분석에 쓰인다. 공개 접근 가능한 URL 이어야 한다.`}
-              count={images.length ? `${images.length}장` : undefined}>
-              <textarea rows={3} value={form.imagesText} onChange={(e) => changeField("imagesText", e.target.value)}
-                placeholder={"https://…/store-1.jpg\nhttps://…/menu.jpg"} />
-            </Field>
-
-            {badImages.length > 0 && (
-              <div className="warn">http/https 로 시작하지 않는 줄 {badImages.length}개는 전송에서 제외된다.</div>
-            )}
-            {images.filter(isHttp).length > 0 && (
-              <div className="thumbs">
-                {images.filter(isHttp).map((u, i) => <Thumb key={u + i} url={u} used={i < VISION_MAX} />)}
-              </div>
-            )}
-
-            <Field label="메뉴"
-              hint="한 줄에 하나 — 품목과 가격을 적힌 그대로. 지도 메뉴탭도 공식 API 가 없어 붙여넣기다. 없는 품목·가격은 생성기가 지어내지 않는다."
-              count={menu.length ? `${menu.length}개` : undefined}>
-              <textarea rows={4} value={form.menuText} onChange={(e) => changeField("menuText", e.target.value)}
-                placeholder={"오늘의 드립 6,000원\n말차 라떼 6,500원"} />
-            </Field>
-
-            <Field label="키워드(선택)"
-              hint="쉼표로 구분. 넣으면 리뷰 빈도 추출 대신 이 값이 톤앤매너 키워드로 쓰인다."
-              count={keywords.length ? `${keywords.length}개` : undefined}>
-              <input value={form.keywordsText} onChange={(e) => changeField("keywordsText", e.target.value)} placeholder="예: 산미, 조용함, 말차" />
             </Field>
           </Fold>
 
-          {/* 동의문은 접지 않는다 — 읽지 않고 체크하게 만들면 동의가 아니다 */}
-          {commercialMode && (
-            <div className="consentbox">
-              <Field label="조직 API 키" required
-                hint="발급된 sk_placeos_… 키. 요청 헤더에만 사용하며 브라우저 저장소에 보관하지 않는다.">
-                <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)}
-                  autoComplete="off" placeholder="sk_placeos_…" />
-              </Field>
-              <label className="consent">
-                <input type="checkbox" checked={rightsConfirmed}
-                  onChange={(e) => setRightsConfirmed(e.target.checked)} />
-                점주 제공 데이터이며 리뷰·사진·메뉴를 제공하고 처리할 권한이 있음을 확인한다.
-              </label>
-              <label className="consent">
-                <input type="checkbox" checked={processingConsent}
-                  onChange={(e) => setProcessingConsent(e.target.checked)} />
-                Program 마케팅 생성 목적으로 입력을 처리하는 데 동의한다.
-              </label>
-              <label className="consent">
-                <input type="checkbox" checked={externalConsent}
-                  onChange={(e) => setExternalConsent(e.target.checked)} />
-                설정된 경우 외부 LLM의 텍스트·이미지 처리 경로를 사용할 수 있음에 동의한다.
-              </label>
-              <label className="consent">
-                <input type="checkbox" checked={retentionAcknowledged}
-                  onChange={(e) => setRetentionAcknowledged(e.target.checked)} />
-                원문은 애플리케이션 DB에 저장하지 않고, 조직·계약 버전·항목별 건수만 감사기록에 남음을 확인한다.
-              </label>
-            </div>
-          )}
-
           <Button type="submit" className="primary" disabled={!canSubmit}>
-            {busy ? `생성 중… ${elapsed}초` : commercialMode ? "동의하고 상용 생성" : "마케팅 솔루션 생성"}
+            {busy ? `생성 중… ${elapsed}초` : "검증 program 생성"}
           </Button>
         </form>
 
@@ -605,26 +378,21 @@ export default function ProgramStudio({ mapDistrictId, handoff, onArrivalDismiss
 
           {!error && !result && !busy && (
             <div className="empty">
-              {"왼쪽에 가게 프로필을 넣고 «마케팅 솔루션 생성»을 누르면 여기에 결과가 나온다. "
-                + "처음이라면 «예시 채우기»로 한 번 돌려보면 된다 — 사진을 넣으면 10~20초 걸린다."}
+              {"왼쪽에 아이템과 검증 방식을 넣고 «검증 program 생성»을 누르면 여기에 결과가 나온다. "
+                + "처음이라면 «예시 채우기»로 한 번 돌려보면 된다."}
             </div>
           )}
 
           {busy && <div className="empty">생성 중… {elapsed}초</div>}
 
           {result && !busy && <Result key={resultVersion} r={result} />}
-          {onboardingReceipt && !busy && (
-            <div className="receipt">
-              상용 입력 동의 영수증 <code>{onboardingReceipt}</code> · 원문 DB 저장 없음
-            </div>
-          )}
         </Card>
       </div>
     </div></div>
   );
 }
 
-/* ───────────── 지도 (2026-09-13) ───────────── */
+/* ───────────── 지도 ───────────── */
 
 /** 행사 기간 문자열("YYYY-MM-DD~YYYY-MM-DD")을 가른다. 모양이 다르면 null — 그 행사는 거르지 않는다
  *  (날짜를 모르는 것을 종료로 단정하면 있는 행사를 지운다). */
@@ -635,8 +403,7 @@ export function eventRange(when: string | null | undefined): { start: string; en
   return one ? { start: one[1], end: one[1] } : null;
 }
 
-/** 종료일이 오늘보다 앞선 행사를 뺀다(화면설계서 2판 PR-01). 행사 산출물이 08-16 빌드라 이미
- *  끝난 행사가 섞여 있다 — 끝난 행사를 "홍보를 붙일 곳"으로 보여주면 거짓 안내가 된다.
+/** 종료일이 오늘보다 앞선 행사를 뺀다(화면설계서 PR-01). 끝난 행사를 "연계할 곳"으로 보여주면 거짓 안내가 된다.
  *  `today` 는 로컬 날짜 "YYYY-MM-DD". 남은 것은 시작일 순. */
 export function splitEvents(events: MarketingEvent[], today: string): { upcoming: MarketingEvent[]; ended: number } {
   const upcoming: MarketingEvent[] = [];
@@ -669,23 +436,18 @@ interface ProgramMapData {
 }
 
 /**
- * Program 이 지도에 그리는 것 — "어디서 홍보를 돌리나".
+ * Program 이 지도에 그리는 것 — "어디서 검증을 돌리고 무엇과 잇나".
  *
- *   ① **가게 후보 칩** — 상호 검색 결과(카카오 로컬). 같은 상호가 여러 곳이면 위치로 고른다.
- *      칩을 누르면 목록에서 고른 것과 똑같이 채워진다(`applyPlace`).
- *   ② **고른 가게 핀** — 채운 뒤에도 "이 가게" 자리가 남는다.
- *   ③ **오프라인 홍보 장소** — 상권의 공공 문화행사. **LLM 을 부르지 않는 경로**
+ *   ① **오프라인 연계 후보** — 상권의 공공 문화행사. **LLM 을 부르지 않는 경로**
  *      (`/marketing/events`)로만 받는다. 시드 폴백은 점선, 종료된 행사는 뺀다.
- *      칩을 누르면 패널 목록에서 그 행사가 선택된다(표식 규칙 — 화면설계서 2판).
- *   ④ **입점 예정 자리** — Posting 에서 넘어왔을 때의 자리(Posting 트랙 색).
+ *   ② **검증할 자리** — Posting 에서 넘어온 공실(Posting 트랙 색).
  *
+ * 종전의 가게 후보 칩·「이 가게」 핀은 사라졌다 — 특정할 영업 중인 가게가 없다(2026-09-17).
  * 지도가 없으면(단독 렌더·테스트) 행사 요청도 보내지 않고 null 을 돌려준다.
  */
-function useProgramMap({ districtId, districts, places, pickedPlace, arrival, eventId, onPickPlace, onPickEvent }: {
+function useProgramMap({ districtId, districts, arrival, eventId, onPickEvent }: {
   districtId: string | null; districts: DistrictSummary[];
-  places: StorePlace[] | null; pickedPlace: StorePlace | null;
   arrival: ProgramHandoff | null; eventId: string | null;
-  onPickPlace: (p: StorePlace) => void;
   onPickEvent: (id: string) => void;
 }): ProgramMapData | null {
   const { map, ready } = useMapHost();
@@ -702,7 +464,6 @@ function useProgramMap({ districtId, districts, places, pickedPlace, arrival, ev
   const current = ev && ev.id === districtId ? ev : null;
   const split = useMemo(() => splitEvents(current?.events ?? [], localToday()), [current]);
 
-  const placeKey = (p: StorePlace, i: number) => `place-${i}-${p.name}`;
   const markers = useMemo<MapMarkerItem[]>(() => {
     const out: MapMarkerItem[] = [];
     const seed = current?.source !== "seoul-open-data";
@@ -717,44 +478,24 @@ function useProgramMap({ districtId, districts, places, pickedPlace, arrival, ev
         }),
       });
     }
-    (places ?? []).forEach((p, i) => {
-      if (p.lat == null || p.lng == null) return;
-      out.push({
-        id: placeKey(p, i), lat: p.lat, lng: p.lng, zIndex: 150,
-        html: mapLabelHTML({ text: p.name, sub: p.category?.split(">").pop()?.trim(), color: colors.ink }),
-      });
-    });
-    if (pickedPlace?.lat != null && pickedPlace.lng != null) {
-      out.push({
-        id: "picked", lat: pickedPlace.lat, lng: pickedPlace.lng, zIndex: 250,
-        html: mapLabelHTML({ text: pickedPlace.name, sub: "이 가게", color: colors.track.program.base, active: true }),
-      });
-    }
     if (arrival) {
       out.push({
         id: "arrival", lat: arrival.lat, lng: arrival.lng, zIndex: 240,
-        html: mapLabelHTML({ text: "입점 예정 자리", sub: `${arrival.area}평 · ${arrival.floor}`, color: colors.track.posting.base, active: true }),
+        html: mapLabelHTML({ text: "검증할 자리", sub: `${arrival.area}평 · ${arrival.floor}`, color: colors.track.posting.base, active: true }),
       });
     }
     return out;
-  }, [current, split, eventId, places, pickedPlace, arrival]);
+  }, [current, split, eventId, arrival]);
 
   useMapMarkers(markers, (id) => {
-    if (id.startsWith("event-")) { onPickEvent(id.slice("event-".length)); return; }
-    const i = (places ?? []).findIndex((p, k) => placeKey(p, k) === id);
-    if (i >= 0) onPickPlace((places ?? [])[i]);
+    if (id.startsWith("event-")) onPickEvent(id.slice("event-".length));
   });
 
-  // 카메라: 후보 → 고른 가게 → 입점 예정 자리 → 상권 중심 순. 키가 바뀔 때만 움직인다.
+  // 카메라: 검증할 자리 → 상권 중심 순. 키가 바뀔 때만 움직인다.
   const hubCenter = districts.find((d) => d.id === districtId)?.center;
-  const candidatePts = (places ?? []).filter((p) => p.lat != null && p.lng != null)
-    .map((p) => ({ lat: p.lat as number, lng: p.lng as number }));
-  const single = pickedPlace?.lat != null && pickedPlace.lng != null ? { lat: pickedPlace.lat, lng: pickedPlace.lng }
-    : arrival ? { lat: arrival.lat, lng: arrival.lng } : null;
-  const fitKey = candidatePts.length ? `places:${candidatePts.map((p) => `${p.lat},${p.lng}`).join("|")}`
-    : single ? `one:${single.lat},${single.lng}` : districtId ? `hub:${districtId}` : null;
-  const fitPts = candidatePts.length ? candidatePts : single ? [single] : [];
-  useFitMap(fitKey, fitPts, hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null);
+  const single = arrival ? { lat: arrival.lat, lng: arrival.lng } : null;
+  const fitKey = single ? `one:${single.lat},${single.lng}` : districtId ? `hub:${districtId}` : null;
+  useFitMap(fitKey, single ? [single] : [], hubCenter ? { lat: hubCenter[0], lng: hubCenter[1] } : null);
 
   if (!ready || !map || !current) return null;
   return {
@@ -766,26 +507,24 @@ function useProgramMap({ districtId, districts, places, pickedPlace, arrival, ev
   };
 }
 
-/** 오프라인 홍보 장소 목록 + 고른 행사 상세. 지도 칩과 같은 목록·같은 선택이다. */
-function OfflinePlaces({ data, selectedId, hasPlaceChips, onSelect }: {
-  data: ProgramMapData; selectedId: string | null; hasPlaceChips: boolean;
-  onSelect: (e: MarketingEvent) => void;
+/** 오프라인 연계 후보 목록 + 고른 행사 상세. 지도 칩과 같은 목록·같은 선택이다. */
+function OfflinePlaces({ data, selectedId, onSelect }: {
+  data: ProgramMapData; selectedId: string | null; onSelect: (e: MarketingEvent) => void;
 }) {
   const { events, ended, source } = data;
   const selected = events.find((e) => e.id === selectedId) ?? null;
   const seed = source !== "seoul-open-data";
   return (
-    <section className="offline-places" aria-label="오프라인 홍보 장소">
+    <section className="offline-places" aria-label="오프라인 연계 후보">
       <div className="op-head">
-        <b>오프라인 홍보 장소 · {events.length}곳</b>
+        <b>오프라인 연계 후보 · {events.length}곳</b>
         {ended > 0 && <span>종료된 행사 {ended}곳은 뺐다</span>}
       </div>
       <p className="op-src" role="status">
         {source === "unavailable" ? "행사 목록을 불러오지 못했다"
           : source === "seed" ? "행사 실데이터 미적재 — 점선 칩은 예시다"
           : events.length === 0 ? "이 상권에 예정된 공공 문화행사가 없다 — 예시로 채우지 않는다."
-          : "서울열린데이터광장 공공 문화행사 · 지도 칩과 같은 목록"}
-        {hasPlaceChips && " · 잉크색 칩 = 가게 후보(눌러서 고른다)"}
+          : "서울열린데이터광장 공공 문화행사 · 검증 기간과 겹치면 유입을 붙일 수 있다 · 지도 칩과 같은 목록"}
       </p>
       {events.length > 0 && (
         <ul className="op-list">
@@ -820,42 +559,35 @@ function OfflinePlaces({ data, selectedId, hasPlaceChips, onSelect }: {
 /**
  * 이 화면이 답한 것과 그 답을 세운 값.
  *
- * 결과가 없을 때도 세 줄을 그대로 낸다 — 라벨은 같고 값이 "아직 무엇이 들어와 있나"로
- * 바뀐다. 빈 화면이 아니라 **무엇이 더 필요한지**를 말하는 자리가 된다.
- *
- * HA 폐기·경고는 상세를 접어도 이 결론 줄에 남긴다. 접힌 자리가 "문제 없음"으로
- * 읽히면 안 된다.
- *
- * 값은 문자열로 잇는다. 강조가 실제로 뜻을 바꾸는 자리(폐기 여부·없는 값)에만
- * 마크업을 쓴다 — 조각을 잘게 나눌수록 화면 글자가 아니라 마크업만 늘어난다.
+ * 근거 세 줄은 검증의 세 질문이다 — **무엇을 확인하나 / 어떻게 모으나 / 무엇으로 판정하나**.
+ * 결과가 없을 때도 세 줄을 그대로 내고, 값이 "아직 무엇이 들어와 있나"로 바뀐다.
+ * HA 폐기·경고와 스텁 여부는 상세를 접어도 이 결론 줄에 남긴다.
  */
-function headline({ result, busy, elapsed, error, commercialMode, hub, counts }: {
-  result: StoreMarketing | null; busy: boolean; elapsed: number; error: string | null;
-  commercialMode: boolean; hub?: DistrictSummary;
-  counts: { merchantReviews: number; publicReviews: number; images: number; menu: number; keywords: number };
+function headline({ result, busy, elapsed, error, hub, form, siteUnitId, filled }: {
+  result: ProgramPlan | null; busy: boolean; elapsed: number; error: string | null;
+  hub?: DistrictSummary; form: FormState; siteUnitId?: string;
+  filled: { hypothesis: boolean; target: boolean; period: boolean; budget: boolean; differentiators: number };
 }): { verdict: ReactNode; grounds: Ground[]; sources: ReactNode[] } {
   const stub = result ? result.source !== "llm" : false;
   const findings = result?.ha_findings ?? [];
   const blocked = findings.filter((f) => f.severity === "violation");
   const warnings = findings.filter((f) => f.severity !== "violation");
-  const route = commercialMode ? "상용 온보딩(점주 제공)" : "공개 데모";
-  const reviewsIn = counts.merchantReviews + (commercialMode ? 0 : counts.publicReviews);
-  const ctx = hub ? `${hub.name}(${hub.gu}) Gold 결합` : "결합 안 함";
+  const modeLabel = MODE_LABEL[result?.mode ?? form.mode] ?? form.mode;
+  const ctx = hub ? `${hub.name}(${hub.gu}) 상권 수치 결합` : "상권 결합 안 함";
 
   /* ── 결론 한 문장 ── */
   let verdict: ReactNode;
   if (error) {
-    verdict = <span className="value-absent">생성에 실패해 돌릴 program 이 없다 — 아래 오류를 확인한다.</span>;
+    verdict = <span className="value-absent">생성에 실패해 돌릴 검증 program 이 없다 — 아래 오류를 확인한다.</span>;
   } else if (busy) {
-    verdict = `생성 중이다 — ${elapsed}초 경과 (사진을 넣으면 10~20초 걸린다).`;
+    verdict = `생성 중이다 — ${elapsed}초 경과.`;
   } else if (!result) {
-    verdict = `아직 돌릴 program 이 없다 — 가게 프로필을 넣으면 온·오프라인 채널안을 근거와 함께 낸다`
-      + ` (현재 ${route} 경로, 근거 ${reviewsIn + counts.images + counts.menu}건 입력).`;
+    verdict = `아직 돌릴 검증 program 이 없다 — 아이템과 검증 방식을 넣으면 모객·자리·판정 세 벌을 근거와 함께 낸다`
+      + ` (현재 ${STAGE_LABEL[form.stage]} · ${modeLabel}).`;
   } else {
-    const lead = `${result.store_name}(${result.category}) — 온라인 ${result.online.length}건 · `
-      + `오프라인 ${result.offline.length}건 홍보 초안을 준비했다`
-      + `${result.online[0] ? `, 첫 수는 「${result.online[0].channel}」` : ""}.`;
-    // 스텁이라는 사실은 상세를 접어도 결론에 남긴다 — 접힌 자리가 "문제 없음"으로 읽히면 안 된다
+    const lead = `${result.item}(${result.category}) — ${modeLabel}로 확인한다: `
+      + `온라인 ${result.online.length}건 · 오프라인 ${result.offline.length}건 · 검증 지표 ${result.signals.length}건`
+      + `${result.signals[0] ? `, 첫 판정선은 「${result.signals[0].name}」` : ""}.`;
     verdict = stub
       ? <>{lead} <span className="value-absent">{blocked.length > 0
         ? `단 LLM 생성물이 HA 검증에 걸려 폐기됐고(${blocked.length}건), 아래는 규칙 기반 스텁이다.`
@@ -864,16 +596,15 @@ function headline({ result, busy, elapsed, error, commercialMode, hub, counts }:
   }
 
   /* ── 근거 3줄 ── */
-  // ① 무엇을 읽고 냈나
-  const inputParts = [
-    `리뷰 ${reviewsIn}건`,
-    `사진 ${counts.images}장${counts.images ? ` (vision ${Math.min(counts.images, VISION_MAX)}장)` : ""}`,
-    `메뉴 ${counts.menu}개`,
-    `키워드 ${counts.keywords}개`,
+  const briefParts = [
+    `가설 ${filled.hypothesis ? "있음" : "없음"}`,
+    `목표 고객 ${filled.target ? "있음" : "없음"}`,
+    `기간 ${filled.period ? "있음" : "미정"}`,
+    `예산 구간 ${filled.budget ? "있음" : "없음"}`,
+    `차별점 ${filled.differentiators}개`,
+    `검증할 자리 ${siteUnitId ? "지정" : "미지정"}`,
   ];
-  const noEvidence = reviewsIn === 0 && counts.images === 0 && counts.menu === 0;
 
-  // ③ 믿을 만한가 — 폐기 > 경고 > 통과 순으로 가른다(등급이 다르면 대응도 다르다)
   const haVerdict = blocked.length > 0
     ? <span className="tr-up">HA 폐기 {blocked.length}건</span>
     : warnings.length > 0
@@ -882,53 +613,42 @@ function headline({ result, busy, elapsed, error, commercialMode, hub, counts }:
 
   const grounds: Ground[] = [
     {
-      label: "무엇을 읽고 냈나",
-      value: noEvidence
-        ? <>{inputParts.join(" · ")} · <span className="value-absent">근거 없음 — 가게 특성이 빠진 일반론이 나온다</span></>
-        : inputParts.join(" · "),
-      source: commercialMode
-        ? "점주 또는 권한을 받은 조직이 직접 제공한 원문만 — 카카오·블로그 자동 검색은 끈다"
-        : `직접 입력 ${counts.merchantReviews}건 + 네이버 블로그 검색 스니펫 ${counts.publicReviews}건`
-          + " · 기본정보는 카카오 로컬 · 사진·메뉴는 붙여넣기(네이버 플레이스 방문자 리뷰·사진·메뉴에는 공식 API 가 없다)",
+      label: "무엇을 확인하나",
+      value: filled.hypothesis
+        ? `${STAGE_LABEL[form.stage]} · ${modeLabel} · ${briefParts.join(" · ")}`
+        : <>{STAGE_LABEL[form.stage]} · {modeLabel} · {briefParts.join(" · ")} · <span className="value-absent">가설이 없어 판정선이 일반론이 된다</span></>,
+      source: "검증 브리프 — 창업자가 넣은 계획과 주장(검증된 사실 아님) · " + ctx,
     },
     {
-      label: "어떤 채널로",
+      label: "어떻게 모으나",
       value: result
         ? `온라인 ${result.online.map((x) => x.channel).join(" / ") || "—"}`
           + ` · 오프라인 ${result.offline.map((x) => x.channel).join(" / ") || "—"}`
         : <span className="value-absent">아직 생성하지 않았다</span>,
-      source: `POST /api/v1/marketing/generate · 상권 컨텍스트 ${ctx}`,
+      source: "POST /api/v1/marketing/generate · 온라인은 창업자 단독, 오프라인은 건물주·상인회 등과 함께",
     },
     {
-      label: "믿을 만한가",
+      label: "무엇으로 판정하나",
       value: result
-        ? <>생성 원본: {stub ? "규칙 기반 폴백" : "LLM 생성"} · {haVerdict}
-          {` · 톤 키워드 ${result.tone_keywords.length}개`}
-          {result.tone_keywords.length ? ` (${result.tone_keywords.join(", ")})` : ""}</>
-        : `경로 ${route} — ` + (commercialMode
-          ? "API 키와 네 가지 확인을 모두 채워야 생성된다"
-          : "공개 검색 스니펫과 예시 입력이 합류할 수 있다"),
-      source: "서버 후처리 ha_guard — 금액·트렌드 방향·최상급·비방·채널 균형을 따로 검증한다"
+        ? <>{result.signals.map((s) => `${s.name}(${s.target})`).join(" · ") || <span className="value-absent">지표 없음</span>}
+          {" · "}생성 원본: {stub ? "규칙 기반 폴백" : "LLM 생성"} · {haVerdict}</>
+        : <span className="value-absent">아직 생성하지 않았다</span>,
+      source: "서버 후처리 ha_guard — 금액·트렌드 방향·미검증 경험·지표 형식을 따로 검증한다"
         + " (LLM 자체점검 문장과 섞지 않는다). 생성 후 편집한 초안은 이 검증에 포함되지 않는다.",
     },
   ];
 
   /* ── 출처 — 아래가 전부 접혀도 남는다 ── */
-  const sources: ReactNode[] = [
-    "POST /api/v1/marketing/generate",
-    commercialMode ? "점주 제공 원문(B2B 온보딩 동의)" : "카카오 로컬(상호·카테고리·주소)",
-  ];
-  if (!commercialMode) sources.push("네이버 블로그 검색(리뷰성 스니펫)");
+  const sources: ReactNode[] = ["POST /api/v1/marketing/generate", "검증 브리프(창업자 입력)"];
   if (hub) sources.push(`Gold 상권 컨텍스트 · ${hub.name}(${hub.gu})`);
-  if (counts.images) sources.push(`Claude vision · 앞 ${VISION_MAX}장`);
+  if (siteUnitId) sources.push("gold/vacant_units(검증할 자리 · 건축물대장)");
   sources.push("HA 서버 검증 ha_guard");
-  sources.push("상권 단위(2단계)는 Platform 탭 거점 심층");
   return { verdict, grounds, sources };
 }
 
 /* ───────────── 결과 ───────────── */
 
-function Result({ r }: { r: StoreMarketing }) {
+function Result({ r }: { r: ProgramPlan }) {
   const stub = r.source !== "llm";
   const findings = r.ha_findings ?? [];
   // 폐기(violation)와 경고(warning)는 성격이 다르다 — 전자는 이 응답이 스텁인 **이유**이고,
@@ -939,8 +659,8 @@ function Result({ r }: { r: StoreMarketing }) {
     <div className="result">
       <div className="rhead">
         <div>
-          <div className="rname">{r.store_name}</div>
-          <div className="rcat">{r.category}</div>
+          <div className="rname">{r.item}</div>
+          <div className="rcat">{r.category} · {MODE_LABEL[r.mode] ?? r.mode} · {STAGE_LABEL[r.stage] ?? r.stage}</div>
         </div>
         <span className={`srcbadge ${stub ? "is-syn" : "is-gold"}`}
           title={stub
@@ -950,12 +670,16 @@ function Result({ r }: { r: StoreMarketing }) {
         </span>
       </div>
 
+      {/* 판정표를 초안보다 **먼저** 둔다 — 무엇으로 판정할지가 이 결과의 결론이고,
+          채널 초안은 그 판정에 쓸 표본을 모으는 수단이다. */}
+      <SignalTable signals={r.signals} />
+
       <DraftWorkspace online={r.online} offline={r.offline} />
 
       {/* 검증의 **결과**는 위 결론 줄이 이미 말했다. 여기 접힌 것은 그 사유와 원문이다. */}
       <Fold title="생성 원본의 Humanistic Authority 검증"
         badge={blocked.length ? `폐기 ${blocked.length}` : warnings.length ? `경고 ${warnings.length}` : "통과"}
-        summary={<>편집 초안은 검증 대상 아님 · 톤 키워드 {r.tone_keywords.length}개 · LLM 자체점검 문장</>}>
+        summary={<>편집 초안은 검증 대상 아님 · LLM 자체점검 문장</>}>
 
         {/* 스텁이 나온 이유가 둘이다. 크레딧·키 문제와 "생성은 됐는데 검증에 걸렸다"를
             같은 문구로 보여주면 엉뚱한 데를 고치게 된다. */}
@@ -976,7 +700,7 @@ function Result({ r }: { r: StoreMarketing }) {
 
         {stub && blocked.length === 0 && (
           <div className="warn">
-            LLM 을 타지 못해 <b>규칙 기반 스텁</b>이 나왔다 — 리뷰·사진을 읽은 결과가 아니다.
+            LLM 을 타지 못해 <b>규칙 기반 스텁</b>이 나왔다 — 브리프·상권 수치를 읽고 쓴 결과가 아니다.
             <code>LLM_API_KEY</code>(로컬은 <code>apps/backend/.env</code>, 배포는 Cloud Run 환경변수),
             Anthropic 크레딧 잔액, 백엔드 로그를 확인하라.
           </div>
@@ -998,23 +722,53 @@ function Result({ r }: { r: StoreMarketing }) {
           </div>
         )}
 
-        {r.tone_keywords.length > 0 && (
-          <>
-            <div className="rlabel">톤앤매너 키워드</div>
-            <div className="chips">{r.tone_keywords.map((k, i) => <span key={i} className="chip">{k}</span>)}</div>
-          </>
-        )}
-
         {/* 자기신고와 서버 검증을 나란히 두되 섞지 않는다 — 아래 문장은 LLM 이 스스로
             적은 것이고, 그게 사실인지는 서버(ha_guard)가 따로 판정한다. */}
         <div className="rlabel">Humanistic Authority 자체점검 <em>LLM 이 적은 문장이다</em></div>
         <div className="ha">{r.ha_check}</div>
         {!stub && warnings.length === 0 && (
-          <div className="note">서버 후처리 검증(금액·트렌드 방향·최상급·비방·채널 균형) 통과.</div>
+          <div className="note">서버 후처리 검증(금액·트렌드 방향·미검증 경험·지표 형식·채널 균형) 통과.</div>
         )}
       </Fold>
     </div>
   );
+}
+
+/** 검증 지표 — 이 결과의 결론. 목표선과 **기각 조건**을 나란히 둔다: 기각 조건이 없는 지표는
+ *  결과를 보고 사후에 말을 맞추게 되므로, 비어 있으면 비어 있다고 적는다. */
+function SignalTable({ signals }: { signals: ValidationSignal[] }) {
+  return (
+    <section className="signals" aria-label="검증 지표">
+      <h2>검증 지표 <span>{signals.length}건 · 시작 전에 정한 판정선</span></h2>
+      {signals.length === 0 ? (
+        <p className="value-absent">검증 지표가 없다 — 무엇을 세면 통했다고 할지 정하지 않은 검증은 판정이 아니라 지출이다.</p>
+      ) : (
+        <div className="sig-scroll">
+          <table>
+            <thead><tr><th>지표</th><th>측정 방법</th><th>목표선</th><th>기각 조건</th></tr></thead>
+            <tbody>
+              {signals.map((s, i) => (
+                <tr key={i}>
+                  <th scope="row">{s.name}</th>
+                  <td>{s.method}</td>
+                  <td className="sig-target">{s.target}</td>
+                  <td>{s.decision || <span className="value-absent">비어 있음</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** 채널 한 건의 부가 속성 한 줄 — 온라인은 타겟·예산비율·KPI, 오프라인은 시기·협업 주체. */
+function planMeta(p: ChannelPlan): string {
+  const bits = p.kind === "online"
+    ? [p.target && `타겟 ${p.target}`, p.budget_share != null && `예산 ${p.budget_share}%`, p.kpi && `KPI ${p.kpi}`]
+    : [p.timing && `시기 ${p.timing}`, p.actors?.length ? `함께 ${p.actors.join("·")}` : null];
+  return bits.filter(Boolean).join(" · ");
 }
 
 /** 본문 편집은 현재 화면의 메모리에서만 한다. 서버 원본·근거·출처는 덮어쓰지 않는다. */
@@ -1053,18 +807,19 @@ function DraftWorkspace({ online, offline }: { online: ChannelPlan[]; offline: C
 
   if (!plan) return <div className="empty">생성된 채널안이 없습니다. 입력 근거를 확인해 다시 생성하세요.</div>;
 
+  const meta = planMeta(plan);
   return (
-    <section className="draft-workspace" aria-label="채널별 홍보 초안">
+    <section className="draft-workspace" aria-label="채널별 실행 초안">
       <div className="draft-intro">
-        <h2>채널별 초안 다듬기</h2>
+        <h2>채널별 실행 초안 다듬기</h2>
         <p>채널 선택 → 본문 편집 → 미리보기 · 수정한 채널 {editedCount}개</p>
-        <p>초안은 이 화면에서만 유지됩니다. 다시 생성하거나 가게 프로필·입력 모드를 바꾸면 사라집니다.</p>
+        <p>초안은 이 화면에서만 유지됩니다. 다시 생성하거나 브리프를 바꾸면 사라집니다.</p>
       </div>
       <div className="draft-layout">
         <div className="draft-channels" role="group" aria-label="초안 채널 선택">
           {([
-            { label: "온라인", items: online, offset: 0 },
-            { label: "오프라인", items: offline, offset: online.length },
+            { label: "온라인 · 모객", items: online, offset: 0 },
+            { label: "오프라인 · 자리·연계", items: offline, offset: online.length },
           ]).map((group) => (
             <div key={group.label} className="draft-channel-group">
               <h3>{group.label} <span>{group.items.length}건</span></h3>
@@ -1093,6 +848,7 @@ function DraftWorkspace({ online, offline }: { online: ChannelPlan[]; offline: C
               <button type="button" aria-pressed={preview} onClick={() => setPreview(true)}>미리보기</button>
             </div>
           </div>
+          {meta && <p className="draft-meta">{meta}</p>}
           <p className="draft-validation" id="draft-validation" role="status">
             {edited
               ? "편집됨 · 생성 후 사용자가 수정한 초안입니다. 수정한 본문은 서버 HA 검증을 거치지 않았습니다."
@@ -1130,36 +886,25 @@ function DraftWorkspace({ online, offline }: { online: ChannelPlan[]; offline: C
 
 /* ───────────── 조각 ───────────── */
 
-function Field({ label, required, hint, count, children }: {
-  label: string; required?: boolean; hint?: string; count?: string; children: React.ReactNode;
+function Field({ label, required, hint, count, group, children }: {
+  label: string; required?: boolean; hint?: string; count?: string;
+  /** 버튼 묶음(라디오 그룹)이면 `<label>` 로 감싸지 않는다. `<label>` 은 첫 버튼을 라벨 대상으로
+   *  삼아, 라벨 글자를 누르면 첫 선택지가 눌리고 그 버튼의 접근성 이름도 라벨로 덮인다. */
+  group?: boolean;
+  children: React.ReactNode;
 }) {
+  const head = (
+    <span className="flabel">
+      {label}{required && <i>*</i>}
+      {count && <em>{count}</em>}
+    </span>
+  );
   return (
     <div className="field">
-      <label>
-        <span className="flabel">
-          {label}{required && <i>*</i>}
-          {count && <em>{count}</em>}
-        </span>
-        {children}
-      </label>
-      {/* 힌트는 접는다 — 일곱 칸의 설명이 동시에 펴져 있으면 정작 입력칸이 안 보인다.
-          접은 것이지 지운 것이 아니다. `<label>` 밖에 두어야 요약줄 클릭이
-          라벨 활성화로 새지 않는다. */}
+      {group ? <div>{head}{children}</div> : <label>{head}{children}</label>}
+      {/* 힌트는 접는다 — 칸마다 설명이 동시에 펴져 있으면 정작 입력칸이 안 보인다.
+          `<label>` 밖에 두어야 요약줄 클릭이 라벨 활성화로 새지 않는다. */}
       {hint && <details className="fhint"><summary>입력 규칙</summary><div>{hint}</div></details>}
-    </div>
-  );
-}
-
-/** 사진 미리보기. 브라우저가 못 불러오는 URL 은 백엔드(Claude vision)도 대개 못 불러온다 —
- *  크레딧을 쓰기 전에 여기서 걸러내라고 실패 상태를 그대로 보여준다. */
-function Thumb({ url, used }: { url: string; used: boolean }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <div className={`thumb${used ? "" : " unused"}${failed ? " failed" : ""}`}
-      title={used ? url : `${url}\n(vision 분석에는 앞 ${VISION_MAX}장만 쓰인다)`}>
-      {failed
-        ? <span className="thumbx">불러올 수 없음</span>
-        : <img src={url} alt="" onError={() => setFailed(true)} />}
     </div>
   );
 }

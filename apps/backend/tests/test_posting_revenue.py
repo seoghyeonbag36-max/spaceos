@@ -402,16 +402,42 @@ def test_seoul_benchmark_sits_on_the_same_rone_axis_as_our_districts():
     `location_premium()` 은 층 관례와 무관한 순수 입지 격차다.
 
     실측 2026-08-25 (분기 20261): 서울 17.37 만원/평 · 우리 중앙 19.26 → **1.109**.
+
+    ⚠ **2026-09-24 전제를 갈았다 — `seoul < ours` 를 뺐다.** 서울 3·4차 15거점이 붙으며
+    우리 중앙이 서울 기준점 **아래**로 내려갔다(서울 17.45 · 우리 17.01 → 배율 0.975).
+    매핑 결함이 아니라 **포트폴리오가 실제로 넓어진 것**이다: 기존 66거점은 명동·강남·
+    홍대 같은 핵심 상권 위주라 중앙 54.27 천원/㎡ 였는데, 신규 15거점은 노원 24.41 ·
+    구로디지털 31.76 · 본서부병원 37.99 처럼 변두리가 많아 중앙 44.29 이고 **11/15 가
+    서울 평균 미만**이다. 전체 81거점 중앙은 51.45 (서울 52.78).
+
+    그래서 "우리 거점이 서울보다 비싸다"는 **거점 구성에 딸린 우연**이지 이 테스트가
+    지키려는 성질이 아니다. 지켜야 할 것은 제목 그대로 **같은 축**인가 — 둘이 같은
+    R-ONE 소규모상가 계열이라 나누면 층 계수가 약분되는가 — 이고, 그것은 서울
+    기준점이 우리 거점 분포 **안에** 들어오는지로 잰다. 축이 어긋나면(단위·계열·분기가
+    다르면) 기준점이 분포 밖으로 튄다.
     """
     seoul = P._seoul_pyeong_rent()
     assert seoul, "R-ONE 서울 기준점 없음 — `python -m data.collectors.rone_rent` 후 build_posting_inputs"
     ours = P._pyeong_rent()
-    assert ours and seoul < ours, "우리 거점 중앙이 서울 표본상권 집계보다 낮다 — 매핑 의심"
+    assert ours, "거점 임대료 중앙이 없다 — build_posting_inputs 를 돌렸는지 볼 것"
+
+    # 축 검사: 서울 기준점이 우리 거점 임대료 분포 안에 있어야 한다.
+    # 둘 다 `rent_per_m2_krw_thousand`(천원/㎡) 라 같은 단위로 직접 견준다.
+    doc_inputs = P._read(P._INPUTS)
+    seoul_pm2 = (doc_inputs.get("seoul") or {}).get("rent_per_m2_krw_thousand")
+    assert seoul_pm2, "seoul.rent_per_m2_krw_thousand 없음"
+    rents = sorted(v["rent_per_m2_krw_thousand"]
+                   for v in doc_inputs["districts"].values()
+                   if v.get("rent_per_m2_krw_thousand"))
+    assert rents[0] < seoul_pm2 < rents[-1], (
+        f"서울 기준점 {seoul_pm2} 이 거점 분포 [{rents[0]}, {rents[-1]}] 밖이다 "
+        f"— 계열·단위·분기가 어긋났는지 볼 것")
 
     lp = P.location_premium()
     # 대역을 넓게 잡는다. 이 값은 "프라임이라 얼마나 비싼가" 가 아니라 "우리가 고른
-    # 42개 상권이 서울 표본 59곳 안에서 어디쯤인가" 이므로 1 근처인 것이 정상이다.
-    assert 1.0 < lp < 1.4, f"입지 배율 {lp:.3f} — 대역 밖이면 기준 분기가 어긋났는지 볼 것"
+    # 상권이 서울 표본 안에서 어디쯤인가" 이므로 1 근처인 것이 정상이다.
+    # ⚠ 하한을 1.0 → 0.8 로 내렸다(2026-09-24). 위 이유로 1 아래가 정상 범위에 들어왔다.
+    assert 0.8 < lp < 1.4, f"입지 배율 {lp:.3f} — 대역 밖이면 기준 분기가 어긋났는지 볼 것"
 
     # 분기가 강제로 일치해야 한다 — 벤치마크만 앞서 가면 배율이 조용히 틀어진다.
     doc = P._read(P._INPUTS)
@@ -455,7 +481,12 @@ def test_prime_inventory_premise_is_measurably_false():
         n_all += n
         if dist.get(d["id"], {}).get("rent_per_m2_krw_thousand", 0) < seoul_pm2:
             n_below += n
-    assert n_all and 0.20 < n_below / n_all < 0.50, (
+    # ⚠ 상한을 0.50 → 0.60 으로 올렸다(2026-09-24). 위 거점 단언이 이미 0.60 인데
+    #   유닛 단언만 0.50 으로 남아 앞뒤가 달랐고, 서울 3·4차 15거점이 붙으며
+    #   423/840 = **50.4%** 로 정확히 그 틈에 걸렸다. 변두리 거점이 늘어 기준선 미만이
+    #   많아진 것이고, 이 테스트가 고정하려는 "전부 프라임이 아니다"는 **더 강하게**
+    #   참이 됐다 — 위험 신호는 0 에 가까워지는 쪽이지 0.5 를 넘는 쪽이 아니다.
+    assert n_all and 0.20 < n_below / n_all < 0.60, (
         f"기준선 미만 유닛 {n_below}/{n_all} — '전부 프라임' 전제가 참이 되려면 0 이어야 한다")
 
 

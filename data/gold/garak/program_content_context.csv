@@ -1,84 +1,84 @@
 kind,key,value
-blog_keyword,송파구,270
-blog_keyword,가락시장역,182
-blog_keyword,송파,169
-blog_keyword,가락동,114
-blog_keyword,가락몰,92
+blog_keyword,송파구,272
+blog_keyword,가락시장역,177
+blog_keyword,송파,161
+blog_keyword,가락동,119
+blog_keyword,가락몰,83
 blog_keyword,파란만잔,78
-blog_keyword,송파대로,72
-blog_keyword,어라운드더클락,70
-blog_keyword,양재대로,64
-blog_keyword,중대로,60
-blog_keyword,시간,60
-blog_keyword,가락시장역점,60
-blog_keyword,매일,55
-blog_keyword,가락시장맛집,52
-blog_keyword,주차,51
-blog_keyword,영재수산,46
-blog_keyword,가락시장역맛집,36
+blog_keyword,송파대로,74
+blog_keyword,중대로,66
+blog_keyword,어라운드더클락,65
+blog_keyword,가락시장맛집,58
+blog_keyword,양재대로,58
+blog_keyword,주차,56
+blog_keyword,가락시장역점,53
+blog_keyword,시간,50
+blog_keyword,매일,44
+blog_keyword,영재수산,42
+blog_keyword,가락점,40
 blog_keyword,오늘은,35
-blog_keyword,가락점,34
-blog_keyword,경찰병원역,31
-blog_keyword,커피,31
-blog_keyword,횟집,29
-blog_keyword,구룡각,29
-blog_keyword,잠실,29
+blog_keyword,근처,34
+blog_keyword,경찰병원역,34
+blog_keyword,커피,33
+blog_keyword,가능,29
 blog_keyword,가락시장카페,29
-blog_keyword,가능,27
 blog_keyword,가성비,27
-blog_keyword,수산시장,27
-blog_keyword,근처,26
-blog_keyword,가락동맛집,26
-blog_keyword,위치한,26
-blog_keyword,판매동,25
+blog_keyword,가락동맛집,25
+blog_keyword,흑돈,25
+blog_keyword,위치한,25
+blog_keyword,서울특별시,25
+blog_keyword,출구에서,24
 blog_keyword,먹고,24
-blog_keyword,서울특별시,24
-blog_keyword,과일,24
-blog_keyword,밀리아나,24
-blog_keyword,가락시장에서,22
-blog_keyword,가락시장역카페,22
-blog_keyword,시카페,22
-blog_keyword,도보,21
-blog_keyword,출구에서,21
-blog_keyword,가락동카페,21
+blog_keyword,정보,23
+blog_keyword,가락본점,22
+blog_keyword,가락시장역맛집,22
+blog_keyword,밀리아나,22
+blog_keyword,횟집,21
+blog_keyword,가락시장역카페,21
+blog_keyword,과일,21
+blog_keyword,가락시장에서,20
+blog_keyword,가락동카페,20
 blog_keyword,로스트앤베이크,20
-blog_keyword,오피스,20
-blog_keyword,빌딩,20
-blog_keyword,가락본점,19
-blog_keyword,만애옥,18
+blog_keyword,곱창,19
+blog_keyword,도보,19
 blog_keyword,가락,18
+blog_keyword,수산시장,18
+blog_keyword,포장,18
+blog_keyword,신선한,18
 blog_keyword,안녕하세요,18
-blog_keyword,호선,18
-category,회,23
-category,한식,9
-category,치과,6
-category,"육류,고기",4
-category,"해물,생선",4
-category,GS25,4
-category,약국,3
-category,베트남음식,2
-category,중국요리,2
-category,커피전문점,2
-category,세븐일레븐,2
-category,피부과,2
-category,정형외과,2
-category,이비인후과,2
-category,구내식당,1
-category,한정식,1
-category,복어,1
-category,한식뷔페,1
-category,곤지암할매소머리국밥,1
-category,음식점,1
-category,아이스크림,1
-category,갈비,1
-category,BBQ,1
-category,파리바게뜨,1
-category,명가통닭,1
-category,두부전문점,1
-category,일식집,1
-category,참치회,1
-category,퓨전요리,1
-category,애슐리,1
+blog_keyword,영업,17
+blog_keyword,판매동,17
+blog_keyword,평일,17
+category,백반/한정식,77
+category,노래방,37
+category,카페,29
+category,일반 유흥 주점,25
+category,수산물 소매업,23
+category,슈퍼마켓,23
+category,횟집,21
+category,채소/과일 소매업,21
+category,요리 주점,20
+category,가축 사료 소매업,19
+category,미용실,17
+category,치과의원,16
+category,입시·교과학원,16
+category,편의점,16
+category,화장품 소매업,16
+category,약국,13
+category,건어물/젓갈 소매업,13
+category,김밥/만두/분식,12
+category,기타 의류 소매업,12
+category,한의원,12
+category,피부 관리실,11
+category,요가/필라테스 학원,11
+category,일식 회/초밥,10
+category,의료기기 소매업,9
+category,세탁소,8
+category,음악학원,8
+category,건강보조식품 소매업,8
+category,돼지고기 구이/찜,7
+category,치킨,7
+category,빵/도넛,7
 trend:가락시장,2024-08-01,7.51768
 trend:가락시장,2024-09-01,7.96978
 trend:가락시장,2024-10-01,8.05359
