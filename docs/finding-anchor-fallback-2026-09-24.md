@@ -10,6 +10,9 @@
 > | 3 | 유닛 foot 81/81 | `build_posting_inputs` | `pppp_status` 의 `rent·foot` **66/81** 그대로 |
 > | 4 | `build_posting_inputs` 재실행 | `build_gold`(그 위의 시계열) | 재실행해도 **66거점** 그대로 |
 > | 5 | 거점 81개 등록 | `DISTRICT_TRDAR` **설정 자체가 미작성** | 수집기가 "전체 1,648행 중 **거점 245행**"으로 거르고, `build_trdar_demand` 가 exit=0 인 채 66거점 |
+> | 6 | 거점 81개 등록 | `build_district_zones` | `gold/{slug}/district_zones.json` 이 66개뿐 → CI 데이터 테스트 **47건** 실패 |
+> | 7 | 블로그 재수집 | — (아래 8번이 원인) | Program 게이트 **66/81** · 진행률 97.4 |
+> | 8 | 거점 81개 등록 | `DISTRICT_PLACES` **설정 자체가 미작성** | `naver_blog --platform13` 이 15거점 **검색어를 아예 안 만든다** — 수집은 exit=0 |
 >
 > **넷 다 에러가 없다.** 1번은 그럴듯한 상수가, 2번은 빠진 거점이, 3·4번은
 > **재실행해도 안 바뀌는 수**가 나온다. 특히 4번이 고약하다 — 빌더를 다시 돌렸는데
@@ -18,6 +21,20 @@
 > **교훈**: 산출물의 거점 수가 안 오르면 그 빌더가 아니라 **그 빌더의 입력**을 본다.
 > 한 층씩 파지 말고 정본 체인(`scripts/run_batch2_chain.py --list`)을 먼저 펼쳐
 > 어디서 끊겼는지 본다 — 09-24 에 네 층을 하나씩 파고 나서야 그 목록에 닿았다.
+>
+> **뿌리: 거점 목록을 든 설정이 한 곳이 아니다.** 거점을 늘리면 아래를 **전부** 채워야
+> 하는데, 어느 하나가 비어도 **에러가 안 난다**. 새 거점을 세운 날 이 표를 훑는다:
+>
+> | 설정 | 무엇을 먹이나 | 비면 생기는 일 |
+> |---|---|---|
+> | `page_hubs.ACTIVE_HUBS` | 체인 전반 | (여기가 기준이다) |
+> | `rone_districts.DISTRICT_RONE` | `rone_rent` → 앵커·임대료 | 앵커가 폴백 10.00% |
+> | `platform_districts.DISTRICT_TRDAR` | `seoul_trdar` → 시계열·demand·foot | 수집기가 걸러 66거점 |
+> | `platform_places.DISTRICT_PLACES` | `naver_blog` → Program 컨텍스트 | 검색어를 안 만들어 blog_keyword 없음 |
+>
+> 그리고 **거점별 산출물을 내는 빌더**도 따로 돌아야 한다(`build_district_zones` 처럼).
+> 그걸 잡아 주는 것이 `data/tests` 인데, `run_full_verify.py` 와 `/verify` 레시피 둘 다
+> 그 스텝이 **없었다** — 그래서 로컬은 초록인데 CI 가 47건으로 깨졌다(09-24 추가함).
 
 ## 사례 1 — 매핑만 추가하면 앵커는 조용히 폴백 10.0% 가 된다
 

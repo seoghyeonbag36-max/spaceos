@@ -1,0 +1,92 @@
+{
+ "slug": "gurodigital",
+ "built_at": "2026-09-24T08:12:42+00:00",
+ "source": "소상공인 상가정보 행정동(adongNm) × gold/page_building_master",
+ "method": "adong_knn9",
+ "note": "건물→행정동 배정은 가장 가까운 점포 9개의 다수결이다. PNU 조인은 79.3% 만 붙고 빠지는 쪽이 공실에 몰려 과소추정을 낳는다. 공실률은 gold_vacancy 와 같은 규칙(집합건물 제외·floor_ouln 분모·polygon_only 제외·지번 중복 제거). 감성(s/d/r/f)은 좌표를 가진 점포 리뷰 채널이 없어 null 이다 — feature-platform §0-K.",
+ "assign": {
+  "counted_buildings": 166,
+  "knn_vs_pnu_compared": 166,
+  "knn_vs_pnu_agree_pct": 100.0
+ },
+ "dropped_spillover": [
+  {
+   "n": "독산3동",
+   "buildings": 3,
+   "stores": 95,
+   "capacity": 10,
+   "active": 9
+  }
+ ],
+ "residual": {
+  "buildings": 3,
+  "capacity": 10,
+  "active": 9
+ },
+ "zones": [
+  {
+   "n": "구로3동",
+   "grp": "구로동",
+   "lat": 37.483068,
+   "lng": 126.899753,
+   "stores": 3922,
+   "buildings": 99,
+   "capacity": 333,
+   "active": 257,
+   "vacancy_rate": 22.82,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z1"
+  },
+  {
+   "n": "조원동",
+   "grp": "신림동",
+   "lat": 37.482092,
+   "lng": 126.902075,
+   "stores": 530,
+   "buildings": 49,
+   "capacity": 143,
+   "active": 119,
+   "vacancy_rate": 16.78,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z2"
+  },
+  {
+   "n": "대림2동",
+   "grp": "대림동",
+   "lat": 37.487719,
+   "lng": 126.901419,
+   "stores": 272,
+   "buildings": 10,
+   "capacity": 18,
+   "active": 15,
+   "vacancy_rate": 16.67,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z3"
+  },
+  {
+   "n": "가리봉동",
+   "grp": "가리봉동",
+   "lat": 37.479364,
+   "lng": 126.89309,
+   "stores": 87,
+   "buildings": 5,
+   "capacity": 10,
+   "active": 8,
+   "vacancy_rate": 20.0,
+   "s": null,
+   "d": null,
+   "r": null,
+   "f": [],
+   "id": "z4"
+  }
+ ]
+}
