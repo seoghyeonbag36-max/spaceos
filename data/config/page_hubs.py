@@ -137,6 +137,53 @@ SEOUL_BATCH2_HUBS: dict[str, PageHub] = {
     "cheonho":     PageHub("cheonho",     "천호",      127.1239, 37.5385, 500, 700),
 }
 
+# ── 서울 3차 확장 5거점 (2026-09-20 등재) ────────────────────────────────────
+# **수집 대상 등록일 뿐 화면 노출이 아니다** — Gold 가 서기 전에는 `seoul_pages.DISTRICTS`
+# 에 올리지 않는다(2차 확장과 같은 규칙).
+#
+# 선정 경위: 서울 TRDAR 상권영역 **전량 1,650곳**을 받아 기존 66거점 수집반경과 대조한 뒤
+# (덮인 것 496 · 완전공백 297), 1km 초과로 떨어진 발달상권·관광특구 93곳을 600m 단일연결로
+# 묶어 78클러스터를 만들고 **전부** §0 게이트를 실측했다 — 통과 53 · 주의 19 · 기각 6.
+# 아래 5곳은 통과분 중 점포 수 상위다. 건축HUB 콜은 0이었다(상가정보만 사용).
+# 근거: reports/seoul_hub_candidates_2026-09-20.json
+#
+# ⚠ 다섯 곳 전부 **R-ONE 공유 매핑**이다 — 서울 55개 세부상권이 기존 66거점에 이미
+#   전부 배분돼 남은 정확 표본이 없다(2차 확장 12곳이 미사용 표본을 정확 매핑으로
+#   가져간 것과 다르다). `rone_districts.SHARED_RONE` 참조.
+SEOUL_BATCH3_HUBS: dict[str, PageHub] = {
+    # 슬러그는 역명 로마자. `ydp-gucheong` 만 구 약칭을 붙였다 —
+    # '구청역'은 서울에 여럿이라 단독으로는 어느 구인지 말하지 않는다.
+    "bangbang":     PageHub("bangbang",     "뱅뱅사거리",   127.0315, 37.4903, 500, 700),
+    "gildong":      PageHub("gildong",      "길동역",      127.1383, 37.5365, 500, 700),
+    "nowon":        PageHub("nowon",        "노원역",      127.0622, 37.6555, 500, 700),
+    "gurodigital":  PageHub("gurodigital",  "구로디지털단지", 126.8981, 37.4836, 500, 700),  # 주의: top10 29.0%
+    "ydp-gucheong": PageHub("ydp-gucheong", "영등포구청역",  126.8909, 37.5254, 500, 700),  # 주의: top10 25.8%
+}
+
+# ── 서울 4차 확장 10거점 (2026-09-20 등재) ───────────────────────────────────
+# 3차와 같은 후보 풀에서 이어 뽑았다. 다만 게이트를 **정식 지표로 다시 쟀다** —
+# 3차 등재 때 쓴 프로브는 분자에서 사무실형 업종과 bldMngNo 결측을 빼고 세어
+# 건물당 점포를 1.1~1.8배 **낮게** 냈다. 저장소 기준은 `scripts/chain_status.py:188`
+# 의 **전체 점포 / bldMngNo 보유 건물**이다(고양 라페스타 37.4 도 이 기준).
+# 재측정 결과 통과 53 → 51. 강등 2곳(gurodigital top10 29.0% · ydp-gucheong 25.8%)은
+# 밀집이 아니라 집중도라 3차에 그대로 두고 주의 표기만 달았다.
+# 근거: reports/seoul_hub_candidates_canonical_2026-09-20.json
+#
+# 아래 10곳은 정식 지표 통과분 중 점포 전량 상위다. R-ONE 은 3차와 같은 이유로
+# **전부 공유 매핑**이다 — 서울 55개 정확 표본에 남은 자리가 없다.
+SEOUL_BATCH4_HUBS: dict[str, PageHub] = {
+    "seochoyeok":   PageHub("seochoyeok",   "서초역",      127.0086, 37.4915, 500, 700),  # 건물당 9.5 — 기준(10) 바로 아래
+    "poi":          PageHub("poi",          "포이사거리",   127.0423, 37.4782, 500, 700),
+    "dogok":        PageHub("dogok",        "도곡동",      127.0399, 37.4926, 500, 700),
+    "yangjae":      PageHub("yangjae",      "양재역",      127.0340, 37.4845, 500, 700),
+    "jamsil-tour":  PageHub("jamsil-tour",  "잠실 관광특구", 127.1143, 37.5162, 500, 700),
+    "daerim":       PageHub("daerim",       "대림역",      126.8978, 37.4941, 500, 700),
+    "guui":         PageHub("guui",         "구의역",      127.0849, 37.5375, 500, 700),
+    "maebong":      PageHub("maebong",      "매봉역",      127.0439, 37.4844, 500, 700),
+    "gurojeonhwa":  PageHub("gurojeonhwa",  "구로전화국",   126.9054, 37.4799, 500, 700),
+    "bonseobu":     PageHub("bonseobu",     "본서부병원",   126.9190, 37.5996, 500, 700),
+}
+
 # ── 경기 확장 후보 (2026-08-29 등재) ─────────────────────────────────────────
 # **수집 대상 등록일 뿐 화면 노출이 아니다.** Gold 산출물이 서기 전에는 API 거점 목록
 # (app/data/seoul_pages.DISTRICTS)에 오르지 않는다 — 시드 zones/units 를 지어내지 않기
@@ -239,7 +286,8 @@ ALIASES: dict[str, str] = {
 # 아직 수집 전이라, 전 거점 루프에 섞이면 산출물 없는 거점이 매 실행마다 실패로 찍히고
 # 거점 수를 세는 곳(coverage tier · Dockerfile 가드 · pppp_status)의 분모가 흔들린다.
 # 그래서 **이름을 대고 부를 때만** 잡히게 한다.
-ALL_HUBS: dict[str, PageHub] = {**HUBS, **SEOUL_BATCH2_HUBS, **GYEONGGI_HUBS}
+ALL_HUBS: dict[str, PageHub] = {**HUBS, **SEOUL_BATCH2_HUBS, **SEOUL_BATCH3_HUBS,
+                                **SEOUL_BATCH4_HUBS, **GYEONGGI_HUBS}
 
 # ── 기본 순회 집합 (2026-09-03) ──────────────────────────────────────────────
 # 위 주석은 "`HUBS`(서울 54)가 기본 순회 집합"이라고 적었는데, 서울 2차 12거점이

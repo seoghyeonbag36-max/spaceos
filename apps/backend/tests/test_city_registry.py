@@ -199,7 +199,8 @@ def test_default_iteration_stays_seoul_only():
     # 구조**다 — 기본 순회(HUBS)는 54 로 남고, ALL_HUBS 는 그 배치들의 합이며,
     # 어느 배치도 서로 슬러그를 겹치지 않는다. 종전에는 `54 + GYEONGGI` 로 적혀 있어
     # 배치가 하나 늘 때마다 깨졌다(09-01 에 86 != 74 로 배포가 막혔다).
-    batches = (ph.SEOUL_BATCH2_HUBS, ph.GYEONGGI_HUBS)
+    batches = (ph.SEOUL_BATCH2_HUBS, ph.SEOUL_BATCH3_HUBS, ph.SEOUL_BATCH4_HUBS,
+               ph.GYEONGGI_HUBS)
     assert len(ph.ALL_HUBS) == 54 + sum(len(b) for b in batches)
     for b in batches:
         assert not (set(b) & set(ph.HUBS))
