@@ -1,0 +1,75 @@
+{
+  "문서 필수항목 검사": {
+    "passed": true,
+    "errors": []
+  },
+  "주장별 근거 검사": {
+    "passed": true,
+    "errors": [],
+    "scope": "등록 근거 파일·기호·해시, 로컬 집계 수치, 사용자 진술 표기 확인. 자연어 전체의 참과 개인 이력은 별도 확인."
+  },
+  "개인정보·비밀정보 검사": {
+    "passed": true,
+    "errors": [],
+    "scope": "생성 Markdown 및 PDF 본문·메타데이터의 정형 패턴 검사. 미탐 가능성을 고려해 수동 검토 병행."
+  },
+  "ZIP 구성 검사": {
+    "passed": true,
+    "errors": [],
+    "members": {
+      "placeos_career_review": [
+        "00_README.md",
+        "03_placeos_portfolio.md",
+        "04_technical_brief.md",
+        "05_application_draft.md",
+        "05a_korea_mot_application.md",
+        "05b_yonsei_anchor_worksheet.md",
+        "05c_yonsei_uif_worksheet.md",
+        "pdf/03_placeos_portfolio.pdf",
+        "pdf/04_technical_brief.pdf",
+        "pdf/05_application_draft.pdf",
+        "pdf/05a_korea_mot_application.pdf",
+        "pdf/05b_yonsei_anchor_worksheet.pdf",
+        "pdf/05c_yonsei_uif_worksheet.pdf",
+        "manifest.json"
+      ],
+      "placeos_korea_career_review": [
+        "00_README.md",
+        "03_placeos_portfolio.md",
+        "04_technical_brief.md",
+        "05a_korea_mot_application.md",
+        "pdf/03_placeos_portfolio.pdf",
+        "pdf/04_technical_brief.pdf",
+        "pdf/05a_korea_mot_application.pdf",
+        "manifest.json"
+      ],
+      "placeos_yonsei_anchor_review": [
+        "00_README.md",
+        "05b_yonsei_anchor_worksheet.md",
+        "pdf/05b_yonsei_anchor_worksheet.pdf",
+        "manifest.json"
+      ],
+      "placeos_yonsei_uif_review": [
+        "00_README.md",
+        "05c_yonsei_uif_worksheet.md",
+        "pdf/05c_yonsei_uif_worksheet.pdf",
+        "manifest.json"
+      ],
+      "placeos_research_preparation": [
+        "00_README.md",
+        "04_technical_brief.md",
+        "08_graduate_research_plan.md",
+        "pdf/04_technical_brief.pdf",
+        "pdf/08_graduate_research_plan.pdf",
+        "manifest.json"
+      ]
+    }
+  },
+  "submission_ready": false,
+  "remaining": [
+    "고려대 공식 제출방식·문항·분량",
+    "연세대 AI 제한과 앵커사업단 적용 범위",
+    "지원자 요건 충족과 세부 기여",
+    "자리표시자 교체·포트폴리오 허용"
+  ]
+}

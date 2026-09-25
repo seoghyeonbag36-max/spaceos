@@ -1,0 +1,135 @@
+{
+  "03_placeos_portfolio": {
+    "pages": 3,
+    "checks": [
+      {
+        "page": 1,
+        "characters": 1107,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      },
+      {
+        "page": 2,
+        "characters": 851,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      },
+      {
+        "page": 3,
+        "characters": 1092,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      }
+    ],
+    "visual_review": "전체 페이지 렌더링 육안 확인 완료",
+    "pdf_sha256": "ef6af16a1fdcb7f4bc2b0a37ab67bb632a78a7888b671c895c2bedf6dab5991c"
+  },
+  "04_technical_brief": {
+    "pages": 2,
+    "checks": [
+      {
+        "page": 1,
+        "characters": 1366,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      },
+      {
+        "page": 2,
+        "characters": 1467,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      }
+    ],
+    "visual_review": "전체 페이지 렌더링 육안 확인 완료",
+    "pdf_sha256": "9a97abf0c30ce16b7295970a17c758c48f36f35ccb93c3c657666eaef60598d9"
+  },
+  "05_application_draft": {
+    "pages": 1,
+    "checks": [
+      {
+        "page": 1,
+        "characters": 1085,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      }
+    ],
+    "visual_review": "전체 페이지 렌더링 육안 확인 완료",
+    "pdf_sha256": "5c457b3e07f0a8a31b4c65c9cf2200855a0dd3afb3e18c8fb29fbe8f0be5fcb9"
+  },
+  "05a_korea_mot_application": {
+    "pages": 2,
+    "checks": [
+      {
+        "page": 1,
+        "characters": 839,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      },
+      {
+        "page": 2,
+        "characters": 878,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      }
+    ],
+    "visual_review": "전체 페이지 렌더링 육안 확인 완료",
+    "pdf_sha256": "aa032ae0bc26b1afa03c09201c11eaeb11e0cd8501d9067e6129e0103cf43b99"
+  },
+  "05b_yonsei_anchor_worksheet": {
+    "pages": 2,
+    "checks": [
+      {
+        "page": 1,
+        "characters": 603,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      },
+      {
+        "page": 2,
+        "characters": 693,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      }
+    ],
+    "visual_review": "전체 페이지 렌더링 육안 확인 완료",
+    "pdf_sha256": "07fdde36f6f21af081a95b4df00055adc95caf5ede1e1470b77c2388632f450e"
+  },
+  "05c_yonsei_uif_worksheet": {
+    "pages": 1,
+    "checks": [
+      {
+        "page": 1,
+        "characters": 1011,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      }
+    ],
+    "visual_review": "전체 페이지 렌더링 육안 확인 완료",
+    "pdf_sha256": "972037acd6630fcb37b0db232d3fccd9ac278f47310999f10db977df7c1facc8"
+  },
+  "08_graduate_research_plan": {
+    "pages": 3,
+    "checks": [
+      {
+        "page": 1,
+        "characters": 1481,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      },
+      {
+        "page": 2,
+        "characters": 1279,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      },
+      {
+        "page": 3,
+        "characters": 1912,
+        "replacement_character": false,
+        "outside_safe_bounds": []
+      }
+    ],
+    "visual_review": "전체 페이지 렌더링 육안 확인 완료",
+    "pdf_sha256": "e7d421159226b44d512cccedaf9401b9e5814ea22f3e1a35b330c5e26dca130e"
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "checked_at_utc": "2026-09-24T23:14:31.080105+00:00",
+  "commit": "ef31a059f962eab5ae922f7d722b8ef9dc435bfc",
+  "python": "3.11.9",
+  "active_hubs": 81,
+  "serving_pages": 81,
+  "heatmap_source_counts": {
+    "gold": 81
+  },
+  "heatmap_consistency_failures": [],
+  "timeseries": {
+    "path": "data/gold/platform13/platform_district_timeseries.parquet",
+    "rows": 1782,
+    "districts": 81,
+    "quarter_min": "20211",
+    "quarter_max": "20262",
+    "quarters": 22,
+    "columns": [
+      "district_id",
+      "quarter",
+      "stor_co",
+      "opbiz_rt",
+      "clsbiz_rt",
+      "n_trdar",
+      "selng_amt",
+      "flpop",
+      "ix_opr_mt",
+      "ix_cls_mt",
+      "vac_small",
+      "vac_mid",
+      "rent_small"
+    ],
+    "duplicate_district_quarter": 0,
+    "missing_by_column": {
+      "district_id": 0,
+      "quarter": 0,
+      "stor_co": 0,
+      "opbiz_rt": 0,
+      "clsbiz_rt": 0,
+      "n_trdar": 0,
+      "selng_amt": 0,
+      "flpop": 0,
+      "ix_opr_mt": 0,
+      "ix_cls_mt": 0,
+      "vac_small": 18,
+      "vac_mid": 18,
+      "rent_small": 18
+    },
+    "sha256": "3ae1a1c3db7310324e2357dc8918fcca90c5511c216b8b2d6a53a2dec046b068"
+  },
+  "sources": {
+    "E01": {
+      "path": "apps/frontend/src/lib/naverMap.ts",
+      "symbol": "loadNaverMaps",
+      "symbol_present": true,
+      "sha256": "6b97df8df269b1ecde16227b8fa6d027b81f72c568f261a638a01da2e8635a77"
+    },
+    "E02": {
+      "path": "apps/backend/app/services/gold_vacancy.py",
+      "symbol": "build_cells",
+      "symbol_present": true,
+      "sha256": "511f643b8007d12641a2b587e8cea1ad07993d6b0dd0b7ac466b02275331867c"
+    },
+    "E03": {
+      "path": "apps/backend/app/services/districts.py",
+      "symbol": "cells_for",
+      "symbol_present": true,
+      "sha256": "2ca2db4643e100aaf3bb904df0c500235f5452606df9c29ebe2914e96e2bab5c"
+    },
+    "E04": {
+      "path": "apps/backend/app/services/building_history.py",
+      "symbol": "get_history",
+      "symbol_present": true,
+      "sha256": "7e5563fbde537cba243e02b7ecc24e7fc836991dffade178596f9f866c66abc6"
+    },
+    "E05": {
+      "path": "apps/backend/app/services/industry_recommend.py",
+      "symbol": "recommend",
+      "symbol_present": true,
+      "sha256": "11592ca8ca52a65f056d536c3398238eccd433ec052e9d8ce7eace5ca7eb4472"
+    },
+    "E06": {
+      "path": "apps/backend/app/services/vacancy_forecast.py",
+      "symbol": "get_forecast",
+      "symbol_present": true,
+      "sha256": "66697a2806974eac725b5201b5159fbfb6a7898c66f06aacdba8044b6d352757"
+    },
+    "E07": {
+      "path": "apps/backend/app/services/marketing.py",
+      "symbol": "generate_program",
+      "symbol_present": true,
+      "sha256": "4140c9f01562b28c0eb422b77c54d5413357883e05eb99c9e0e3b53bcbdf7717"
+    },
+    "E08": {
+      "path": "apps/backend/app/services/district_zones.py",
+      "symbol": "zones",
+      "symbol_present": true,
+      "sha256": "fb09012537f3d233a0c03a4482ef608534bd1538c765280fe71f1b721ea0bd43"
+    },
+    "E09": {
+      "path": "data/pipelines/build_gold.py",
+      "symbol": "",
+      "symbol_present": true,
+      "sha256": "34993c0330722a3dd248dd546579de3f0ed6499558aa50a43e7ad1af60ed110c"
+    },
+    "E10": {
+      "path": "data/pipelines/build_page_master.py",
+      "symbol": "_licensed_pip",
+      "symbol_present": true,
+      "sha256": "3b5f78689a4400fa818c6f3b3511450c6532ac01d61e48b471a12bec72662817"
+    },
+    "E11": {
+      "path": "data/config/page_hubs.py",
+      "symbol": "ACTIVE_HUBS",
+      "symbol_present": true,
+      "sha256": "1a574907eca6233e93cde9ac6e6820f37824805f65ae08dcac7e0dea8e4e9bf2"
+    },
+    "E12": {
+      "path": "docs/papers/page-study/evidence-verification.json",
+      "symbol": "",
+      "symbol_present": true,
+      "sha256": "c24d81e8f353656ca309cb6b8018099babdd7cc9eee636caeaa648ecc984cba2"
+    },
+    "E13": {
+      "path": "apps/backend/tests/conftest.py",
+      "symbol": "SPACEOS_",
+      "symbol_present": true,
+      "sha256": "929ef7faa8d396fef1b10aacb650072561fd649e5a55033566ce1314375b9956"
+    },
+    "E14": {
+      "path": "apps/backend/app/services/districts.py",
+      "symbol": "recommend_tier",
+      "symbol_present": true,
+      "sha256": "2ca2db4643e100aaf3bb904df0c500235f5452606df9c29ebe2914e96e2bab5c"
+    },
+    "E15": {
+      "path": "apps/frontend/package.json",
+      "symbol": "",
+      "symbol_present": true,
+      "sha256": "146064f4a65446cc7ea6e1a7f6c0f1f66e027b619a2f518a279d6e4a3d1e59d4"
+    },
+    "E16": {
+      "path": "apps/backend/app/main.py",
+      "symbol": "FastAPI",
+      "symbol_present": true,
+      "sha256": "300ab65dd3dfc70348f507aa4dabf3b32e26c246b94347872cb9c9fd7c3d1a27"
+    },
+    "E17": {
+      "path": "ml/training/datasets.py",
+      "symbol": "load_gold",
+      "symbol_present": true,
+      "sha256": "0cc070b83193540a43ff9af2f82f549155c94f152817572111083615b8d6f22c"
+    },
+    "E18": {
+      "path": "ml/training/train_gnn.py",
+      "symbol": "",
+      "symbol_present": true,
+      "sha256": "215fc3f6d68630ae4653d259a142b2393c0f4bdf9ba79ec9ed32e4096deb22f2"
+    },
+    "E19": {
+      "path": "ml/training/train_lstm.py",
+      "symbol": "",
+      "symbol_present": true,
+      "sha256": "ed732315d8e83b6f71ee36edc5f7589ebbd003de5890addaa64a25772db97888"
+    },
+    "E20": {
+      "path": "apps/backend/app/services/vacant_inventory.py",
+      "symbol": "",
+      "symbol_present": true,
+      "sha256": "ebd37b4a43f240395ef3d4a54387815e765c46de4fd5eae29d05054b5270ee61"
+    },
+    "E21": {
+      "path": "apps/frontend/src/lib/api.ts",
+      "symbol": "",
+      "symbol_present": true,
+      "sha256": "633c7f323da692adc2b9de725912e2677e3a948f3c76a04ddc85dab3d036b78f"
+    }
+  },
+  "status_commands": [
+    {
+      "command": "python scripts/pppp_status.py --json",
+      "exit_code": 0,
+      "result": "status_pppp.json"
+    },
+    {
+      "command": "python scripts/chain_status.py --all --json",
+      "exit_code": 0,
+      "result": "status_chain.json"
+    }
+  ],
+  "tests": {
+    "names": [
+      "tests/test_districts.py::test_list_districts",
+      "tests/test_districts.py::test_gold_cells_are_internally_consistent",
+      "tests/test_districts.py::test_lot_polygons_counted_once",
+      "tests/test_districts.py::test_polygon_only_never_counted",
+      "tests/test_building_history.py::test_history_absent_returns_empty_not_dummy",
+      "tests/test_building_history.py::test_shared_lot_history_is_labeled_lot_scope"
+    ],
+    "exit_code": 0,
+    "summary": "6 passed in 62.36s (0:01:02)"
+  },
+  "limitations": [
+    "로컬 서비스 함수 및 선택 테스트 범위",
+    "브라우저 및 배포 환경 미검증",
+    "ML 재학습과 LLM 실호출 미실행",
+    "개인 기여 미확인"
+  ]
+}

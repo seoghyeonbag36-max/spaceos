@@ -1,0 +1,30 @@
+{
+  "checked_at": "2026-09-25",
+  "J01": {
+    "source": "사용자 첨부 고려대 행정팀 공고 이미지",
+    "role": "행사·서무",
+    "deadline": "사용자 진술 2026-09-30 24시, 이미지 미표시"
+  },
+  "J02": {
+    "url": "https://research.yonsei.ac.kr/research/service/recruit.do?mode=view&articleNo=479015",
+    "deadline": "2026-09-30",
+    "role": "비교과 프로그램 기획·운영, 총괄사업단 운영"
+  },
+  "J03": {
+    "url": "https://research.yonsei.ac.kr/research/service/recruit.do?mode=view&articleNo=479917",
+    "deadline": "2026-09-27",
+    "role": "앵커사업 과제 협약·정산관리"
+  },
+  "J04": {
+    "url": "https://rhr.yonsei.ac.kr/main/noticeDetail.do?seqnr=29",
+    "ai_restriction": true,
+    "anchor_email_scope": "미확인"
+  },
+  "J05": {
+    "url": "https://research.yonsei.ac.kr/research/service/recruit.do?articleNo=479015&attachNo=218788&mode=download",
+    "questions": 5,
+    "characters_per_question_approx": 300,
+    "sha256": "959a5c4c9aed72861be1b09ab1594ebfcefacd55cc65fa2ed9d00b79f81b469f",
+    "method": "OLE BodyText PARA_TEXT 텍스트 추출, 원본 서식 편집·제출 미실행"
+  }
+}

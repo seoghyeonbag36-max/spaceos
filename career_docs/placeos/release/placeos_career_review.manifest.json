@@ -1,0 +1,54 @@
+[
+  {
+    "path": "00_README.md",
+    "sha256": "d9cbfb22e9631703e0f547d6879284d9238d6d1812c4651f4ade04b365373182"
+  },
+  {
+    "path": "03_placeos_portfolio.md",
+    "sha256": "be6fc0a6bb1da32aa062b315a10ce23444aa06050dcf701dc9e74e13aef9ba27"
+  },
+  {
+    "path": "04_technical_brief.md",
+    "sha256": "d6e82557bbacb3324e8e94bd18fa70e8314f2d8a651d12fb6ec97104754fa81b"
+  },
+  {
+    "path": "05_application_draft.md",
+    "sha256": "b885e7edad61dc86d984052b7da192885c1321402650e1042f3de35038c2b59b"
+  },
+  {
+    "path": "05a_korea_mot_application.md",
+    "sha256": "ebfe1d5d882382c5dceb8d40c6fc044dbea235f607cc896051c8fbe1c769a0b8"
+  },
+  {
+    "path": "05b_yonsei_anchor_worksheet.md",
+    "sha256": "eb7f382e46e981e50d3fdca45f0939efbbd0d4f6768789831a90ce45fa69a262"
+  },
+  {
+    "path": "05c_yonsei_uif_worksheet.md",
+    "sha256": "a5c25243cbac48691cd46a68b02f093962d9d07813406662010685827be394d9"
+  },
+  {
+    "path": "pdf/03_placeos_portfolio.pdf",
+    "sha256": "ef6af16a1fdcb7f4bc2b0a37ab67bb632a78a7888b671c895c2bedf6dab5991c"
+  },
+  {
+    "path": "pdf/04_technical_brief.pdf",
+    "sha256": "9a97abf0c30ce16b7295970a17c758c48f36f35ccb93c3c657666eaef60598d9"
+  },
+  {
+    "path": "pdf/05_application_draft.pdf",
+    "sha256": "5c457b3e07f0a8a31b4c65c9cf2200855a0dd3afb3e18c8fb29fbe8f0be5fcb9"
+  },
+  {
+    "path": "pdf/05a_korea_mot_application.pdf",
+    "sha256": "aa032ae0bc26b1afa03c09201c11eaeb11e0cd8501d9067e6129e0103cf43b99"
+  },
+  {
+    "path": "pdf/05b_yonsei_anchor_worksheet.pdf",
+    "sha256": "07fdde36f6f21af081a95b4df00055adc95caf5ede1e1470b77c2388632f450e"
+  },
+  {
+    "path": "pdf/05c_yonsei_uif_worksheet.pdf",
+    "sha256": "972037acd6630fcb37b0db232d3fccd9ac278f47310999f10db977df7c1facc8"
+  }
+]

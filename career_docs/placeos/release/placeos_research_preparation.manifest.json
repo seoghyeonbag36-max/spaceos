@@ -1,0 +1,22 @@
+[
+  {
+    "path": "00_README.md",
+    "sha256": "ae43d5b874efcca1db9220e4a5807a1945312b85decdb259eb00264966272d93"
+  },
+  {
+    "path": "04_technical_brief.md",
+    "sha256": "d6e82557bbacb3324e8e94bd18fa70e8314f2d8a651d12fb6ec97104754fa81b"
+  },
+  {
+    "path": "08_graduate_research_plan.md",
+    "sha256": "641b7bdba39971fe87a2c585abf6aadb1c9b42b5aadfac3fa6c31930d8b30b85"
+  },
+  {
+    "path": "pdf/04_technical_brief.pdf",
+    "sha256": "9a97abf0c30ce16b7295970a17c758c48f36f35ccb93c3c657666eaef60598d9"
+  },
+  {
+    "path": "pdf/08_graduate_research_plan.pdf",
+    "sha256": "e7d421159226b44d512cccedaf9401b9e5814ea22f3e1a35b330c5e26dca130e"
+  }
+]
