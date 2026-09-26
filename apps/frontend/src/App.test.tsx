@@ -45,15 +45,19 @@ describe("App — 레일과 지도 셸 (2026-09-13)", MULTI_TAB, () => {
     expect(rail.textContent).toContain("PlaceOS");
     expect(rail.textContent).not.toMatch(/SpaceOS/);
     const labels = Array.from(rail.querySelectorAll("button")).map((b) => b.textContent);
-    // 레일 순서는 첫 화면(Page)부터 사용자가 밟는 순서다(2026-09-15).
-    expect(labels).toEqual(["Page", "Platform", "Posting", "Program"]);
+    // 레일 순서는 PPPP 프레임워크 순서 그대로다(2026-09-26).
+    expect(labels).toEqual(["Platform", "Page", "Posting", "Program"]);
     expect(screen.queryByRole("button", { name: "서울" })).toBeNull();
     expect(screen.queryByRole("button", { name: "거점" })).toBeNull();
-    await screen.findByRole("button", { name: "검토 건물 후보 저장" }, TAB_LOAD);
+    // 레일 맨 위와 첫 화면은 같은 트랙이다(2026-09-26) — 어긋나면 여기가 운다.
+    expect(screen.getByRole("button", { name: "Platform" }).getAttribute("aria-current")).toBe("page");
+    await screen.findByRole("complementary", { name: "상권 정체성" }, TAB_LOAD);
   });
 
   it("Platform·Posting·Program 도 같은 지도 위 패널로 뜬다 — 탭을 옮겨도 지도는 하나다", async () => {
     mount(true);
+    // 첫 화면이 Platform 이라(2026-09-26) Page 는 눌러서 연다 — 지도 한 개를 넷이 쓰는지 보는 테스트다.
+    fireEvent.click(screen.getByRole("button", { name: "Page" }));
     await screen.findByRole("button", { name: "검토 건물 후보 저장" }, TAB_LOAD);
     const map = naver.map();
     expect(map).not.toBeNull();

@@ -82,10 +82,12 @@ describe("「내 사업」 — 화면설계서 3판", { timeout: 60000 }, () => 
     const card = await screen.findByRole("region", { name: "무엇을 하려고 하세요?" });
     fireEvent.click(within(card).getByRole("button", { name: "그냥 둘러보기" }));
     expect(screen.queryByRole("region", { name: "무엇을 하려고 하세요?" })).toBeNull();
-    expect(screen.getByRole("button", { name: /내 사업 설정/ })).toBeTruthy();
+    // 첫 화면이 Platform 이 된 뒤(2026-09-26)로 「내 사업 설정」은 **둘**이다 — 셸의 칩과
+    // Platform 빈 카드(IndustryFitCard)의 버튼. 여기서 보려는 건 칩이라 aria-expanded 로 가른다.
+    expect(screen.getByRole("button", { name: /내 사업 설정/, expanded: false })).toBeTruthy();
     cleanup();
     mount();
-    await screen.findByRole("button", { name: /내 사업 설정/ });
+    await screen.findByRole("button", { name: /내 사업 설정/, expanded: false });
     expect(screen.queryByRole("region", { name: "무엇을 하려고 하세요?" })).toBeNull();
   });
 

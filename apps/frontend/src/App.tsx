@@ -56,8 +56,9 @@ const PRELOAD_DELAY_MS = 1500;
  *
  * 2026-09-13(화면설계서 3판): **「내 사업」을 네 트랙이 공유한다.** 주요 고객이 상권을 먼저 고르는
  *   분석가에서 업종·지금 가게에서 출발하는 사업자(창업 · 업종 바꾸기 · 상권 옮기기)로 바뀌었다.
- *   상권과 같은 급의 공유 값이라 여기 둔다 — 처음 방문이면 Page 지도 위에 카드를 펴고,
- *   「시작」하면 Platform 으로 넘어가 「내 업종으로 본 상권」부터 답한다.
+ *   상권과 같은 급의 공유 값이라 여기 둔다 — 처음 방문이면 카드를 펴고, 「시작」하면
+ *   Platform 의 「내 업종으로 본 상권」부터 답한다(2026-09-26 부터 첫 화면이 Platform 이라
+ *   카드도 그 위에 펴진다. 그전에는 Page 지도 위였다).
  *
  * #admin 해시는 관리자 커버리지 패널로 간다. 네비게이션에 버튼을 두지 않는다 —
  * 지도에서 제외된 건물 수는 공개 대상이 아니다(2026-07-26). 데이터 자체도
@@ -71,18 +72,22 @@ type View = "platform" | "map" | "posting" | "program";
 const NAV: { key: View; label: string; icon: JSX.Element; track: TrackKey }[] = [
   // PPPP 네 트랙. 전통 4P 와 1:1 대응한다(2026-09-05 재정의): Place▶Platform · Product▶Page ·
   // Price▶Posting · Promotion▶Program. 라벨을 되돌리지 말 것.
-  // 2026-09-15: 레일 순서는 **Page → Platform → Posting → Program** 이다. 프레임워크 순서
-  //   (Platform → Page → …)와 일부러 다르다 — 사용자가 실제로 밟는 순서를 따른다. 첫 화면이
-  //   Page 지도이고, 거기서 「내 사업」을 「시작」하면 Platform 으로 넘어간다(화면설계서 3판).
-  { key: "map", label: "Page", icon: <IconPin />, track: "page" },
+  // 2026-09-26: 레일 순서를 **Platform → Page → Posting → Program** 으로 되돌렸다 —
+  //   PPPP 프레임워크 순서 그대로다. 그전(2026-09-15)에는 사용자가 밟는 순서를 따라
+  //   Page 를 맨 위에 뒀는데, 레일이 프레임워크를 말하지 않는 쪽이 더 헷갈렸다.
+  //   첫 화면도 같이 Platform 으로 옮겼다(아래 useState<View>) — 레일 맨 위와 처음 열리는
+  //   화면이 어긋나지 않게.
   { key: "platform", label: "Platform", icon: <IconSpark />, track: "platform" },
+  { key: "map", label: "Page", icon: <IconPin />, track: "page" },
   { key: "posting", label: "Posting", icon: <IconKey />, track: "posting" },
   { key: "program", label: "Program", icon: <IconMegaphone />, track: "program" },
 ];
 
 export default function App() {
-  // 첫 화면은 **Page 지도**다(2026-09-12). 되돌리려면 이 한 줄만 바꾼다.
-  const [view, setView] = useState<View>("map");
+  // 첫 화면은 **Platform** 이다(2026-09-26 — 그전 Page 지도, 2026-09-12). 되돌리려면 이 한 줄만 바꾼다.
+  // 「내 사업」 카드는 이 위에 펴진다. 「시작」이 가는 곳도 Platform 이라(startBusiness) 이제
+  // 같은 화면이고, 「그냥 둘러보기」는 카드만 걷고 Platform 에 남는다(그전에는 Page 지도).
+  const [view, setView] = useState<View>("platform");
   const [pageWorkspace, setPageWorkspace] = useState(createPageWorkspace);
   const [postingSelection, setPostingSelection] = useState<(BuildingSelection & { requestId: number })>();
   const reviewBuilding = (selection: BuildingSelection) => {
